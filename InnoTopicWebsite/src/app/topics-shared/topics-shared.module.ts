@@ -6,11 +6,13 @@ import { TopicLogoComponent } from './topic-logo/topic-logo.component';
 import { TopicTagComponent } from './topic-tag/topic-tag.component';
 import {ThemeDemoPageModule} from "../themes/theme-demo/theme-demo.module";
 import {TopicsListComponent} from "./topics-list/topics-list.component";
+import {HashtagReplacerComponent} from "./hashtag-replacer/hashtag-replacer.component";
 
 let declarations = [
   TopicLogoComponent,
   TopicTagComponent,
   TopicsListComponent,
+  HashtagReplacerComponent,
 ];
 
 let imports = [

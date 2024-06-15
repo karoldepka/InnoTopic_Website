@@ -52,10 +52,12 @@ export class TopicTagComponent implements OnInit {
   ngOnInit() {
     // console.log('related tags', this.relatedTopicLists)
     // console.log('TopicTagComponent: tag', this.tag)
+    this.tId = this.tId.replace("#", '') // FIXME for c#
     const topicById = this.topicsService.getTopicById(this.tId)
     if ( ! topicById ) {
       console.error('! topicById', this.tag, this.tId)
     }
+
     this.tag = new TopicInterest(topicById)
 
     this.highlightService.highlight$.subscribe(id => {

@@ -7,20 +7,22 @@ import { WorkExperienceModule } from '../skills/work-experience.module';
 import { UtilsModule } from '../utils/utils.module';
 import { WorkProjectsSectionComponent } from './work-projects-section/work-projects-section.component';
 import { WorkProjectComponent } from './work-projects-section/work-project/work-project.component';
+import {TopicsSharedModule} from "../topics-shared/topics-shared.module";
 
 @NgModule({
   declarations: [
     WorkProjectsSectionComponent,
     WorkProjectComponent,
   ],
-  imports: [
-    CommonModule,
-    WorkExperienceModule,
-    SharedModule,
-    CountriesModule,
-    UtilsModule,
-    FontAwesomeModule,
-  ],
+    imports: [
+        CommonModule,
+        WorkExperienceModule,
+        SharedModule,
+        CountriesModule,
+        UtilsModule,
+        FontAwesomeModule,
+        TopicsSharedModule,
+    ],
   exports: [
     WorkProjectsSectionComponent,
   ]
