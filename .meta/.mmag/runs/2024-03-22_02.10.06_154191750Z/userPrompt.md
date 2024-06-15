@@ -1,0 +1,1 @@
+add a signal with derived value, and display its value
