@@ -34,6 +34,11 @@ export class Topic {
   logo!: string | null;
   id!: string
   logoSize!: number[]
+  attribution?: string
+  license?: string
+  author?: string
+  downloadedFrom?: string
+  url?: string
 
   public pressKitUrl?: Url
 

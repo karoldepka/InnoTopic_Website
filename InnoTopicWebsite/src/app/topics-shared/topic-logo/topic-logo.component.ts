@@ -18,8 +18,8 @@ export const defaultIconHeight = 18
 })
 export class TopicLogoComponent implements OnInit {
 
-  // debug_showText = false
-  debug_showText = true
+  debug_showText = false
+  // debug_showText = true
 
   @Input() public topic!: Topic | string;
   public _topic!: Topic
@@ -66,9 +66,9 @@ export class TopicLogoComponent implements OnInit {
       'margin-right.px': this.margin,
       'vertical-align': 'middle'
     }
-    if ( ! this.topic.logoTypeWide ) {
-      this.styles['width.px'] = this.width // TODO: try limiting width instead of height
-    }
+    // if ( ! this.topic.logoTypeWide ) {
+    //   this.styles['width.px'] = this.width // TODO: try limiting width instead of height
+    // }
     this.changeDetectorRef.markForCheck()
   }
 

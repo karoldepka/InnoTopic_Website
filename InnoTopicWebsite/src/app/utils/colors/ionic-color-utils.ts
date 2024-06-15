@@ -24,7 +24,7 @@ export function setIonicColorSteps(baseColor: string, step: number = 50, limit: 
 
 
 export function setIonicColorVarHexAndRgb(root: CSSStyleDeclaration, varName: string, colorValue: string) {
-  console.log(`root.setProperty(, )`, varName, colorValue)
+  // console.log(`root.setProperty(, )`, varName, colorValue)
   root.setProperty(varName, colorValue)
   // set in RGB format: https://ionicframework.com/docs/theming/advanced#the-alpha-problem
   root.setProperty(`${varName}-rgb`, hexToRgb(colorValue))

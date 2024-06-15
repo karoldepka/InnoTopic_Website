@@ -5,12 +5,12 @@ import { TopicsCoreModule } from '../TopicFriendsShared3/topics-core/topics-core
 import { TopicLogoComponent } from './topic-logo/topic-logo.component';
 import { TopicTagComponent } from './topic-tag/topic-tag.component';
 import {ThemeDemoPageModule} from "../themes/theme-demo/theme-demo.module";
-
-/* test */
+import {TopicsListComponent} from "./topics-list/topics-list.component";
 
 let declarations = [
   TopicLogoComponent,
   TopicTagComponent,
+  TopicsListComponent,
 ];
 
 let imports = [
@@ -24,7 +24,7 @@ let imports = [
     imports,
     ThemeDemoPageModule
   ],
-  declarations: declarations,
+  declarations,
   exports: [
     ...declarations,
     ...imports,

@@ -199,6 +199,8 @@ export class Frontend {
   'Compose Multiplatform' = tNarrow('compose-multiplatform.svg') /* Develop stunning shared UIs for Android, iOS, desktop, and web. JetBrains. https://stackshare.io/compose-mp */
   'Vue.js' = tWide({logo: 'vue'})
   'Nuxt' = tWide('nuxt-icon')
+  'Hono' = tNarrow('hono.svg')
+  'Backbone.js' = tNarrow('backbone-icon.svg')
   'Gridsome' = t({logo: 'gridsome-icon.svg'})
   'Svelte' = tNarrow('svelte-icon') // https://github.com/sveltejs/branding
   // TODO Phoenix  https://www.phoenixframework.org/  supposedly most loved; https://github.com/phoenixframework/phoenix
@@ -232,7 +234,7 @@ export class Frontend {
   'AG Grid' = tWide('ag-grid')
   'ApexCharts.js' = tNoIcon()
   AngularFire = tNoIcon()
-  NgRx = t()
+  NgRx = t() // https://ngrx.io/presskit
   // NGXS = t({logo: 'ngxs.png', logoSize: [442, 132]})
   NGXS = t() // https://github.com/adisreyaj/store/pull/1/commits/4a7702048653a5261694c40b6ceb61f77a82b59a#diff-feb17517a55f6687ca9433cf00fab45526e32f6b05f018096c0806f1dc767ac8
   MobX = t()
@@ -246,6 +248,7 @@ export class Frontend {
   Jotai = tWide('jotai')
   Zustand = tWide('zustand--logo512.png--vectorizer.ai--cropped.svg') // tagline: '🐻 Bear necessities for state management in React'
   Pinia = tWide() // vue state management
+  Effect = tSquare('effect-icon.svg') // is it frontend or backend or both?
 
   React = tWide()
 
@@ -370,7 +373,8 @@ export class Backend {
   'Spring Boot' = t()
 
   Hibernate = t()
-  "Fermyon" = tNarrow('fermyon-icon.svg') // wasm instead of docker { tagline: 'Fermyon Cloud is the easiest way to deploy and manage cloud native WebAssembly applications with Spin, our developer tool.', pressKitUrl: 'https://design.fermyon.dev/' }'
+  "Fermyon" = tNarrow('fermyon-icon.svg') /* too ugly */ // wasm instead of docker { tagline: 'Fermyon Cloud is the easiest way to deploy and manage cloud native WebAssembly applications with Spin, our developer tool.', pressKitUrl: 'https://design.fermyon.dev/' }'
+
   Docker = tWide('docker-simple'/* https://www.docker.com/company/newsroom/media-resources */)
   'Vagrant' = tNarrow('vagrant-icon.svg')
   Terraform = t('terraform-icon.svg') /* company: HashiCorp */
@@ -451,7 +455,9 @@ export class Tools {
 
   WebStorm = t(/* https://www.jetbrains.com/de-de/company/brand/logos/ */)
   PyCharm = t(/* https://www.jetbrains.com/de-de/company/brand/logos/ */)
-  'JetBrains Fleet' = t('jetbrains-fleet-icon2.svg')
+  'JetBrains Fleet' = t('jetbrains-fleet-icon.svg')
+  //  TODO: 'JetBrains ReSharper' = t('') // C#
+  // TODO: 'Rider' = t('') // C#
   RubyMine = t()
   'Android Studio' = t('Android_Studio_icon.svg')
   Eclipse = t('eclipse-icon.svg')
@@ -471,9 +477,6 @@ export class Tools {
   'Dribbble' = t(`dribbble-ball-mark.svg`) // https://dribbble.com/media-kit
   'Slack' = t('slack-icon.svg')
   'PandaDoc' = tNoIcon() /* FIXME logo */
-  'Datadog' = t('datadog-icon')
-  'Dynatrace' = t('dynatrace-icon')
-  'Sentry' = t('sentry-icon')
   'Snyk' = tWide()
   "OWASP" = t('owasp-icon')
   'CodeSee' = tWide('codesee-icon') // move to comprehension?
@@ -571,6 +574,11 @@ export class Languages {
   Raku = tWide('raku-cropped.svg')
   Fortran = t()
   COBOL = tWide('cobol.svg')
+  Rexx = tWide('rexx-icon.svg') // Rexx (Restructured Extended Executor)
+  Amiga = tWide('amiga-icon.svg')
+  Commodore = tWide('commodore-logo.svg')
+
+  /// those were actually kinda before C ^
 
   C = t()
   'HolyC' = tNarrow('HolyC_Logo.svg')
@@ -582,15 +590,19 @@ export class Languages {
   Elm = t()
   CoffeeScript = tWide('coffeescript.svg')
   PureScript = tWide('purescript-icon')
-  ReScript = tWide('rescript-icon')
+  ReScript = tSquare('rescript-icon')
+  "Roc Lang" = tNarrow('roc-lang-icon.svg')
   Imba = tWide('imba-icon')
   'Mint Lang' = tWide('mint-lang-icon-wide.svg')
   Zig = tWide('zig-icon.svg')
   Nim = tWide('nim-lang-icon-wide.svg')
   'Google Carbon' = tSquare('google-carbon-icon.svg')
   Rust = t()
+  // RustRover = t()
   Tauri = tNarrow('tauri.svg')
-  Tokio = tNarrow('tokio-fixme.svg') // https://tokio.rs/img/tokio-horizontal.svg
+  Tokio = tWide('tokio-icon.svg') // https://tokio.rs/img/tokio-horizontal.svg
+  Dioxus = tNarrow('dioxus-icon.svg')
+  "JetBrains RustRover" = tSquare('jetbrains-rustrover-icon.svg')
   WebAssembly = t({
     categories: "Frontend",
     ecosystem: "JavaScript",
@@ -623,7 +635,7 @@ export class Languages {
 }
 
 export class OS {
-  Linux = t('tux.svg')
+  Linux = t('linux-tux-black-white.svg')
   'Ubuntu Linux' = t('ubuntu.svg')
   'SUSE Linux' = tWide('suse.svg')
   'RedHat Linux' = t('redhat-icon.svg')
@@ -653,11 +665,16 @@ export class Mobile {
 
 export class Cloud {
   // TODO: cloud-native
+  'Refine' = tSquare('refine-icon.svg') /* A React Framework for building internal tools, admin panels, dashboards & B2B apps with unmatched flexibility. */
+  'Outline' = tNarrow('outline-icon.svg') // https://www.getoutline.com/images/logo.svg
+  'Appwrite' = tWide('appwrite-icon.svg')
+  'AppFlowy' = tWide('appflowy-icon.svg')
+  // TODO: Maybe RocketChat?
   'Supabase' = tNarrow('supabase-icon.svg') /* open source Firebase alternative supabase.com; https://supabase.com/brand-assets ; https://golden.com/wiki/Supabase-YX5N66V ; Build in a weekend.
     Scale to millions.
     Supabase is an open source Firebase alternative. Start your project with a Postgres database, Authentication, instant APIs, Edge Functions, Realtime subscriptions, and Storage.*/
   'Redis' = tWide('redis.svg')
-  'Firebase' = t({
+  'Firebase' = tNarrow(/*{
     subTopics: {
       // most are from firebase console left navbar:
       'Authentication': t(),
@@ -670,11 +687,11 @@ export class Cloud {
       'Analytics': t(),
       'Grow': t(),
     }
-  })
+  }*/)
   'Cloud Firestore' = t('firebase-firestore.svg')
 
-  'GCP - Google Cloud Platform' = t({
-    logo: 'gcp-google-cloud-platform-logo.svg',
+  'GCP - Google Cloud Platform' = tWide({
+    logo: 'google-cloud.svg',
     iconUrl: 'logo_gcp_hexagon_rgb.png'
     /* logos SVG-s: https://googlecloudcheatsheet.withgoogle.com/ */
   })
@@ -696,12 +713,21 @@ export class Cloud {
 
   // TODO: CockroachDB
   tRPC = t('trpc-icon.svg') // end-to-end typescript typesafe; powered by Vercel. https://trpc.io/media (RIGHT CLICK on logo! I'm impressed :D)
+  Zod = tWide('zod-no-shadow.svg')
   "Microsoft Azure" = t('microsoft-azure')
   AWS = tWide()
   'AWS Amplify' = tWide('aws-amplify.svg')
   // TODO: CLoudFlare - has its own databases, D1, on the edge
 }
 
+export class Monitoring_and_observability {
+  Grafana = tNarrow()
+  'Datadog' = t('datadog-icon')
+  'Dynatrace' = t('dynatrace-icon')
+  'Sentry' = tWide('sentry-icon.svg')
+}
+
+// TODO: business intelligence / analytics - metabase, apache superset
 
 // TODO: ai -> vector_databases
 
@@ -714,14 +740,14 @@ export class Databases {
   // TODO
   NoSQL = tNoIcon()
   SQL = tNoIcon()
-  PostgreSQL = t()
+  PostgreSQL = t() // it's also a data framework
   MySQL = t('mysql-icon')
   MariaDB = t()
   Oracle = tWide()
   IndexedDB = tNoIcon()
   SurrealDB = t('surrealdb-icon') // Multi-modal. ACID transactions, while scaling horizontally. Feels like SQL, but uses arrows to connect nodes and edges
   Xata = t('xata-icon') // Postgres + Elastic. Feels like a developer-friendly alternative to Notion or AirTable. Treats your data like a spreadsheet.
-  Dgraph = t('dgraph-icon')
+  Dgraph = tNarrow('dgraph-icon-no-gradient.svg')
   Fauna = t('fauna-icon') /* document db that supports joins; custom query language called FQL; closed-source */
   RethinkDB = tWide('rethinkdb')
   "RxDB" = tNarrow('rxdb-icon') /* A fast, offline-first, reactive database for JavaScript Applications */
@@ -766,12 +792,14 @@ export class Other {
   'PayPal' = t()
   'TransferWise' = tNoIcon()
   'Axios' = tNoIcon()
+  // === Social platforms, comprehension, investors:
   'Discord' = tWide(`discord-icon.svg`)
   'Y Combinator' = tWide(`ycombinator.svg`)
+  'Sequoia Capital' = tNarrow(`sequoia-capital-icon.svg`)
   'Wikipedia' = tWide(`generic/fun/wikipedia-w2.svg`)
   'Google Play' = t('google-play-icon')
   'WordPress' = t('wordpress-icon.svg')
-  '.NET' = t('dotnet-logo-2020.svg', 'https://github.com/dotnet/brand/blob/main/logo/dotnet-logo.svg')
+  '.NET' = tSquare('dotnet.svg'/*, 'https://github.com/dotnet/brand/blob/main/logo/dotnet-logo.svg'*/)
   'Blazor' = tWide('blazor2.svg', /*['https://worldvectorlogo.com/logo/blazor', 'https://dotnet.microsoft.com/apps/aspnet/web-apps/blazor']*/)
   // 'NET.smth' = t('dotnet.svg') // for testing dot
   // 'test' = t('dotnet.svg')
@@ -784,9 +812,8 @@ export class Other {
   Carbide = t('carbide.svg')
   Replit = tNarrow('replit-icon.svg') /* highlights: social coding; computation token currency; AI-assisted IDE (Ghostwriter) */
   "Ghostwriter" = tNarrow('ghostwriter-icon-cropped.svg') /* #AI #IDE */
-  "Cursor.sh" = tNarrow('FIXME-cursor')
+  "Cursor.sh" = tNarrow('cursor-icon.svg') /* for Alvarito  :) */
   "Rift" = tWide('rift-icon.svg') /* #AI #VScode*/
-  "MetaMage" = tNarrow('FIXME-metamage')
   Zapier = t('zapier-icon')
   IFTTT = tWide('ifttt.svg')
   // ======== LowCode / NoCode / CMS:
@@ -794,10 +821,18 @@ export class Other {
   WebFlow = t('webflow-mark-vector-blue.svg') /* https://brand-at.webflow.io/resources#logos */
   Wix = tWide()
   'Vercel V0' = tWide('vercel-v0-icon.svg')
-  'Builder.io' = t('builder-io-icon.svg')
+  'Builder.io' = tNarrow('builder-io-icon.svg')
   'Budibase' = tSquare('budibase-icon.svg')
   'Bubble' = t('bubble-icon') /** is a **visual programming language**, a no-code development platform and an application platform as a service, developed by Bubble Group, that enables non-technical people to build web applications without needing to type code */
   'Framer' = t()
+  'AFFiNE' = tWide('affine-icon.svg')
+  'Metabase' = tSquare('metabase.svg')
+  'Apache Superset' = tWide('apache-superset-icon.svg')
+  'ClickHouse' = tWide('clickhouse-icon.svg')
+  'Apache Spark' = tNarrow('apache-spark-icon.svg')
+  'Odoo' = tSquare('odoo-icon.svg')
+  'Mattermost' = tSquare('mattermost-icon.svg') /* Mattermost is an open source platform for secure collaboration across the entire software development lifecycle.. ;;; like open-source slack? */
+  'n8n' = tWide('n8n-icon.svg')
 
 
   RegExp = t('_icon_hammer-solid.svg')
@@ -864,9 +899,10 @@ export class AI {
   "LangChain" = tWide('langchain.svg')
   "Microsoft AutoGen" = tNarrow('autogen-icon.svg')
   "Microsoft Bing" = tNarrow('bing.svg')
-  "Microsoft Copilot" = tNarrow('microsoft-copilot.svg')
+  "Microsoft Copilot" = tNarrow('microsoft-copilot-icon.svg')
   "GitHub Copilot" = tWide('github-copilot.svg')
   "Tabnine" = tNarrow('tabnine-icon.svg')
+  // "JetBrains AI Assistant"
   // TODO: CodeGPT / https://www.codegpt.co/#start
   // TODO: AskCodi /  https://www.askcodi.com/
   "CodiumAI" = tWide('codium-icon.svg' /* from svgporn */)
@@ -874,31 +910,40 @@ export class AI {
   "Sourcegraph" = tWide('sourcegraph.svg')
   "Cody AI" = tWide('cody-icon.svg')
   "Continue" = tWide('continue-icon.svg')
+  "MetaMage" = tNarrow('metamage-icon.svg')
   "TabbyML" = tNarrow('tabbyml-icon.svg')
   "OpenAI Codex" = tNarrow('openai-codex')
   OpenAI = t('openai-icon')
-  xAI = t('x.ai.svg')
   "Magic.dev" = tWide('magic.dev.svg') // Magic is working on frontier-scale code models to build a coworker, not just a copilot.
-  'Tesla' = tWide('fixme-tesla') // next to xAI
+  xAI = t('x.ai.svg')
+  // Hardware / futurism / robots / self-driving:
+  'Apple' = tNarrow('apple.svg')
+  'Tesla' = tWide('tesla-icon.svg')
+  'Neuralink' = tWide('neuralink-icon.svg')
+  'Limitless AI' = tSquare('limitless-ai-icon.svg')
   '1X Technologies' = tWide('1x-technologies.svg') // https://www.1x.tech/ // autonomous robots; "Founded in Norway."
   'Boston Dynamics' = tNarrow('boston-dynamics.svg')
-  'Stanford University' = tWide('FIXME-stanford') // https://mobile-aloha.github.io/
+  'Stanford University' = tNarrow('stanford-university-icon.svg') // https://mobile-aloha.github.io/
+
+  'Home Assistant' = tWide('home-assistant-icon.svg') // iot / hardware / smart home
 
   'Phind' = tWide('phind.svg')
+  'Amazon Q' = tNarrow('amazon-q.svg')
   'Amazon CodeWhisperer' = tSquare('Arch_Amazon-CodeWhisperer_16.svg')
-  'Amazon Q' = tSquare('Fixme-amazon-q')
   'Amazon Bedrock' = tSquare('Arch_Amazon-Bedrock_16.svg')
   'Amazon SageMaker' = tSquare('Arch_Amazon-SageMaker_16.svg')
   'Amazon Lex' = tSquare('Arch_Amazon-Lex_16.svg')
   'Amazon Comprehend' = tSquare('Arch_Amazon-Comprehend_16.svg') // Gewinnen Sie wertvolle Einblicke und Erkenntnisse aus Ihren Textdokumenten
   'Amazon Kendra' = tSquare('Arch_Amazon-Kendra_16.svg')
   'Perplexity.ai' = tNarrow('perplexity-ai.svg')
+  'Hume AI' = tWide('hume-ai-icon.svg', /*{slogan: "Empathic AI to serve human well-being"} "EMPATHIC VOICE INTERFACE (EVI)"*/)
   'Quora Poe' = tWide('quora-poe.svg')
   'Open Assistant' = tWide('open-assistant-icon-wide.svg') // https://github.com/LAION-AI/Open-Assistant
   'Google Bard' = tSquare('Google_Bard_logo.svg')
   'Google Gemini' = tSquare('google-gemini-icon.svg')
   'Google DeepMind' = tSquare('google-deepmind-icon.svg')
   'Google Vertex AI' = tNarrow('vertexai.svg') // MLOps
+  'Meta' = tWide('meta-icon.svg')
   'Anthropic' = tWide('anthropic-icon.svg')
   'AI21 Labs' = tWide('ai21.svg')
   'Mistral AI' = tWide('mistral-ai-icon.svg')
@@ -906,6 +951,12 @@ export class AI {
   'Ollama' = tNarrow('ollama.svg')
   Gradio = tWide('gradio-icon.svg')
   Streamlit = tWide('streamlit.svg')
+  MLflow = tWide('mlflow-icon.svg')
+  RAGFlow = tNarrow('ragflow-icon.svg')
+  AnythingLLM = tWide('anything-llm-icon.svg')
+  Quivr = tWide('quivr-icon.svg')
+  v7 = tWide('v7.svg') // https://www.v7labs.com/
+  Botpress = tSquare('botpress-icon.svg')
 
   'Stable Diffusion' = tWide('stable-diffusion-logo-vectorizer.ai.svg') // not official?
   'Midjourney' = tWide('midjourney.svg')
@@ -914,7 +965,7 @@ export class AI {
   'Google Colaboratory' = tWide('google-colab-icon-wide.svg')
   TensorFlow = t()
   NumPy = t()
-  'Hugging Face' = tWide('huggingface_logo-noborder.svg')
+  'Hugging Face' = tWide('hugging-face-icon.svg')
   'Cohere' = tSquare('cohere-icon.svg')
   "Weights & Biases" = tSquare('weights-and-biases-icon.svg')
   "Open Neural Network Exchange" = t('onnxai-icon.svg') /* ONNX  acronym; */ // https://www.vectorlogo.zone/logos/onnxai/index.html
@@ -923,6 +974,8 @@ export class AI {
   "Conda" = tNarrow('conda-icon.svg')
   "Anaconda" = tNarrow('anaconda-icon.svg')
   "JetBrains DataLore" = t('jetbrains-datalore-icon.svg')
+  "JetBrains AI Assistant" = tSquare('jetbrains-ai-assistant-icon.svg')
+  Polars = tWide('polars-icon.svg') // Rust
   PyTorch = tWide('pytorch-icon')
   pandas = tNarrow('pandas-icon.svg')
   Keras = t/*Wide*/('keras.svg'/*{
@@ -934,6 +987,12 @@ export class AI {
 
 }
 
+export class AI_Hardware {
+  NVIDIA = tWide('nvidia-icon.svg')
+  Groq = tNarrow('groq-icon.svg')
+}
+
+
 export class Build_Systems_And_Package_Managers {
   Gradle = t()
   Maven = tWide()
@@ -944,19 +1003,30 @@ export class Build_Systems_And_Package_Managers {
 
 export class FunAndSports {
   Volleyball = t(`generic/fun/volleyball-ball-solid.svg`) /* TODO FIVB logo - cool*/ /* TODO: beach volleyball icon - net on the sand */
-  'Interpersonal Networking' = t('generic/users-solid.svg')
+  'Interpersonal Networking' = tWide('generic/users-solid-cropped.svg')
   'Hiking' = t('generic/fun/hiking-solid')
-  Outdoors = t('generic/fun/cloud-sun-solid.svg')
+  Outdoors = tWide('generic/fun/cloud-sun-solid-cropped.svg')
   Nature = t('generic/fun/tree-solid.svg')
-  'Car trips' = t('generic/fun/car-solid')
-  'Bicycle' = tWide('generic/fun/bicycle-solid')
+  'Car trips' = tWide('generic/fun/car-solid-cropped.svg')
+  'Bicycle' = tWide('generic/fun/bicycle-solid-cropped.svg')
   'Table Tennis' = t('generic/fun/table-tennis-solid.svg') /* search terms: ping pong */
   Padel = t('generic/fun/tennis-ball-svgrepo-com.svg')/* search terms: paddle paddel */
   Swimming = tWide('generic/fun/swimmer-solid-karol.svg')
   Chess = t('generic/fun/chess-solid.svg')
-  'Triskelion' = t('generic/fun/triskelion4.svg')
-  'Business' = t('generic/business--chart-line')
-  'Psychology' = t('generic/brain-solid')
+  "Game of Life" = tWide({
+    logo: 'generic/game-of-life.svg', // hacker symbol, emergence
+  })
+  "Mandelbrot Set" = tWide({
+    logo: 'generic/mandelbrot-set.svg',
+    attribution: "Mandelbrot Fractal by Christian Frost from Noun Project (CC BY 3.0)",
+    author: "Christian Frost",
+    downloadedFrom: "Noun Project",
+    license: "CC BY 3.0",
+    url: "https://thenounproject.com/icon/mandelbrot-fractal-103125/",
+  })
+  'Triskelion' = t('generic/fun/triskelion-2024-2.svg')
+  'Business' = t('generic/business--chart-line-square.svg')
+  'Psychology' = tWide('generic/brain-solid-cropped.svg') // & neuroscience
   'Guitar' = t('generic/fun/heavy-metal-sharpen-guitar-like-an-insect-svgrepo-com.svg')
   'ASG' = t('generic/fun/gun.svg')
 }
@@ -993,8 +1063,10 @@ export type Topics =
   Frontend & Frontend_Visual & Frontend_And_Backend_App_Platforms &
   Graphics &
   Backend & Other & Testing & Tools & Languages & OS & Mobile & Cloud &
-  Project_Management_Tools & Version_Control & Databases & Java & JavaScript & Build_Systems_And_Package_Managers &
-  AI & Crypto & FunAndSports & Social
+  Project_Management_Tools & Version_Control & Databases & Monitoring_and_observability &
+  Java & JavaScript & Build_Systems_And_Package_Managers &
+  AI & AI_Hardware &
+  Crypto & FunAndSports & Social
 
 function mergeTopics<T1, T2, T3, T4, T5>(t1: T1, t2: T2, t3: T3, t4: T4, t5?: T5) {
   return Object.assign({}, Object.create(t1 as any), Object.create(t2 as any), Object.create(t3 as any), Object.create(t4 as any), Object.create(t5 as any));
@@ -1027,6 +1099,7 @@ export const topicCategoriesArray = [
   new TopicCategory('Tools', new Tools()),
   new TopicCategory('Languages', new Languages()),
   new TopicCategory('Databases', new Databases()),
+  new TopicCategory('Monitoring and observability', new Monitoring_and_observability()),
   new TopicCategory('Version Control', new Version_Control()),
   new TopicCategory('Project Management Tools', new Project_Management_Tools()),
   new TopicCategory('Graphics', new Graphics()),
@@ -1037,6 +1110,7 @@ export const topicCategoriesArray = [
   new TopicCategory('JavaScript', new JavaScript()),
   new TopicCategory('Build Systems and package managers', new Build_Systems_And_Package_Managers()),
   new TopicCategory('AI', new AI()),
+  new TopicCategory('AI Hardware', new AI_Hardware()),
   new TopicCategory('Other', new Other()),
   new TopicCategory('Crypto', new Crypto()),
   new TopicCategory('Fun and Sports', new FunAndSports()),

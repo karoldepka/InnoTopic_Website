@@ -295,6 +295,8 @@ export class WorkOrganisationsAndProjectsData {
         topicsById: {
           'Angular Material': {},
           Angular: {},
+          NgRx: {},
+          RxJS: {},
           TypeScript: {},
           Nx: {},
           Sass: {},
@@ -339,6 +341,8 @@ export class WorkOrganisationsAndProjectsData {
         roles: `Founder, Angular Developer`,
         topicsById: {
           Angular: {},
+          NgRx: {},
+          RxJS: {},
           PrimeNG: {},
           'Font Awesome': {},
           'Sass': {},
@@ -362,6 +366,7 @@ export class WorkOrganisationsAndProjectsData {
           Sass: {},
           TypeScript: {},
           NgRx: {},
+          RxJS: {},
           Karma: {},
           Jasmine: {},
           TestCafe: {},

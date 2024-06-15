@@ -142,7 +142,7 @@ export const topicsOld = [
   'Neo4j' /* https://neo4j.com/brand/ */, 'Hadoop',
   tagLogoType('OpenGL'), 'Unity',
   // tagLogoTipo('Backbone.js', 'backbone-icon'),
-  tag('Backbone.js', 'backbone-icon'), // TODO: knockout
+  // tag('Backbone.js', 'backbone-icon'), // TODO: knockout
   tagNoIcon('Backend'),
   'Sinatra',
   'Flask', tagNoIcon('Pylons'), tagNoIcon('Zope'),

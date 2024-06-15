@@ -28,10 +28,11 @@ export const highlights = {
   // TODO: observable (data visualization platform), redux-observable (both on svgporn)
   // TODO: medium, quora, stackoverflow ?
 
+  /** High-level stuff that I really do or very strongly want to do */
   main: topics({
     Angular: {},
     React: {},
-    "Next.js": {},
+    'Next.js': {},
     Ionic: {},
     JavaScript: {},
     TypeScript: {},
@@ -42,16 +43,22 @@ export const highlights = {
     'Mistral AI': {},
     xAI: {},
     'Amazon Bedrock': {},
+    'Amazon Q': {},
     'Google Vertex AI': {},
     'Google Gemini': {},
     'Perplexity.ai': {},
-    'Ollama': {}, // nod to locally running
-    LangChain: {},
-    "Microsoft AutoGen": {},
+    'Quora Poe': {}, // (Platform for Open Exploration) is a service developed by Quora and launched in December 2022.
+    'Hume AI': {},
+    Ollama: {}, // nod to locally running
+    Python: {},
     PyTorch: {},
+    LangChain: {},
+    'Microsoft AutoGen': {},
     Qdrant: {},
     'Visual Studio Code': {},
     Continue: {},
+    MetaMage: {},
+    "Cursor.sh": {},
     Rust: {},
     WebAssembly: {},
     // TODO maybe ts-node; https://typestrong.org/ts-node/ , https://github.com/TypeStrong/ts-node
@@ -60,14 +67,56 @@ export const highlights = {
   secondaryHighlights: topics({
     'Vue.js': {},
     Svelte: {},
+    'Vercel V0': {}, /* before vercel coz triangle "kerning" was bad */
     Vercel: {},
-    "Vercel V0": {},
-    Deno: {} /* TODO: secondary highlights */,
-    Bun: {} /* TODO: mark as non-main experience; written in Zig */,
+    AWS: {},
+    "GCP - Google Cloud Platform": {},
+    // "Google Palm": {},
+    'Microsoft Azure': {},
+    Deno: {},
+    Bun: {} /* TODO: written in Zig */,
     Zig: {},
     Gradio: {},
-    Python: {},
+    // Python: {},
     Jupyter: {},
+    'Meta': {}, /* for Llama, Meta AI (e.g. generates images in realtime) ;  TODO: AI: Meta AI circle logo */
+    'Hugging Face': {},
+    'Refine': {},
+    'Outline': {},
+    'AppFlowy': {},
+    'Appwrite': {},
+    'Supabase': {},
+    'Firebase': {},
+    'AFFiNE': {},
+    'Metabase': {},
+    'Apache Superset': {},
+    'Apache Spark': {},
+    'ClickHouse': {},
+    'Odoo': {},
+    'Mattermost': {},
+    'n8n': {},
+    'Botpress': {},
+    MindsDB: {},
+    Polars: {},
+    'MLflow': {},
+    'RAGFlow': {},
+    'Quivr': {},
+    'AnythingLLM': {},
+    'v7': {},
+    // TODO: AI: Dify but PNG with gradient
+    'NVIDIA': {},
+    'Groq': {},
+    ...{ /* Stuff added for interviews */
+      Android: {},
+      Java: {},
+      Scala: {},
+      Kotlin: {},
+      Swift: {},
+      Dart: {},
+      Flutter: {},
+      "C#": {},
+      ".NET": {},
+    }
   }),
   crossPlatform: topics({
     HTML5: {},
@@ -110,12 +159,15 @@ export const highlights = {
     Inferno: {},
     // TODO akita; elf https://github.com/ngneat/elf built on top of RxJS
     Preact: {},
+    'Next.js': {},
     NestJS: {},
     // TODO: maybe https://analogjs.org/ - The fullstack Angular meta-framework. SSR, file-based routing
     Nuxt: {},
     // TODO: Frontend: Gridsome: {} /* A Jamstack framework for Vue.js */,
     Gatsby: {},
-    'Next.js': {},
+    Hono: {},
+    'Backbone.js': {},
+    // 'Knockout.js': {},
     // TODO: Frontend: 'https://million.dev/': {},
 
     jQuery: {} /* kinda as a joke / to test someone */,
@@ -176,6 +228,7 @@ export const highlights = {
     MobX: {}, // TODO FIXME MobX-State-Tree https://github.com/mobxjs/mobx-state-tree/blob/b6c1c9b29d7bd7525ac6588f8f67f6c13eb17b2b/website/static/img/mobx-state-tree-logo.svg
     'MobX-State-Tree': {}, // TODO FIXME MobX-State-Tree https://github.com/mobxjs/mobx-state-tree/blob/b6c1c9b29d7bd7525ac6588f8f67f6c13eb17b2b/website/static/img/mobx-state-tree-logo.svg
     // https://github.com/simple-icons/simple-icons/issues/4352
+    Effect: {},
     Vercel: {},
     Netlify: {},
     Jamstack: {},
@@ -245,8 +298,8 @@ export const highlights = {
     Rust: {},
     Tauri: {},
     Tokio: {},
-    // TODO: Rust: Tauri: {},
-    // TODO: Rust: Tokio: {},
+    Dioxus: {},
+    "JetBrains RustRover": {},
     // TODO: Rust: Tonic: {},
     // TODO: Rust: Rust Rover
     /// ===== ^^^^^ End of Frontend / UI / UX / WASM related
@@ -258,11 +311,13 @@ export const highlights = {
     OpenAPI: {},
     // TODO
     tRPC: {},
+    Zod: {},
     // ====== Tracking / tracing / security:
     Dynatrace: {},
     Sentry: {},
     // ^^ stuff that is kinda frontend-related
     Datadog: {},
+    Grafana: {},
     Snyk: {} /*  --- comments: includes/bought deepcode */,
     OWASP: {} /*  */,
     CodeSee: {},
@@ -277,13 +332,11 @@ export const highlights = {
     Airtable: {},
     Notion: {},
     // https://www.opensourcealternative.to/alternatives-to/Airtable
-    // TODO: Lowcode: 'FIXME Affine': {}, // https://affine.pro/
     // TODO: Lowcode: 'FIXME Outline': {}, // or next to notion
     // TODO: Lowcode: 'FIXME Appflowy': {}, // or next to notion
     // TODO: Lowcode: 'FIXME Baserow': {}, // or next to notion
     // TODO: Lowcode: 'FIXME Rowy': {}, // or next to notion
     // TODO: Lowcode:'FIXME nocodb': {}, // or next to notion
-    // TODO: Lowcode: https://github.com/appwrite/appwrite
 
     Coda: {},
     Zapier: {},
@@ -319,11 +372,12 @@ export const highlights = {
     'Open VSX Registry': {},
     Carbide: {},
     // "Cloud9": {},
-    'JetBrains Fleet': {},
+    'JetBrains Fleet': {}, // https://www.jetbrains.com/company/brand/
     WebStorm: {},
     PyCharm: {},
     //
     'JetBrains DataLore': {},
+    'JetBrains AI Assistant': {},
     Jupyter: {},
     Conda: {},
     Anaconda: {},
@@ -397,11 +451,12 @@ export const highlights = {
     Rift: {},
     // Blackbox - https://marketplace.visualstudio.com/items?itemName=Blackboxapp.blackbox
     Continue: {},
+    // "MetaMage": {},
     TabbyML: {},
     // TODO: https://learn.microsoft.com/en-us/semantic-kernel/overview/ -- Semantic Kernel
     'OpenAI Codex': {},
-    'Amazon CodeWhisperer': {}, // https://aws-icons.com/icons/augmented-ai-a2i -> https://aws.amazon.com/architecture/icons/
     'Amazon Q': {}, // https://aws-icons.com/icons/augmented-ai-a2i -> https://aws.amazon.com/architecture/icons/
+    'Amazon CodeWhisperer': {}, // https://aws-icons.com/icons/augmented-ai-a2i -> https://aws.amazon.com/architecture/icons/
     'Amazon Bedrock': {},
     'Amazon SageMaker': {}, // ipynb?
     'Amazon Comprehend': {},
@@ -430,16 +485,21 @@ export const highlights = {
 
     OpenAI: {},
     // TODO: AI: OpenAI Gym
-    xAI: {},
-    'Magic.dev': {},
+    'Magic.dev': {}, /* --- unlimited context window? ? */
+    // === Hardware / self-driving / robots / futurism :
     Tesla: {},
+    Neuralink: {},
+    Apple: {}, /* for hardware, wearables like Apple Vision Pro */
+    "Limitless AI": {}, /* Wearable: AI Clip / pendant */
     '1X Technologies': {},
     'Boston Dynamics': {},
     'Stanford University': {},
+
+    'Home Assistant': {},
+
     Phind: {},
     'Perplexity.ai': {},
-    'Quora Poe': {},
-    // TODO: AI: Poe: {}, // Quora Poe (Platform for Open Exploration) is a service developed by Quora and launched in December 2022.
+
     'Google Bard': {},
     'Google Gemini': {},
     'Google DeepMind': {},
@@ -474,7 +534,7 @@ export const highlights = {
     'ethers.js': {},
     Solid: {},
 
-    // ==== Social / Content / Discovery / comprehension
+    // ==== Social / Content / Discovery / comprehension / influencers
     YouTube: {},
     Twitch: {}, // live codings
     Spotify: {}, // live codings
@@ -485,6 +545,7 @@ export const highlights = {
     Meetup: {},
     Discord: {}, // AI stuff
     'Y Combinator': {}, // also Hacker News ( https://news.ycombinator.com/ ) where stuff emerges; also social and kinda comprehension
+    'Sequoia Capital': {}, // Andrew Ng etc. AI Fund
     // TODO  "TechCrunch": {}, // also discovery and comprehension https://www.techstars.com/portfolio
     // TODO  "TechStars": {},
     // TODO  "CrunchBase": {},
@@ -498,7 +559,6 @@ export const highlights = {
     // TODO: postrgres, redis (also vec db) ,, pgvector
     // MySQL vec db -- planetscale - https://planetscale.com/blog/planetscale-is-bringing-vector-search-and-storage-to-mysql https://planetscale.com/ logo svgporn
     // TODO Azure Cosmos DB
-    // TODO: Grafana: {},
     Feathers: {},
     '8base': {},
     Algolia: {},
@@ -516,7 +576,7 @@ export const highlights = {
     'AWS Amplify': {},
     // TODO 'CouchBase', 'CouchDB',
     Firebase: {},
-    Supabase: {},
+    // Supabase: {},
     // TODO PocketBase - Open Source realtime backend in 1 file (good id, relations, rich text)
     RxDB: {},
     // ===== analytics: (helps in comprehension, discovery, tracking)
@@ -525,6 +585,8 @@ export const highlights = {
     // TODO  "Apache Superset": {}, // lot of typescript and python
 
     Prisma: {},
+    // "Drizzle ORM": {},
+    PostgreSQL: {},
     MongoDB: {},
     ArangoDB: {},
     SurrealDB: {} /* Also vector DB, written in Rust */,
@@ -533,7 +595,6 @@ export const highlights = {
     Fauna: {},
     // TODO: https://github.com/MaterializeInc/materialize - Streaming DB, Rust
     // "RethinkDB": {}, /* disabled to save space and optimize layout for print */
-    MindsDB: {},
     // ====== Vector / Embeddings DB-s (Databases)
     // - https://en.wikipedia.org/wiki/Vector_database
     // - https://learn.microsoft.com/en-us/semantic-kernel/memories/vector-db
@@ -653,8 +714,12 @@ export const highlights = {
     OCaml: {},
     Fortran: {},
     COBOL: {},
+    Rexx: {},
+    Amiga: {},
+    Commodore: {},
     PureScript: {},
     ReScript: {}, // Cristiano Calcagno from Rift
+    "Roc Lang": {}, // from Brydon
     'Mint Lang': {},
     Imba: {},
     Elm: {},
@@ -682,10 +747,14 @@ export const highlights = {
     Swimming: {},
     // Guitar: {},
     ASG: {},
-    Chess: {},
     Triskelion: {},
-    Wikipedia: {},
+    Chess: {},
+    "Game of Life": {}, // emergence, Turing-complete, hacker symbol
+    "Mandelbrot Set": {}, // emergence
+    "Guitar": {},
+    // "Composing music": {}, // piano, musical note, etc.
     Business: {},
+    Wikipedia: {},
     Psychology: {},
     // TODO: travel, international? (globe), natural languages
     /* TODO: Wikipedia (learning / curiosity) */
