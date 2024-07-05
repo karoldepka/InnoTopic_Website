@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg width="256px" height="296px" viewBox="0 0 256 296" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" preserveAspectRatio="xMidYMid">
+<svg fill="rgb(114,114,114)"  width="256px" height="296px" viewBox="0 0 256 296" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" preserveAspectRatio="xMidYMid">
     <title>OpenJS Fondation</title>
     <defs>
         <linearGradient x1="20.3935593%" y1="15.8494593%" x2="79.5710016%" y2="84.1511768%" id="OpenJS-linearGradient-1">
-            <stop stop-color="rgb(170,170,170)" offset="21.45%"></stop>
-            <stop stop-color="rgb(186,186,186)" offset="70.67%"></stop>
-            <stop stop-color="rgb(204,204,204)" offset="100%"></stop>
+            <stop stop-color="rgb(177,177,177)" offset="21.45%"></stop>
+            <stop stop-color="rgb(217,217,217)" offset="70.67%"></stop>
+            <stop stop-color="rgb(0,0,0)" offset="100%"></stop>
         </linearGradient>
     </defs>
     <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">

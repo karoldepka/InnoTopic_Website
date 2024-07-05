@@ -19,6 +19,9 @@ import {CvPageModule1} from "../cv-page/cv-page.module";
     CvPageModule,
     CvPageModule1
   ],
+  exports: [
+    CvPagePrintPage
+  ],
   declarations: [CvPagePrintPage]
 })
 export class CvPagePrintPageModule {}

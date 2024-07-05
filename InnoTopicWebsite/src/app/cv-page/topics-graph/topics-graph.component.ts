@@ -9,6 +9,7 @@ import {
   topics,
 } from '../../TopicFriendsShared3/topics-core/topics-data';
 import { errorAlert } from '../../utils/utils';
+import {size} from "./topics-graph.data";
 
 
 // idea: new/expanding-to topics could be with effect e.g. static noise or fading in-out, e.g. qwik, turbopack; while old, permanently faded
@@ -51,8 +52,12 @@ const preset = {
 
 // TODO: try d3.forceRadial(radius[, x][, y])
 
-const veryBigSize = 2, bigSize = 1.76, midSize = 1.25, smallSize = 0.7, verySmallSize = 0.35;
-
+export const
+  veryBigSize = size.veryBig,
+  bigSize = size.big,
+  midSize = size.mid,
+  smallSize = size.small,
+  verySmallSize = size.small;
 
 @Component({
   selector: 'app-topics-graph',
@@ -86,11 +91,30 @@ export class TopicsGraphComponent implements OnInit {
           sizeMult: veryBigSize,
           strengthMul: 0.4,
         },
+
+        // backend, cloud
+
         'Frontend': { /*type: 'writtenIn'*/ /* dependsOn / uses */
           strengthMul: 1.5,
           sizeMult: veryBigSize,
           // strengthMul: 0.4,
           connections: {
+            Backend: {
+              connections: {
+                Python: {
+                  sizeMult: veryBigSize,
+                  connections: {
+                    Django: {
+                      sizeMult: bigSize,
+
+                    },
+                    Flask: {
+                      sizeMult: smallSize
+                    },
+                  }
+                }
+              }
+            },
             Svelte: {sizeMult: midSize},
             Qwik: {sizeMult: smallSize},
             // Astro: {},

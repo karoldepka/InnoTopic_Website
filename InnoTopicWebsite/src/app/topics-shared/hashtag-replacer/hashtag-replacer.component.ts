@@ -5,7 +5,9 @@ import { Component, Input } from '@angular/core';
   template: `
     <ng-container *ngFor="let part of processedText">
       <ng-container *ngIf="part.isTag; else normalText">
-        <app-topic-tag [tId]="part.tagText?.slice(1)!">{{ part.tagText }}</app-topic-tag>
+        <app-topic-tag [tId]="part.tagText?.slice(1)!">
+<!--          {{ part.tagText }}-->
+        </app-topic-tag>
       </ng-container>
       <ng-template #normalText>{{ part.text }}</ng-template>
     </ng-container>
@@ -15,6 +17,7 @@ export class HashtagReplacerComponent {
   @Input() text: string = 'Test Hello #Angular and #Ionic™ ! ';
 
   get processedText(): { text: string; isTag: boolean; tagText?: string }[] {
+    this.text ??= ''
     const parts = [];
     const regex = /#(\w+)/g;
     let match;

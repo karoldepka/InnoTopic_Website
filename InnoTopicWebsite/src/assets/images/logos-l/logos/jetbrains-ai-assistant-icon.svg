@@ -1,11 +1,11 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" fill="none" viewBox="0 0 48 48">
+<svg fill="rgb(114,114,114)"  xmlns="http://www.w3.org/2000/svg" width="48" height="48" fill="none" viewBox="0 0 48 48">
   <defs>
     <linearGradient id="b" x1="4.75309" x2="70.6136" y1="8.63622" y2="59.748" gradientUnits="userSpaceOnUse">
-      <stop stop-color="rgb(173,173,173)"/>
-      <stop offset="1" stop-color="rgb(170,170,170)"/>
+      <stop stop-color="rgb(184,184,184)"/>
+      <stop offset="1" stop-color="rgb(177,177,177)"/>
     </linearGradient>
     <clipPath id="a">
-      <path fill="rgb(204,204,204)" d="M0 0h48v48H0z"/>
+      <path fill="rgb(0,0,0)" d="M0 0h48v48H0z"/>
     </clipPath>
   </defs>
   <g clip-path="url(#a)">

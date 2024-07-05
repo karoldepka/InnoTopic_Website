@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg width="256px" height="256px" viewBox="0 0 256 256" version="1.1" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid">
+<svg fill="rgb(114,114,114)"  width="256px" height="256px" viewBox="0 0 256 256" version="1.1" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid">
     <title>Overloop</title>
     <defs>
         <linearGradient x1="100.000913%" y1="-7.14383695%" x2="0.00217923797%" y2="92.8571023%" id="overloopLinearGradient-1">
-            <stop stop-color="rgb(170,170,170)" offset="0%"></stop>
-            <stop stop-color="rgb(204,204,204)" offset="100%"></stop>
+            <stop stop-color="rgb(205,205,205)" offset="0%"></stop>
+            <stop stop-color="rgb(0,0,0)" offset="100%"></stop>
         </linearGradient>
     </defs>
     <g>

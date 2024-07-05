@@ -1,24 +1,24 @@
-<svg id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 140 140">
+<svg fill="rgb(114,114,114)"  id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 140 140">
   <defs>
     <linearGradient id="linear-gradient" x1="105.97886" y1="186.08497" x2="-27.24385" y2="15.44015" gradientUnits="userSpaceOnUse">
-      <stop offset="0.0914" stop-color="rgb(170,170,170)"/>
-      <stop offset="0.2077" stop-color="rgb(171,171,171)"/>
-      <stop offset="0.39603" stop-color="rgb(174,174,174)"/>
-      <stop offset="0.63282" stop-color="rgb(178,178,178)"/>
-      <stop offset="0.87097" stop-color="rgb(182,182,182)"/>
+      <stop offset="0.0914" stop-color="rgb(193,193,193)"/>
+      <stop offset="0.2077" stop-color="rgb(194,194,194)"/>
+      <stop offset="0.39603" stop-color="rgb(200,200,200)"/>
+      <stop offset="0.63282" stop-color="rgb(208,208,208)"/>
+      <stop offset="0.87097" stop-color="rgb(217,217,217)"/>
     </linearGradient>
     <linearGradient id="linear-gradient-2" x1="178.60455" y1="129.38597" x2="45.38182" y2="-41.25888" xlink:href="#linear-gradient"/>
     <linearGradient id="linear-gradient-3" x1="78.58615" y1="105.51616" x2="126.29738" y2="-22.78835" gradientUnits="userSpaceOnUse">
-      <stop offset="0.12297" stop-color="rgb(182,182,182)"/>
-      <stop offset="0.13191" stop-color="rgb(183,183,183)"/>
-      <stop offset="0.21553" stop-color="rgb(188,188,188)"/>
-      <stop offset="0.30328" stop-color="rgb(192,192,192)"/>
-      <stop offset="0.39353" stop-color="rgb(196,196,196)"/>
-      <stop offset="0.487" stop-color="rgb(199,199,199)"/>
-      <stop offset="0.58469" stop-color="rgb(201,201,201)"/>
-      <stop offset="0.68842" stop-color="rgb(203,203,203)"/>
-      <stop offset="0.80231" stop-color="rgb(204,204,204)"/>
-      <stop offset="0.94595" stop-color="rgb(204,204,204)"/>
+      <stop offset="0.12297" stop-color="rgb(217,217,217)"/>
+      <stop offset="0.13191" stop-color="rgb(219,219,219)"/>
+      <stop offset="0.21553" stop-color="rgb(228,228,228)"/>
+      <stop offset="0.30328" stop-color="rgb(236,236,236)"/>
+      <stop offset="0.39353" stop-color="rgb(244,244,244)"/>
+      <stop offset="0.487" stop-color="rgb(250,250,250)"/>
+      <stop offset="0.58469" stop-color="rgb(254,254,254)"/>
+      <stop offset="0.68842" stop-color="rgb(0,0,0)"/>
+      <stop offset="0.80231" stop-color="rgb(0,0,0)"/>
+      <stop offset="0.94595" stop-color="rgb(0,0,0)"/>
     </linearGradient>
   </defs>
   <title>mps_logo</title>

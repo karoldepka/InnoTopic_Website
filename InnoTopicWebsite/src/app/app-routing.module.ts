@@ -59,7 +59,7 @@ const routes: Routes = [
     loadChildren: () => import('./cv/cv.module').then( m => m.CvPageModule)
   },
   {
-    path: 'cv-page-print',
+    path: 'print',
     loadChildren: () => import('./cv-page-print/cv-page-print.module').then( m => m.CvPagePrintPageModule)
   },
   //
@@ -70,6 +70,10 @@ const routes: Routes = [
   // },
   {
     path: 'topics-graph',
+    component: TopicsGraphComponent,
+  },
+  {
+    path: 'graph',
     component: TopicsGraphComponent,
   },
   // {

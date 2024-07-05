@@ -7,7 +7,15 @@
 <!--       <fa name="male"></fa><span><label>  Roles: </label>{{roles}}</span>-->
     </div>
   </h3>
-  <span *ngIf="project.description; let description">{{description}}</span>
+<!--  <span *ngIf="project.description; let description">{{description}}</span>-->
+  <ng-container
+    *ngIf="project.description; let description"
+  >
+    <span *ngIf="project.description; let description">
+    </span>
+    <app-hashtag-replacer [text]="description" />
+
+  </ng-container>
 
   <section class="project-skills">
     <label>Skills:</label>

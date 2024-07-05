@@ -143,7 +143,7 @@ export const topicsOld = [
   tagLogoType('OpenGL'), 'Unity',
   // tagLogoTipo('Backbone.js', 'backbone-icon'),
   // tag('Backbone.js', 'backbone-icon'), // TODO: knockout
-  tagNoIcon('Backend'),
+  // tagNoIcon('Backend'),
   'Sinatra',
   'Flask', tagNoIcon('Pylons'), tagNoIcon('Zope'),
   tagNoIcon('UX'), tagNoIcon('UI'), tagNoIcon('Usability'), tagNoIcon('Accessibility'),

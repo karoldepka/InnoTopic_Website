@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg width="512px" height="53px" viewBox="0 0 512 53" version="1.1" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid">
+<svg fill="rgb(114,114,114)"  width="512px" height="53px" viewBox="0 0 512 53" version="1.1" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid">
     <title>Astronomer</title>
     <defs>
         <linearGradient x1="-0.799%" y1="49.487%" x2="100.073%" y2="50.542%" id="astronomer-linearGradient">
-            <stop stop-color="rgb(170,170,170)" offset="0%"></stop>
-            <stop stop-color="rgb(204,204,204)" offset="100%"></stop>
+            <stop stop-color="rgb(173,173,173)" offset="0%"></stop>
+            <stop stop-color="rgb(0,0,0)" offset="100%"></stop>
         </linearGradient>
     </defs>
     <g>

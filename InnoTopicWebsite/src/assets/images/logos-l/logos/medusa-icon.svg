@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg width="256px" height="277px" viewBox="0 0 256 277" version="1.1" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid">
+<svg fill="rgb(114,114,114)"  width="256px" height="277px" viewBox="0 0 256 277" version="1.1" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid">
     <title>Medusa</title>
     <defs>
         <linearGradient x1="-66.6972559%" y1="81.8702074%" x2="108.629506%" y2="34.4186803%" id="medusaLinearGradient-1">
-            <stop stop-color="rgb(170,170,170)" offset="26.5625%"></stop>
-            <stop stop-color="rgb(204,204,204)" offset="100%"></stop>
+            <stop stop-color="rgb(218,218,218)" offset="26.5625%"></stop>
+            <stop stop-color="rgb(0,0,0)" offset="100%"></stop>
         </linearGradient>
     </defs>
     <g>

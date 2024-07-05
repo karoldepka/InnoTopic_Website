@@ -45,10 +45,10 @@ html, body {
 //    background-image: none !important;
 //  }
 //
-//  /* Make sure scrollable content is visible during print */
-//  ion-content, .scrollable {
-//    overflow: visible !important;
-//  }
+  /* Make sure scrollable content is visible during print */
+  ion-content, .scrollable {
+    //overflow: visible !important;
+  }
 //
 //  /* Add any other styles specific to print media */
 //}
@@ -56,10 +56,10 @@ html, body {
 /** This is from ChatGPT to enable scrolling (multiple pages, instead of limited to viewport) for print: */
 /* 2024: disabling this fixes exporting to PDF: */
 @media print {
-  /* Set the page size to auto */
-  @page {
-    size: auto;
-  }
+  ///* Set the page size to auto */
+  //@page {
+  //  size: auto;
+  //}
 
 /* BEGIN issues with PDF export blank page is here: */
   ///* Make sure the body, ion-content, and other container elements have the correct height and overflow properties */

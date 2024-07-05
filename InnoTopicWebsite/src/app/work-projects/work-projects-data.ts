@@ -5,6 +5,7 @@ import { setIdsFromKeys } from '../utils/dictionary-utils';
 export interface Organisation {
   flags?: string
   locations?: string
+  description?: string
   projects: {[projKey: string]: Project}
   time: (number|string)[]
   logoFileName?: string
@@ -58,10 +59,11 @@ export class WorkOrganisationsAndProjectsData {
     linkedInRecommendations: 3,
     locations: `Málaga, remote, Madrid, Dubai`,
     logoFileName: `epic-elite-logo.svg`,
+    description: 'Test #Rust #React and #AWS hashtags',
     projects: {
       'EpicElite Platform': project({
         roles: 'Staff Engineer',
-        description: 'Recruited and interviewed 5 Developers and a UI/UX/Web/Graphics Designer. I have lead a team of 5 Developers. Did code&architecture reviews.' +
+        description: 'Recruited and interviewed 5 Developers and a UI/UX/Web/Graphics Designer. #Lead of 5 #TypeScript and #Python Developers. Did code&architecture reviews.' +
           'Working directly with CEO & Director of Operations. Communication in English, Spanish, Polish.',
         topicsById: {
           'Terraform': {},

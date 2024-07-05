@@ -28,7 +28,7 @@ function coerceLogoToTopicData(topicData: TopicDataOrLogo): TopicData {
 }
 
 export function t(topicData?: TopicDataOrLogo, iconWebsiteTodo?: string | string[]) {
-  topicData = coerceLogoToTopicData(topicData !)
+  topicData = coerceLogoToTopicData(/*'OFF__' + */topicData !)
   const topic = Object.create(Topic.prototype)
   Object.assign(topic, topicData)
   // console.log(`t()`, `topicData`, topicData, `topic`, topic, `topic.id`, topic.id)
@@ -55,7 +55,7 @@ export function tSquare(topicData?: TopicDataOrLogo, logoSize?: number[]) {
 
 
 export function tWide(topicData?: TopicDataOrLogo, logoSize?: number[]) {
-  topicData = coerceLogoToTopicData(topicData!);
+  topicData = coerceLogoToTopicData(/*'zfdfadfas' +*/ topicData!);
   return t({...topicData, logoTypeWide: true, logoSize})
 }
 
@@ -314,9 +314,10 @@ export class Java {
 export class Backend {
   // TODO: hapi fastify apollo-server koa
   // TODO: type-graphql, typeORM
+  'Backend' = t('generic/fontawesome/server.svg')
   'Microservices' = tNoIcon()
   'TypeORM' = tNoIcon()
-  'TypeGraphQL' = t(`typegraphql-icon.svg` /* https://github.com/MichalLytek/type-graphql/issues/824 */)
+  'TypeGraphQL' = t(`typegrap hql-icon.svg` /* https://github.com/MichalLytek/type-graphql/issues/824 */)
   'Altair GraphQL Client' = t(`altair`) // https://altairgraphql.dev/
   'Apollo' = t(`apollostack.svg`)
   'Apollo Studio' = t(`apollostack.svg`)
@@ -459,7 +460,7 @@ export class Tools {
   //  TODO: 'JetBrains ReSharper' = t('') // C#
   // TODO: 'Rider' = t('') // C#
   RubyMine = t()
-  'Android Studio' = t('Android_Studio_icon.svg')
+  'Android Studio' = t('Android_Studio_icon_OFF.svg')
   Eclipse = t('eclipse-icon.svg')
   'IntelliJ IDEA' = t()
   'NetBeans' = t('apache-netbeans')
@@ -563,6 +564,7 @@ export class Languages {
   mypy = tWide('mypy-icon.svg') // #AI #Python
   'Python Pyre' = tWide('pyre-icon.svg') // #Python
   'Pyright' = tWide('pyright-icon.svg') // #Python
+  'Flask' = tWide('flask-icon.svg') // #Python
   Mojo = tWide('modular-mojo-icon') // #AI #Python
   Hack = tWide()
   Haxe = t()
@@ -732,6 +734,7 @@ export class Monitoring_and_observability {
 // TODO: ai -> vector_databases
 
 export class Databases {
+  Database = tSquare('generic/fontawesome/database.svg')
   "8base" = t('8base-icon') // like Hasura; "Create custom JavaScript and TypeScript logic and run as 8base Serverless Functions."
   Prisma = tWide() /* "Next-generation Node.js and TypeScript ORM" */
   MongoDB = tWide('mongodb-icon.svg')
@@ -871,6 +874,8 @@ export class Other {
   'Antipatterns' = t('project-diagram-solid.svg')
   'Making Presentations' = t('project-diagram-solid.svg')
   'Leadership' = t('project-diagram-solid.svg')
+  'Lead' = t('project-diagram-solid.svg') // FIXME better icon
+  'Staff Engineer' = t('project-diagram-solid.svg')
   'Performance Optimization' = t('project-diagram-solid.svg')
   'Performance Profiling' = t('project-diagram-solid.svg')
   'UX - User Experience' = t('project-diagram-solid.svg')
@@ -897,7 +902,7 @@ export class Crypto {
 export class AI {
   "C3 AI" = tWide('c3-ai.svg')
   "LangChain" = tWide('langchain.svg')
-  "Microsoft AutoGen" = tNarrow('autogen-icon.svg')
+  "Microsoft AutoGen" = tNarrow('autogen-icon2222.svg')
   "Microsoft Bing" = tNarrow('bing.svg')
   "Microsoft Copilot" = tNarrow('microsoft-copilot-icon.svg')
   "GitHub Copilot" = tWide('github-copilot.svg')
@@ -911,7 +916,7 @@ export class AI {
   "Cody AI" = tWide('cody-icon.svg')
   "Continue" = tWide('continue-icon.svg')
   "MetaMage" = tNarrow('metamage-icon.svg')
-  "TabbyML" = tNarrow('tabbyml-icon.svg')
+  "TabbyML" = tNarrow('OFF' + 'tabbyml-icon.svg')
   "OpenAI Codex" = tNarrow('openai-codex')
   OpenAI = t('openai-icon')
   "Magic.dev" = tWide('magic.dev.svg') // Magic is working on frontier-scale code models to build a coworker, not just a copilot.
@@ -995,7 +1000,7 @@ export class AI_Hardware {
 
 export class Build_Systems_And_Package_Managers {
   Gradle = t()
-  Maven = tWide()
+  Maven = tWide('maven_OFF')
   Yarn = t()
   NPM = tWide()
   Bazel = t(`bazel-icon.svg`)
@@ -1008,6 +1013,7 @@ export class FunAndSports {
   Outdoors = tWide('generic/fun/cloud-sun-solid-cropped.svg')
   Nature = t('generic/fun/tree-solid.svg')
   'Car trips' = tWide('generic/fun/car-solid-cropped.svg')
+  'Karate' = tWide('generic/sports/karate.svg')
   'Bicycle' = tWide('generic/fun/bicycle-solid-cropped.svg')
   'Table Tennis' = t('generic/fun/table-tennis-solid.svg') /* search terms: ping pong */
   Padel = t('generic/fun/tennis-ball-svgrepo-com.svg')/* search terms: paddle paddel */
@@ -1024,9 +1030,10 @@ export class FunAndSports {
     license: "CC BY 3.0",
     url: "https://thenounproject.com/icon/mandelbrot-fractal-103125/",
   })
-  'Triskelion' = t('generic/fun/triskelion-2024-2.svg')
+  'Triskelion' = t('generic/fun/triskelion-2024-2-no-stroke.svg')
   'Business' = t('generic/business--chart-line-square.svg')
   'Psychology' = tWide('generic/brain-solid-cropped.svg') // & neuroscience
+  'Psi' = tWide('generic/psi.svg') // & neuroscience
   'Guitar' = t('generic/fun/heavy-metal-sharpen-guitar-like-an-insect-svgrepo-com.svg')
   'ASG' = t('generic/fun/gun.svg')
 }

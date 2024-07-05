@@ -1212,6 +1212,9 @@ const routes = [{
 }, {
   path: 'shirt',
   loadChildren: () => Promise.all(/*! import() */[__webpack_require__.e("default-src_app_themes_theme-demo_theme-demo_module_ts"), __webpack_require__.e("default-src_app_topics-shared_topics-shared_module_ts"), __webpack_require__.e("default-src_app_skills_work-experience-highlights-data_ts"), __webpack_require__.e("src_app_shirt_shirt_module_ts")]).then(__webpack_require__.bind(__webpack_require__, /*! ./shirt/shirt.module */ 7811)).then(m => m.ShirtPageModule)
+}, {
+  path: ['print', 'cv'],
+  loadChildren: () => Promise.all(/*! import() */[__webpack_require__.e("default-src_app_themes_theme-demo_theme-demo_module_ts"), __webpack_require__.e("default-src_app_topics-shared_topics-shared_module_ts"), __webpack_require__.e("default-src_app_skills_work-experience-highlights-data_ts"), __webpack_require__.e("src_app_shirt_shirt_module_ts")]).then(__webpack_require__.bind(__webpack_require__, /*! ./shirt/shirt.module */ 7811)).then(m => m.ShirtPageModule)
 },
 // ====
 // {

@@ -21,6 +21,11 @@
             "inlineStyleLanguage": "scss",
             "assets": [
               {
+                "glob": "index2.html",
+                "input": "index2.html",
+                "output": "index2.html"
+              },
+              {
                 "glob": "**/*",
                 "input": "src/assets",
                 "output": "assets"
@@ -31,7 +36,11 @@
                 "output": "./svg"
               }
             ],
-            "styles": ["src/theme/variables.scss", "src/global.scss", "src/styles.sass"],
+            "styles": [
+//              "src/theme/variables.scss",
+//              "src/global.scss",
+//              "src/styles.sass"
+            ],
             "scripts": []
           },
           "configurations": {
@@ -111,7 +120,11 @@
                 "output": "./svg"
               }
             ],
-            "styles": ["src/theme/variables.scss", "src/global.scss", "src/styles.sass"],
+            "styles": [
+              "src/theme/variables.scss",
+              "src/global.scss",
+              "src/styles.sass"
+            ],
             "scripts": []
           },
           "configurations": {

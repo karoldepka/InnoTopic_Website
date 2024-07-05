@@ -1,4 +1,4 @@
-<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 1000 1000" width="1000"
+<svg fill="rgb(114,114,114)"  xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 1000 1000" width="1000"
      height="1000" preserveAspectRatio="xMidYMid meet"
      style="width: 100%; height: 100%; transform: translate3d(0px, 0px, 0px); content-visibility: visible;">
   <defs>
@@ -9,7 +9,7 @@
       <g style="display: block;"
          transform="matrix(0.3333300054073334,0,0,0.3333300054073334,214.9351348876953,249.76846313476562)" opacity="1">
         <g opacity="1" transform="matrix(1,0,0,1,40.69499969482422,-63.30500030517578)">
-          <path fill="rgb(170,170,170)" fill-opacity="1"
+          <path fill="rgb(114,114,114)" fill-opacity="1"
                 d=" M0,-834 C460.28460693359375,-834 834,-460.28460693359375 834,0 C834,460.28460693359375 460.28460693359375,834 0,834 C-460.28460693359375,834 -834,460.28460693359375 -834,0 C-834,-460.28460693359375 -460.28460693359375,-834 0,-834z"></path>
         </g>
       </g>
@@ -21,7 +21,7 @@
     </filter>
     <mask id="__lottie_element_237_2" mask-type="alpha">
       <g filter="url(#__lottie_element_243)">
-        <rect width="1000" height="1000" x="0" y="0" fill="rgb(204,204,204)" opacity="0"></rect>
+        <rect width="1000" height="1000" x="0" y="0" fill="rgb(0,0,0)" opacity="0"></rect>
         <use xlink:href="#__lottie_element_237"></use>
       </g>
     </mask>
@@ -29,16 +29,16 @@
       <g style="display: block;"
          transform="matrix(0.3333300054073334,0,0,0.3333300054073334,214.9351348876953,249.76846313476562)" opacity="1">
         <g opacity="1" transform="matrix(1,0,0,1,40.69499969482422,-63.30500030517578)">
-          <path fill="rgb(170,170,170)" fill-opacity="1"
+          <path fill="rgb(114,114,114)" fill-opacity="1"
                 d=" M0,-834 C460.28460693359375,-834 834,-460.28460693359375 834,0 C834,460.28460693359375 460.28460693359375,834 0,834 C-460.28460693359375,834 -834,460.28460693359375 -834,0 C-834,-460.28460693359375 -460.28460693359375,-834 0,-834z"></path>
         </g>
       </g>
     </g>
     <radialGradient id="__lottie_element_250" spreadMethod="pad" gradientUnits="userSpaceOnUse" cx="0" cy="0" r="400"
                     fx="0" fy="0">
-      <stop offset="0%" stop-color="rgb(204,204,204)"></stop>
-      <stop offset="50%" stop-color="rgb(204,204,204)"></stop>
-      <stop offset="100%" stop-color="rgb(204,204,204)"></stop>
+      <stop offset="0%" stop-color="rgb(0,0,0)"></stop>
+      <stop offset="50%" stop-color="rgb(0,0,0)"></stop>
+      <stop offset="100%" stop-color="rgb(0,0,0)"></stop>
     </radialGradient>
     <mask id="__lottie_element_252">
       <path fill="url(#__lottie_element_251)"
@@ -46,9 +46,9 @@
     </mask>
     <radialGradient id="__lottie_element_251" spreadMethod="pad" gradientUnits="userSpaceOnUse" cx="0" cy="0" r="400"
                     fx="0" fy="0">
-      <stop stop-color="rgb(204,204,204)" offset="30%" stop-opacity="1"></stop>
-      <stop stop-color="rgb(204,204,204)" offset="65%" stop-opacity="0.5"></stop>
-      <stop stop-color="rgb(204,204,204)" offset="100%" stop-opacity="0"></stop>
+      <stop stop-color="rgb(0,0,0)" offset="30%" stop-opacity="1"></stop>
+      <stop stop-color="rgb(0,0,0)" offset="65%" stop-opacity="0.5"></stop>
+      <stop stop-color="rgb(0,0,0)" offset="100%" stop-opacity="0"></stop>
     </radialGradient>
     <filter id="__lottie_element_253" filterUnits="objectBoundingBox" x="0%" y="0%" width="100%" height="100%">
       <feComponentTransfer in="SourceGraphic">
@@ -57,7 +57,7 @@
     </filter>
     <mask id="__lottie_element_244_2" mask-type="alpha">
       <g filter="url(#__lottie_element_253)">
-        <rect width="1000" height="1000" x="0" y="0" fill="rgb(204,204,204)" opacity="0"></rect>
+        <rect width="1000" height="1000" x="0" y="0" fill="rgb(0,0,0)" opacity="0"></rect>
         <use xlink:href="#__lottie_element_244"></use>
       </g>
     </mask>
@@ -65,7 +65,7 @@
       <g transform="matrix(0.3333300054073334,0,0,0.3333300054073334,102.93513488769531,137.76846313476562)" opacity="1"
          style="display: none;">
         <g opacity="1" transform="matrix(1,0,0,1,40.69499969482422,-63.30500030517578)">
-          <path fill="rgb(170,170,170)" fill-opacity="1"
+          <path fill="rgb(114,114,114)" fill-opacity="1"
                 d=" M0,-834 C460.28460693359375,-834 834,-460.28460693359375 834,0 C834,460.28460693359375 460.28460693359375,834 0,834 C-460.28460693359375,834 -834,460.28460693359375 -834,0 C-834,-460.28460693359375 -460.28460693359375,-834 0,-834z"></path>
         </g>
       </g>
@@ -77,7 +77,7 @@
     </filter>
     <mask id="__lottie_element_254_2" mask-type="alpha">
       <g filter="url(#__lottie_element_260)">
-        <rect width="1000" height="1000" x="0" y="0" fill="rgb(204,204,204)" opacity="0"></rect>
+        <rect width="1000" height="1000" x="0" y="0" fill="rgb(0,0,0)" opacity="0"></rect>
         <use xlink:href="#__lottie_element_254"></use>
       </g>
     </mask>
@@ -86,7 +86,7 @@
     <g mask="url(#__lottie_element_254_2)" style="display: none;">
       <g transform="matrix(0.3333300054073334,0,0,0.3333300054073334,489.2681579589844,526.1014404296875)" opacity="1">
         <g opacity="1" transform="matrix(1,0,0,1,40.69499969482422,-63.30500030517578)">
-          <path fill="rgb(204,204,204)" fill-opacity="1"
+          <path fill="rgb(0,0,0)" fill-opacity="1"
                 d=" M0,-768.5 C424.1351623535156,-768.5 768.5,-424.1351623535156 768.5,0 C768.5,424.1351623535156 424.1351623535156,768.5 0,768.5 C-424.1351623535156,768.5 -768.5,424.1351623535156 -768.5,0 C-768.5,-424.1351623535156 -424.1351623535156,-768.5 0,-768.5z"></path>
         </g>
       </g>
@@ -103,7 +103,7 @@
     <g mask="url(#__lottie_element_237_2)" style="display: block;">
       <g transform="matrix(0.3333300054073334,0,0,0.3333300054073334,489.2681579589844,526.1014404296875)" opacity="1">
         <g opacity="1" transform="matrix(1,0,0,1,40.69499969482422,-63.30500030517578)">
-          <path fill="rgb(204,204,204)" fill-opacity="1"
+          <path fill="rgb(0,0,0)" fill-opacity="1"
                 d=" M0,-768.5 C424.1351623535156,-768.5 768.5,-424.1351623535156 768.5,0 C768.5,424.1351623535156 424.1351623535156,768.5 0,768.5 C-424.1351623535156,768.5 -768.5,424.1351623535156 -768.5,0 C-768.5,-424.1351623535156 -424.1351623535156,-768.5 0,-768.5z"></path>
         </g>
       </g>

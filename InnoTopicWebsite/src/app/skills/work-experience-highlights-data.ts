@@ -299,6 +299,7 @@ export const highlights = {
     Tauri: {},
     Tokio: {},
     Dioxus: {},
+    // FIxmE: yew
     "JetBrains RustRover": {},
     // TODO: Rust: Tonic: {},
     // TODO: Rust: Rust Rover
@@ -742,6 +743,9 @@ export const highlights = {
     Nature: {},
     'Car trips': {},
     Bicycle: {},
+    Karate: {},
+    // TODO: archery
+    // TODO: kayaking
     'Table Tennis': {},
     Padel: {},
     Swimming: {},
@@ -755,6 +759,7 @@ export const highlights = {
     // "Composing music": {}, // piano, musical note, etc.
     Business: {},
     Wikipedia: {},
+    Psi: {},
     Psychology: {},
     // TODO: travel, international? (globe), natural languages
     /* TODO: Wikipedia (learning / curiosity) */
