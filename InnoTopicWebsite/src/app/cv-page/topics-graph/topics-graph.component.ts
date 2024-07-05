@@ -101,6 +101,28 @@ export class TopicsGraphComponent implements OnInit {
           connections: {
             Backend: {
               connections: {
+                Cloud: {
+                  connections: {
+                    AWS: {},
+                    "GCP - Google Cloud Platform": {},
+                    "Microsoft Azure": {},
+                    // "Cloud Firestore": {},
+
+                  },
+                },
+
+                Databases: {
+                  connections: {
+                    "Cloud Firestore": {},
+                    "PostgreSQL": {},
+                    "MongoDB": {
+                      sizeMult: size.big,
+                    },
+                    "Supabase": {},
+                    "MariaDB": {},
+                    "SurrealDB": {},
+                  }
+                },
                 Python: {
                   sizeMult: veryBigSize,
                   connections: {

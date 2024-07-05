@@ -666,6 +666,7 @@ export class Mobile {
 }
 
 export class Cloud {
+  Cloud = tWide('generic/fontawesome/cloud.svg')
   // TODO: cloud-native
   'Refine' = tSquare('refine-icon.svg') /* A React Framework for building internal tools, admin panels, dashboards & B2B apps with unmatched flexibility. */
   'Outline' = tNarrow('outline-icon.svg') // https://www.getoutline.com/images/logo.svg
@@ -734,7 +735,7 @@ export class Monitoring_and_observability {
 // TODO: ai -> vector_databases
 
 export class Databases {
-  Database = tSquare('generic/fontawesome/database.svg')
+  Databases = tSquare('generic/fontawesome/database.svg')
   "8base" = t('8base-icon') // like Hasura; "Create custom JavaScript and TypeScript logic and run as 8base Serverless Functions."
   Prisma = tWide() /* "Next-generation Node.js and TypeScript ORM" */
   MongoDB = tWide('mongodb-icon.svg')
@@ -745,10 +746,10 @@ export class Databases {
   SQL = tNoIcon()
   PostgreSQL = t() // it's also a data framework
   MySQL = t('mysql-icon')
-  MariaDB = t()
+  MariaDB = t('mariadb-icon.svg')
   Oracle = tWide()
   IndexedDB = tNoIcon()
-  SurrealDB = t('surrealdb-icon') // Multi-modal. ACID transactions, while scaling horizontally. Feels like SQL, but uses arrows to connect nodes and edges
+  SurrealDB = t('surrealdb-icon.svg') // Multi-modal. ACID transactions, while scaling horizontally. Feels like SQL, but uses arrows to connect nodes and edges
   Xata = t('xata-icon') // Postgres + Elastic. Feels like a developer-friendly alternative to Notion or AirTable. Treats your data like a spreadsheet.
   Dgraph = tNarrow('dgraph-icon-no-gradient.svg')
   Fauna = t('fauna-icon') /* document db that supports joins; custom query language called FQL; closed-source */
