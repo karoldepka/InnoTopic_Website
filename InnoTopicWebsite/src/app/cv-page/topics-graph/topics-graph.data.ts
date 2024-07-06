@@ -3,5 +3,5 @@ export const size = {
   small: 0.7,
   mid: 1.25,
   big: 1.76,
-  veryBig: 2,
+  veryBig: 3,
 }

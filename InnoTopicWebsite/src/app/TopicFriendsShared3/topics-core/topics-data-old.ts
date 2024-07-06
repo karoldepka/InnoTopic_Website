@@ -145,7 +145,8 @@ export const topicsOld = [
   // tag('Backbone.js', 'backbone-icon'), // TODO: knockout
   // tagNoIcon('Backend'),
   'Sinatra',
-  'Flask', tagNoIcon('Pylons'), tagNoIcon('Zope'),
+  // 'Flask',
+  tagNoIcon('Pylons'), tagNoIcon('Zope'),
   tagNoIcon('UX'), tagNoIcon('UI'), tagNoIcon('Usability'), tagNoIcon('Accessibility'),
   'Grunt', tag('Browserify', 'browserify-icon'),
   tagNoIcon('NHibernate'), /*'MariaDB',*/ 'Material-UI',
