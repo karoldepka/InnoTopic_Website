@@ -104,7 +104,7 @@ export class TopicsGraphComponent implements OnInit {
           // strengthMul: 0.4,
           connections: {
             Backend: {
-              sizeMult: size.big,
+              sizeMult: size.veryBig,
               strengthMul: 1.5,
               connections: {
                 Cloud: {
@@ -122,7 +122,7 @@ export class TopicsGraphComponent implements OnInit {
                     "Cloud Firestore": {},
                     "PostgreSQL": {},
                     "MongoDB": {
-                      sizeMult: size.big,
+                      sizeMult: size.veryBig,
                     },
                     "Supabase": {},
                     "MariaDB": {},
@@ -130,14 +130,14 @@ export class TopicsGraphComponent implements OnInit {
                   }
                 },
                 Python: {
-                  sizeMult: veryBigSize,
+                  sizeMult: size.veryBig,
                   connections: {
                     Django: {
-                      sizeMult: bigSize,
+                      sizeMult: size.veryBig,
 
                     },
                     Flask: {
-                      sizeMult: smallSize
+                      sizeMult: size.mid
                     },
                   }
                 }
