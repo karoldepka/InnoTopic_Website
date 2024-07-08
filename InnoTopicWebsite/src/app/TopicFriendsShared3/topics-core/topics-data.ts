@@ -790,7 +790,7 @@ export class Version_Control {
 */
 export class Other {
   'Mailgun' = t('mailgun-icon.svg')
-  'reCAPTCHA' = t('recaptcha.svg') // TODO: crop icon only
+  'reCAPTCHA' = t('recaptcha-icon.svg') // TODO: crop icon only
   'AudioSalad' = t(`audiosalad-traced.svg`)
   'WorldFirst' = tNoIcon()
   'Payoneer' = tWide()
