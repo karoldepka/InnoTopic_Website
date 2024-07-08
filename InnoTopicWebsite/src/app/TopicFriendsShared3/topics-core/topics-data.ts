@@ -645,7 +645,7 @@ export class OS {
   'Debian Linux' = t('debian.svg')
   'Fedora Linux' = t('fedora.svg' /* Officially just "Fedora", but better for filtering*/)
   'macOS' = t('macosx.svg')
-  'Microsoft Windows' = t()
+  'Microsoft Windows' = t('microsoft-windows-icon.svg')
 }
 
 export class Mobile {
@@ -739,6 +739,7 @@ export class Databases {
   "8base" = t('8base-icon') // like Hasura; "Create custom JavaScript and TypeScript logic and run as 8base Serverless Functions."
   Prisma = tWide() /* "Next-generation Node.js and TypeScript ORM" */
   MongoDB = tWide('mongodb-icon.svg')
+  DynamoDB = tSquare('aws-dynamodb.svg')
   ArangoDB = tWide('arangodb-icon') /* native multi-model database with flexible data models for documents, graphs, and key-values. Build high performance applications using a convenient SQL-like query language or JavaScript extensions. */
   Mongoose = tNoIcon()
   // TODO
