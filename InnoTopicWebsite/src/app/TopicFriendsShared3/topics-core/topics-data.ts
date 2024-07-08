@@ -266,7 +266,7 @@ export class Frontend {
   'Dexie.js' = t('dexie-js.svg')
   'Aurelia' = t()
   'Font Awesome' = t('fort-awesome-alt-brands.svg')
-  Workbox = tWide('Workbox-Logo-Grey.svg')
+  Workbox = tWide('workbox-icon.svg')
   'SVG.js' = t('svg-js.png' /* WTF, PNG for an SVG lib :D */)
   'Storybook' = t('storybook-icon.svg')
   // TODO: storyblok?
@@ -276,7 +276,7 @@ export class Frontend {
     https://developers.google.com/web/tools/lighthouse
     https://developers.google.com/web/tools/lighthouse/images/lighthouse-logo.svg*/
   )
-  'three.js' = tNoIcon(/*
+  'three.js' = t('threejs.svg'/*
     https://threejs.org/
     pressKit: https://github.com/mrdoob/three.js/issues/2789
 
@@ -339,7 +339,7 @@ export class Backend {
   Laravel = t()
 
   'Express.js' = tWide({
-    logo: 'express.svg',
+    logo: 'expressjs-icon.svg',
     subTopics: [
       tag('Kraken.js', 'krakenjs', 'http://krakenjs.com/'),
       tag('FeathersJS', 'feathersjs', 'https://feathersjs.com/'),
@@ -394,8 +394,8 @@ export class Backend {
 
 
 export class Frontend_And_Backend_App_Platforms {
-  JHipster = t()
-  Meteor = tWide()
+  JHipster = tWide("jhipster-icon.svg")
+  Meteor = tWide('meteor-icon.svg')
   Hoodie = tWide() // redirects to rxdb
   Feathers = t('feathersjs.svg') // The API and Real-time Application Framework
   Akita = tWide() // https://github.com/datorama/akita
