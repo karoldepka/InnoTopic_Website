@@ -750,7 +750,7 @@ export class Databases {
   PostgreSQL = t() // it's also a data framework
   MySQL = t('mysql-icon')
   MariaDB = t('mariadb-icon.svg')
-  Oracle = tWide()
+  Oracle = tWide('oracle-icon.svg')
   IndexedDB = tNoIcon()
   SurrealDB = t('surrealdb-icon.svg') // Multi-modal. ACID transactions, while scaling horizontally. Feels like SQL, but uses arrows to connect nodes and edges
   Xata = t('xata-icon') // Postgres + Elastic. Feels like a developer-friendly alternative to Notion or AirTable. Treats your data like a spreadsheet.
