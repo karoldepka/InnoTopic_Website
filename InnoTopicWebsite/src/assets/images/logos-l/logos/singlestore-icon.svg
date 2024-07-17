@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg fill="rgb(114,114,114)"  width="256px" height="256px" viewBox="0 0 256 256" version="1.1" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid">
+<svg fill="rgb(45,45,45)"  width="256px" height="256px" viewBox="0 0 256 256" version="1.1" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid">
     <title>SingleStore</title>
     <defs>
         <linearGradient x1="67.3449258%" y1="-26.0044686%" x2="-18.5227789%" y2="22.9877555%" id="singleStoreLinearGradient-1">
-            <stop stop-color="rgb(0,0,0)" offset="0%"></stop>
-            <stop stop-color="rgb(179,179,179)" offset="35.0158%"></stop>
-            <stop stop-color="rgb(166,166,166)" offset="100%"></stop>
+            <stop stop-color="rgb(83,83,83)" offset="0%"></stop>
+            <stop stop-color="rgb(62,62,62)" offset="35.0158%"></stop>
+            <stop stop-color="rgb(58,58,58)" offset="100%"></stop>
         </linearGradient>
         <linearGradient x1="36.2591509%" y1="-19.3628763%" x2="111.72205%" y2="44.9975357%" id="singleStoreLinearGradient-2">
-            <stop stop-color="rgb(0,0,0)" offset="3.54358%"></stop>
-            <stop stop-color="rgb(166,166,166)" offset="57.6537%"></stop>
-            <stop stop-color="rgb(153,153,153)" offset="100%"></stop>
+            <stop stop-color="rgb(83,83,83)" offset="3.54358%"></stop>
+            <stop stop-color="rgb(58,58,58)" offset="57.6537%"></stop>
+            <stop stop-color="rgb(55,55,55)" offset="100%"></stop>
         </linearGradient>
     </defs>
     <g>

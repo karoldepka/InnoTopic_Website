@@ -1,23 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg fill="rgb(114,114,114)"  width="256px" height="256px" viewBox="0 0 256 256" version="1.1" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid">
+<svg fill="rgb(45,45,45)"  width="256px" height="256px" viewBox="0 0 256 256" version="1.1" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid">
     <title>Ktor</title>
     <defs>
         <linearGradient x1="23.9648148%" y1="23.9648148%" x2="74.6407407%" y2="74.6407407%" id="ktorLinearGradient-1">
-            <stop stop-color="rgb(236,236,236)" offset="29.6%"></stop>
-            <stop stop-color="rgb(234,234,234)" offset="69.4%"></stop>
-            <stop stop-color="rgb(232,232,232)" offset="100%"></stop>
+            <stop stop-color="rgb(77,77,77)" offset="29.6%"></stop>
+            <stop stop-color="rgb(76,76,76)" offset="69.4%"></stop>
+            <stop stop-color="rgb(76,76,76)" offset="100%"></stop>
         </linearGradient>
         <linearGradient x1="26.2055556%" y1="26.2055556%" x2="74.1166667%" y2="74.1166667%" id="ktorLinearGradient-2">
-            <stop stop-color="rgb(237,237,237)" offset="10.8%"></stop>
-            <stop stop-color="rgb(239,239,239)" offset="17.3%"></stop>
-            <stop stop-color="rgb(251,251,251)" offset="49.2%"></stop>
-            <stop stop-color="rgb(0,0,0)" offset="71.6%"></stop>
-            <stop stop-color="rgb(0,0,0)" offset="82.3%"></stop>
+            <stop stop-color="rgb(77,77,77)" offset="10.8%"></stop>
+            <stop stop-color="rgb(78,78,78)" offset="17.3%"></stop>
+            <stop stop-color="rgb(81,81,81)" offset="49.2%"></stop>
+            <stop stop-color="rgb(82,82,82)" offset="71.6%"></stop>
+            <stop stop-color="rgb(83,83,83)" offset="82.3%"></stop>
         </linearGradient>
     </defs>
     <g>
         <polygon fill="url(#ktorLinearGradient-1)" points="170.666667 85.3333333 128.176988 42.8436543 85.3333333 0 40.2773333 45.056 0 85.3333333 85.3333333 170.666667"></polygon>
         <polygon fill="url(#ktorLinearGradient-2)" points="85.3333333 170.666667 127.823012 213.156346 170.666667 256 215.722667 210.944 256 170.666667 170.666667 85.3333333"></polygon>
-        <polygon fill="rgb(114,114,114)" points="170.666667 85.3333333 85.3333333 85.3333333 85.3333333 170.666667 170.666667 170.666667"></polygon>
+        <polygon fill="rgb(45,45,45)" points="170.666667 85.3333333 85.3333333 85.3333333 85.3333333 170.666667 170.666667 170.666667"></polygon>
     </g>
 </svg>

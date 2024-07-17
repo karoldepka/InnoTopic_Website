@@ -1,32 +1,32 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg fill="rgb(114,114,114)"  width="256px" height="233px" viewBox="0 0 256 233" version="1.1" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid">
+<svg fill="rgb(45,45,45)"  width="256px" height="233px" viewBox="0 0 256 233" version="1.1" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid">
     <title>Mistral AI</title>
     <g>
-        <rect fill="rgb(114,114,114)" x="186.181818" y="0" width="46.5454545" height="46.5454545"></rect>
-        <rect fill="rgb(0,0,0)" x="209.454545" y="0" width="46.5454545" height="46.5454545"></rect>
-        <rect fill="rgb(114,114,114)" x="0" y="0" width="46.5454545" height="46.5454545"></rect>
-        <rect fill="rgb(114,114,114)" x="0" y="46.5454545" width="46.5454545" height="46.5454545"></rect>
-        <rect fill="rgb(114,114,114)" x="0" y="93.0909091" width="46.5454545" height="46.5454545"></rect>
-        <rect fill="rgb(114,114,114)" x="0" y="139.636364" width="46.5454545" height="46.5454545"></rect>
-        <rect fill="rgb(114,114,114)" x="0" y="186.181818" width="46.5454545" height="46.5454545"></rect>
-        <rect fill="rgb(0,0,0)" x="23.2727273" y="0" width="46.5454545" height="46.5454545"></rect>
-        <rect fill="rgb(241,241,241)" x="209.454545" y="46.5454545" width="46.5454545" height="46.5454545"></rect>
-        <rect fill="rgb(241,241,241)" x="23.2727273" y="46.5454545" width="46.5454545" height="46.5454545"></rect>
-        <rect fill="rgb(114,114,114)" x="139.636364" y="46.5454545" width="46.5454545" height="46.5454545"></rect>
-        <rect fill="rgb(241,241,241)" x="162.909091" y="46.5454545" width="46.5454545" height="46.5454545"></rect>
-        <rect fill="rgb(241,241,241)" x="69.8181818" y="46.5454545" width="46.5454545" height="46.5454545"></rect>
-        <rect fill="rgb(219,219,219)" x="116.363636" y="93.0909091" width="46.5454545" height="46.5454545"></rect>
-        <rect fill="rgb(219,219,219)" x="162.909091" y="93.0909091" width="46.5454545" height="46.5454545"></rect>
-        <rect fill="rgb(219,219,219)" x="69.8181818" y="93.0909091" width="46.5454545" height="46.5454545"></rect>
-        <rect fill="rgb(114,114,114)" x="93.0909091" y="139.636364" width="46.5454545" height="46.5454545"></rect>
-        <rect fill="rgb(204,204,204)" x="116.363636" y="139.636364" width="46.5454545" height="46.5454545"></rect>
-        <rect fill="rgb(219,219,219)" x="209.454545" y="93.0909091" width="46.5454545" height="46.5454545"></rect>
-        <rect fill="rgb(219,219,219)" x="23.2727273" y="93.0909091" width="46.5454545" height="46.5454545"></rect>
-        <rect fill="rgb(114,114,114)" x="186.181818" y="139.636364" width="46.5454545" height="46.5454545"></rect>
-        <rect fill="rgb(204,204,204)" x="209.454545" y="139.636364" width="46.5454545" height="46.5454545"></rect>
-        <rect fill="rgb(114,114,114)" x="186.181818" y="186.181818" width="46.5454545" height="46.5454545"></rect>
-        <rect fill="rgb(204,204,204)" x="23.2727273" y="139.636364" width="46.5454545" height="46.5454545"></rect>
-        <rect fill="rgb(188,188,188)" x="209.454545" y="186.181818" width="46.5454545" height="46.5454545"></rect>
-        <rect fill="rgb(188,188,188)" x="23.2727273" y="186.181818" width="46.5454545" height="46.5454545"></rect>
+        <rect fill="rgb(45,45,45)" x="186.181818" y="0" width="46.5454545" height="46.5454545"></rect>
+        <rect fill="rgb(83,83,83)" x="209.454545" y="0" width="46.5454545" height="46.5454545"></rect>
+        <rect fill="rgb(45,45,45)" x="0" y="0" width="46.5454545" height="46.5454545"></rect>
+        <rect fill="rgb(45,45,45)" x="0" y="46.5454545" width="46.5454545" height="46.5454545"></rect>
+        <rect fill="rgb(45,45,45)" x="0" y="93.0909091" width="46.5454545" height="46.5454545"></rect>
+        <rect fill="rgb(45,45,45)" x="0" y="139.636364" width="46.5454545" height="46.5454545"></rect>
+        <rect fill="rgb(45,45,45)" x="0" y="186.181818" width="46.5454545" height="46.5454545"></rect>
+        <rect fill="rgb(83,83,83)" x="23.2727273" y="0" width="46.5454545" height="46.5454545"></rect>
+        <rect fill="rgb(78,78,78)" x="209.454545" y="46.5454545" width="46.5454545" height="46.5454545"></rect>
+        <rect fill="rgb(78,78,78)" x="23.2727273" y="46.5454545" width="46.5454545" height="46.5454545"></rect>
+        <rect fill="rgb(45,45,45)" x="139.636364" y="46.5454545" width="46.5454545" height="46.5454545"></rect>
+        <rect fill="rgb(78,78,78)" x="162.909091" y="46.5454545" width="46.5454545" height="46.5454545"></rect>
+        <rect fill="rgb(78,78,78)" x="69.8181818" y="46.5454545" width="46.5454545" height="46.5454545"></rect>
+        <rect fill="rgb(73,73,73)" x="116.363636" y="93.0909091" width="46.5454545" height="46.5454545"></rect>
+        <rect fill="rgb(73,73,73)" x="162.909091" y="93.0909091" width="46.5454545" height="46.5454545"></rect>
+        <rect fill="rgb(73,73,73)" x="69.8181818" y="93.0909091" width="46.5454545" height="46.5454545"></rect>
+        <rect fill="rgb(45,45,45)" x="93.0909091" y="139.636364" width="46.5454545" height="46.5454545"></rect>
+        <rect fill="rgb(69,69,69)" x="116.363636" y="139.636364" width="46.5454545" height="46.5454545"></rect>
+        <rect fill="rgb(73,73,73)" x="209.454545" y="93.0909091" width="46.5454545" height="46.5454545"></rect>
+        <rect fill="rgb(73,73,73)" x="23.2727273" y="93.0909091" width="46.5454545" height="46.5454545"></rect>
+        <rect fill="rgb(45,45,45)" x="186.181818" y="139.636364" width="46.5454545" height="46.5454545"></rect>
+        <rect fill="rgb(69,69,69)" x="209.454545" y="139.636364" width="46.5454545" height="46.5454545"></rect>
+        <rect fill="rgb(45,45,45)" x="186.181818" y="186.181818" width="46.5454545" height="46.5454545"></rect>
+        <rect fill="rgb(69,69,69)" x="23.2727273" y="139.636364" width="46.5454545" height="46.5454545"></rect>
+        <rect fill="rgb(64,64,64)" x="209.454545" y="186.181818" width="46.5454545" height="46.5454545"></rect>
+        <rect fill="rgb(64,64,64)" x="23.2727273" y="186.181818" width="46.5454545" height="46.5454545"></rect>
     </g>
 </svg>

@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg fill="rgb(114,114,114)"  id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1000">
+<svg fill="rgb(45,45,45)"  id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1000">
   <defs>
     <style>
       .cls-1 {
-        fill: rgb(0,0,0);
+        fill: rgb(83,83,83);
       }
     </style>
   </defs>
   <rect class="cls-1" width="1000" height="1000"/>
-  <g fill="rgb(114,114,114)">
+  <g fill="rgb(45,45,45)">
     <polygon points="661.27 399.72 676.27 792 746.27 792 761.27 256.91 661.27 399.72"/>
     <polygon points="761.27 213.32 639.19 213.32 447.64 486.9 508.67 574.07 761.27 213.32"/>
     <polygon points="234 792 356.08 792 417.12 704.83 356.08 617.66 234 792"/>

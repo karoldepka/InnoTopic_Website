@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg fill="rgb(114,114,114)"  width="256px" height="299px" viewBox="0 0 256 299" version="1.1" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid">
+<svg fill="rgb(45,45,45)"  width="256px" height="299px" viewBox="0 0 256 299" version="1.1" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid">
     <title>SurrealDB</title>
     <defs>
         <linearGradient x1="31.0469515%" y1="11.7049903%" x2="68.9568365%" y2="88.3026737%" id="surrealDBLinearGradient-1">
-            <stop stop-color="rgb(0,0,0)" offset="0%"></stop>
-            <stop stop-color="rgb(227,227,227)" offset="100%"></stop>
+            <stop stop-color="rgb(83,83,83)" offset="0%"></stop>
+            <stop stop-color="rgb(75,75,75)" offset="100%"></stop>
         </linearGradient>
     </defs>
     <g>

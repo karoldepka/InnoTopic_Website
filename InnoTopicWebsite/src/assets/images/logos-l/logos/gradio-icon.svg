@@ -1,18 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg fill="rgb(114,114,114)"  width="256px" height="224px" viewBox="0 0 256 224" version="1.1" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid">
+<svg fill="rgb(45,45,45)"  width="256px" height="224px" viewBox="0 0 256 224" version="1.1" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid">
     <title>gradio</title>
     <defs>
         <linearGradient x1="-6.4516129%" y1="49.7835498%" x2="85.235732%" y2="49.7835498%" id="linearGradient-1">
-            <stop stop-color="rgb(0,0,0)" offset="0%"></stop>
-            <stop stop-color="rgb(221,221,221)" offset="100%"></stop>
+            <stop stop-color="rgb(83,83,83)" offset="0%"></stop>
+            <stop stop-color="rgb(73,73,73)" offset="100%"></stop>
         </linearGradient>
         <linearGradient x1="106.079404%" y1="49.7835498%" x2="14.2679901%" y2="49.7835498%" id="linearGradient-2">
-            <stop stop-color="rgb(0,0,0)" offset="0%"></stop>
-            <stop stop-color="rgb(221,221,221)" offset="100%"></stop>
+            <stop stop-color="rgb(83,83,83)" offset="0%"></stop>
+            <stop stop-color="rgb(73,73,73)" offset="100%"></stop>
         </linearGradient>
         <linearGradient x1="-12.8712871%" y1="75.8627995%" x2="169.795545%" y2="74.878214%" id="linearGradient-3">
-            <stop stop-color="rgb(0,0,0)" offset="0%"></stop>
-            <stop stop-color="rgb(221,221,221)" offset="100%"></stop>
+            <stop stop-color="rgb(83,83,83)" offset="0%"></stop>
+            <stop stop-color="rgb(73,73,73)" offset="100%"></stop>
         </linearGradient>
     </defs>
     <g>
