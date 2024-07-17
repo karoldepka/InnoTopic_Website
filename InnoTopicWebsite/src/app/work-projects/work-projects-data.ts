@@ -63,9 +63,13 @@ export class WorkOrganisationsAndProjectsData {
     projects: {
       'AI-based LLM-powered processing of product metadata': project({
         roles: 'Staff Engineer',
-        description: 'Using #Python and #Amazon_Bedrock with #DynamoDB and #MongoDB and #Django + #TypeScript Web App' +
-          'Working directly with CTO and Senior Principal Engineer.',
+        description: 'Using #Python and #Amazon_Bedrock with #DynamoDB and #MongoDB and #Django + #TypeScript Web App. ' +
+          'Working directly with CTO and Senior Principal Engineer. ' +
+          'Working with big brands like Walmart, Adidas, Puma, Amazon.',
         topicsById: {
+          'Python': {},
+          'Django': {},
+          'MongoDB': {},
           'Terraform': {},
           'Angular': {},
           'React': {},
@@ -108,15 +112,65 @@ export class WorkOrganisationsAndProjectsData {
           'TypeORM': {},
           'TypeGraphQL': {},
           'AudioSalad': {},
+        }
+      }),
+      'eCommerce Orders SLA real-time monitor and analytics platform': project({
+        roles: 'Staff Engineer, #Rust, #React, #Angular Developer',
+        description: 'Using #Rust, #Python and #DynamoDB and #MongoDB and #Django + #TypeScript Web App' +
+          'Working directly with CTO and Senior Principal Engineer. ' +
+          'Working with big brands like Walmart, Adidas, Puma, Amazon.',
+        topicsById: {
+          // TODO: 'AWS CDK': {},
+          'Rust': {},
+          'Tokio': {},
+          'Tauri': {},
+          'Terraform': {},
+          'Angular': {},
+          'React': {},
+          'Tailwind CSS': {},
+          'Angular Material': {},
+          'AG Grid': {},
+          'GraphQL': {},
+          'Apollo': {},
+          'Apollo Studio': {},
+          'TypeScript': {},
+          'Ionic': {},
+          'Cypress': {},
+          'Jest': {},
+          'Bootstrap': {},
+          'React-Bootstrap': {},
+          'Netlify': {},
+          'Gatsby': {},
+          'Lodash': {},
+          'Figma': {},
+          'Zeplin': {},
+          'SVG': {},
+          'MobX': {},
+          "MobX-State-Tree": {},
+          // 'TestCafe': {},
+          'Git': {},
+          'GitHub': {},
+          'Docker': {},
+          'Kubernetes': {},
+          'Elasticsearch': {},
+          'DynamoDB': {},
+          'MongoDB': {},
+          'AWS': {},
+          // 'Trello': {},
+          'WebStorm': {},
+          // 'PyCharm': {},
+          'Notion': {},
+          'Slack': {},
+          'Datadog': {},
+          'TypeORM': {},
+          'TypeGraphQL': {},
+          'AudioSalad': {},
           'Python': {},
           'Django': {},
           // TODO: PyCharm
-          'PHP': {},
-          'Laravel': {},
-          'PandaDoc': {},
-          DDEX: {},
         }
       })
+
     },
   })
 
@@ -236,6 +290,8 @@ export class WorkOrganisationsAndProjectsData {
             }
           },
           TypeScript: {},
+          Python: {},
+          Django: {},
           Karma: {},
           Jasmine: {},
           Bootstrap: {},

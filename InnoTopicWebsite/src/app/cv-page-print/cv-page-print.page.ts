@@ -9,7 +9,8 @@ import {PrintService} from "../TopicFriendsShared3/topics-core/print.service";
 export class CvPagePrintPage implements OnInit {
 
   constructor() {
-    PrintService.isPrint = true
+    console.log('CvPagePrintPage ctor')
+    // PrintService.isPrint = true
   }
 
   ngOnInit() {

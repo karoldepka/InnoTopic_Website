@@ -317,7 +317,7 @@ export class Backend {
   'Backend' = t('generic/fontawesome/server.svg')
   'Microservices' = tNoIcon()
   'TypeORM' = tNoIcon()
-  'TypeGraphQL' = t(`typegrap hql-icon.svg` /* https://github.com/MichalLytek/type-graphql/issues/824 */)
+  'TypeGraphQL' = t(`typegraphql-icon.svg` /* https://github.com/MichalLytek/type-graphql/issues/824 */)
   'Altair GraphQL Client' = t(`altair`) // https://altairgraphql.dev/
   'Apollo' = t(`apollostack.svg`)
   'Apollo Studio' = t(`apollostack.svg`)
@@ -473,7 +473,7 @@ export class Tools {
   // ==== CI:
   'CircleCI' = t()
   'Travis CI' = t()
-  'Jenkins' = t('jenkins-icon')
+  'Jenkins' = tNarrow('jenkins-icon2.svg')
   'Zeplin' = tWide()
   'Dribbble' = t(`dribbble-ball-mark.svg`) // https://dribbble.com/media-kit
   'Slack' = t('slack-icon.svg')
@@ -526,7 +526,7 @@ export class Graphics {
   'Affinity Designer' = t('affinity-designer.svg')
   'Gravit Designer' = t('gravitio-icon.svg')
   'GIMP' = t('gimp-wilber-big.png')
-  'Inkscape' = t('inkscape-logo.svg')
+  'Inkscape' = tWide('inkscape-icon.svg')
 }
 
 export class Markup_And_Config_Languages {
@@ -603,7 +603,9 @@ export class Languages {
   // RustRover = t()
   Tauri = tNarrow('tauri.svg')
   Tokio = tWide('tokio-icon.svg') // https://tokio.rs/img/tokio-horizontal.svg
+  Tonic = tWide('tonic-icon.svg')
   Dioxus = tNarrow('dioxus-icon.svg')
+  Yew = tNarrow('yew-icon.svg')
   "JetBrains RustRover" = tSquare('jetbrains-rustrover-icon.svg')
   WebAssembly = t({
     categories: "Frontend",
@@ -1032,6 +1034,11 @@ export class FunAndSports {
     license: "CC BY 3.0",
     url: "https://thenounproject.com/icon/mandelbrot-fractal-103125/",
   })
+  "Euler's identity" = tSquare('eulers-identity.svg')
+  "All-Seeing Eye" = tSquare('all-seeing-eye.svg')
+  "Hinduism" = tWide('hinduism.svg')
+  "Judaism" = tWide('judaism.svg')
+  "Sirius Disclosure" = tWide('sirius-disclosure.svg')
   'Triskelion' = t('generic/fun/triskelion-2024-2-no-stroke.svg')
   'Business' = t('generic/business--chart-line-square.svg')
   'Psychology' = tWide('generic/brain-solid-cropped.svg') // & neuroscience

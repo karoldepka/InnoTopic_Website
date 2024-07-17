@@ -133,7 +133,6 @@ export const highlights = {
     // TODO: Rust: Tauri: {} /* TODO: mark as non-main experience */,
     // TODO: Rust:  clap
     // TODO: Rust: Tonic: {} /* TODO: mark as non-main experience */,
-    // TODO: Rust:  Yew: {} /* TODO: mark as non-main experience */,
     // TODO: Rust: 'https://bevyengine.org/': {} /* TODO: Near Rust */,
     // TODO: Rust: 'InfluxDB': {} /* TODO: Near Rust; written in rust */,
     // TODO: Rust: https://github.com/helix-editor/helix
@@ -307,10 +306,9 @@ export const highlights = {
     Tauri: {},
     Tokio: {},
     Dioxus: {},
-    // FIxmE: yew
-    "JetBrains RustRover": {},
-    // TODO: Rust: Tonic: {},
-    // TODO: Rust: Rust Rover
+    Yew: {},
+    Tonic: {},
+    "JetBrains RustRover": {}, // #Rust
     /// ===== ^^^^^ End of Frontend / UI / UX / WASM related
     // ========= Frontend-Backed communication protocols:
     GraphQL: {},
@@ -765,11 +763,27 @@ export const highlights = {
     Chess: {},
     "Game of Life": {}, // emergence, Turing-complete, hacker symbol
     "Mandelbrot Set": {}, // emergence
+    "Euler's identity": {}, // + Riemann's Hypothesis
+    "Tree of Life": {},
+    "All-Seeing Eye": {},
+    "Pentagram": {}, // E.g., Washington's street layout; baphomet.svg too suggestive?
+    "Hinduism": {},
+    "Judaism": {},
+    "Merkaba": {},
+    "Mandala": {},
+    "Taoism": {},
+    "Islam": {},
+    "Christianity": {},
+    "Bahai Faith": {},
+    // TODO: Christian Cross
+    "Yin and Yang": {},
+    // TODO: Freemasonry?
+    Psi: {},
+    "Sirius Disclosure": {}, // + UAP
     "Guitar": {},
     // "Composing music": {}, // piano, musical note, etc.
     Business: {},
     Wikipedia: {},
-    Psi: {},
     Psychology: {},
     // TODO: travel, international? (globe), natural languages
     /* TODO: Wikipedia (learning / curiosity) */

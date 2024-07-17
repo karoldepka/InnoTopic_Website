@@ -69,7 +69,9 @@ export const
 })
 export class TopicsGraphComponent implements OnInit {
 
-  isPrint = PrintService.isPrint
+  get isPrint() {
+    return PrintService.isPrint
+  }
 
   @Input()
   nodes = {
@@ -204,7 +206,19 @@ export class TopicsGraphComponent implements OnInit {
         Deno: {
           connections: {
             Rust: {
+              sizeMult: size.veryBig,
               connections: {
+                WebAssembly: {
+
+                },
+                Tokio: {},
+                Tonic: {
+                  sizeMult: smallSize,
+                },
+                Tauri: {},
+                Dioxus: {},
+                Yew: {},
+                // SurrealDB: {},
                 Turbopack: {},
                 Turborepo: {},
               },
@@ -353,7 +367,7 @@ export class TopicsGraphComponent implements OnInit {
       svgRootElement.call(d3.zoom().on("zoom", function () {
         // https://www.geeksforgeeks.org/d3-js-transform-scale-function/
         console.log('transform d3.event.transform', d3.event.transform)
-        svg.attr("transform", d3.event.transform)
+        svg.attr("transform", d3.event.transform) // TODO: I could hack the default zoom level here??
         // svg.attr("transform", {k: 0.6087830093314941, x: 176.23706425069088, y: 116.76122945091723})
         // svg.attr("transform", d3.transform({k: 0.6087830093314941, x: 176.23706425069088, y: 116.76122945091723}))
       }));
@@ -374,7 +388,7 @@ export class TopicsGraphComponent implements OnInit {
         d3.forceLink().id(function(d: any) { return d.id; })
           .strength(function(d: any) {
             if (d.strengthMul) {
-              console.log('d.strengthMul', d.strengthMul)
+              // console.log('d.strengthMul', d.strengthMul)
             }
             // return preset.forceLinkStrength;
             //          return 1 / Math.min(count(link.source), count(link.target));

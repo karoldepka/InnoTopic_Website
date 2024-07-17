@@ -7,8 +7,12 @@ import {PrintService} from "./TopicFriendsShared3/topics-core/print.service";
 })
 export class AppComponent {
 
-  isPrint = PrintService.isPrint
+  get isPrint() {
+    return PrintService.isPrint
+  }
 
 
-  constructor() {}
+  constructor(
+    printService: PrintService,
+  ) {}
 }
