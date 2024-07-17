@@ -764,19 +764,19 @@ export const highlights = {
     "Game of Life": {}, // emergence, Turing-complete, hacker symbol
     "Mandelbrot Set": {}, // emergence
     "Euler's identity": {}, // + Riemann's Hypothesis
-    "Tree of Life": {},
+    // "Tree of Life": {},
     "All-Seeing Eye": {},
-    "Pentagram": {}, // E.g., Washington's street layout; baphomet.svg too suggestive?
+    // "Pentagram": {}, // E.g., Washington's street layout; baphomet.svg too suggestive?
     "Hinduism": {},
     "Judaism": {},
-    "Merkaba": {},
-    "Mandala": {},
-    "Taoism": {},
-    "Islam": {},
-    "Christianity": {},
-    "Bahai Faith": {},
+    // "Merkaba": {},
+    // "Mandala": {},
+    // "Taoism": {},
+    // "Islam": {},
+    // "Christianity": {},
+    // "Bahai Faith": {},
     // TODO: Christian Cross
-    "Yin and Yang": {},
+    // "Yin and Yang": {},
     // TODO: Freemasonry?
     Psi: {},
     "Sirius Disclosure": {}, // + UAP
