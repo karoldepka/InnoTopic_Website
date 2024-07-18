@@ -81,43 +81,94 @@ InnoTopic_Website is a cutting-edge web and mobile platform that harnesses the p
 - Environmental and social impact
 - Marketing and outreach
 
-## Installation
+# Image Generation Services
 
-To set up InnoTopic_Website locally, follow these steps:
+## Local Image Generation
 
-1. Clone the repository:
+InnoTopic_Website offers the flexibility to generate images locally, giving users full control over their design process without relying on an internet connection or external services. This option is ideal for users who prioritize privacy and want to utilize their own hardware capabilities.
+
+### How to Set Up Local Image Generation
+
+1. **Clone the Repository:**
     ```bash
     git clone https://github.com/yourusername/innotopic_website.git
     cd innotopic_website
     ```
-2. Install dependencies:
+
+2. **Install Dependencies:**
     ```bash
     pip install -r requirements.txt
     ```
-3. Set up environment variables:
+
+3. **Set Up Environment Variables:**
     Create a `.env` file in the root directory and add the following:
     ```plaintext
-    GRAPHRAG_API_KEY=your_openai_api_key
-    DATABASE_URL=your_database_url
-    ```
-4. Initialize the database:
-    ```bash
-    python manage.py migrate
-    ```
-5. Start the server:
-    ```bash
-    python manage.py runserver
+    IMAGE_GEN_MODEL_PATH=path_to_your_local_model
     ```
 
-## Usage
+4. **Initialize the System:**
+    ```bash
+    python setup_local_image_generation.py
+    ```
 
-1. Create an account or log in to your existing account.
-2. Navigate to the "Create Design" page.
-3. Input your design idea or preferences.
-4. Click "Generate Designs" to receive AI-generated shirt design prompts and visual mockups.
-5. Use the virtual try-on feature to see how the designs look on you.
-6. Customize your favorite designs using our AI-powered design tools.
-7. Save your designs to your account or share them on the marketplace.
+5. **Generate Images:**
+    Use the local image generation tool:
+    ```bash
+    python generate_image.py --input "your_design_prompt"
+    ```
+
+### Benefits of Local Image Generation
+
+- **Privacy:** No data is sent to external servers.
+- **Control:** Full control over the hardware and environment.
+- **Customization:** Ability to tweak and fine-tune the model for specific needs.
+
+## Public Image Generation Service
+
+InnoTopic_Website also provides a robust public image generation service for users who prefer the convenience and power of cloud-based AI without needing to set up their own systems. This service is accessible through our website and operates on a credit-based system.
+
+### Using the Public Image Generation Service
+
+1. **Create an Account:**
+    Sign up on our [website](https://innotopic-website.com) or log in to your existing account.
+
+2. **Purchase Credits:**
+    Visit the [Credits Page](https://innotopic-website.com/credits) to buy credits. Our flexible pricing plans cater to both casual users and power users.
+
+3. **Generate Images:**
+    Navigate to the "Create Design" page and input your design prompt. Each image generation will deduct a certain number of credits from your account.
+
+4. **Download and Share:**
+    Once the image is generated, you can download it or share it directly to social media.
+
+### Benefits of Public Image Generation Service
+
+- **Convenience:** No need for local setup or maintenance.
+- **Scalability:** Utilize the power of our cloud infrastructure for faster and more complex image generation.
+- **Access to Latest Models:** Always use the latest and most advanced models available on our platform.
+
+### Pricing
+
+Our credit-based pricing is designed to be flexible and affordable:
+
+- **Basic Plan:** $10 for 100 credits daily
+- **Pro Plan:** $45 for 500 credits daily
+- **Enterprise Plan:** $80 for 1000 credits daily
+(Credits not claimed are redeemable for up to 1 month after not claimed for paid plans, must be claimed daily for free tier.)
+
+Visit our [Pricing Page](https://innotopic-website.com/pricing) for more details.
+
+### Example Usage
+
+**Generating an image using 10 credits:**
+1. Navigate to the "Create Design" page.
+2. Enter your design prompt.
+3. Click "Generate Image" (Credit cost varies on model and LoRa Specifications).
+4. Download or share your generated image.
+
+### Support
+
+For any issues or questions, please contact our support team at support@innotopic-website.com or visit our [Help Center](https://innotopic-website.com/help).
 
 ## API Documentation
 
