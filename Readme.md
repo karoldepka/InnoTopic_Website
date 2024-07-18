@@ -81,7 +81,6 @@ InnoTopic_Website is a cutting-edge web and mobile platform that harnesses the p
 - Environmental and social impact
 - Marketing and outreach
 
-# Image Generation Services
 
 ## Local Image Generation
 
