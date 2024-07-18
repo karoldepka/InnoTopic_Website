@@ -161,10 +161,12 @@ Our credit-based pricing is designed to be flexible and affordable:
 - **Enterprise Plan:** $25 monthly for 1000 credits daily
 - (Credits not claimed are redeemable for up to 1 month after not claimed for paid plans, must be claimed daily for free tier.)
 
+
+
 Visit our [Pricing Page](https://innotopic-website.com/pricing) for more details.
 
 ### Example Usage
-
+- **Note:** Credit cost varies based on chosen Model and LoRa.
 **Generating an image using 10 credits:**
 1. Navigate to the "Create Design" page.
 2. Enter your design prompt.
