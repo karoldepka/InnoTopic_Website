@@ -165,7 +165,7 @@ Our credit-based pricing is designed to be flexible and affordable:
 
 Visit our [Pricing Page](https://innotopic-website.com/pricing) for more details.
 
-**Note** (Credit cost per generation varies based on chosen Model and LoRa.)
+**Note:** (Credit cost per generation varies based on chosen Model and LoRa.)
 ### Example Usage
 **Generating an image using 10 credits:**
 1. Navigate to the "Create Design" page.
