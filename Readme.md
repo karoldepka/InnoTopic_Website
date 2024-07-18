@@ -122,6 +122,12 @@ InnoTopic_Website offers the flexibility to generate images locally, giving user
 - **Control:** Full control over the hardware and environment.
 - **Customization:** Ability to tweak and fine-tune the model for specific needs.
 
+### Cons of Local Image Generation
+
+- **Resources:** Image generation is a computational heavy task and will not work correctly on certain systems, or take a prohitively long time.
+- **Presets:** Use of premade presets and designs.
+- **Initial Setup:** Necessary to initially set up system locally.
+  
 ## Public Image Generation Service
 
 InnoTopic_Website also provides a robust public image generation service for users who prefer the convenience and power of cloud-based AI without needing to set up their own systems. This service is accessible through our website and operates on a credit-based system.
