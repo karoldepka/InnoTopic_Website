@@ -22,6 +22,23 @@
 19. [Contributing](#contributing)
 20. [License](#license)
 21. [Contact](#contact)
+22. [User Feedback and Ratings](#user-feedback-and-ratings)
+23. [Social Sharing](#social-sharing)
+24. [Advanced Search](#advanced-search)
+25. [Collaboration Tools](#collaboration-tools)
+26. [Notifications](#notifications)
+27. [Mobile Optimization](#mobile-optimization)
+28. [Personalization and Recommendations](#personalization-and-recommendations)
+29. [Augmented Reality (AR) Integration](#augmented-reality-ar-integration)
+30. [Gamification](#gamification)
+31. [Customer Feedback and Support](#customer-feedback-and-support)
+32. [Credits and Payment System](#credits-and-payment-system)
+33. [Advanced AI Models](#advanced-ai-models)
+34. [User Experience Enhancements](#user-experience-enhancements)
+35. [Integration with Other Platforms](#integration-with-other-platforms)
+36. [Advanced Analytics](#advanced-analytics)
+37. [Environmental and Social Impact](#environmental-and-social-impact)
+38. [Marketing and Outreach](#marketing-and-outreach)
 
 ## Introduction
 
@@ -48,17 +65,50 @@ InnoTopic_Website is a cutting-edge web and mobile platform that harnesses the p
 - Design analytics for creators
 - Bulk design generation for businesses and events
 - Multi-language support and region-specific trends
+- User feedback and ratings
+- Advanced search functionality
+- Notification system for updates and design activity
+- Mobile optimization for seamless user experience
+- Personalization and recommendations
+- Augmented Reality (AR) integration
+- Gamification
+- Customer feedback and support
+- Credit and payment system for model usage
+- Advanced AI models
+- User experience enhancements
+- Integration with other platforms
+- Advanced analytics
+- Environmental and social impact
+- Marketing and outreach
 
 ## Installation
 
 To set up InnoTopic_Website locally, follow these steps:
 
 1. Clone the repository:
+    ```bash
+    git clone https://github.com/yourusername/innotopic_website.git
+    cd innotopic_website
+    ```
 2. Install dependencies:
+    ```bash
+    pip install -r requirements.txt
+    ```
 3. Set up environment variables:
-Create a `.env` file in the root directory and add the following:
+    Create a `.env` file in the root directory and add the following:
+    ```plaintext
+    GRAPHRAG_API_KEY=your_openai_api_key
+    DATABASE_URL=your_database_url
+    ```
 4. Initialize the database:
+    ```bash
+    python manage.py migrate
+    ```
 5. Start the server:
+    ```bash
+    python manage.py runserver
+    ```
+
 ## Usage
 
 1. Create an account or log in to your existing account.
@@ -116,11 +166,14 @@ Our comprehensive design toolkit includes:
 
 ## Mobile App
 
-The InnoTopic_Website mobile app offers:
+### Features
+
 - On-the-go design creation
 - Marketplace browsing
 - Push notifications for design trends and contest updates
 - Seamless sync with web platform
+
+### Download
 
 Download: [iOS App Store](link-to-ios-app) | [Google Play Store](link-to-android-app)
 
@@ -207,3 +260,116 @@ Join our community:
 - Twitter: [@InnoTopicWebsite](https://twitter.com/InnoTopicWebsite)
 - Instagram: [@InnoTopicWebsiteOfficial](https://instagram.com/InnoTopicWebsiteOfficial)
 - Discord: [InnoTopic_Website Community](https://discord.gg/innotopic-website)
+
+## User Feedback and Ratings
+
+Users can provide feedback and rate designs through:
+- Star rating system
+- Written reviews
+- Upvoting helpful reviews
+
+## Social Sharing
+
+Easily share your designs on social media:
+- Auto-generate posts for Twitter, Facebook, Instagram, and Pinterest
+- Social media login options
+
+## Advanced Search
+
+Find the perfect design with advanced search features:
+- Filter by category, color, style, and more
+- Search by keyword or tag
+- AI-powered recommendations based on search history
+
+## Collaboration Tools
+
+Work together on design projects:
+- Real-time collaboration with team members
+- Version control and history tracking
+- Assign tasks and roles within a project
+
+## Notifications
+
+Stay updated with:
+- Email notifications for account activity
+- Push notifications for design trends and contest updates
+- In-app notifications for messages and collaboration requests
+
+## Mobile Optimization
+
+Ensuring a seamless mobile experience:
+- Responsive design for all screen sizes
+- Optimized loading times for mobile devices
+- Touch-friendly interface elements
+
+## Personalization and Recommendations
+
+Tailor the experience to each user:
+- Personalized design suggestions based on user preferences
+- AI-driven recommendations for design elements and templates
+- Customizable user profiles
+
+## Augmented Reality (AR) Integration
+
+Visualize your designs in real life:
+- AR feature for trying on designs through mobile cameras
+- 3D modeling for a realistic preview
+
+## Gamification
+
+Enhance user engagement with:
+- Badges and achievements
+- Points and rewards for activity
+- Leaderboards for top designers
+- Daily and weekly challenges
+
+## Customer Feedback and Support
+
+Provide excellent customer support:
+- Real-time chat support
+- Feedback forms and surveys
+- Help center with FAQs and guides
+
+## Credits and Payment System
+
+Manage usage with a credit system:
+- Users receive daily credits
+- Purchase additional credits
+- Earn credits through activities (e.g., referring friends, participating in contests)
+- Configurable model usage based on credits
+
+## Advanced AI Models
+
+Enhance the platform with sophisticated AI:
+- Generative Adversarial Networks (GANs) for diverse and high-quality image generation
+- StyleGAN for highly customizable styles
+
+## User Experience Enhancements
+
+Improve user interaction:
+- Drag-and-Drop Interface for easy design creation
+- Real-Time Feedback on design changes
+
+## Integration with Other Platforms
+
+Expand reach and functionality:
+- API Access for businesses to integrate features
+- E-commerce Integration for easy sales and distribution
+
+## Advanced Analytics
+
+Provide deeper insights:
+- In-Depth Analytics on design performance and user engagement
+- AI-Powered Predictions for trends and recommendations
+
+## Environmental and Social Impact
+
+Promote sustainability and social responsibility:
+- Sustainable Practices like carbon offsetting and recycling
+- Social Impact Programs supporting causes through sales and collaborations
+
+## Marketing and Outreach
+
+Boost visibility and engagement:
+- Influencer Partnerships for promotion
+- Interactive Tutorials and Workshops to educate users
