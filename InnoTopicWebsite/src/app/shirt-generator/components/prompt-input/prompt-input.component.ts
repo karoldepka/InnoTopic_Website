@@ -1,14 +1,20 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, EventEmitter, Output } from '@angular/core';
 
 @Component({
   selector: 'app-prompt-input',
   templateUrl: './prompt-input.component.html',
   styleUrls: ['./prompt-input.component.scss'],
 })
-export class PromptInputComponent  implements OnInit {
+export class PromptInputComponent {
+
+  searchInput = '';
+
+  @Output() searchEvent = new EventEmitter<string>();
 
   constructor() { }
 
-  ngOnInit() {}
+  onSearchClick() {
+    this.searchEvent.next(this.searchInput);
+  }
 
 }

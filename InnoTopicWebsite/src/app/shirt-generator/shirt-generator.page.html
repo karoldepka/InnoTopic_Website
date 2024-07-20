@@ -5,6 +5,9 @@
 </ion-header>
 
 <ion-content [fullscreen]="true">
-  <app-prompt-input />
-  <app-prompt-result />
+  <app-prompt-input (searchEvent)="onSearch($event)"/>
+    <app-prompt-result
+      [promptResult]="$any(result$ | async)"
+      [isLoading]="$any(isLoading$ | async)"
+    />
 </ion-content>

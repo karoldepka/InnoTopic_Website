@@ -2,7 +2,7 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
-import { IonicModule } from '@ionic/angular';
+import {IonicModule} from '@ionic/angular';
 
 import { ShirtGeneratorPageRoutingModule } from './shirt-generator-routing.module';
 
@@ -22,7 +22,7 @@ const componentDeclarations = [
     CommonModule,
     FormsModule,
     IonicModule,
-    ShirtGeneratorPageRoutingModule
+    ShirtGeneratorPageRoutingModule,
   ],
   declarations: [
     ShirtGeneratorPage,
