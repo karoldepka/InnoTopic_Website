@@ -311,7 +311,7 @@ export class WorkExperienceData {
     'Plastic SCM': we(),
     Workbox: we(),
     // Keras: we(),
-    Hoodie: we(),
+    // Hoodie: we(),
     Svelte: we(),
     Bazel: we(),
     Blazor: we(),
