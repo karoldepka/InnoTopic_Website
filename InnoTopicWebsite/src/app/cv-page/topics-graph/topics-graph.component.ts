@@ -5,11 +5,12 @@ import {
   ViewEncapsulation,
 } from '@angular/core';
 import {
+  t, tNarrow,
   Topics,
-  topics,
+  topics, tSquare, tWide,
 } from '../../TopicFriendsShared3/topics-core/topics-data';
 import { errorAlert } from '../../utils/utils';
-import {size} from "./topics-graph.data";
+import {size, strength} from "./topics-graph.data";
 import {PrintService} from "../../TopicFriendsShared3/topics-core/print.service";
 
 
@@ -208,8 +209,16 @@ export class TopicsGraphComponent implements OnInit {
             Rust: {
               sizeMult: size.veryBig,
               connections: {
+                "JetBrains RustRover": { sizeMult: size.verySmall },
                 WebAssembly: {
-
+                  connections: {
+                    "WebAssembly System Interface (WASI)": { sizeMult: size.verySmall, strengthMul: strength.veryBig},
+                    "Wasmtime": { sizeMult: size.verySmall, strengthMul: strength.veryBig },
+                    "Wasmer": { sizeMult: size.verySmall, strengthMul: strength.veryBig },
+                    "WebAssembly Package Manager (WAPM)": { sizeMult: size.verySmall, strengthMul: strength.veryBig },
+                    AssemblyScript: { sizeMult: size.verySmall, strengthMul: strength.veryBig },
+                    // Fermyon too ugly ;)
+                  },
                 },
                 Tokio: {},
                 Tonic: {
