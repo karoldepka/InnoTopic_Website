@@ -742,13 +742,13 @@ export class Databases {
   Prisma = tWide() /* "Next-generation Node.js and TypeScript ORM" */
   MongoDB = tWide('mongodb-icon.svg')
   DynamoDB = tSquare('aws-dynamodb.svg')
-  ArangoDB = tWide('arangodb-icon') /* native multi-model database with flexible data models for documents, graphs, and key-values. Build high performance applications using a convenient SQL-like query language or JavaScript extensions. */
+  ArangoDB = tWide('arangodb-icon.svg') /* native multi-model database with flexible data models for documents, graphs, and key-values. Build high performance applications using a convenient SQL-like query language or JavaScript extensions. */
   Mongoose = tNoIcon()
   // TODO
   NoSQL = tNoIcon()
   SQL = tNoIcon()
   PostgreSQL = t() // it's also a data framework
-  MySQL = t('mysql-icon')
+  MySQL = t('mysql-icon.svg')
   MariaDB = t('mariadb-icon.svg')
   Oracle = tWide('oracle-icon.svg')
   IndexedDB = tNoIcon()
