@@ -1,9 +1,9 @@
 import {Injectable} from '@angular/core';
-import {BehaviorSubject, delay, Observable, of} from "rxjs";
-import {HttpClient} from "@angular/common/http";
+import {BehaviorSubject} from "rxjs";
+import {AiEngineFactory} from '../models/ai-engine.factory';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class ShirtGeneratorService {
 
@@ -14,16 +14,8 @@ export class ShirtGeneratorService {
   readonly apiUrl = 'localhost:3000';
 
   constructor(
-    private httpClient: HttpClient,
+    private aiEngine: AiEngineFactory,
   ) {
-  }
-
-  generate(searchText: string): Observable<unknown> {
-    return this.httpClient.get<unknown>(this.apiUrl);
-  }
-
-  generateMock(searchText: string): Observable<string[]> {
-    return of(['Data 1', 'Data 2', 'Data 3', 'Data 4']).pipe(delay(400));
   }
 
   clearGeneratedContent() {
@@ -33,4 +25,9 @@ export class ShirtGeneratorService {
   setGeneratedContent(value: string[]) {
     this.generatedContent.next(value);
   }
+
+  generateTopics(text: string) {
+    return this.aiEngine.prompt(text);
+  }
+
 }

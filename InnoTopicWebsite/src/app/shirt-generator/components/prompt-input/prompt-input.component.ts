@@ -14,7 +14,7 @@ export class PromptInputComponent {
   constructor() { }
 
   onSearchClick() {
-    this.searchEvent.next(this.searchInput);
+    this.searchEvent.emit(this.searchInput);
   }
 
 }

@@ -28,13 +28,15 @@ export class ShirtGeneratorPage implements OnInit, OnDestroy {
       debounceTime(500),
       switchMap((text) => {
         this.isLoading$.next(true);
-        return this.shirtGeneratorService.generateMock(text);
+        return this.shirtGeneratorService.generateTopics(text);
       }),
       catchError((error) => {
         this.shirtGeneratorService.clearGeneratedContent();
         return of(error)
       }),
       tap((res) => {
+        console.log(`Result: `);
+        console.log(res);
         this.shirtGeneratorService.setGeneratedContent(res);
         this.isLoading$.next(false)
       }),
