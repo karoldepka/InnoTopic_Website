@@ -36,7 +36,8 @@ const componentDeclarations = [
   ],
   providers: [
     ShirtGeneratorService,
-    {provide: AiEngineFactory, useClass: DummyTopicsPromptService} // TODO:
+    {provide: AiEngineFactory, useClass: DummyTopicsPromptService}, // <- TODO: @joisco Remove this
+    // {provide: AiEngineFactory, useClass: WindowDotAiTopicsPromptService} // <- TODO: @joisco use this
   ]
 })
 export class ShirtGeneratorPageModule {}
