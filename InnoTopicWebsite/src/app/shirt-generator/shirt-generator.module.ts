@@ -10,7 +10,7 @@ import { ShirtGeneratorPage } from './shirt-generator.page';
 import { PromptInputComponent } from './components/prompt-input/prompt-input.component';
 import { PromptResultComponent } from './components/prompt-result/prompt-result.component';
 import { PreviewComponent } from './components/preview/preview.component';
-import { AiEngineFactory } from './models/ai-engine.factory';
+import { AbstractTopicsPromptService } from './models/abstract-topics-prompt.service';
 import { ShirtGeneratorService } from './services/shirt-generator.service';
 import { WindowDotAiTopicsPromptService } from './services/window-dot-ai-topics-prompt.service';
 import { TopicsSharedModule } from "../topics-shared/topics-shared.module";
@@ -36,8 +36,8 @@ const componentDeclarations = [
   ],
   providers: [
     ShirtGeneratorService,
-    {provide: AiEngineFactory, useClass: DummyTopicsPromptService}, // <- TODO: @joisco Remove this
-    // {provide: AiEngineFactory, useClass: WindowDotAiTopicsPromptService} // <- TODO: @joisco use this
+    {provide: AbstractTopicsPromptService, useClass: DummyTopicsPromptService}, // <- TODO: @joisco Remove this
+    // {provide: AbstractTopicsPromptService, useClass: WindowDotAiTopicsPromptService} // <- TODO: @joisco use this
   ]
 })
 export class ShirtGeneratorPageModule {}
