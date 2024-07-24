@@ -11,8 +11,6 @@ export class ShirtGeneratorService {
 
   readonly generatedContent$ = this.generatedContent.asObservable();
 
-  readonly apiUrl = 'localhost:3000';
-
   constructor(
     private aiEngine: AbstractTopicsPromptService,
   ) {
