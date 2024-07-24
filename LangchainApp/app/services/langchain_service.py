@@ -17,3 +17,14 @@ async def call_ollama_api(text: str) -> str:
 async def process_text(text: str) -> str:
     result = await call_ollama_api(text)
     return result
+
+async def summarize_text(text: str) -> str:
+    async with httpx.AsyncClient() as client:
+        headers = {
+            "Authorization": f"Bearer {OLLAMA_API_KEY}",
+            "Content-Type": "application/json"
+        }
+        data = {"text": text, "task": "summarize"}
+        response = await client.post(OLLAMA_API_URL, json=data, headers=headers)
+        response.raise_for_status()
+        return response.json()["summary"]
