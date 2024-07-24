@@ -769,9 +769,10 @@ export const highlights = {
     // "Pentagram": {}, // E.g., Washington's street layout; baphomet.svg too suggestive?
     "Hinduism": {},
     "Judaism": {},
+    // Mormon temple
     // "Merkaba": {},
     // "Mandala": {},
-    // "Taoism": {},
+    // "Taoism": {}, // https://es.wikipedia.org/wiki/Tao#/media/Archivo:Tao.svg
     // "Islam": {},
     // "Christianity": {},
     // "Bahai Faith": {},
