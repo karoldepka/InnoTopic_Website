@@ -130,7 +130,7 @@ export const highlights = {
     HTML5: {},
     Ionic: {},
     Electron: {} /* TODO: mark as non-main experience */,
-    // TODO: Rust: Tauri: {} /* TODO: mark as non-main experience */,
+    Tauri: {},
     // TODO: Rust:  clap
     // TODO: Rust: Tonic: {} /* TODO: mark as non-main experience */,
     // TODO: Rust: 'https://bevyengine.org/': {} /* TODO: Near Rust */,
