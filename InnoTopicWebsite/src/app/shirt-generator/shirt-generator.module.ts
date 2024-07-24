@@ -22,6 +22,15 @@ const componentDeclarations = [
   PreviewComponent,
 ];
 
+const topicsPromptServiceFactory = () => {
+  const url  = window.location.href;
+  if(url.includes('window-ai')) {
+    return new WindowDotAiTopicsPromptService();
+  } else {
+    return new DummyTopicsPromptService();
+  }
+}
+
 @NgModule({
   imports: [
     CommonModule,
@@ -36,8 +45,10 @@ const componentDeclarations = [
   ],
   providers: [
     ShirtGeneratorService,
-    {provide: AbstractTopicsPromptService, useClass: DummyTopicsPromptService}, // <- TODO: @joisco Remove this
-    // {provide: AbstractTopicsPromptService, useClass: WindowDotAiTopicsPromptService} // <- TODO: @joisco use this
+    {
+      provide: AbstractTopicsPromptService,
+      useFactory: topicsPromptServiceFactory,
+    }
   ]
 })
 export class ShirtGeneratorPageModule {}
