@@ -8,7 +8,7 @@ router = APIRouter()
 @router.post("/process-text", response_model=TextResponse)
 async def process_text_route(request: TextRequest):
     try:
-        result = process_text(request.text)
+        result = await process_text(request.text)
         return TextResponse(result=result)
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
