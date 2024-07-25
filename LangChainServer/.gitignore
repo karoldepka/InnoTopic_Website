@@ -1,0 +1,17 @@
+venv
+.idea
+.env
+__pycache__
+.mypy_cache
+.vscode
+.cache
+.DS_Store
+docs_build
+.Python
+build/
+dist/
+lib/
+wheels/
+env/
+venv/
+/site
