@@ -1,6 +1,15 @@
-from app.services.langchain_service import process_text
+# tests/test_services.py
 
-def test_process_text():
-    result = process_text("Hello, LangChain!")
-    assert result == "processed text"
-    
+import pytest
+from app.services.langchain_service import generate_prompt
+from app.services.content_summarization import summarize_content
+
+def test_generate_prompt():
+    prompt = generate_prompt("Create a new shirt design")
+    assert prompt is not None
+    assert isinstance(prompt, str)
+
+def test_summarize_content():
+    summary = summarize_content("This is a detailed description of the shirt design.")
+    assert summary is not None
+    assert isinstance(summary, str)

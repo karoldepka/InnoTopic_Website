@@ -1,12 +1,17 @@
+# app/main.py
+
 from fastapi import FastAPI
 from app.routes import router
-from app.logging_middleware import log_requests
+from app.logging_middleware import LoggingMiddleware
 
 app = FastAPI()
 
-app.middleware("http")(log_requests)
+# Add logging middleware
+app.add_middleware(LoggingMiddleware)
+
+# Include the router from the routes module
 app.include_router(router)
 
-if __name__ == "__main__":
-    import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+@app.get("/")
+def read_root():
+    return {"message": "Welcome to InnoTopic_Website API!"}

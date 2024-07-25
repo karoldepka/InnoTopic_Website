@@ -1,6 +1,7 @@
-# app/services/content_summarization.py
-import httpx
+# services/content_summarization.py
 
-async def summarize_text(text: str) -> str:
-    # Call to an external API or LangChain model for text summarization
-    pass
+def summarize_content(content: str) -> str:
+    # Example summarization implementation
+    sentences = content.split('.')
+    summary = sentences[0] if sentences else content
+    return summary
