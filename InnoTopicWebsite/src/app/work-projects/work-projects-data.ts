@@ -415,7 +415,7 @@ export class WorkOrganisationsAndProjectsData {
         }
       },
       'LifeSuite': {
-        description: 'Ionic 5 App (Web, Android, iOS) for finding solutions (psychology, motivation, productivity, etc.) to common life problems and to see life overview in terms of charts (SVG) like Ikigai, Flow State, etc. '
+        description: '#Ionic 5 App (Web, #Android, #iOS) for finding solutions (psychology, motivation, productivity, etc.) to common life problems and to see life overview in terms of charts (SVG) like Ikigai, Flow State, etc. '
           + 'Released to Google Play and soon to Apple App Store. Has a search engine with Damerau-Levenshtein distance between strings - fuzzy search taking typos into account, with memoization for performance optimization. Strictest settings of TypeScript and Angular.',
         roles: `Founder, Angular/Ionic/Android/iOS Developer`,
         topicsById: {

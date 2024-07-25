@@ -83,194 +83,207 @@ export class TopicsGraphComponent implements OnInit {
 
   @Input()
   connections: GraphConnections = {
-    CSS3: {
-      sizeMult: bigSize,
+    InnoTopic : {
+      sizeMult: size.veryBig,
       connections: {
-        Sass: {},
-        Stylus: { sizeMult: smallSize},
-        Less: { sizeMult: smallSize},
-      }
-    },
-    JavaScript: {
-      sizeMult: bigSize,
-      connections: {
-        'TypeScript': { /*type: 'writtenIn'*/ /* dependsOn / uses */
-          sizeMult: veryBigSize,
-          strengthMul: 0.4,
-        },
-
-        // backend, cloud
-
-        'Frontend': { /*type: 'writtenIn'*/ /* dependsOn / uses */
-          strengthMul: 1.5,
-          sizeMult: veryBigSize,
-          // strengthMul: 0.4,
+        Ethereum: {
           connections: {
-            Backend: {
-              sizeMult: size.veryBig,
+            Solidity: {},
+            Bitcoin: {},
+
+          }
+        },
+        CSS3: {
+          sizeMult: bigSize,
+          connections: {
+            Sass: {},
+            Stylus: { sizeMult: smallSize},
+            Less: { sizeMult: smallSize},
+          }
+        },
+        JavaScript: {
+          sizeMult: bigSize,
+          connections: {
+            'TypeScript': { /*type: 'writtenIn'*/ /* dependsOn / uses */
+              sizeMult: veryBigSize,
+              strengthMul: 0.4,
+            },
+
+            // backend, cloud
+
+            'Frontend': { /*type: 'writtenIn'*/ /* dependsOn / uses */
               strengthMul: 1.5,
+              sizeMult: veryBigSize,
+              // strengthMul: 0.4,
               connections: {
-                Cloud: {
-                  connections: {
-                    AWS: {},
-                    "GCP - Google Cloud Platform": {},
-                    "Microsoft Azure": {},
-                    // "Cloud Firestore": {},
-
-                  },
-                },
-
-                Databases: {
-                  connections: {
-                    "Cloud Firestore": {},
-                    "PostgreSQL": {},
-                    "MongoDB": {
-                      sizeMult: size.veryBig,
-                    },
-                    "Supabase": {},
-                    "MariaDB": {},
-                    "SurrealDB": {},
-                  }
-                },
-                Python: {
+                Backend: {
                   sizeMult: size.veryBig,
+                  strengthMul: 1.5,
                   connections: {
-                    Django: {
-                      sizeMult: size.veryBig,
+                    Cloud: {
+                      connections: {
+                        AWS: {},
+                        "GCP - Google Cloud Platform": {},
+                        "Microsoft Azure": {},
+                        // "Cloud Firestore": {},
 
+                      },
                     },
-                    Flask: {
-                      sizeMult: size.mid
+
+                    Databases: {
+                      connections: {
+                        "Cloud Firestore": {},
+                        "PostgreSQL": {},
+                        "MongoDB": {
+                          sizeMult: size.veryBig,
+                        },
+                        "Supabase": {},
+                        "MariaDB": {},
+                        "SurrealDB": {},
+                      }
                     },
-                    FastAPI: {
-                      sizeMult: size.mid
-                    },
+                    Python: {
+                      sizeMult: size.veryBig,
+                      connections: {
+                        Django: {
+                          sizeMult: size.veryBig,
+
+                        },
+                        Flask: {
+                          sizeMult: size.mid
+                        },
+                        FastAPI: {
+                          sizeMult: size.mid
+                        },
+                      }
+                    }
                   }
+                },
+                Svelte: {sizeMult: midSize},
+                Qwik: {sizeMult: smallSize},
+                // Astro: {},
+                SolidJS: {
+                  sizeMult: smallSize,
+                },
+                Ionic: {
+                  strengthMul: 2,
+                  sizeMult: veryBigSize,
+                  connections: {
+
+                    'Angular': {
+                      strengthMul: 0.7,
+                      sizeMult: veryBigSize,
+                      connections: {
+                        NgRx: {
+                          strengthMul: 2,
+                        },
+                      }
+                    },
+                    'Vue.js': {
+                      strengthMul: 0.5,
+                      sizeMult: bigSize
+                    },
+                    'React': { /*...weak*/
+                      strengthMul: 0.5,
+                      sizeMult: veryBigSize
+                    },
+                    Android: {
+                      strengthMul: 1.5,
+                      sizeMult: midSize,
+                      connections: {
+                        Java: {
+                          strengthMul: 3,
+                          sizeMult: smallSize,
+                          connections: {
+                            "Spring Boot": {
+                              strengthMul: 2,
+                              sizeMult: verySmallSize,
+                              /* TODO could display old stuff as faded/transparent/grayed */
+                              // ...small
+                            }
+                          }
+                        },
+                        Kotlin: {},
+                      },
+                    },
+                    'Stencil': {
+                      strengthMul: 2,
+                      connections: {
+                        'Web Components': {},
+                      }
+                    }
+                  },
                 }
               }
             },
-            Svelte: {sizeMult: midSize},
-            Qwik: {sizeMult: smallSize},
-            // Astro: {},
-            SolidJS: {
-              sizeMult: smallSize,
-            },
-            Ionic: {
-              strengthMul: 2,
-              sizeMult: veryBigSize,
+            'Node.js': {},
+            Deno: {
               connections: {
-
-                'Angular': {
-                  strengthMul: 0.7,
-                  sizeMult: veryBigSize,
+                Rust: {
+                  sizeMult: size.veryBig,
                   connections: {
-                    NgRx: {
-                      strengthMul: 2,
-                    },
-                  }
-                },
-                'Vue.js': {
-                  strengthMul: 0.5,
-                  sizeMult: bigSize
-                },
-                'React': { /*...weak*/
-                  strengthMul: 0.5,
-                  sizeMult: veryBigSize
-                },
-                Android: {
-                  strengthMul: 1.5,
-                  sizeMult: midSize,
-                  connections: {
-                    Java: {
-                      strengthMul: 3,
-                      sizeMult: smallSize,
+                    "JetBrains RustRover": { sizeMult: size.verySmall },
+                    WebAssembly: {
                       connections: {
-                        "Spring Boot": {
-                          strengthMul: 2,
-                          sizeMult: verySmallSize,
-                          /* TODO could display old stuff as faded/transparent/grayed */
-                          // ...small
-                        }
-                      }
+                        "WebAssembly System Interface (WASI)": { sizeMult: size.verySmall, strengthMul: strength.veryBig},
+                        "Wasmtime": { sizeMult: size.verySmall, strengthMul: strength.veryBig },
+                        "Wasmer": { sizeMult: size.verySmall, strengthMul: strength.veryBig },
+                        "WebAssembly Package Manager (WAPM)": { sizeMult: size.verySmall, strengthMul: strength.veryBig },
+                        AssemblyScript: { sizeMult: size.verySmall, strengthMul: strength.veryBig },
+                        // Fermyon too ugly ;)
+                      },
                     },
-                    Kotlin: {},
+                    Tokio: {},
+                    Tonic: {
+                      sizeMult: smallSize,
+                    },
+                    Tauri: {},
+                    Dioxus: {},
+                    Yew: {},
+                    // SurrealDB: {},
+                    Turbopack: {},
+                    Turborepo: {},
                   },
-                },
-                'Stencil': {
                   strengthMul: 2,
-                  connections: {
-                    'Web Components': {},
-                  }
-                }
-              },
-            }
-          }
-        },
-        'Node.js': {},
-        Deno: {
-          connections: {
-            Rust: {
-              sizeMult: size.veryBig,
-              connections: {
-                "JetBrains RustRover": { sizeMult: size.verySmall },
-                WebAssembly: {
-                  connections: {
-                    "WebAssembly System Interface (WASI)": { sizeMult: size.verySmall, strengthMul: strength.veryBig},
-                    "Wasmtime": { sizeMult: size.verySmall, strengthMul: strength.veryBig },
-                    "Wasmer": { sizeMult: size.verySmall, strengthMul: strength.veryBig },
-                    "WebAssembly Package Manager (WAPM)": { sizeMult: size.verySmall, strengthMul: strength.veryBig },
-                    AssemblyScript: { sizeMult: size.verySmall, strengthMul: strength.veryBig },
-                    // Fermyon too ugly ;)
-                  },
                 },
-                Tokio: {},
-                Tonic: {
-                  sizeMult: smallSize,
-                },
-                Tauri: {},
-                Dioxus: {},
-                Yew: {},
-                // SurrealDB: {},
-                Turbopack: {},
-                Turborepo: {},
-              },
-              strengthMul: 2,
+              }
             },
-          }
+            Jest: {},
+            Redux: {},
+            RxJS: {},
+            Vite: {
+              strengthMul: 0.5,
+            },
+            // Turbopack: {
+            //   connections: {
+            //     Turborepo: {},
+            //   },
+            // },
+            // TODO: "JS build & deploy node" - icon with a box and up-arrow (a'la upload): vercel, esbuild turbopack, netlify, vite
+            // "JavaScript Libraries": {},
+            // Astro: {},
+            // TurboPack,
+            Vercel: {},
+            Netlify: {},
+          },
         },
-        Jest: {},
-        Redux: {},
-        RxJS: {},
-        Vite: {
-          strengthMul: 0.5,
-        },
-        // Turbopack: {
-        //   connections: {
-        //     Turborepo: {},
-        //   },
-        // },
-        // TODO: "JS build & deploy node" - icon with a box and up-arrow (a'la upload): vercel, esbuild turbopack, netlify, vite
-        // "JavaScript Libraries": {},
-        // Astro: {},
-        // TurboPack,
-        Vercel: {},
-        Netlify: {},
-      },
-    },
-    HTML5: {
-      sizeMult: bigSize,
-      connections: {
-        SVG: {
+        HTML5: {
           sizeMult: bigSize,
-          strengthMul: 2,
           connections: {
-            "Affinity Designer": { sizeMult: smallSize},
-            Figma: {},
-            'D3.js': {},
-          }
+            SVG: {
+              sizeMult: bigSize,
+              strengthMul: 2,
+              connections: {
+                "Affinity Designer": { sizeMult: smallSize},
+                Figma: {},
+                'D3.js': {},
+              }
+            },
+          },
         },
-      },
-    },
+      }
+    }
+
   }
 
   public d3Nodes: any[] = []

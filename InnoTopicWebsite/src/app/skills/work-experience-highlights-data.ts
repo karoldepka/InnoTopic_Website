@@ -769,7 +769,8 @@ export const highlights = {
     // "Pentagram": {}, // E.g., Washington's street layout; baphomet.svg too suggestive?
     "Hinduism": {},
     "Judaism": {},
-    // Mormon temple
+
+    // Mormon temple; https://thenounproject.com/icon/salt-lake-temple-219294/
     // "Merkaba": {},
     // "Mandala": {},
     // "Taoism": {}, // https://es.wikipedia.org/wiki/Tao#/media/Archivo:Tao.svg

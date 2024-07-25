@@ -75,6 +75,10 @@ export class Frontend_Visual {
  *  - another criterion: stuff that I actually use for my own apps; e.g. I wouldnt care too much about e.g. Business Intelligence (yest?)
  * Frontend - Other (includes libs like lodash, state mgmt) */
 export class Frontend {
+  InnoTopic = tNarrow('InnoTopic.svg') // FIXME MOVE
+
+
+
   'Frontend' = tSquare('generic/frontend')
   'HTML5' = t({logo: 'html-5.svg'})
   'CSS3' = t({logo: 'css-3.svg'})
