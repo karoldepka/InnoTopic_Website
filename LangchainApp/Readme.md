@@ -1,3 +1,6 @@
+Here's the updated README file with the specified format:
+
+```markdown
 # InnoTopic_Website: AI-Powered Shirt Design Ecosystem
 
 ## Table of Contents
@@ -81,101 +84,54 @@ InnoTopic_Website is a cutting-edge web and mobile platform that harnesses the p
 - Environmental and social impact
 - Marketing and outreach
 
+## Installation
 
-## Local Image Generation
+### Prerequisites
 
-InnoTopic_Website offers the flexibility to generate images locally, giving users full control over their design process without relying on an internet connection or external services. This option is ideal for users who prioritize privacy and want to utilize their own hardware capabilities.
+- Python 3.8+
+- Pip
 
-### How to Set Up Local Image Generation
+### Installation Steps
 
-1. **Clone the Repository:**
-    ```bash
-    git clone https://github.com/yourusername/innotopic_website.git
-    cd innotopic_website
-    ```
+1. **Clone the repository**:
 
-2. **Install Dependencies:**
-    ```bash
-    pip install -r requirements.txt
-    ```
+   ```sh
+   git clone https://github.com/yourusername/innotopic_website.git
+   cd innotopic_website
+   ```
 
-3. **Set Up Environment Variables:**
-    Create a `.env` file in the root directory and add the following:
-    ```plaintext
-    IMAGE_GEN_MODEL_PATH=path_to_your_local_model
-    ```
+2. **Create a virtual environment**:
 
-4. **Initialize the System:**
-    ```bash
-    python setup_local_image_generation.py
-    ```
+   - On Windows:
+     ```sh
+     python -m venv venv
+     .\venv\Scripts\activate
+     ```
+   - On macOS/Linux:
+     ```sh
+     python3 -m venv venv
+     source venv/bin/activate
+     ```
 
-5. **Generate Images:**
-    Use the local image generation tool:
-    ```bash
-    python generate_image.py --input "your_design_prompt"
-    ```
+3. **Install the dependencies**:
 
-### Benefits of Local Image Generation
+   ```sh
+   pip install -r requirements.txt
+   ```
 
-- **Privacy:** No data is sent to external servers.
-- **Control:** Full control over the hardware and environment.
-- **Customization:** Ability to tweak and fine-tune the model for specific needs.
+## Usage
 
-### Cons of Local Image Generation
+### Running the Application
 
-- **Resources:** Image generation is a computational heavy task and will not work correctly on certain systems, or take a prohitively long time.
-- **Presets:** Use of premade presets and designs.
-- **Initial Setup:** Necessary to initially set up system locally.
-  
-## Public Image Generation Service
+1. **Start the FastAPI server**:
 
-InnoTopic_Website also provides a robust public image generation service for users who prefer the convenience and power of cloud-based AI without needing to set up their own systems. This service is accessible through our website and operates on a credit-based system.
+   ```sh
+   python app/main.py
+   ```
 
-### Using the Public Image Generation Service
+2. **Access the API documentation**:
 
-1. **Create an Account:**
-    Sign up on our [website](https://innotopic-website.com) or log in to your existing account.
-
-2. **Purchase Credits:**
-    Visit the [Credits Page](https://innotopic-website.com/credits) to buy credits. Our flexible pricing plans cater to both casual users and power users.
-
-3. **Generate Images:**
-    Navigate to the "Create Design" page and input your design prompt. Each image generation will deduct a certain number of credits from your account.
-
-4. **Download and Share:**
-    Once the image is generated, you can download it or share it directly to social media.
-
-### Benefits of Public Image Generation Service
-
-- **Convenience:** No need for local setup or maintenance.
-- **Scalability:** Utilize the power of our cloud infrastructure for faster and more complex image generation.
-- **Access to Latest Models:** Always use the latest and most advanced models available on our platform.
-
-### Pricing
-
-Our credit-based pricing is designed to be flexible and affordable:
-
-- **Basic Plan:** $5 monthly for 100 credits daily
-- **Pro Plan:** $15 monthly for 500 credits daily
-- **Enterprise Plan:** $25 monthly for 1000 credits daily
-- (Credits not claimed are redeemable for up to 1 month after not claimed for paid plans, must be claimed daily for free tier.)
-
-
-
-Visit our [Pricing Page](https://innotopic-website.com/pricing) for more details.
-
-**Note:** (Credit cost per generation varies based on chosen Model and LoRa.)
-### Example Usage
-**Generating an image using 10 credits:**
-1. Navigate to the "Create Design" page.
-2. Enter your design prompt.
-3. Click "Generate Image" (Credit cost varies on model and LoRa Specifications).
-4. Download or share your generated image.
-
-### Support
-
-For any issues or questions, please contact our support team at support@innotopic-website.com or visit our [Help Center](https://innotopic-website.com/help).
+   Open your browser and go to `http://127.0.0.1:8000/docs` to see the interactive API documentation provided by Swagger UI.
 
 ## API Documentation
 
@@ -362,6 +318,8 @@ Ensuring a seamless mobile experience:
 
 ## Personalization and Recommendations
 
+
+
 Tailor the experience to each user:
 - Personalized design suggestions based on user preferences
 - AI-driven recommendations for design elements and templates
@@ -431,3 +389,6 @@ Promote sustainability and social responsibility:
 Boost visibility and engagement:
 - Influencer Partnerships for promotion
 - Interactive Tutorials and Workshops to educate users
+```
+
+This README format ensures comprehensive documentation, making it easier for users and developers to understand and navigate the project.
