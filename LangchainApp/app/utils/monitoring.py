@@ -6,9 +6,7 @@ from fastapi import Request, FastAPI
 REQUEST_COUNT = Counter("request_count", "App Request Count", ["method", "endpoint"])
 REQUEST_LATENCY = Histogram("request_latency_seconds", "Request latency", ["endpoint"])
 
-app = FastAPI()
-
-@app.middleware("http")
+# Middleware for collecting metrics
 async def metrics_middleware(request: Request, call_next):
     method = request.method
     endpoint = request.url.path
@@ -17,6 +15,10 @@ async def metrics_middleware(request: Request, call_next):
         response = await call_next(request)
     return response
 
-@app.get("/metrics")
-async def get_metrics():
-    return generate_latest()
+# Route to expose metrics
+def setup_metrics(app: FastAPI):
+    @app.get("/metrics")
+    async def get_metrics():
+        return generate_latest()
+
+    app.middleware("http")(metrics_middleware)
