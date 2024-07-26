@@ -2,6 +2,7 @@ import {Component, Input, OnInit, ViewEncapsulation,} from '@angular/core';
 import {topics} from '../../TopicFriendsShared3/topics-core/topics-data';
 import {midSize, nodeConnections, nodeLinks, preset, size, strength} from "./topics-graph.data";
 import {GraphConnections, GraphNode, GraphNodeId, LinkByIds} from "./topics-graph.types";
+import {ActivatedRoute} from "@angular/router";
 
 declare const d3: any;
 declare const $: any;
@@ -18,11 +19,17 @@ export class TopicsGraphComponent implements OnInit {
 
   public d3Nodes: any[] = [];
   private d3Links: LinkByIds[] = [...nodeLinks];
+  graphHasContainer = false;
 
   // idea: new/expanding-to topics could be with effect e.g. static noise or fading in-out, e.g. qwik, turbopack; while old, permanently faded
   // TODO: try d3.forceRadial(radius[, x][, y])
 
+  constructor(
+    private activatedRoute: ActivatedRoute
+  ) { }
+
   ngOnInit() {
+    this.graphHasContainer = Boolean(this.activatedRoute.snapshot.queryParams['container']);
     console.log('generateNodes', this.d3Nodes)
     this.generateNodes(this.connections)
     console.log('d3Nodes', this.d3Nodes)
@@ -78,6 +85,7 @@ export class TopicsGraphComponent implements OnInit {
   }
 
   private initD3Graph() {
+    const self = this;
     const svgRootElement = d3.select("#topics-graph-d3"),
       width = +svgRootElement.attr("width"),
       height = +svgRootElement.attr("height");
@@ -92,6 +100,12 @@ export class TopicsGraphComponent implements OnInit {
     //   .scale(2))
     // svg.call(d3.zoom().transform, d3.zoomIdentity.translate(1050, 50)
     //   .scale(130.5));
+    // const zoom = d3.zoom()
+    //   .scaleExtent([0.5, 5])
+    //   .on("zoom", function() {
+    //     svg.attr("transform", d3.event.transform);
+    //   });
+    // svg.call(zoom.transform, d3.zoomIdentity.scale(1)); // This sets the initial zoom level to 1
 
     if (preset.allowZoom) {
       svgRootElement.call(d3.zoom().on("zoom", function () {
@@ -298,9 +312,16 @@ export class TopicsGraphComponent implements OnInit {
       //   .attr("x2", function(d: any) { return d.target.x; })
       //   .attr("y2", function(d: any) { return d.target.y; });
 
-      perNodeMainGroup
-        .attr("x", function(d: any) { return (d.x - radiusFunc(d) ); })
-        .attr("y", function(d: any) { return (d.y - radiusFunc(d) ); });
+
+      if(self.graphHasContainer) {
+        perNodeMainGroup
+          .attr("cx", function(d: any) { return d.x = Math.max(radiusFunc(d), Math.min(width - radiusFunc(d), d.x)); })
+          .attr("cy", function(d: any) { return d.y = Math.max(radiusFunc(d), Math.min(height - radiusFunc(d), d.y)); });
+      } else {
+        perNodeMainGroup
+          .attr("x", function(d: any) { return (d.x - radiusFunc(d) ); })
+          .attr("y", function(d: any) { return (d.y - radiusFunc(d) ); });
+      }
       nodeCircleOverlay /* need to set position separately, because of issue with drag&drop and "translate(...)" transform */
         .attr("x", function(d: any) { return (d.fx || d.x) - radiusFunc(d); })
         .attr("y", function(d: any) { return (d.fy || d.y) - radiusFunc(d); });
