@@ -21,6 +21,11 @@ export class TopicsGraphComponent implements OnInit {
   private d3Links: LinkByIds[] = [...nodeLinks];
   graphHasContainer = false;
 
+  @Input()
+  config = {
+    containerMul: 0.2
+  }
+
   // idea: new/expanding-to topics could be with effect e.g. static noise or fading in-out, e.g. qwik, turbopack; while old, permanently faded
   // TODO: try d3.forceRadial(radius[, x][, y])
 
@@ -85,6 +90,9 @@ export class TopicsGraphComponent implements OnInit {
   }
 
   private initD3Graph() {
+
+    const config = this.config
+
     const self = this;
     const svgRootElement = d3.select("#topics-graph-d3"),
       width = +svgRootElement.attr("width"),
@@ -315,8 +323,8 @@ export class TopicsGraphComponent implements OnInit {
 
       if(self.graphHasContainer) {
         perNodeMainGroup
-          .attr("cx", function(d: any) { return d.x = Math.max(radiusFunc(d), Math.min(width - radiusFunc(d), d.x)); })
-          .attr("cy", function(d: any) { return d.y = Math.max(radiusFunc(d), Math.min(height - radiusFunc(d), d.y)); });
+          .attr("cx", function(d: any) { return d.x = Math.max(radiusFunc(d), Math.min(width  * config.containerMul - radiusFunc(d), d.x)); })
+          .attr("cy", function(d: any) { return d.y = Math.max(radiusFunc(d), Math.min(height * config.containerMul - radiusFunc(d), d.y)); });
       } else {
         perNodeMainGroup
           .attr("x", function(d: any) { return (d.x - radiusFunc(d) ); })
