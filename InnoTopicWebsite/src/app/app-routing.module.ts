@@ -108,11 +108,11 @@ const routes: Routes = [
     path: 'shirt-generator',
     loadChildren: () => import('./shirt-generator/shirt-generator.module').then( m => m.ShirtGeneratorPageModule)
   },
-  { path: '**', redirectTo: 'karol-depka' /* FIXME: does not work? */ },
   {
     path: 'people',
     loadChildren: () => import('./people/people.module').then( m => m.PeoplePageModule)
   },
+  { path: '**', redirectTo: 'karol-depka' /* FIXME: does not work? */ },
 ];
 
 @NgModule({
