@@ -33,8 +33,9 @@ export const people = {
   }),
 
 
-  "joisco": person({
-    position: "LLM intern",
+  "Joisco": person({
+    position: "#LLM intern specializing in #Python",
+    tagline: "Finding creative solutions with #LLM-s, #Python, #AutoGen and #LangChain"
   }),
 
   jay: person({
