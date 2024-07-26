@@ -62,7 +62,7 @@ export const highlights = {
     // Python: {},
     PyTorch: {},
     LangChain: {},
-    'Microsoft AutoGen': {},
+    'AutoGen': {},
     Qdrant: {},
     'Visual Studio Code': {},
     Continue: {},
@@ -485,7 +485,7 @@ export const highlights = {
 
     'Microsoft Bing': {},
     'Microsoft Copilot': {},
-    'Microsoft AutoGen': {},
+    'AutoGen': {}, // 'Microsoft AutoGen' old id
     LangChain: {},
     // TODO: AI: https://smythos.com/
     'C3 AI': {}, // enterprise AI
