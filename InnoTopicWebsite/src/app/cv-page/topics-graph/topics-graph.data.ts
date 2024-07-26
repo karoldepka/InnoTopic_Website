@@ -21,9 +21,16 @@ export const
   verySmallSize = size.small;
 
 export const nodeConnections: GraphConnections = {
-  InnoTopic : {
+  "InnoTopic" : {
     sizeMult: size.veryBig,
     connections: {
+      "Artificial Intelligence": {
+        connections: {
+          OpenAI: {},
+          "Amazon Bedrock": {},
+          "Google Gemini": {},
+        },
+      },
       Ethereum: {
         connections: {
           Solidity: {},

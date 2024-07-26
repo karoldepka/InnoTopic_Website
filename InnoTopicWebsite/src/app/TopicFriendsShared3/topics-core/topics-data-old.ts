@@ -232,7 +232,7 @@ export const topicsOld = [
   tagNoIcon('Neural Networks'),
   tagNoIcon('Convolutional Neural Networks'),
   tagNoIcon('Machine Learning'),
-  tagNoIcon('Artificial Intelligence'),
+  // tagNoIcon('Artificial Intelligence'),
   tagNoIcon('Deep Learning'),
   tagNoIcon('DeepMind'),
   tagNoIcon('Big Data'),
