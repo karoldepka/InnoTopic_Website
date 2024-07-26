@@ -29,6 +29,11 @@ export const nodeConnections: GraphConnections = {
           OpenAI: {},
           "Amazon Bedrock": {},
           "Google Gemini": {},
+          "Ollama": {},
+          "Anthropic": {},
+          "LangChain": {},
+          "Amazon SageMaker": {},
+          "Jupyter": {},
         },
       },
       Ethereum: {
@@ -118,9 +123,10 @@ export const nodeConnections: GraphConnections = {
                     strengthMul: 0.7,
                     sizeMult: veryBigSize,
                     connections: {
-                      NgRx: {
-                        strengthMul: 2,
-                      },
+                      'Nx': {},
+                      // NgRx: { /* does not show icon*/
+                      //   strengthMul: 2,
+                      // },
                     }
                   },
                   'Vue.js': {
@@ -166,7 +172,7 @@ export const nodeConnections: GraphConnections = {
               Rust: {
                 sizeMult: size.veryBig,
                 connections: {
-                  "JetBrains RustRover": { sizeMult: size.verySmall },
+                  "JetBrains RustRover": { sizeMult: size.small },
                   WebAssembly: {
                     connections: {
                       "WebAssembly System Interface (WASI)": { sizeMult: size.verySmall, strengthMul: strength.veryBig},
