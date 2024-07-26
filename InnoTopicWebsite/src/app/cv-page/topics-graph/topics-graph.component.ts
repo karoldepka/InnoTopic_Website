@@ -1,66 +1,10 @@
-import {
-  Component,
-  Input,
-  OnInit,
-  ViewEncapsulation,
-} from '@angular/core';
-import {
-  t, tNarrow,
-  Topics,
-  topics, tSquare, tWide,
-} from '../../TopicFriendsShared3/topics-core/topics-data';
-import { errorAlert } from '../../utils/utils';
-import {size, strength} from "./topics-graph.data";
-import {PrintService} from "../../TopicFriendsShared3/topics-core/print.service";
-
-
-// idea: new/expanding-to topics could be with effect e.g. static noise or fading in-out, e.g. qwik, turbopack; while old, permanently faded
+import {Component, Input, OnInit, ViewEncapsulation,} from '@angular/core';
+import {topics} from '../../TopicFriendsShared3/topics-core/topics-data';
+import {midSize, nodeConnections, nodeLinks, preset, size, strength} from "./topics-graph.data";
+import {GraphConnections, GraphNode, GraphNodeId, LinkByIds} from "./topics-graph.types";
 
 declare const d3: any;
 declare const $: any;
-
-export type GraphNodeId = string
-export type TopicId = string /*FIXME move*/
-
-// export type GraphConnections = { [key: TopicId]: GraphNode }
-export type GraphConnections = { [key in keyof Partial<Topics>]: GraphNode }
-
-export interface GraphNode {
-  connections?: GraphConnections
-  sizeMult?: number
-  strengthMul?: number
-}
-
-export interface LinkByIds {
-  source: GraphNodeId
-  target: GraphNodeId
-  strengthMul?: number
-}
-
-const preset1 = {
-  // forceLinkStrength: 3,
-  forceLinkStrength: 0.1,
-  // forceManyBodyStrength: -1000,
-  forceManyBodyStrength: -50,
-}
-
-const preset = {
-  // forceLinkStrength: 3,
-  forceLinkStrength: 1,
-  // forceManyBodyStrength: -1000,
-  forceManyBodyStrength: -200,
-  allowZoom: true,
-  // allowZoom: false,
-}
-
-// TODO: try d3.forceRadial(radius[, x][, y])
-
-export const
-  veryBigSize = size.veryBig,
-  bigSize = size.big,
-  midSize = size.mid,
-  smallSize = size.small,
-  verySmallSize = size.small;
 
 @Component({
   selector: 'app-topics-graph',
@@ -70,235 +14,13 @@ export const
 })
 export class TopicsGraphComponent implements OnInit {
 
-  get isPrint() {
-    return PrintService.isPrint
-  }
+  @Input() connections: GraphConnections = {...nodeConnections};
 
-  @Input()
-  nodes = {
-    /* only nodes that I want to apply special properties */
-    jQuery: { /*size: small*/},
-    Angular: { /*size: big*/},
-  }
+  public d3Nodes: any[] = [];
+  private d3Links: LinkByIds[] = [...nodeLinks];
 
-  @Input()
-  connections: GraphConnections = {
-    InnoTopic : {
-      sizeMult: size.veryBig,
-      connections: {
-        Ethereum: {
-          connections: {
-            Solidity: {},
-            Bitcoin: {},
-
-          }
-        },
-        CSS3: {
-          sizeMult: bigSize,
-          connections: {
-            Sass: {},
-            Stylus: { sizeMult: smallSize},
-            Less: { sizeMult: smallSize},
-          }
-        },
-        JavaScript: {
-          sizeMult: bigSize,
-          connections: {
-            'TypeScript': { /*type: 'writtenIn'*/ /* dependsOn / uses */
-              sizeMult: veryBigSize,
-              strengthMul: 0.4,
-            },
-
-            // backend, cloud
-
-            'Frontend': { /*type: 'writtenIn'*/ /* dependsOn / uses */
-              strengthMul: 1.5,
-              sizeMult: veryBigSize,
-              // strengthMul: 0.4,
-              connections: {
-                Backend: {
-                  sizeMult: size.veryBig,
-                  strengthMul: 1.5,
-                  connections: {
-                    Cloud: {
-                      connections: {
-                        AWS: {},
-                        "GCP - Google Cloud Platform": {},
-                        "Microsoft Azure": {},
-                        // "Cloud Firestore": {},
-
-                      },
-                    },
-
-                    Databases: {
-                      connections: {
-                        "Cloud Firestore": {},
-                        "PostgreSQL": {},
-                        "MongoDB": {
-                          sizeMult: size.veryBig,
-                        },
-                        "Supabase": {},
-                        "MariaDB": {},
-                        "SurrealDB": {},
-                      }
-                    },
-                    Python: {
-                      sizeMult: size.veryBig,
-                      connections: {
-                        Django: {
-                          sizeMult: size.veryBig,
-
-                        },
-                        Flask: {
-                          sizeMult: size.mid
-                        },
-                        FastAPI: {
-                          sizeMult: size.mid
-                        },
-                      }
-                    }
-                  }
-                },
-                Svelte: {sizeMult: midSize},
-                Qwik: {sizeMult: smallSize},
-                // Astro: {},
-                SolidJS: {
-                  sizeMult: smallSize,
-                },
-                Ionic: {
-                  strengthMul: 2,
-                  sizeMult: veryBigSize,
-                  connections: {
-
-                    'Angular': {
-                      strengthMul: 0.7,
-                      sizeMult: veryBigSize,
-                      connections: {
-                        NgRx: {
-                          strengthMul: 2,
-                        },
-                      }
-                    },
-                    'Vue.js': {
-                      strengthMul: 0.5,
-                      sizeMult: bigSize
-                    },
-                    'React': { /*...weak*/
-                      strengthMul: 0.5,
-                      sizeMult: veryBigSize
-                    },
-                    Android: {
-                      strengthMul: 1.5,
-                      sizeMult: midSize,
-                      connections: {
-                        Java: {
-                          strengthMul: 3,
-                          sizeMult: smallSize,
-                          connections: {
-                            "Spring Boot": {
-                              strengthMul: 2,
-                              sizeMult: verySmallSize,
-                              /* TODO could display old stuff as faded/transparent/grayed */
-                              // ...small
-                            }
-                          }
-                        },
-                        Kotlin: {},
-                      },
-                    },
-                    'Stencil': {
-                      strengthMul: 2,
-                      connections: {
-                        'Web Components': {},
-                      }
-                    }
-                  },
-                }
-              }
-            },
-            'Node.js': {},
-            Deno: {
-              connections: {
-                Rust: {
-                  sizeMult: size.veryBig,
-                  connections: {
-                    "JetBrains RustRover": { sizeMult: size.verySmall },
-                    WebAssembly: {
-                      connections: {
-                        "WebAssembly System Interface (WASI)": { sizeMult: size.verySmall, strengthMul: strength.veryBig},
-                        "Wasmtime": { sizeMult: size.verySmall, strengthMul: strength.veryBig },
-                        "Wasmer": { sizeMult: size.verySmall, strengthMul: strength.veryBig },
-                        "WebAssembly Package Manager (WAPM)": { sizeMult: size.verySmall, strengthMul: strength.veryBig },
-                        AssemblyScript: { sizeMult: size.verySmall, strengthMul: strength.veryBig },
-                        // Fermyon too ugly ;)
-                      },
-                    },
-                    Tokio: {},
-                    Tonic: {
-                      sizeMult: smallSize,
-                    },
-                    Tauri: {},
-                    Dioxus: {},
-                    Yew: {},
-                    // SurrealDB: {},
-                    Turbopack: {},
-                    Turborepo: {},
-                  },
-                  strengthMul: 2,
-                },
-              }
-            },
-            Jest: {},
-            Redux: {},
-            RxJS: {},
-            Vite: {
-              strengthMul: 0.5,
-            },
-            // Turbopack: {
-            //   connections: {
-            //     Turborepo: {},
-            //   },
-            // },
-            // TODO: "JS build & deploy node" - icon with a box and up-arrow (a'la upload): vercel, esbuild turbopack, netlify, vite
-            // "JavaScript Libraries": {},
-            // Astro: {},
-            // TurboPack,
-            Vercel: {},
-            Netlify: {},
-          },
-        },
-        HTML5: {
-          sizeMult: bigSize,
-          connections: {
-            SVG: {
-              sizeMult: bigSize,
-              strengthMul: 2,
-              connections: {
-                "Affinity Designer": { sizeMult: smallSize},
-                Figma: {},
-                'D3.js': {},
-              }
-            },
-          },
-        },
-      }
-    }
-
-  }
-
-  public d3Nodes: any[] = []
-  private d3Links: LinkByIds[] = [
-    // {source: 'Web Components', target: 'HTML5'},
-    {source: 'Kotlin', target: 'Java'},
-    {source: 'Turbopack', target: 'Vercel'},
-    {source: 'Turborepo', target: 'Vercel'},
-    // {source: 'Angular', target: 'TypeScript', strengthMul: 0.3},
-    {source: 'Frontend', target: 'CSS3'},
-    {source: 'Frontend', target: 'HTML5'},
-    // TODO: introduce a grouping element for "Frontend" (to separate a bit from Node.js, deno)
-  ]
-
-  constructor() { }
+  // idea: new/expanding-to topics could be with effect e.g. static noise or fading in-out, e.g. qwik, turbopack; while old, permanently faded
+  // TODO: try d3.forceRadial(radius[, x][, y])
 
   ngOnInit() {
     console.log('generateNodes', this.d3Nodes)
@@ -309,11 +31,10 @@ export class TopicsGraphComponent implements OnInit {
   }
 
   private async fetchIcons() {
-    // const topicNodes = [topics.Svelte, topics['Vue.js'], topics.React]
     const topicNodes = this.d3Nodes.map(d3Node => {
       let topicId = d3Node.id;
       const topic = (topics as any)[topicId]
-      if ( ! topic ) {
+      if (!topic) {
         console.error('No topic for graph node id:', topicId)
       }
       return topic
@@ -333,14 +54,10 @@ export class TopicsGraphComponent implements OnInit {
       //     console.log('d3Node with text', d3Node)
       //   })
       // })
-      return responsePromise/*.then(x => {
-        console.log('topic svg fetched', x.text())
-      })*/
-      // return (await responsePromise).text()
+      return responsePromise;
     });
     console.log(`topic logosPromises`, logosPromises)
     const topicLogosResponses = await Promise.all(logosPromises)
-
     const topicLogosTexts = await Promise.all(topicLogosResponses.map(resp => resp.text())).then(texts => {
       texts.forEach((text, i) => {
         const topic = topicNodes[i]
@@ -356,28 +73,16 @@ export class TopicsGraphComponent implements OnInit {
       })
       this.initD3Graph() // FIXME
     })
-    // const topicLogosTexts = await Promise.all(topicLogosResponses)
-
     console.log(`topic logos`, topicLogosResponses)
     console.log(`topic logos topicLogosTexts`, topicLogosTexts)
-
-    // setTimeout(() => {
-    //   this.initD3Graph() // FIXME
-    // }, 3000)
-
-    // fetch('../../../assets/images/logos-l/logos/stencil.svg').then(x => {
-    //   console.log('svg fetched', x.text())
-    // })
-
   }
-
 
   private initD3Graph() {
     const svgRootElement = d3.select("#topics-graph-d3"),
       width = +svgRootElement.attr("width"),
       height = +svgRootElement.attr("height");
 
-      svgRootElement.selectAll('*').remove();
+    svgRootElement.selectAll('*').remove(); // remove all previous elements before rendering graph
 
     const svg = svgRootElement.append("g"); /* actually a <g>, to fix transform not working in <svg> on chrome:
         http://stackoverflow.com/questions/27283610/d3-workaround-for-svg-transform-in-chrome */
@@ -385,10 +90,8 @@ export class TopicsGraphComponent implements OnInit {
     // svgRootElement.call(zoom1.transform, d3.zoomIdentity
     //   .translate(150, 100)
     //   .scale(2))
-
     // svg.call(d3.zoom().transform, d3.zoomIdentity.translate(1050, 50)
     //   .scale(130.5));
-
 
     if (preset.allowZoom) {
       svgRootElement.call(d3.zoom().on("zoom", function () {
@@ -406,8 +109,7 @@ export class TopicsGraphComponent implements OnInit {
     // const color = d3.rgb(80, 80, 80)// .copy({opacity: 0.5});
     const color = d3.color(`rgba(80, 80, 80, 0.5)`) // .copy({opacity: 0.5});
 
-    /* Base Example:
-       Force-Directed Graph: https://bl.ocks.org/mbostock/4062045 */
+    /* Base Example: Force-Directed Graph: https://bl.ocks.org/mbostock/4062045 */
     const simulation = d3.forceSimulation()
       // .force("gravity", 3)
       // .velocityDecay(3)
@@ -418,7 +120,7 @@ export class TopicsGraphComponent implements OnInit {
               // console.log('d.strengthMul', d.strengthMul)
             }
             // return preset.forceLinkStrength;
-            //          return 1 / Math.min(count(link.source), count(link.target));
+            // return 1 / Math.min(count(link.source), count(link.target));
             return preset.forceLinkStrength * (d.strengthMul ?? 1)
           }))
       .force("charge", d3.forceManyBody().strength(function(d: GraphNode) {
@@ -436,38 +138,15 @@ export class TopicsGraphComponent implements OnInit {
     //            return -1000000;
     //        })
     const nodes = {};
-
-    // const links = [
-    //   {source: Java, target: "Scala"},
-    //   {source: Java, target: Android},
-    //   {source: Java, target: Kotlin, distance: 1.3},
-    //   {source: Java, target: "Groovy"},
-    //   {source: Ruby, target: "Groovy", thick: 0},
-    // ];
-
-    // const nodesWebOnly = [
-    //   nodes.Cordova,
-    //   nodes.HTML5,
-    // ];
-    /* ToDo: Bower, Grunt, JSLint */
-
-    // const linksWebOnly = [
-    //   {source: HTML5, target: CSS, thick: 10},
-    //   {source: SVG, target: HTML5, thick: 10, distance: 1.5},
-    // ];
-
     const nodesKeys = Object.keys(nodes);
-
     const nodesArray = nodesKeys.map(function(v) { return (nodes as any)[v]; });
 
     // initial xy: https://observablehq.com/@d3/force-layout-phyllotaxis
-
 
     const graph = {
       nodes: this.d3Nodes,
       links: this.d3Links
     };
-
 
     // const allLinksGroup = svg.append("g")
     //   .attr("class", "links")
@@ -517,11 +196,7 @@ export class TopicsGraphComponent implements OnInit {
       .attr("r", radiusFunc )
       .attr("id2", function(d: any) { return d.id } )
       .attr("id", function(d: any) { return d.id } )
-
-      .attr("fill", function(d: any) { return color; })
-//                .attr("title", "TEST")
-    ;
-
+      .attr("fill", function(d: any) { return color });
 
     const foreignObjectW = 100; // foreign object width
     const foreignObjectH = 50;
@@ -544,9 +219,6 @@ export class TopicsGraphComponent implements OnInit {
         return "";
       }
     });
-
-
-    const border = 0;
 
     perNodeMainGroup.append("foreignObject")
       .attr("style", "pointer-events:none;")
@@ -590,17 +262,18 @@ export class TopicsGraphComponent implements OnInit {
       //        .attr("y", -defaultRadius)
       .classed("techCircleOverlay", true);
 
-    nodeCircleOverlay.on("mouseover", function(this: any, d: any) {
-      if ( ! isDragging ) {
-//            $('tech').hover(function() {
-        $('#' + d.id).addClass("techCircleHover");
-//            $("[id2='"+ d.id + "']").css('background-color','rgba(0, 0, 0, 0.6)');
-        $("." + d.id + '_background').css('background-color', 'rgba(0, 0, 0, 0.6)');
-        d3.select(this).classed("techCircleHover", true); // "#fff8ee00"
-      }
-    })
-      .on("mouseout", function(this: any, d: any) {
-        if ( ! isDragging ) { /* While dragging, the highlight shall stay */
+    nodeCircleOverlay
+      .on("mouseover", function (this: any, d: any) {
+        if (!isDragging) {
+          // $('tech').hover(function() {
+          $('#' + d.id).addClass("techCircleHover");
+          // $("[id2='"+ d.id + "']").css('background-color','rgba(0, 0, 0, 0.6)');
+          $("." + d.id + '_background').css('background-color', 'rgba(0, 0, 0, 0.6)');
+          d3.select(this).classed("techCircleHover", true); // "#fff8ee00"
+        }
+      })
+      .on("mouseout", function (this: any, d: any) {
+        if (!isDragging) { /* While dragging, the highlight shall stay */
           unHighlightHover.call(this, d);
         }
       });
@@ -609,14 +282,14 @@ export class TopicsGraphComponent implements OnInit {
       d3.drag()
         .on("start", dragStarted)
         .on("drag", dragged)
-        .on("end", dragEnded));
+        .on("end", dragEnded)
+    );
 
     const titleFunc = function(d: any) { return d.id; };
     nodeCircle.append("title")
       .text(titleFunc);
     nodeCircleOverlay.append("title")
       .text(titleFunc);
-
 
     function ticked() {
       // allLinksGroup
@@ -666,7 +339,6 @@ export class TopicsGraphComponent implements OnInit {
   }
 
   private generateNodes(connections: GraphConnections) {
-    // const nodesSet = new Set(GraphNodeId)
     const nodes = []
     nodes.push(... Object.keys(connections).map(key => {
       const child = (connections as any)[key]
@@ -674,8 +346,6 @@ export class TopicsGraphComponent implements OnInit {
       if ( childConnections ) {
         this.generateNodes(childConnections)
       }
-
-      // return {id: key, html: key}
       return {
         id: key,
         ... child /* TODO keep in mind that I might be mixing connection and note attrs here; so maybe smth like: 'connection: xyz' */,
@@ -691,8 +361,6 @@ export class TopicsGraphComponent implements OnInit {
       if ( childConnections ) {
         this.generateLinks(childConnections)
       }
-
-      // const nestedConnections = child.connections
       const nestedConnections = (connections as any)[sourceId].connections || {}
       const links: LinkByIds[] = Object.keys(nestedConnections).map(
         key => {
