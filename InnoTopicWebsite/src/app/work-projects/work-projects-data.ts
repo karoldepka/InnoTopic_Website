@@ -348,9 +348,40 @@ export class WorkOrganisationsAndProjectsData {
     flags: 'pl us gb es',
     time: [2017],
     projects: {
+      // TODO: 'ShirtGen': project({
+      'AIShirtGen - InnoTopic AI LLM Shirts/Posters/Banners Generator': project({
+        // TODO: title: "InnoTopic AI LLM Shirts/Posters/Banners Generator",
+        roles: `Founder, Owner, Angular developer`,
+        topicsById: {
+          'Ionic': {},
+          'LangChain': {},
+          'Ollama': {},
+          'Mistral AI': {},
+          Angular: {},
+          NgRx: {},
+          RxJS: {},
+          TypeScript: {},
+          Nx: {},
+          Sass: {},
+          WebStorm: {},
+          WebGL: {},
+          Blender: {},
+          glTF: {},
+          'D3.js': {},
+          Git: {},
+          GitHub: {},
+          SVG: {},
+          'Affinity Designer': {},
+          'Figma': {},
+          'Font Awesome': {},
+          'Node.js': {},
+          'Firebase': {},
+        }
+      }),
       'InnoTopic.com website': project({
         roles: `Founder, Owner, Angular developer`,
         topicsById: {
+          'Ionic': {},
           'Angular Material': {},
           Angular: {},
           NgRx: {},
