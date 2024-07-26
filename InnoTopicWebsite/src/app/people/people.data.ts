@@ -41,7 +41,11 @@ export const people = {
     company: companies.InnoTopic,
     // note we r using "position", not "title", as title, could be smth like PhD.
     tagline: "#Rust and #TypeScript enthusiast with a broad experience, especially in #Frontend",
-    location: cities.Malaga
+    location: cities.Malaga,
+    skills: {
+      Angular: { level: "expert" /* TODO unify check level */},
+
+    }
   }),
 
 
@@ -53,8 +57,9 @@ export const people = {
 
 
   "Joisco": person({
+    givenNames: "Joseph",
     position: "#LLM intern specializing in #Python",
-    tagline: "Finding creative solutions with #LLM-s, #Python, #AutoGen and #LangChain"
+    tagline: "Finding creative solutions with #LLM-s, #Python, #Ollama and #LangChain" // TODO: AutoGen when icon
   }),
 
   jay: person({

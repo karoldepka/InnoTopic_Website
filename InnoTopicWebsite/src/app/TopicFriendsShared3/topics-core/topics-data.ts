@@ -910,6 +910,7 @@ export class Crypto {
 /** AI / Machine Learning ML */
 export class AI {
   "Artificial Intelligence" = tSquare('generic/ai.svg')
+  "LLM" = tSquare('generic/ai.svg' /*TODO*/)
   "C3 AI" = tWide('c3-ai.svg')
   "LangChain" = tWide('langchain.svg')
   "AutoGen" = tNarrow('autogen-icon2222.svg')
