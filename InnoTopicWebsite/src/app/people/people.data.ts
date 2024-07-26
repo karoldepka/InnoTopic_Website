@@ -67,6 +67,11 @@ export const people = {
 
   }),
 
+  Nekmo: person({
+    position: "#Python and #Django Expert"
+  }),
+
+
   noviodelangel: person({
 
   }),
