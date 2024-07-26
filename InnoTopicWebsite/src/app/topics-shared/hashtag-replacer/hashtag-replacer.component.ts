@@ -14,6 +14,7 @@ import { Component, Input } from '@angular/core';
   `,
 })
 export class HashtagReplacerComponent {
+
   @Input() text: string = 'Test Hello #Angular and #Ionic™ ! ';
 
   get processedText(): { text: string; isTag: boolean; tagText?: string }[] {

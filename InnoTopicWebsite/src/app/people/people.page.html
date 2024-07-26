@@ -25,13 +25,15 @@
 
         </ion-card-title>
       <ion-card-subtitle>
-        <strong>{{ person.position }}</strong>
+        <strong>
+          <app-hashtag-replacer [text]="person.position" />
+        </strong>
           at {{person.company}}
       </ion-card-subtitle>
     </ion-card-header>
 
     <ion-card-content>
-      {{ person.tagline }}
+      <app-hashtag-replacer [text]="person.tagline" />
 
       TODO: BIO
       TODO: natural languages
