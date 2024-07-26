@@ -1,11 +1,11 @@
 import {GraphConnections, LinkByIds} from "./topics-graph.types";
 
 export const size = {
-  verySmall: 0.45,
+  verySmall: 0.35,
   small: 0.7,
-  mid: 1.25,
-  big: 1.76,
-  veryBig: 3,
+  mid: 1.15,
+  big: 1.56,
+  veryBig: 2.5,
 };
 
 export const strength = {
