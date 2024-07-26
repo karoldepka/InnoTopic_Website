@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import {peopleArray} from "./people.data";
 
 @Component({
   selector: 'app-people',
@@ -6,6 +7,8 @@ import { Component, OnInit } from '@angular/core';
   styleUrls: ['./people.page.scss'],
 })
 export class PeoplePage implements OnInit {
+
+  peopleArray = peopleArray
 
   constructor() { }
 

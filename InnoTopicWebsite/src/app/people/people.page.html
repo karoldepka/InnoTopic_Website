@@ -10,4 +10,12 @@
       <ion-title size="large">people</ion-title>
     </ion-toolbar>
   </ion-header>
+
+  <ion-card *ngFor="let person of peopleArray">
+    <ion-card-content>
+      <a href="p/{{ person.id }}"> {{ person.id }}</a>
+
+    </ion-card-content>
+  </ion-card>
+
 </ion-content>

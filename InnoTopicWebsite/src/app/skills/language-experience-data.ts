@@ -11,7 +11,7 @@ export const LanguageExperiences: Language[] = [
   new Language('Italian', experience('it', LanguageLevel.BEGINNER)),
   new Language('Dutch', experience('nl be', LanguageLevel.BEGINNER)),
   new Language('Ukrainian', experience('ua', LanguageLevel.BEGINNER)),
-  new Language('Russian', experience('ru ua', LanguageLevel.BEGINNER)),
+  new Language('Russian', experience('ru' /* 'ru ua' */, LanguageLevel.BEGINNER)),
   new Language('Mandarin Chinese', experience('cn', LanguageLevel.BEGINNER)),
   new Language('Arabic', experience('ma', LanguageLevel.BEGINNER)),
   new Language('Hindi', experience('in', LanguageLevel.BEGINNER)),
