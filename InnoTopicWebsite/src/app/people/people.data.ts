@@ -1,38 +1,59 @@
 import {dictToArrayAssigningIds} from "../utils/dictionary-utils";
 
+export function person(x: any) {
+  return {
+    get fullName(): string {
+      return this.givenNames + ' ' + this.surnames
+    },
+    ...x /* this could overwrite fullName*/,
+  }
+}
+
+export const companies = {
+  InnoTopic: "InnoTopic SLU"
+}
+
 export const people = {
-  dmilith: {
+
+  karol: person({
+    givenNames: "Karol",
+    surnames: "Depka Pradzinski",
+    position: "CEO, Chief Software Developer",
+    company: companies.InnoTopic,
+    // note we r using "position", not "title", as title, could be smth like PhD.
+    tagline: "#Rust and #TypeScript enthusiast with a broad experience, especially in #Frontend"
+
+  }),
+
+
+  dmilith: person({
     givenNames: "Daniel",
     surnames: "Dettlaff",
     position: "#Rust expert, CTO",
-  },
-
-  karol: {
-    givenNames: "Karol",
-    surnames: "Depka Pradzinski",
-    position: "#Rust expert, CTO",
-  },
-
-  joisco: {
-    // LLM intern
-  },
-
-  jay: {
-
-  },
-
-  noviodelangel: {
-
-  },
-
-  samyak: {
-    // intern
-  },
+  }),
 
 
-  paco: {
-    //  LLM intern
-  },
+  "joisco": person({
+    position: "LLM intern",
+  }),
+
+  jay: person({
+    company: companies.InnoTopic,
+
+  }),
+
+  noviodelangel: person({
+
+  }),
+
+  samyak: person({
+    position: "Part-time Intern"
+  }),
+
+
+  paco: person({
+    position: "Part-time LLM intern"
+  }),
 
 }
 
