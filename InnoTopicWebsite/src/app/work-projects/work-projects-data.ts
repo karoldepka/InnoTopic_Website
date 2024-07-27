@@ -351,6 +351,7 @@ export class WorkOrganisationsAndProjectsData {
       // TODO: 'ShirtGen': project({
       'AIShirtGen - InnoTopic AI LLM Shirts/Posters/Banners Generator': project({
         // TODO: title: "InnoTopic AI LLM Shirts/Posters/Banners Generator",
+        description: "OP #Python #LangChain #Ollama product",
         roles: `Founder, Owner, Angular developer`,
         topicsById: {
           'Ionic': {},
@@ -376,6 +377,11 @@ export class WorkOrganisationsAndProjectsData {
           'Font Awesome': {},
           'Node.js': {},
           'Firebase': {},
+          'Elasticsearch': {},
+          'Supabase': {},
+          'Meilisearch': {},
+          'TypeGraphQL': {},
+          'SurrealDB': {},
         }
       }),
       'InnoTopic.com website': project({
