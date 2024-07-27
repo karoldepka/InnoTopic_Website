@@ -1,12 +1,22 @@
-# app/services/llm_service.py
-from app.utils.rag_retriever import retrieve_documents
+import logging
+import os
+import requests
+
+logger = logging.getLogger(__name__)
+
+ollama_api_url = os.getenv("OLLAMA_API_URL")
 
 def generate_response_with_rag(prompt: str) -> str:
-    documents = retrieve_documents(prompt, "app/utils/vector_store.db")
-    if documents:
-        # Combine the prompt and the retrieved document content to generate a response
-        # Placeholder for actual model inference logic
-        response = f"Response based on the prompt: '{prompt}' and document: '{documents[0]['content']}'"
-    else:
-        response = f"No relevant documents found for the prompt: '{prompt}'"
-    return response
+    logger.info(f"Received prompt: {prompt}")
+    try:
+        response = requests.post(
+            f"{ollama_api_url}/generate",
+            json={"prompt": prompt}
+        )
+        response.raise_for_status()
+        result = response.json()
+        logger.info(f"Generated response: {result['response']}")
+        return result['response']
+    except Exception as e:
+        logger.error(f"Error generating response: {e}")
+        return "An error occurred while generating the response."
