@@ -705,6 +705,9 @@ export class Cloud {
     iconUrl: 'logo_gcp_hexagon_rgb.png'
     /* logos SVG-s: https://googlecloudcheatsheet.withgoogle.com/ */
   })
+
+  "Vector Databases" = tSquare('generic/fontawesome/database.svg')
+
   Algolia = t('algolia-icon.svg') /* new icon ~2023 */
   "Meilisearch" = tWide('meilisearch-icon-wide.svg')  /* Rust 99% */
   "Typesense" = tWide('typesense-icon.svg')

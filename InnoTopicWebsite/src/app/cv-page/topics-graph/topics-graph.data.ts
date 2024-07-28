@@ -34,6 +34,14 @@ export const nodeConnections: GraphConnections = {
           "LangChain": {},
           "Amazon SageMaker": {},
           "Jupyter": {},
+          "Vector Databases": {
+            connections: {
+              "Qdrant": {},
+              "Milvus": {},
+              "Pinecone": {},
+              "MindsDB": {},
+            },
+          },
         },
       },
       Ethereum: {
@@ -224,6 +232,7 @@ export const nodeConnections: GraphConnections = {
             sizeMult: bigSize,
             strengthMul: 2,
             connections: {
+              GreenSock: {},
               "Affinity Designer": { sizeMult: smallSize},
               Figma: {},
               'D3.js': {},
