@@ -3,8 +3,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 import httpx
 import logging
-import os
-from typing import List, Dict, Optional
+from typing import List, Dict
+from app.config import settings
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -23,12 +23,11 @@ app.add_middleware(
 )
 
 # Configuration
-OLLAMA_API_BASE_URL = os.getenv("OLLAMA_API_BASE_URL", "http://localhost:11434")
-DEFAULT_MODEL = "dolphin-llama3:8b-256k"
+OLLAMA_API_BASE_URL = settings.ollama_api_base_url
 
 class Query(BaseModel):
     prompt: str = Field(..., description="The prompt to generate text from")
-    model: str = Field(DEFAULT_MODEL, description="The model to use for generation")
+    model: str = Field(settings.default_model, description="The model to use for generation")
 
 class Conversation(BaseModel):
     id: str
@@ -190,4 +189,4 @@ async def health_check(client: httpx.AsyncClient = Depends(get_client)):
 if __name__ == "__main__":
     import uvicorn
     logger.info("Starting FastAPI application")
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    uvicorn.run(app, host=settings.fastapi_host, port=settings.fastapi_port)

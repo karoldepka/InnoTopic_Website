@@ -1,9 +1,101 @@
-# Ignore Python bytecode
-*.pyc
+# Byte-compiled / optimized / DLL files
 __pycache__/
+*.py[cod]
+*$py.class
 
-# Ignore virtual environments
+# C extensions
+*.so
+
+# Distribution / packaging
+.Python
+env/
 venv/
+ENV/
+env.bak/
+venv.bak/
+*.egg-info/
+.dist/
+build/
+dist/
+.eggs/
+parts/
+sdist/
+var/
+wheels/
+pip-wheel-metadata/
+share/python-wheels/
 
-# Ignore log files
+# Installer logs
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.nox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+.hypothesis/
+.pytest_cache/
+.pytype/
+test/__pycache__/
+tests/__pycache__/
+tests/*.py[cod]
+
+# Translations
+*.mo
+*.pot
+
+# Logs and databases
 *.log
+*.sql
+*.sqlite
+*.sqlite3
+*.db
+*.db-journal
+
+# Editor directories and files
+.vscode/
+.idea/
+*.swp
+*~
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# Django stuff:
+*.log
+local_settings.py
+db.sqlite3
+
+# Flask stuff:
+instance/
+.webassets-cache
+
+# Scrapy stuff:
+.scrapy
+
+# Sphinx documentation
+docs/_build/
+
+# PyBuilder
+target/
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# dotenv
+.env
+
+# FastAPI specific
+app/__pycache__/
+
+# Mac specific
+.DS_Store
+
+# Windows specific
+Thumbs.db
