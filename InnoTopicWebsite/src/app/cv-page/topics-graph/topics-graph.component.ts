@@ -135,26 +135,19 @@ export class TopicsGraphComponent implements OnInit {
     const simulation = d3.forceSimulation()
       // .force("gravity", 3)
       // .velocityDecay(3)
-      .force("link",
-        d3.forceLink().id(function(d: any) { return d.id; })
-          .strength(function(d: any) {
-            if (d.strengthMul) {
-              // console.log('d.strengthMul', d.strengthMul)
-            }
-            // return preset.forceLinkStrength;
-            // return 1 / Math.min(count(link.source), count(link.target));
-            return preset.forceLinkStrength * (d.strengthMul ?? 1)
-          }))
-      .force("charge", d3.forceManyBody().strength(function(d: GraphNode) {
-        const size = d.sizeMult ?? midSize;
-        // return preset.forceManyBodyStrength
-        // return size**5 * preset.forceManyBodyStrength / 3
-        // return size**10 * preset.forceManyBodyStrength / 100 // this was kinda working
-        return size**1.5 * preset.forceManyBodyStrength / 1 // this was kinda working
-        // return size * 1000000
+      .nodes(this.d3Nodes)
+    .force("link", d3.forceLink().id(function(d: any) { return d.id; })
+      .strength(function(d: any) {
+        return preset.forceLinkStrength * (d.strengthMul ?? 1)
       }))
-      .force("center", d3.forceCenter(width / 2, height / 2));
-
+    .force("charge", d3.forceManyBody().strength(function(d: GraphNode) {
+      const size = d.sizeMult ?? midSize;
+      return size**1.5 * preset.forceManyBodyStrength / 1
+    }))
+    .force("center", d3.forceCenter(width / 2, height / 2))
+    .force("collide", d3.forceCollide().radius(function(d: any) {
+      return d.sizeMult ? d.sizeMult * 30 : 30; // Adjust the radius as needed
+    }));
     // simulation.force("charge", function() {
     ////        return (d.sizeMult ? d.sizeMult : 1) * 100 }
     //            return -1000000;
@@ -321,18 +314,14 @@ export class TopicsGraphComponent implements OnInit {
       //   .attr("y2", function(d: any) { return d.target.y; });
 
 
-      if(self.graphHasContainer) {
-        perNodeMainGroup
-          .attr("cx", function(d: any) { return d.x = Math.max(radiusFunc(d), Math.min(width  * config.containerMul - radiusFunc(d), d.x)); })
-          .attr("cy", function(d: any) { return d.y = Math.max(radiusFunc(d), Math.min(height * config.containerMul - radiusFunc(d), d.y)); });
-      } else {
-        perNodeMainGroup
-          .attr("x", function(d: any) { return (d.x - radiusFunc(d) ); })
-          .attr("y", function(d: any) { return (d.y - radiusFunc(d) ); });
-      }
-      nodeCircleOverlay /* need to set position separately, because of issue with drag&drop and "translate(...)" transform */
-        .attr("x", function(d: any) { return (d.fx || d.x) - radiusFunc(d); })
-        .attr("y", function(d: any) { return (d.fy || d.y) - radiusFunc(d); });
+      perNodeMainGroup
+           .attr("cx", function(d: any) { return d.x = Math.max(radiusFunc(d), Math.min(width - radiusFunc(d), d.x)); })
+           .attr("cy", function(d: any) { return d.y = Math.max(radiusFunc(d), Math.min(height - radiusFunc(d), d.y)); });
+        
+
+       nodeCircleOverlay /* need to set position separately, because of issue with drag&drop and "translate(...)" transform */
+         .attr("x", function(d: any) { return (d.fx || d.x) - radiusFunc(d); })
+         .attr("y", function(d: any) { return (d.fy || d.y) - radiusFunc(d); });
       perNodeMainGroup.attr("transform", function(d: any) {
         // return "translate(" + (d.x + radiusFunc(d) / 2) + "," + (d.y + radiusFunc(d) / 2) + ")";
         return "translate(" + (d.x) + "," + (d.y) + ")";
