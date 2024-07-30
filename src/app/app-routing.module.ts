@@ -96,7 +96,11 @@ const routes: Routes = [
     loadChildren: () => import('./apps/Lifedvisor/life-overviews/life-overviews.module').then(m => m.LifeOverviewsPageModule)
   },
 
-  { path: '**', redirectTo: '' },
+  { path: '**', redirectTo: '' },  {
+    path: 'audio',
+    loadChildren: () => import('./apps/Learn/audio/audio.module').then( m => m.AudioPageModule)
+  },
+
 
 ];
 
