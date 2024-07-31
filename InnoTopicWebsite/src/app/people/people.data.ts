@@ -73,7 +73,15 @@ export const people = {
 
 
   noviodelangel: person({
-
+    givenNames: "Mateusz",
+    surnames: "Werpulewski",
+    position: "Full Stack Developer",
+    company: companies.InnoTopic,
+    tagline: "#Java and #TypeScript developer with a broad experience, especially in #Backend",
+    skills: {
+      Java: { level: "advanced"},
+      TypeScript: { level: "advanced"},
+    }
   }),
 
   samyak: person({
