@@ -27,6 +27,14 @@ export const cities = {
       // TODO: lat lng @Jay
     },
     timeZone: timezones.CET,
+  },
+  Berlin: {
+    city: "Berlin",
+    countryCodeISO3166_1Alpha2: "DE",
+    coords: {
+      // TODO: lat lng @Jay
+    },
+    timeZone: timezones.CET,
   }
 }
 
@@ -44,7 +52,25 @@ export const people = {
     location: cities.Malaga,
     skills: {
       Angular: { level: "expert" /* TODO unify check level */},
+    },
+    profiles: {
+      // externalProfilesKarol
+      linkedIn: "https://linkedin.com/in/karoldepka",
+    }
+  }),
 
+  DrIT: person({
+    givenNames: "Jolanda Gerda",
+    surnames: "Tromp (PhD)",
+    formalTitle: "PhD",
+    position: "CMO, Chief Metaverse Officer",
+    // company: companies.XR-Prototyping /* TBD InnoTopic */,
+    company: companies.InnoTopic /* TBD InnoTopic */,
+    // note can list as CMO for InnoTopic?
+    // tagline: "#XR and #HCI enthusiast with broad experience, especially in #Research, #Prototyping, #Innovation, #Mentoring, #Curriculum, #Startups",
+    location: cities.Malaga,
+    skills: {
+      "Human Factors Design and Evaluation": { level: "expert"},
     }
   }),
 
@@ -91,6 +117,12 @@ export const people = {
 
   paco: person({
     position: "Part-time LLM intern"
+  }),
+
+  janek: person({
+    firstName: "Jan",
+    position: "#PHP Architect and Expert at #Laravel and #Symfony",
+    location: cities.Berlin,
   }),
 
 }

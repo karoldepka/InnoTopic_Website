@@ -4,6 +4,7 @@ export const size = {
   verySmall: 0.35,
   small: 0.7,
   mid: 1.15,
+  medium: 1.15 /* duplicate */,
   big: 1.56,
   veryBig: 2.5,
 };
@@ -77,6 +78,10 @@ export const nodeConnections: GraphConnections = {
                 sizeMult: size.veryBig,
                 strengthMul: 1.5,
                 connections: {
+                  Docker: {
+                    sizeMult: size.medium,
+                  },
+
                   Cloud: {
                     connections: {
                       AWS: {},
