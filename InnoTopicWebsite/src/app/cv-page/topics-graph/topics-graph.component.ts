@@ -160,7 +160,8 @@ export class TopicsGraphComponent implements OnInit {
           // return size**10 * preset.forceManyBodyStrength / 100 // this was kinda working
           return size ** 1.5 * preset.forceManyBodyStrength / 1 // this was kinda working
           // return size * 1000000
-        }));
+        }))
+        .force("center", d3.forceCenter(width / 2, height / 2));
         // simulation.force("charge", function() {
         ////        return (d.sizeMult ? d.sizeMult : 1) * 100 }
         //            return -1000000;
