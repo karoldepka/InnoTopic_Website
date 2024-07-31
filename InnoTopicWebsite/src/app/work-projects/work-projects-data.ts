@@ -361,6 +361,10 @@ export class WorkOrganisationsAndProjectsData {
           Angular: {},
           NgRx: {},
           RxJS: {},
+          Python: {},
+          Django: {},
+          FastAPI: {},
+          Docker: {},
           TypeScript: {},
           Nx: {},
           Sass: {},
@@ -405,6 +409,7 @@ export class WorkOrganisationsAndProjectsData {
           'D3.js': {},
           Git: {},
           GitHub: {},
+          Docker: {},
           SVG: {},
           'Affinity Designer': {},
           'Figma': {},
@@ -433,6 +438,7 @@ export class WorkOrganisationsAndProjectsData {
           'Inkscape': {},
           'Adobe Illustrator': {},
           'Customer Support': {},
+          Docker: {},
         }
       },
       'OrYoL - Organize Your Life': {
@@ -452,6 +458,8 @@ export class WorkOrganisationsAndProjectsData {
           'Cloud Firestore': {},
           'GCP - Google Cloud Platform': {},
           'GitHub': {},
+          Docker: {},
+
         }
       },
       'LifeSuite': {
@@ -481,6 +489,8 @@ export class WorkOrganisationsAndProjectsData {
           'SVG': {},
           'Gravit Designer': {},
           'Affinity Designer': {},
+          Docker: {},
+
         }
       },
       'CloudTime': {
@@ -504,6 +514,8 @@ export class WorkOrganisationsAndProjectsData {
           'iOS': {},
           'Google Play': {},
           'Affinity Designer': {},
+          Docker: {},
+
         }
       }
     },
@@ -523,6 +535,7 @@ export class WorkOrganisationsAndProjectsData {
           Karma: {},
           Meetup: {},
           Git: {},
+
         }
       }
     },
@@ -594,6 +607,7 @@ export class WorkOrganisationsAndProjectsData {
           Eclipse: {},
           'IntelliJ IDEA': {},
           'Android Studio': {},
+          Docker: {},
         }
       }
     }
