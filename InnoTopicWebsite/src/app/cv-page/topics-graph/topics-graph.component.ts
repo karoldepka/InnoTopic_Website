@@ -34,7 +34,7 @@ export class TopicsGraphComponent implements OnInit {
   ) { }
 
   ngOnInit() {
-    this.graphHasContainer = Boolean(this.activatedRoute.snapshot.queryParams['container']);
+    this.graphHasContainer = !! this.activatedRoute.snapshot.queryParams['container']; // Jay and Samyak this is better than Boolean(). e.g. container=1
     console.log('generateNodes', this.d3Nodes)
     this.generateNodes(this.connections)
     console.log('d3Nodes', this.d3Nodes)
