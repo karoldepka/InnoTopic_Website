@@ -35,6 +35,13 @@ export const cities = {
       // TODO: lat lng @Jay
     },
     timeZone: timezones.CET,
+  },
+  Surat: {
+    city: "Surat",
+    countryCodeISO3166_1Alpha2: "IN",
+    coords: {
+      // TODO: lat lng @Jay
+    }
   }
 }
 
@@ -89,8 +96,24 @@ export const people = {
   }),
 
   jay: person({
+    givenNames: "Jay",
+    surnames: "Tailor",
     company: companies.InnoTopic,
-
+    position: "Full Stack #typescript and #javascript developer, Specialization in #Angular",
+    // position: "Full Stack #typescript and #javascript developer, Specialization in #Angular also works with #Node.js and #NestJS", TODO: check why node and nest is not working
+    location: cities.Surat,
+    skills: {
+      Angular: { level: "expert" },
+      NodeJs: { level: "professional" },
+      ExpressJs: { level: "expert" },
+      NestJs: { level: "professional" },
+      ReactJs: { level: "intermediate" }
+    },
+    profiles: {
+      twitter: "https://x.com/JayTailor45",
+      linkedIn: "https://linkedin.com/in/jaytailor45",
+      facebook: "https://www.facebook.com/jaytailor45",
+    }
   }),
 
   Nekmo: person({
