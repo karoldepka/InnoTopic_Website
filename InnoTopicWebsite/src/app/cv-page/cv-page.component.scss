@@ -30,3 +30,9 @@ app-external-profiles {
 section {
   padding: 10px 0;
 }
+
+.graph-container {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+}
