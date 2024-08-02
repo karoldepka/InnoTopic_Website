@@ -186,6 +186,8 @@ export const nodeConnections: GraphConnections = {
                             strengthMul: strength.big,
                             sizeMult: size.big,
                             connections: {
+                              Gradle: {},
+                              Groovy: {},
                               "OpenShift": { sizeMult: size.small, strengthMul: strength.veryBig },
                               "Hazelcast": { sizeMult: size.small, strengthMul: strength.veryBig },
                               "Kafka": { sizeMult: size.small, strengthMul: strength.veryBig, },
