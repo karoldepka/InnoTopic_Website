@@ -82,7 +82,9 @@ export const nodeConnections: GraphConnections = {
                   "Apollo Studio": {},
                   "OpenAPI": {
                     connections: {
-                      "Swagger": {},
+                      "Swagger": {
+                        strengthMul: strength.veryBig,
+                      },
                     }
                   },
                   // TODO: monitoring, devops,
