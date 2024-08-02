@@ -780,6 +780,7 @@ export const highlights = {
     // TODO: Christian Cross
     // "Yin and Yang": {},
     // TODO: Freemasonry?
+    // TODO Eye of Chorus, of Ra. Projection of the brain; Pineal -> DMT, Melatonin, 3rd eye.
     Psi: {},
     "Sirius Disclosure": {}, // + UAP
     "Guitar": {},
