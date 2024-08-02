@@ -158,9 +158,13 @@ export const nodeConnections: GraphConnections = {
                         strengthMul: 3,
                         sizeMult: smallSize,
                         connections: {
-                          "Kafka": {},
+                          "Kafka": {
+                            sizeMult: verySmallSize,
+                            strengthMul: strength.veryBig,
+
+                          },
                           "Spring Boot": {
-                            strengthMul: 2,
+                            strengthMul: strength.veryBig,
                             sizeMult: verySmallSize,
                             /* TODO could display old stuff as faded/transparent/grayed */
                             // ...small
