@@ -9,17 +9,15 @@ export const size = {
   veryBig: 2.5,
 };
 
+export const sizes = size;
+
 export const strength = {
   ...size,
   veryBig: 4,
 };
 
-export const
-  veryBigSize = size.veryBig,
-  bigSize = size.big,
-  midSize = size.mid,
-  smallSize = size.small,
-  verySmallSize = size.small;
+export const strengths = strength;
+
 
 export const nodeConnections: GraphConnections = {
   "InnoTopic" : {
@@ -52,18 +50,18 @@ export const nodeConnections: GraphConnections = {
         }
       },
       CSS3: {
-        sizeMult: bigSize,
+        sizeMult: size.big,
         connections: {
           Sass: {},
-          Stylus: { sizeMult: smallSize},
-          Less: { sizeMult: smallSize},
+          Stylus: { sizeMult: size.verySmall},
+          Less: { sizeMult: size.verySmall},
         }
       },
       JavaScript: {
-        sizeMult: bigSize,
+        sizeMult: size.big,
         connections: {
           'TypeScript': { /*type: 'writtenIn'*/ /* dependsOn / uses */
-            sizeMult: veryBigSize,
+            sizeMult: size.veryBig,
             strengthMul: 0.4,
           },
 
@@ -71,7 +69,7 @@ export const nodeConnections: GraphConnections = {
 
           'Frontend': { /*type: 'writtenIn'*/ /* dependsOn / uses */
             strengthMul: 1.5,
-            sizeMult: veryBigSize,
+            sizeMult: size.veryBig,
             // strengthMul: 0.4,
             connections: {
               Backend: {
@@ -121,20 +119,20 @@ export const nodeConnections: GraphConnections = {
                   }
                 }
               },
-              Svelte: {sizeMult: midSize},
-              Qwik: {sizeMult: smallSize},
+              Svelte: {sizeMult: size.medium},
+              Qwik: {sizeMult: size.verySmall},
               // Astro: {},
               SolidJS: {
-                sizeMult: smallSize,
+                sizeMult: size.verySmall,
               },
               Ionic: {
                 strengthMul: 2,
-                sizeMult: veryBigSize,
+                sizeMult: size.veryBig,
                 connections: {
 
                   'Angular': {
                     strengthMul: 0.7,
-                    sizeMult: veryBigSize,
+                    sizeMult: size.veryBig,
                     connections: {
                       'Nx': {},
                       // NgRx: { /* does not show icon*/
@@ -144,34 +142,52 @@ export const nodeConnections: GraphConnections = {
                   },
                   'Vue.js': {
                     strengthMul: 0.5,
-                    sizeMult: bigSize
+                    sizeMult: size.big
                   },
                   'React': { /*...weak*/
                     strengthMul: 0.5,
-                    sizeMult: veryBigSize
+                    sizeMult: size.veryBig
                   },
-                  Android: {
+                  Mobile: {
                     strengthMul: 1.5,
-                    sizeMult: midSize,
+                    sizeMult: size.big,
                     connections: {
-                      Java: {
-                        strengthMul: 3,
-                        sizeMult: smallSize,
+                      Flutter: {},
+                      "React Native": {},
+                      "NativeScript": {},
+                      "Compose Multiplatform": {},
+                      iOS: {
+                        strengthMul: strength.medium,
+                        sizeMult: strength.big,
                         connections: {
-                          "Kafka": {
-                            sizeMult: verySmallSize,
-                            strengthMul: strength.veryBig,
-
-                          },
-                          "Spring Boot": {
-                            strengthMul: strength.veryBig,
-                            sizeMult: verySmallSize,
-                            /* TODO could display old stuff as faded/transparent/grayed */
-                            // ...small
+                          Swift: {
+                            strengthMul: strength.medium,
+                            sizeMult: strength.big,
                           }
-                        }
+                        },
                       },
-                      Kotlin: {},
+                      Android: {
+                        strengthMul: strength.medium,
+                        sizeMult: strength.big,
+                        connections: {
+                          Java: {
+                            strengthMul: strength.big,
+                            sizeMult: size.big,
+                            connections: {
+                              "OpenShift": { sizeMult: size.small, strengthMul: strength.veryBig },
+                              "Hazelcast": { sizeMult: size.small, strengthMul: strength.veryBig },
+                              "Kafka": { sizeMult: size.small, strengthMul: strength.veryBig, },
+                              "Spring Boot": {
+                                strengthMul: strength.veryBig,
+                                sizeMult: size.medium,
+                                /* TODO could display old stuff as faded/transparent/grayed */
+                                // ...small
+                              }
+                            }
+                          },
+                          Kotlin: {},
+                        },
+                      },
                     },
                   },
                   'Stencil': {
@@ -194,7 +210,7 @@ export const nodeConnections: GraphConnections = {
                   WebAssembly: {
                     connections: {
                       "WebAssembly System Interface (WASI)": { sizeMult: size.verySmall, strengthMul: strength.veryBig},
-                      "Wasmtime": { sizeMult: size.verySmall, strengthMul: strength.veryBig },
+                      // "Wasmtime": { sizeMult: size.verySmall, strengthMul: strength.veryBig }, // OFF: does not colorize
                       "Wasmer": { sizeMult: size.verySmall, strengthMul: strength.veryBig },
                       "WebAssembly Package Manager (WAPM)": { sizeMult: size.verySmall, strengthMul: strength.veryBig },
                       AssemblyScript: { sizeMult: size.verySmall, strengthMul: strength.veryBig },
@@ -203,7 +219,7 @@ export const nodeConnections: GraphConnections = {
                   },
                   Tokio: {},
                   Tonic: {
-                    sizeMult: smallSize,
+                    sizeMult: size.verySmall,
                   },
                   Tauri: {},
                   Dioxus: {},
@@ -236,14 +252,14 @@ export const nodeConnections: GraphConnections = {
         },
       },
       HTML5: {
-        sizeMult: bigSize,
+        sizeMult: size.big,
         connections: {
           SVG: {
-            sizeMult: bigSize,
+            sizeMult: size.big,
             strengthMul: 2,
             connections: {
               GreenSock: {},
-              "Affinity Designer": { sizeMult: smallSize},
+              "Affinity Designer": { sizeMult: size.verySmall},
               Figma: {},
               'D3.js': {},
             }

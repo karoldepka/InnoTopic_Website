@@ -377,6 +377,8 @@ export class Backend {
   Spring = t('spring-icon.svg')
   'Spring Boot' = t()
   'Kafka' = tNarrow('kafka-icon.svg')
+  'OpenShift' = tWide('openshift.svg')
+  'Hazelcast' = tNarrow('hazelcast-icon.svg')
 
   Hibernate = t()
   "Fermyon" = tNarrow('fermyon-icon.svg') /* too ugly */ // wasm instead of docker { tagline: 'Fermyon Cloud is the easiest way to deploy and manage cloud native WebAssembly applications with Spin, our developer tool.', pressKitUrl: 'https://design.fermyon.dev/' }'
@@ -657,6 +659,7 @@ export class OS {
 }
 
 export class Mobile {
+  Mobile = tNarrow('generic/fontawesome/mobile.svg')
   iOS = t()
   Android = tWide({
     logo: 'android-icon.svg',
@@ -668,6 +671,7 @@ export class Mobile {
   Cordova = t()
   PhoneGap = t()
   NativeScript = t()
+  "React Native" = tWide('react.svg')
   Flutter = tWide('flutter.svg')
   'Java Micro Edition' = t('java')
   'BlackBerry' = tNoIcon()

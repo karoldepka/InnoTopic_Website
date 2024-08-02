@@ -74,7 +74,9 @@ export const topicsOld = [
   /*'JavaScript', */ tag('ECMAScript', 'es6'),
   tag('.NET Core', null),
   tagNoIcon('Akka'),
-  /*tagLogoType('Ember'),*/ /*'React'*//*, 'Redux',*/ tagNoIcon('React Native'), 'Xamarin', tagNoIcon('Xamarin.Forms'),
+  /*tagLogoType('Ember'),*/ /*'React'*//*, 'Redux',*/
+  /*tagNoIcon('React Native'),*/
+  'Xamarin', tagNoIcon('Xamarin.Forms'),
   /*tag('TensorFlow', 'tensorflow'),*/ 'OpenCV',
   'Appium', tagNoIcon('Robotium'),
   /*'Laravel', */'CakePHP', 'Zend Framework', 'CodeIgniter', 'Symfony',

@@ -1,6 +1,6 @@
 import {Component, Input, OnInit, ViewEncapsulation,} from '@angular/core';
 import {topics} from '../../TopicFriendsShared3/topics-core/topics-data';
-import {midSize, nodeConnections, nodeLinks, preset, size, strength} from "./topics-graph.data";
+import {nodeConnections, nodeLinks, preset, sizes, strengths} from "./topics-graph.data";
 import {GraphConnections, GraphNode, GraphNodeId, LinkByIds} from "./topics-graph.types";
 import {ActivatedRoute} from "@angular/router";
 
@@ -134,7 +134,7 @@ export class TopicsGraphComponent implements OnInit {
             })
           )
           .force("charge", d3.forceManyBody().strength(function(d: GraphNode) {
-            const size = d.sizeMult ?? midSize;
+            const size = d.sizeMult ?? sizes.medium;
             return size**1.5 * preset.forceManyBodyStrength / 1
           }))
           .force("center", d3.forceCenter(width / 2, height / 2))
@@ -154,7 +154,7 @@ export class TopicsGraphComponent implements OnInit {
           return preset.forceLinkStrength * (d.strengthMul ?? 1)
         }))
         .force("charge", d3.forceManyBody().strength(function(d: GraphNode) {
-          const size = d.sizeMult ?? midSize;
+          const size = d.sizeMult ?? sizes.medium;
           // return preset.forceManyBodyStrength
           // return size**5 * preset.forceManyBodyStrength / 3
           // return size**10 * preset.forceManyBodyStrength / 100 // this was kinda working
@@ -223,7 +223,9 @@ export class TopicsGraphComponent implements OnInit {
       return radiusFunc(d) * 2;
     }
     const nodeCircle = perNodeMainGroup.append("circle")
-      .attr("class", function(d: any) { d.id + '_background' + ' circleBg' + ' techCircle'} )
+      .attr("class", function(d: any) {
+        return d.id + '_background' + ' circleBg' + ' techCircle' // FIXME: check, it was not returning value
+      } )
       .attr("r", radiusFunc )
       .attr("id2", function(d: any) { return d.id } )
       .attr("id", function(d: any) { return d.id } )
