@@ -79,6 +79,16 @@ export const nodeConnections: GraphConnections = {
                   Docker: {
                     sizeMult: size.medium,
                   },
+                  "Apollo Studio": {},
+                  "OpenAPI": {
+                    connections: {
+                      "Swagger": {},
+                    }
+                  },
+                  // TODO: monitoring, devops,
+                  Datadog: {},
+                  Ansible: {},
+
 
                   Cloud: {
                     connections: {

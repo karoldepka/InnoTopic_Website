@@ -75,7 +75,7 @@ export class TopicsGraphComponent implements OnInit {
         }
         d3Node.body = text.trim().substr(text.indexOf('<svg')) // TODO maybe remove other attrs like width height
         // TODO: prolly i really wanna remove stuff AFTER <svg
-        console.log('d3Node with text', d3Node)
+        // console.log('d3Node with text', d3Node)
 
       })
       this.initD3Graph() // FIXME
