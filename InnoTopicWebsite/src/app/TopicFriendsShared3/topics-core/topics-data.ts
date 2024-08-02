@@ -376,6 +376,7 @@ export class Backend {
 
   Spring = t('spring-icon.svg')
   'Spring Boot' = t()
+  'Kafka' = tNarrow('kafka-icon.svg')
 
   Hibernate = t()
   "Fermyon" = tNarrow('fermyon-icon.svg') /* too ugly */ // wasm instead of docker { tagline: 'Fermyon Cloud is the easiest way to deploy and manage cloud native WebAssembly applications with Spin, our developer tool.', pressKitUrl: 'https://design.fermyon.dev/' }'

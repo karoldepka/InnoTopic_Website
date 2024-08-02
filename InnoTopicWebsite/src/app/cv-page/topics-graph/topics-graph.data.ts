@@ -158,6 +158,7 @@ export const nodeConnections: GraphConnections = {
                         strengthMul: 3,
                         sizeMult: smallSize,
                         connections: {
+                          "Kafka": {},
                           "Spring Boot": {
                             strengthMul: 2,
                             sizeMult: verySmallSize,
