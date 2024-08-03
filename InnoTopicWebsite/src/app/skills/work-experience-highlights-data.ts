@@ -779,8 +779,9 @@ export const highlights = {
     // "Bahai Faith": {},
     // TODO: Christian Cross
     // "Yin and Yang": {},
-    // TODO: Freemasonry?
-    // TODO Eye of Chorus, of Ra. Projection of the brain; Pineal -> DMT, Melatonin, 3rd eye.
+    // TODO: Freemasonry? all-seeing eye
+    "Eye of Horus": {}, // Eye of Ra. Projection of the brain; Pineal -> DMT, Melatonin, 3rd eye.,
+    // "Buddha": {},
     Psi: {},
     "Sirius Disclosure": {}, // + UAP
     "Guitar": {},

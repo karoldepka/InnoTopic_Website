@@ -1053,6 +1053,7 @@ export class FunAndSports {
   "All-Seeing Eye" = tSquare('all-seeing-eye.svg')
   "Hinduism" = tWide('hinduism.svg')
   "Judaism" = tWide('judaism.svg')
+  "Eye of Horus" = tWide('generic/mind/eye-of-horus-svgrepo-com.svg')
   "Sirius Disclosure" = tWide('sirius-disclosure.svg')
   'Triskelion' = t('generic/fun/triskelion-2024-2-no-stroke.svg')
   'Business' = t('generic/business--chart-line-square.svg')
