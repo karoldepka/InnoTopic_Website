@@ -766,9 +766,12 @@ export const highlights = {
     "Euler's identity": {}, // + Riemann's Hypothesis
     // "Tree of Life": {},
     "All-Seeing Eye": {},
+    // TODO: Freemasonry? all-seeing eye
+    "Eye of Horus": {}, // Eye of Ra. Projection of the brain; Pineal -> DMT, Melatonin, 3rd eye.,
     // "Pentagram": {}, // E.g., Washington's street layout; baphomet.svg too suggestive?
     "Hinduism": {},
     "Judaism": {},
+
 
     // Mormon temple; https://thenounproject.com/icon/salt-lake-temple-219294/
     // "Merkaba": {},
@@ -778,9 +781,7 @@ export const highlights = {
     // "Christianity": {},
     // "Bahai Faith": {},
     // TODO: Christian Cross
-    // "Yin and Yang": {},
-    // TODO: Freemasonry? all-seeing eye
-    "Eye of Horus": {}, // Eye of Ra. Projection of the brain; Pineal -> DMT, Melatonin, 3rd eye.,
+    "Yin and Yang": {},
     // "Buddha": {},
     Psi: {},
     "Sirius Disclosure": {}, // + UAP

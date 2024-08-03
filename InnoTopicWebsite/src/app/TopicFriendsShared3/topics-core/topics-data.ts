@@ -921,7 +921,7 @@ export class AI {
   "LLM" = tSquare('generic/ai.svg' /*TODO*/)
   "C3 AI" = tWide('c3-ai.svg')
   "LangChain" = tWide('langchain.svg')
-  "AutoGen" = tNarrow('autogen-icon2222.svg')
+  "AutoGen" = tWide('autogen-icon.svg')
   "Microsoft Bing" = tNarrow('bing.svg')
   "Microsoft Copilot" = tNarrow('microsoft-copilot-icon.svg')
   "GitHub Copilot" = tWide('github-copilot.svg')
@@ -1049,12 +1049,13 @@ export class FunAndSports {
     license: "CC BY 3.0",
     url: "https://thenounproject.com/icon/mandelbrot-fractal-103125/",
   })
-  "Euler's identity" = tSquare('eulers-identity.svg')
-  "All-Seeing Eye" = tSquare('all-seeing-eye.svg')
-  "Hinduism" = tWide('hinduism.svg')
-  "Judaism" = tWide('judaism.svg')
+  "Euler's identity" = tSquare('generic/mind/eulers-identity.svg')
+  "All-Seeing Eye" = tSquare('generic/mind/all-seeing-eye.svg')
+  "Hinduism" = tWide('generic/mind/hinduism.svg')
+  "Judaism" = tWide('generic/mind/judaism.svg')
+  "Yin and Yang" = tSquare('generic/mind/yin-yang.svg')
   "Eye of Horus" = tWide('generic/mind/eye-of-horus-svgrepo-com.svg')
-  "Sirius Disclosure" = tWide('sirius-disclosure.svg')
+  "Sirius Disclosure" = tWide('generic/mind/sirius-disclosure.svg')
   'Triskelion' = t('generic/fun/triskelion-2024-2-no-stroke.svg')
   'Business' = t('generic/business--chart-line-square.svg')
   'Psychology' = tWide('generic/brain-solid-cropped.svg') // & neuroscience
