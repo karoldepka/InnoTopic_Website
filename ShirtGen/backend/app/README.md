@@ -44,3 +44,25 @@ This is the backend service for the Shirt Generator application, built with Fast
 
 ### Project Structure
 
+frontend/
+├── public/
+├── src/
+│ ├── components/
+│ │ ├── LogoList.js
+│ │ └── SearchForm.js
+│ ├── App.css
+│ ├── App.js
+│ ├── index.css
+│ ├── index.js
+├── package.json
+├── setup_and_run.bat
+├── README.md
+
+### Components
+
+- `LogoList.js`: Displays the list of logos fetched from the backend.
+- `SearchForm.js`: Form for entering and submitting prompts.
+
+## License
+
+This project is licensed under the MIT License.
