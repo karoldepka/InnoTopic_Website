@@ -1,8 +1,3 @@
-Got it. Here's a README file with details about 50 popular models, including their size, performance, distinctive traits, and commands to download and run them.
-
-### README.md
-
-```markdown
 # OllamaFastAPI
 
 This repository provides a FastAPI wrapper for the Ollama API, allowing users to interact with large language models (LLMs) running locally. Users can configure the API, list available models, generate text based on prompts, and manage conversations.
