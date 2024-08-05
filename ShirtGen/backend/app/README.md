@@ -42,22 +42,6 @@ This is the backend service for the Shirt Generator application, built with Fast
   - Request Body: `{ "prompt": "your prompt here" }`
   - Response: `[ "logo_url1", "logo_url2", ... ]`
 
-### Project Structure
-
-frontend/
-├── public/
-├── src/
-│ ├── components/
-│ │ ├── LogoList.js
-│ │ └── SearchForm.js
-│ ├── App.css
-│ ├── App.js
-│ ├── index.css
-│ ├── index.js
-├── package.json
-├── setup_and_run.bat
-├── README.md
-
 ### Components
 
 - `LogoList.js`: Displays the list of logos fetched from the backend.
