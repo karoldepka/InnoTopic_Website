@@ -1,0 +1,38 @@
+.App {
+    text-align: center;
+}
+
+.tshirt-preview {
+    width: 300px;
+    height: 400px;
+    position: relative;
+    margin: 20px auto;
+    border: 1px solid #ccc;
+}
+
+.logo-display img {
+    width: 100px;
+    margin: 5px;
+    cursor: pointer;
+}
+
+.logo-display div {
+    display: inline-block;
+    margin: 10px;
+}
+
+.design-manager {
+    margin: 20px;
+}
+
+.design-manager label {
+    margin-right: 10px;
+}
+
+.design-manager .tshirt-preview img {
+    position: absolute;
+}
+
+.design-manager h3 {
+    margin-top: 20px;
+}

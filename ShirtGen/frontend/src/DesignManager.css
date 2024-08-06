@@ -1,0 +1,9 @@
+.tshirt-preview {
+    width: 300px;
+    height: 400px;
+    border: 1px solid #000;
+    position: relative;
+    margin: 20px 0;
+    background-image: url('/path/to/tshirt-template.png'); /* Add a T-shirt template image */
+    background-size: cover;
+}

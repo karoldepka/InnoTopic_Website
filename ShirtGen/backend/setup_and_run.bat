@@ -18,16 +18,6 @@ pip install -r requirements.txt
 echo Starting FastAPI server...
 start /B python -m uvicorn app.main:app --reload
 
-:: Navigate to frontend directory
-cd ..\frontend
-
-:: Install frontend dependencies
-echo Installing frontend dependencies...
-npm install
-
-:: Start React development server
-echo Starting React development server...
-npm start
 
 :: Keep the command prompt open
 pause

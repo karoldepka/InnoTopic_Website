@@ -1,10 +1,12 @@
 import React from 'react';
 
-function LogoDisplay({ logos }) {
+function LogoDisplay({ logos, onAddLogo }) {
   return (
-    <div>
+    <div className="logo-display">
       {logos.map((logo, index) => (
-        <img key={index} src={logo} alt={`Logo ${index + 1}`} />
+        <div key={index} onClick={() => onAddLogo(logo)}>
+          <img src={logo.thumbnail_url} alt={`Logo ${index + 1}`} />
+        </div>
       ))}
     </div>
   );
