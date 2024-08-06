@@ -6,6 +6,7 @@ function LogoDisplay({ logos, onAddLogo }) {
       {logos.map((logo, index) => (
         <div key={index} onClick={() => onAddLogo(logo)}>
           <img src={logo.thumbnail_url} alt={`Logo ${index + 1}`} />
+          <p>{`Logo ${index + 1}`}</p>
         </div>
       ))}
     </div>

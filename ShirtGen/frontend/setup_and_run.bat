@@ -1,5 +1,3 @@
-@echo off
-SETLOCAL
 
 :: Check if virtual environment directory exists
 IF NOT EXIST "venv" (
@@ -8,7 +6,7 @@ IF NOT EXIST "venv" (
 )
 
 :: Activate virtual environment
-call venv\Scripts\activate
+venv\Scripts\activate
 
 :: Change to frontend directory
 cd frontend

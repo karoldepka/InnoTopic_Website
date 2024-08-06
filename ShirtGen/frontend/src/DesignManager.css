@@ -1,9 +1,33 @@
-.tshirt-preview {
+.design-manager {
+    margin: 20px;
+  }
+  
+  .design-manager label {
+    margin-right: 10px;
+  }
+  
+  .tshirt-preview {
+    position: relative;
     width: 300px;
     height: 400px;
-    border: 1px solid #000;
-    position: relative;
-    margin: 20px 0;
-    background-image: url('/path/to/tshirt-template.png'); /* Add a T-shirt template image */
-    background-size: cover;
-}
+    margin: 20px auto;
+    border: 1px solid #ccc;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+  }
+  
+  .tshirt-preview img {
+    position: absolute;
+    cursor: move;
+  }
+  
+  input[type="range"] {
+    width: 200px;
+    margin: 10px 0;
+  }
+  
+  button {
+    margin-left: 10px;
+  }
+  

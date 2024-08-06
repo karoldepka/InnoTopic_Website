@@ -11,6 +11,7 @@ function App() {
   const [tshirtDesign, setTshirtDesign] = useState({
     color: '#ffffff',
     logos: [],
+    template: 'tshirt-template1.png'
   });
 
   const handlePromptSubmit = async (prompt) => {
@@ -55,7 +56,7 @@ function App() {
       <PromptInput onSubmit={handlePromptSubmit} />
       {error && <p style={{ color: 'red' }}>{error}</p>}
       <LogoDisplay logos={logos} onAddLogo={handleAddLogo} />
-      <DesignManager onDesignChange={handleDesignChange} tshirtDesign={tshirtDesign} />
+      <DesignManager onDesignChange={handleDesignChange} />
       <OrderManager tshirtDesign={tshirtDesign} />
     </div>
   );
