@@ -10,7 +10,7 @@ logger = logging.getLogger(__name__)
 
 load_dotenv()
 
-OLLAMA_API_URL = "http://localhost:11434/api/generate"
+OLLAMA_API_URL = os.getenv('OLLAMA_API_URL')
 OLLAMA_API_KEY = os.getenv('OLLAMA_API_KEY')
 
 if not OLLAMA_API_KEY:
@@ -57,7 +57,7 @@ def generate_text_with_ollama(prompt):
             "Content-Type": "application/json"
         }
         data = {
-            "model": "llama3",
+            "model": "dolphin-llama3:8b-256k",  # Specify your model here
             "prompt": prompt,
             "stream": False
         }
@@ -68,6 +68,7 @@ def generate_text_with_ollama(prompt):
     except requests.RequestException as e:
         logger.error(f"Error calling Ollama API: {str(e)}", exc_info=True)
         raise
+
 
 def extract_keywords(text):
     # Simple keyword extraction logic
