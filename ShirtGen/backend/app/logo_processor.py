@@ -50,6 +50,12 @@ def process_prompt(prompt):
         logger.error(f"Error in process_prompt: {str(e)}", exc_info=True)
         raise
 
+OLLAMA_MODEL_NAME = os.getenv('OLLAMA_MODEL_NAME')
+
+if not OLLAMA_MODEL_NAME:
+    logger.error("OLLAMA_MODEL_NAME is not set")
+    raise ValueError("OLLAMA_MODEL_NAME is not set")
+
 def generate_text_with_ollama(prompt):
     try:
         headers = {
@@ -57,7 +63,7 @@ def generate_text_with_ollama(prompt):
             "Content-Type": "application/json"
         }
         data = {
-            "model": "dolphin-llama3:8b-256k",  # Specify your model here
+            "model": OLLAMA_MODEL_NAME,  # Use the environment variable
             "prompt": prompt,
             "stream": False
         }
