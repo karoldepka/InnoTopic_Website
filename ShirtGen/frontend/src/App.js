@@ -11,7 +11,7 @@ function App() {
   const [tshirtDesign, setTshirtDesign] = useState({
     color: '#ffffff',
     logos: [],
-    template: 'tshirt-template1.png'
+    template: 'tshirt-template1.png',
   });
 
   const handlePromptSubmit = async (prompt) => {
@@ -42,6 +42,10 @@ function App() {
   };
 
   const handleAddLogo = (logo) => {
+    if (!logo.thumbnail_url) {
+      setError('Invalid logo data');
+      return;
+    }
     const newLogo = { url: logo.thumbnail_url, size: 100, position: { x: 50, y: 50 } };
     const updatedDesign = {
       ...tshirtDesign,
@@ -51,13 +55,29 @@ function App() {
   };
 
   return (
-    <div className="App">
+    <div className="App container">
       <h1>Shirt Generator</h1>
-      <PromptInput onSubmit={handlePromptSubmit} />
-      {error && <p style={{ color: 'red' }}>{error}</p>}
-      <LogoDisplay logos={logos} onAddLogo={handleAddLogo} />
-      <DesignManager onDesignChange={handleDesignChange} />
-      <OrderManager tshirtDesign={tshirtDesign} />
+      <div className="row">
+        <div className="col">
+          <PromptInput onSubmit={handlePromptSubmit} />
+          {error && <p className="text-danger">{error}</p>}
+        </div>
+      </div>
+      <div className="row">
+        <div className="col">
+          <LogoDisplay logos={logos} onAddLogo={handleAddLogo} />
+        </div>
+      </div>
+      <div className="row">
+        <div className="col">
+          <DesignManager tshirtDesign={tshirtDesign} onDesignChange={handleDesignChange} />
+        </div>
+      </div>
+      <div className="row">
+        <div className="col">
+          <OrderManager tshirtDesign={tshirtDesign} />
+        </div>
+      </div>
     </div>
   );
 }

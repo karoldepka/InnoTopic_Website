@@ -6,7 +6,7 @@ IF NOT EXIST "venv" (
 )
 
 :: Activate virtual environment
-venv\Scripts\activate
+call venv\Scripts\activate
 
 :: Change to frontend directory
 cd frontend
