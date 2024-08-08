@@ -23,8 +23,7 @@ class NounProjectAPI:
 
         # Set up session with retries
         self.session = requests.Session()
-        retries = Retry(total=3, backoff_factor=1, status_forcelist=[500, 502, 503, 504])
-        self.session.mount('https://', HTTPAdapter(max_retries=retries))
+        self.session.mount('https://', HTTPAdapter())
 
     def search(self, term, limit=5):
         url = f"{self.base_url}/v2/icon"
@@ -47,24 +46,11 @@ class NounProjectAPI:
             raise
 
 
-def exponential_backoff_retry(func, *args, max_retries=3, initial_delay=1, **kwargs):
-    delay = initial_delay
-    for attempt in range(max_retries):
-        try:
-            return func(*args, **kwargs)
-        except Exception as e:
-            logger.warning(f"Attempt {attempt + 1} failed: {e}. Retrying in {delay} seconds...")
-            time.sleep(delay)
-            delay *= 2
-    logger.error(f"All {max_retries} attempts failed. Returning an empty result.")
-    return None
-
-
 def search_noun_project(query: str) -> list:
     logger.debug(f"Searching Noun Project for: {query}")
     try:
         api = NounProjectAPI(os.getenv('NOUN_PROJECT_API_KEY'), os.getenv('NOUN_PROJECT_API_SECRET'))
-        results = exponential_backoff_retry(api.search, query, limit=5)
+        results = api.search(query, limit=2)
         if results:
             logger.debug(f"Noun Project search results: {results}")
             return [icon['thumbnail_url'] for icon in results.get('icons', [])]

@@ -28,13 +28,15 @@ This is a FastAPI project that integrates with Langchain to generate shirts from
    poetry install
    ```
 
-4. Set the OpenAI API key as an environment variable:
+4. Copy `.env` from `.env~template`
 
    ```
-   export OPENAI_API_KEY=your_openai_api_key_here
+   OPENAI_API_KEY=<your openai key>
+   NOUN_PROJECT_API_KEY=<api key from noun api>
+   NOUN_PROJECT_API_SECRET=<api secret from noun api>
    ```
 
-   Replace `your_openai_api_key_here` with your actual OpenAI API key.
+   Add your API key and secrets for above environment variables
 
 ## Running the Application
 
@@ -48,7 +50,7 @@ This will start the server at `http://localhost:8000`.
 
 ## Project Structure
 
-- `app.py`: The main FastAPI application file that sets up the API endpoints and Langchain components.
+- `main.py`: The main FastAPI application file that sets up the API endpoints and Langchain components.
 - `pyproject.toml`: The Poetry configuration file.
 
 ## Dependencies
