@@ -4,6 +4,9 @@ from app.services.noun_api_service import search_noun_project
 
 logger = logging.getLogger(__name__)
 
+# In-memory cache for icons
+icon_cache = {}
+
 def generate_svgs_from_prompt(prompt: str, use_keywords: bool) -> [str]:
     logger.info(f"Received prompt: {prompt}, use_keywords: {use_keywords}")
 
@@ -15,10 +18,15 @@ def generate_svgs_from_prompt(prompt: str, use_keywords: bool) -> [str]:
         # Use the prompt directly as a keyword
         generated_keywords = [prompt]
 
-    # Search Noun Project for each keyword
+    # Search Noun Project for each keyword, using cache if available
     logos = []
     for keyword in generated_keywords:
-        logos.extend(search_noun_project(keyword))
+        if keyword in icon_cache:
+            logos.extend(icon_cache[keyword])
+        else:
+            icons = search_noun_project(keyword)
+            icon_cache[keyword] = icons
+            logos.extend(icons)
 
     logger.debug(f"Found logos: {logos}")
 

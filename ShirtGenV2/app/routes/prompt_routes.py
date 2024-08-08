@@ -1,6 +1,7 @@
 import logging
 from fastapi import APIRouter, HTTPException, Request
 from app.models.prompt_request_model import PromptRequest
+from app.models.user_settings_model import UserSettingsRequest
 from app.services.prompt_service import generate_svgs_from_prompt
 
 logger = logging.getLogger(__name__)
@@ -14,3 +15,22 @@ async def generate(request: Request, request_data: PromptRequest):
     if response == "An error occurred while generating the response.":
         raise HTTPException(status_code=500, detail="Internal Server Error")
     return {"response": response}
+
+@router.get("/health")
+async def health_check():
+    return {"status": "Healthy"}
+
+# In-memory store for user settings (for demonstration purposes)
+user_settings_store = {}
+
+@router.post("/save-settings")
+async def save_settings(request_data: UserSettingsRequest):
+    logger.info("Saving settings for user: %s", request_data.user_id)
+    user_settings_store[request_data.user_id] = request_data.settings
+    return {"status": "Settings saved"}
+
+@router.get("/get-settings/{user_id}")
+async def get_settings(user_id: str):
+    logger.info("Fetching settings for user: %s", user_id)
+    settings = user_settings_store.get(user_id, {})
+    return {"settings": settings}
