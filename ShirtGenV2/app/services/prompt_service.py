@@ -18,4 +18,4 @@ def generate_svgs_from_prompt(prompt: str) -> [str]:
 
     logger.debug(f"Found logos: {logos}")
 
-    return ["Hi there", "How Are you!"]
+    return logos
