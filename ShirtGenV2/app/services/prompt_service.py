@@ -4,12 +4,16 @@ from app.services.noun_api_service import search_noun_project
 
 logger = logging.getLogger(__name__)
 
+def generate_svgs_from_prompt(prompt: str, use_keywords: bool) -> [str]:
+    logger.info(f"Received prompt: {prompt}, use_keywords: {use_keywords}")
 
-def generate_svgs_from_prompt(prompt: str) -> [str]:
-    logger.info(f"Received prompt: {prompt}")
-    # if single keyword, directly return result from NounAPI else generate keywords
-    generated_keywords = KeywordsGeneratorService().run_keyword_generator_chain(prompt)
-    logger.info(f"Generated keywords: {generated_keywords}")
+    if use_keywords:
+        # Generate keywords from the prompt
+        generated_keywords = KeywordsGeneratorService().run_keyword_generator_chain(prompt)
+        logger.info(f"Generated keywords: {generated_keywords}")
+    else:
+        # Use the prompt directly as a keyword
+        generated_keywords = [prompt]
 
     # Search Noun Project for each keyword
     logos = []
@@ -18,4 +22,5 @@ def generate_svgs_from_prompt(prompt: str) -> [str]:
 
     logger.debug(f"Found logos: {logos}")
 
-    return logos
+    # Return only the first 3 logos
+    return logos[:3]
