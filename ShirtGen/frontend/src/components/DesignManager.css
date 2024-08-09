@@ -1,0 +1,27 @@
+.tshirt-preview {
+    position: relative;
+    width: 300px;
+    height: 400px;
+    border: 1px solid #000;
+    margin: 20px auto;
+    background-size: cover;
+  }
+  
+  .tshirt-preview img {
+    position: absolute;
+    cursor: move;
+  }
+  
+  label {
+    font-weight: bold;
+  }
+  
+  input[type="range"] {
+    width: 200px;
+    margin: 10px 0;
+  }
+  
+  button {
+    margin-left: 10px;
+  }
+  
