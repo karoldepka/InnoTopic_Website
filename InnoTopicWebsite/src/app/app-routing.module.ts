@@ -109,6 +109,14 @@ const routes: Routes = [
     loadChildren: () => import('./shirt-generator/shirt-generator.module').then( m => m.ShirtGeneratorPageModule)
   },
   {
+    path: 'shirt-gen',
+    loadChildren: () => import('./shirt-generator/shirt-generator.module').then( m => m.ShirtGeneratorPageModule)
+  },
+  {
+    path: 'shirtgen',
+    loadChildren: () => import('./shirt-generator/shirt-generator.module').then( m => m.ShirtGeneratorPageModule)
+  },
+  {
     path: 'people',
     loadChildren: () => import('./people/people.module').then( m => m.PeoplePageModule)
   },
