@@ -1042,7 +1042,7 @@ export class FunAndSports {
     logo: 'generic/game-of-life.svg', // hacker symbol, emergence
   })
   "Mandelbrot Set" = tWide({
-    logo: 'generic/mandelbrot-set.svg',
+    logo: 'generic/math/mandelbrot-set.svg',
     attribution: "Mandelbrot Fractal by Christian Frost from Noun Project (CC BY 3.0)",
     author: "Christian Frost",
     downloadedFrom: "Noun Project",
@@ -1050,6 +1050,7 @@ export class FunAndSports {
     url: "https://thenounproject.com/icon/mandelbrot-fractal-103125/",
   })
   "Euler's identity" = tSquare('generic/mind/eulers-identity.svg')
+  "ℵω" = tSquare('generic/math/ℵω.svg')
   "All-Seeing Eye" = tSquare('generic/mind/all-seeing-eye.svg')
   "Hinduism" = tWide('generic/mind/hinduism.svg')
   "Judaism" = tWide('generic/mind/judaism.svg')
