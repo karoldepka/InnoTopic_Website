@@ -11,7 +11,7 @@ router = APIRouter()
 @router.post("/process-prompt")
 async def generate(request: Request, request_data: PromptRequest):
     logger.info("Generating response for request: %s", request_data)
-    response = generate_svgs_from_prompt(request_data.prompt, request_data.use_keywords)
+    response = generate_svgs_from_prompt(request_data.prompt)
     if response == "An error occurred while generating the response.":
         raise HTTPException(status_code=500, detail="Internal Server Error")
     return {"response": response}

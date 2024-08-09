@@ -7,8 +7,8 @@ logger = logging.getLogger(__name__)
 # In-memory cache for icons
 icon_cache = {}
 
-def generate_svgs_from_prompt(prompt: str, use_keywords: bool) -> [str]:
-    logger.info(f"Received prompt: {prompt}, use_keywords: {use_keywords}")
+def generate_svgs_from_prompt(prompt: str) -> [str]:
+    logger.info(f"Received prompt: {prompt}")
 
     logos = KeywordsGeneratorService().run_keyword_generator_chain(prompt)
     logger.debug(f"Found logos: {logos}")
