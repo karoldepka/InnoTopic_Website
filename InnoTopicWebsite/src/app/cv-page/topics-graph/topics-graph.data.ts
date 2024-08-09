@@ -23,26 +23,6 @@ export const nodeConnections: GraphConnections = {
   "InnoTopic" : {
     sizeMult: size.veryBig,
     connections: {
-      "Artificial Intelligence": {
-        connections: {
-          OpenAI: {},
-          "Amazon Bedrock": {},
-          "Google Gemini": {},
-          "Ollama": {},
-          "Anthropic": {},
-          "LangChain": {},
-          "Amazon SageMaker": {},
-          "Jupyter": {},
-          "Vector Databases": {
-            connections: {
-              "Qdrant": {},
-              "Milvus": {},
-              "Pinecone": {},
-              "MindsDB": {},
-            },
-          },
-        },
-      },
       Ethereum: {
         connections: {
           Solidity: {},
@@ -114,22 +94,35 @@ export const nodeConnections: GraphConnections = {
                       "SurrealDB": {},
                     }
                   },
-                  Python: {
-                    sizeMult: size.veryBig,
+                  "Artificial Intelligence": {
                     connections: {
-                      Django: {
+                      OpenAI: {},
+                      "Amazon Bedrock": {},
+                      "Google Gemini": {},
+                      "Ollama": {},
+                      "Anthropic": {},
+                      "LangChain": {},
+                      "Amazon SageMaker": {},
+                      "Jupyter": {},
+                      "Vector Databases": {
+                        connections: {
+                          "Qdrant": {},
+                          "Milvus": {},
+                          "Pinecone": {},
+                          "MindsDB": {},
+                        },
+                      },
+                      Python: {
                         sizeMult: size.veryBig,
-
-                      },
-                      Flask: {
-                        sizeMult: size.mid
-                      },
-                      FastAPI: {
-                        sizeMult: size.mid
-                      },
-                    }
+                        connections: {
+                          Django: { sizeMult: size.veryBig },
+                          Flask: { sizeMult: size.mid },
+                          FastAPI: { sizeMult: size.mid },
+                        }
+                      }
+                    },
                   }
-                }
+                },
               },
               Svelte: {sizeMult: size.medium},
               Qwik: {sizeMult: size.verySmall},

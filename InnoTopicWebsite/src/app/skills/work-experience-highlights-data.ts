@@ -118,6 +118,7 @@ export const highlights = {
       Java: {},
       Scala: {},
       Kotlin: {},
+      "Spring Boot": {},
       Swift: {},
       Dart: {},
       Flutter: {},
@@ -764,6 +765,7 @@ export const highlights = {
     "Game of Life": {}, // emergence, Turing-complete, hacker symbol
     "Mandelbrot Set": {}, // emergence
     "Euler's identity": {}, // + Riemann's Hypothesis
+    "ℵω": {}, // = sup{ ℵn | n ∈ ω } = sup{ ℵn | n ∈ {0, 1, 2, ...} }": {}, // + Riemann's Hypothesis
     // "Tree of Life": {},
     "All-Seeing Eye": {},
     // TODO: Freemasonry? all-seeing eye
@@ -771,6 +773,7 @@ export const highlights = {
     // "Pentagram": {}, // E.g., Washington's street layout; baphomet.svg too suggestive?
     "Hinduism": {},
     "Judaism": {},
+    // https://en.wikipedia.org/wiki/Aleph_number
 
 
     // Mormon temple; https://thenounproject.com/icon/salt-lake-temple-219294/
