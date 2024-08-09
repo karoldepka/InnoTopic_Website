@@ -15,6 +15,9 @@ const routes: Routes = [
     path: 'dummy-ai',
     component: ShirtGeneratorPage,
   },{
+    path: 'custom-ai',
+    component: ShirtGeneratorPage,
+  },{
     path: '**',
     redirectTo: ''
   }

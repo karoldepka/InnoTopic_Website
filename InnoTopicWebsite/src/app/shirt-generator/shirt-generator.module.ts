@@ -15,6 +15,8 @@ import { ShirtGeneratorService } from './services/shirt-generator.service';
 import { WindowDotAiTopicsPromptService } from './services/window-dot-ai-topics-prompt.service';
 import { TopicsSharedModule } from "../topics-shared/topics-shared.module";
 import { DummyTopicsPromptService } from './services/dummy-topics-prompt.service';
+import { CustomPromptService } from "./services/custom-prompt.service";
+import { HttpClient } from "@angular/common/http";
 
 const componentDeclarations = [
   PromptInputComponent,
@@ -22,10 +24,12 @@ const componentDeclarations = [
   PreviewComponent,
 ];
 
-const topicsPromptServiceFactory = () => {
+const topicsPromptServiceFactory = (httpClient: HttpClient) => {
   const url  = window.location.href;
   if(url.includes('window-ai')) {
     return new WindowDotAiTopicsPromptService();
+  } else if(url.includes('custom-ai')) {
+    return new CustomPromptService(httpClient)
   } else {
     return new DummyTopicsPromptService();
   }
@@ -48,6 +52,7 @@ const topicsPromptServiceFactory = () => {
     {
       provide: AbstractTopicsPromptService,
       useFactory: topicsPromptServiceFactory,
+      deps: [HttpClient]
     }
   ]
 })
