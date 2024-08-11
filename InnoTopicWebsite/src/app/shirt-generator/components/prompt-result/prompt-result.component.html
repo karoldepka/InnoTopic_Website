@@ -2,7 +2,11 @@
   <ion-grid>
     <ion-row>
       <ion-col size="6" size-md="4" size-lg="3" *ngFor="let item of promptResult">
-        <app-preview [item]="item" />
+        @if(isCustomAI) {
+          <pre>{{item}}</pre>
+        } @else {
+          <app-preview [item]="item" />
+        }
       </ion-col>
     </ion-row>
   </ion-grid>

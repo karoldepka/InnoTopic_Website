@@ -21,6 +21,15 @@ class KeywordsGeneratorService:
     # INFO: kept langchain related code as comment because we may need it if retrieving directly from store doesn't
     # return optimized output or incorrect output
 
+    def extract_metadata(self, response_data):
+        meta_datas = []
+
+        for item in response_data:
+            data = item[0]
+            meta_datas.append(data.metadata)
+
+        return meta_datas
+
     def run_keyword_generator_chain(self, prompt):
         logger = logging.getLogger(__name__)
 
@@ -45,7 +54,8 @@ class KeywordsGeneratorService:
 
             # Prepare data for Chroma
             texts = [f"{logo['name']}" for logo in logos_data]
-            meta_datas = [{"name": logo["name"], "svg_logo": logo["files"][0], "url": logo["url"]} for logo in logos_data]
+            meta_datas = [{"name": logo["name"], "svg_logo": logo["files"][0], "url": logo["url"]} for logo in
+                          logos_data]
 
             vectorstore = Chroma.from_texts(
                 texts=texts,
@@ -84,5 +94,6 @@ class KeywordsGeneratorService:
 
         result = db.similarity_search_with_score(prompt, k=5)
 
-        logger.info(f"response from vector store")
-        return result
+        logger.info(f"response from vector store{result}")
+
+        return self.extract_metadata(result)

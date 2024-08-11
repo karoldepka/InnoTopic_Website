@@ -41,7 +41,7 @@ const topicsPromptServiceFactory = (httpClient: HttpClient) => {
     FormsModule,
     IonicModule,
     ShirtGeneratorPageRoutingModule,
-    TopicsSharedModule
+    TopicsSharedModule,
 ],
   declarations: [
     ShirtGeneratorPage,

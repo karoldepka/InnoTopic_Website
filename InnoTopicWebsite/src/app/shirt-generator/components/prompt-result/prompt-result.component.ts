@@ -1,4 +1,5 @@
 import {Component, Input, OnInit} from '@angular/core';
+import {ActivatedRoute} from "@angular/router";
 
 @Component({
   selector: 'app-prompt-result',
@@ -10,7 +11,11 @@ export class PromptResultComponent  implements OnInit {
   @Input() promptResult: string[] = [];
   @Input() isLoading = false;
 
-  constructor() { }
+  isCustomAI =  this.route.snapshot.url.pop()?.path.includes('custom-ai');
+
+  constructor(
+    private route: ActivatedRoute
+  ) { }
 
   ngOnInit() {}
 

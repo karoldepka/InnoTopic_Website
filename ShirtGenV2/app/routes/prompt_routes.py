@@ -8,6 +8,7 @@ logger = logging.getLogger(__name__)
 
 router = APIRouter()
 
+
 @router.post("/process-prompt")
 async def generate(request: Request, request_data: PromptRequest):
     logger.info("Generating response for request: %s", request_data)
@@ -16,18 +17,22 @@ async def generate(request: Request, request_data: PromptRequest):
         raise HTTPException(status_code=500, detail="Internal Server Error")
     return {"response": response}
 
+
 @router.get("/health")
 async def health_check():
     return {"status": "Healthy"}
 
+
 # In-memory store for user settings (for demonstration purposes)
 user_settings_store = {}
+
 
 @router.post("/save-settings")
 async def save_settings(request_data: UserSettingsRequest):
     logger.info("Saving settings for user: %s", request_data.user_id)
     user_settings_store[request_data.user_id] = request_data.settings
     return {"status": "Settings saved"}
+
 
 @router.get("/get-settings/{user_id}")
 async def get_settings(user_id: str):
