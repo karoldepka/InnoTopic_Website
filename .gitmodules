@@ -1,3 +1,6 @@
 [submodule "svg-conversions"]
 	path = svg-conversions
 	url = https://github.com/noviodelangel/svg-conversions
+[submodule "InnoTopicWebsite/src/assets/logos"]
+	path = InnoTopicWebsite/src/assets/logos
+	url = git@github.com:gilbarbara/logos.git
