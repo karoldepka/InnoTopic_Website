@@ -109,9 +109,6 @@ export class WorkOrganisationsAndProjectsData {
           'Notion': {},
           'Slack': {},
           'Datadog': {},
-          'TypeORM': {},
-          'TypeGraphQL': {},
-          'AudioSalad': {},
         }
       }),
       'eCommerce Orders SLA real-time monitor and analytics platform': project({
@@ -162,11 +159,12 @@ export class WorkOrganisationsAndProjectsData {
           'Notion': {},
           'Slack': {},
           'Datadog': {},
-          'TypeORM': {},
-          'TypeGraphQL': {},
-          'AudioSalad': {},
           'Python': {},
           'Django': {},
+          'Java': {},
+          'Kotlin': {},
+          'Spring': {},
+          'Spring Boot': {},
           // TODO: PyCharm
         }
       })
@@ -237,6 +235,8 @@ export class WorkOrganisationsAndProjectsData {
           'PHP': {},
           'Laravel': {},
           'PandaDoc': {},
+          'Java': {},
+          'Kotlin': {},
         }
       })
     },
@@ -290,6 +290,10 @@ export class WorkOrganisationsAndProjectsData {
             }
           },
           TypeScript: {},
+          Java: {},
+          Kotlin: {},
+          'Spring': {},
+          "Spring Boot": {},
           Python: {},
           Django: {},
           Karma: {},
@@ -312,12 +316,18 @@ export class WorkOrganisationsAndProjectsData {
         }
       },
       'Customer-facing application for managing insurance plans and customer data': {
-        roles: 'Senior Angular & Node.js Developer',
+        roles: 'Senior Angular & Node.js & Java/Kotlin Developer',
         description: '' /* FIXME */,
         topicsById: {
           Angular: {},
           Bootstrap: {},
           TypeScript: {},
+          Java: {},
+          Kotlin: {},
+          Groovy: {},
+          Gradle: {},
+          'Spring': {},
+          "Spring Boot": {},
           Less: {},
           'Node.js': {},
           'Express.js': {},
@@ -331,6 +341,13 @@ export class WorkOrganisationsAndProjectsData {
         roles: 'Senior Angular Developer',
         description: 'Drag & drop tree, file upload via drag & drop.',
         topicsById: {
+          Java: {},
+          Kotlin: {},
+          Groovy: {},
+          Gradle: {},
+          Maven: {},
+          'Spring': {},
+          "Spring Boot": {},
           Angular: {},
           TypeScript: {},
           Karma: {},
@@ -423,11 +440,12 @@ export class WorkOrganisationsAndProjectsData {
         description: 'Android app for time planning (freemium). Reached 100k installs organically; 4.3/5 average rating. I developed the app from scratch in native Android & Java and released many versions based on a lot of user feedback I received. ' +
           'I was also in regular communication with users (paid and gratis) over e-mail, IM and voice chat, helping to solve issues and discussing improvement suggestions. App available in English, Spanish, German, Polish.',
         topicsById: {
+          Ionic: {},
           Android: {},
+          Java: {},
           Kotlin: {},
           Groovy: {},
           Spock: {},
-          Java: {},
           Gradle: {},
           JUnit: {},
           Eclipse: {},
@@ -445,6 +463,12 @@ export class WorkOrganisationsAndProjectsData {
         roles: `Founder, Angular Developer`,
         topicsById: {
           Angular: {},
+          Ionic: {},
+          Android: {},
+          Groovy: {},
+          Gradle: {},
+          Java: {},
+          Kotlin: {},
           NgRx: {},
           RxJS: {},
           PrimeNG: {},
@@ -484,6 +508,10 @@ export class WorkOrganisationsAndProjectsData {
           'Git': {},
           'GitHub': {},
           'Android': {},
+          Java: {},
+          Kotlin: {},
+          Groovy: {},
+          Gradle: {},
           'iOS': {},
           'Google Play': {},
           'SVG': {},
@@ -511,6 +539,10 @@ export class WorkOrganisationsAndProjectsData {
           'Git': {},
           'GitHub': {},
           'Android': {},
+          Java: {},
+          Kotlin: {},
+          Groovy: {},
+          Gradle: {},
           'iOS': {},
           'Google Play': {},
           'Affinity Designer': {},
@@ -535,7 +567,6 @@ export class WorkOrganisationsAndProjectsData {
           Karma: {},
           Meetup: {},
           Git: {},
-
         }
       }
     },
@@ -627,6 +658,9 @@ export class WorkOrganisationsAndProjectsData {
           `We were also dogfooding using the Gerrit-based code review system which was a great opportunity to also master advanced Git workflows using rebasing, squashing, etc.`,
         topicsById: {
           Java: {},
+          Scala: {},
+          Groovy: {},
+          Spring: {},
           SOAP: {},
           Perl: {},
           Python: {},
@@ -661,6 +695,9 @@ export class WorkOrganisationsAndProjectsData {
         description: `Development of EuroStat's MDT (Multi-Dimensional Tool) - main tool used for all kinds of statistics in the European Union. Advanced Java Swing UI.`,
         topicsById: {
           Java: {},
+          Scala: {},
+          Spring: {},
+          Groovy: {},
           Jira: {},
           Subversion: {},
           Eclipse: {},
@@ -686,6 +723,10 @@ export class WorkOrganisationsAndProjectsData {
           'Subversion': {},
           'Debian Linux': {},
           Scala: {},
+          Spring: {},
+          Groovy: {},
+          Android: {},
+
           Maven: {},
           Eclipse: {},
           NetBeans: {},
@@ -709,6 +750,7 @@ export class WorkOrganisationsAndProjectsData {
         roles: 'Senior Java developer',
         topicsById: {
           Java: {},
+          Spring: {},
           'Subversion': {},
           'JAXB': {},
         }
@@ -717,6 +759,8 @@ export class WorkOrganisationsAndProjectsData {
         roles: 'Senior Java developer, tech lead',
         topicsById: {
           Java: {},
+          Spring: {},
+          // Struts: {},
           'Java Micro Edition': {},
           'Subversion': {},
           'Trac': {},

@@ -778,6 +778,7 @@ export const highlights = {
 
     // Mormon temple; https://thenounproject.com/icon/salt-lake-temple-219294/
     // "Merkaba": {},
+    // TODO: Metatron's Cube. https://thenounproject.com/search/icons/?q=metatron ;  https://www.gaia.com/video/samadhi-maya-illusion-self?fullplayer=feature ;
     // "Mandala": {},
     // "Taoism": {}, // https://es.wikipedia.org/wiki/Tao#/media/Archivo:Tao.svg
     // "Islam": {},

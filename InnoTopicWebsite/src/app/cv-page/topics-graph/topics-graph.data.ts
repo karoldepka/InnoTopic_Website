@@ -74,9 +74,9 @@ export const nodeConnections: GraphConnections = {
 
                   Cloud: {
                     connections: {
-                      AWS: {},
-                      "GCP - Google Cloud Platform": {},
-                      "Microsoft Azure": {},
+                      AWS: { sizeMult: size.veryBig},
+                      "GCP - Google Cloud Platform": { sizeMult: size.veryBig },
+                      "Microsoft Azure": { sizeMult: size.veryBig },
                       // "Cloud Firestore": {},
 
                     },
@@ -96,7 +96,7 @@ export const nodeConnections: GraphConnections = {
                   },
                   "Artificial Intelligence": {
                     connections: {
-                      OpenAI: {},
+                      OpenAI: { sizeMult: size.veryBig },
                       "Amazon Bedrock": {},
                       "Google Gemini": {},
                       "Ollama": {},
@@ -173,26 +173,27 @@ export const nodeConnections: GraphConnections = {
                       },
                       Android: {
                         strengthMul: strength.medium,
-                        sizeMult: strength.big,
+                        sizeMult: size.veryBig,
                         connections: {
                           Java: {
                             strengthMul: strength.big,
-                            sizeMult: size.big,
+                            sizeMult: size.veryBig,
                             connections: {
                               Gradle: {},
                               Groovy: {},
                               "OpenShift": { sizeMult: size.small, strengthMul: strength.veryBig },
                               "Hazelcast": { sizeMult: size.small, strengthMul: strength.veryBig },
                               "Kafka": { sizeMult: size.small, strengthMul: strength.veryBig, },
+                              "Spring": { sizeMult: size.veryBig },
                               "Spring Boot": {
                                 strengthMul: strength.veryBig,
-                                sizeMult: size.medium,
+                                sizeMult: size.veryBig,
                                 /* TODO could display old stuff as faded/transparent/grayed */
                                 // ...small
                               }
                             }
                           },
-                          Kotlin: {},
+                          Kotlin: { sizeMult: size.veryBig },
                         },
                       },
                     },
