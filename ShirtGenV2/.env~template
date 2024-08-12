@@ -1,4 +1,2 @@
 OPENAI_API_KEY=your openai key
-NOUN_PROJECT_API_KEY=api key from noun api
-NOUN_PROJECT_API_SECRET=api secret from noun api
 PORT=8000
