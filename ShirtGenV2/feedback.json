@@ -1,0 +1,8 @@
+[
+    {
+        "user_id": "string",
+        "logo_name": "string",
+        "rating": 1,
+        "comments": "string"
+    }
+]

@@ -3,6 +3,7 @@ __pycache__/
 *.py[cod]
 *$py.class
 
+prometheus-2.54.0.windows-amd64/
 # C extensions
 *.so
 
