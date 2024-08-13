@@ -2,7 +2,7 @@
 from fastapi import APIRouter, HTTPException, Request
 from app.models.prompt_request_model import PromptRequest
 from app.models.user_settings_model import UserSettingsRequest
-from app.services.prompt_service import generate_svgs_from_prompt
+from app.services.prompt_service import generate_svgs_from_prompt, get_query_logs, search_query, set_query_parameters, get_query_parameters
 import logging
 
 logger = logging.getLogger(__name__)
@@ -62,3 +62,71 @@ async def get_settings(user_id: str):
     
     return {"settings": settings}
 
+# New Endpoint: Webhook Registration and Event Handling
+@router.post("/webhook")
+async def handle_webhook(request: Request):
+    """
+    Handle webhook events.
+    """
+    try:
+        payload = await request.json()
+        logger.info(f"Received webhook event: {payload}")
+        # Process the webhook payload as needed
+        return {"status": "Webhook received"}
+    except Exception as e:
+        logger.error(f"Error handling webhook: {str(e)}", exc_info=True)
+        raise HTTPException(status_code=500, detail="Failed to process webhook")
+
+# New Endpoint: Get Query Log
+@router.get("/get-query-log")
+async def get_query_log():
+    """
+    Retrieve query logs.
+    """
+    try:
+        logs = get_query_logs()
+        return {"logs": logs}
+    except Exception as e:
+        logger.error(f"Error retrieving query logs: {str(e)}", exc_info=True)
+        raise HTTPException(status_code=500, detail="Failed to retrieve query logs")
+
+# New Endpoint: Set Query Parameters
+@router.post("/set-query-parameters")
+async def set_query_params(request: Request):
+    """
+    Set default query parameters.
+    """
+    try:
+        params = await request.json()
+        set_query_parameters(params)
+        return {"status": "Query parameters set"}
+    except Exception as e:
+        logger.error(f"Error setting query parameters: {str(e)}", exc_info=True)
+        raise HTTPException(status_code=500, detail="Failed to set query parameters")
+
+# New Endpoint: Get Query Parameters
+@router.get("/get-query-parameters")
+async def get_query_params():
+    """
+    Retrieve current query parameters.
+    """
+    try:
+        params = get_query_parameters()
+        return {"parameters": params}
+    except Exception as e:
+        logger.error(f"Error retrieving query parameters: {str(e)}", exc_info=True)
+        raise HTTPException(status_code=500, detail="Failed to retrieve query parameters")
+
+# New Endpoint: Search
+@router.post("/search")
+async def search(request: Request):
+    """
+    Search using the provided query.
+    """
+    try:
+        search_params = await request.json()
+        results = search_query(search_params)
+        return {"results": results}
+    except Exception as e:
+        logger.error(f"Error during search: {str(e)}", exc_info=True)
+        raise HTTPException(status_code=500, detail="Search failed")

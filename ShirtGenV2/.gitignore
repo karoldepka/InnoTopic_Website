@@ -6,7 +6,7 @@ __pycache__/
 prometheus-2.54.0.windows-amd64/
 # C extensions
 *.so
-
+feedback.json/
 # Distribution / packaging
 .Python
 build/
