@@ -15,7 +15,9 @@ urllib3 = "^2.2.2"
 langchain-openai = "^0.1.20"
 langchain-community = "^0.2.11"
 chromadb = "^0.5.5"
-
+qdrant-client = "^0.8.0"  # Add Qdrant client
+python-dotenv = "^0.20.0"  # Add dotenv for environment variable management
+pydantic = "^1.10.0"  # Add Pydantic for data validation
 
 [build-system]
 requires = ["poetry-core"]

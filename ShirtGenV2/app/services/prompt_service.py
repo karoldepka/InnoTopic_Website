@@ -1,3 +1,5 @@
+# app/services/prompt_service.py
+
 import logging
 import time
 from app.services.keywords_generator_service import KeywordsGeneratorService
@@ -21,20 +23,23 @@ def purge_expired_cache():
         logger.debug(f"Purging expired cache for prompt: {key}")
         del icon_cache[key]
 
-def generate_svgs_from_prompt(prompt: str) -> [str]:
-    logger.info(f"Received prompt: {prompt}")
+def generate_svgs_from_prompt(prompt: str, num_logos: int) -> [str]:
+    logger.info(f"Received prompt: {prompt} with {num_logos} logos")
 
     # Purge expired cache entries
     purge_expired_cache()
 
+    # Create a unique cache key based on prompt and num_logos
+    cache_key = (prompt, num_logos)
+
     # Check if the prompt result is cached
-    if prompt in icon_cache:
-        logger.debug(f"Returning cached result for prompt: {prompt}")
-        return icon_cache[prompt][0]
+    if cache_key in icon_cache:
+        logger.debug(f"Returning cached result for prompt: {prompt} with {num_logos} logos")
+        return icon_cache[cache_key][0]
 
     # If not cached, generate the logos
     try:
-        logos = KeywordsGeneratorService().run_keyword_generator_chain(prompt)
+        logos = KeywordsGeneratorService().run_keyword_generator_chain(prompt, num_logos)
     except Exception as e:
         logger.error(f"Error generating logos: {str(e)}", exc_info=True)
         return []
@@ -42,10 +47,10 @@ def generate_svgs_from_prompt(prompt: str) -> [str]:
     logger.debug(f"Found logos: {logos}")
 
     # Cache the result for future use
-    icon_cache[prompt] = (logos, time.time())
+    icon_cache[cache_key] = (logos, time.time())
 
     # Log the query
-    query_logs.append({"prompt": prompt, "timestamp": time.time()})
+    query_logs.append({"prompt": prompt, "num_logos": num_logos, "timestamp": time.time()})
 
     return logos
 
