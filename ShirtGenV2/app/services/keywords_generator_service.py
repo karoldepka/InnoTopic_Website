@@ -17,8 +17,8 @@ class KeywordsGeneratorService:
         """
         meta_datas = []
         for item in response_data:
-            data = item[0]
-            meta_datas.append(data.metadata)
+            data, score = item
+            meta_datas.append({"metadata": data.metadata, "similarity": score})
         return meta_datas
 
     def get_db_stats(self, db):

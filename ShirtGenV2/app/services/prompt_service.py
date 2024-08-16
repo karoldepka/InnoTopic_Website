@@ -1,5 +1,3 @@
-# app/services/prompt_service.py
-
 import logging
 import time
 from app.services.keywords_generator_service import KeywordsGeneratorService
@@ -13,6 +11,12 @@ cache_expiry_seconds = 3600  # 1 hour cache expiry
 # In-memory storage for query logs
 query_logs = []
 
+# Default query parameters
+default_query_params = {
+    "max_results": 10,
+    "similarity_threshold": 0.7
+}
+
 def purge_expired_cache():
     """
     Purge expired cache entries.
@@ -23,7 +27,7 @@ def purge_expired_cache():
         logger.debug(f"Purging expired cache for prompt: {key}")
         del icon_cache[key]
 
-def generate_svgs_from_prompt(prompt: str, num_logos: int) -> [str]:
+def generate_svgs_from_prompt(prompt: str, num_logos: int) -> [dict]:
     logger.info(f"Received prompt: {prompt} with {num_logos} logos")
 
     # Purge expired cache entries
@@ -60,15 +64,43 @@ def get_query_logs():
     """
     return query_logs
 
-# Placeholder functions for other imported but not implemented functions
 def search_query(search_params):
-    # Implement search functionality
-    pass
+    """
+    Perform a search based on the provided query parameters.
+    """
+    try:
+        prompt = search_params.get("prompt")
+        num_logos = search_params.get("num_logos", default_query_params["max_results"])
+        similarity_threshold = search_params.get("similarity_threshold", default_query_params["similarity_threshold"])
+
+        logger.info(f"Performing search with prompt: {prompt}, num_logos: {num_logos}, similarity_threshold: {similarity_threshold}")
+
+        # Perform the search using the KeywordsGeneratorService
+        logos = KeywordsGeneratorService().run_keyword_generator_chain(prompt, num_logos)
+
+        # Filter logos based on similarity threshold
+        filtered_logos = [logo for logo in logos if logo.get("similarity", 0) >= similarity_threshold]
+
+        logger.debug(f"Found {len(filtered_logos)} logos matching the search criteria.")
+        return filtered_logos
+
+    except Exception as e:
+        logger.error(f"Error during search: {str(e)}", exc_info=True)
+        return []
 
 def set_query_parameters(params):
-    # Implement setting query parameters
-    pass
+    """
+    Set default query parameters.
+    """
+    try:
+        global default_query_params
+        default_query_params.update(params)
+        logger.info(f"Query parameters set: {default_query_params}")
+    except Exception as e:
+        logger.error(f"Error setting query parameters: {str(e)}", exc_info=True)
 
 def get_query_parameters():
-    # Implement getting query parameters
-    pass
+    """
+    Retrieve the current query parameters.
+    """
+    return default_query_params

@@ -1,5 +1,3 @@
-# prompt_routes.py
-
 from fastapi import APIRouter, HTTPException, Request
 from app.models.prompt_request_model import PromptRequest
 from app.models.user_settings_model import UserSettingsRequest
