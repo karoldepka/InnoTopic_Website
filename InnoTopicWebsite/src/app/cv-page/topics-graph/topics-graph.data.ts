@@ -99,11 +99,13 @@ export const nodeConnections: GraphConnections = {
                       OpenAI: { sizeMult: size.veryBig },
                       "Amazon Bedrock": {},
                       "Google Gemini": {},
+                      "xAI": {},
                       "Ollama": {},
                       "Anthropic": {},
                       "LangChain": {},
                       "Amazon SageMaker": {},
                       "Jupyter": {},
+                      "Gradio": { sizeMult: size.medium },
                       "Vector Databases": {
                         connections: {
                           "Qdrant": {},
