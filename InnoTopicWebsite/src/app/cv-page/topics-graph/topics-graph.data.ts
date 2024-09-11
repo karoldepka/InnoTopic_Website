@@ -153,7 +153,15 @@ export const nodeConnections: GraphConnections = {
                   },
                   'React': { /*...weak*/
                     strengthMul: 0.5,
-                    sizeMult: size.veryBig
+                    sizeMult: size.veryBig,
+                    connections: {
+                      "Next.js": {
+                        sizeMult: size.veryBig,
+                      },
+                      "Material UI": {
+                        sizeMult: sizes.medium
+                      },
+                    }
                   },
                   Mobile: {
                     strengthMul: 1.5,

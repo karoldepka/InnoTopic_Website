@@ -232,6 +232,7 @@ export class Frontend {
   Bootstrap = tWide()
   'React-Bootstrap' = t('react-bootstrap.svg')
   "Material Design" = t('Google_Material_Design_Logo.svg')
+  "Material UI" = tWide('material-ui.svg')
   jQuery = tWide('jquery-icon-cropped.svg')
   "Hotwired Turbo" = tNarrow('hotwired-turbo.svg') // "Hotwire is an alternative approach to building modern web applications without using much JavaScript by sending HTML instead of JSON over the wire."
   "Hotwired Stimulus" = tNarrow('hotwired-stimulus.svg')
