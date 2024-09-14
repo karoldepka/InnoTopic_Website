@@ -2,7 +2,7 @@ import json
 import os
 import logging
 from langchain_openai import OpenAIEmbeddings
-from langchain_chroma import Chroma  # Updated import
+# from langchain_chroma import Chroma  # Updated import
 
 logger = logging.getLogger(__name__)
 

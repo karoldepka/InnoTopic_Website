@@ -18,6 +18,7 @@ chromadb = "^0.5.5"
 #qdrant-client = "^0.8.0"  # Add Qdrant client
 python-dotenv = "^0.20.0"  # Add dotenv for environment variable management
 pydantic = "^2.7.4"  # Add Pydantic for data validation
+uvicorn = "^0.30.6"
 
 [build-system]
 requires = ["poetry-core"]
