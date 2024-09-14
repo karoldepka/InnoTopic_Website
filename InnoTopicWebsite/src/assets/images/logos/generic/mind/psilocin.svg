@@ -4,7 +4,10 @@
 
 >
   <g
-    style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2; fill:currentColor;fill-rule:nonzero;stroke:currentColor;stroke-width:2px;"
+    style="
+      fill-rule:evenodd;
+      clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2; fill:currentColor;fill-rule:nonzero;stroke:currentColor;
+      stroke-width:3px;"
   >
     <g transform="matrix(17.534,0,0,17.534,22.6667,508.943)">
       <path d="M1.7,39.65L0,40.601L0,0L1.7,0.95L1.7,39.65Z" />

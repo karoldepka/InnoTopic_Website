@@ -460,7 +460,7 @@ export const highlights = {
     // Blackbox - https://marketplace.visualstudio.com/items?itemName=Blackboxapp.blackbox
     Continue: {},
     // "MetaMage": {},
-    TabbyML: {},
+    // TabbyML: {}, // TOO complex shape
     // TODO: https://learn.microsoft.com/en-us/semantic-kernel/overview/ -- Semantic Kernel
     'OpenAI Codex': {},
     'Amazon Q': {}, // https://aws-icons.com/icons/augmented-ai-a2i -> https://aws.amazon.com/architecture/icons/

@@ -937,7 +937,7 @@ export class AI {
   "Cody AI" = tWide('cody-icon.svg')
   "Continue" = tWide('continue-icon.svg')
   "MetaMage" = tNarrow('metamage-icon.svg')
-  "TabbyML" = tNarrow('OFF' + 'tabbyml-icon.svg')
+  // "TabbyML" = tNarrow('OFF' + 'tabbyml-icon.svg')
   "OpenAI Codex" = tNarrow('openai-codex')
   OpenAI = t('openai-icon')
   "Magic.dev" = tWide('magic.dev.svg') // Magic is working on frontier-scale code models to build a coworker, not just a copilot.
@@ -1051,7 +1051,7 @@ export class FunAndSports {
     license: "CC BY 3.0",
     url: "https://thenounproject.com/icon/mandelbrot-fractal-103125/",
   })
-  "Euler's identity" = tSquare('generic/mind/eulers-identity.svg')
+  "Euler's identity" = tSquare('generic/math/eulers-identity.svg')
   "ℵω" = tWide('generic/math/ℵω.svg') // TODO: make square
   "All-Seeing Eye" = tSquare('generic/mind/all-seeing-eye.svg')
   "Hinduism" = tWide('generic/mind/hinduism.svg')
