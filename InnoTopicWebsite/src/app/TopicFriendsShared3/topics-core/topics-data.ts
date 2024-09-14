@@ -262,6 +262,7 @@ export class Frontend {
   Preact = t()
   Gatsby = t('Gatsby-Monogram.svg', /* https://www.gatsbyjs.com/guidelines/logo */)
   "Next.js" = t('nextjs-icon-export.svg')
+  // "Next.js" = t('nextjs-icon.svg')
   "Remix" = t('remix-icon.svg') /* https://remix.run/ */
   // TODO: Chakra, Playwright
   GreenSock = t('greensock-icon.svg')
@@ -1061,12 +1062,13 @@ export class FunAndSports {
   'Triskelion' = t('generic/fun/triskelion-2024-2-no-stroke.svg')
   'Business' = t('generic/business--chart-line-square.svg')
   'Psychology' = tWide('generic/brain-solid-cropped.svg') // & neuroscience
-  'Psi' = tWide('generic/psi.svg') // & neuroscience
+  'Psi' = tNarrow('generic/mind/psi.svg') // & neuroscience
+  'Psilocin' = tWide('generic/mind/psilocin.svg')
   'Guitar' = t('generic/fun/heavy-metal-sharpen-guitar-like-an-insect-svgrepo-com.svg')
   'ASG' = t('generic/fun/gun.svg')
 }
 
-export class Social /* and media platforms */ {
+export class Social /* and media platforms AndMediaPlatforms */ {
   'YouTube' = tWide('youtube-icon.svg')
   'Vimeo' = tWide('vimeo-icon.svg')
   'Twitch' = tNarrow('twitch.svg') // also live coding
