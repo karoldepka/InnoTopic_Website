@@ -788,6 +788,7 @@ export const highlights = {
     "Yin and Yang": {},
     // "Buddha": {},
     Psi: {},
+    Psilocin: {},
     "Sirius Disclosure": {}, // + UAP
     "Guitar": {},
     // "Composing music": {}, // piano, musical note, etc.

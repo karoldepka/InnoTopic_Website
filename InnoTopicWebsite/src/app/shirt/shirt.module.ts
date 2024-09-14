@@ -20,9 +20,10 @@ import {TopicsSharedModule} from "../topics-shared/topics-shared.module";
         SharedModule,
         TopicsSharedModule,
     ],
-    exports: [
-        ShirtPage
-    ],
+  exports: [
+    ShirtPage,
+    ShirtComponent
+  ],
     declarations: [
         ShirtPage,
         ShirtComponent,
