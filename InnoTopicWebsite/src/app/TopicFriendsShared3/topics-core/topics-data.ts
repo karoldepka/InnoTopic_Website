@@ -232,6 +232,7 @@ export class Frontend {
   Bootstrap = tWide()
   'React-Bootstrap' = t('react-bootstrap.svg')
   "Material Design" = t('Google_Material_Design_Logo.svg')
+  "Material UI" = tWide('material-ui.svg')
   jQuery = tWide('jquery-icon-cropped.svg')
   "Hotwired Turbo" = tNarrow('hotwired-turbo.svg') // "Hotwire is an alternative approach to building modern web applications without using much JavaScript by sending HTML instead of JSON over the wire."
   "Hotwired Stimulus" = tNarrow('hotwired-stimulus.svg')
@@ -261,6 +262,7 @@ export class Frontend {
   Preact = t()
   Gatsby = t('Gatsby-Monogram.svg', /* https://www.gatsbyjs.com/guidelines/logo */)
   "Next.js" = t('nextjs-icon-export.svg')
+  // "Next.js" = t('nextjs-icon.svg')
   "Remix" = t('remix-icon.svg') /* https://remix.run/ */
   // TODO: Chakra, Playwright
   GreenSock = t('greensock-icon.svg')
@@ -935,7 +937,7 @@ export class AI {
   "Cody AI" = tWide('cody-icon.svg')
   "Continue" = tWide('continue-icon.svg')
   "MetaMage" = tNarrow('metamage-icon.svg')
-  "TabbyML" = tNarrow('OFF' + 'tabbyml-icon.svg')
+  // "TabbyML" = tNarrow('OFF' + 'tabbyml-icon.svg')
   "OpenAI Codex" = tNarrow('openai-codex')
   OpenAI = t('openai-icon')
   "Magic.dev" = tWide('magic.dev.svg') // Magic is working on frontier-scale code models to build a coworker, not just a copilot.
@@ -1049,8 +1051,8 @@ export class FunAndSports {
     license: "CC BY 3.0",
     url: "https://thenounproject.com/icon/mandelbrot-fractal-103125/",
   })
-  "Euler's identity" = tSquare('generic/mind/eulers-identity.svg')
-  "ℵω" = tSquare('generic/math/ℵω.svg')
+  "Euler's identity" = tSquare('generic/math/eulers-identity.svg')
+  "ℵω" = tWide('generic/math/ℵω.svg') // TODO: make square
   "All-Seeing Eye" = tSquare('generic/mind/all-seeing-eye.svg')
   "Hinduism" = tWide('generic/mind/hinduism.svg')
   "Judaism" = tWide('generic/mind/judaism.svg')
@@ -1060,12 +1062,13 @@ export class FunAndSports {
   'Triskelion' = t('generic/fun/triskelion-2024-2-no-stroke.svg')
   'Business' = t('generic/business--chart-line-square.svg')
   'Psychology' = tWide('generic/brain-solid-cropped.svg') // & neuroscience
-  'Psi' = tWide('generic/psi.svg') // & neuroscience
+  'Psi' = tNarrow('generic/mind/psi.svg') // & neuroscience
+  'Psilocin' = tWide('generic/mind/psilocin.svg')
   'Guitar' = t('generic/fun/heavy-metal-sharpen-guitar-like-an-insect-svgrepo-com.svg')
   'ASG' = t('generic/fun/gun.svg')
 }
 
-export class Social /* and media platforms */ {
+export class Social /* and media platforms AndMediaPlatforms */ {
   'YouTube' = tWide('youtube-icon.svg')
   'Vimeo' = tWide('vimeo-icon.svg')
   'Twitch' = tNarrow('twitch.svg') // also live coding

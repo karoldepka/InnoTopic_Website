@@ -8,6 +8,10 @@ import {filter} from "rxjs";
 export class PrintService {
 
   static isPrint = false // !! JSON.parse(window.localStorage.getItem('isPrint') ?? 'false') // true // hack for now
+  static url = undefined
+  static page = undefined
+
+  static printPages = ['/print', '/shirt'];
 
   constructor(
     private router: Router,
@@ -18,11 +22,23 @@ export class PrintService {
       filter((event) => event instanceof NavigationStart)
     ).subscribe((event: any) => {
       console.log('PrintService event', event)
-      if ( event.url.includes('/print') ) {
-        console.log('PrintService event.url.includes(\'/print\')')
+      const url = event.url;
+      const printPages = PrintService.printPages;
+      if (
+        this.isPrintUrl(url)
+      ) {
+        console.log(`PrintService event.url.includes(${printPages.join(',')})`)
+        PrintService.url = url
+        PrintService.page = url.replace('/', '')
         PrintService.isPrint = true
       }
       // this.currentRouteSubject.next(event.urlAfterRedirects);
     });
+  }
+
+  private isPrintUrl(url: string) {
+    return PrintService.printPages.some(
+      path => url.includes(path)
+    );
   }
 }

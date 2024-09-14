@@ -1,22 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg fill="rgb(45,45,45)"  width="256px" height="258px" viewBox="0 0 256 258" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" preserveAspectRatio="xMidYMid">
+<svg fill="rgb(26,26,26)"  width="256px" height="258px" viewBox="0 0 256 258" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" preserveAspectRatio="xMidYMid">
     <title>Bard</title>
     <defs>
         <radialGradient cx="78.3021802%" cy="55.5203129%" fx="78.3021802%" fy="55.5203129%" r="78.1147983%" gradientTransform="translate(0.783022,0.555203),scale(0.999475,1.000000),rotate(78.858000),translate(-0.783022,-0.555203)" id="radialGradient-1">
-            <stop stop-color="rgb(73,73,73)" offset="0%"></stop>
-            <stop stop-color="rgb(73,73,73)" offset="0.01%"></stop>
-            <stop stop-color="rgb(74,74,74)" offset="30.0221%"></stop>
-            <stop stop-color="rgb(75,75,75)" offset="54.5524%"></stop>
-            <stop stop-color="rgb(75,75,75)" offset="82.5372%"></stop>
-            <stop stop-color="rgb(83,83,83)" offset="100%"></stop>
+            <stop stop-color="rgb(82,82,82)" offset="0%"></stop>
+            <stop stop-color="rgb(82,82,82)" offset="0.01%"></stop>
+            <stop stop-color="rgb(83,83,83)" offset="30.0221%"></stop>
+            <stop stop-color="rgb(86,86,86)" offset="54.5524%"></stop>
+            <stop stop-color="rgb(86,86,86)" offset="82.5372%"></stop>
+            <stop stop-color="rgb(102,102,102)" offset="100%"></stop>
         </radialGradient>
         <radialGradient cx="-3.4086494%" cy="-54.2187761%" fx="-3.4086494%" fy="-54.2187761%" r="169.363094%" gradientTransform="translate(-0.034086,-0.542188),scale(0.999462,1.000000),rotate(78.858000),translate(0.034086,0.542188)" id="radialGradient-2">
-            <stop stop-color="rgb(73,73,73)" offset="0%"></stop>
-            <stop stop-color="rgb(73,73,73)" offset="0.01%"></stop>
-            <stop stop-color="rgb(74,74,74)" offset="30.0221%"></stop>
-            <stop stop-color="rgb(75,75,75)" offset="54.5524%"></stop>
-            <stop stop-color="rgb(75,75,75)" offset="82.5372%"></stop>
-            <stop stop-color="rgb(83,83,83)" offset="100%"></stop>
+            <stop stop-color="rgb(82,82,82)" offset="0%"></stop>
+            <stop stop-color="rgb(82,82,82)" offset="0.01%"></stop>
+            <stop stop-color="rgb(83,83,83)" offset="30.0221%"></stop>
+            <stop stop-color="rgb(86,86,86)" offset="54.5524%"></stop>
+            <stop stop-color="rgb(86,86,86)" offset="82.5372%"></stop>
+            <stop stop-color="rgb(102,102,102)" offset="100%"></stop>
         </radialGradient>
     </defs>
     <g>

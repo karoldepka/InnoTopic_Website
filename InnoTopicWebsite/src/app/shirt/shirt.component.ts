@@ -13,6 +13,7 @@ export class ShirtComponent implements OnInit {
   constructor() { }
 
   ngOnInit() {
+    document.title = "InnoTopic-Shirt"
   }
 
 }

@@ -1,19 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg fill="rgb(45,45,45)"  width="256px" height="210px" viewBox="0 0 256 210" version="1.1" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid">
+<svg fill="rgb(26,26,26)"  width="256px" height="210px" viewBox="0 0 256 210" version="1.1" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid">
     <title>PM2</title>
     <defs>
         <linearGradient x1="67.1299837%" y1="64.6873025%" x2="46.1614684%" y2="45.7804854%" id="pm2LinearGradient-1">
-            <stop stop-color="rgb(60,60,60)" offset="0%"></stop>
-            <stop stop-color="rgb(68,68,68)" offset="100%"></stop>
-            <stop stop-color="rgb(68,68,68)" offset="100%"></stop>
+            <stop stop-color="rgb(56,56,56)" offset="0%"></stop>
+            <stop stop-color="rgb(73,73,73)" offset="100%"></stop>
+            <stop stop-color="rgb(73,73,73)" offset="100%"></stop>
         </linearGradient>
         <linearGradient x1="67.4626279%" y1="34.9939767%" x2="42.4094293%" y2="56.9018791%" id="pm2LinearGradient-2">
-            <stop stop-color="rgb(67,67,67)" offset="0%"></stop>
-            <stop stop-color="rgb(78,78,78)" offset="100%"></stop>
+            <stop stop-color="rgb(69,69,69)" offset="0%"></stop>
+            <stop stop-color="rgb(91,91,91)" offset="100%"></stop>
         </linearGradient>
         <linearGradient x1="100%" y1="50%" x2="29.9733771%" y2="50%" id="pm2LinearGradient-3">
-            <stop stop-color="rgb(74,74,74)" offset="0%"></stop>
-            <stop stop-color="rgb(83,83,83)" offset="100%"></stop>
+            <stop stop-color="rgb(84,84,84)" offset="0%"></stop>
+            <stop stop-color="rgb(102,102,102)" offset="100%"></stop>
         </linearGradient>
     </defs>
     <g>

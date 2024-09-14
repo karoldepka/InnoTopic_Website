@@ -1,16 +1,16 @@
-<svg fill="rgb(45,45,45)"  width="885" height="936" xmlns="http://www.w3.org/2000/svg">
+<svg fill="rgb(26,26,26)"  width="885" height="936" xmlns="http://www.w3.org/2000/svg">
   <defs>
     <radialGradient id="a" cx="0" cy="0" r="1"
                     gradientTransform="matrix(0 507.22601 -479.57501 0 442.9857483 427.93551636)"
                     gradientUnits="userSpaceOnUse">
-      <stop stop-color="rgb(82,82,82)"/>
-      <stop offset="1" stop-color="rgb(67,67,67)"/>
+      <stop stop-color="rgb(100,100,100)"/>
+      <stop offset="1" stop-color="rgb(70,70,70)"/>
     </radialGradient>
     <radialGradient id="b" cx="0" cy="0" r="1"
                     gradientTransform="matrix(314.00042 156.99986 -140.10327 280.20717 441.99906213 454.49818724)"
                     gradientUnits="userSpaceOnUse">
-      <stop offset=".271" stop-color="rgb(83,83,83)"/>
-      <stop offset="1" stop-color="rgb(64,64,64)"/>
+      <stop offset=".271" stop-color="rgb(102,102,102)"/>
+      <stop offset="1" stop-color="rgb(65,65,65)"/>
     </radialGradient>
   </defs>
   <path fill="url(#a)"

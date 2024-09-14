@@ -460,7 +460,7 @@ export const highlights = {
     // Blackbox - https://marketplace.visualstudio.com/items?itemName=Blackboxapp.blackbox
     Continue: {},
     // "MetaMage": {},
-    TabbyML: {},
+    // TabbyML: {}, // TOO complex shape
     // TODO: https://learn.microsoft.com/en-us/semantic-kernel/overview/ -- Semantic Kernel
     'OpenAI Codex': {},
     'Amazon Q': {}, // https://aws-icons.com/icons/augmented-ai-a2i -> https://aws.amazon.com/architecture/icons/
@@ -766,8 +766,8 @@ export const highlights = {
     "Mandelbrot Set": {}, // emergence
     "Euler's identity": {}, // + Riemann's Hypothesis
     "ℵω": {}, // = sup{ ℵn | n ∈ ω } = sup{ ℵn | n ∈ {0, 1, 2, ...} }": {}, // + Riemann's Hypothesis
-    // "Tree of Life": {},
     "All-Seeing Eye": {},
+    // "Tree of Life": {}, // "Face Of god"  by Terence
     // TODO: Freemasonry? all-seeing eye
     "Eye of Horus": {}, // Eye of Ra. Projection of the brain; Pineal -> DMT, Melatonin, 3rd eye.,
     // "Pentagram": {}, // E.g., Washington's street layout; baphomet.svg too suggestive?
@@ -778,6 +778,7 @@ export const highlights = {
 
     // Mormon temple; https://thenounproject.com/icon/salt-lake-temple-219294/
     // "Merkaba": {},
+    // TODO: Metatron's Cube. https://thenounproject.com/search/icons/?q=metatron ;  https://www.gaia.com/video/samadhi-maya-illusion-self?fullplayer=feature ;
     // "Mandala": {},
     // "Taoism": {}, // https://es.wikipedia.org/wiki/Tao#/media/Archivo:Tao.svg
     // "Islam": {},
@@ -787,6 +788,7 @@ export const highlights = {
     "Yin and Yang": {},
     // "Buddha": {},
     Psi: {},
+    Psilocin: {},
     "Sirius Disclosure": {}, // + UAP
     "Guitar": {},
     // "Composing music": {}, // piano, musical note, etc.

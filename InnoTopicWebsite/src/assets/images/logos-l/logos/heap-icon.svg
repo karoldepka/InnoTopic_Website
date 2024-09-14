@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg fill="rgb(45,45,45)"  width="256px" height="415px" viewBox="0 0 256 415" version="1.1" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid">
+<svg fill="rgb(26,26,26)"  width="256px" height="415px" viewBox="0 0 256 415" version="1.1" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid">
     <title>Heap</title>
     <g>
-        <rect fill="rgb(45,45,45)" x="-7.44077544e-15" y="89.6132271" width="47.9991526" height="235.195644"></rect>
-        <rect fill="rgb(45,45,45)" x="104.025152" y="1.48815509e-14" width="47.9991526" height="179.196377"></rect>
-        <rect fill="rgb(83,83,83)" x="104.025152" y="235.228683" width="47.9991526" height="179.196377"></rect>
-        <rect fill="rgb(83,83,83)" x="208.000847" y="89.6132271" width="47.9991526" height="235.195644"></rect>
+        <rect fill="rgb(26,26,26)" x="-7.44077544e-15" y="89.6132271" width="47.9991526" height="235.195644"></rect>
+        <rect fill="rgb(26,26,26)" x="104.025152" y="1.48815509e-14" width="47.9991526" height="179.196377"></rect>
+        <rect fill="rgb(102,102,102)" x="104.025152" y="235.228683" width="47.9991526" height="179.196377"></rect>
+        <rect fill="rgb(102,102,102)" x="208.000847" y="89.6132271" width="47.9991526" height="235.195644"></rect>
     </g>
 </svg>

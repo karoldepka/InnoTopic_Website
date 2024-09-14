@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<svg fill="rgb(45,45,45)"  width="512px" height="116px" viewBox="0 0 512 116" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" preserveAspectRatio="xMidYMid">
+<svg fill="rgb(26,26,26)"  width="512px" height="116px" viewBox="0 0 512 116" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" preserveAspectRatio="xMidYMid">
     <defs>
         <linearGradient x1="50%" y1="100%" x2="50%" y2="0%" id="linearGradient-1">
-            <stop stop-color="rgb(69,69,69)" offset="0%"></stop>
-            <stop stop-color="rgb(64,64,64)" offset="100%"></stop>
+            <stop stop-color="rgb(75,75,75)" offset="0%"></stop>
+            <stop stop-color="rgb(63,63,63)" offset="100%"></stop>
         </linearGradient>
         <linearGradient x1="50%" y1="0%" x2="50%" y2="100%" id="linearGradient-2">
-            <stop stop-color="rgb(83,83,83)" offset="0%"></stop>
-            <stop stop-color="rgb(78,78,78)" offset="100%"></stop>
+            <stop stop-color="rgb(102,102,102)" offset="0%"></stop>
+            <stop stop-color="rgb(92,92,92)" offset="100%"></stop>
         </linearGradient>
     </defs>
 	<g>

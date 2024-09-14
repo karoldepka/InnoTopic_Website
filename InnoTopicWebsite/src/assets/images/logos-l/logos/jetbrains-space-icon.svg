@@ -1,23 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg fill="rgb(45,45,45)"  width="256px" height="256px" viewBox="0 0 256 256" version="1.1" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid">
+<svg fill="rgb(26,26,26)"  width="256px" height="256px" viewBox="0 0 256 256" version="1.1" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid">
     <title>Space</title>
     <defs>
         <linearGradient x1="45.0824163%" y1="-1.34304614%" x2="55.5220482%" y2="97.6099761%" id="spaceLinearGradient-1">
-            <stop stop-color="rgb(83,83,83)" offset="0%"></stop>
-            <stop stop-color="rgb(78,78,78)" offset="32%"></stop>
-            <stop stop-color="rgb(72,72,72)" offset="79%"></stop>
-            <stop stop-color="rgb(69,69,69)" offset="100%"></stop>
+            <stop stop-color="rgb(102,102,102)" offset="0%"></stop>
+            <stop stop-color="rgb(93,93,93)" offset="32%"></stop>
+            <stop stop-color="rgb(79,79,79)" offset="79%"></stop>
+            <stop stop-color="rgb(74,74,74)" offset="100%"></stop>
         </linearGradient>
         <linearGradient x1="-2.94159918%" y1="38.9923346%" x2="100.445236%" y2="62.1053821%" id="spaceLinearGradient-2">
-            <stop stop-color="rgb(73,73,73)" offset="0%"></stop>
-            <stop stop-color="rgb(62,62,62)" offset="100%"></stop>
+            <stop stop-color="rgb(81,81,81)" offset="0%"></stop>
+            <stop stop-color="rgb(60,60,60)" offset="100%"></stop>
         </linearGradient>
         <linearGradient x1="-3.30779496%" y1="71.8068763%" x2="111.745094%" y2="15.4620075%" id="spaceLinearGradient-3">
             <stop stop-color="rgb(64,64,64)" offset="0%"></stop>
-            <stop stop-color="rgb(63,63,63)" offset="18%"></stop>
-            <stop stop-color="rgb(60,60,60)" offset="49%"></stop>
-            <stop stop-color="rgb(56,56,56)" offset="89%"></stop>
-            <stop stop-color="rgb(55,55,55)" offset="100%"></stop>
+            <stop stop-color="rgb(62,62,62)" offset="18%"></stop>
+            <stop stop-color="rgb(57,57,57)" offset="49%"></stop>
+            <stop stop-color="rgb(49,49,49)" offset="89%"></stop>
+            <stop stop-color="rgb(46,46,46)" offset="100%"></stop>
         </linearGradient>
     </defs>
     <g>

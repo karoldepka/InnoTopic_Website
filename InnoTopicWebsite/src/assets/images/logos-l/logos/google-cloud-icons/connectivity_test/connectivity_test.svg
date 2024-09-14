@@ -1,6 +1,6 @@
-<svg fill="rgb(45,45,45)"  width="24px" height="24px" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<svg fill="rgb(26,26,26)"  width="24px" height="24px" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
     <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-        <polyline id="Stroke-1" stroke="rgb(83,83,83)" stroke-width="2" points="20 4 4 13 4 6.71740939"></polyline>
-        <polyline id="Stroke-3" stroke="rgb(83,83,83)" stroke-width="2" points="4 21 20 12 20 18.2825906"></polyline>
+        <polyline id="Stroke-1" stroke="rgb(102,102,102)" stroke-width="2" points="20 4 4 13 4 6.71740939"></polyline>
+        <polyline id="Stroke-3" stroke="rgb(102,102,102)" stroke-width="2" points="4 21 20 12 20 18.2825906"></polyline>
     </g>
 </svg>

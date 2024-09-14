@@ -8,6 +8,10 @@ import {PrintService} from "../TopicFriendsShared3/topics-core/print.service";
 })
 export class CvPagePrintPage implements OnInit {
 
+  get printPage() {
+    return PrintService.page
+  }
+
   constructor() {
     console.log('CvPagePrintPage ctor')
     // PrintService.isPrint = true
