@@ -1051,7 +1051,7 @@ export class FunAndSports {
     url: "https://thenounproject.com/icon/mandelbrot-fractal-103125/",
   })
   "Euler's identity" = tSquare('generic/mind/eulers-identity.svg')
-  "ℵω" = tSquare('generic/math/ℵω.svg')
+  "ℵω" = tWide('generic/math/ℵω.svg') // TODO: make square
   "All-Seeing Eye" = tSquare('generic/mind/all-seeing-eye.svg')
   "Hinduism" = tWide('generic/mind/hinduism.svg')
   "Judaism" = tWide('generic/mind/judaism.svg')

@@ -766,8 +766,8 @@ export const highlights = {
     "Mandelbrot Set": {}, // emergence
     "Euler's identity": {}, // + Riemann's Hypothesis
     "ℵω": {}, // = sup{ ℵn | n ∈ ω } = sup{ ℵn | n ∈ {0, 1, 2, ...} }": {}, // + Riemann's Hypothesis
-    // "Tree of Life": {},
     "All-Seeing Eye": {},
+    // "Tree of Life": {}, // "Face Of god"  by Terence
     // TODO: Freemasonry? all-seeing eye
     "Eye of Horus": {}, // Eye of Ra. Projection of the brain; Pineal -> DMT, Melatonin, 3rd eye.,
     // "Pentagram": {}, // E.g., Washington's street layout; baphomet.svg too suggestive?
