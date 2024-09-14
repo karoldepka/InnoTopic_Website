@@ -1,5 +1,12 @@
 # Project README
 
+FIXME: rename from shirtGen to smth like TopicFansGen
+* q and a
+* posters
+* wallpapers
+* shirts
+* mouse pads :D
+
 ## Overview
 
 This project is designed to create a highly efficient and scalable backend system using FastAPI, Chroma, Prometheus, and Grafana. The system is designed for generating and managing SVG logos based on user input, with advanced features such as monitoring, logging, caching, and customizable query settings.

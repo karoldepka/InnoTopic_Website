@@ -2,7 +2,7 @@
 name = "shirt-gen-v2"
 version = "0.1.0"
 description = ""
-authors = ["Jay Tailor <tailorj64@gmail.com>"]
+authors = ["Jay Tailor <tailorj64@gmail.com>", "Karol Depka"]
 readme = "README.md"
 
 [tool.poetry.dependencies]
@@ -15,9 +15,9 @@ urllib3 = "^2.2.2"
 langchain-openai = "^0.1.20"
 langchain-community = "^0.2.11"
 chromadb = "^0.5.5"
-qdrant-client = "^0.8.0"  # Add Qdrant client
+#qdrant-client = "^0.8.0"  # Add Qdrant client
 python-dotenv = "^0.20.0"  # Add dotenv for environment variable management
-pydantic = "^1.10.0"  # Add Pydantic for data validation
+pydantic = "^2.7.4"  # Add Pydantic for data validation
 
 [build-system]
 requires = ["poetry-core"]
