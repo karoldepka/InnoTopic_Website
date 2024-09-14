@@ -12,17 +12,20 @@ import {ShirtComponent} from "./shirt.component";
 import {TopicsSharedModule} from "../topics-shared/topics-shared.module";
 
 @NgModule({
-  imports: [
-    CommonModule,
-    FormsModule,
-    IonicModule,
-    ShirtPageRoutingModule,
-    SharedModule,
-    TopicsSharedModule,
-  ],
-  declarations: [
-    ShirtPage,
-    ShirtComponent,
-  ]
+    imports: [
+        CommonModule,
+        FormsModule,
+        IonicModule,
+        ShirtPageRoutingModule,
+        SharedModule,
+        TopicsSharedModule,
+    ],
+    exports: [
+        ShirtPage
+    ],
+    declarations: [
+        ShirtPage,
+        ShirtComponent,
+    ]
 })
 export class ShirtPageModule {}

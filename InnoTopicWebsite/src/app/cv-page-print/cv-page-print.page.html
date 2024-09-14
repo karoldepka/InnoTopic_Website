@@ -1,4 +1,11 @@
 
 <!--<ion-content>-->
-  <app-cv-page></app-cv-page>
+
+<ng-container *ngIf="printPage === 'shirt' else cv">
+  <app-shirt-page/>
+</ng-container>
+
+<ng-template #cv>
+  <app-cv-page/>
+</ng-template>
 <!--</ion-content>-->
