@@ -30,6 +30,19 @@ export const highlights = {
 
   /** High-level stuff that I really do or very strongly want to do */
   main: topics({
+
+    Angular: {},
+    React: {},
+    'Next.js': {},
+    Ionic: {},
+    JavaScript: {},
+    TypeScript: {},
+    'Web Components': {},
+
+    // === Backend:
+
+    'Node.js': {},
+
     Python: {},
     Django: {},
     Rust: {},
@@ -39,14 +52,8 @@ export const highlights = {
     PostgreSQL: {},
     Supabase: {},
 
-    Angular: {},
-    React: {},
-    'Next.js': {},
-    Ionic: {},
-    JavaScript: {},
-    TypeScript: {},
-    'Web Components': {},
-    'Node.js': {},
+    // ==== AI:
+
     Anthropic: {},
     OpenAI: {},
     'Mistral AI': {},
@@ -67,6 +74,8 @@ export const highlights = {
     'Visual Studio Code': {},
     Continue: {},
     MetaMage: {},
+    // TDOO: OpenHands
+    "All Hands AI": {},
     "Cursor.sh": {},
     // TODO maybe ts-node; https://typestrong.org/ts-node/ , https://github.com/TypeStrong/ts-node
     // TODO: JavaScriptCore: {} /* used by bun */, // (not here; small frontend icon)
