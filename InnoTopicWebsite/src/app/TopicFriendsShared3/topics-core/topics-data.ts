@@ -937,6 +937,7 @@ export class AI {
   "Cody AI" = tWide('cody-icon.svg')
   "Continue" = tWide('continue-icon.svg')
   "MetaMage" = tNarrow('metamage-icon.svg')
+  "All Hands AI" = tNarrow('all-hands-ai-icon.svg')
   // "TabbyML" = tNarrow('OFF' + 'tabbyml-icon.svg')
   "OpenAI Codex" = tNarrow('openai-codex')
   OpenAI = t('openai-icon')
