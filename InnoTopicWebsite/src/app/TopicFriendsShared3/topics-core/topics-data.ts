@@ -1063,8 +1063,8 @@ export class FunAndSports {
   'Triskelion' = t('generic/fun/triskelion-2024-2-no-stroke.svg')
   'Business' = t('generic/business--chart-line-square.svg')
   'Psychology' = tWide('generic/brain-solid-cropped.svg') // & neuroscience
-  'Psi' = tNarrow('generic/mind/psi.svg') // & neuroscience
-  'Psilocin' = tWide('generic/mind/psilocin.svg')
+  'Ѱ' = tNarrow('generic/mind/Ѱ.svg') // & neuroscience
+  'Ѱƛ⍹' = tWide('generic/mind/Ѱƛ⍹.svg')
   'Guitar' = t('generic/fun/heavy-metal-sharpen-guitar-like-an-insect-svgrepo-com.svg')
   'ASG' = t('generic/fun/gun.svg')
 }

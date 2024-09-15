@@ -796,8 +796,8 @@ export const highlights = {
     // TODO: Christian Cross
     "Yin and Yang": {},
     // "Buddha": {},
-    Psi: {},
-    Psilocin: {},
+    Ѱ: {},
+    "Ѱƛ⍹": {},
     "Sirius Disclosure": {}, // + UAP
     "Guitar": {},
     // "Composing music": {}, // piano, musical note, etc.
