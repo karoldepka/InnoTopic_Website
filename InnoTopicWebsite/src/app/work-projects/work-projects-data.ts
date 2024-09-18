@@ -58,8 +58,8 @@ export class WorkOrganisationsAndProjectsData {
     time: ['2023', '2024' /* TODO: make months optional */],
     linkedInRecommendations: 3,
     locations: `Málaga, remote, Madrid, Dubai`,
-    logoFileName: `epic-elite-logo.svg`,
-    description: 'Test #Rust #React and #AWS hashtags',
+    logoFileName: `Rithum/rithum-icon.svg`,
+    description: 'Staff Engineer, developing in #Rust, #Python, #React and #AWS, #Amazon_Bedrock and related', // TODO: #Amazon_CDK
     projects: {
       'AI-based LLM-powered processing of product metadata': project({
         roles: 'Staff Engineer',
