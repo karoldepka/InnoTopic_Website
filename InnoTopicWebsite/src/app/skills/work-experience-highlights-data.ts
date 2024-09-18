@@ -800,11 +800,11 @@ export const highlights = {
     // "Buddha": {},
     Ѱ: {},
     "Ѱƛ⍹": {},
-    "⍺": {},
-    "beta": {}, /*join them 4 in 1 icon maybe?*/
-    "delta": {},
-    "gamma": {},
-    "Θ": {}, // theta brainwave
+    // "⍺": {},
+    // "beta": {}, /*join them 4 in 1 icon maybe?*/
+    // "delta": {},
+    // "gamma": {},
+    // "Θ": {}, // theta brainwaves // generator from must normal FONT, other app-logo-type id="Θ" if not found or if logo svg not provided
     "Sirius Disclosure": {}, // + UAP
     "Guitar": {},
     // "Composing music": {}, // piano, musical note, etc.
