@@ -48,7 +48,6 @@ export const highlights = {
 
     Python: {},
     Django: {},
-    Rust: {},
     WebAssembly: {},
 
     MongoDB: {},
