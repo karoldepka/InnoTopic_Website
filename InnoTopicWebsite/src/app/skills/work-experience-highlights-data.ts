@@ -39,6 +39,12 @@ export const highlights = {
     TypeScript: {},
     'Web Components': {},
 
+    Vercel: {},
+    AWS: {},
+    Amazon: {},
+    "GCP - Google Cloud Platform": {},
+
+
     // === Backend:
 
     'Node.js': {},
@@ -86,9 +92,6 @@ export const highlights = {
     'Vue.js': {},
     Svelte: {},
     'Vercel V0': {}, /* before vercel coz triangle "kerning" was bad */
-    Vercel: {},
-    AWS: {},
-    "GCP - Google Cloud Platform": {},
     // "Google Palm": {},
     'Microsoft Azure': {},
     Deno: {},

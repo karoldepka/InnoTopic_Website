@@ -59,13 +59,13 @@ export class WorkOrganisationsAndProjectsData {
     linkedInRecommendations: 3,
     locations: `Málaga, remote, Madrid, Dubai`,
     logoFileName: `Rithum/rithum-icon.svg`,
-    description: 'Staff Engineer, developing in #Rust, #Python, #React and #AWS, #Amazon_Bedrock and related', // TODO: #Amazon_CDK
+    description: 'Staff Engineer, developing in #Rust, #Python, #React and #AWS, #Amazon_Bedrock, #OpenSearch and related', // TODO: #Amazon_CDK
     projects: {
       'AI-based LLM-powered processing of product metadata': project({
         roles: 'Staff Engineer',
-        description: 'Using #Python and #Amazon_Bedrock with #DynamoDB and #MongoDB and #Django + #TypeScript Web App. ' +
+        description: 'Using #Python and #Amazon_Bedrock with #DynamoDB and #MongoDB and #Django + #TypeScript & #Rust Web App. ' +
           'Working directly with CTO and Senior Principal Engineer. ' +
-          'Working with big brands like Walmart, Adidas, Puma, Amazon.',
+          'Working with big brands like #Amazon, Walmart, Adidas, Puma.',
         topicsById: {
           'Python': {},
           'Django': {},
@@ -113,9 +113,9 @@ export class WorkOrganisationsAndProjectsData {
       }),
       'eCommerce Orders SLA real-time monitor and analytics platform': project({
         roles: 'Staff Engineer, #Rust, #React, #Angular Developer',
-        description: 'Using #Rust, #Python and #DynamoDB and #MongoDB and #Django + #TypeScript Web App' +
+        description: 'Using #Rust, #Python and #DynamoDB and #MongoDB and #Django + #TypeScript Web App. ' +
           'Working directly with CTO and Senior Principal Engineer. ' +
-          'Working with big brands like Walmart, Adidas, Puma, Amazon.',
+          'Working with big brands like Amazon, Walmart, Adidas, Puma.',
         topicsById: {
           // TODO: 'AWS CDK': {},
           'Rust': {},

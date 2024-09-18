@@ -19,7 +19,11 @@ export class WorkExperienceData {
   main = experience('Main Experience', 'extensive usage and always honing my skills and learning', {
     Python:
       we(advanced, expert),
+    Rust:
+      we(advanced, expert),
     Docker:
+      we(advanced),
+    AWS:
       we(advanced),
     Angular:
       we(advanced, expert),

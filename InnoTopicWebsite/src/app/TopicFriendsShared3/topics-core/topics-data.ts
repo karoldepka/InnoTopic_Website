@@ -736,6 +736,7 @@ export class Cloud {
   Zod = tWide('zod-no-shadow.svg')
   "Microsoft Azure" = t('microsoft-azure')
   AWS = tWide()
+  Amazon = tWide('Amazon.svg')
   'AWS Amplify' = tWide('aws-amplify.svg')
   // TODO: CLoudFlare - has its own databases, D1, on the edge
 }
