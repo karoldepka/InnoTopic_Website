@@ -1055,7 +1055,7 @@ export class FunAndSports {
   "Euler's identity" = tSquare('generic/math/eulers-identity.svg')
   "ℵω" = tWide('generic/math/ℵω.svg') // TODO: make square
   "All-Seeing Eye" = tSquare('generic/mind/all-seeing-eye.svg')
-  "Hinduism" = tWide('generic/mind/hinduism.svg')
+  "🕉" = tWide('generic/mind/🕉.svg')
   "Judaism" = tWide('generic/mind/judaism.svg')
   "Yin and Yang" = tSquare('generic/mind/yin-yang.svg')
   "Eye of Horus" = tWide('generic/mind/eye-of-horus-svgrepo-com.svg')

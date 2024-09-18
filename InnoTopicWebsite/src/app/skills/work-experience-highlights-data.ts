@@ -42,6 +42,9 @@ export const highlights = {
     // === Backend:
 
     'Node.js': {},
+    'Rust': {},
+    'Tokio': {},
+    'Tauri': {},
 
     Python: {},
     Django: {},
@@ -780,7 +783,7 @@ export const highlights = {
     // TODO: Freemasonry? all-seeing eye
     "Eye of Horus": {}, // Eye of Ra. Projection of the brain; Pineal -> DMT, Melatonin, 3rd eye.,
     // "Pentagram": {}, // E.g., Washington's street layout; baphomet.svg too suggestive?
-    "Hinduism": {},
+    "🕉": {},
     "Judaism": {},
     // https://en.wikipedia.org/wiki/Aleph_number
 
@@ -798,6 +801,11 @@ export const highlights = {
     // "Buddha": {},
     Ѱ: {},
     "Ѱƛ⍹": {},
+    "⍺": {},
+    "beta": {}, /*join them 4 in 1 icon maybe?*/
+    "delta": {},
+    "gamma": {},
+    "Θ": {}, // theta brainwave
     "Sirius Disclosure": {}, // + UAP
     "Guitar": {},
     // "Composing music": {}, // piano, musical note, etc.
