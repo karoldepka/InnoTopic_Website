@@ -1107,8 +1107,8 @@ export class Organizations /* and companies and clients */ {
 
   Intel = tNoIcon()
 
-  EuroStat = tWide('../countries/eu.svg')
-  "European Union" = tWide('../countries/eu.svg')
+  EuroStat = tWide('countries/eu.svg')
+  "European Union" = tWide('countries/eu.svg')
   "TopicFriends" = tNoIcon() // FIXME icon
 }
 

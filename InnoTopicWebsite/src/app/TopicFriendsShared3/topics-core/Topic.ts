@@ -126,11 +126,11 @@ export class Topic {
     if ( !iconFileName )
       return null // FIXME: undefined ; well actually it is NULL
 
-    const nonLogos = ['../countries/', 'countries/']
+    const nonLogos = [/*'../countries/', */'countries/'] // maybe clients, but still we colorize companies logos
     if ( nonLogos.some(x => iconFileName.startsWith(x) ) )
       return '../../../assets/images/' + iconFileName
     else
-      return '../../../assets/images/logos-l/logos/' + iconFileName
+      return '../../../assets/images/logos-l/logos/' + iconFileName // FIXME: colorful on hover
   }
 
   private getLogoFileName(tag: string) {

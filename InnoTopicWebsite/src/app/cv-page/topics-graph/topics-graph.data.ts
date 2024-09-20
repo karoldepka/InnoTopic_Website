@@ -18,6 +18,8 @@ export const strength = {
 
 export const strengths = strength;
 
+// FIXME - high prio: add a checker if stuff is on workExperience.main / extra; here and in work experience
+
 
 export const nodeConnections: GraphConnections = {
   "InnoTopic" : {
