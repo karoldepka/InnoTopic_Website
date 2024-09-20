@@ -60,7 +60,7 @@ export function tWide(topicData?: TopicDataOrLogo, logoSize?: number[]) {
 }
 
 export function tNoIcon(topicData?: TopicData) {
-  return t({...topicData, logo: undefined})
+  return t({...topicData, logo: null /* null not undefined, coz we know it's not available */})
 }
 
 
@@ -75,9 +75,6 @@ export class Frontend_Visual {
  *  - another criterion: stuff that I actually use for my own apps; e.g. I wouldnt care too much about e.g. Business Intelligence (yest?)
  * Frontend - Other (includes libs like lodash, state mgmt) */
 export class Frontend {
-  InnoTopic = tNarrow('InnoTopic.svg') // FIXME MOVE
-
-
 
   'Frontend' = tSquare('generic/frontend')
   'HTML5' = t({logo: 'html-5.svg'})
@@ -736,8 +733,15 @@ export class Cloud {
   Zod = tWide('zod-no-shadow.svg')
   "Microsoft Azure" = t('microsoft-azure')
   AWS = tWide()
-  Amazon = tWide('Amazon.svg')
   'AWS Amplify' = tWide('aws-amplify.svg')
+
+  // FIXME: companies:
+  Amazon = tWide('Amazon.svg')
+
+  CollabNet = tNoIcon()
+  ALM = tNoIcon()
+  NXP = tNoIcon()
+  Ericsson = tNoIcon()
   // TODO: CLoudFlare - has its own databases, D1, on the edge
 }
 
@@ -874,6 +878,7 @@ export class Other {
   'Customer Support' = t('user-solid.svg')
   'Agile' = t('project-diagram-solid.svg')
   'Scrum' = t('project-diagram-solid.svg')
+  'ALM' = t('project-diagram-solid.svg') // FIXME alias/shortname used in tags in collabnet experience
   'ALM - Application Lifecycle Management' = t('project-diagram-solid.svg')
   'Algorithms' = t('project-diagram-solid.svg')
   'Data Structures' = t('project-diagram-solid.svg')
@@ -1080,6 +1085,46 @@ export class Social /* and media platforms AndMediaPlatforms */ {
   'Mastodon' = t('mastodon-icon')
 }
 
+export class Roles /* and responsibilities and posts */ {
+  'Team Lead' = tNoIcon()
+  'Tech Lead' = tNoIcon()
+  'CEO' = tNoIcon()
+  'CTO' = tNoIcon()
+  'Staff Engineer' = tNoIcon()
+  'Director of Operations' = tNoIcon()
+  'Senior Principal Engineer' = tNoIcon()
+}
+
+export class Organizations /* and companies and clients */ {
+  // get name() {
+  //   return 'Companies'
+  // }
+  // get subtitle() {
+  //   return 'and companies and clients'
+  // }
+
+  InnoTopic = tNarrow('InnoTopic.svg')
+
+  Intel = tNoIcon()
+
+  EuroStat = tWide('../countries/eu.svg')
+  "European Union" = tWide('../countries/eu.svg')
+  "TopicFriends" = tNoIcon() // FIXME icon
+}
+
+
+export class Natural_Languages /* and responsibilities and posts */ {
+  // TODO: generate from descriptors; or this be the main descriptors
+  'English' = tWide('countries/gb.svg')
+  'Polish' = tWide('countries/pl.svg')
+  'Spanish' = tWide('countries/es.svg')
+  'German' = tWide('countries/de.svg') // TODO: ['at-at, 'de-de', 'de-ch'] multi-icon
+  'French' = tWide('countries/fr.svg')
+  'Portuguese' = tWide('countries/pt.svg')
+  'Italian' = tWide('countries/it.svg')
+  'Catalan' = tWide('countries/es-ct.svg')
+}
+
 export function processTopics<T extends Object>(inputTopics: T/*: Topics*/): T {
   // inputTopics = setIdsFromKeys(inputTopics, 'name')
   for (let topicKey of Object.getOwnPropertyNames(inputTopics)) {
@@ -1105,7 +1150,8 @@ export type Topics =
   Project_Management_Tools & Version_Control & Databases & Monitoring_and_observability &
   Java & JavaScript & Build_Systems_And_Package_Managers &
   AI & AI_Hardware &
-  Crypto & FunAndSports & Social
+  Crypto & FunAndSports & Social &
+  Roles & Natural_Languages & Organizations
 
 function mergeTopics<T1, T2, T3, T4, T5>(t1: T1, t2: T2, t3: T3, t4: T4, t5?: T5) {
   return Object.assign({}, Object.create(t1 as any), Object.create(t2 as any), Object.create(t3 as any), Object.create(t4 as any), Object.create(t5 as any));
@@ -1154,6 +1200,9 @@ export const topicCategoriesArray = [
   new TopicCategory('Crypto', new Crypto()),
   new TopicCategory('Fun and Sports', new FunAndSports()),
   new TopicCategory('Social', new Social()),
+  new TopicCategory('Roles', new Roles()),
+  new TopicCategory('Organizations', new Organizations()),
+  new TopicCategory('Natural Languages', new Natural_Languages()),
 ]
 
 export const topics: Topics = processTopics(
@@ -1163,3 +1212,6 @@ export const topics: Topics = processTopics(
 )
 
 export const topicsArr = getDictionaryValuesAsArray(topics as { [p: string]: any })
+
+
+// FIXME: duplicate detector; write using o1 GPT

@@ -1,3 +1,4 @@
+
 function escapeRegexp(s: any) {
   return s.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
 }
@@ -122,7 +123,14 @@ export class Topic {
   public getLogoPath(iconFileName: string) {
     // return '../../../assets/images/logos/' + iconFileName.toLowerCase() + '-icon.svg'
     // return '../../../assets/images/logos/' + iconFileName
-    return '../../../assets/images/logos-l/logos/' + iconFileName
+    if ( !iconFileName )
+      return null // FIXME: undefined ; well actually it is NULL
+
+    const nonLogos = ['../countries/', 'countries/']
+    if ( nonLogos.some(x => iconFileName.startsWith(x) ) )
+      return '../../../assets/images/' + iconFileName
+    else
+      return '../../../assets/images/logos-l/logos/' + iconFileName
   }
 
   private getLogoFileName(tag: string) {

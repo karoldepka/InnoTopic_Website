@@ -59,15 +59,15 @@ export class WorkOrganisationsAndProjectsData {
     linkedInRecommendations: 3,
     locations: `Málaga, remote, Madrid, Dubai`,
     logoFileName: `Rithum/rithum-icon.svg`,
-    description: 'Staff Engineer, developing in #Rust, #Python, #React and #AWS, #Amazon_Bedrock, #OpenSearch and related', // TODO: #Amazon_CDK
+    description: '#Staff_Engineer, developing in #Rust, #Python, #React and #AWS, #Amazon_Bedrock, #OpenSearch and related', // TODO: #Amazon_CDK
     projects: {
       'AI-based LLM-powered processing of product metadata': project({
         roles: 'Staff Engineer',
         description: 'Using #Python and #Amazon_Bedrock with #DynamoDB and #MongoDB and #Django + #TypeScript & #Rust Web App. ' +
-          'Working directly with CTO and Senior Principal Engineer. ' +
+          'Working directly with #CTO and #Senior_Principal_Engineer and other #Staff_Engineer. ' +
           'Working with big brands like #Amazon, Walmart, Adidas, Puma.',
         topicsById: {
-          'Python': {},
+          'Java': {},
           'Django': {},
           'MongoDB': {},
           'Terraform': {},
@@ -113,9 +113,9 @@ export class WorkOrganisationsAndProjectsData {
       }),
       'eCommerce Orders SLA real-time monitor and analytics platform': project({
         roles: 'Staff Engineer, #Rust, #React, #Angular Developer',
-        description: 'Using #Rust, #Python and #DynamoDB and #MongoDB and #Django + #TypeScript Web App. ' +
-          'Working directly with CTO and Senior Principal Engineer. ' +
-          'Working with big brands like Amazon, Walmart, Adidas, Puma.',
+        description: 'Using #Rust, #Python, #Java, #Kafka, #Spring_Boot, #DynamoDB, #MongoDB and #Django + #TypeScript Web App. ' +
+          'Working directly with #CTO and #Senior_Principal_Engineer. ' +
+          'Working with big brands like #Amazon, Walmart, Adidas, Puma.',
         topicsById: {
           // TODO: 'AWS CDK': {},
           'Rust': {},
@@ -165,6 +165,7 @@ export class WorkOrganisationsAndProjectsData {
           'Kotlin': {},
           'Spring': {},
           'Spring Boot': {},
+          'Kafka': {},
           // TODO: PyCharm
         }
       })
@@ -182,8 +183,8 @@ export class WorkOrganisationsAndProjectsData {
     projects: {
       'EpicElite Platform': project({
         roles: 'Lead/Senior Full-Stack Developer & Interviewing and Recruiting (Consultant)',
-        description: 'Recruited and interviewed 5 Developers and a UI/UX/Web/Graphics Designer. I have lead a team of 5 Developers. Did code&architecture reviews.' +
-          'Working directly with CEO & Director of Operations. Communication in English, Spanish, Polish. #Python #Django + #TypeScript app using #MongoDB and #MariaDB .',
+        description: 'Recruited and interviewed 5 Developers and a UI/UX/Web/Graphics Designer. I was a #Team_Lead of 5 Developers. Did code&architecture reviews.' +
+          'Working directly with #CEO & #Director_of_Operations. Communication in #English, #Spanish, #Polish. #Python #Django + #TypeScript app using #MongoDB and #MariaDB .',
         topicsById: {
           'Mailgun': {},
           'Rust': {},
@@ -236,6 +237,7 @@ export class WorkOrganisationsAndProjectsData {
           'Laravel': {},
           'PandaDoc': {},
           'Java': {},
+          'Kafka': {},
           'Kotlin': {},
         }
       })
@@ -252,8 +254,8 @@ export class WorkOrganisationsAndProjectsData {
     projects: {
       'Genengine Angular App for genetic diagnosis of rare diseases': {
         roles: 'Senior Angular Developer (Consultant)',
-        description: 'First I wrote a suite of E2E UI tests in TestCafe from scratch, in order to increase confidence while making changes.' +
-          ' Then I made numerous improvements of UI/UX, performance, robustness, architecture, refactors and I prepared the app for release. Working directly with CEO & CTO. Communication in English and Spanish.',
+        description: 'First I wrote a suite of E2E UI tests in #TestCafe from scratch, in order to increase confidence while making changes.' +
+          ' Then I made numerous improvements of UI/UX, performance, robustness, architecture, refactors and I prepared the app for release. Working directly with #CEO & #CTO. Communication in #English and #Spanish.',
         topicsById: {
           'Angular': {},
           'React': {},
@@ -281,7 +283,7 @@ export class WorkOrganisationsAndProjectsData {
       'Platform for assessing risk': {
         roles: 'Lead frontend developer and backend developer, teaching Angular',
         description: 'PWA working fully offline and synchronising with server to support multi-million-dollar multi-national functionality. Advanced analytics using charts and grid. Internationalisation. ' +
-          'I developed the Angular + Bootstrap app from scratch and helped with the Node.js + MongoDB backend (conceptually as well as in development). Communication in English and German.',
+          'I developed the Angular + Bootstrap app from scratch and helped with the Node.js + MongoDB backend (conceptually as well as in development). Communication in #English and #German.',
         // recommendations: '',
         topicsById: {
           Angular: {
@@ -294,6 +296,7 @@ export class WorkOrganisationsAndProjectsData {
           Kotlin: {},
           'Spring': {},
           "Spring Boot": {},
+          'Kafka': {},
           Python: {},
           Django: {},
           Karma: {},
@@ -438,7 +441,7 @@ export class WorkOrganisationsAndProjectsData {
       'FlexAgenda': {
         roles: 'Founder, Android/Java Developer, Publisher',
         description: 'Android app for time planning (freemium). Reached 100k installs organically; 4.3/5 average rating. I developed the app from scratch in native Android & Java and released many versions based on a lot of user feedback I received. ' +
-          'I was also in regular communication with users (paid and gratis) over e-mail, IM and voice chat, helping to solve issues and discussing improvement suggestions. App available in English, Spanish, German, Polish.',
+          'I was also in regular communication with users (paid and gratis) over e-mail, IM and voice chat, helping to solve issues and discussing improvement suggestions. App available in #English, #Spanish, #Catalan, #German, #Polish, #French, #Italian.',
         topicsById: {
           Ionic: {},
           Android: {},
@@ -652,10 +655,11 @@ export class WorkOrganisationsAndProjectsData {
     linkedInRecommendations: 2,
 
     projects: {
-      'TeamForge integration with Gerrit and Git': {
+      'TeamForge integration with Gerrit and Git': project({
         roles: 'Java Developer and related',
-        description: `Worked at the Company that created Subversion (Svn) version control system, somewhat ironically on development of integration of Git and Gerrit with CollabNet's flagship product - TeamForge, an ALM (Application Lifecycle Management) enterprise system, used by big enterprise clients like Intel, Ericsson, NXP. ` +
-          `We were also dogfooding using the Gerrit-based code review system which was a great opportunity to also master advanced Git workflows using rebasing, squashing, etc.`,
+        description: `Worked at the Company that created #Subversion (Svn) version control system, somewhat ironically on development of integration of #Git and #Gerrit with #CollabNet's flagship product - TeamForge, an #ALM (Application Lifecycle Management) enterprise system, used by big enterprise clients like #Intel, #Ericsson, #NXP. ` +
+          `We were also dogfooding using the Gerrit-based code review system which was a great opportunity to also master advanced Git workflows using rebasing, squashing, etc. Communication in #English, #German, #Polish .`,
+        // TODO: languages: 'de en pl',
         topicsById: {
           Java: {},
           Scala: {},
@@ -666,6 +670,7 @@ export class WorkOrganisationsAndProjectsData {
           Python: {},
           Bash: {},
           Git: {},
+          'Gerrit': {},
           Subversion: {},
           JUnit: {},
           Cobertura: {},
@@ -675,10 +680,9 @@ export class WorkOrganisationsAndProjectsData {
           'Eclipse': {},
           'Jenkins': {},
           'TeamForge': {},
-          'Gerrit': {},
           'PostgreSQL': {},
         }
-      }
+      })
     }
   })
 
@@ -691,8 +695,8 @@ export class WorkOrganisationsAndProjectsData {
     linkedInRecommendations: 2,
     projects: {
       'Multi-Dimensional-Tool for EuroStat (European Commission)': {
-        roles: 'Java & Swing Senior Developer',
-        description: `Development of EuroStat's MDT (Multi-Dimensional Tool) - main tool used for all kinds of statistics in the European Union. Advanced Java Swing UI.`,
+        roles: '#Java & #Java_Swing Senior Developer',
+        description: `Development of #EuroStat's MDT (Multi-Dimensional Tool) - main tool used for all kinds of statistics in the #European_Union. Advanced #Java #Java_Swing UI.`,
         topicsById: {
           Java: {},
           Scala: {},

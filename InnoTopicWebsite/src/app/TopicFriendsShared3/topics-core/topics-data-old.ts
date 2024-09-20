@@ -62,7 +62,7 @@ export const topicsOld = [
   //     'https://twitter.com/djangoproject'
   //   )),
   tag('PeopleMatcher'),
-  tag('TopicFriends', 'PeopleMatcher'),
+  // tag('TopicFriends', 'PeopleMatcher'),
   tag('UAP', null),
   tag('KotlinJS', null), tagNoIcon('Java EE'),
   tagNoIcon('ASP.NET'), tagNoIcon('ASP.NET MVC'), tagNoIcon('ASP.NET Core MVC') /* https://github.com/aspnet/Mvc */,

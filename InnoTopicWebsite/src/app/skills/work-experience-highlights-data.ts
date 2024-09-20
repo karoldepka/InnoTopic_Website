@@ -44,13 +44,22 @@ export const highlights = {
     Amazon: {},
     "GCP - Google Cloud Platform": {},
 
-
     // === Backend:
 
     'Node.js': {},
     'Rust': {},
     'Tokio': {},
     'Tauri': {},
+
+
+    ...{ // JAVA:
+      Android: {},
+      Java: {},
+      Scala: {},
+      Kotlin: {},
+      "Spring Boot": {},
+      Kafka: {},
+    },
 
     Python: {},
     Django: {},
@@ -128,11 +137,6 @@ export const highlights = {
     'NVIDIA': {},
     'Groq': {},
     ...{ /* Stuff added for interviews */
-      Android: {},
-      Java: {},
-      Scala: {},
-      Kotlin: {},
-      "Spring Boot": {},
       Swift: {},
       Dart: {},
       Flutter: {},
