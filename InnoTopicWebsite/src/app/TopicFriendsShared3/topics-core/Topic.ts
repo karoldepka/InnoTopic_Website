@@ -123,8 +123,9 @@ export class Topic {
   public getLogoPath(iconFileName: string) {
     // return '../../../assets/images/logos/' + iconFileName.toLowerCase() + '-icon.svg'
     // return '../../../assets/images/logos/' + iconFileName
-    if ( !iconFileName )
+    if ( !iconFileName ) // FIXME: have a zero-width image for null, coz vertical align
       return null // FIXME: undefined ; well actually it is NULL
+
 
     const nonLogos = [/*'../countries/', */'countries/'] // maybe clients, but still we colorize companies logos
     if ( nonLogos.some(x => iconFileName.startsWith(x) ) )

@@ -616,7 +616,7 @@ export class WorkOrganisationsAndProjectsData {
     projects: {
       'Mezzanine Android': {
         roles: 'Android Lead, Senior Developer',
-        description: `Lead developer on the Android client of Company's flagship product, Mezzanine. ` +
+        description: `#Lead_developer, #Java #Developer on the #Android client of Company's flagship product, Mezzanine. ` +
           `I solidified and refactored existing codebase/prototype written by a Junior Developer, successfully releasing it and then making subsequent releases with new features. ` +
           `Also developed a schema language and code generator for Company's communication protocol, using JetBrains MPS (generating Java code from a DSL).`,
         topicsById: {
@@ -657,7 +657,7 @@ export class WorkOrganisationsAndProjectsData {
     projects: {
       'TeamForge integration with Gerrit and Git': project({
         roles: 'Java Developer and related',
-        description: `Worked at the Company that created #Subversion (Svn) version control system, somewhat ironically on development of integration of #Git and #Gerrit with #CollabNet's flagship product - TeamForge, an #ALM (Application Lifecycle Management) enterprise system, used by big enterprise clients like #Intel, #Ericsson, #NXP. ` +
+        description: `Worked as a #Java #Developer at the Company that created #Subversion (Svn) version control system, somewhat ironically on development of integration of #Git and #Gerrit with #CollabNet's flagship product - TeamForge, an #ALM (Application Lifecycle Management) enterprise system, used by big enterprise clients like #Intel, #Ericsson, #NXP. ` +
           `We were also dogfooding using the Gerrit-based code review system which was a great opportunity to also master advanced Git workflows using rebasing, squashing, etc. Communication in #English, #German, #Polish .`,
         // TODO: languages: 'de en pl',
         topicsById: {

@@ -466,7 +466,8 @@ export class Tools {
   //  TODO: 'JetBrains ReSharper' = t('') // C#
   // TODO: 'Rider' = t('') // C#
   RubyMine = t()
-  'Android Studio' = t('Android_Studio_icon_OFF.svg')
+  // 'Android Studio' = t('Android_Studio_icon_OFF.svg')
+  'Android Studio' = tNoIcon()
   Eclipse = t('eclipse-icon.svg')
   'IntelliJ IDEA' = t()
   'NetBeans' = t('apache-netbeans')
@@ -531,7 +532,8 @@ export class Graphics {
   'Adobe Creative Cloud' = t('adobe--creativecloud-32x32.svg')
   'Affinity Designer' = t('affinity-designer.svg')
   'Gravit Designer' = t('gravitio-icon.svg')
-  'GIMP' = t('gimp-wilber-big.png')
+  // 'GIMP' = t('gimp-wilber-big.png')
+  'GIMP' = tNoIcon()
   'Inkscape' = tWide('inkscape-icon.svg')
 }
 
@@ -1086,6 +1088,8 @@ export class Social /* and media platforms AndMediaPlatforms */ {
 }
 
 export class Roles /* and responsibilities and posts */ {
+  'Lead developer' = tNoIcon()
+  'Developer' = tNoIcon()
   'Team Lead' = tNoIcon()
   'Tech Lead' = tNoIcon()
   'CEO' = tNoIcon()
