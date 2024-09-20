@@ -1121,6 +1121,7 @@ export class Natural_Languages /* and responsibilities and posts */ {
   'German' = tWide('countries/de.svg') // TODO: ['at-at, 'de-de', 'de-ch'] multi-icon
   'French' = tWide('countries/fr.svg')
   'Portuguese' = tWide('countries/pt.svg')
+  'Russian' = tWide('countries/ru.svg')
   'Italian' = tWide('countries/it.svg')
   'Catalan' = tWide('countries/es-ct.svg')
 }

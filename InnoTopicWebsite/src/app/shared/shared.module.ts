@@ -128,6 +128,7 @@ import { CompanyLogoComponent } from './company-logo/company-logo.component';
 import { SpacerComponent } from './spacer/spacer.component';
 import {CommonModule} from "@angular/common";
 import {BooksComponent} from "../books/books.component";
+import {TopicsSharedModule} from "../topics-shared/topics-shared.module";
 
 let imports = [
   // BrowserModule,
@@ -142,13 +143,14 @@ let imports = [
 let declarations = [SpacerComponent, CompanyLogoComponent];
 
 @NgModule({
-  imports: imports,
+  imports: [
+    imports,
+  ],
     declarations: [
         declarations,
-        BooksComponent
     ],
     exports: [
-        ...imports, ...declarations, BooksComponent
+        ...imports, ...declarations
     ],
   providers: []
 })

@@ -7,12 +7,14 @@ import { TopicTagComponent } from './topic-tag/topic-tag.component';
 import {ThemeDemoPageModule} from "../themes/theme-demo/theme-demo.module";
 import {TopicsListComponent} from "./topics-list/topics-list.component";
 import {HashtagReplacerComponent} from "./hashtag-replacer/hashtag-replacer.component";
+import {BooksComponent} from "../books/books.component";
 
 let declarations = [
   TopicLogoComponent,
   TopicTagComponent,
   TopicsListComponent,
   HashtagReplacerComponent,
+  BooksComponent,
 ];
 
 let imports = [
