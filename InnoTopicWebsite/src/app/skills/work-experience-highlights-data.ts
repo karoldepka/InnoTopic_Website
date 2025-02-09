@@ -150,14 +150,14 @@ export const highlights = {
       // TODO: Frontend: Biome: {}, // small icon frontend
       Qwik: {},
       SolidJS: {},
-      Mithril: {},
-      Marko: {},
-      Rax: {},
-      Remix: {},
-      Riot: {},
+      // Mithril: {},
+      // Marko: {},
+      // Rax: {},
+      // Remix: {},
+      // Riot: {},
       'Alpine.js': {},
       Astro: {},
-      Inferno: {},
+      // Inferno: {},
       // TODO akita; elf https://github.com/ngneat/elf built on top of RxJS
       Preact: {},
       'Next.js': {},
@@ -194,8 +194,8 @@ export const highlights = {
       Bootstrap: {},
       'Material Design': {},
       'Chakra UI': {},
-      Mantine: {},
-      Bulma: {},
+      // Mantine: {},
+      // Bulma: {},
       'Web Components': {},
       Lit: {},
       // TODO styled-jsx - https://marketplace.visualstudio.com/items?itemName=blanu.vscode-styled-jsx - 200k installs
@@ -251,13 +251,13 @@ export const highlights = {
       /* TODO: Smth like PowerBI, Tableau ? */
       /* TODO: (kubernetes?) */
       // TODO: Mine: ComRev: {}, // CompaReview -
-      StackShare: {}, // comprehension
+      // StackShare: {}, // comprehension
       // TODO: https://open-vsx.org/ // comprehension
   
-      Openbase: {},
-      SVGPorn: {},
-      SVGO: {},
-      SVGator: {},
+      // Openbase: {},
+      // SVGPorn: {},
+      // SVGO: {},
+      // SVGator: {},
       Figma: {},
       UXPin: {},
       Zeplin: {},
@@ -292,10 +292,9 @@ export const highlights = {
       AssemblyScript: {},
       'WebAssembly System Interface (WASI)': {},
       Wasmer: {},
-      'WebAssembly Package Manager (WAPM)':
-        {} /* https://wapm.io/startpage/logo.svg */,
-      Wasmtime: {},
-      Fermyon: {}, // https://github.com/fermyon/spin ; microservices in webassembly // too ugly; but this will have tiny icons anyway
+      // 'WebAssembly Package Manager (WAPM)': {} /* https://wapm.io/startpage/logo.svg */,
+      // Wasmtime: {},
+      // Fermyon: {}, // https://github.com/fermyon/spin ; microservices in webassembly // too ugly; but this will have tiny icons anyway
       Rust: {},
       Tauri: {},
       Tokio: {},
@@ -659,7 +658,7 @@ export const highlights = {
     Java: {},
     Groovy: {},
     Scala: {},
-    'Eclipse Ceylon': {},
+    // 'Eclipse Ceylon': {},
     Android: {},
     Dart: {},
     Swift: {},
@@ -675,7 +674,7 @@ export const highlights = {
     'C#': {},
     '.NET': {},
     // ".NET Core": {},
-    Blazor: {},
+    // Blazor: {},
     Ruby: {},
     Python: {},
     // TODO: AI: PyScript: {}, // by anaconda
@@ -690,7 +689,7 @@ export const highlights = {
 
     PHP: {},
     Perl: {},
-    Raku: {},
+    // Raku: {},
     Bash: {},
     'R Language': {},
     Lua: {},
