@@ -298,7 +298,7 @@ export const highlights = {
       Rust: {},
       Tauri: {},
       Tokio: {},
-      Dioxus: {},
+      // Dioxus: {},
       Yew: {},
       Tonic: {},
       "JetBrains RustRover": {}, // #Rust
@@ -351,7 +351,7 @@ export const highlights = {
       Bubble: {},
       Framer: {},
       WebFlow: {},
-      Wix: {},
+      // Wix: {},
   
       // TODO: https://github.com/imartinez/privateGPT
       // TODO: https://github.com/smol-ai/developer
@@ -368,9 +368,9 @@ export const highlights = {
       Replit: {},
       // TODO: AI-powered coding: CodeSandbox: {}, // Boxy AI // https://codesandbox.io/
       'Visual Studio Code': {},
-      VSCodium: {},
-      'Open VSX Registry': {},
-      Carbide: {},
+      // VSCodium: {},
+      // 'Open VSX Registry': {},
+      // Carbide: {},
       // "Cloud9": {},
       'JetBrains Fleet': {}, // https://www.jetbrains.com/company/brand/
       WebStorm: {},
@@ -383,7 +383,7 @@ export const highlights = {
       Anaconda: {},
       // TODO: python poetry
       'Google Colaboratory': {},
-      Observable: {},
+      // Observable: {},
       'Hugging Face': {},
       // TODO: AI: kaggle -  data sets, models
   
@@ -423,15 +423,15 @@ export const highlights = {
       // TODO: AI: 'nvidia.svg': {},
       // ============== AI-powered coding
       // TODO: AI: prompt engineering
-      'Builder.io': {}, // https://www.youtube.com/watch?v=bRFLE9qi3t8&ab_channel=Steve%28Builder.io%29 -- MIT License
+      // 'Builder.io': {}, // https://www.youtube.com/watch?v=bRFLE9qi3t8&ab_channel=Steve%28Builder.io%29 -- MIT License
       // TODO: Frontend: 'FIXME https://github.com/BuilderIO/mitosis': {},
       'Vercel V0': {}, // vercel-v0-icon
       'GitHub Copilot': {},
       // TODO: AI-powered coding: 'GitHub Copilot in Terminal': {},
       Tabnine: {},
       // TODO: AI-powered coding: "https://www.jetbrains.com/ai/": {}, // jetbrains ai assistant // got the swirly logo
-      CodiumAI: {},
-      Safurai: {},
+      // CodiumAI: {},
+      // Safurai: {},
       /// Open-source AI-powered coding
       // TODO: AI:  "https://github.com/AntonOsika/gpt-engineer": {}, // -- no logo
       // TODO: AI: "Aider": {}, // -- no logo except on discord
@@ -448,7 +448,7 @@ export const highlights = {
       Sourcegraph: {},
       'Cody AI': {},
       MetaMage: {},
-      Rift: {},
+      // Rift: {},
       // Blackbox - https://marketplace.visualstudio.com/items?itemName=Blackboxapp.blackbox
       Continue: {},
       // "MetaMage": {},
@@ -487,15 +487,15 @@ export const highlights = {
       // TODO: AI: OpenAI Gym
       'Magic.dev': {}, /* --- unlimited context window? ? */
       // === Hardware / self-driving / robots / futurism :
-      Tesla: {},
-      Neuralink: {},
-      Apple: {}, /* for hardware, wearables like Apple Vision Pro */
-      "Limitless AI": {}, /* Wearable: AI Clip / pendant */
-      '1X Technologies': {},
-      'Boston Dynamics': {},
-      'Stanford University': {},
+      // Tesla: {},
+      // Neuralink: {},
+      // Apple: {}, /* for hardware, wearables like Apple Vision Pro */
+      // "Limitless AI": {}, /* Wearable: AI Clip / pendant */
+      // '1X Technologies': {},
+      // 'Boston Dynamics': {},
+      // 'Stanford University': {},
   
-      'Home Assistant': {},
+      // 'Home Assistant': {},
   
       Phind: {},
       'Perplexity.ai': {},
