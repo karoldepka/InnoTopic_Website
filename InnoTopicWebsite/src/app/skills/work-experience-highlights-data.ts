@@ -32,6 +32,7 @@ export const highlights = {
   main: topics({
 
     Angular: {},
+    "Vue.js": {},
     React: {},
     'Next.js': {},
     Ionic: {},
@@ -509,15 +510,15 @@ export const highlights = {
       'AI21 Labs': {},
       // TODO: AI: 'TODO Meta': {}, // (llama, FAISS)
       'Open Assistant': {},
-      LAION: {},
+      // LAION: {},
       Ollama: {},
       Gradio: {},
       Streamlit: {}, // chat: https://docs.streamlit.io/knowledge-base/tutorials/build-conversational-apps
       // TODO: AI: "https://github.com/joaomdmoura/crewAI": {},
       'Stability AI': {},
       'Stable Diffusion': {},
-      Midjourney: {},
-      Runway: {}, // https://runwayml.com/
+      // Midjourney: {},
+      // Runway: {}, // https://runwayml.com/
       // TODO: AI: AutoGPT: {},
       // TODO: AI: 'https://www.rabbit.tech/': {}, // rabbit r1 - https://twitter.com/PatrickJS__/status/1744976985313660968
       // TODO: AI: 'https://www.aie.foundation/': {},
@@ -525,8 +526,8 @@ export const highlights = {
       // TODO: AI (competition to markdown): Asciidoctor: {}, // asciidoc
   
       // ===== BlockChain / CryptoCurrencies
-      Ethereum: {},
-      'Basic Attention Token (BAT)': {},
+      // Ethereum: {},
+      // 'Basic Attention Token (BAT)': {},
       Bitcoin: {},
       Solidity: {},
       Web3: {},

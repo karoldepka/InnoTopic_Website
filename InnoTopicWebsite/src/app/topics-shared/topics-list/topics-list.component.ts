@@ -1,5 +1,5 @@
 import {Component, Input, OnInit} from '@angular/core';
-import {highlights} from "../../skills/work-experience-highlights-data";
+import {highlights} from "../../skills/work-experience-highlights-data-shirt";
 
 /** TODO unfinished */
 @Component({
@@ -10,7 +10,7 @@ import {highlights} from "../../skills/work-experience-highlights-data";
 export class TopicsListComponent {
 
   @Input() public topics: any[] = [];
-
+  
   @Input() public iconSize!: number
 
   @Input() public gap!: number

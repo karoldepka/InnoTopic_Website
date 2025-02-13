@@ -1,9 +1,26 @@
 <section id="languages" class="container">
   <!-- FIXME: extract languages component -->
-  <h2 class="section-title">Languages</h2>
+  <h2 class="section-title">Natural Languages</h2>
   <!-- FIXME: 2..4 columns -->
   <!--  <app-flags flags="de at lu pl gb us pt es es-ct fr" />-->
   <!-- FIXME: extract component for flag + label-->
+  <ng-container *ngIf="false">
+    <ng-container *ngFor="let language of languageExperiences;  let i = index">
+      <span [ngStyle]="{'font-size': language.details.size}">
+  
+        <ng-container *ngIf="i>0">
+          <span>, </span>
+        </ng-container>
+        <!-- <div class="language"> -->
+          <app-flags [flags]="language.details.flags"/>
+          <label>{{ language.name }}</label> -
+          <span>{{ language.details.level }}</span>
+        <!-- </div> -->
+      </span>
+  </ng-container>
+  
+</ng-container>
+
   <div class="languages-grid">
     <ng-container *ngFor="let language of languageExperiences">
       <div class="language">
