@@ -11,7 +11,7 @@ import {ThemeConfigComponent} from "../theme-config/theme-config.component";
 import {ChipComponent} from "../../chip/chip.component";
 import {ThemeSamplesComponent} from "../theme-samples/theme-samples.component";
 import {TintedSwatchesComponent} from "../tinted-swatches/tinted-swatches.component";
-import {ThemesLibModule} from "themes-lib";
+// import {ThemesLibModule} from "themes-lib";
 
 @NgModule({
   imports: [

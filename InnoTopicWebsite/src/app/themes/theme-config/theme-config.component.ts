@@ -5,7 +5,7 @@ import {Observable, take} from 'rxjs';
 
 import {ThemeConfigState} from "../../models/theme-config-state.model";
 import {updateThemeConfig} from "../../store/actions/theme-config-actions";
-import {testLibFunc} from "themes-lib";
+// import {testLibFunc} from "themes-lib";
 
 @Component({
   selector: 'app-theme-config',
