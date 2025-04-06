@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { highlights } from '../skills/work-experience-highlights-data';
+import { highlights } from '../skills/work-experience-highlights-data-shirt';
 
 @Component({
   selector: 'app-shirt',

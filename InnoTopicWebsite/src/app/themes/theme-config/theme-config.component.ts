@@ -18,7 +18,7 @@ export class ThemeConfigComponent implements OnInit {
   themeConfig$: Observable<ThemeConfigState>;
 
   constructor(private fb: FormBuilder, private store: Store<{ themeConfig: ThemeConfigState }>) {
-    testLibFunc()
+    // testLibFunc()
     this.themeConfigForm = this.fb.group({
       ion_color_primary: '',
       ion_color_secondary: '',

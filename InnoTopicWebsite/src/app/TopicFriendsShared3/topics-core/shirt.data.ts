@@ -1,4 +1,4 @@
-import {topics} from "../../skills/work-experience-highlights-data";
+import {topics} from "../../skills/work-experience-highlights-data-shirt";
 
 const tRefs = topics
 // rename topics() to tRefs coz topics.data also has topics() function

@@ -35,9 +35,16 @@ html, body {
 
 @media print {
   html, body, app-root, ion-router-outlet, ion-content {
-    overflow: scroll !important;
+    overflow: hidden !important;
     height: auto !important; // FOR PDF Print 2024
     max-height: max-content !important;
+
+    // === hide scrollbar:
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* IE 10+ */
+    .scrollable::-webkit-scrollbar {
+      display: none; /* Chrome, Safari, and Opera */
+    }
   }
 }
 

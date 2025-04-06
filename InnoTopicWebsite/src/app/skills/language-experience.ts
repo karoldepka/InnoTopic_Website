@@ -8,17 +8,21 @@ export enum LanguageLevel {
 export type LanguageDetail = {
   flags: string;
   level: LanguageLevel;
+  size: string, // TODO: smth like importance
 };
 
-export function experience(flags: string, level: LanguageLevel) {
-  return { flags: flags || '', level };
+export function experience(flags: string, level: LanguageLevel, size: string) {
+  return { flags: flags || '', level, size };
 }
 
 export class Language {
   name: string;
   details: LanguageDetail;
 
-  constructor(name: string, details: LanguageDetail) {
+  constructor(
+    name: string, 
+    details: LanguageDetail,
+  ) {
     this.name = name;
     this.details = details;
   }

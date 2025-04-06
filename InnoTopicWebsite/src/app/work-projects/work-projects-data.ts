@@ -179,7 +179,7 @@ export class WorkOrganisationsAndProjectsData {
     time: ['March 2021', 'September 2022'],
     linkedInRecommendations: 3,
     locations: `Málaga, remote, London, Dubai`,
-    logoFileName: `epic-elite-logo.svg`,
+    logoFileName: `epic-elite-logo-black.svg`,
     projects: {
       'EpicElite Platform': project({
         roles: 'Lead/Senior Full-Stack Developer & Interviewing and Recruiting (Consultant)',

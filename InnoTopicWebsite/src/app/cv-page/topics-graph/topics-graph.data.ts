@@ -151,7 +151,7 @@ export const nodeConnections: GraphConnections = {
                   },
                   'Vue.js': {
                     strengthMul: 0.5,
-                    sizeMult: size.big
+                    sizeMult: size.veryBig
                   },
                   'React': { /*...weak*/
                     strengthMul: 0.5,
