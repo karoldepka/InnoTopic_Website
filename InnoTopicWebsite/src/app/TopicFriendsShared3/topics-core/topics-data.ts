@@ -847,6 +847,7 @@ export class Other {
   IFTTT = tWide('ifttt.svg')
   // ======== LowCode / NoCode / CMS:
   Shopify = tNarrow()
+  PrestaShop = tSquare()
   WebFlow = t('webflow-mark-vector-blue.svg') /* https://brand-at.webflow.io/resources#logos */
   Wix = tWide()
   'Vercel V0' = tWide('vercel-v0-icon.svg')

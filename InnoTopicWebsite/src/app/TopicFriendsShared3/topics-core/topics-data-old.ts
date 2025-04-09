@@ -122,7 +122,7 @@ export const topicsOld = [
   tagNoIcon('Alpine Linux'),
   'FreeBSD',
   'Memcached',
-  'PrestaShop', 'WooCommerce', tagNoIcon('osCommerce'), 'Magento', /*'Shopify',*/ tagNoIcon('BigCommerce'),
+  /* 'PrestaShop', */ 'WooCommerce', tagNoIcon('osCommerce'), 'Magento', /*'Shopify',*/ tagNoIcon('BigCommerce'),
   tagNoIcon('Continuous Integration'),
   tagNoIcon('Continuous Delivery'),
   // 'Wix',
