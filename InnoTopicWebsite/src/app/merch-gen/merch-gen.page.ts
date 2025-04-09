@@ -1,7 +1,7 @@
 import { AfterViewInit, Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import * as THREE from 'three';
 import { SVGLoader } from 'three/examples/jsm/loaders/SVGLoader';
-import {svgFileData} from "./svg.data";
+import {psilo, psilo2, svgFileData, yin, yin2} from "./svg.data";
 
 @Component({
   selector: 'app-merch-gen-page',
@@ -24,89 +24,87 @@ export class MerchGenPage implements OnInit, AfterViewInit {
     renderer.setSize(this.getContainerWidth(), this.getContainerHeight());
     this.rendererContainer.nativeElement.appendChild(renderer.domElement);
 
-    const light = new THREE.AmbientLight(0x404040);
-    scene.add(light);
+    const ambientLight = new THREE.AmbientLight(0x404040);
+    scene.add(ambientLight);
 
     const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
     directionalLight.position.set(1, 1, 1).normalize();
     scene.add(directionalLight);
 
+    const highlightLight = new THREE.DirectionalLight(0xffffff, 0.5);
+    highlightLight.position.set(-1, 1, 2);
+    scene.add(highlightLight);
+
     const loader = new SVGLoader();
-    const svgData = loader.parse(svgFileData);
+    const svgFiles = [/*svgFileData, yin, yin2, */psilo2]; // Load multiple SVGs
+    const fullGroup = new THREE.Group();
 
-    const paths = svgData.paths;
-    const group = new THREE.Group();
+    const spacing = 150; // Distance between SVGs
+    let currentX = 0;
 
-    paths.forEach(path => {
-      const shapes = SVGLoader.createShapes(path);
-      shapes.forEach(shape => {
-        const extrudeSettings: THREE.ExtrudeGeometryOptions = {
-          depth: 10,
-          bevelEnabled: true,
-          bevelThickness: 2,
-          bevelSize: 1,
-          bevelSegments: 5,
-        };
+    svgFiles.forEach((svgData, index) => {
+      const svg = loader.parse(svgData);
+      const paths = svg.paths;
+      const svgGroup = new THREE.Group();
 
-        const geometry = new THREE.ExtrudeGeometry(shape, extrudeSettings);
-        const material = new THREE.MeshPhongMaterial({
-          color: 0xffff00, // Yellow
-          specular: 0xffffff, // White highlights
-          shininess: 100, // Higher = shinier
+      paths.forEach(path => {
+        const shapes = SVGLoader.createShapes(path);
+        shapes.forEach(shape => {
+          const extrudeSettings: THREE.ExtrudeGeometryOptions = {
+            depth: 10,
+            bevelEnabled: true,
+            bevelThickness: 2,
+            bevelSize: 1,
+            bevelSegments: 5,
+            curveSegments: 100,
+          };
+
+          const geometry = new THREE.ExtrudeGeometry(shape, extrudeSettings);
+          const material = new THREE.MeshPhongMaterial({
+            color: 0xffff00,
+            specular: 0xffffff,
+            shininess: 100,
+          });
+
+          const mesh = new THREE.Mesh(geometry, material);
+          svgGroup.add(mesh);
         });
-
-        const mesh = new THREE.Mesh(geometry, material);
-        group.add(mesh);
       });
+
+      // Center this individual SVG group
+      const box = new THREE.Box3().setFromObject(svgGroup);
+      const center = new THREE.Vector3();
+      box.getCenter(center);
+      svgGroup.position.sub(center);
+
+      // Then shift it over based on index
+      svgGroup.position.x += currentX;
+      currentX += box.getSize(new THREE.Vector3()).x + spacing;
+
+      fullGroup.add(svgGroup);
     });
 
-    // Debug info BEFORE centering
-    const boxBefore = new THREE.Box3().setFromObject(group);
-    const sizeBefore = new THREE.Vector3();
-    boxBefore.getSize(sizeBefore);
-    const centerBefore = new THREE.Vector3();
-    boxBefore.getCenter(centerBefore);
-    console.log('SVG Bounding Box BEFORE centering:', boxBefore);
-    console.log('SVG Center BEFORE:', centerBefore);
-
-    // Center the group
-    group.position.sub(centerBefore);
-
-    // Debug info AFTER centering
-    const boxAfter = new THREE.Box3().setFromObject(group);
-    const sizeAfter = new THREE.Vector3();
-    boxAfter.getSize(sizeAfter);
-    const centerAfter = new THREE.Vector3();
-    boxAfter.getCenter(centerAfter);
-    console.log('SVG Bounding Box AFTER centering:', boxAfter);
-    console.log('SVG Center AFTER:', centerAfter);
+    // Center the entire set
+    const fullBox = new THREE.Box3().setFromObject(fullGroup);
+    const fullCenter = new THREE.Vector3();
+    fullBox.getCenter(fullCenter);
+    fullGroup.position.sub(fullCenter);
 
     // Fit to camera
-    const maxDim = Math.max(sizeAfter.x, sizeAfter.y);
+    const size = new THREE.Vector3();
+    fullBox.getSize(size);
+    const maxDim = Math.max(size.x, size.y);
     const fov = camera.fov * (Math.PI / 180);
     let distance = maxDim / (2 * Math.tan(fov / 2));
-    distance *= 1.5;
+    distance *= 1.4;
     camera.position.z = distance;
 
-    scene.add(group);
-
-    // Control cube
-    const cubeGeometry = new THREE.BoxGeometry(20, 20, 20);
-    const cubeMaterial = new THREE.MeshStandardMaterial({ color: 0x00ff00 });
-    const cube = new THREE.Mesh(cubeGeometry, cubeMaterial);
-    cube.position.set(0, 0, -50);
-    scene.add(cube);
+    scene.add(fullGroup);
 
     // Animate
     const animate = () => {
       requestAnimationFrame(animate);
-
-      cube.rotation.x += 0.01;
-      cube.rotation.y += 0.01;
-
-      group.rotation.y += 0.005; // Animate SVG group (rotate)
-      group.rotation.x = Math.sin(Date.now() * 0.001) * 0.1; // subtle bounce
-
+      fullGroup.rotation.y += 0.005;
       renderer.render(scene, camera);
     };
 
