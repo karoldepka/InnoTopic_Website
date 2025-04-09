@@ -39,7 +39,7 @@ export class MerchGenPage implements OnInit, AfterViewInit {
 
     paths.forEach(path => {
       const material = new THREE.MeshBasicMaterial({
-        color: path.color || new THREE.Color(Math.random() * 0xffffff),
+        color: 0xffff00, // 💛 Force yellow color
         side: THREE.DoubleSide,
         depthWrite: false,
       });
@@ -52,43 +52,52 @@ export class MerchGenPage implements OnInit, AfterViewInit {
       });
     });
 
-    // Center and scale SVG to fit the viewport
-    const box = new THREE.Box3().setFromObject(group);
-    const size = new THREE.Vector3();
-    box.getSize(size);
-    const center = new THREE.Vector3();
-    box.getCenter(center);
+    // Debug: Before positioning
+    const boxBefore = new THREE.Box3().setFromObject(group);
+    const sizeBefore = new THREE.Vector3();
+    boxBefore.getSize(sizeBefore);
+    const centerBefore = new THREE.Vector3();
+    boxBefore.getCenter(centerBefore);
+    console.log('SVG Bounding Box BEFORE centering:', boxBefore);
+    console.log('SVG Center BEFORE:', centerBefore);
+    console.log('SVG Size BEFORE:', sizeBefore);
 
-    group.position.sub(center); // Center the group
+    // Center the group
+    group.position.sub(centerBefore);
+
+    // Debug: After positioning
+    const boxAfter = new THREE.Box3().setFromObject(group);
+    const sizeAfter = new THREE.Vector3();
+    boxAfter.getSize(sizeAfter);
+    const centerAfter = new THREE.Vector3();
+    boxAfter.getCenter(centerAfter);
+    console.log('SVG Bounding Box AFTER centering:', boxAfter);
+    console.log('SVG Center AFTER:', centerAfter);
+    console.log('SVG Size AFTER:', sizeAfter);
 
     // Fit to camera
-    const maxDim = Math.max(size.x, size.y);
-    const fov = camera.fov * (Math.PI / 180); // Convert vertical FOV to radians
+    const maxDim = Math.max(sizeAfter.x, sizeAfter.y);
+    const fov = camera.fov * (Math.PI / 180);
     let distance = maxDim / (2 * Math.tan(fov / 2));
     distance *= 1.2;
     camera.position.z = distance;
 
     scene.add(group);
 
-    // 🎯 Add control shape: A spinning 3D cube
+    // 🧊 Add control cube
     const cubeGeometry = new THREE.BoxGeometry(20, 20, 20);
     const cubeMaterial = new THREE.MeshStandardMaterial({ color: 0x00ff00 });
     const cube = new THREE.Mesh(cubeGeometry, cubeMaterial);
-
-    // Position it behind the SVG
     cube.position.set(0, 0, -50);
     scene.add(cube);
 
     const animate = () => {
       requestAnimationFrame(animate);
-
-      // Rotate the cube a bit for visibility
       cube.rotation.x += 0.01;
       cube.rotation.y += 0.01;
-
       renderer.render(scene, camera);
     };
-
+  
     animate();
   }
 
