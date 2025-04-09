@@ -49,10 +49,10 @@ export class MerchGenPage implements OnInit, AfterViewInit {
         };
 
         const geometry = new THREE.ExtrudeGeometry(shape, extrudeSettings);
-        const material = new THREE.MeshStandardMaterial({
+        const material = new THREE.MeshPhongMaterial({
           color: 0xffff00, // Yellow
-          metalness: 0.3,
-          roughness: 0.7,
+          specular: 0xffffff, // White highlights
+          shininess: 100, // Higher = shinier
         });
 
         const mesh = new THREE.Mesh(geometry, material);
