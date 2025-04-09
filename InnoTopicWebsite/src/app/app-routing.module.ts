@@ -120,7 +120,14 @@ const routes: Routes = [
     path: 'people',
     loadChildren: () => import('./people/people.module').then( m => m.PeoplePageModule)
   },
+
+  {
+    path: 'merch-gen',
+    loadChildren: () => import('./merch-gen/merch-gen.module').then( m => m.MerchGenPageModule)
+  },
   { path: '**', redirectTo: 'karol-depka' /* FIXME: does not work? */ },
+
+
 ];
 
 @NgModule({
