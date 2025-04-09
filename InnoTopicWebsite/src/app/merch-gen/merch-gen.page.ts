@@ -1,7 +1,7 @@
 import { AfterViewInit, Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import * as THREE from 'three';
 import { SVGLoader } from 'three/examples/jsm/loaders/SVGLoader';
-import {psilo, psilo2, svgFileData, yin, yin2} from "./svg.data";
+import { psilo, psilo2, svgFileData, yin, yin2 } from './svg.data';
 
 @Component({
   selector: 'app-merch-gen-page',
@@ -9,21 +9,41 @@ import {psilo, psilo2, svgFileData, yin, yin2} from "./svg.data";
   styleUrls: ['./merch-gen.page.scss'],
 })
 export class MerchGenPage implements OnInit, AfterViewInit {
-  @ViewChild('rendererContainer', {static: false}) rendererContainer!: ElementRef;
+  @ViewChild('rendererContainer', { static: false }) rendererContainer!: ElementRef;
 
-  constructor() {
-  }
+  constructor() {}
 
-  ngOnInit() {
-  }
+  ngOnInit() {}
 
   ngAfterViewInit(): void {
-    const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(75, this.getAspectRatio(), 0.1, 1000);
+    const scene = this.createScene();
+    const camera = this.createCamera();
+    const renderer = this.createRenderer();
+
+    this.addLights(scene);
+    const fullGroup = this.createSVGs();
+
+    scene.add(fullGroup);
+    this.fitCameraToScene(camera, fullGroup);
+    this.animate(fullGroup, renderer, scene, camera);
+  }
+
+  private createScene(): THREE.Scene {
+    return new THREE.Scene();
+  }
+
+  private createCamera(): THREE.PerspectiveCamera {
+    return new THREE.PerspectiveCamera(75, this.getAspectRatio(), 0.1, 5000); // Adjusted far clipping plane
+  }
+
+  private createRenderer(): THREE.WebGLRenderer {
     const renderer = new THREE.WebGLRenderer({ antialias: true });
     renderer.setSize(this.getContainerWidth(), this.getContainerHeight());
     this.rendererContainer.nativeElement.appendChild(renderer.domElement);
+    return renderer;
+  }
 
+  private addLights(scene: THREE.Scene): void {
     const ambientLight = new THREE.AmbientLight(0x404040);
     scene.add(ambientLight);
 
@@ -34,63 +54,81 @@ export class MerchGenPage implements OnInit, AfterViewInit {
     const highlightLight = new THREE.DirectionalLight(0xffffff, 0.5);
     highlightLight.position.set(-1, 1, 2);
     scene.add(highlightLight);
+  }
 
+  private createSVGs(): THREE.Group {
     const loader = new SVGLoader();
-    const svgFiles = [/*svgFileData, yin, yin2, */psilo2]; // Load multiple SVGs
+    const svgFiles = [yin2, psilo2]; // Load multiple SVGs
     const fullGroup = new THREE.Group();
 
     const spacing = 150; // Distance between SVGs
     let currentX = 0;
 
     svgFiles.forEach((svgData, index) => {
-      const svg = loader.parse(svgData);
-      const paths = svg.paths;
-      const svgGroup = new THREE.Group();
-
-      paths.forEach(path => {
-        const shapes = SVGLoader.createShapes(path);
-        shapes.forEach(shape => {
-          const extrudeSettings: THREE.ExtrudeGeometryOptions = {
-            depth: 10,
-            bevelEnabled: true,
-            bevelThickness: 2,
-            bevelSize: 1,
-            bevelSegments: 5,
-            curveSegments: 100,
-          };
-
-          const geometry = new THREE.ExtrudeGeometry(shape, extrudeSettings);
-          const material = new THREE.MeshPhongMaterial({
-            color: 0xffff00,
-            specular: 0xffffff,
-            shininess: 100,
-          });
-
-          const mesh = new THREE.Mesh(geometry, material);
-          svgGroup.add(mesh);
-        });
-      });
-
-      // Center this individual SVG group
-      const box = new THREE.Box3().setFromObject(svgGroup);
-      const center = new THREE.Vector3();
-      box.getCenter(center);
-      svgGroup.position.sub(center);
-
-      // Then shift it over based on index
+      const svgGroup = this.createSVGGroup(loader, svgData);
       svgGroup.position.x += currentX;
-      currentX += box.getSize(new THREE.Vector3()).x + spacing;
-
+      currentX += this.getGroupSize(svgGroup).x + spacing;
       fullGroup.add(svgGroup);
     });
 
     // Center the entire set
-    const fullBox = new THREE.Box3().setFromObject(fullGroup);
-    const fullCenter = new THREE.Vector3();
-    fullBox.getCenter(fullCenter);
-    fullGroup.position.sub(fullCenter);
+    this.centerGroup(fullGroup);
+    return fullGroup;
+  }
 
-    // Fit to camera
+  private createSVGGroup(loader: SVGLoader, svgData: string): THREE.Group {
+    const svg = loader.parse(svgData);
+    const paths = svg.paths;
+    const svgGroup = new THREE.Group();
+
+    paths.forEach((path) => {
+      const shapes = SVGLoader.createShapes(path);
+      shapes.forEach((shape) => {
+        const mesh = this.createExtrudeMesh(shape);
+        svgGroup.add(mesh);
+      });
+    });
+
+    // Center this individual SVG group
+    this.centerGroup(svgGroup);
+
+    return svgGroup;
+  }
+
+  private createExtrudeMesh(shape: THREE.Shape): THREE.Mesh {
+    const extrudeSettings: THREE.ExtrudeGeometryOptions = {
+      depth: 10,
+      bevelEnabled: true,
+      bevelThickness: 2,
+      bevelSize: 1,
+      bevelSegments: 5,
+      curveSegments: 100,
+    };
+
+    const geometry = new THREE.ExtrudeGeometry(shape, extrudeSettings);
+    const material = new THREE.MeshPhongMaterial({
+      color: 0x800080,  // Purple color
+      specular: 0xffffff,
+      shininess: 100,
+    });
+
+    return new THREE.Mesh(geometry, material);
+  }
+
+  private centerGroup(group: THREE.Group): void {
+    const box = new THREE.Box3().setFromObject(group);
+    const center = new THREE.Vector3();
+    box.getCenter(center);
+    group.position.sub(center);
+  }
+
+  private getGroupSize(group: THREE.Group): THREE.Vector3 {
+    const box = new THREE.Box3().setFromObject(group);
+    return box.getSize(new THREE.Vector3());
+  }
+
+  private fitCameraToScene(camera: THREE.PerspectiveCamera, fullGroup: THREE.Group): void {
+    const fullBox = new THREE.Box3().setFromObject(fullGroup);
     const size = new THREE.Vector3();
     fullBox.getSize(size);
     const maxDim = Math.max(size.x, size.y);
@@ -98,10 +136,9 @@ export class MerchGenPage implements OnInit, AfterViewInit {
     let distance = maxDim / (2 * Math.tan(fov / 2));
     distance *= 1.4;
     camera.position.z = distance;
+  }
 
-    scene.add(fullGroup);
-
-    // Animate
+  private animate(fullGroup: THREE.Group, renderer: THREE.WebGLRenderer, scene: THREE.Scene, camera: THREE.PerspectiveCamera): void {
     const animate = () => {
       requestAnimationFrame(animate);
       fullGroup.rotation.y += 0.005;
@@ -110,8 +147,6 @@ export class MerchGenPage implements OnInit, AfterViewInit {
 
     animate();
   }
-
-
 
   private getContainerWidth(): number {
     return this.rendererContainer.nativeElement.clientWidth;
