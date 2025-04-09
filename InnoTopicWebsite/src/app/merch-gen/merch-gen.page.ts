@@ -38,21 +38,29 @@ export class MerchGenPage implements OnInit, AfterViewInit {
     const group = new THREE.Group();
 
     paths.forEach(path => {
-      const material = new THREE.MeshBasicMaterial({
-        color: 0xffff00, // 💛 Force yellow color
-        side: THREE.DoubleSide,
-        depthWrite: false,
-      });
-
       const shapes = SVGLoader.createShapes(path);
       shapes.forEach(shape => {
-        const geometry = new THREE.ShapeGeometry(shape);
+        const extrudeSettings: THREE.ExtrudeGeometryOptions = {
+          depth: 10,
+          bevelEnabled: true,
+          bevelThickness: 2,
+          bevelSize: 1,
+          bevelSegments: 5,
+        };
+
+        const geometry = new THREE.ExtrudeGeometry(shape, extrudeSettings);
+        const material = new THREE.MeshStandardMaterial({
+          color: 0xffff00, // Yellow
+          metalness: 0.3,
+          roughness: 0.7,
+        });
+
         const mesh = new THREE.Mesh(geometry, material);
         group.add(mesh);
       });
     });
 
-    // Debug: Before positioning
+    // Debug info BEFORE centering
     const boxBefore = new THREE.Box3().setFromObject(group);
     const sizeBefore = new THREE.Vector3();
     boxBefore.getSize(sizeBefore);
@@ -60,12 +68,11 @@ export class MerchGenPage implements OnInit, AfterViewInit {
     boxBefore.getCenter(centerBefore);
     console.log('SVG Bounding Box BEFORE centering:', boxBefore);
     console.log('SVG Center BEFORE:', centerBefore);
-    console.log('SVG Size BEFORE:', sizeBefore);
 
     // Center the group
     group.position.sub(centerBefore);
 
-    // Debug: After positioning
+    // Debug info AFTER centering
     const boxAfter = new THREE.Box3().setFromObject(group);
     const sizeAfter = new THREE.Vector3();
     boxAfter.getSize(sizeAfter);
@@ -73,31 +80,36 @@ export class MerchGenPage implements OnInit, AfterViewInit {
     boxAfter.getCenter(centerAfter);
     console.log('SVG Bounding Box AFTER centering:', boxAfter);
     console.log('SVG Center AFTER:', centerAfter);
-    console.log('SVG Size AFTER:', sizeAfter);
 
     // Fit to camera
     const maxDim = Math.max(sizeAfter.x, sizeAfter.y);
     const fov = camera.fov * (Math.PI / 180);
     let distance = maxDim / (2 * Math.tan(fov / 2));
-    distance *= 1.2;
+    distance *= 1.5;
     camera.position.z = distance;
 
     scene.add(group);
 
-    // 🧊 Add control cube
+    // Control cube
     const cubeGeometry = new THREE.BoxGeometry(20, 20, 20);
     const cubeMaterial = new THREE.MeshStandardMaterial({ color: 0x00ff00 });
     const cube = new THREE.Mesh(cubeGeometry, cubeMaterial);
     cube.position.set(0, 0, -50);
     scene.add(cube);
 
+    // Animate
     const animate = () => {
       requestAnimationFrame(animate);
+
       cube.rotation.x += 0.01;
       cube.rotation.y += 0.01;
+
+      group.rotation.y += 0.005; // Animate SVG group (rotate)
+      group.rotation.x = Math.sin(Date.now() * 0.001) * 0.1; // subtle bounce
+
       renderer.render(scene, camera);
     };
-  
+
     animate();
   }
 
