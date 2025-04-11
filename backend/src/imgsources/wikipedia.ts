@@ -130,6 +130,11 @@ async function crawlPageForSVGs(pageUrl: string, svgUrls: Set<string>) {
     await sleep(500);
   }
   
+  function getHashPath(fileName: string): string {
+    const first = fileName[0] || '_';
+    const second = fileName[1] || '_';
+    return `${first}/${first}${second}`;
+  }
   
 
 // Get the direct download link for the SVG file
