@@ -4,75 +4,42 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { URL } from 'url';
 
-// Sets to track visited pages and categories
-const visitedPages = new Set<string>();
+const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+
 const visitedCategories = new Set<string>();
+const visitedPages = new Set<string>();
 
-// Utility function to download SVG file
-async function downloadSVG(url: string, folder: string) {
-  const fileName = path.basename(new URL(url).pathname);
-  const fullPath = path.join(folder, fileName);
-
-  // Skip if already downloaded
-  if (fs.existsSync(fullPath)) {
-    console.debug(`[SKIP] Already downloaded: ${fileName}`);
-    return;
+// Retry wrapper for network resilience
+async function withRetry<T>(fn: () => Promise<T>, label = '', retries = 3, delay = 2000): Promise<T | null> {
+  for (let attempt = 1; attempt <= retries; attempt++) {
+    try {
+      return await fn();
+    } catch (err: any) {
+      console.warn(`[RETRY ${attempt}/${retries}] ${label} - ${err?.message || err}`);
+      if (attempt < retries) await sleep(delay);
+    }
   }
-
-  // Create folder if doesn't exist
-  if (!fs.existsSync(folder)) {
-    fs.mkdirSync(folder, { recursive: true });
-  }
-
-  console.debug(`[DOWNLOAD] ${url} → ${fullPath}`);
-
-  try {
-    const response = await axios.get(url, {
-      responseType: 'stream',
-      timeout: 10000,
-    });
-    const writer = fs.createWriteStream(fullPath);
-    response.data.pipe(writer);
-    writer.on('finish', () => console.debug(`[DONE] Saved: ${fileName}`));
-    writer.on('error', (err) => console.error(`[ERROR] Failed to save: ${fileName} - ${err.message}`));
-  } catch (err) {
-    console.error(`[ERROR] Download failed: ${url} - ${err.message}`);
-  }
+  console.error(`[FAILED] ${label} after ${retries} retries.`);
+  return null;
 }
 
-// Fetch HTML from the URL
+// Get cheerio-loaded HTML
 async function fetchHTML(url: string): Promise<cheerio.CheerioAPI> {
-  const result = await axios.get(url, { timeout: 10000 }).then(res => cheerio.load(res.data));
+  const result = await withRetry(() =>
+    axios.get(url, { timeout: 10000 }).then(res => cheerio.load(res.data)),
+    `Fetch HTML: ${url}`
+  );
   if (!result) throw new Error(`Failed to fetch HTML from ${url}`);
   return result;
 }
 
-// Crawl a Wikipedia page to find SVG links and download them
-async function crawlPageForSVGs(pageUrl: string, svgUrls: Set<string>) {
-  if (visitedPages.has(pageUrl)) {
-    console.debug(`[SKIP] Page already visited: ${pageUrl}`);
-    return;
-  }
-  console.debug(`[PAGE] Visiting: ${pageUrl}`);
-  visitedPages.add(pageUrl);
-
-  const $ = await fetchHTML(pageUrl);
-
-  // Search for <a> tags with the class that contains the download link
-  $('a.cdx-button--fake-button.mw-mmv-download-button').each((_, el) => {
-    const href = $(el).attr('href');
-    if (href) {
-      const downloadUrl = href.startsWith('https') ? href : `https://upload.wikimedia.org${href}`;
-      if (!svgUrls.has(downloadUrl)) {
-        console.debug(`[FOUND SVG] ${downloadUrl}`);
-        svgUrls.add(downloadUrl);
-        downloadSVG(downloadUrl, './downloads/wikipedia'); // Instant download
-      }
-    }
-  });
+// Extracts the category name from URL
+function extractCategoryName(categoryUrl: string): string {
+  const match = categoryUrl.match(/Category:([^/?#]+)/);
+  return match ? decodeURIComponent(match[1].replace(/\s+/g, '_')) : 'UnknownCategory';
 }
 
-// Crawl the category page and recursively visit subcategories
+// Crawl a category page and subcategories recursively
 async function crawlCategory(categoryUrl: string, svgUrls: Set<string>) {
   if (visitedCategories.has(categoryUrl)) {
     console.debug(`[SKIP] Category already visited: ${categoryUrl}`);
@@ -102,7 +69,7 @@ async function crawlCategory(categoryUrl: string, svgUrls: Set<string>) {
     }
   });
 
-  // Handle pagination (if applicable)
+  // Handle pagination
   const nextLink = $('a:contains("next page")').attr('href');
   if (nextLink) {
     const nextPageUrl = baseUrl + nextLink;
@@ -112,24 +79,137 @@ async function crawlCategory(categoryUrl: string, svgUrls: Set<string>) {
   await sleep(1000);
 }
 
-// Utility function to sleep (in milliseconds)
-const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+// Find SVG links in a Wikipedia article page
+async function crawlPageForSVGs(pageUrl: string, svgUrls: Set<string>) {
+    if (visitedPages.has(pageUrl)) {
+      console.debug(`[SKIP] Page already visited: ${pageUrl}`);
+      return;
+    }
+    console.debug(`[PAGE] Visiting: ${pageUrl}`);
+    visitedPages.add(pageUrl);
+  
+    const $ = await fetchHTML(pageUrl);
+  
+    // Debug: Log all the links we're looking at
+    console.debug(`[DEBUG] Scraping ${pageUrl} for SVGs...`);
+  
+    // 1. Search for links to SVGs
+    $('a').each((_, el) => {
+      const href = $(el).attr('href');
+      if (!href) return;
+  
+      // Case 1: Handle links ending in .svg
+      if (href.endsWith('.svg')) {
+        let fileTitle = '';
+  
+        // Case 2: Handle /#/media/File: links directly
+        if (href.includes('#/media/File:')) {
+          const match = href.match(/File:([^#]+\.svg)/);
+          if (match) fileTitle = match[1];
+        } 
+        // Case 3: Handle /wiki/File: links
+        else if (href.startsWith('/wiki/File:')) {
+          const match = href.match(/File:(.+\.svg)/);
+          if (match) fileTitle = match[1];
+        }
+  
+        if (fileTitle) {
+          const safeFilename = decodeURIComponent(fileTitle);
+          const directUrl = `https://upload.wikimedia.org/wikipedia/commons/${getHashPath(safeFilename)}/${safeFilename}`;
+          if (!svgUrls.has(directUrl)) {
+            console.debug(`[FOUND SVG] ${directUrl}`);
+            downloadSVG(directUrl)
+            svgUrls.add(directUrl);
+          }
+        }
+      }
+    });
+  
+    // Debug: Check how many SVG links were found
+    console.debug(`[DEBUG] Found ${svgUrls.size} SVG links in ${pageUrl}`);
+  
+    await sleep(500);
+  }
+  
+  function getHashPath(fileName: string): string {
+    const first = fileName[0] || '_';
+    const second = fileName[1] || '_';
+    return `${first}/${first}${second}`;
+  }
+  
 
-// Main function to start crawling
+// Get the direct download link for the SVG file
+async function getDirectSVGLinks(svgPageUrl: string): Promise<string | null> {
+  const $ = await fetchHTML(svgPageUrl);
+  const fileLink = $('a:contains("Original file")').attr('href');
+  return fileLink ? 'https:' + fileLink : null;
+}
+
+// Download SVG file to given folder
+async function downloadSVG(url: string, folder: string) {
+  console.log("downloadSVG", url)
+  const fileName = path.basename(new URL(url).pathname);
+  const fullPath = path.join(folder, fileName);
+
+  if (fs.existsSync(fullPath)) {
+    console.debug(`[SKIP] Already downloaded: ${fileName}`);
+    return;
+  }
+
+  if (!fs.existsSync(folder)) {
+    fs.mkdirSync(folder, { recursive: true });
+  }
+
+  console.debug(`[DOWNLOAD] ${url} → ${fullPath}`);
+
+  const success = await withRetry(async () => {
+    const response = await axios.get(url, {
+      responseType: 'stream',
+      timeout: 10000,
+    });
+    console.log('fullPath')
+    const writer = fs.createWriteStream(fullPath);
+    response.data.pipe(writer);
+    return new Promise<void>((resolve, reject) => {
+      writer.on('finish', resolve);
+      writer.on('error', reject);
+    });
+  }, `Download SVG: ${url}`);
+
+  if (success) {
+    console.debug(`[DONE] Saved: ${fileName}`);
+  }
+}
+
+// Main execution flow
 async function main() {
   const categoryUrls = [
     'https://en.wikipedia.org/wiki/Category:Psychedelic_drugs',
-    // Add other categories here
+    // Add more categories here
   ];
 
-  const svgUrls = new Set<string>();
-
   for (const categoryUrl of categoryUrls) {
-    console.log(`\n🔍 Crawling category: ${categoryUrl}`);
-    await crawlCategory(categoryUrl, svgUrls);
+    const categoryName = extractCategoryName(categoryUrl);
+    const outputDir = path.join('downloads', 'wikipedia', categoryName);
+    const svgPageUrls = new Set<string>();
+
+    console.log(`\n🔍 Crawling category: ${categoryName}`);
+    await crawlCategory(categoryUrl, svgPageUrls);
+
+    console.log(`🔗 Found ${svgPageUrls.size} SVG page(s) in ${categoryName}.`);
+
+    for (const svgPageUrl of svgPageUrls) {
+      const directLink = await getDirectSVGLinks(svgPageUrl);
+      if (directLink) {
+        console.log(`⬇️ Downloading: ${directLink}`);
+        await downloadSVG(directLink, outputDir);
+        await sleep(500);
+      }
+    }
   }
 
-  console.log(`\n✅ All SVGs found: ${svgUrls.size} SVG(s)`);
+  console.log('\n✅ All downloads complete.');
 }
 
+console.log("start")
 main().catch(console.error);
