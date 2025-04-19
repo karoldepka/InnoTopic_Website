@@ -40,7 +40,7 @@ function extractCategoryName(categoryUrl: string): string {
 }
 
 // Crawl a category page and subcategories recursively
-async function crawlCategory(categoryUrl: string, svgUrls: Set<string>) {
+async function crawlCategory(categoryUrl: string, svgUrls: Set<string>, outputDir: string) {
   if (visitedCategories.has(categoryUrl)) {
     console.debug(`[SKIP] Category already visited: ${categoryUrl}`);
     return;
@@ -56,7 +56,7 @@ async function crawlCategory(categoryUrl: string, svgUrls: Set<string>) {
     const href = $(el).attr('href');
     if (href && href.startsWith('/wiki/') && !href.includes(':')) {
       const pageUrl = baseUrl + href;
-      crawlPageForSVGs(pageUrl, svgUrls);
+      crawlPageForImages(pageUrl, svgUrls, outputDir);
     }
   });
 
@@ -65,7 +65,7 @@ async function crawlCategory(categoryUrl: string, svgUrls: Set<string>) {
     const href = $(el).attr('href');
     if (href && href.startsWith('/wiki/Category:')) {
       const subcategoryUrl = baseUrl + href;
-      crawlCategory(subcategoryUrl, svgUrls);
+      crawlCategory(subcategoryUrl, svgUrls, outputDir /** FIXME subdir for subcategory */);
     }
   });
 
@@ -73,14 +73,14 @@ async function crawlCategory(categoryUrl: string, svgUrls: Set<string>) {
   const nextLink = $('a:contains("next page")').attr('href');
   if (nextLink) {
     const nextPageUrl = baseUrl + nextLink;
-    await crawlCategory(nextPageUrl, svgUrls);
+    await crawlCategory(nextPageUrl, svgUrls, outputDir);
   }
 
-  await sleep(1000);
+  // await sleep(1000);
 }
 
 // Find SVG links in a Wikipedia article page
-async function crawlPageForSVGs(pageUrl: string, svgUrls: Set<string>) {
+async function crawlPageForImages(pageUrl: string, svgUrls: Set<string>, downloadsDir: string) {
     if (visitedPages.has(pageUrl)) {
       console.debug(`[SKIP] Page already visited: ${pageUrl}`);
       return;
@@ -98,18 +98,18 @@ async function crawlPageForSVGs(pageUrl: string, svgUrls: Set<string>) {
       const href = $(el).attr('href');
       if (!href) return;
   
-      // Case 1: Handle links ending in .svg
-      if (href.endsWith('.svg')) {
+      const fileExtensions = ['.svg', '.png', '.jpg', '.jpeg', '.gif'];
+      if (fileExtensions.some(x=>href.endsWith(x))) {
         let fileTitle = '';
   
         // Case 2: Handle /#/media/File: links directly
         if (href.includes('#/media/File:')) {
-          const match = href.match(/File:([^#]+\.svg)/);
+          const match = href.match(/File:([^#]+(\.svg|\.png|\.jpg))/); // FIXME SVG
           if (match) fileTitle = match[1];
         } 
         // Case 3: Handle /wiki/File: links
         else if (href.startsWith('/wiki/File:')) {
-          const match = href.match(/File:(.+\.svg)/);
+          const match = href.match(/File:(.+(\.svg|\.png|\.jpg))/);
           if (match) fileTitle = match[1];
         }
   
@@ -117,8 +117,8 @@ async function crawlPageForSVGs(pageUrl: string, svgUrls: Set<string>) {
           const safeFilename = decodeURIComponent(fileTitle);
           const directUrl = `https://upload.wikimedia.org/wikipedia/commons/${getHashPath(safeFilename)}/${safeFilename}`;
           if (!svgUrls.has(directUrl)) {
-            console.debug(`[FOUND SVG] ${directUrl}`);
-            downloadSVG(directUrl)
+            console.debug(`[FOUND Picture] ${directUrl}`);
+            downloadPicture(directUrl, downloadsDir);
             svgUrls.add(directUrl);
           }
         }
@@ -128,7 +128,7 @@ async function crawlPageForSVGs(pageUrl: string, svgUrls: Set<string>) {
     // Debug: Check how many SVG links were found
     console.debug(`[DEBUG] Found ${svgUrls.size} SVG links in ${pageUrl}`);
   
-    await sleep(500);
+    // await sleep(500);
   }
   
   function getHashPath(fileName: string): string {
@@ -146,7 +146,7 @@ async function getDirectSVGLinks(svgPageUrl: string): Promise<string | null> {
 }
 
 // Download SVG file to given folder
-async function downloadSVG(url: string, folder: string) {
+async function downloadPicture(url: string, folder: string) {
   console.log("downloadSVG", url)
   const fileName = path.basename(new URL(url).pathname);
   const fullPath = path.join(folder, fileName);
@@ -194,18 +194,17 @@ async function main() {
     const svgPageUrls = new Set<string>();
 
     console.log(`\n🔍 Crawling category: ${categoryName}`);
-    await crawlCategory(categoryUrl, svgPageUrls);
+    await crawlCategory(categoryUrl, svgPageUrls, outputDir);
 
     console.log(`🔗 Found ${svgPageUrls.size} SVG page(s) in ${categoryName}.`);
 
-    for (const svgPageUrl of svgPageUrls) {
-      const directLink = await getDirectSVGLinks(svgPageUrl);
-      if (directLink) {
-        console.log(`⬇️ Downloading: ${directLink}`);
-        await downloadSVG(directLink, outputDir);
-        await sleep(500);
-      }
-    }
+    // for (const svgPageUrl of svgPageUrls) {
+    //   const directLink = await getDirectSVGLinks(svgPageUrl);
+    //   if (directLink) {
+    //     await downloadPicture(directLink, outputDir);
+    //     // await sleep(500);
+    //   }
+    // }
   }
 
   console.log('\n✅ All downloads complete.');
