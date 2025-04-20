@@ -18,6 +18,7 @@ function extractCategoryName(categoryUrl: string): string {
 // Crawl a category page and subcategories recursively
 async function crawlCategory(ctx: Context, categoryUrl: string) {
   const categoryName = extractCategoryName(categoryUrl)
+  console.log(`categoryName`, categoryName)
   const outputDirRelative = categoryName //, path.join(ctx.downloadsDir, 'wikipedia', categoryName)
 
   console.log(`\n🔍 Crawling category: ${categoryName}`)
@@ -30,14 +31,13 @@ async function crawlCategory(ctx: Context, categoryUrl: string) {
 	visitedCategories.add(categoryUrl)
 
 	const $ = await fetchHTML(categoryUrl)
-	const baseUrl = 'https://en.wikipedia.org'
 
 	// Crawl member pages
 	const memberLinks = $('div.mw-category a').toArray()
 	for (const el of memberLinks) {
 		const href = $(el).attr('href')
 		if (href && href.startsWith('/wiki/') && !href.includes(':')) {
-			const pageUrl = baseUrl + href
+			const pageUrl = ctx.baseUrl + href
 			await crawlPageForImages(ctx, pageUrl, outputDirRelative)
 		}
 	}
@@ -47,8 +47,8 @@ async function crawlCategory(ctx: Context, categoryUrl: string) {
 	for (const el of subcategoryLinks) {
 		const href = $(el).attr('href')
 		if (href && href.startsWith('/wiki/Category:')) {
-			const subcategoryUrl = baseUrl + href
-			await crawlCategory(ctx, subcategoryUrl, outputDir /** FIXME subdir for subcategory */)
+			const subcategoryUrl = ctx.baseUrl + href
+			await crawlCategory(ctx, subcategoryUrl, /*outputDirRelative */ /** FIXME subdir for subcategory */)
 		}
 	}
 
