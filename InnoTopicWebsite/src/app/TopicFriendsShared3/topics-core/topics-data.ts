@@ -1074,6 +1074,8 @@ export class FunAndSports {
   'Psychology' = tWide('generic/brain-solid-cropped.svg') // & neuroscience
   'Ѱ' = tNarrow('generic/mind/Ѱ.svg') // & neuroscience
   'Ѱƛ⍹' = tWide('generic/mind/Ѱƛ⍹.svg')
+  'ΜΔΜΑ' = tWide('generic/mind/ΜΔΜΑ.svg')
+  'The_Spirit_Molecule' = tWide('generic/mindThe_Spirit_Molecule.svg')
   'Guitar' = t('generic/fun/heavy-metal-sharpen-guitar-like-an-insect-svgrepo-com.svg')
   'ASG' = t('generic/fun/gun.svg')
 }

@@ -808,6 +808,8 @@ export const highlights = {
     // "Buddha": {},
     Ѱ: {},
     "Ѱƛ⍹": {},
+    "ΜΔΜΑ": {},
+    "The_Spirit_Molecule": {},
     // "⍺": {},
     // "beta": {}, /*join them 4 in 1 icon maybe?*/
     // "delta": {},
