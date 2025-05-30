@@ -48,12 +48,12 @@
 
   <app-node-expansion-icon
     [treeNode]="treeNode"
-  ></app-node-expansion-icon>
+  />
 
   <app-node-class-icon
     [treeNode]="treeNode"
     (click)="onClickClassIcon($event)"
-  ></app-node-class-icon>
+  />
 
   <ng-container *ngIf="treeNode.content.itemData?.deleted">
     Deleted <!--{{treeNode.itemData?.deleted}}-->
@@ -72,25 +72,25 @@
     [nodeContentComponent]="this"
     [cell]="cells.forColumn(columnDefs.estimatedTimeMin) !"
     [hidden]="! isEstimatedTimeShown || ! (config$ | async)?.showMinMaxColumns"
-  ></app-node-cell>
+  />
 
   <app-node-cell
     [nodeContentComponent]="this"
     [cell]="cells.forColumn(columnDefs.estimatedTime) !"
     [hidden]="! isEstimatedTimeShown"
-  ></app-node-cell>
+  />
 
   <app-node-cell
     [nodeContentComponent]="this"
     [cell]="cells.forColumn(columnDefs.estimatedTimeMax) !"
     [hidden]="! isEstimatedTimeShown || ! (config$ | async)?.showMinMaxColumns"
-  ></app-node-cell>
+  />
   <!-- ===== end new cells approach -->
 
   <app-node-content-time-tracking
     [treeNode]="treeNode"
     style="margin-left: 0.5em; vertical-align: middle; align-self: center"
-  ></app-node-content-time-tracking>
+  />
 
   <div *ngIf="treeNode.content.isDayPlan"
        style="margin-left: 4px; margin-right: 2px; user-select: none; vertical-align: middle; display: table-cell; align-self: center"
@@ -110,12 +110,12 @@
     '
     [nodeContentComponent]="this"
     [cell]="cells.forColumn(columnDefs.title) !"
-  ></app-contenteditable-cell>
+  />
 
   <app-node-debug-cell
     *ngIf="debugService.isDebug$ | async"
     [treeNode]="treeNode"
     [nodeDebug]="nodeDebug"
-  ></app-node-debug-cell>
+  />
 
 </div>

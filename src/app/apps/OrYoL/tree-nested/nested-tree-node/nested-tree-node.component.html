@@ -23,7 +23,7 @@
     *ngIf="! treeNode.isRoot"
     [treeNode]="treeNode"
     [treeHost]="treeHost"
-  ></app-node-content>
+  />
 
   <div *ngIf="treeNode.expanded || alwaysExpanded" class="node-children">
 <!--    Children {{treeNode.childrenTreeTableNodes | json}}-->
@@ -31,7 +31,7 @@
       <app-nested-tree-node
         [treeNode]="childNode"
         [treeHost]="treeHost"
-      ></app-nested-tree-node>
+      />
 <!--      <hr *ngIf="isVisualRoot"/>-->
     </ng-container>
   </div>
