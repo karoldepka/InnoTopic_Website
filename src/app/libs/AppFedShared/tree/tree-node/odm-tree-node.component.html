@@ -14,7 +14,7 @@
 
   <app-tree-node-content
     [treeNode]="treeNode"
-  ></app-tree-node-content>
+  />
 
 <!--  children: {{(treeNode.childNodesList$ | async) ?. length}}-->
 <!--  childNodesList$: {{(treeNode.childNodesList$ | async) }}-->
@@ -34,7 +34,7 @@
       <app-tree-node
         *ngFor="let node of childNodesList; trackBy: trackById"
         [treeNode]="node"
-      ></app-tree-node>
+      />
 
     </div>
 
