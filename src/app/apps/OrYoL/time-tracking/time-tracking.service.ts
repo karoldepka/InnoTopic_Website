@@ -8,7 +8,7 @@ import {TimeTrackedEntry} from './TimeTrackedEntry'
 import {OryItem$} from '../db/OryItem$'
 import {TimeTrackingPersistentData} from './TimeTrackingPersistentData'
 import {map} from 'rxjs/operators'
-import {maxBy} from 'lodash-es'
+import {maxBy, uniqBy} from 'lodash-es'
 
 
 export interface TimeTrackableItemData {
@@ -91,20 +91,16 @@ export class TimeTrackingService {
       // 1 MRU paused
       // --- if not more than 1 item:
       // 1 MRU DONE item
-      const retEntries = entries.filter(entry => !! entry.nowTrackingSince)
+      const retEntries = entries.filter(entry => entry.isTrackingNow())
 
-      // console.log(`toolbarEntries$ lastPaused`, lastPaused)
-      if ( retEntries.length < 1 ) {
-        if ( opts.showLastPausedItemIfNoItemCurrentlyTracking ) {
-          const lastPaused = this.getLastPausedItem(entries)
-          if ( lastPaused ) {
-            retEntries.push(lastPaused)
-          }
+      if (retEntries.length < 1 && opts.showLastPausedItemIfNoItemCurrentlyTracking) {
+        const lastPaused = this.getLastPausedItem(entries)
+        if (lastPaused) {
+          retEntries.push(lastPaused)
         }
       }
 
-      // return retEntries
-      return [... new Set(retEntries)] // remove duplicates - provisional fix for toolbar duplicate items
+      return uniqBy(retEntries, entry => entry.timeTrackable.getId())
     })
   )
 
@@ -152,41 +148,20 @@ export class TimeTrackingService {
     this.dataItemsService.onItemAddedOrModified$.subscribe((addedOrModifiedDataItem: HasItemData<TimeTrackableItemData>) => {
       const itemData = addedOrModifiedDataItem.getItemData()
       const ttData: TimeTrackingPersistentData | undefined = itemData?.timeTrack
-      if ( ttData?.nowTrackingSince || /* tracking now OR was ever tracked before */
-        ttData?.whenFirstStarted/* as any)?.toDate*/ /* FIX for a string */
-        /* FIXME looks like this condition sometimes prevents items, which were previously paused, to be shown on
-          tt toolbar after resumed (both local user action as well as from remote; but way more often from remote).
-          possible explanation: item data now has nowTrackingSince = false, AND is not on the list of currently tracked items; so will not get tracked at all
-          TODO: should keep this.timeTrackedEntries$ as full as possible (even no problem in including done ones, for data handling, and introduce a new filtered mapped list$ limiting showing old done/paused stuff
-          + dropdown with all (first paused unfinished, then maybe finished)
-        **/
-      ) {
-        // console.log('onItemWithDataAdded$.subscribe ttData.nowTrackingSince', ttData.nowTrackingSince, ttData)
-        const timeTrackedEntry = this.obtainEntryForItem(addedOrModifiedDataItem as TimeTrackable /* HACK */)
-        // console.log('dataItemsService.onItemAddedOrModified$.subscribe has nowTrackingSince', addedOrModifiedDataItem, ttData, timeTrackedEntry)
-        timeTrackedEntry.updateFromTimeTrackData(ttData) // TODO check if this is needed
+      const id = addedOrModifiedDataItem.getId()
+      const existingEntry = this.currentEntries?.find(entry => entry.timeTrackable.getId() === id)
+
+      if (ttData?.nowTrackingSince || ttData?.whenFirstStarted) {
+        const timeTrackedEntry = existingEntry || this.obtainEntryForItem(addedOrModifiedDataItem as TimeTrackable)
+        timeTrackedEntry.updateFromTimeTrackData(ttData)
         this.emitTimeTrackedEntry(timeTrackedEntry)
-
-      } else {
-        // if ( this.currentEntries?.some(entry => entry.timeTrackable.getId() === addedOrModifiedDataItem.getId()) ) {
-        const timeTrackedEntry = this.currentEntries?.find(entry => entry.timeTrackable.getId() === addedOrModifiedDataItem.getId() )
-        // we don't obtain() to not generate lots of unnecessary domain objects.
-        if ( timeTrackedEntry) {
-          console.log(`onItemAddedOrModified$.subscribe item was on list of time tracked entries`, addedOrModifiedDataItem)
-          // this.currentEntry[0].
-          // this.timeTrackedEntries$.nextWithCache(this.currentEntries) // keep in mind that Object.assign there
-            if ( ttData ) {
-              timeTrackedEntry.updateFromTimeTrackData(ttData) // TODO check if this is needed
-            }
-            // timeTrackedEntry.updateFromTimeTrackData?.(addedOrModifiedDataItem.getItemData().timeTrack)
-            this.emitTimeTrackedEntry(timeTrackedEntry)
-          // }
-          // this.timeTrackedEntries$.nextWithCache(this.currentEntry?.filter(entry =>
-          //   entry.timeTrackable.getId() !== addedOrModifiedDataItem.getId())
-          // ) // TODO maybe do not remove, coz might be paused and useful to still see previous item
+      } else if (existingEntry) {
+        console.log(`onItemAddedOrModified$.subscribe item was on list of time tracked entries`, addedOrModifiedDataItem)
+        if (ttData) {
+          existingEntry.updateFromTimeTrackData(ttData)
         }
-      }// TODO: else check if it was previously tracked, and remove from current entries
-
+        this.emitTimeTrackedEntry(existingEntry)
+      }
     })
   }
 
@@ -195,36 +170,22 @@ export class TimeTrackingService {
   // }
 
   emitTimeTrackedEntry(entry: TimeTrackedEntry) {
-    let newEntriesArr = this.currentEntries || []
-    // this.timeTrackingOf$.next(entry && entry.timeTrackable)
-    if ( ! this.currentEntries?.includes(entry) ) {
-      newEntriesArr = [...newEntriesArr, entry]
-    }
-    // TODO: is this where the duplicate item shows on toolbar?
+    const previousEntries = this.currentEntries || []
+    const entryId = entry.timeTrackable.getId()
 
-    // if (
-    //   && isDone
-    //   && newEntriesArr.length > 1
-    // ) {
-    //   console.log('removing tt entry from array')
-    // }
+    // 1. Add or update the entry
+    let newEntriesArr = previousEntries.some(e => e.timeTrackable.getId() === entryId)
+      ? previousEntries.map(e => e.timeTrackable.getId() === entryId ? entry : e)
+      : [...previousEntries, entry]
 
-    if ( newEntriesArr.length > 1 ) {
+    // 2. Apply cleanup logic if multiple entries exist
+    if (newEntriesArr.length > 1) {
       newEntriesArr = newEntriesArr.filter(e => {
         const isDone = e.timeTrackable.data$.lastVal?.isDone
-        return e.val?.isTrackingNow || ! isDone
-        // TODO: could make it so that all paused not-done items would still stay here
-        /*
-          if not tracking, and is done, we can remove it.
-          in the future, I could leave the last such item for MRU sake
-          or better, MRU should be a drop-down of history of tracked items
-        */
+        return e.isTrackingNow() || !isDone
       })
     }
-    // console.log('emitTimeTrackedEntry', entry, newEntriesArr, `isDone`, isDone)
 
-    // this.timeTrackedEntries$.nextWithCache([entry] /* hack to emulate multi-tracking */)
-    // FIXME: ensure ALWAYS (not just for just-modified item) max 1 done not-currently-tracking item; sort by whenLastTouched
     this.timeTrackedEntries$.nextWithCache(newEntriesArr)
   }
 
