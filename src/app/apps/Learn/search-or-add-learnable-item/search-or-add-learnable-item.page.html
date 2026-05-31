@@ -94,6 +94,22 @@
       ><ion-icon name="add-circle-outline" />&nbsp;LEARN</ion-button>
 
       <ion-button
+        (click)="addWithAI()"
+        [disabled]="isAddingWithAI"
+        title="Fill with AI"
+        size="small"
+      >
+        <ion-spinner
+          *ngIf="isAddingWithAI"
+          name="dots"
+         />
+        <span
+          *ngIf="! isAddingWithAI"
+          style="font-size: 1.2rem"
+        >✨</span>
+      </ion-button>
+
+      <ion-button
         *ngIf="feat.showExperimental"
         [routerLink]="['/journal/write/new']"
         (click)="addToJournal()"

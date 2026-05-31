@@ -25,7 +25,7 @@
                 "output": "assets"
               },
               { "glob": "**/*", "input": "node_modules/tinymce", "output": "/assets/tinymce/"
-                
+
               },
               {
                 "glob": "**/*.svg",
@@ -95,7 +95,8 @@
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
           "options": {
-            "browserTarget": "app:build"
+            "browserTarget": "app:build",
+            "proxyConfig": "src/proxy.conf.json"
           },
           "configurations": {
             "production": {
