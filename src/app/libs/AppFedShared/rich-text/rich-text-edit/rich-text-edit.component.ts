@@ -280,7 +280,7 @@ export class RichTextEditComponent extends AbstractCellComponent implements OnIn
         editor.addShortcut('ctrl+f', 'Fancy style ', function(){
           editor.formatter.toggle('fancy');
         });
-        editor.addShortcut('ctrl+c', 'Concept style ', function(){
+        editor.addShortcut('ctrl+shift+c', 'Concept style ', function(){
           editor.formatter.toggle('concept');
         });
         editor.ui.registry.addButton('customMarkBtn', {
