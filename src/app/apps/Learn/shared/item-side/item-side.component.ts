@@ -8,6 +8,9 @@ import {debugLog} from '../../../../libs/AppFedShared/utils/log'
 import {LearnItem} from '../../models/LearnItem'
 import {RichTextEditComponent} from '../../../../libs/AppFedShared/rich-text/rich-text-edit/rich-text-edit.component'
 import {OdmCell} from '../../../../libs/AppFedShared/tree/cells/OdmCell'
+import {AiBackendService} from '../../core/ai-backend.service'
+import {stripHtml} from '../../../../libs/AppFedShared/utils/html-utils'
+import {finalize} from 'rxjs/operators'
 
 export type SideFormControlsDict = {[key in keyof SidesDefs]: UntypedFormControl }
 
@@ -43,6 +46,8 @@ export class ItemSideComponent implements OnInit {
 
   editorOpened = false
 
+  aiLoading = false
+
   @ViewChild(RichTextEditComponent)
   editorViewChild ! : RichTextEditComponent
 
@@ -55,7 +60,7 @@ export class ItemSideComponent implements OnInit {
   viewSyncer ! : ViewSyncer
 
 
-  constructor() { }
+  constructor(private aiBackend: AiBackendService) { }
 
   ngOnInit() {
     if ( this.side ) {
@@ -118,6 +123,33 @@ export class ItemSideComponent implements OnInit {
       return ! this.side?.onlyForLearn
     }
     return true
+  }
+
+  async fillWithAI() {
+    if (this.aiLoading) {
+      return
+    }
+    const item = this.item$.currentVal
+    if (!item) return
+
+    // Use the Q&A question as the prompt input, and persist generated text to the answer side.
+    const question = stripHtml(item.getQuestion?.() || item.title || '') || ''
+    const context = (item.joinedSides ? stripHtml(item.joinedSides()) : '') ?? ''
+
+    this.aiLoading = true
+    this.editorOpened = true
+    this.formControl.setValue('')
+    this.item$.patchThrottled({answer: ''})
+
+    this.aiBackend.generateAnswerStream(question, context).pipe(
+      finalize(() => this.aiLoading = false)
+    ).subscribe(
+      answer => {
+        this.formControl.setValue(answer)
+        this.item$.patchThrottled({answer})
+      },
+      e => console.error('Error filling with AI', e)
+    )
   }
 
 }

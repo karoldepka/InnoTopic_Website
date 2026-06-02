@@ -29,6 +29,45 @@ export function requestJson<T>(baseUrl: URL, path: string): Promise<T> {
   })
 }
 
+export function postJson<T>(
+  baseUrl: URL,
+  path: string,
+  payload: Record<string, unknown>,
+): Promise<T> {
+  return new Promise((resolve, reject) => {
+    const transport = baseUrl.protocol === 'https:' ? https : http
+    const body = JSON.stringify(payload)
+    const req = transport.request(new URL(path, baseUrl), {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Content-Length': Buffer.byteLength(body),
+      },
+    }, res => {
+      let responseBody = ''
+
+      res.setEncoding('utf8')
+      res.on('data', chunk => responseBody += chunk)
+      res.on('end', () => {
+        if ((res.statusCode || 0) >= 400) {
+          reject(new Error(`HTTP ${res.statusCode}: ${responseBody}`))
+          return
+        }
+
+        try {
+          resolve(JSON.parse(responseBody) as T)
+        } catch (error) {
+          reject(error)
+        }
+      })
+    })
+
+    req.on('error', reject)
+    req.write(body)
+    req.end()
+  })
+}
+
 export function postStreamingText(
   baseUrl: URL,
   path: string,

@@ -31,6 +31,23 @@
     <app-side-label
       [side]="side"
      />
+    <ion-button
+      *ngIf="side.id === answerDescr.id"
+      size="small"
+      fill="clear"
+      [disabled]="aiLoading"
+      (click)="fillWithAI(); $event.stopPropagation()"
+      title="Fill with AI"
+    >
+      <ion-spinner
+        *ngIf="aiLoading"
+        name="dots"
+       />
+      <span
+        *ngIf="! aiLoading"
+        style="font-size: 1.2rem"
+      >✨</span>
+    </ion-button>
     <!--    <ion-button size="small">Reveal</ion-button>-->
   </div>
 
@@ -52,4 +69,3 @@
    />
 
 </div>
-

@@ -91,7 +91,7 @@ export class TimeTrackingService {
       // 1 MRU paused
       // --- if not more than 1 item:
       // 1 MRU DONE item
-      const retEntries = entries.filter(entry => entry.isTrackingNow())
+      const retEntries = entries.filter(entry => entry.isTrackingNow)
 
       if (retEntries.length < 1 && opts.showLastPausedItemIfNoItemCurrentlyTracking) {
         const lastPaused = this.getLastPausedItem(entries)
@@ -182,7 +182,7 @@ export class TimeTrackingService {
     if (newEntriesArr.length > 1) {
       newEntriesArr = newEntriesArr.filter(e => {
         const isDone = e.timeTrackable.data$.lastVal?.isDone
-        return e.isTrackingNow() || !isDone
+        return e.isTrackingNow || !isDone
       })
     }
 

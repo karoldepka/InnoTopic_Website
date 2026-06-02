@@ -1,5 +1,5 @@
 import * as http from 'http'
-import {collectObservable, postStreamingText, requestJson} from './ai-backend-test-utils'
+import {collectObservable, postJson, postStreamingText, requestJson} from './ai-backend-test-utils'
 
 interface MockBackend {
   requests: unknown[]
@@ -12,6 +12,18 @@ function createMockBackend(): MockBackend {
     if (req.method === 'GET' && req.url === '/ai-api/health') {
       res.writeHead(200, {'Content-Type': 'application/json'})
       res.end(JSON.stringify({status: 'ok', llm: 'mock', model: 'mock-model'}))
+      return
+    }
+
+    if (req.method === 'GET' && req.url === '/ai-api/health-error') {
+      res.writeHead(503, {'Content-Type': 'text/plain'})
+      res.end('backend unavailable')
+      return
+    }
+
+    if (req.method === 'GET' && req.url === '/ai-api/invalid-json') {
+      res.writeHead(200, {'Content-Type': 'application/json'})
+      res.end('not json')
       return
     }
 
@@ -30,6 +42,36 @@ function createMockBackend(): MockBackend {
           }, 5)
         }, 5)
       })
+      return
+    }
+
+    if (req.method === 'POST' && req.url === '/ai-api/generate-answer') {
+      let body = ''
+      req.setEncoding('utf8')
+      req.on('data', chunk => body += chunk)
+      req.on('end', () => {
+        requests.push(JSON.parse(body))
+        res.writeHead(200, {'Content-Type': 'application/json'})
+        res.end(JSON.stringify({answer: 'mock json answer'}))
+      })
+      return
+    }
+
+    if (req.method === 'POST' && req.url === '/ai-api/generate-answer-error') {
+      res.writeHead(500, {'Content-Type': 'application/json'})
+      res.end(JSON.stringify({detail: 'mock answer failure'}))
+      return
+    }
+
+    if (req.method === 'POST' && req.url === '/ai-api/generate-empty-answer-stream') {
+      res.writeHead(200, {'Content-Type': 'text/plain'})
+      res.end()
+      return
+    }
+
+    if (req.method === 'POST' && req.url === '/ai-api/generate-answer-stream-error') {
+      res.writeHead(500, {'Content-Type': 'text/plain'})
+      res.end('mock stream failure')
       return
     }
 
@@ -99,5 +141,47 @@ describe('AI backend mocked server', () => {
       question: 'mock question',
       context: 'mock context',
     }])
+  })
+
+  test('JSON POST helper sends the question and returns a generated answer', async () => {
+    await expect(postJson(backendUrl, '/ai-api/generate-answer', {
+      question: 'mock json question',
+      context: 'mock json context',
+    })).resolves.toEqual({
+      answer: 'mock json answer',
+    })
+
+    expect(mockBackend.requests).toEqual([{
+      question: 'mock json question',
+      context: 'mock json context',
+    }])
+  })
+
+  test('JSON helper rejects non-2xx backend responses with response body', async () => {
+    await expect(requestJson(backendUrl, '/ai-api/health-error')).rejects.toThrow(
+      'HTTP 503: backend unavailable'
+    )
+  })
+
+  test('JSON helper rejects invalid JSON responses', async () => {
+    await expect(requestJson(backendUrl, '/ai-api/invalid-json')).rejects.toThrow()
+  })
+
+  test('JSON POST helper rejects non-2xx backend responses with response body', async () => {
+    await expect(postJson(backendUrl, '/ai-api/generate-answer-error', {
+      question: 'failing answer',
+    })).rejects.toThrow('HTTP 500: {"detail":"mock answer failure"}')
+  })
+
+  test('streaming helper emits no chunks for an empty successful stream', async () => {
+    await expect(collectObservable(postStreamingText(backendUrl, '/ai-api/generate-empty-answer-stream', {
+      question: 'empty stream',
+    }))).resolves.toEqual([])
+  })
+
+  test('streaming helper rejects non-2xx stream responses with response body', async () => {
+    await expect(collectObservable(postStreamingText(backendUrl, '/ai-api/generate-answer-stream-error', {
+      question: 'failing stream',
+    }))).rejects.toThrow('HTTP 500: mock stream failure')
   })
 })

@@ -7,7 +7,7 @@ import {AuthService} from '../../../auth/auth.service'
 import {debugLog, errorAlert} from '../../../libs/AppFedShared/utils/log'
 import {UntypedFormControl} from '@angular/forms'
 import {htmlToId, stripHtml} from '../../../libs/AppFedShared/utils/html-utils'
-import {debounceTime, distinctUntilChanged} from 'rxjs/operators'
+import {debounceTime, distinctUntilChanged, finalize} from 'rxjs/operators'
 import {LingueeService} from '../natural-langs/linguee.service'
 import {MerriamWebsterDictService} from '../natural-langs/merriam-webster-dict.service'
 import {PopoverController} from '@ionic/angular'
@@ -25,6 +25,8 @@ import {ListProcessing} from './list-processing'
 import {BaseComponent} from '../../../libs/AppFedShared/base/base.component'
 import {LearnStatsService} from '../core/learn-stats.service'
 
+import {AiBackendService} from '../core/ai-backend.service'
+
 /** TODO: rename to smth simpler more standard like LearnDoItemsPage (search-or-add is kinda implied, especially search) */
 @Component({
   selector: 'app-search-or-add-learnable-item',
@@ -39,6 +41,8 @@ export class SearchOrAddLearnableItemPageComponent extends BaseComponent impleme
   htmlSearch ? : string = undefined
 
   searchFormControl = new UntypedFormControl()
+
+  isAddingWithAI = false
 
   get filteredItem$s(): LearnItem$[] { return this.listModel.filteredItem$s }
 
@@ -57,6 +61,7 @@ export class SearchOrAddLearnableItemPageComponent extends BaseComponent impleme
     public merriamWebsterDictService: MerriamWebsterDictService,
     public popoverController: PopoverController,
     public router: Router,
+    private aiBackend: AiBackendService,
     injector: Injector,
   ) {
     super(injector)
@@ -262,6 +267,31 @@ export class SearchOrAddLearnableItemPageComponent extends BaseComponent impleme
     // this.merriamWebsterDictService.doIt(this.search)
 
     this.add(undefined, false, navInto)
+  }
+
+  async addWithAI() {
+    if (this.isAddingWithAI) {
+      return
+    }
+    const text = this.getUserString()
+    if (!text) return
+    this.isAddingWithAI = true
+    try {
+      const item = this.createItemFromInputString(text, false)
+      item.answer = ''
+      const item$ = await this.learnDoService.add(item)
+      this.clearInput()
+      this.navigateIntoItem(item$.id!)
+      this.aiBackend.generateAnswerStream(text).pipe(
+        finalize(() => this.isAddingWithAI = false)
+      ).subscribe(
+        answer => item$.patchThrottled({answer}),
+        e => console.error('Error adding with AI', e)
+      )
+    } catch (e) {
+      console.error('Error adding with AI', e)
+      this.isAddingWithAI = false
+    }
   }
 
   @HostListener('window:keyup.alt.enter', ['$event'])

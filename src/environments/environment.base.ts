@@ -4,8 +4,8 @@
 
 export const environmentBase = {
 
-  // collectionNameSuffix: '',
-  collectionNameSuffix: '_DEBUG',
+  collectionNameSuffix: '',
+  // collectionNameSuffix: '_DEBUG',
 
   showExperimentalThemes: true,
   firebaseConfig: {
@@ -18,6 +18,7 @@ export const environmentBase = {
   },
   // production: true
   production: false,
+  aiBackendUrl: 'http://localhost:8000',
 };
 
 /*
