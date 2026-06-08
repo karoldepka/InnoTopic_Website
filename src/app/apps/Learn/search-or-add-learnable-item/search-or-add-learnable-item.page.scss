@@ -8,3 +8,46 @@
     padding-left: 5px;
   }
 }
+
+.search-add-workspace {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(280px, 380px);
+  min-height: 100%;
+}
+
+.search-add-results {
+  min-width: 0;
+  min-height: 0;
+}
+
+.search-add-chat {
+  border-left: 1px solid rgba(0, 0, 0, 0.08);
+  background: var(--ion-background-color);
+  padding: 8px;
+  min-width: 0;
+}
+
+.search-add-chat deep-chat {
+  display: block;
+}
+
+:host ::ng-deep app-item-list {
+  display: block;
+  height: 100%;
+}
+
+:host ::ng-deep app-item-list ion-virtual-scroll {
+  height: 100%;
+}
+
+@media (max-width: 900px) {
+  .search-add-workspace {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .search-add-chat {
+    order: -1;
+    border-left: 0;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+  }
+}

@@ -92,6 +92,10 @@ const routes: Routes = [
     loadChildren: () => import('./apps/Lifedvisor/ask/ask.module').then(m => m.AskPageModule)
   },
   {
+    path: 'copilotkit',
+    loadChildren: () => import('./apps/CopilotKit/copilotkit-compare/copilotkit-compare.module').then(m => m.CopilotKitCompareModule)
+  },
+  {
     path: 'life-overviews',
     loadChildren: () => import('./apps/Lifedvisor/life-overviews/life-overviews.module').then(m => m.LifeOverviewsPageModule)
   },

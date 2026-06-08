@@ -34,6 +34,15 @@
         Plan
       </ion-button>
 
+      <ion-button
+        [routerLink]="'/copilotkit'"
+        size="small"
+        title="CopilotKit"
+        aria-label="CopilotKit"
+      >
+        <ion-icon name="chatbubble-ellipses-outline" slot="icon-only" />
+      </ion-button>
+
       <app-what-next-button></app-what-next-button>
 
       <ion-buttons slot="end">
@@ -154,20 +163,36 @@
 <!--    ></app-actionable-item>-->
 
 <!--  </ng-container>-->
-  <ng-container *ngIf="(! (authService.authUser$ | async)) else loggedIn">
+  <div class="search-add-workspace">
+    <section class="search-add-results">
+      <ng-container *ngIf="(! (authService.authUser$ | async)) else loggedIn">
 
-    <div style="display: flex; flex-direction: row; align-items: center; margin: 10px">
-      Please &nbsp;
-      <ion-button (click)="authService.logInViaGoogle()">LOG IN</ion-button>
+        <div style="display: flex; flex-direction: row; align-items: center; margin: 10px">
+          Please &nbsp;
+          <ion-button (click)="authService.logInViaGoogle()">LOG IN</ion-button>
 
-    </div>
+        </div>
 
-  </ng-container>
+      </ng-container>
 
-  <ng-template #loggedIn>
-    <app-item-list
-      [listModel]="listModel"
-    ></app-item-list>
-  </ng-template>
+      <ng-template #loggedIn>
+        <app-item-list
+          [listModel]="listModel"
+        ></app-item-list>
+      </ng-template>
+    </section>
+
+    <aside class="search-add-chat">
+      <deep-chat
+        [connect]="deepChatConnect"
+        [requestBodyLimits]="deepChatRequestBodyLimits"
+        [introMessage]="deepChatIntroMessage"
+        [names]="deepChatNames"
+        [textInput]="deepChatTextInput"
+        [chatStyle]="deepChatChatStyle"
+        [messageStyles]="deepChatMessageStyles"
+      ></deep-chat>
+    </aside>
+  </div>
 
 </ion-content>

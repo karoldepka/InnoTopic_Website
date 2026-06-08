@@ -24,6 +24,11 @@
                 "input": "src/assets",
                 "output": "assets"
               },
+              {
+                "glob": "**/*",
+                "input": ".tmp/copilotkit-react-embed",
+                "output": "assets/copilotkit-react-embed"
+              },
               { "glob": "**/*", "input": "node_modules/tinymce", "output": "/assets/tinymce/"
 
               },
