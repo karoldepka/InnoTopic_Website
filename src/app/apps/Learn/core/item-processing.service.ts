@@ -2,18 +2,44 @@ import { Injectable } from '@angular/core';
 import {LearnItemItemsService} from './learn-item-items.service'
 import {LearnItem$} from '../models/LearnItem$'
 import {map, shareReplay} from 'rxjs/operators'
-import {Observable} from 'rxjs'
+import {BehaviorSubject, Observable} from 'rxjs'
 import {findPreferred} from '../../../libs/AppFedShared/utils/cachedSubject2/collectionUtils'
 import {countBy} from 'lodash-es'
 import {LearnItem} from '../models/LearnItem'
+import {sidesDefsArray} from './sidesDefs'
+import {stripHtml} from '../../../libs/AppFedShared/utils/html-utils'
+import {AiBackendService} from './ai-backend.service'
+
+export interface FillQuestionsWithAiProgress {
+  running: boolean
+  total: number
+  done: number
+  filled: number
+  errors: number
+  percent: number
+  currentQuestion?: string
+  lastError?: string
+}
+
+const emptyFillQuestionsProgress: FillQuestionsWithAiProgress = {
+  running: false,
+  total: 0,
+  done: 0,
+  filled: 0,
+  errors: 0,
+  percent: 0,
+}
 
 @Injectable({
   providedIn: 'root'
 })
 export class ItemProcessingService {
 
+  fillQuestionsWithAiProgress$ = new BehaviorSubject<FillQuestionsWithAiProgress>(emptyFillQuestionsProgress)
+
   constructor(
     private learnDoService: LearnItemItemsService,
+    private aiBackend: AiBackendService,
   ) {
     console.log('ItemProcessingService service constructor')
   }
@@ -65,5 +91,98 @@ export class ItemProcessingService {
 
   getCountNeedingProcessing() {
     return this.getItemsNeedingProcessing()?.length
+  }
+
+  public getQuestionsWithoutAnswers() {
+    return this.learnDoService.localItems$.lastVal?.filter(item$ => this.isQuestionWithoutAnswer(item$)) ?? []
+  }
+
+  public getCountQuestionsWithoutAnswers() {
+    return this.getQuestionsWithoutAnswers().length
+  }
+
+  public async fillQuestionsWithoutAnswersWithAi() {
+    if (this.fillQuestionsWithAiProgress$.value.running) {
+      return
+    }
+
+    const itemsToFill = this.getQuestionsWithoutAnswers()
+    this.setFillQuestionsProgress({
+      ...emptyFillQuestionsProgress,
+      running: true,
+      total: itemsToFill.length,
+    })
+
+    for (const item$ of itemsToFill) {
+      const item = item$.currentVal
+      const question = this.getQuestionForAi(item)
+      this.setFillQuestionsProgress({
+        currentQuestion: question,
+      })
+
+      try {
+        const response = await this.aiBackend.generateAnswerWithWebSearch(
+          question,
+          this.getContextForAi(item),
+        ).toPromise()
+        const modelName = response?.modelName || 'unknown-model'
+        const answer = this.withFilledByAiMarker(response?.answer || '', modelName)
+        item$.patchThrottled({answer})
+        this.setFillQuestionsProgress({
+          done: this.fillQuestionsWithAiProgress$.value.done + 1,
+          filled: this.fillQuestionsWithAiProgress$.value.filled + 1,
+        })
+      } catch (e) {
+        console.error('Error filling question with AI', e)
+        this.setFillQuestionsProgress({
+          done: this.fillQuestionsWithAiProgress$.value.done + 1,
+          errors: this.fillQuestionsWithAiProgress$.value.errors + 1,
+          lastError: (e as any)?.message || `${e}`,
+        })
+      }
+    }
+
+    this.setFillQuestionsProgress({
+      running: false,
+      currentQuestion: undefined,
+    })
+  }
+
+  private setFillQuestionsProgress(patch: Partial<FillQuestionsWithAiProgress>) {
+    const next = {
+      ...this.fillQuestionsWithAiProgress$.value,
+      ...patch,
+    }
+    next.percent = next.total ? Math.round((next.done / next.total) * 100) : 0
+    this.fillQuestionsWithAiProgress$.next(next)
+  }
+
+  private isQuestionWithoutAnswer(item$: LearnItem$): boolean {
+    const item = item$.currentVal
+    if (!item || item.isTask || item.whenDeleted || item.isDeleted) {
+      return false
+    }
+
+    const filledSides = sidesDefsArray.filter(side => {
+      const val = item.getSideVal(side)
+      return !!(stripHtml(val || '') || '').trim()
+    })
+
+    return filledSides.length > 0
+      && filledSides.every(side => side.id === 'title' || side.id === 'question')
+  }
+
+  private getQuestionForAi(item?: LearnItem | null) {
+    return (stripHtml(item?.getQuestion?.() || item?.title || '') || '').trim()
+  }
+
+  private getContextForAi(item?: LearnItem | null) {
+    return (stripHtml(item?.joinedSides?.() || '') || '').trim()
+  }
+
+  private withFilledByAiMarker(answer: string, modelName: string) {
+    const trimmed = (answer || '').trim()
+    const marker = `#FilledByAI:(${modelName})`
+    return trimmed.includes(marker) ? trimmed : `${trimmed}\n\n${marker}`.trim()
   }
 }

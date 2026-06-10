@@ -18,6 +18,46 @@
 <!--  <app-what-next-button></app-what-next-button>-->
   <app-process-button />
 
+  <section
+    class="ai-fill"
+    *ngIf="itemProcessingService.fillQuestionsWithAiProgress$ | async as fillProgress"
+  >
+    <ion-button
+      expand="block"
+      [disabled]="fillProgress.running || itemProcessingService.getCountQuestionsWithoutAnswers() === 0"
+      (click)="itemProcessingService.fillQuestionsWithoutAnswersWithAi()"
+    >
+      <ion-icon
+        name="sparkles-outline"
+        slot="start"
+      />
+      Fill unanswered questions with AI
+    </ion-button>
+
+    <ion-progress-bar
+      [value]="fillProgress.total ? fillProgress.done / fillProgress.total : 0"
+    />
+
+    <div class="ai-fill-status">
+      <span>Done {{fillProgress.done}} of {{fillProgress.total}}</span>
+      <span>{{fillProgress.percent}}%</span>
+      <span>Errors {{fillProgress.errors}}</span>
+    </div>
+
+    <ion-note *ngIf="! fillProgress.running">
+      Eligible: {{itemProcessingService.getCountQuestionsWithoutAnswers()}}
+    </ion-note>
+    <ion-note *ngIf="fillProgress.running && fillProgress.currentQuestion">
+      {{fillProgress.currentQuestion}}
+    </ion-note>
+    <ion-note
+      color="danger"
+      *ngIf="fillProgress.lastError"
+    >
+      {{fillProgress.lastError}}
+    </ion-note>
+  </section>
+
   {{itemProcessingService.getCountsByImportance() | json}}
 
   Total: {{itemProcessingService.getCountNeedingProcessing() | json}}

@@ -141,10 +141,13 @@ export class ItemSideComponent implements OnInit {
     this.formControl.setValue('')
     this.item$.patchThrottled({answer: ''})
 
-    this.aiBackend.generateAnswerStream(question, context).pipe(
+    this.aiBackend.generateAnswerWithWebSearch(question, context).pipe(
       finalize(() => this.aiLoading = false)
     ).subscribe(
-      answer => {
+      response => {
+        const modelName = response?.modelName || 'unknown-model'
+        const marker = `#FilledByAI:(${modelName})`
+        const answer = `${(response?.answer || '').trim()}\n\n${marker}`.trim()
         this.formControl.setValue(answer)
         this.item$.patchThrottled({answer})
       },

@@ -5,6 +5,8 @@ import { Observable } from 'rxjs';
 
 export interface AIResponse {
   answer: string;
+  modelName?: string;
+  searchResults?: string[];
 }
 
 @Injectable({
@@ -22,9 +24,18 @@ export class AiBackendService {
     });
   }
 
+  generateAnswerWithWebSearch(question: string, context: string = ''): Observable<AIResponse> {
+    return this.http.post<AIResponse>(`${this.baseUrl}/generate-answer`, {
+      question,
+      context,
+      web_search: true,
+    });
+  }
+
   generateAnswerStream(
     question: string,
     context: string = '',
+    webSearch = false,
   ): Observable<string> {
     return new Observable<string>(subscriber => {
       const abortController = new AbortController()
@@ -35,7 +46,7 @@ export class AiBackendService {
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify({question, context}),
+          body: JSON.stringify({question, context, web_search: webSearch}),
           signal: abortController.signal,
         })
 
