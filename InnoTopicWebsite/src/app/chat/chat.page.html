@@ -1,0 +1,68 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/karol-depka"></ion-back-button>
+    </ion-buttons>
+    <ion-title>InnoTopic AI Assistant</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true" class="ion-padding chat-container">
+  <div class="chat-wrapper glass-panel">
+    
+    <!-- Chat History -->
+    <div class="chat-messages" #chatContent>
+      <div class="welcome-box" *ngIf="chat.messages.length === 0">
+        <ion-icon name="chatbubbles-outline" class="welcome-icon"></ion-icon>
+        <h2>Welcome to InnoTopic AI</h2>
+        <p>Ask me anything about wisdom, strength, or design projects!</p>
+      </div>
+
+      <div *ngFor="let message of chat.messages" 
+           [ngClass]="{'message-user': message.role === 'user', 'message-ai': message.role === 'assistant'}"
+           class="message-bubble-wrapper">
+        <div class="message-bubble glass-bubble">
+          <div class="message-sender">{{ message.role === 'user' ? 'You' : 'Assistant' }}</div>
+          <div class="message-text">{{ getMessageText(message) }}</div>
+        </div>
+      </div>
+
+      <!-- Loading / Streaming Indicator -->
+      <div *ngIf="chat.status === 'streaming'" class="typing-indicator-wrapper">
+        <div class="typing-indicator">
+          <span></span><span></span><span></span>
+        </div>
+      </div>
+      
+      <!-- Error Message -->
+      <div *ngIf="chat.error" class="error-container">
+        <ion-icon name="alert-circle-outline"></ion-icon>
+        <span>{{ chat.error.message || 'An error occurred during communication.' }}</span>
+      </div>
+    </div>
+
+    <!-- Input Footer -->
+    <div class="chat-footer glass-footer">
+      <form (submit)="sendMessage($event)" class="chat-input-form">
+        <ion-textarea
+          [value]="inputMessage()"
+          (ionInput)="inputMessage.set($any($event).target.value)"
+          placeholder="Ask a question..."
+          rows="1"
+          class="chat-input-textarea"
+          (keydown.enter)="$event.preventDefault(); sendMessage()"
+          [disabled]="chat.status === 'streaming'"
+        ></ion-textarea>
+        
+        <ion-button 
+          type="submit" 
+          color="tertiary" 
+          [disabled]="chat.status === 'streaming' || !inputMessage().trim()"
+          class="send-btn"
+        >
+          <ion-icon name="send" slot="icon-only"></ion-icon>
+        </ion-button>
+      </form>
+    </div>
+  </div>
+</ion-content>

@@ -125,6 +125,10 @@ const routes: Routes = [
     path: 'merch-gen',
     loadChildren: () => import('./merch-gen/merch-gen.module').then( m => m.MerchGenPageModule)
   },
+  {
+    path: 'chat',
+    loadChildren: () => import('./chat/chat.module').then( m => m.ChatPageModule)
+  },
   { path: '**', redirectTo: 'karol-depka' /* FIXME: does not work? */ },
 
 
