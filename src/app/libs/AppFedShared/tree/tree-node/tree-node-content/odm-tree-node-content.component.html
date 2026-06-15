@@ -1,39 +1,56 @@
 <div
-  style="display: flex; flex-direction: row; align-items: center"
+  class="tree-node-content"
   (keydown.arrowleft)="onArrowLeft()"
   (keydown.alt.arrowleft)="onArrowLeft()"
   (keydown.meta.arrowleft)="onArrowLeft()"
   (keydown.control.a)="this.toggleShowAnswer()"
 >
-  <i
-    style="color: var(--ion-color-secondary); vertical-align: middle; padding-top: 3px; aspect-ratio: 1 / 1;"
-    class="material-icons tappable-icon actionable"
-    (tap)="treeNode.isExpanded = ! treeNode.isExpanded"
+  <ion-button
+    fill="clear"
+    size="small"
+    class="node-icon-button"
+    title="Expand or collapse"
+    aria-label="Expand or collapse"
+    (click)="treeNode.isExpanded = ! treeNode.isExpanded"
   >
-    <!--  {{ treeNode.hasChildren ? 'expand_more' : 'add_circle' }}-->
-    <!-- Idea: add_circle icon if no children (therefore no expand/collapse) and would create child node -->
-    expand_more
-  </i>
+    <ion-icon
+      slot="icon-only"
+      [name]="treeNode.isExpanded ? 'chevron-down-outline' : 'chevron-forward-outline'"
+    />
+  </ion-button>
 
-  <i
-    style="vertical-align: middle; aspect-ratio: 1 / 1;"
-    class="material-icons tappable-icon actionable"
+  <ion-button
+    fill="clear"
+    size="small"
+    class="node-icon-button"
+    title="Node actions"
+    aria-label="Node actions"
     (click)="onClickClassIcon($event)"
   >
-    question_mark
-  </i>
+    <ion-icon
+      slot="icon-only"
+      name="ellipsis-horizontal-circle-outline"
+    />
+  </ion-button>
 
-  <i
-    style="vertical-align: middle; margin: 3px; aspect-ratio: 1 / 1;"
-    class="material-icons tappable-icon actionable"
+  <ion-button
+    fill="clear"
+    size="small"
+    class="node-icon-button"
+    title="Show or hide answer"
+    aria-label="Show or hide answer"
+    [color]="showAnswer ? 'primary' : 'medium'"
     (click)="toggleShowAnswer()"
   >
-    question_answer
-  </i>
+    <ion-icon
+      slot="icon-only"
+      name="chatbubble-ellipses-outline"
+    />
+  </ion-button>
   <!--  (public)-->
 
   <app-rich-text-edit-cell
-    style="flex-grow: 1"
+    class="tree-title-cell"
     [cell]="mapColumnIdToCell.get('title')!"
   ></app-rich-text-edit-cell>
 
@@ -54,9 +71,8 @@
 <app-rich-text-edit-cell
   #answerCell
   [hidden]="((! showAnswer) && !((val$ | async)?.answer)) || (!treeNode.isExpanded)"
-  style="flex-grow: 1; margin-left: 1.5rem"
+  class="tree-answer-cell"
   [cell]="mapColumnIdToCell.get('answer')!"
 ></app-rich-text-edit-cell>
-
 
 

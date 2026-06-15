@@ -1,26 +1,129 @@
-<a
-  [routerLink]="item$ . getRouterLinkUrl()"
->
-  Item: {{ stripHtml((item$ . getTitleOrQuestion$() | async)) }}</a>&nbsp;
-  <!--      {{ stripHtml((ancestor?.val?.title)) ?? 'unnamed' }}-->
-<!--  <ion-icon style="color: var(&#45;&#45;ion-color-secondary)" name="chevron-forward-outline" />-->
+<div class="tree-node-popup">
+  <a
+    class="node-link"
+    [routerLink]="item$ . getRouterLinkUrl()"
+  >
+    {{ stripHtml((item$ . getTitleOrQuestion$() | async)) || 'Untitled item' }}
+  </a>
 
+  <ion-note
+    *ngIf="isOffline"
+    color="medium"
+    class="offline-note"
+  >
+    Offline: children are saved locally first.
+  </ion-note>
 
+  <ion-segment
+    [value]="newChildType"
+    mode="ios"
+  >
+    <ion-segment-button
+      value="learn"
+      (click)="setNewChildType('learn')"
+    >
+      <ion-label>Learn</ion-label>
+    </ion-segment-button>
+    <ion-segment-button
+      value="task"
+      (click)="setNewChildType('task')"
+    >
+      <ion-label>Task</ion-label>
+    </ion-segment-button>
+    <ion-segment-button
+      value="category"
+      (click)="setNewChildType('category')"
+    >
+      <ion-label>Category</ion-label>
+    </ion-segment-button>
+  </ion-segment>
 
-<ion-button
-  (click)="deleteWithConfirmation()"
->Delete</ion-button>
-<ion-button
-  (click)="addChild($event)"
->Add Sub-Item</ion-button>
-<odm-checkbox
-  [fieldName]="'hideAncestorsInQuiz'"
-  [item$]="item$"
->
-  HIDE ANCESTORS IN QUIZ
-</odm-checkbox>
+  <ion-item
+    lines="full"
+    class="child-title-item"
+  >
+    <ion-label position="stacked">New child</ion-label>
+    <ion-input
+      [value]="newChildTitle"
+      [disabled]="isAddingChild"
+      autocomplete="off"
+      enterkeyhint="done"
+      placeholder="Name this child"
+      (ionInput)="updateNewChildTitle($event)"
+      (keyup.enter)="addChild($event); $event.stopPropagation(); $event.preventDefault()"
+    />
+  </ion-item>
 
-<ion-button
->Add Item After</ion-button>
-<!--(click)="addSiblingAfter($event)"-->
+  <ion-note
+    *ngIf="childTitleError"
+    color="danger"
+  >
+    {{ childTitleError }}
+  </ion-note>
 
+  <div class="popup-actions">
+    <ion-button
+      fill="solid"
+      size="small"
+      [disabled]="! canAddChild()"
+      (click)="addChild($event)"
+    >
+      <ion-spinner
+        *ngIf="isAddingChild"
+        name="dots"
+      />
+      <ion-icon
+        *ngIf="! isAddingChild"
+        name="add-circle-outline"
+        slot="start"
+      />
+      Add
+    </ion-button>
+
+    <ion-button
+      fill="clear"
+      color="medium"
+      size="small"
+      [disabled]="! newChildTitle || isAddingChild"
+      (click)="clearNewChild()"
+    >
+      <ion-icon
+        name="close-outline"
+        slot="start"
+      />
+      Clear
+    </ion-button>
+
+    <ion-button
+      fill="clear"
+      size="small"
+      [routerLink]="item$ . getRouterLinkUrl()"
+    >
+      <ion-icon
+        name="open-outline"
+        slot="start"
+      />
+      Open
+    </ion-button>
+
+    <ion-button
+      fill="clear"
+      color="danger"
+      size="small"
+      (click)="deleteWithConfirmation()"
+    >
+      <ion-icon
+        name="trash-outline"
+        slot="start"
+      />
+      Delete
+    </ion-button>
+  </div>
+
+  <odm-checkbox
+    [fieldName]="'hideAncestorsInQuiz'"
+    [item$]="item$"
+  >
+    Hide ancestors in quiz
+  </odm-checkbox>
+</div>

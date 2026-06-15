@@ -10,7 +10,7 @@ import {htmlToId, stripHtml} from '../../../libs/AppFedShared/utils/html-utils'
 import {debounceTime, distinctUntilChanged, finalize} from 'rxjs/operators'
 import {LingueeService} from '../natural-langs/linguee.service'
 import {MerriamWebsterDictService} from '../natural-langs/merriam-webster-dict.service'
-import {PopoverController} from '@ionic/angular'
+import {PopoverController, ToastController} from '@ionic/angular'
 import {ListOptionsComponent} from './list-options/list-options.component'
 import {ListOptions, ListOptionsData} from './list-options'
 import {JournalEntryItemsService} from '../../Journal/core/journal-entries.service'
@@ -26,6 +26,7 @@ import {BaseComponent} from '../../../libs/AppFedShared/base/base.component'
 import {LearnStatsService} from '../core/learn-stats.service'
 
 import {AiBackendService} from '../core/ai-backend.service'
+import {ItemProcessingService} from '../core/item-processing.service'
 import 'deep-chat'
 
 /** TODO: rename to smth simpler more standard like LearnDoItemsPage (search-or-add is kinda implied, especially search) */
@@ -36,6 +37,7 @@ import 'deep-chat'
 })
 export class SearchOrAddLearnableItemPageComponent extends BaseComponent implements OnInit {
 
+  private readonly searchDraftStorageKey = 'LifeSuite.Learn.searchOrAdd.draft'
 
   listModel = new ListProcessing(this.injector)
 
@@ -44,6 +46,10 @@ export class SearchOrAddLearnableItemPageComponent extends BaseComponent impleme
   searchFormControl = new UntypedFormControl()
 
   isAddingWithAI = false
+
+  addErrorMessage?: string
+
+  isOffline = typeof navigator !== 'undefined' ? !navigator.onLine : false
 
   deepChatConnect = {
     stream: {simulation: 6},
@@ -111,14 +117,17 @@ export class SearchOrAddLearnableItemPageComponent extends BaseComponent impleme
     public lingueeService: LingueeService,
     public merriamWebsterDictService: MerriamWebsterDictService,
     public popoverController: PopoverController,
+    private toastController: ToastController,
     public router: Router,
     private aiBackend: AiBackendService,
+    private itemProcessingService: ItemProcessingService,
     injector: Injector,
   ) {
     super(injector)
   }
 
   ngOnInit() {
+    this.restoreDraft()
     this.searchFormControl.valueChanges.pipe(
       debounceTime(/*100*/300) /* FIXME: this debounceTime() is probably causing the double-adding of items */,
       // tap(debugLog),
@@ -128,6 +137,7 @@ export class SearchOrAddLearnableItemPageComponent extends BaseComponent impleme
     ).subscribe(val => {
       this.htmlSearch = val // !! FIXME BUG: this is debounced; BUG when pressing enter/alt+enter fast - old value is taken
       val = stripHtml(val)
+      this.persistDraft()
 
       this.listModel.search = val
       this.listModel.onChangeSearch(val)
@@ -138,8 +148,9 @@ export class SearchOrAddLearnableItemPageComponent extends BaseComponent impleme
     })
   }
 
-  add(string?: string, isTask?: boolean, navInto?: boolean) {
+  add(string?: string, isTask?: boolean, navInto?: boolean, addDuplicateAnyway = false) {
     console.log('add: ', string)
+    this.clearAddError()
 
     if ( this.isTextEmpty() ) {
       const val = new LearnItem()
@@ -149,6 +160,14 @@ export class SearchOrAddLearnableItemPageComponent extends BaseComponent impleme
       return
     }
     string = this.getUserString(string)
+    const duplicate = addDuplicateAnyway ? undefined : this.findExistingSimilarItem(string, isTask)
+    if (duplicate) {
+      this.presentDuplicateToast(
+        duplicate,
+        () => this.add(string, isTask, navInto, true)
+      )
+      return
+    }
     // if ( !string ) {
     //   return // FIXME: allow creating empty --> ?? ``
     // }
@@ -161,12 +180,18 @@ export class SearchOrAddLearnableItemPageComponent extends BaseComponent impleme
     if ( newItem ) {
       debugLog(`add item:`, newItem)
       const item$ = this.learnDoService.add(newItem as any as LearnItem)
+      if (!isTask) {
+        this.fillNewItemAnswerIfNeeded(item$)
+      }
       // this.syncStatusService.handleSavingPromise(
       //   this.coll.add(newItem) /* This will go away when migrated to ODM */ )
       this.clearInput()
       if ( navInto ) {
         this.navigateIntoItem(item$.id !)
       }
+      this.presentAddedToast(item$, isTask ? 'Task added.' : 'Learn item added.')
+    } else {
+      this.showAddError('I could not turn that text into an item.')
     }
   }
 
@@ -184,6 +209,7 @@ export class SearchOrAddLearnableItemPageComponent extends BaseComponent impleme
     this.listModel.search = ''
     this.htmlSearch = ''
     this.searchFormControl.setValue('')
+    this.clearDraft()
   }
 
   /** maybe this could be moved to model class ---> actually service */
@@ -312,6 +338,23 @@ export class SearchOrAddLearnableItemPageComponent extends BaseComponent impleme
     this.add(undefined, true, navInto)
   }
 
+  private fillNewItemAnswerIfNeeded(item$: LearnItem$) {
+    if (!this.itemProcessingService.isQuestionWithoutAnswer(item$)) {
+      return
+    }
+    if (this.isOffline) {
+      return
+    }
+
+    this.isAddingWithAI = true
+    this.itemProcessingService.fillAnswerWithAi(item$)
+      .catch(e => {
+        console.error('Error auto-filling answer with AI', e)
+        this.showAddError(this.formatAddError(e, 'The item was added, but the AI answer could not be filled.'))
+      })
+      .finally(() => this.isAddingWithAI = false)
+  }
+
   addToLearn(navInto?: boolean) {
     console.log('addToLearn')
     // this.lingueeService.doIt(this.search).then()
@@ -324,25 +367,174 @@ export class SearchOrAddLearnableItemPageComponent extends BaseComponent impleme
     if (this.isAddingWithAI) {
       return
     }
+    this.clearAddError()
+    if (this.isOffline) {
+      this.showAddError('You are offline. Add the item now, then fill with AI when you are back online.')
+      return
+    }
     const text = this.getUserString()
-    if (!text) return
+    if (isNullishOrEmptyOrBlank(stripHtml(text))) {
+      this.showAddError('Write something to learn before asking AI to fill it.')
+      return
+    }
     this.isAddingWithAI = true
     try {
       const item = this.createItemFromInputString(text, false)
+      if (!item) {
+        this.showAddError('I could not turn that text into an item.')
+        this.isAddingWithAI = false
+        return
+      }
       item.answer = ''
       const item$ = await this.learnDoService.add(item)
       this.clearInput()
       this.navigateIntoItem(item$.id!)
-      this.aiBackend.generateAnswerStream(text).pipe(
+      let answerSubscription: any
+      answerSubscription = this.aiBackend.generateAnswerStream(text).pipe(
         finalize(() => this.isAddingWithAI = false)
       ).subscribe(
         answer => item$.patchThrottled({answer}),
-        e => console.error('Error adding with AI', e)
+        e => {
+          console.error('Error adding with AI', e)
+          this.showAddError(this.formatAddError(e, 'The item was added, but AI could not fill the answer.'))
+        }
       )
+      this.presentAddedToast(item$, 'Learn item added with AI.', () => answerSubscription?.unsubscribe())
     } catch (e) {
       console.error('Error adding with AI', e)
+      this.showAddError(this.formatAddError(e, 'Could not add the item with AI.'))
       this.isAddingWithAI = false
     }
+  }
+
+  private clearAddError() {
+    this.addErrorMessage = undefined
+  }
+
+  private showAddError(message: string) {
+    this.addErrorMessage = message
+    this.presentToast(message, 'danger')
+  }
+
+  private async presentToast(message: string, color: 'success' | 'danger' | 'warning' | 'medium' = 'success') {
+    const toast = await this.toastController.create({
+      message,
+      duration: 2400,
+      color,
+      position: 'top',
+    })
+    await toast.present()
+  }
+
+  private async presentAddedToast(item$: LearnItem$, message: string, beforeUndo?: () => void) {
+    const toast = await this.toastController.create({
+      message: this.withOfflineSaveHint(message),
+      duration: 5000,
+      color: 'success',
+      position: 'top',
+      buttons: [
+        {
+          text: 'Undo',
+          role: 'cancel',
+          handler: () => {
+            beforeUndo?.()
+            item$.deleteWithoutConfirmation()
+            if (this.router.url === item$.getRouterLinkUrl()) {
+              this.router.navigateByUrl('/learn')
+            }
+            this.presentToast('Item removed.', 'medium')
+          },
+        },
+      ],
+    })
+    await toast.present()
+  }
+
+  private async presentDuplicateToast(existingItem$: LearnItem$, addAnyway: () => void) {
+    const title = this.getPlainItemTitle(existingItem$) || 'that item'
+    const toast = await this.toastController.create({
+      message: `Looks like "${title}" already exists.`,
+      duration: 7000,
+      color: 'warning',
+      position: 'top',
+      buttons: [
+        {
+          text: 'Open',
+          handler: () => this.router.navigateByUrl(existingItem$.getRouterLinkUrl()),
+        },
+        {
+          text: 'Add anyway',
+          handler: addAnyway,
+        },
+      ],
+    })
+    await toast.present()
+  }
+
+  private formatAddError(error: any, fallback: string): string {
+    return error?.error?.message
+      ?? error?.message
+      ?? fallback
+  }
+
+  private findExistingSimilarItem(text: string, isTask?: boolean): LearnItem$ | undefined {
+    const normalized = this.normalizeForDuplicateCheck(text)
+    if (!normalized) {
+      return undefined
+    }
+
+    return this.item$s.find(item$ => {
+      const item = item$.currentVal
+      if (!item || item.whenDeleted || item.isDeleted) {
+        return false
+      }
+      if (!!item.isTask !== !!isTask) {
+        return false
+      }
+      return [
+        item.title,
+        (item as any).question,
+        (item as any).question2,
+        (item as any).question3,
+      ].some(value => this.normalizeForDuplicateCheck(value) === normalized)
+    })
+  }
+
+  private normalizeForDuplicateCheck(text?: string | nullish): string {
+    return stripHtml(text)?.replace(/\s+/g, ' ').trim().toLowerCase() ?? ''
+  }
+
+  private getPlainItemTitle(item$: LearnItem$) {
+    const item = item$.currentVal
+    return stripHtml(item?.title || (item as any)?.question)?.trim()
+  }
+
+  private withOfflineSaveHint(message: string) {
+    return this.isOffline
+      ? `${message} Saved on this device; it will sync when you are online.`
+      : message
+  }
+
+  private persistDraft() {
+    const draft = this.searchFormControl.value
+    if (isNullishOrEmptyOrBlank(stripHtml(draft))) {
+      this.clearDraft()
+      return
+    }
+    localStorage.setItem(this.searchDraftStorageKey, draft)
+  }
+
+  private restoreDraft() {
+    const draft = localStorage.getItem(this.searchDraftStorageKey)
+    if (!draft || !isNullishOrEmptyOrBlank(this.searchFormControl.value)) {
+      return
+    }
+    this.searchFormControl.setValue(draft)
+    this.presentToast('Draft restored.', 'medium')
+  }
+
+  private clearDraft() {
+    localStorage.removeItem(this.searchDraftStorageKey)
   }
 
   private handleDeepChatRequest(body: any, signals: any) {
@@ -399,6 +591,18 @@ export class SearchOrAddLearnableItemPageComponent extends BaseComponent impleme
   @HostListener('window:keyup.alt.enter', ['$event'])
   handleKeyboardEvent(event: KeyboardEvent) {
     console.log(`alt enter`)
+  }
+
+  @HostListener('window:online')
+  onOnline() {
+    this.isOffline = false
+    this.presentToast('Back online. Pending changes can sync.', 'success')
+  }
+
+  @HostListener('window:offline')
+  onOffline() {
+    this.isOffline = true
+    this.presentToast('Offline mode. New items are saved on this device.', 'medium')
   }
 
   hasSearchText() {

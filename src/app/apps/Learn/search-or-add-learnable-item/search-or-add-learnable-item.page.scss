@@ -31,6 +31,40 @@
   display: block;
 }
 
+.offline-note {
+  display: block;
+  padding: 4px 8px;
+  color: var(--ion-color-medium);
+  font-size: 0.82rem;
+}
+
+.capture-editor {
+  display: flex;
+  align-items: stretch;
+  gap: 4px;
+}
+
+.capture-editor app-search-or-add-text-editor {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.capture-actions {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
+}
+
+.add-feedback {
+  display: inline-flex;
+  max-width: min(520px, 100%);
+  padding: 0 8px;
+  vertical-align: middle;
+  font-size: 0.9rem;
+  line-height: 1.25;
+}
+
 :host ::ng-deep app-item-list {
   display: block;
   height: 100%;
@@ -49,5 +83,29 @@
     order: -1;
     border-left: 0;
     border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+  }
+}
+
+@media (max-width: 640px) {
+  .toolbar {
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .capture-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr auto;
+    width: 100%;
+    padding: 4px;
+  }
+
+  .capture-actions ion-button {
+    min-width: 0;
+    margin: 0;
+  }
+
+  .add-feedback {
+    display: flex;
+    padding: 4px 8px;
   }
 }

@@ -66,7 +66,16 @@
     style="display: flex; align-items: stretch"
   >
     <div style="flex-grow: 1; color: white">
+      <ion-note
+        *ngIf="isOffline"
+        color="medium"
+        class="offline-note"
+      >
+        Offline: new items stay on this device until sync resumes.
+      </ion-note>
+
       <div
+        class="capture-editor"
         (keyup.enter)="addTask(); $event.stopPropagation(); $event.preventDefault()"
         (keyup.meta.enter)="addToLearn(); $event.stopPropagation(); $event.preventDefault()"
         (keyup.alt.enter)="addToLearn(); $event.stopPropagation(); $event.preventDefault()"
@@ -78,6 +87,10 @@
 
         <ion-button
           [hidden]="! hasSearchText()"
+          fill="clear"
+          size="small"
+          title="Clear draft"
+          aria-label="Clear draft"
           (click)="clearInput()"
         ><ion-icon name="close-outline" /></ion-button>
       </div>
@@ -92,31 +105,43 @@
         [selection]="listModel.selection"
       ></app-selection-info>
 
-      <ion-button
-        (press)="addTask(true)"
-        (click)="addTask()"
-      ><ion-icon name="add-circle-outline" />&nbsp;TASK</ion-button>
+      <div class="capture-actions">
+        <ion-button
+          (press)="addTask(true)"
+          (click)="addTask()"
+          [disabled]="isAddingWithAI"
+        ><ion-icon name="add-circle-outline" />&nbsp;TASK</ion-button>
 
-      <ion-button
-        (press)="addToLearn(true)"
-        (click)="addToLearn()"
-      ><ion-icon name="add-circle-outline" />&nbsp;LEARN</ion-button>
+        <ion-button
+          (press)="addToLearn(true)"
+          (click)="addToLearn()"
+          [disabled]="isAddingWithAI"
+        ><ion-icon name="add-circle-outline" />&nbsp;LEARN</ion-button>
 
-      <ion-button
-        (click)="addWithAI()"
-        [disabled]="isAddingWithAI"
-        title="Fill with AI"
-        size="small"
+        <ion-button
+          (click)="addWithAI()"
+          [disabled]="isAddingWithAI || isOffline"
+          title="Fill with AI"
+          size="small"
+        >
+          <ion-spinner
+            *ngIf="isAddingWithAI"
+            name="dots"
+           />
+          <span
+            *ngIf="! isAddingWithAI"
+            style="font-size: 1.2rem"
+          >✨</span>
+        </ion-button>
+      </div>
+
+      <ion-text
+        *ngIf="addErrorMessage"
+        color="danger"
+        class="add-feedback"
       >
-        <ion-spinner
-          *ngIf="isAddingWithAI"
-          name="dots"
-         />
-        <span
-          *ngIf="! isAddingWithAI"
-          style="font-size: 1.2rem"
-        >✨</span>
-      </ion-button>
+        {{ addErrorMessage }}
+      </ion-text>
 
       <ion-button
         *ngIf="feat.showExperimental"

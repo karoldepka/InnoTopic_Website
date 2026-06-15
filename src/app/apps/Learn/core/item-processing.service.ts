@@ -121,16 +121,10 @@ export class ItemProcessingService {
       })
 
       try {
-        const response = await this.aiBackend.generateAnswerWithWebSearch(
-          question,
-          this.getContextForAi(item),
-        ).toPromise()
-        const modelName = response?.modelName || 'unknown-model'
-        const answer = this.withFilledByAiMarker(response?.answer || '', modelName)
-        item$.patchThrottled({answer})
+        const filled = await this.fillAnswerWithAi(item$)
         this.setFillQuestionsProgress({
           done: this.fillQuestionsWithAiProgress$.value.done + 1,
-          filled: this.fillQuestionsWithAiProgress$.value.filled + 1,
+          filled: this.fillQuestionsWithAiProgress$.value.filled + (filled ? 1 : 0),
         })
       } catch (e) {
         console.error('Error filling question with AI', e)
@@ -148,6 +142,22 @@ export class ItemProcessingService {
     })
   }
 
+  public async fillAnswerWithAi(item$: LearnItem$): Promise<boolean> {
+    if (!this.isQuestionWithoutAnswer(item$)) {
+      return false
+    }
+
+    const item = item$.currentVal
+    const response = await this.aiBackend.generateAnswerWithWebSearch(
+      this.getQuestionForAi(item),
+      this.getContextForAi(item),
+    ).toPromise()
+    const modelName = response?.modelName || 'unknown-model'
+    const answer = this.withFilledByAiMarker(response?.answer || '', modelName)
+    item$.patchThrottled({answer})
+    return true
+  }
+
   private setFillQuestionsProgress(patch: Partial<FillQuestionsWithAiProgress>) {
     const next = {
       ...this.fillQuestionsWithAiProgress$.value,
@@ -157,7 +167,7 @@ export class ItemProcessingService {
     this.fillQuestionsWithAiProgress$.next(next)
   }
 
-  private isQuestionWithoutAnswer(item$: LearnItem$): boolean {
+  public isQuestionWithoutAnswer(item$: LearnItem$): boolean {
     const item = item$.currentVal
     if (!item || item.isTask || item.whenDeleted || item.isDeleted) {
       return false

@@ -1,4 +1,5 @@
 <div
+  class="tree-node"
   (keydown.control.s)="this.addChild()"
   (keydown.alt.enter)="this.addChild()"
   (keydown.control.enter)="this.addChild()"
@@ -23,11 +24,14 @@
   <ng-container
     *ngIf="!(treeNode.childNodesList$ | async)"
   >
-    Loading....
+    <ion-note class="tree-loading">
+      <ion-spinner name="dots" />
+      Loading
+    </ion-note>
   </ng-container>
 
 
-  <div style="margin-left: 20px" *ngIf="treeNode.isExpanded">
+  <div class="tree-children" *ngIf="treeNode.isExpanded">
     <div
       *ngIf="(treeNode.childNodesList$ | async) let childNodesList"
     >
@@ -59,4 +63,3 @@
 <!--  </button>-->
 
 </div>
-

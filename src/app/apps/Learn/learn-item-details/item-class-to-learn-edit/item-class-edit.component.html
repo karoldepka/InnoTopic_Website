@@ -1,9 +1,11 @@
-<ion-item>
-  <ion-checkbox [formControl]="formControls[fieldName]"
-                slot="start"
-  >
-  </ion-checkbox>
+<ion-item class="to-learn-toggle">
+  <ion-checkbox
+    [formControl]="formControls[fieldName]"
+    slot="start"
+    aria-label="Include in learning"
+  />
   <ion-label>
-    TO LEARN
+    <h3>To learn</h3>
+    <p>Include this item in learning and quiz flows.</p>
   </ion-label>
 </ion-item>
