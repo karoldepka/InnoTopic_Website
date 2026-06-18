@@ -57,7 +57,7 @@ export class WorkOrganisationsAndProjectsData {
     flags: 'es uk us pt',
     time: ['2023', 'present' /* TODO: make months optional */],
     linkedInRecommendations: 0,
-    locations: `Málaga, remote, Madrid, Dubai`,
+    locations: `Málaga, remote, Madrid`,
     logoFileName: `Rithum/rithum-icon.svg`,
     description: '#Staff_Engineer, developing in #Rust, #Python, #React and #AWS, #Amazon_Bedrock, #OpenSearch #Elasticsearch and related', // TODO: #Amazon_CDK
     projects: {
