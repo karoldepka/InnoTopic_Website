@@ -1,4 +1,4 @@
-import * as chroma from 'chroma-js';
+import chroma from 'chroma-js';
 import {hexToRgb} from "./colorUtils";
 
 export function setIonicColorSteps(baseColor: string, step: number = 50, limit: number = 950): void {

@@ -3,6 +3,7 @@ import { Chat } from '@ai-sdk/angular';
 import { TextStreamChatTransport, UIMessage } from 'ai';
 
 @Component({
+  standalone: false,
   selector: 'app-chat',
   templateUrl: './chat.page.html',
   styleUrls: ['./chat.page.scss'],

@@ -5,6 +5,7 @@ import {
 } from '@angular/core';
 
 @Component({
+  standalone: false,
   selector: 'app-cv-page',
   templateUrl: './cv-page.component.html',
   styleUrls: ['./cv-page.component.scss'],

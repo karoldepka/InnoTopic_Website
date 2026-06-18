@@ -9,6 +9,7 @@ import {updateThemeConfig} from "../../store/actions/theme-config-actions";
 
 @Component({
   selector: 'app-theme-config',
+  standalone: false,
   templateUrl: './theme-config.component.html',
   styleUrls: ['./theme-config.component.scss'],
 })

@@ -2,6 +2,7 @@ import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 //import * as d3 from "d3";
 declare const d3: any;
 @Component({
+  standalone: false,
   selector: 'app-tech-graph-d3',
   templateUrl: './tech-graph-d3.component.html',
   styleUrls: ['./tech-graph-d3.component.sass'],

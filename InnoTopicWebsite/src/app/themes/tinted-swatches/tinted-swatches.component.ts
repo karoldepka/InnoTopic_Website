@@ -2,6 +2,7 @@ import {Component, Input, OnInit} from '@angular/core';
 
 @Component({
   selector: 'app-tinted-swatches',
+  standalone: false,
   templateUrl: './tinted-swatches.component.html',
   styleUrls: ['./tinted-swatches.component.scss'],
 })

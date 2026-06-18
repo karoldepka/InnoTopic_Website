@@ -21,6 +21,7 @@ const preset = {
 
 
 @Component({
+  standalone: false,
   selector: 'app-tech-graph-d3-index1',
   templateUrl: './tech-graph-d3-index1.component.html',
   styleUrls: ['./tech-graph-d3-index1.component.sass'],

@@ -5,6 +5,7 @@ import {ThemeConfigState} from "../../models/theme-config-state.model";
 
 @Component({
   selector: 'app-theme-samples',
+  standalone: false,
   templateUrl: './theme-samples.component.html',
   styleUrls: ['./theme-samples.component.scss'],
 })

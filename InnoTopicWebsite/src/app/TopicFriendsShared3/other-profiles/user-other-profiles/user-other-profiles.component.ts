@@ -20,6 +20,7 @@ import {
 
 
 @Component({
+  standalone: false,
 selector: 'app-user-other-profiles',
   templateUrl: './user-other-profiles.component.html',
   styleUrls: ['./user-other-profiles.component.scss'],

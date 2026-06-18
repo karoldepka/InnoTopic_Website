@@ -3,6 +3,7 @@ import { highlights } from '../skills/work-experience-highlights-data-shirt';
 
 @Component({
   selector: 'app-shirt',
+  standalone: false,
   templateUrl: './shirt.component.html',
   styleUrls: ['./shirt.component.sass']
 })

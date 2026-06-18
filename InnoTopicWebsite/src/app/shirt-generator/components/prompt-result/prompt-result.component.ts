@@ -3,6 +3,7 @@ import {ActivatedRoute} from "@angular/router";
 
 @Component({
   selector: 'app-prompt-result',
+  standalone: false,
   templateUrl: './prompt-result.component.html',
   styleUrls: ['./prompt-result.component.scss'],
 })

@@ -2,6 +2,7 @@ import { Component, EventEmitter, Output } from '@angular/core';
 
 @Component({
   selector: 'app-prompt-input',
+  standalone: false,
   templateUrl: './prompt-input.component.html',
   styleUrls: ['./prompt-input.component.scss'],
 })

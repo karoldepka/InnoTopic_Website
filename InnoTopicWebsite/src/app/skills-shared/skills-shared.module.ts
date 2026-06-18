@@ -5,13 +5,11 @@ import { SkillLevelIconComponent } from './skill-level-icon/skill-level-icon.com
 import { SkillLevelsIconsComponent } from './skill-levels-icons/skill-levels-icons.component';
 
 @NgModule({
-  declarations: [
-    SkillLevelsIconsComponent,
-    SkillLevelIconComponent,
-  ],
   imports: [
     CommonModule,
     TopicsSharedModule,
+    SkillLevelsIconsComponent,
+    SkillLevelIconComponent,
   ],
   exports: [
     SkillLevelsIconsComponent,

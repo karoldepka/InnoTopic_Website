@@ -1,9 +1,10 @@
 import { AfterViewInit, Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import * as THREE from 'three';
-import { SVGLoader } from 'three/examples/jsm/loaders/SVGLoader';
+import { SVGLoader, SVGResultPaths } from 'three/examples/jsm/loaders/SVGLoader';
 import { psilo, psilo2, svgFileData, yin, yin2 } from './svg.data';
 
 @Component({
+  standalone: false,
   selector: 'app-merch-gen-page',
   templateUrl: './merch-gen.page.html',
   styleUrls: ['./merch-gen.page.scss'],
@@ -81,9 +82,9 @@ export class MerchGenPage implements OnInit, AfterViewInit {
     const paths = svg.paths;
     const svgGroup = new THREE.Group();
 
-    paths.forEach((path) => {
+    paths.forEach((path: SVGResultPaths) => {
       const shapes = SVGLoader.createShapes(path);
-      shapes.forEach((shape) => {
+      shapes.forEach((shape: THREE.Shape) => {
         const mesh = this.createExtrudeMesh(shape);
         svgGroup.add(mesh);
       });

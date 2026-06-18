@@ -5,13 +5,11 @@ import { TopicsSharedModule } from '../topics-shared/topics-shared.module';
 import { TopicSkillComponent } from './topic-skill/topic-skill.component';
 
 @NgModule({
-  declarations: [
-    TopicSkillComponent,
-  ],
   imports: [
     CommonModule,
     TopicsSharedModule,
     SkillsSharedModule,
+    TopicSkillComponent,
   ],
   exports: [
     TopicSkillComponent,

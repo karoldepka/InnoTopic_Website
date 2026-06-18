@@ -4,7 +4,6 @@ import { SharedModule } from '../shared/shared.module';
 import { TopicsCoreModule } from '../TopicFriendsShared3/topics-core/topics-core.module';
 import { TopicLogoComponent } from './topic-logo/topic-logo.component';
 import { TopicTagComponent } from './topic-tag/topic-tag.component';
-import {ThemeDemoPageModule} from "../themes/theme-demo/theme-demo.module";
 import {TopicsListComponent} from "./topics-list/topics-list.component";
 import {HashtagReplacerComponent} from "./hashtag-replacer/hashtag-replacer.component";
 import {BooksComponent} from "../books/books.component";
@@ -14,7 +13,6 @@ import {BooksComponent} from "../books/books.component";
     CommonModule,
     TopicsCoreModule,
     SharedModule,
-    ThemeDemoPageModule,
     TopicLogoComponent,
     TopicTagComponent,
     TopicsListComponent,

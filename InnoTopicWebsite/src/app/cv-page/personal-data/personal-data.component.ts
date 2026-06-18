@@ -6,6 +6,7 @@ interface InfoItem {
 }
 
 @Component({
+  standalone: false,
   selector: 'app-personal-data',
   templateUrl: './personal-data.component.html',
   styleUrls: ['./personal-data.component.sass']

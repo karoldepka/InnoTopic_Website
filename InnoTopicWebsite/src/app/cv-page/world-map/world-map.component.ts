@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 
 @Component({
+  standalone: false,
   selector: 'app-world-map',
   templateUrl: './world-map.component.html',
   styleUrls: ['./world-map.component.sass']

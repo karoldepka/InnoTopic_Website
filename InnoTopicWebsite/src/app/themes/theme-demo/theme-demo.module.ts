@@ -20,7 +20,7 @@ import {TintedSwatchesComponent} from "../tinted-swatches/tinted-swatches.compon
     ReactiveFormsModule,
     IonicModule,
     ThemeDemoPageRoutingModule,
-    // ThemesLibModule,
+    ChipComponent,
   ],
   exports: [
     ThemeConfigComponent,
@@ -29,7 +29,6 @@ import {TintedSwatchesComponent} from "../tinted-swatches/tinted-swatches.compon
   declarations: [
     ThemeDemoPage,
     ThemeConfigComponent,
-    ChipComponent,
     ThemeSamplesComponent,
     TintedSwatchesComponent,
   ]

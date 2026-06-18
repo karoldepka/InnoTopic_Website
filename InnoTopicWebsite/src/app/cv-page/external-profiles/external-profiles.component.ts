@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { externalProfilesKarol } from './external-profiles-karol';
 
 @Component({
+  standalone: false,
   selector: 'app-external-profiles',
   templateUrl: './external-profiles.component.html',
   styleUrls: ['./external-profiles.component.sass']

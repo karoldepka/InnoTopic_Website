@@ -7,6 +7,7 @@ import {
 } from '@angular/core';
 
 @Component({
+  standalone: false,
   selector: 'app-signal-example',
   template: `
     <h2>Angular Signals Example</h2>

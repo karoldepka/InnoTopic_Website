@@ -3,6 +3,7 @@ import {FormControl, FormGroup} from '@angular/forms'
 import { UserOtherProfileDescriptor } from '../../other-profiles-core/UserOtherProfilesDescriptors'
 
 @Component({
+  standalone: false,
   selector: 'app-other-profile-user-name',
   templateUrl: './other-profile-user-name.component.html',
   styleUrls: ['./other-profile-user-name.component.scss']

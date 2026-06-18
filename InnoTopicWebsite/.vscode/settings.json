@@ -2,5 +2,5 @@
     "search.exclude": {
         "export/**": true
     },
-    "workbench.colorTheme": "Dark+"
+    "workbench.colorTheme": "Abyss"
 }

@@ -5,6 +5,7 @@ import {tap} from "rxjs/operators";
 
 @Component({
   selector: 'app-shirt-generator',
+  standalone: false,
   templateUrl: './shirt-generator.page.html',
   styleUrls: ['./shirt-generator.page.scss'],
 })

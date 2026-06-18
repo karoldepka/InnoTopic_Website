@@ -10,6 +10,7 @@ import { WorkExperienceListComponent } from '../../../skills/work-experience-lis
 import { WorkExperienceModule } from '../../../skills/work-experience.module';
 
 import { faLaptop } from '@fortawesome/free-solid-svg-icons'
+import { IconDefinition } from '@fortawesome/fontawesome-svg-core';
 
 @Component({
   selector: 'app-work-project',
@@ -20,7 +21,7 @@ import { faLaptop } from '@fortawesome/free-solid-svg-icons'
 })
 export class WorkProjectComponent implements OnInit {
 
-  faLaptop = faLaptop
+  faLaptop: IconDefinition = faLaptop
 
   @Input() project!: any
 

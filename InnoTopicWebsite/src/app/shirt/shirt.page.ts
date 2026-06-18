@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 
 @Component({
   selector: 'app-shirt-page',
+  standalone: false,
   templateUrl: './shirt.page.html',
   styleUrls: ['./shirt.page.scss'],
 })

@@ -2,6 +2,8 @@ import { Component, OnInit } from '@angular/core';
 
 @Component({
   selector: 'app-chip',
+  standalone: true,
+  imports: [],
   templateUrl: './chip.component.html',
   styleUrls: ['./chip.component.scss'],
 })

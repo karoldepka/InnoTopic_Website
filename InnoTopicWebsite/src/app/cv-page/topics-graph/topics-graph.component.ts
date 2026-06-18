@@ -8,6 +8,7 @@ declare const d3: any;
 declare const $: any;
 
 @Component({
+  standalone: false,
   selector: 'app-topics-graph',
   templateUrl: './topics-graph.component.html',
   styleUrls: ['./topics-graph.component.sass'],

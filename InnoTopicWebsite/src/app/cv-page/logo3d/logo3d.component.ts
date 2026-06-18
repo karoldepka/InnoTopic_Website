@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 
 @Component({
+  standalone: false,
   selector: 'app-logo3d',
   templateUrl: './logo3d.component.html',
   styleUrls: ['./logo3d.component.sass']
