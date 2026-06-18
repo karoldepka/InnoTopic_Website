@@ -1,5 +1,4 @@
-@import '../../styles.sass';
-@import '../../shared.scss';
+@use '../../shared' as *;
 
 div {
   display: flex;
