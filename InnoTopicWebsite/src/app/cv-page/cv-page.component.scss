@@ -12,17 +12,28 @@ div {
 }
 
 app-personal-data {
-  width: 48%;
+  width: fit-content;
+  max-width: 100%;
 }
 
 app-external-profiles {
-  width: 52%;
+  width: fit-content;
+  max-width: 100%;
 }
 
 app-personal-data,
 app-external-profiles {
   @media screen and (max-width: $break-medium) {
     width: 100%;
+  }
+}
+
+.profile-header {
+  justify-content: center;
+
+  .container {
+    flex-direction: column;
+    align-items: center;
   }
 }
 

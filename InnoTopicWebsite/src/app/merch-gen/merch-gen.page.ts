@@ -1,6 +1,6 @@
 import { AfterViewInit, Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import * as THREE from 'three';
-import { SVGLoader, SVGResultPaths } from 'three/examples/jsm/loaders/SVGLoader';
+import { SVGLoader, SVGResultPaths } from 'three/examples/jsm/loaders/SVGLoader.js';
 import { psilo, psilo2, svgFileData, yin, yin2 } from './svg.data';
 
 @Component({

@@ -110,13 +110,37 @@ export class TopicsGraphComponent implements OnInit {
     // svg.call(zoom.transform, d3.zoomIdentity.scale(1)); // This sets the initial zoom level to 1
 
     if (preset.allowZoom) {
-      svgRootElement.call(d3.zoom().on("zoom", function () {
+      const wheelZoomSpeed = 10;
+      const zoom = d3.zoom()
+        .wheelDelta(function () {
+          const event = d3.event;
+          const deltaModeScale = event.deltaMode ? 120 : 1;
+
+          return -event.deltaY * deltaModeScale / 500 * wheelZoomSpeed;
+        })
+        .filter(function () {
+          const event = d3.event;
+
+          if (!event) {
+            return true;
+          }
+
+          if (event.type === 'wheel') {
+            return event.ctrlKey || event.metaKey;
+          }
+
+          return event.type !== 'dblclick' && !event.button;
+        })
+        .on("zoom", function () {
         // https://www.geeksforgeeks.org/d3-js-transform-scale-function/
         console.log('transform d3.event.transform', d3.event.transform)
         svg.attr("transform", d3.event.transform) // TODO: I could hack the default zoom level here??
         // svg.attr("transform", {k: 0.6087830093314941, x: 176.23706425069088, y: 116.76122945091723})
         // svg.attr("transform", d3.transform({k: 0.6087830093314941, x: 176.23706425069088, y: 116.76122945091723}))
-      }));
+      });
+
+      svgRootElement.call(zoom);
+      svgRootElement.on("dblclick.zoom", null);
     }
 
     // var color = d3.scaleOrdinal(d3.schemeCategory20);
