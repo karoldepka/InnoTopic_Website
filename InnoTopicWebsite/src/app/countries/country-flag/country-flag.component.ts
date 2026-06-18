@@ -6,6 +6,8 @@ import {
 
 @Component({
   selector: 'app-country-flag',
+  standalone: true,
+  imports: [],
   templateUrl: './country-flag.component.html',
   styleUrls: ['./country-flag.component.scss']
 })

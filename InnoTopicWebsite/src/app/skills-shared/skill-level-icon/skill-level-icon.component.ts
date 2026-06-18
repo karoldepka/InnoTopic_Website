@@ -3,11 +3,14 @@ import {
   Input,
   OnInit,
 } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { UserSkillLevelEnum } from '../../TopicFriendsShared3/skills/skills-core/user-skills';
 import { skillsIconsSignal } from '../skill-levels-icons/skill-levels-icons.component';
 
 @Component({
   selector: 'app-skill-level-icon',
+  standalone: true,
+  imports: [CommonModule],
   templateUrl: './skill-level-icon.component.html',
   styleUrls: ['./skill-level-icon.component.sass']
 })

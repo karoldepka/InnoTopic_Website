@@ -3,18 +3,15 @@ import { CommonModule } from '@angular/common';
 import { CountryFlagComponent } from './country-flag/country-flag.component';
 import { FlagsComponent } from './flags/flags.component';
 
-let declarations = [
-  CountryFlagComponent,
-  FlagsComponent,
-];
-
 @NgModule({
-  declarations: declarations,
   imports: [
     CommonModule,
+    CountryFlagComponent,
+    FlagsComponent,
   ],
   exports: [
-    ...declarations,
+    CountryFlagComponent,
+    FlagsComponent,
   ]
 })
 export class CountriesModule { }

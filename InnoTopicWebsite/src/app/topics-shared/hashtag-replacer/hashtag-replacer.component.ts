@@ -1,7 +1,11 @@
 import { Component, Input } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { TopicTagComponent } from '../topic-tag/topic-tag.component';
 
 @Component({
   selector: 'app-hashtag-replacer',
+  standalone: true,
+  imports: [CommonModule, TopicTagComponent],
   template: `
     <ng-container *ngFor="let part of processedText">
       <ng-container *ngIf="part.isTag; else normalText">

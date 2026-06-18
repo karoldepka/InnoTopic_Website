@@ -9,29 +9,27 @@ import {TopicsListComponent} from "./topics-list/topics-list.component";
 import {HashtagReplacerComponent} from "./hashtag-replacer/hashtag-replacer.component";
 import {BooksComponent} from "../books/books.component";
 
-let declarations = [
-  TopicLogoComponent,
-  TopicTagComponent,
-  TopicsListComponent,
-  HashtagReplacerComponent,
-  BooksComponent,
-];
-
-let imports = [
-  CommonModule,
-  TopicsCoreModule,
-  SharedModule,
-];
-
 @NgModule({
   imports: [
-    imports,
-    ThemeDemoPageModule
+    CommonModule,
+    TopicsCoreModule,
+    SharedModule,
+    ThemeDemoPageModule,
+    TopicLogoComponent,
+    TopicTagComponent,
+    TopicsListComponent,
+    HashtagReplacerComponent,
+    BooksComponent,
   ],
-  declarations,
   exports: [
-    ...declarations,
-    ...imports,
+    TopicLogoComponent,
+    TopicTagComponent,
+    TopicsListComponent,
+    HashtagReplacerComponent,
+    BooksComponent,
+    CommonModule,
+    TopicsCoreModule,
+    SharedModule,
   ]
 })
 export class TopicsSharedModule { }

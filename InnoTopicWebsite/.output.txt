@@ -1,0 +1,898 @@
+Command finished with exit code 1.
+Command output:
+
+> InnoTopicWeb@0.0.1 build
+> ng build
+
+One or more browsers which are configured in the project's Browserslist configuration will be ignored as ES5 output is not supported by the Angular CLI.
+Ignored browsers: kaios 2.5, op_mini all
+- Generating browser application bundles (phase: setup)...
+✔ Browser application bundle generation complete.
+✔ Browser application bundle generation complete.
+
+./src/app/cv-page/cv-page.component.scss?ngResource - Warning: Module Warning (from ./node_modules/sass-loader/dist/cjs.js):
+Deprecation Warning on line 0, column 8 of file:///C:/Users/karol/my/r/InnoTopic/InnoTopic_Website/InnoTopicWebsite/src/app/cv-page/cv-page.component.scss:0:8:
+Sass @import rules are deprecated and will be removed in Dart Sass 3.0.0.
+
+More info and automated migrator: https://sass-lang.com/d/import
+
+0 | @import '../../styles.sass';
+
+
+src\app\cv-page\cv-page.component.scss 1:9  root stylesheet
+
+
+./src/app/cv-page/cv-page.component.scss?ngResource - Warning: Module Warning (from ./node_modules/sass-loader/dist/cjs.js):
+Deprecation Warning on line 0, column 8 of file:///C:/Users/karol/my/r/InnoTopic/InnoTopic_Website/InnoTopicWebsite/src/styles.sass:0:8:
+Sass @import rules are deprecated and will be removed in Dart Sass 3.0.0.
+
+More info and automated migrator: https://sass-lang.com/d/import
+
+0 | @import 'global.scss'
+
+
+src\styles.sass 1:9                         @import
+src\app\cv-page\cv-page.component.scss 1:9  root stylesheet
+
+
+./src/app/cv-page/cv-page.component.scss?ngResource - Warning: Module Warning (from ./node_modules/sass-loader/dist/cjs.js):
+Deprecation Warning on line 1, column 8 of file:///C:/Users/karol/my/r/InnoTopic/InnoTopic_Website/InnoTopicWebsite/src/app/cv-page/cv-page.component.scss:1:8:
+Sass @import rules are deprecated and will be removed in Dart Sass 3.0.0.
+
+More info and automated migrator: https://sass-lang.com/d/import
+
+1 | @import '../../shared.scss';
+
+
+src\app\cv-page\cv-page.component.scss 2:9  root stylesheet
+
+
+./src/app/cv-page/cv-page.component.scss?ngResource - Warning: Module Warning (from ./node_modules/sass-loader/dist/cjs.js):
+Deprecation Warning on line 1, column 8 of file:///C:/Users/karol/my/r/InnoTopic/InnoTopic_Website/InnoTopicWebsite/src/styles.sass:1:8:
+Sass @import rules are deprecated and will be removed in Dart Sass 3.0.0.
+
+More info and automated migrator: https://sass-lang.com/d/import
+
+1 | @import 'shared'
+
+
+src\styles.sass 2:9                         @import
+src\app\cv-page\cv-page.component.scss 1:9  root stylesheet
+
+
+./src/app/cv-page/cv-page.component.scss?ngResource - Warning: Module Warning (from ./node_modules/sass-loader/dist/cjs.js):
+Deprecation Warning on line 2, column 8 of file:///C:/Users/karol/my/r/InnoTopic/InnoTopic_Website/InnoTopicWebsite/src/styles.sass:2:8:
+Sass @import rules are deprecated and will be removed in Dart Sass 3.0.0.
+
+More info and automated migrator: https://sass-lang.com/d/import
+
+2 | @import 'theme/variables'
+
+
+src\styles.sass 3:9                         @import
+src\app\cv-page\cv-page.component.scss 1:9  root stylesheet
+
+
+./src/styles.sass - Warning: Module Warning (from ./node_modules/sass-loader/dist/cjs.js):
+Deprecation Warning on line 0, column 8 of file:///C:/Users/karol/my/r/InnoTopic/InnoTopic_Website/InnoTopicWebsite/src/styles.sass:0:8:
+Sass @import rules are deprecated and will be removed in Dart Sass 3.0.0.
+
+More info and automated migrator: https://sass-lang.com/d/import
+
+0 | @import 'global.scss'
+
+
+src\styles.sass 1:9  root stylesheet
+
+
+./src/styles.sass - Warning: Module Warning (from ./node_modules/sass-loader/dist/cjs.js):
+Deprecation Warning on line 1, column 8 of file:///C:/Users/karol/my/r/InnoTopic/InnoTopic_Website/InnoTopicWebsite/src/styles.sass:1:8:
+Sass @import rules are deprecated and will be removed in Dart Sass 3.0.0.
+
+More info and automated migrator: https://sass-lang.com/d/import
+
+1 | @import 'shared'
+
+
+src\styles.sass 2:9  root stylesheet
+
+
+./src/styles.sass - Warning: Module Warning (from ./node_modules/sass-loader/dist/cjs.js):
+Deprecation Warning on line 2, column 8 of file:///C:/Users/karol/my/r/InnoTopic/InnoTopic_Website/InnoTopicWebsite/src/styles.sass:2:8:
+Sass @import rules are deprecated and will be removed in Dart Sass 3.0.0.
+
+More info and automated migrator: https://sass-lang.com/d/import
+
+2 | @import 'theme/variables'
+
+
+src\styles.sass 3:9  root stylesheet
+
+
+./src/app/countries/flags/flags.component.sass?ngResource - Warning: Module Warning (from ./node_modules/sass-loader/dist/cjs.js):
+Deprecation Warning on line 0, column 8 of file:///C:/Users/karol/my/r/InnoTopic/InnoTopic_Website/InnoTopicWebsite/src/app/countries/flags/flags.component.sass:0:8:
+Sass @import rules are deprecated and will be removed in Dart Sass 3.0.0.
+
+More info and automated migrator: https://sass-lang.com/d/import
+
+0 | @import '../../../shared.scss'
+
+
+src\app\countries\flags\flags.component.sass 1:9  root stylesheet
+
+
+./src/app/cv-page/personal-data/personal-data.component.sass?ngResource - Warning: Module Warning (from ./node_modules/sass-loader/dist/cjs.js):
+Deprecation Warning on line 0, column 8 of file:///C:/Users/karol/my/r/InnoTopic/InnoTopic_Website/InnoTopicWebsite/src/styles.sass:0:8:
+Sass @import rules are deprecated and will be removed in Dart Sass 3.0.0.
+
+More info and automated migrator: https://sass-lang.com/d/import
+
+0 | @import 'global.scss'
+
+
+src\styles.sass 1:9                                             @import
+src\app\cv-page\personal-data\personal-data.component.sass 2:9  root stylesheet
+
+
+./src/app/cv-page/personal-data/personal-data.component.sass?ngResource - Warning: Module Warning (from ./node_modules/sass-loader/dist/cjs.js):
+Deprecation Warning on line 1, column 8 of file:///C:/Users/karol/my/r/InnoTopic/InnoTopic_Website/InnoTopicWebsite/src/app/cv-page/personal-data/personal-data.component.sass:1:8:
+Sass @import rules are deprecated and will be removed in Dart Sass 3.0.0.
+
+More info and automated migrator: https://sass-lang.com/d/import
+
+1 | @import '../../../styles.sass'
+
+
+src\app\cv-page\personal-data\personal-data.component.sass 2:9  root stylesheet
+
+
+./src/app/cv-page/personal-data/personal-data.component.sass?ngResource - Warning: Module Warning (from ./node_modules/sass-loader/dist/cjs.js):
+Deprecation Warning on line 1, column 8 of file:///C:/Users/karol/my/r/InnoTopic/InnoTopic_Website/InnoTopicWebsite/src/styles.sass:1:8:
+Sass @import rules are deprecated and will be removed in Dart Sass 3.0.0.
+
+More info and automated migrator: https://sass-lang.com/d/import
+
+1 | @import 'shared'
+
+
+src\styles.sass 2:9                                             @import
+src\app\cv-page\personal-data\personal-data.component.sass 2:9  root stylesheet
+
+
+./src/app/cv-page/personal-data/personal-data.component.sass?ngResource - Warning: Module Warning (from ./node_modules/sass-loader/dist/cjs.js):
+Deprecation Warning on line 2, column 8 of file:///C:/Users/karol/my/r/InnoTopic/InnoTopic_Website/InnoTopicWebsite/src/styles.sass:2:8:
+Sass @import rules are deprecated and will be removed in Dart Sass 3.0.0.
+
+More info and automated migrator: https://sass-lang.com/d/import
+
+2 | @import 'theme/variables'
+
+
+src\styles.sass 3:9                                             @import
+src\app\cv-page\personal-data\personal-data.component.sass 2:9  root stylesheet
+
+
+./src/app/skills/work-experience-by-status-section/work-experience-by-status-section.component.sass?ngResource - Warning: Module Warning (from ./node_modules/sass-loader/dist/cjs.js):
+Deprecation Warning on line 1, column 8 of file:///C:/Users/karol/my/r/InnoTopic/InnoTopic_Website/InnoTopicWebsite/src/app/skills/work-experience-by-status-section/work-experience-by-status-section.component.sass:1:8:
+Sass @import rules are deprecated and will be removed in Dart Sass 3.0.0.
+
+More info and automated migrator: https://sass-lang.com/d/import
+
+1 | @import '../../../shared'
+
+
+src\app\skills\work-experience-by-status-section\work-experience-by-status-section.component.sass 2:9  root stylesheet
+
+
+./src/app/skills/work-experience-list/work-experience-list.component.sass?ngResource - Warning: Module Warning (from ./node_modules/sass-loader/dist/cjs.js):
+Deprecation Warning on line 1, column 8 of file:///C:/Users/karol/my/r/InnoTopic/InnoTopic_Website/InnoTopicWebsite/src/app/skills/work-experience-list/work-experience-list.component.sass:1:8:
+Sass @import rules are deprecated and will be removed in Dart Sass 3.0.0.
+
+More info and automated migrator: https://sass-lang.com/d/import
+
+1 | @import '../../../shared'
+
+
+src\app\skills\work-experience-list\work-experience-list.component.sass 2:9  root stylesheet
+
+
+./src/app/skills/work-experience.component.sass?ngResource - Warning: Module Warning (from ./node_modules/sass-loader/dist/cjs.js):
+Deprecation Warning on line 1, column 8 of file:///C:/Users/karol/my/r/InnoTopic/InnoTopic_Website/InnoTopicWebsite/src/app/skills/work-experience.component.sass:1:8:
+Sass @import rules are deprecated and will be removed in Dart Sass 3.0.0.
+
+More info and automated migrator: https://sass-lang.com/d/import
+
+1 | @import '../../shared'
+
+
+src\app\skills\work-experience.component.sass 2:9  root stylesheet
+
+
+./src/app/work-projects/work-projects-section/work-project/work-project.component.sass?ngResource - Warning: Module Warning (from ./node_modules/sass-loader/dist/cjs.js):
+Deprecation Warning on line 3, column 8 of file:///C:/Users/karol/my/r/InnoTopic/InnoTopic_Website/InnoTopicWebsite/src/app/work-projects/work-projects-section/work-project/work-project.component.sass:3:8:
+Sass @import rules are deprecated and will be removed in Dart Sass 3.0.0.
+
+More info and automated migrator: https://sass-lang.com/d/import
+
+3 | @import '../../../../shared.scss'
+
+
+src\app\work-projects\work-projects-section\work-project\work-project.component.sass 4:9  root stylesheet
+
+
+./src/app/work-projects/work-projects-section/work-projects-section.component.sass?ngResource - Warning: Module Warning (from ./node_modules/sass-loader/dist/cjs.js):
+Deprecation Warning on line 0, column 8 of file:///C:/Users/karol/my/r/InnoTopic/InnoTopic_Website/InnoTopicWebsite/src/styles.sass:0:8:
+Sass @import rules are deprecated and will be removed in Dart Sass 3.0.0.
+
+More info and automated migrator: https://sass-lang.com/d/import
+
+0 | @import 'global.scss'
+
+
+src\styles.sass 1:9                                                                   @import
+src\app\work-projects\work-projects-section\work-projects-section.component.sass 2:9  root stylesheet
+
+
+./src/app/work-projects/work-projects-section/work-projects-section.component.sass?ngResource - Warning: Module Warning (from ./node_modules/sass-loader/dist/cjs.js):
+Deprecation Warning on line 1, column 8 of file:///C:/Users/karol/my/r/InnoTopic/InnoTopic_Website/InnoTopicWebsite/src/app/work-projects/work-projects-section/work-projects-section.component.sass:1:8:
+Sass @import rules are deprecated and will be removed in Dart Sass 3.0.0.
+
+More info and automated migrator: https://sass-lang.com/d/import
+
+1 | @import '../../../styles.sass'
+
+
+src\app\work-projects\work-projects-section\work-projects-section.component.sass 2:9  root stylesheet
+
+
+./src/app/work-projects/work-projects-section/work-projects-section.component.sass?ngResource - Warning: Module Warning (from ./node_modules/sass-loader/dist/cjs.js):
+Deprecation Warning on line 1, column 8 of file:///C:/Users/karol/my/r/InnoTopic/InnoTopic_Website/InnoTopicWebsite/src/styles.sass:1:8:
+Sass @import rules are deprecated and will be removed in Dart Sass 3.0.0.
+
+More info and automated migrator: https://sass-lang.com/d/import
+
+1 | @import 'shared'
+
+
+src\styles.sass 2:9                                                                   @import
+src\app\work-projects\work-projects-section\work-projects-section.component.sass 2:9  root stylesheet
+
+
+./src/app/work-projects/work-projects-section/work-projects-section.component.sass?ngResource - Warning: Module Warning (from ./node_modules/sass-loader/dist/cjs.js):
+Deprecation Warning on line 2, column 8 of file:///C:/Users/karol/my/r/InnoTopic/InnoTopic_Website/InnoTopicWebsite/src/app/work-projects/work-projects-section/work-projects-section.component.sass:2:8:
+Sass @import rules are deprecated and will be removed in Dart Sass 3.0.0.
+
+More info and automated migrator: https://sass-lang.com/d/import
+
+2 | @import '../../../shared.scss'
+
+
+src\app\work-projects\work-projects-section\work-projects-section.component.sass 3:9  root stylesheet
+
+
+./src/app/work-projects/work-projects-section/work-projects-section.component.sass?ngResource - Warning: Module Warning (from ./node_modules/sass-loader/dist/cjs.js):
+Deprecation Warning on line 2, column 8 of file:///C:/Users/karol/my/r/InnoTopic/InnoTopic_Website/InnoTopicWebsite/src/styles.sass:2:8:
+Sass @import rules are deprecated and will be removed in Dart Sass 3.0.0.
+
+More info and automated migrator: https://sass-lang.com/d/import
+
+2 | @import 'theme/variables'
+
+
+src\styles.sass 3:9                                                                   @import
+src\app\work-projects\work-projects-section\work-projects-section.component.sass 2:9  root stylesheet
+
+
+Warning: src/app/topics-shared/topics-list/topics-list.component.ts:10:27 - warning NG8113: TopicTagComponent is not used within the template of TopicsListComponent
+
+10   imports: [CommonModule, TopicTagComponent],
+                             ~~~~~~~~~~~~~~~~~
+
+
+Warning: src/app/work-projects/work-projects-section/work-projects-section.component.ts:16:91 - warning NG8113: KeyValOrderedPipe is not used within the template of WorkProjectsSectionComponent
+
+16   imports: [CommonModule, FlagsComponent, HashtagReplacerComponent, WorkProjectComponent, KeyValOrderedPipe],
+                                                                                             ~~~~~~~~~~~~~~~~~
+
+
+Warning: C:/Users/karol/my/r/InnoTopic/InnoTopic_Website/InnoTopicWebsite/src/app/cv-page/cv-page.component.scss exceeded maximum budget. Budget 26.00 kB was not met by 1.08 kB with a total of 27.08 kB.
+
+Warning: C:/Users/karol/my/r/InnoTopic/InnoTopic_Website/InnoTopicWebsite/src/app/cv-page/personal-data/personal-data.component.sass exceeded maximum budget. Budget 26.00 kB was not met by 989 bytes with a total of 26.99 kB.
+
+Warning: C:/Users/karol/my/r/InnoTopic/InnoTopic_Website/InnoTopicWebsite/src/app/work-projects/work-projects-section/work-projects-section.component.sass exceeded maximum budget. Budget 26.00 kB was not met by 1.64 kB with a total of 27.64 kB.
+
+Warning: C:\Users\karol\my\r\InnoTopic\InnoTopic_Website\InnoTopicWebsite\node_modules\@ai-sdk\gateway\dist\index.mjs depends on '@vercel/oidc'. CommonJS or AMD dependencies can cause optimization bailouts.
+For more info see: https://angular.dev/tools/cli/build#configuring-commonjs-dependencies
+
+Warning: C:\Users\karol\my\r\InnoTopic\InnoTopic_Website\InnoTopicWebsite\src\app\utils\colors\ionic-color-utils.ts depends on 'chroma-js'. CommonJS or AMD dependencies can cause optimization bailouts.
+For more info see: https://angular.dev/tools/cli/build#configuring-commonjs-dependencies
+
+
+
+Error: src/app/TopicFriendsShared3/other-profiles/other-profiles.module.ts:13:5 - error NG6008: Component UserOtherProfileIconComponent is standalone, and cannot be declared in an NgModule. Did you mean to import it instead?
+
+13     UserOtherProfileIconComponent,
+       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+Error: src/app/TopicFriendsShared3/other-profiles/other-profiles.module.ts:14:5 - error NG6008: Component OtherProfileUserNameComponent is standalone, and cannot be declared in an NgModule. Did you mean to import it instead?
+
+14     OtherProfileUserNameComponent,
+       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+Error: src/app/TopicFriendsShared3/other-profiles/other-profiles.module.ts:15:5 - error NG6008: Component UserOtherProfilesComponent is standalone, and cannot be declared in an NgModule. Did you mean to import it instead?
+
+15     UserOtherProfilesComponent,
+       ~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+Error: src/app/TopicFriendsShared3/other-profiles/other-profiles.module.ts:23:5 - error NG6004: Can't be exported from this NgModule, as it must be imported first
+
+23     UserOtherProfileIconComponent,
+       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+Error: src/app/TopicFriendsShared3/other-profiles/other-profiles.module.ts:24:5 - error NG6004: Can't be exported from this NgModule, as it must be imported first
+
+24     OtherProfileUserNameComponent,
+       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+Error: src/app/TopicFriendsShared3/other-profiles/other-profiles.module.ts:25:5 - error NG6004: Can't be exported from this NgModule, as it must be imported first
+
+25     UserOtherProfilesComponent,
+       ~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+Error: src/app/app.module.ts:57:5 - error NG6008: Component AppComponent is standalone, and cannot be declared in an NgModule. Did you mean to import it instead?
+
+57     AppComponent,
+       ~~~~~~~~~~~~
+
+
+Error: src/app/app.module.ts:68:5 - error NG6002: This import contains errors, which may affect components that depend on this NgModule.
+
+68     CvPagePrintPageModule,
+       ~~~~~~~~~~~~~~~~~~~~~
+
+
+Error: src/app/books/books.component.html:30:5 - error NG8001: 'app-hashtag-replacer' is not a known element:
+1. If 'app-hashtag-replacer' is an Angular component, then verify that it is included in the '@Component.imports' of this component.
+2. If 'app-hashtag-replacer' is a Web Component then add 'CUSTOM_ELEMENTS_SCHEMA' to the '@Component.schemas' of this component to suppress this message.
+
+30     <app-hashtag-replacer text="
+       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+31       Some of the books and audiobooks that I've read and listened to,
+   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+32       in #English, #Polish, #German, #Spanish, #Catalan, #Portuguese, #Russian, #French, #Italian."
+   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+33     />
+   ~~~~~~
+
+  src/app/books/books.component.ts:9:16
+    9   templateUrl: './books.component.html',
+                     ~~~~~~~~~~~~~~~~~~~~~~~~
+    Error occurs in the template of component BooksComponent.
+
+
+Error: src/app/chat/chat.module.ts:15:18 - error NG6008: Component ChatPage is standalone, and cannot be declared in an NgModule. Did you mean to import it instead?
+
+15   declarations: [ChatPage]
+                    ~~~~~~~~
+
+
+Error: src/app/cv-page-print/cv-page-print.module.ts:20:5 - error NG6002: This import contains errors, which may affect components that depend on this NgModule.
+
+20     CvPageModule,
+       ~~~~~~~~~~~~
+
+
+Error: src/app/cv-page-print/cv-page-print.module.ts:21:5 - error NG6002: This import contains errors, which may affect components that depend on this NgModule.
+
+21     CvPageModule1,
+       ~~~~~~~~~~~~~
+
+
+Error: src/app/cv-page-print/cv-page-print.module.ts:22:5 - error NG6002: This import contains errors, which may affect components that depend on this NgModule.
+
+22     ShirtPageModule
+       ~~~~~~~~~~~~~~~
+
+
+Error: src/app/cv-page-print/cv-page-print.module.ts:25:5 - error NG6004: Can't be exported from this NgModule, as it must be imported first
+
+25     CvPagePrintPage
+       ~~~~~~~~~~~~~~~
+
+
+Error: src/app/cv-page-print/cv-page-print.module.ts:27:18 - error NG6008: Component CvPagePrintPage is standalone, and cannot be declared in an NgModule. Did you mean to import it instead?
+
+27   declarations: [CvPagePrintPage]
+                    ~~~~~~~~~~~~~~~
+
+
+Error: src/app/cv-page/cv-page.module.ts:25:5 - error NG6008: Component CvPageComponent is standalone, and cannot be declared in an NgModule. Did you mean to import it instead?
+
+25     CvPageComponent,
+       ~~~~~~~~~~~~~~~
+
+
+Error: src/app/cv-page/cv-page.module.ts:26:5 - error NG6008: Component PersonalDataComponent is standalone, and cannot be declared in an NgModule. Did you mean to import it instead?
+
+26     PersonalDataComponent,
+       ~~~~~~~~~~~~~~~~~~~~~
+
+
+Error: src/app/cv-page/cv-page.module.ts:27:5 - error NG6008: Component ExternalProfilesComponent is standalone, and cannot be declared in an NgModule. Did you mean to import it instead?
+
+27     ExternalProfilesComponent,
+       ~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+Error: src/app/cv-page/cv-page.module.ts:28:5 - error NG6008: Component TechGraphComponent is standalone, and cannot be declared in an NgModule. Did you mean to import it instead?
+
+28     TechGraphComponent,
+       ~~~~~~~~~~~~~~~~~~
+
+
+Error: src/app/cv-page/cv-page.module.ts:29:5 - error NG6008: Component WorldMapComponent is standalone, and cannot be declared in an NgModule. Did you mean to import it instead?
+
+29     WorldMapComponent,
+       ~~~~~~~~~~~~~~~~~
+
+
+Error: src/app/cv-page/cv-page.module.ts:30:5 - error NG6008: Component Logo3dComponent is standalone, and cannot be declared in an NgModule. Did you mean to import it instead?
+
+30     Logo3dComponent,
+       ~~~~~~~~~~~~~~~
+
+
+Error: src/app/cv-page/cv-page.module.ts:31:5 - error NG6008: Component TechGraphD3Component is standalone, and cannot be declared in an NgModule. Did you mean to import it instead?
+
+31     TechGraphD3Component,
+       ~~~~~~~~~~~~~~~~~~~~
+
+
+Error: src/app/cv-page/cv-page.module.ts:32:5 - error NG6008: Component TechGraphD3Index1Component is standalone, and cannot be declared in an NgModule. Did you mean to import it instead?
+
+32     TechGraphD3Index1Component,
+       ~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+Error: src/app/cv-page/cv-page.module.ts:33:5 - error NG6008: Component TopicsGraphComponent is standalone, and cannot be declared in an NgModule. Did you mean to import it instead?
+
+33     TopicsGraphComponent,
+       ~~~~~~~~~~~~~~~~~~~~
+
+
+Error: src/app/cv-page/cv-page.module.ts:34:5 - error NG6008: Component VideoCvComponent is standalone, and cannot be declared in an NgModule. Did you mean to import it instead?
+
+34     VideoCvComponent
+       ~~~~~~~~~~~~~~~~
+
+
+Error: src/app/cv-page/cv-page.module.ts:37:5 - error NG6004: Can't be exported from this NgModule, as it must be imported first
+
+37     CvPageComponent,
+       ~~~~~~~~~~~~~~~
+
+
+Error: src/app/cv-page/cv-page.module.ts:41:9 - error NG6002: This import contains errors, which may affect components that depend on this NgModule.
+
+41         WorkExperienceModule,
+           ~~~~~~~~~~~~~~~~~~~~
+
+
+Error: src/app/cv-page/cv-page.module.ts:42:9 - error NG6002: This import contains errors, which may affect components that depend on this NgModule.
+
+42         WorkProjectsModule,
+           ~~~~~~~~~~~~~~~~~~
+
+
+Error: src/app/cv-page/cv-page.module.ts:43:9 - error NG6002: This import contains errors, which may affect components that depend on this NgModule.
+
+43         PersonalInterestsModule,
+           ~~~~~~~~~~~~~~~~~~~~~~~
+
+
+Error: src/app/cv-page/cv-page.module.ts:44:9 - error NG6002: This import contains errors, which may affect components that depend on this NgModule.
+
+44         OtherProfilesModule,
+           ~~~~~~~~~~~~~~~~~~~
+
+
+Error: src/app/cv-page/cv-page.module.ts:46:9 - error NG6002: This import contains errors, which may affect components that depend on this NgModule.
+
+46         TopicsSharedModule,
+           ~~~~~~~~~~~~~~~~~~
+
+
+Error: src/app/cv/cv.module.ts:20:5 - error NG6002: This import contains errors, which may affect components that depend on this NgModule.
+
+20     CvPageModule1,
+       ~~~~~~~~~~~~~
+
+
+Error: src/app/cv/cv.module.ts:22:5 - error NG6002: This import contains errors, which may affect components that depend on this NgModule.
+
+22     ThemeDemoPageModule,
+       ~~~~~~~~~~~~~~~~~~~
+
+
+Error: src/app/cv/cv.module.ts:25:5 - error NG6004: Can't be exported from this NgModule, as it must be imported first
+
+25     CvPage
+       ~~~~~~
+
+
+Error: src/app/cv/cv.module.ts:27:18 - error NG6008: Component CvPage is standalone, and cannot be declared in an NgModule. Did you mean to import it instead?
+
+27   declarations: [CvPage]
+                    ~~~~~~
+
+
+Error: src/app/experiments/experiments.module.ts:19:18 - error NG6008: Component ExperimentsPage is standalone, and cannot be declared in an NgModule. Did you mean to import it instead?
+
+19   declarations: [ExperimentsPage, SignalExampleComponent]
+                    ~~~~~~~~~~~~~~~
+
+
+Error: src/app/experiments/experiments.module.ts:19:35 - error NG6008: Component SignalExampleComponent is standalone, and cannot be declared in an NgModule. Did you mean to import it instead?
+
+19   declarations: [ExperimentsPage, SignalExampleComponent]
+                                     ~~~~~~~~~~~~~~~~~~~~~~
+
+
+Error: src/app/folder/folder.module.ts:18:18 - error NG6008: Component FolderPage is standalone, and cannot be declared in an NgModule. Did you mean to import it instead?
+
+18   declarations: [FolderPage]
+                    ~~~~~~~~~~
+
+
+Error: src/app/merch-gen/merch-gen.module.ts:18:18 - error NG6008: Component MerchGenPage is standalone, and cannot be declared in an NgModule. Did you mean to import it instead?
+
+18   declarations: [MerchGenPage]
+                    ~~~~~~~~~~~~
+
+
+Error: src/app/people/people.module.ts:18:9 - error NG6002: This import contains errors, which may affect components that depend on this NgModule.
+
+18         TopicsSharedModule
+           ~~~~~~~~~~~~~~~~~~
+
+
+Error: src/app/people/people.module.ts:20:18 - error NG6008: Component PeoplePage is standalone, and cannot be declared in an NgModule. Did you mean to import it instead?
+
+20   declarations: [PeoplePage]
+                    ~~~~~~~~~~
+
+
+Error: src/app/personal-interests/personal-interests.module.ts:6:18 - error NG6008: Component PersonalInterestsComponent is standalone, and cannot be declared in an NgModule. Did you mean to import it instead?
+
+6   declarations: [PersonalInterestsComponent],
+                   ~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+Error: src/app/personal-interests/personal-interests.module.ts:8:5 - error NG6004: Can't be exported from this NgModule, as it must be imported first
+
+8     PersonalInterestsComponent,
+      ~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+Error: src/app/shirt-generator/shirt-generator.module.ts:44:5 - error NG6002: This import contains errors, which may affect components that depend on this NgModule.
+
+44     TopicsSharedModule,
+       ~~~~~~~~~~~~~~~~~~
+
+
+Error: src/app/shirt-generator/shirt-generator.module.ts:47:5 - error NG6008: Component ShirtGeneratorPage is standalone, and cannot be declared in an NgModule. Did you mean to import it instead?
+
+47     ShirtGeneratorPage,
+       ~~~~~~~~~~~~~~~~~~
+
+
+Error: src/app/shirt-generator/shirt-generator.module.ts:48:5 - error NG6008: Component PromptInputComponent is standalone, and cannot be declared in an NgModule. Did you mean to import it instead?
+
+48     PromptInputComponent,
+       ~~~~~~~~~~~~~~~~~~~~
+
+
+Error: src/app/shirt-generator/shirt-generator.module.ts:49:5 - error NG6008: Component PromptResultComponent is standalone, and cannot be declared in an NgModule. Did you mean to import it instead?
+
+49     PromptResultComponent,
+       ~~~~~~~~~~~~~~~~~~~~~
+
+
+Error: src/app/shirt-generator/shirt-generator.module.ts:50:5 - error NG6008: Component PreviewComponent is standalone, and cannot be declared in an NgModule. Did you mean to import it instead?
+
+50     PreviewComponent,
+       ~~~~~~~~~~~~~~~~
+
+
+Error: src/app/shirt/shirt.module.ts:21:9 - error NG6002: This import contains errors, which may affect components that depend on this NgModule.
+
+21         TopicsSharedModule,
+           ~~~~~~~~~~~~~~~~~~
+
+
+Error: src/app/shirt/shirt.module.ts:24:5 - error NG6004: Can't be exported from this NgModule, as it must be imported first
+
+24     ShirtPage,
+       ~~~~~~~~~
+
+
+Error: src/app/shirt/shirt.module.ts:25:5 - error NG6004: Can't be exported from this NgModule, as it must be imported first
+
+25     ShirtComponent
+       ~~~~~~~~~~~~~~
+
+
+Error: src/app/shirt/shirt.module.ts:28:9 - error NG6008: Component ShirtPage is standalone, and cannot be declared in an NgModule. Did you mean to import it instead?
+
+28         ShirtPage,
+           ~~~~~~~~~
+
+
+Error: src/app/shirt/shirt.module.ts:29:9 - error NG6008: Component ShirtComponent is standalone, and cannot be declared in an NgModule. Did you mean to import it instead?
+
+29         ShirtComponent,
+           ~~~~~~~~~~~~~~
+
+
+Error: src/app/skills-shared/skills-shared.module.ts:9:5 - error NG6008: Component SkillLevelsIconsComponent is standalone, and cannot be declared in an NgModule. Did you mean to import it instead?
+
+9     SkillLevelsIconsComponent,
+      ~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+Error: src/app/skills-shared/skills-shared.module.ts:10:5 - error NG6008: Component SkillLevelIconComponent is standalone, and cannot be declared in an NgModule. Did you mean to import it instead?
+
+10     SkillLevelIconComponent,
+       ~~~~~~~~~~~~~~~~~~~~~~~
+
+
+Error: src/app/skills-shared/skills-shared.module.ts:14:5 - error NG6002: This import contains errors, which may affect components that depend on this NgModule.
+
+14     TopicsSharedModule,
+       ~~~~~~~~~~~~~~~~~~
+
+
+Error: src/app/skills-shared/skills-shared.module.ts:17:5 - error NG6004: Can't be exported from this NgModule, as it must be imported first
+
+17     SkillLevelsIconsComponent,
+       ~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+Error: src/app/skills-shared/skills-shared.module.ts:18:5 - error NG6004: Can't be exported from this NgModule, as it must be imported first
+
+18     SkillLevelIconComponent,
+       ~~~~~~~~~~~~~~~~~~~~~~~
+
+
+Error: src/app/skills-shared/skills-shared.module.ts:19:5 - error NG6003: This export contains errors, which may affect components that depend on this NgModule.
+
+19     TopicsSharedModule,
+       ~~~~~~~~~~~~~~~~~~
+
+
+Error: src/app/skills/language-section/language-section.component.html:15:11 - error NG8001: 'app-flags' is not a known element:
+1. If 'app-flags' is an Angular component, then verify that it is included in the '@Component.imports' of this component.
+2. If 'app-flags' is a Web Component then add 'CUSTOM_ELEMENTS_SCHEMA' to the '@Component.schemas' of this component to suppress this message.
+
+15           <app-flags [flags]="language.details.flags"/>
+             ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+  src/app/skills/language-section/language-section.component.ts:10:16
+    10   templateUrl: './language-section.component.html',
+                      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    Error occurs in the template of component LanguageSectionComponent.
+
+
+Error: src/app/skills/language-section/language-section.component.html:15:22 - error NG8002: Can't bind to 'flags' since it isn't a known property of 'app-flags'.
+1. If 'app-flags' is an Angular component and it has 'flags' input, then verify that it is included in the '@Component.imports' of this component.
+2. If 'app-flags' is a Web Component then add 'CUSTOM_ELEMENTS_SCHEMA' to the '@Component.schemas' of this component to suppress this message.
+3. To allow any property add 'NO_ERRORS_SCHEMA' to the '@Component.schemas' of this component.
+
+15           <app-flags [flags]="language.details.flags"/>
+                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+  src/app/skills/language-section/language-section.component.ts:10:16
+    10   templateUrl: './language-section.component.html',
+                      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    Error occurs in the template of component LanguageSectionComponent.
+
+
+Error: src/app/skills/language-section/language-section.component.html:28:11 - error NG8001: 'app-flags' is not a known element:
+1. If 'app-flags' is an Angular component, then verify that it is included in the '@Component.imports' of this component.
+2. If 'app-flags' is a Web Component then add 'CUSTOM_ELEMENTS_SCHEMA' to the '@Component.schemas' of this component to suppress this message.
+
+28           <app-flags [flags]="language.details.flags"/>
+             ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+  src/app/skills/language-section/language-section.component.ts:10:16
+    10   templateUrl: './language-section.component.html',
+                      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    Error occurs in the template of component LanguageSectionComponent.
+
+
+Error: src/app/skills/language-section/language-section.component.html:28:22 - error NG8002: Can't bind to 'flags' since it isn't a known property of 'app-flags'.
+1. If 'app-flags' is an Angular component and it has 'flags' input, then verify that it is included in the '@Component.imports' of this component.
+2. If 'app-flags' is a Web Component then add 'CUSTOM_ELEMENTS_SCHEMA' to the '@Component.schemas' of this component to suppress this message.
+3. To allow any property add 'NO_ERRORS_SCHEMA' to the '@Component.schemas' of this component.
+
+28           <app-flags [flags]="language.details.flags"/>
+                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+  src/app/skills/language-section/language-section.component.ts:10:16
+    10   templateUrl: './language-section.component.html',
+                      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    Error occurs in the template of component LanguageSectionComponent.
+
+
+Error: src/app/skills/work-experience.module.ts:15:5 - error NG6002: This import contains errors, which may affect components that depend on this NgModule.
+
+15     TopicSkillsModule,
+       ~~~~~~~~~~~~~~~~~
+
+
+Error: src/app/test-tag/test-tag.module.ts:18:5 - error NG6002: This import contains errors, which may affect components that depend on this NgModule.
+
+18     TopicSkillsModule
+       ~~~~~~~~~~~~~~~~~
+
+
+Error: src/app/test-tag/test-tag.module.ts:20:18 - error NG6008: Component TestTagPage is standalone, and cannot be declared in an NgModule. Did you mean to import it instead?
+
+20   declarations: [TestTagPage]
+                    ~~~~~~~~~~~
+
+
+Error: src/app/themes/theme-demo/theme-demo.module.ts:26:5 - error NG6004: Can't be exported from this NgModule, as it must be imported first
+
+26     ThemeConfigComponent,
+       ~~~~~~~~~~~~~~~~~~~~
+
+
+Error: src/app/themes/theme-demo/theme-demo.module.ts:27:5 - error NG6004: Can't be exported from this NgModule, as it must be imported first
+
+27     ChipComponent,
+       ~~~~~~~~~~~~~
+
+
+Error: src/app/themes/theme-demo/theme-demo.module.ts:30:5 - error NG6008: Component ThemeDemoPage is standalone, and cannot be declared in an NgModule. Did you mean to import it instead?
+
+30     ThemeDemoPage,
+       ~~~~~~~~~~~~~
+
+
+Error: src/app/themes/theme-demo/theme-demo.module.ts:31:5 - error NG6008: Component ThemeConfigComponent is standalone, and cannot be declared in an NgModule. Did you mean to import it instead?
+
+31     ThemeConfigComponent,
+       ~~~~~~~~~~~~~~~~~~~~
+
+
+Error: src/app/themes/theme-demo/theme-demo.module.ts:32:5 - error NG6008: Component ChipComponent is standalone, and cannot be declared in an NgModule. Did you mean to import it instead?
+
+32     ChipComponent,
+       ~~~~~~~~~~~~~
+
+
+Error: src/app/themes/theme-demo/theme-demo.module.ts:33:5 - error NG6008: Component ThemeSamplesComponent is standalone, and cannot be declared in an NgModule. Did you mean to import it instead?
+
+33     ThemeSamplesComponent,
+       ~~~~~~~~~~~~~~~~~~~~~
+
+
+Error: src/app/themes/theme-demo/theme-demo.module.ts:34:5 - error NG6008: Component TintedSwatchesComponent is standalone, and cannot be declared in an NgModule. Did you mean to import it instead?
+
+34     TintedSwatchesComponent,
+       ~~~~~~~~~~~~~~~~~~~~~~~
+
+
+Error: src/app/topic-skills/topic-skills.module.ts:9:5 - error NG6008: Component TopicSkillComponent is standalone, and cannot be declared in an NgModule. Did you mean to import it instead?
+
+9     TopicSkillComponent,
+      ~~~~~~~~~~~~~~~~~~~
+
+
+Error: src/app/topic-skills/topic-skills.module.ts:13:5 - error NG6002: This import contains errors, which may affect components that depend on this NgModule.
+
+13     TopicsSharedModule,
+       ~~~~~~~~~~~~~~~~~~
+
+
+Error: src/app/topic-skills/topic-skills.module.ts:14:5 - error NG6002: This import contains errors, which may affect components that depend on this NgModule.
+
+14     SkillsSharedModule,
+       ~~~~~~~~~~~~~~~~~~
+
+
+Error: src/app/topic-skills/topic-skills.module.ts:17:5 - error NG6004: Can't be exported from this NgModule, as it must be imported first
+
+17     TopicSkillComponent,
+       ~~~~~~~~~~~~~~~~~~~
+
+
+Error: src/app/topic-skills/topic-skills.module.ts:18:5 - error NG6003: This export contains errors, which may affect components that depend on this NgModule.
+
+18     TopicsSharedModule,
+       ~~~~~~~~~~~~~~~~~~
+
+
+Error: src/app/topic-skills/topic-skills.module.ts:19:5 - error NG6003: This export contains errors, which may affect components that depend on this NgModule.
+
+19     SkillsSharedModule,
+       ~~~~~~~~~~~~~~~~~~
+
+
+Error: src/app/topics-shared/topic-tag/topic-tag.component.html:47:1 - error NG8001: 'app-chip' is not a known element:
+1. If 'app-chip' is an Angular component, then verify that it is included in the '@Component.imports' of this component.
+2. If 'app-chip' is a Web Component then add 'CUSTOM_ELEMENTS_SCHEMA' to the '@Component.schemas' of this component to suppress this message.
+
+47 <app-chip style="display: inline-block; margin: 0.3rem;">
+   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+  src/app/topics-shared/topic-tag/topic-tag.component.ts:34:16
+    34   templateUrl: './topic-tag.component.html',
+                      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    Error occurs in the template of component TopicTagComponent.
+
+
+Error: src/app/topics-shared/topics-list/topics-list.component.html:4:3 - error NG8001: 'app-topic-logo' is not a known element:
+1. If 'app-topic-logo' is an Angular component, then verify that it is included in the '@Component.imports' of this component.
+2. If 'app-topic-logo' is a Web Component then add 'CUSTOM_ELEMENTS_SCHEMA' to the '@Component.schemas' of this component to suppress this message.
+
+4   <app-topic-logo [size]="iconSize" *ngFor="let topic of topics" [topic]="topic" />
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+  src/app/topics-shared/topics-list/topics-list.component.ts:11:16
+    11   templateUrl: './topics-list.component.html',
+                      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    Error occurs in the template of component TopicsListComponent.
+
+
+Error: src/app/topics-shared/topics-list/topics-list.component.html:4:19 - error NG8002: Can't bind to 'size' since it isn't a known property of 'app-topic-logo'.
+1. If 'app-topic-logo' is an Angular component and it has 'size' input, then verify that it is included in the '@Component.imports' of this component.
+2. If 'app-topic-logo' is a Web Component then add 'CUSTOM_ELEMENTS_SCHEMA' to the '@Component.schemas' of this component to suppress this message.
+3. To allow any property add 'NO_ERRORS_SCHEMA' to the '@Component.schemas' of this component.
+
+4   <app-topic-logo [size]="iconSize" *ngFor="let topic of topics" [topic]="topic" />
+                    ~~~~~~~~~~~~~~~~~
+
+  src/app/topics-shared/topics-list/topics-list.component.ts:11:16
+    11   templateUrl: './topics-list.component.html',
+                      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    Error occurs in the template of component TopicsListComponent.
+
+
+Error: src/app/topics-shared/topics-list/topics-list.component.html:4:66 - error NG8002: Can't bind to 'topic' since it isn't a known property of 'app-topic-logo'.
+1. If 'app-topic-logo' is an Angular component and it has 'topic' input, then verify that it is included in the '@Component.imports' of this component.
+2. If 'app-topic-logo' is a Web Component then add 'CUSTOM_ELEMENTS_SCHEMA' to the '@Component.schemas' of this component to suppress this message.
+3. To allow any property add 'NO_ERRORS_SCHEMA' to the '@Component.schemas' of this component.
+
+4   <app-topic-logo [size]="iconSize" *ngFor="let topic of topics" [topic]="topic" />
+                                                                   ~~~~~~~~~~~~~~~
+
+  src/app/topics-shared/topics-list/topics-list.component.ts:11:16
+    11   templateUrl: './topics-list.component.html',
+                      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    Error occurs in the template of component TopicsListComponent.
+
+
+Error: src/app/topics-shared/topics-shared.module.ts:17:5 - error NG6002: This import contains errors, which may affect components that depend on this NgModule.
+
+17     ThemeDemoPageModule,
+       ~~~~~~~~~~~~~~~~~~~
+
+
+Error: src/app/work-projects/work-projects.module.ts:15:5 - error NG6002: This import contains errors, which may affect components that depend on this NgModule.
+
+15     WorkExperienceModule,
+       ~~~~~~~~~~~~~~~~~~~~
+
+
+Error: src/app/work-projects/work-projects.module.ts:20:5 - error NG6002: This import contains errors, which may affect components that depend on this NgModule.
+
+20     TopicsSharedModule,
+       ~~~~~~~~~~~~~~~~~~

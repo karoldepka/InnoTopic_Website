@@ -130,27 +130,16 @@ import {CommonModule} from "@angular/common";
 import {BooksComponent} from "../books/books.component";
 import {TopicsSharedModule} from "../topics-shared/topics-shared.module";
 
-let imports = [
-  // BrowserModule,
-  CommonModule,
-  // AppRoutingModule,
-  // BrowserAnimationsModule,
-  // MatToolbarModule,
-  // MatButtonModule,
-  // MatChipsModule,
-];
-
-let declarations = [SpacerComponent, CompanyLogoComponent];
-
 @NgModule({
   imports: [
-    imports,
+    CommonModule,
+    SpacerComponent,
+    CompanyLogoComponent,
   ],
-    declarations: [
-        declarations,
-    ],
     exports: [
-        ...imports, ...declarations
+      CommonModule,
+      SpacerComponent,
+      CompanyLogoComponent,
     ],
   providers: []
 })

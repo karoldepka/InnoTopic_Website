@@ -5,6 +5,7 @@ import {
   ChangeDetectionStrategy,
   ChangeDetectorRef,
 } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { Topic } from '../../TopicFriendsShared3/topics-core/Topic';
 import { TopicsService } from '../../TopicFriendsShared3/topics-core/topics.service';
 
@@ -12,6 +13,8 @@ export const defaultIconHeight = 18
 
 @Component({
   selector: 'app-topic-logo',
+  standalone: true,
+  imports: [CommonModule],
   templateUrl: './topic-logo.component.html',
   styleUrls: ['./topic-logo.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,

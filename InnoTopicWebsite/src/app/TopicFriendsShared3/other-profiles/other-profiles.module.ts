@@ -8,15 +8,11 @@ import { UserOtherProfileIconComponent } from './user-other-profile-icon/user-ot
 import { OtherProfileUserNameComponent } from './user-other-profiles/other-profile-user-name/other-profile-user-name.component';
 import { UserOtherProfilesComponent } from './user-other-profiles/user-other-profiles.component';
 
-const exports = [
-  UserOtherProfileIconComponent,
-  OtherProfileUserNameComponent,
-  UserOtherProfilesComponent,
-]
-
 @NgModule({
   declarations: [
-    ...exports,
+    UserOtherProfileIconComponent,
+    OtherProfileUserNameComponent,
+    UserOtherProfilesComponent,
   ],
   imports: [
     CommonModule,
@@ -24,7 +20,9 @@ const exports = [
     ReactiveFormsModule,
   ],
   exports: [
-    exports,
+    UserOtherProfileIconComponent,
+    OtherProfileUserNameComponent,
+    UserOtherProfilesComponent,
   ]
 })
 export class OtherProfilesModule { }

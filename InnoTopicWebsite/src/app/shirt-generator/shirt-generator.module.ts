@@ -45,7 +45,9 @@ const topicsPromptServiceFactory = (httpClient: HttpClient) => {
 ],
   declarations: [
     ShirtGeneratorPage,
-    ...componentDeclarations,
+    PromptInputComponent,
+    PromptResultComponent,
+    PreviewComponent,
   ],
   providers: [
     ShirtGeneratorService,

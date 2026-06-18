@@ -24,7 +24,7 @@ import {TintedSwatchesComponent} from "../tinted-swatches/tinted-swatches.compon
   ],
   exports: [
     ThemeConfigComponent,
-    ChipComponent
+    ChipComponent,
   ],
   declarations: [
     ThemeDemoPage,

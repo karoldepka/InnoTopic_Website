@@ -4,6 +4,8 @@ import {
   Input,
   ViewEncapsulation,
 } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { SkillLevelIconComponent } from '../skill-level-icon/skill-level-icon.component';
 import {
   UserSkillLevelEnum,
   UserSkillLevelsHaveWant,
@@ -23,6 +25,8 @@ export const skillsIconsSignal = {
 /** TODO: rename: app-skill-levels-icons-have-want */
 @Component({
   selector: 'app-skill-levels-icons',
+  standalone: true,
+  imports: [CommonModule, SkillLevelIconComponent],
   templateUrl: './skill-levels-icons.component.html',
   styleUrls: ['./skill-levels-icons.component.sass'],
   encapsulation: ViewEncapsulation.None

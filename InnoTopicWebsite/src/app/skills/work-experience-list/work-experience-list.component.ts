@@ -3,6 +3,8 @@ import {
   Input,
   OnInit,
 } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { TopicSkillComponent } from '../../topic-skills/topic-skill/topic-skill.component';
 import { TopicCategory } from '../../TopicFriendsShared3/topics-core/topics';
 import { topicCategoriesArray } from '../../TopicFriendsShared3/topics-core/topics-data';
 import { TopicsService } from '../../TopicFriendsShared3/topics-core/topics.service';
@@ -21,6 +23,8 @@ import {groupBy} from "lodash-es";
 
 @Component({
   selector: 'app-work-experience-list',
+  standalone: true,
+  imports: [CommonModule, TopicSkillComponent],
   templateUrl: './work-experience-list.component.html',
   styleUrls: ['./work-experience-list.component.sass']
 })

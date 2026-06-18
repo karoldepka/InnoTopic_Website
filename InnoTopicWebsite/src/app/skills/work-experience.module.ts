@@ -9,21 +9,23 @@ import { WorkExperienceListComponent } from './work-experience-list/work-experie
 import { WorkExperienceComponent } from './work-experience.component';
 import { LanguageSectionComponent } from "./language-section/language-section.component";
 
-let declarations = [
-  WorkExperienceComponent,
-  WorkExperienceListComponent,
-  WorkExperienceByStatusSectionComponent,
-  LanguageSectionComponent
-]
-
 @NgModule({
   imports: [
     CommonModule,
     TopicSkillsModule,
     CountriesModule,
     SharedModule,
+    // Standalone components used by this feature
+    WorkExperienceComponent,
+    WorkExperienceListComponent,
+    WorkExperienceByStatusSectionComponent,
+    LanguageSectionComponent,
   ],
-  declarations: declarations,
-  exports: declarations
+  exports: [
+    WorkExperienceComponent,
+    WorkExperienceListComponent,
+    WorkExperienceByStatusSectionComponent,
+    LanguageSectionComponent,
+  ]
 })
 export class WorkExperienceModule { }

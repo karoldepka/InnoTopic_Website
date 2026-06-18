@@ -4,19 +4,17 @@ import { SkillsSharedModule } from '../skills-shared/skills-shared.module';
 import { TopicsSharedModule } from '../topics-shared/topics-shared.module';
 import { TopicSkillComponent } from './topic-skill/topic-skill.component';
 
-let declarations = [
-  TopicSkillComponent,
-];
-
 @NgModule({
-  declarations: declarations,
+  declarations: [
+    TopicSkillComponent,
+  ],
   imports: [
     CommonModule,
     TopicsSharedModule,
     SkillsSharedModule,
   ],
   exports: [
-    ...declarations,
+    TopicSkillComponent,
     TopicsSharedModule,
     SkillsSharedModule,
   ]

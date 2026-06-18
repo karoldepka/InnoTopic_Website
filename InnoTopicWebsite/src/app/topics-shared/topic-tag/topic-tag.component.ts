@@ -7,6 +7,8 @@ import {
   Output,
   ViewEncapsulation,
 } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { TopicLogoComponent } from '../topic-logo/topic-logo.component';
 import { HighlightService } from '../../TopicFriendsShared3/topics-core/highlight.service';
 import { Topic } from '../../TopicFriendsShared3/topics-core/Topic';
 import { TopicsService } from '../../TopicFriendsShared3/topics-core/topics.service';
@@ -27,6 +29,8 @@ export class TopicInterest {
 
 @Component({
   selector: 'app-topic-tag',
+  standalone: true,
+  imports: [CommonModule, TopicLogoComponent],
   templateUrl: './topic-tag.component.html',
   styleUrls: ['./topic-tag.component.scss'],
   encapsulation: ViewEncapsulation.None,

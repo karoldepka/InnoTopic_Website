@@ -10,21 +10,14 @@ import { WorkProjectComponent } from './work-projects-section/work-project/work-
 import {TopicsSharedModule} from "../topics-shared/topics-shared.module";
 
 @NgModule({
-  declarations: [
+  imports: [
+    CommonModule,
     WorkProjectsSectionComponent,
     WorkProjectComponent,
   ],
-    imports: [
-        CommonModule,
-        WorkExperienceModule,
-        SharedModule,
-        CountriesModule,
-        UtilsModule,
-        FontAwesomeModule,
-        TopicsSharedModule,
-    ],
   exports: [
     WorkProjectsSectionComponent,
+    WorkProjectComponent,
   ]
 })
 export class WorkProjectsModule { }

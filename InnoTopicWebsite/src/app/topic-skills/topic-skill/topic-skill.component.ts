@@ -4,6 +4,9 @@ import {
   Input,
   OnInit,
 } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { TopicTagComponent } from '../../topics-shared/topic-tag/topic-tag.component';
+import { SkillLevelsIconsComponent } from '../../skills-shared/skill-levels-icons/skill-levels-icons.component';
 import {
   UserSkillLevelsHaveWant,
   UserSkillLevelsHaveWant2,
@@ -11,6 +14,8 @@ import {
 
 @Component({
   selector: 'app-topic-skill',
+  standalone: true,
+  imports: [CommonModule, TopicTagComponent, SkillLevelsIconsComponent],
   templateUrl: './topic-skill.component.html',
   styleUrls: ['./topic-skill.component.sass']
 })

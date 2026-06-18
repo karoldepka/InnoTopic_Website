@@ -4,21 +4,18 @@ import { TopicsSharedModule } from '../topics-shared/topics-shared.module';
 import { SkillLevelIconComponent } from './skill-level-icon/skill-level-icon.component';
 import { SkillLevelsIconsComponent } from './skill-levels-icons/skill-levels-icons.component';
 
-let exportDeclarations = [
-  SkillLevelsIconsComponent,
-  SkillLevelIconComponent,
-];
-
 @NgModule({
   declarations: [
-    ...exportDeclarations,
+    SkillLevelsIconsComponent,
+    SkillLevelIconComponent,
   ],
   imports: [
     CommonModule,
     TopicsSharedModule,
   ],
   exports: [
-    ...exportDeclarations,
+    SkillLevelsIconsComponent,
+    SkillLevelIconComponent,
     TopicsSharedModule,
   ]
 })

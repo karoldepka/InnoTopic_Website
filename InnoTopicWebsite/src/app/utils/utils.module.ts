@@ -2,17 +2,13 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { KeyValOrderedPipe } from './KeyValueOrderedPipe';
 
-let exports = [
-  KeyValOrderedPipe,
-];
-
 @NgModule({
   imports: [
-    CommonModule
+    CommonModule,
+    KeyValOrderedPipe,
   ],
-  declarations: [
-    ...exports,
-  ],
-  exports: exports
+  exports: [
+    KeyValOrderedPipe,
+  ]
 })
 export class UtilsModule { }

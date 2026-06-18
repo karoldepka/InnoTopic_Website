@@ -44,7 +44,11 @@ export interface KeyValue<K, V> {
  * @publicApi
  */
 @Injectable()
-@Pipe({name: 'keyValOrdered', pure: false})
+@Pipe({
+  name: 'keyValOrdered',
+  standalone: true,
+  pure: false
+})
 export class KeyValOrderedPipe implements PipeTransform {
   constructor() {}
 
