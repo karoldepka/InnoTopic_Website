@@ -171,20 +171,20 @@ export const highlights = {
       'Backbone.js': {},
       // 'Knockout.js': {},
       // TODO: Frontend: 'https://million.dev/': {},
-  
+
       jQuery: {} /* kinda as a joke / to test someone */,
       'Hotwired Turbo': {} /* DHH, does not use TS nor JSDoc nor .d.ts */,
       'Hotwired Stimulus': {} /* DHH, does not use TS nor JSDoc nor .d.ts */,
       Nx: {},
       Rush: {}, // https://rushstack.io/
       PWA: {},
-  
+
       // TODO: lighthouse, web.dev
-  
+
       /* TODO; SvelteKit svelte-kit */
       /* TODO: Meteor */
       /* TODO: webhooks */
-  
+
       Sass: {},
       Less: {},
       Stylus: {},
@@ -254,7 +254,7 @@ export const highlights = {
       // TODO: Mine: ComRev: {}, // CompaReview -
       // StackShare: {}, // comprehension
       // TODO: https://open-vsx.org/ // comprehension
-  
+
       // Openbase: {},
       // SVGPorn: {},
       // SVGO: {},
@@ -272,7 +272,7 @@ export const highlights = {
       glTF: {} /* FIXME too big */,
       WebGPU: {},
       Blender: {},
-  
+
       // "AG Grid": {}, // old logo; and trying to conserve horizontal space
       Lodash: {},
       ReactiveX: {},
@@ -328,7 +328,7 @@ export const highlights = {
       GitLab: {},
       /* TODO: smth like Jira / Atlassian */
       /* TODO: BitBucket ? */
-  
+
       // ====== LowCode / NoCode
       Airtable: {},
       Notion: {},
@@ -338,7 +338,7 @@ export const highlights = {
       // TODO: Lowcode: 'FIXME Baserow': {}, // or next to notion
       // TODO: Lowcode: 'FIXME Rowy': {}, // or next to notion
       // TODO: Lowcode:'FIXME nocodb': {}, // or next to notion
-  
+
       Coda: {},
       Zapier: {},
       IFTTT: {},
@@ -353,7 +353,7 @@ export const highlights = {
       Framer: {},
       WebFlow: {},
       // Wix: {},
-  
+
       // TODO: https://github.com/imartinez/privateGPT
       // TODO: https://github.com/smol-ai/developer
       // TODO: AI: 'SMOL.ai': {}, // vercel investment
@@ -387,7 +387,7 @@ export const highlights = {
       // Observable: {},
       'Hugging Face': {},
       // TODO: AI: kaggle -  data sets, models
-  
+
       // ===== TODO MLOPS (MLOps)
       Cohere: {},
       'Weights & Biases': {},
@@ -418,7 +418,7 @@ export const highlights = {
       // TODO Jax - https://github.com/google/jax - has logo - group with lower-level stuff with smaller icons
       // whereas my higher-level stuff like LLM-s for coding, with bigger icons, almost as big as TypeScript, Angular, second row
       // TODO: ONNX | Home -- Open Neural Network Exchange -- The open standard for machine learning interoperability
-  
+
       TensorFlow: {},
       Keras: {},
       // TODO: AI: 'nvidia.svg': {},
@@ -476,14 +476,14 @@ export const highlights = {
       // TODO: AI: 'Google Palm': {},
       // TODO: AI: Google Bard, Lamda, https://ai.meta.com/llama/ meta llama, "Meta AI"
       // TODO: AI: https://github.com/langgenius/dify - "An Open-Source Assistants API and GPTs alternative. Dify.AI is an LLM application development platform. It integrates the concepts of Backend as a Service and LLMOps, covering the core tech stack required for building generative AI-native applications, including a built-in RAG engine."
-  
+
       'Microsoft Bing': {},
       'Microsoft Copilot': {},
       'AutoGen': {}, // 'Microsoft AutoGen' old id
       LangChain: {},
       // TODO: AI: https://smythos.com/
       'C3 AI': {}, // enterprise AI
-  
+
       OpenAI: {},
       // TODO: AI: OpenAI Gym
       'Magic.dev': {}, /* --- unlimited context window? ? */
@@ -495,12 +495,12 @@ export const highlights = {
       // '1X Technologies': {},
       // 'Boston Dynamics': {},
       // 'Stanford University': {},
-  
+
       // 'Home Assistant': {},
-  
+
       Phind: {},
       'Perplexity.ai': {},
-  
+
       'Google Bard': {},
       'Google Gemini': {},
       'Google DeepMind': {},
@@ -524,7 +524,7 @@ export const highlights = {
       // TODO: AI: 'https://www.aie.foundation/': {},
       Markdown: {},
       // TODO: AI (competition to markdown): Asciidoctor: {}, // asciidoc
-  
+
       // ===== BlockChain / CryptoCurrencies
       // Ethereum: {},
       // 'Basic Attention Token (BAT)': {},
@@ -534,7 +534,7 @@ export const highlights = {
       'web3.js' /* FIXME */: {},
       'ethers.js': {},
       Solid: {},
-  
+
       // ==== Social / Content / Discovery / comprehension / influencers
       YouTube: {},
       Twitch: {}, // live codings
@@ -584,7 +584,7 @@ export const highlights = {
       // TODO "Apache Spark": {},
       // TODO "Apache Druid": {}, /* analytics*/
       // TODO  "Apache Superset": {}, // lot of typescript and python
-  
+
       Prisma: {},
       // "Drizzle ORM": {},
       PostgreSQL: {},
@@ -605,17 +605,17 @@ export const highlights = {
       Vespa: {},
       Weaviate: {},
       Chroma: {},
-  
+
       Milvus: {},
       // TODO: AI: 'Milvus Zilliz': {},
       Qdrant: {},
       // TODO: AI: Faiss: {},
       'Apache Cassandra': {},
       // FAISS is (from meta) is another thing related to embeddings / vector db; but no logo currently
-  
+
       // TODO: some vector db-s https://www.youtube.com/watch?v=klTvEwg3oJ4&ab_channel=Fireship
       // TODO JetBrains Fleet
-  
+
       //
       // "RxJS": {}, -- no icon (can be ReactiveX)
       // TODO: , Ng-bootstrap, material, angular-material
@@ -668,6 +668,17 @@ export const highlights = {
     // ====== Closer to C, C++
     Rust: {},
     // TODO: "https://www.roc-lang.org/": {/* Brydon*/},
+    // ====== Crypto
+    Bitcoin: {},
+    Ethereum: {},
+    "Basic Attention Token (BAT)": {},
+    Solidity: {},
+    "Web3": {},
+    "web3.js": {},
+    "ethers.js": {},
+    "Solid": {},
+
+
     Go: {},
     'C++': {},
     C: {},

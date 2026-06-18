@@ -1,6 +1,12 @@
 {
   "/ai-api": {
-    "target": "http://localhost:8000",
+    "target": "http://localhost:8001",
+    "secure": false,
+    "changeOrigin": true,
+    "pathRewrite": { "^/ai-api": "" }
+  },
+  "/copilotkit": {
+    "target": "http://localhost:8002",
     "secure": false,
     "changeOrigin": true
   }

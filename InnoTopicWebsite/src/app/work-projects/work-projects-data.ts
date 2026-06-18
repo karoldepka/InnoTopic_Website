@@ -55,11 +55,11 @@ export class WorkOrganisationsAndProjectsData {
     // subTitle: '(formerly known as CommerceHub / ChannelAdvisor / DSCO)',
     // TODO: some info that it was e-commerce
     flags: 'es uk us pt',
-    time: ['2023', '2024' /* TODO: make months optional */],
-    linkedInRecommendations: 3,
+    time: ['2023', 'present' /* TODO: make months optional */],
+    linkedInRecommendations: 0,
     locations: `Málaga, remote, Madrid, Dubai`,
     logoFileName: `Rithum/rithum-icon.svg`,
-    description: '#Staff_Engineer, developing in #Rust, #Python, #React and #AWS, #Amazon_Bedrock, #OpenSearch and related', // TODO: #Amazon_CDK
+    description: '#Staff_Engineer, developing in #Rust, #Python, #React and #AWS, #Amazon_Bedrock, #OpenSearch #Elasticsearch and related', // TODO: #Amazon_CDK
     projects: {
       'AI-based LLM-powered processing of product metadata': project({
         roles: 'Staff Engineer',

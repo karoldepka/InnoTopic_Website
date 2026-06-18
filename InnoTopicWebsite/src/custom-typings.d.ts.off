@@ -1,0 +1,40 @@
+declare module 'globe.gl' {
+  import type { ThreeGlobeGeneric } from 'three-globe';
+  const Globe: (config?: { animateIn?: boolean; [key: string]: any }) => ThreeGlobeGeneric<any> & {
+    (el: HTMLElement): any;
+    width(w: number): any;
+    height(h: number): any;
+    backgroundColor(color: string): any;
+    showAtmosphere(show: boolean): any;
+    atmosphereColor(color: string): any;
+    atmosphereAltitude(altitude: number): any;
+    globeImageUrl(url: string | null): any;
+    globeMaterial(material: any): any;
+    polygonsData(data: any[]): any;
+    polygonCapColor(fn: (() => string) | string): any;
+    polygonSideColor(fn: (() => string) | string): any;
+    polygonStrokeColor(fn: (() => string) | string): any;
+    polygonAltitude(alt: number | ((d: any) => number)): any;
+    objectsData(data: any[]): any;
+    objectLat(fn: ((d: any) => number) | string): any;
+    objectLng(fn: ((d: any) => number) | string): any;
+    objectAltitude(fn: ((d: any) => number) | number): any;
+    objectLabel(fn: ((d: any) => string) | string): any;
+    objectThreeObject(fn: ((d: any) => any) | any): any;
+    arcsData(data: any[]): any;
+    arcStartLat(fn: ((d: any) => number) | string): any;
+    arcStartLng(fn: ((d: any) => number) | string): any;
+    arcEndLat(fn: ((d: any) => number) | string): any;
+    arcEndLng(fn: ((d: any) => number) | string): any;
+    arcColor(fn: ((d: any) => any) | any): any;
+    arcAltitude(alt: number | ((d: any) => number)): any;
+    arcStroke(w: number | ((d: any) => number)): any;
+    arcDashLength(len: number | ((d: any) => number)): any;
+    arcDashGap(gap: number | ((d: any) => number)): any;
+    arcDashAnimateTime(ms: number | ((d: any) => number)): any;
+    pointOfView(pov: { lat: number; lng: number; altitude: number }): any;
+    controls(): any;
+    _destructor?: () => void;
+  };
+  export default Globe;
+}
