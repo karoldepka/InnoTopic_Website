@@ -9,6 +9,7 @@ import { ThemeDemoPageRoutingModule } from './theme-demo-routing.module';
 import { ThemeDemoPage } from './theme-demo.page';
 import {ThemeConfigComponent} from "../theme-config/theme-config.component";
 import {ChipComponent} from "../../chip/chip.component";
+import {HeaderComponent} from "../../header/header.component";
 import {ThemeSamplesComponent} from "../theme-samples/theme-samples.component";
 import {TintedSwatchesComponent} from "../tinted-swatches/tinted-swatches.component";
 // import {ThemesLibModule} from "themes-lib";
@@ -21,6 +22,7 @@ import {TintedSwatchesComponent} from "../tinted-swatches/tinted-swatches.compon
     IonicModule,
     ThemeDemoPageRoutingModule,
     ChipComponent,
+    HeaderComponent,
   ],
   exports: [
     ThemeConfigComponent,
