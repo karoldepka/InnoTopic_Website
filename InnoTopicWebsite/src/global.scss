@@ -62,6 +62,29 @@ html, body {
     position: static !important;
     contain: none !important;
   }
+
+  // Prevent SVGs and their containers from being cut across page boundaries
+  svg {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  app-topic-logo,
+  app-flags,
+  app-world-map,
+  app-topics-graph,
+  app-topic-logos-list {
+    break-inside: avoid;
+    page-break-inside: avoid;
+    display: inline-block;
+  }
+
+  // Rows/sections containing icons or graphics should stay together
+  .overview > div,
+  section.container {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
 }
 
 //
