@@ -29,22 +29,38 @@
 //
 //
 html, body {
-  overflow: scroll !important;
+  overflow: auto !important;
   //height: 100% !important; /* this is causing no scroll on PDF print */
 }
 
 @media print {
-  html, body, app-root, ion-router-outlet, ion-content {
-    overflow: hidden !important;
-    height: auto !important; // FOR PDF Print 2024
-    max-height: max-content !important;
+  ion-header {
+    display: none !important;
+  }
 
-    // === hide scrollbar:
-    scrollbar-width: none; /* Firefox */
-    -ms-overflow-style: none; /* IE 10+ */
-    .scrollable::-webkit-scrollbar {
-      display: none; /* Chrome, Safari, and Opera */
-    }
+  html, body, app-root, ion-router-outlet {
+    overflow: visible !important;
+    height: auto !important;
+    max-height: none !important;
+    position: static !important;
+  }
+
+  ion-content {
+    display: block !important;
+    position: static !important;
+    height: auto !important;
+    max-height: none !important;
+    overflow: visible !important;
+    --overflow: visible;
+    contain: none !important;
+  }
+
+  // Override ion-content's shadow DOM scroll container
+  ion-content::part(scroll) {
+    overflow: visible !important;
+    height: auto !important;
+    position: static !important;
+    contain: none !important;
   }
 }
 

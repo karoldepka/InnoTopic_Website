@@ -19,7 +19,7 @@ export class ThemeConfigEffects {
         // concatLatestFrom
         tap((action) => {
           const storeVal = action // FIXME
-          console.log(`action`, action)
+          // console.log(`action`, action)
           const root = document.documentElement.style;
           for (const [key, value] of Object.entries(action)) {
             // const variable = `--${key.replace('_', '-')}`;
@@ -81,7 +81,7 @@ export class ThemeConfigEffects {
         ofType(updateThemeConfig),
         throttleTime(1000, undefined, {leading: true, trailing: true}),
         tap((action) => {
-          console.log('setLocalStorage$ action: ', action)
+          // console.log('setLocalStorage$ action: ', action)
           // FIXME: store entire config, not just patch (action)
           localStorage.setItem('theme_config', JSON.stringify(action));
         }),
