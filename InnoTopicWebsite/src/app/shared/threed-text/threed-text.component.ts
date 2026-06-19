@@ -8,6 +8,10 @@ import { ThemeConfigState } from '../../models/theme-config-state.model';
   selector: 'app-three-d-text',
   imports: [AsyncPipe],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
+  styles: [`:host {
+    display: block;
+    margin: 20px 0 10px;
+  }`],
   template: `
     <threed-text
       [attr.primary-color]="primaryColor$ | async"
