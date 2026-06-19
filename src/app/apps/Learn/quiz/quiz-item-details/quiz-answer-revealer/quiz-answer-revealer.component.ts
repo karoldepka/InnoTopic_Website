@@ -1,10 +1,12 @@
-import {Component, Input, OnInit} from '@angular/core';
+import {Component, Input, OnInit, ChangeDetectionStrategy} from '@angular/core';
 import {FormControl} from '@angular/forms'
 import {stripHtml} from '../../../../../libs/AppFedShared/utils/html-utils'
 
 @Component({
+  standalone: false,
   selector: 'app-quiz-answer-revealer',
   templateUrl: './quiz-answer-revealer.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./quiz-answer-revealer.component.scss'],
 })
 export class QuizAnswerRevealerComponent implements OnInit {

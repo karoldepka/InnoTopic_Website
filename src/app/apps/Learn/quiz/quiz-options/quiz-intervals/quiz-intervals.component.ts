@@ -1,12 +1,14 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import {QuizService} from '../../../core/quiz/quiz.service'
 import {ImportanceDescriptor, importanceDescriptors, importanceDescriptorsArray} from '../../../models/fields/importance.model'
 import {ImportanceVal} from '../../../models/LearnItem'
 import {SelfRating} from '../../../models/fields/self-rating.model'
 
 @Component({
+  standalone: false,
   selector: 'app-quiz-intervals',
   templateUrl: './quiz-intervals.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./quiz-intervals.component.sass'],
 })
 export class QuizIntervalsComponent implements OnInit {

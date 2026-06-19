@@ -1,6 +1,6 @@
 <div
   style="display: flex; align-items: center; cursor: pointer; border-radius: 3px; padding: 1px; margin-right: 2px;"
-  [ngClass]="{timeTrackingNow: (timeTrackVal$ | async)?.isTrackingNow}"
+  [ngClass]="{timeTrackingNow: $safeNavigationMigration((timeTrackVal$ | async)?.isTrackingNow)}"
 >
 
   <!--  val json: {{(timeTrackVal$ | async) | json}}-->
@@ -38,7 +38,7 @@
         (((config$ | async)?.showTimeTrackedValue || toolBarMode )
         && (timeTrackVal$ | async)?.wasTracked)
         || (timeTrackVal$ | async)?.isTrackingNow"
-    [referenceTime]="(timeTrackVal$ | async)?.whenFirstStarted"
+    [referenceTime]="$safeNavigationMigration((timeTrackVal$ | async)?.whenFirstStarted)"
     [pausableEntry]="timeTrackedEntry"
     [isCountDown]="false"
   ></app-time-passing>
@@ -50,8 +50,8 @@
   <ng-container
     *ngIf="debugService.isDebug$.lastVal"
   >
-    tt entry: {{(timeTrackVal$ | async)?.isTrackingNow | json}}
-    tt start: {{(timeTrackVal$ | async)?.whenFirstStarted | json}}
+    tt entry: {{$safeNavigationMigration((timeTrackVal$ | async)?.isTrackingNow) | json}}
+    tt start: {{$safeNavigationMigration((timeTrackVal$ | async)?.whenFirstStarted) | json}}
     tt json: {{(timeTrackVal$ | async) | json}}
   </ng-container>
 

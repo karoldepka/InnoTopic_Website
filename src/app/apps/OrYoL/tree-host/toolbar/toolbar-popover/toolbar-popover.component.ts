@@ -2,6 +2,7 @@ import {
   Component,
   Input,
   OnInit,
+  ChangeDetectionStrategy
 } from '@angular/core';
 import { TreeHostComponent } from '../../tree-host/tree-host.component'
 import { DebugService } from '../../../core/debug.service'
@@ -16,8 +17,10 @@ import {
 import { debugLog } from '../../../utils/log'
 
 @Component({
+  standalone: false,
   selector: 'app-toolbar-popover',
   templateUrl: './toolbar-popover.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./toolbar-popover.component.sass']
 })
 export class ToolbarPopoverComponent implements OnInit {

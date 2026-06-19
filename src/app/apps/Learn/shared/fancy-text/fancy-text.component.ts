@@ -1,8 +1,10 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 
 @Component({
+  standalone: false,
   selector: 'app-fancy-text',
   templateUrl: './fancy-text.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./fancy-text.component.sass'],
 })
 export class FancyTextComponent implements OnInit {

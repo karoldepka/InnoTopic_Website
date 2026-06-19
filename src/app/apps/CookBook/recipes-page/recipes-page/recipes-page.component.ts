@@ -1,10 +1,12 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import {RecipesService} from "../recipes/recipes.service";
 import {Recipe} from "../recipes/Recipe";
 
 @Component({
+  standalone: false,
   selector: 'app-recipes-page',
   templateUrl: './recipes-page.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./recipes-page.component.sass'],
 })
 export class RecipesPageComponent implements OnInit {

@@ -8,6 +8,7 @@ import {nullish} from '../../../../libs/AppFedShared/utils/type-utils'
 import {Required} from '../../../../libs/AppFedShared/utils/angular/Required.decorator'
 
 @Component({
+  standalone: false,
   selector: 'app-journal-text-fields-view',
   templateUrl: './journal-text-fields-view.component.html',
   styleUrls: ['./journal-text-fields-view.component.sass'],

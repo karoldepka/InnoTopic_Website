@@ -16,7 +16,7 @@
 
   <app-item-side-editor
     [item$]="item$ !"
-    [side]="(itemVal$ ! | async) ?. getSideWithQuestionOrFirstNonEmpty()"
+    [side]="$safeNavigationMigration((itemVal$ ! | async) ?. getSideWithQuestionOrFirstNonEmpty())"
    />
 
   <div

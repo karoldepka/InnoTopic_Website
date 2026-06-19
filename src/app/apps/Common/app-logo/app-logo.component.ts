@@ -1,9 +1,11 @@
-import {Component, Input, OnInit} from '@angular/core';
+import {Component, Input, OnInit, ChangeDetectionStrategy} from '@angular/core';
 import {Router} from '@angular/router'
 
 @Component({
+  standalone: false,
   selector: 'app-app-logo',
   templateUrl: './app-logo.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./app-logo.component.sass'],
 })
 export class AppLogoComponent implements OnInit {

@@ -1,4 +1,4 @@
-import {Component, Injector, Input, OnInit} from '@angular/core';
+import {Component, Injector, Input, OnInit, ChangeDetectionStrategy} from '@angular/core';
 import {QuizService} from '../../core/quiz/quiz.service'
 import {NumericPickerVal} from '../../../../libs/AppFedSharedIonic/ratings/numeric-picker/numeric-picker.component'
 import {LearnItem$} from '../../models/LearnItem$'
@@ -10,8 +10,10 @@ import {requestNextQuizItem} from '../../core/quiz/quiz.actions'
 import {BaseComponent} from '../../../../libs/AppFedShared/base/base.component'
 
 @Component({
+  standalone: false,
   selector: 'app-show-answer-and-rate',
   templateUrl: './show-answer-and-rate.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./show-answer-and-rate.component.sass'],
 })
 export class ShowAnswerAndRateComponent extends BaseComponent implements OnInit {

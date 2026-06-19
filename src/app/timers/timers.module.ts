@@ -12,6 +12,7 @@ import {TimeLeftOrDurationComponent} from "./time-left-or-duration/time-left-or-
 import {TimeModule} from "../libs/AppFedShared/time/time.module";
 import {TimeIonicModule} from "../libs/AppFedSharedIonic/time/time-ionic.module";
 import {OdmModule} from '../libs/AppFedShared/odm/odm.module'
+import {JournalEntryListItemModule} from './timers-list/journal-entry-list-item/journal-entry-list-item.module'
 
 @NgModule({
     imports: [
@@ -23,6 +24,7 @@ import {OdmModule} from '../libs/AppFedShared/odm/odm.module'
         TimeModule,
         TimeIonicModule,
         OdmModule,
+        JournalEntryListItemModule,
     ],
     declarations: [
         TimersPageComponent,

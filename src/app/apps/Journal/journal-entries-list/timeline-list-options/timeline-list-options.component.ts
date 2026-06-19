@@ -1,4 +1,4 @@
-import {Component, Input, OnInit} from '@angular/core';
+import {Component, Input, OnInit, ChangeDetectionStrategy} from '@angular/core';
 import {Required} from '../../../../libs/AppFedShared/utils/angular/Required.decorator'
 import {PatchableObservable} from '../../../../libs/AppFedShared/utils/rxUtils'
 import {createViewSyncerForField, ViewSyncer} from '../../../../libs/AppFedShared/odm/ui/ViewSyncer'
@@ -9,8 +9,10 @@ import {OdmService2} from '../../../../libs/AppFedShared/odm/OdmService2'
 import {errorAlert} from '../../../../libs/AppFedShared/utils/log'
 
 @Component({
+  standalone: false,
   selector: 'app-timeline-list-options',
   templateUrl: './timeline-list-options.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./timeline-list-options.component.sass'],
 })
 export class TimelineListOptionsComponent implements OnInit {

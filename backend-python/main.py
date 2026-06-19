@@ -8,13 +8,22 @@ from html.parser import HTMLParser
 from typing import Any
 from urllib.parse import urlencode
 from urllib.request import Request, urlopen
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Query
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel, Field
 from dotenv import load_dotenv
 from langchain_ollama import ChatOllama
 from langchain_core.prompts import ChatPromptTemplate
 from fastapi.middleware.cors import CORSMiddleware
+
+try:
+    import psycopg
+    from psycopg.rows import dict_row
+    from psycopg.types.json import Jsonb
+except ImportError:
+    psycopg = None
+    dict_row = None
+    Jsonb = None
 
 load_dotenv()
 
@@ -95,6 +104,19 @@ class AgUiRunInput(BaseModel):
     tools: list[Any] = []
     context: list[Any] = []
     forwardedProps: Any = None
+
+class OdmSaveRequest(BaseModel):
+    owner: str
+    data: dict[str, Any] = Field(default_factory=dict)
+    parentIds: list[str] = Field(default_factory=list)
+    ancestorIds: list[str] = Field(default_factory=list)
+    storeVersionHistory: bool = True
+
+class OdmDeleteRequest(BaseModel):
+    owner: str
+
+class OdmItemsResponse(BaseModel):
+    items: list[dict[str, Any]]
 
 # Initialize Ollama LLM
 # Assumes llama3.2 is available on localhost:11434.
@@ -870,6 +892,168 @@ def build_question_answer_record_response(
     if not items:
         return build_question_answer_response(response_content, search_results, generation_requests)
     return QuestionAnswerResponse(items=items, modelName=OLLAMA_MODEL, searchResults=search_results)
+
+def get_odm_database_url() -> str:
+    database_url = os.getenv("NEON_DATABASE_URL") or os.getenv("DATABASE_URL")
+    if not database_url:
+        raise HTTPException(status_code=500, detail="Missing NEON_DATABASE_URL or DATABASE_URL")
+    return database_url
+
+def connect_odm_db():
+    if psycopg is None:
+        raise HTTPException(status_code=500, detail="Install psycopg[binary] to use the Neon ODM API")
+    return psycopg.connect(get_odm_database_url(), row_factory=dict_row)
+
+def ensure_odm_tables_if_requested() -> None:
+    if os.getenv("LIFESUITE_ODM_AUTO_MIGRATE", "").lower() not in {"1", "true", "yes"}:
+        return
+    schema_sql = """
+    create table if not exists public.lifesuite_odm_items (
+      collection text not null,
+      item_id text not null,
+      owner text not null,
+      data jsonb not null default '{}'::jsonb,
+      parent_ids text[] not null default '{}',
+      ancestor_ids text[] not null default '{}',
+      when_last_modified timestamptz not null default now(),
+      when_deleted timestamptz,
+      primary key (collection, item_id)
+    );
+    create index if not exists lifesuite_odm_items_owner_collection_modified_idx
+      on public.lifesuite_odm_items (owner, collection, when_last_modified desc);
+    create index if not exists lifesuite_odm_items_parent_ids_idx
+      on public.lifesuite_odm_items using gin (parent_ids);
+    create index if not exists lifesuite_odm_items_ancestor_ids_idx
+      on public.lifesuite_odm_items using gin (ancestor_ids);
+    create table if not exists public.lifesuite_odm_item_history (
+      history_id text primary key,
+      collection text not null,
+      item_id text not null,
+      owner text not null,
+      data jsonb not null default '{}'::jsonb,
+      parent_ids text[] not null default '{}',
+      ancestor_ids text[] not null default '{}',
+      snapshot_at timestamptz not null default now()
+    );
+    create index if not exists lifesuite_odm_item_history_item_idx
+      on public.lifesuite_odm_item_history (owner, collection, item_id, snapshot_at desc);
+    """
+    with connect_odm_db() as conn:
+        with conn.cursor() as cursor:
+            cursor.execute(schema_sql)
+
+def odm_row_to_response(row: dict[str, Any]) -> dict[str, Any]:
+    return {
+        "collection": row["collection"],
+        "item_id": row["item_id"],
+        "owner": row["owner"],
+        "data": row["data"],
+        "parent_ids": row.get("parent_ids") or [],
+        "ancestor_ids": row.get("ancestor_ids") or [],
+        "when_deleted": row.get("when_deleted").isoformat() if row.get("when_deleted") else None,
+        "when_last_modified": row.get("when_last_modified").isoformat() if row.get("when_last_modified") else None,
+    }
+
+@app.get("/api/odm/items", response_model=OdmItemsResponse)
+def list_odm_items(
+    collection: str,
+    owner: str,
+    limit: int | None = Query(default=None, ge=1, le=1000),
+    parentId: str | None = None,
+    ancestorId: str | None = None,
+):
+    ensure_odm_tables_if_requested()
+    where_clauses = ["collection = %s", "owner = %s", "when_deleted is null"]
+    params: list[Any] = [collection, owner]
+
+    if parentId:
+        where_clauses.append("parent_ids @> array[%s]::text[]")
+        params.append(parentId)
+    if ancestorId:
+        where_clauses.append("ancestor_ids @> array[%s]::text[]")
+        params.append(ancestorId)
+
+    limit_sql = ""
+    if limit is not None:
+        limit_sql = " limit %s"
+        params.append(limit)
+
+    sql = f"""
+      select collection, item_id, owner, data, parent_ids, ancestor_ids, when_deleted, when_last_modified
+      from public.lifesuite_odm_items
+      where {' and '.join(where_clauses)}
+      order by when_last_modified desc
+      {limit_sql}
+    """
+
+    with connect_odm_db() as conn:
+        with conn.cursor() as cursor:
+            cursor.execute(sql, params)
+            rows = cursor.fetchall()
+    return OdmItemsResponse(items=[odm_row_to_response(row) for row in rows])
+
+@app.put("/api/odm/items/{collection}/{item_id}")
+def save_odm_item(collection: str, item_id: str, request: OdmSaveRequest):
+    ensure_odm_tables_if_requested()
+    history_id = f"{item_id}_{uuid.uuid4()}"
+
+    with connect_odm_db() as conn:
+        with conn.cursor() as cursor:
+            if request.storeVersionHistory:
+                cursor.execute(
+                    """
+                    insert into public.lifesuite_odm_item_history
+                      (history_id, collection, item_id, owner, data, parent_ids, ancestor_ids)
+                    values (%s, %s, %s, %s, %s, %s, %s)
+                    """,
+                    (
+                        history_id,
+                        collection,
+                        item_id,
+                        request.owner,
+                        Jsonb(request.data),
+                        request.parentIds,
+                        request.ancestorIds,
+                    ),
+                )
+            cursor.execute(
+                """
+                insert into public.lifesuite_odm_items
+                  (collection, item_id, owner, data, parent_ids, ancestor_ids, when_last_modified, when_deleted)
+                values (%s, %s, %s, %s, %s, %s, now(), null)
+                on conflict (collection, item_id) do update set
+                  owner = excluded.owner,
+                  data = excluded.data,
+                  parent_ids = excluded.parent_ids,
+                  ancestor_ids = excluded.ancestor_ids,
+                  when_last_modified = now(),
+                  when_deleted = null
+                """,
+                (
+                    collection,
+                    item_id,
+                    request.owner,
+                    Jsonb(request.data),
+                    request.parentIds,
+                    request.ancestorIds,
+                ),
+            )
+    return {"ok": True}
+
+@app.post("/api/odm/items/{collection}/{item_id}/delete")
+def delete_odm_item(collection: str, item_id: str, request: OdmDeleteRequest):
+    ensure_odm_tables_if_requested()
+    with connect_odm_db() as conn:
+        with conn.cursor() as cursor:
+            cursor.execute(
+                """
+                update public.lifesuite_odm_items
+                set when_deleted = now(), when_last_modified = now()
+                where collection = %s and item_id = %s and owner = %s
+                """,
+                (collection, item_id, request.owner),
+            )
+    return {"ok": True}
 
 @app.get("/categories/existing")
 @app.get("/ai-api/categories/existing")

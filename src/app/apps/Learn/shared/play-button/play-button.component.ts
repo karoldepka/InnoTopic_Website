@@ -4,6 +4,7 @@ import {AngularFirestore} from '@angular/fire/compat/firestore'
 import {LearnItem$} from '../../models/LearnItem$'
 
 @Component({
+  standalone: false,
   selector: 'app-play-button',
   templateUrl: './play-button.component.html',
   styleUrls: ['./play-button.component.sass'],

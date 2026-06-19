@@ -4,6 +4,7 @@ import {
   Input,
   OnInit,
   ViewChild,
+  ChangeDetectionStrategy
 } from '@angular/core';
 import { CellComponent } from '../CellComponent'
 import { NodeContentComponent } from '../../node-content/node-content.component'
@@ -14,8 +15,10 @@ import {setCaretOnContentEditable} from '../../../../../libs/AppFedShared/utils/
 import {nullish} from '../../../../../libs/AppFedShared/utils/type-utils'
 
 @Component({
+  standalone: false,
   selector: 'app-contenteditable-cell',
   templateUrl: './contenteditable-cell.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./contenteditable-cell.component.sass'],
 })
 export class ContenteditableCellComponent extends CellComponent implements OnInit {

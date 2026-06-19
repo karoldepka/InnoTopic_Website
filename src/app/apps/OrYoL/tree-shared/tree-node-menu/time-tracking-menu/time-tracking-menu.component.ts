@@ -2,6 +2,7 @@ import {
   Component,
   Input,
   OnInit,
+  ChangeDetectionStrategy
 } from '@angular/core';
 import {
   date,
@@ -19,8 +20,10 @@ import {ApfBaseTreeNode, OryBaseTreeNode} from '../../../tree-model/TreeModel'
 // }
 
 @Component({
+  standalone: false,
   selector: 'app-time-tracking-menu',
   templateUrl: './time-tracking-menu.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./time-tracking-menu.component.scss']
 })
 export class TimeTrackingMenuComponent implements OnInit {

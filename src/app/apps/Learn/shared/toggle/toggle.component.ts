@@ -1,9 +1,11 @@
-import {Component, Input, OnInit} from '@angular/core';
+import {Component, Input, OnInit, ChangeDetectionStrategy} from '@angular/core';
 import {OptionsService} from '../../core/options.service'
 
 @Component({
+  standalone: false,
   selector: 'app-toggle',
   templateUrl: './toggle.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./toggle.component.sass'],
 })
 export class ToggleComponent implements OnInit {

@@ -1,12 +1,14 @@
-import {Component, Input, OnInit} from '@angular/core';
+import {Component, Input, OnInit, ChangeDetectionStrategy} from '@angular/core';
 import {DomSanitizer} from '@angular/platform-browser'
 import {convertToHtmlIfNeeded} from '../../utils/html-utils'
 import {nullish} from '../../utils/type-utils'
 
 
 @Component({
+  standalone: false,
   selector: 'app-rich-text-view',
   templateUrl: './rich-text-view.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./rich-text-view.component.sass'],
 })
 export class RichTextViewComponent implements OnInit {

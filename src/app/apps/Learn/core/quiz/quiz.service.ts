@@ -69,7 +69,7 @@ export class QuizService {
   nextItemRequests$ = new CachedSubject<void>()
 
   /** TODO make into a member field to ensure no-one calls this spuriously by accident */
-  readonly quizStatus$: Observable<QuizStatus> = combineLatest(
+  readonly quizStatus$: Observable<QuizStatus> = combineLatest([
     // TODO:  take into account: this.isWaitingForNextItem = true ; and set to false once new item provided; might need to change approach to a more pull-based
     // https://stackoverflow.com/questions/50276165/combinelatest-deprecated-in-favor-of-static-combinelatest
     this.options$,
@@ -79,11 +79,11 @@ export class QuizService {
         // also anything using `localItems$.pipe` is suspicious
       throttleTimeWithLeadingTrailing_ReallyThrottle(secondsAsMs(1))) as Observable<LearnItem$[]>
     ),
-    combineLatest(
+    combineLatest([
       timer(0, secondsAsMs(60) /* FIXME make the timer longer for performance/battery */),
       this.nextItemRequests$,
-    ),
-    (quizOptions: QuizOptions, item$s: LearnItem$[]) => {
+    ]),
+  ]).pipe(map(([quizOptions, item$s]) => {
       // debugLog(`quizStatus$ combineLatest; FIXME this runs multiple times; use smth like publish() / shareReplay`)
       item$s = this.filterByOptions(quizOptions, item$s)
 
@@ -110,8 +110,8 @@ export class QuizService {
 
       // return minBy(item$s,
       //   (item$: LearnItem$) => this.calculateWhenNextRepetitionMsEpoch(item$, quizOptions.dePrioritizeNewMaterial))
-    },
-  ).pipe(shareReplay(1))
+    }
+  ), shareReplay(1))
 
 
   private calculatePendingItemsTodayCount(item$s: LearnItem$[]) {

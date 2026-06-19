@@ -1,8 +1,10 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 
 @Component({
+  standalone: false,
   selector: 'app-test-virtual-scroll',
   templateUrl: './test-virtual-scroll.page.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./test-virtual-scroll.page.scss'],
 })
 export class TestVirtualScrollPage implements OnInit {

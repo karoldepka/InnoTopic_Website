@@ -2,6 +2,7 @@ import {
   Component,
   Input,
   OnInit,
+  ChangeDetectionStrategy
 } from '@angular/core';
 
 import {OryBaseTreeNode, OryNonRootTreeNode} from '../../../tree-model/TreeModel'
@@ -12,8 +13,10 @@ export class NodeDebug {
 }
 
 @Component({
+  standalone: false,
   selector: 'app-node-debug-cell',
   templateUrl: './node-debug-cell.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./node-debug-cell.component.sass']
 })
 export class NodeDebugCellComponent implements OnInit {

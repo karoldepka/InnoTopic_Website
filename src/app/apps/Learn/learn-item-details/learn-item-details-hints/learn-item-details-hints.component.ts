@@ -1,8 +1,10 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 
 @Component({
+  standalone: false,
   selector: 'app-learn-item-details-hints',
   templateUrl: './learn-item-details-hints.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./learn-item-details-hints.component.scss'],
 })
 export class LearnItemDetailsHintsComponent implements OnInit {

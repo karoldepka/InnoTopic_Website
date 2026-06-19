@@ -6,6 +6,7 @@ import {
   Injector,
   Input,
   OnInit,
+  ChangeDetectionStrategy
 } from '@angular/core'
 import { ColumnCell } from '../node-content/Cells'
 import { NodeContentComponent } from '../node-content/node-content.component'
@@ -15,8 +16,10 @@ import {
 import {nullish} from '../../../../libs/AppFedShared/utils/type-utils'
 
 @Component({
+  standalone: false,
   selector: 'zzz-app-abstract-node-cell',
   template: '',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: []
 })
 export abstract class CellComponent implements OnInit {
@@ -57,7 +60,7 @@ export abstract class CellComponent implements OnInit {
     // console.log(this.injector.get(ElementRef))
   }
 
-  @HostListener('focusin', ['$event'])
+  @HostListener('focusin')
   onFocusIn() {
     this.nodeContentComponent.onColumnFocused(this.column, null)
   }

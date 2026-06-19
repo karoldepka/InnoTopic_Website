@@ -20,6 +20,10 @@ export class MigrateImgBase64Service {
 
   async processLearnItems(): Promise<void> {
     const learnItems = await this.firestore.collection('LearnItem').get().toPromise();
+    if (!learnItems) {
+      console.warn('No LearnItem documents returned for base64 migration.');
+      return;
+    }
     const totalDocuments = learnItems.docs.length;
     let totalSizeInBytes = 0;
     let totalSizeSaved = 0;

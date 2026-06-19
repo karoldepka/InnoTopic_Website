@@ -1,4 +1,4 @@
-import {Component, Input, OnInit} from '@angular/core';
+import {Component, Input, OnInit, ChangeDetectionStrategy} from '@angular/core';
 import {JournalTextDescriptor, TextDescriptorsFormControlsDict} from '../../../models/JournalTextDescriptors'
 import {UntypedFormControl, UntypedFormGroup} from '@angular/forms'
 import {ViewSyncer} from '../../../../../libs/AppFedShared/odm/ui/ViewSyncer'
@@ -6,8 +6,10 @@ import {JournalEntry} from '../../../models/JournalEntry'
 import {JournalEntry$} from '../../../models/JournalEntry$'
 
 @Component({
+  standalone: false,
   selector: 'app-journal-text-field',
   templateUrl: './journal-text-field.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./journal-text-field.component.sass'],
 })
 export class JournalTextFieldComponent implements OnInit {

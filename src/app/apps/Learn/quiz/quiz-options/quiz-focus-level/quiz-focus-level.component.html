@@ -8,4 +8,4 @@
 >
 </app-slider>
 
-{{ removeQuotes(( (quizStatus$ | async) ?. chooserParams ?. probabilitiesByImportance ) | json) }}
+{{ removeQuotes(( $safeNavigationMigration((quizStatus$ | async) ?. chooserParams ?. probabilitiesByImportance) ) | json) }}

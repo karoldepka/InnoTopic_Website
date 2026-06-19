@@ -1,10 +1,12 @@
-import {Component, Input, OnInit} from '@angular/core';
+import {Component, Input, OnInit, ChangeDetectionStrategy} from '@angular/core';
 import {LearnItem$} from '../../models/LearnItem$'
 import {BehaviorSubject} from 'rxjs'
 
 @Component({
+  standalone: false,
   selector: 'app-item-sub-items',
   templateUrl: './item-sub-items.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./item-sub-items.component.sass'],
 })
 export class ItemSubItemsComponent implements OnInit {

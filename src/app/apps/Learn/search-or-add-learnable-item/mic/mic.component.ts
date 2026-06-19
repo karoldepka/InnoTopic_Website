@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import {UploadService} from '../../core/upload.service'
 import {LearnItemItemsService} from '../../core/learn-item-items.service'
 import {OdmBackend} from '../../../../libs/AppFedShared/odm/OdmBackend'
@@ -7,8 +7,10 @@ import {LearnItem} from '../../models/LearnItem'
 declare const MediaRecorder: any;
 
 @Component({
+  standalone: false,
   selector: 'app-mic',
   templateUrl: './mic.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./mic.component.sass'],
 })
 export class MicComponent implements OnInit {

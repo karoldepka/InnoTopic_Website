@@ -1,4 +1,4 @@
-import {Component, Input, OnInit} from '@angular/core';
+import {Component, Input, OnInit, ChangeDetectionStrategy} from '@angular/core';
 import {SelectionManager} from '../SelectionManager'
 import {ignorePromise} from '../../../../libs/AppFedShared/utils/promiseUtils'
 import {AlertController} from '@ionic/angular'
@@ -38,8 +38,10 @@ export class MultiSelectItem$<TInMem extends OdmInMemItem> implements PatchableO
 /* =============== */
 
 @Component({
+  standalone: false,
   selector: 'app-selection-popup',
   templateUrl: './selection-popup.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./selection-popup.component.sass'],
 })
 export class SelectionPopupComponent implements OnInit {

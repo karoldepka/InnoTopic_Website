@@ -1,11 +1,13 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { AngularFireAuth } from '@angular/fire/compat/auth';
 import { AuthService } from '../auth.service';
 
 @Component({
+  standalone: false,
   selector: 'app-signup-email-password',
   templateUrl: './signup-email-password.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./signup-email-password.component.sass'],
 })
 export class SignupEmailPasswordComponent implements OnInit {

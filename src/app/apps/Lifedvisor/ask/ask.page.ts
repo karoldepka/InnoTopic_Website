@@ -2,6 +2,7 @@ import {
   Component,
   EventEmitter,
   OnInit,
+  ChangeDetectionStrategy
 } from '@angular/core';
 import { debounceTime } from 'rxjs/operators';
 import { HintFinder } from './HintFinder';
@@ -12,8 +13,10 @@ import {Filter} from '../shared-with-testcafe/text_search/Filter';
 import {sortBy} from 'lodash-es';
 
 @Component({
+  standalone: false,
   selector: 'app-ask-page',
   templateUrl: './ask.page.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./ask.page.scss']
 })
 export class AskPage implements OnInit {

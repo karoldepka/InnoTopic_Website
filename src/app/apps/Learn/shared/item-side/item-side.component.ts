@@ -1,4 +1,4 @@
-import {Component, Input, OnInit, ViewChild} from '@angular/core';
+import {Component, Input, OnInit, ViewChild, ChangeDetectionStrategy} from '@angular/core';
 import {Side, sidesDefs, SidesDefs} from '../../core/sidesDefs'
 import {ViewSyncer} from '../../../../libs/AppFedShared/odm/ui/ViewSyncer'
 import {UntypedFormControl, UntypedFormGroup} from '@angular/forms'
@@ -17,8 +17,10 @@ export type SideFormControlsDict = {[key in keyof SidesDefs]: UntypedFormControl
 
 // TODO: escape key to hide toolbar&menu bar
 @Component({
+  standalone: false,
   selector: 'app-item-side-editor',
   templateUrl: './item-side.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./item-side.component.sass'],
 })
 export class ItemSideComponent implements OnInit {

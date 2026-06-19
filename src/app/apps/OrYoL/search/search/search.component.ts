@@ -4,14 +4,17 @@ import {
   ElementRef,
   OnInit,
   ViewChild,
+  ChangeDetectionStrategy
 } from '@angular/core';
 import { SearchService } from '../../core/search.service'
 import { NavigationService } from '../../core/navigation.service'
 
 
 @Component({
+  standalone: false,
   selector: 'app-search',
   templateUrl: './search.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./search.component.sass']
 })
 export class SearchComponent implements OnInit, AfterViewInit {

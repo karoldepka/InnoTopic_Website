@@ -5,6 +5,7 @@ import {LearnItem} from '../../../apps/Learn/models/LearnItem'
 import {JournalEntry} from '../../../apps/Journal/models/JournalEntry'
 
 @Component({
+  standalone: false,
   selector: 'app-journal-entry-list-item',
   templateUrl: './journal-entry-list-item.component.html',
   styleUrls: ['./journal-entry-list-item.component.sass'],

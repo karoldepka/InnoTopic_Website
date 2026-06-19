@@ -1,5 +1,5 @@
-import {Injectable, NgModule} from '@angular/core';
-import {BrowserModule, HAMMER_GESTURE_CONFIG, HammerGestureConfig, HammerModule} from '@angular/platform-browser';
+import {NgModule} from '@angular/core';
+import {BrowserModule} from '@angular/platform-browser';
 import { RouteReuseStrategy } from '@angular/router';
 
 import { IonicModule, IonicRouteStrategy } from '@ionic/angular';
@@ -25,20 +25,6 @@ import {FaIconLibrary} from '@fortawesome/angular-fontawesome';
 // import { ServiceWorkerModule } from '@angular/service-worker';
 import { environment } from '../environments/environment'
 
-// custom configuration Hammerjs
-@Injectable()
-export class HammerConfig extends HammerGestureConfig {
-  override overrides = <any> {
-    // I will only use the swap gesture so
-    // I will deactivate the others to avoid overlaps
-    'pinch': { enable: false },
-    'rotate': { enable: false },
-    press: {
-      time: 1000,
-    }
-  }
-}
-
 const swOpts = {
   enabled: environment.production,
   // Register the ServiceWorker as soon as the application is stable
@@ -58,7 +44,6 @@ console.log(`service worker swOpts`, swOpts)
         CoreModule,
         ShoppingListsModule,
         AngularFireStorageModule, BrowserAnimationsModule,
-        HammerModule,
         DbFirestoreModule,
         HttpClientModule /* Only for primeng tree demo */,
         StoreModule.forRoot({ count: counterReducer }),
@@ -77,10 +62,6 @@ console.log(`service worker swOpts`, swOpts)
         StatusBar,
         SplashScreen,
         { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
-        {
-            provide: HAMMER_GESTURE_CONFIG,
-            useClass: HammerConfig
-        }
         // { provide: RouteReuseStrategy, useClass: }
     ],
     bootstrap: [AppComponent]

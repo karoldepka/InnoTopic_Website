@@ -1,9 +1,11 @@
-import {Component, Input, OnInit} from '@angular/core';
+import {Component, Input, OnInit, ChangeDetectionStrategy} from '@angular/core';
 import {UntypedFormControl} from '@angular/forms'
 
 @Component({
+  standalone: false,
   selector: 'app-slider',
   templateUrl: './slider.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./slider.component.sass'],
 })
 export class SliderComponent implements OnInit {

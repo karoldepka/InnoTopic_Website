@@ -3,6 +3,7 @@ import {Meeting} from "../meetings-models/Meeting";
 import {FormControl, FormGroup} from "@angular/forms";
 
 @Component({
+  standalone: false,
   selector: 'app-meeting-details-page',
   templateUrl: './meeting-details.page.html',
   styleUrls: ['./meeting-details.page.sass'],

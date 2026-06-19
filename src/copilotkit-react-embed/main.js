@@ -234,7 +234,7 @@ function ChatMessage({ message }) {
 function CategoryNodeEditor({ node, depth, onRename, onCountChange, onAddChild, onDelete }) {
   return React.createElement(
     'div',
-    { className: 'category-node', style: { '--depth': depth } },
+    { className: 'category-node stream-enter', style: { '--depth': depth } },
     React.createElement(
       'div',
       { className: 'category-row' },
@@ -404,7 +404,7 @@ function QuestionPreview({
           const answerVisible = showAnswers || expandedAnswerKeys.includes(answerKey);
           return React.createElement(
             'article',
-            { className: 'question-card', key: answerKey },
+            { className: 'question-card stream-enter', key: answerKey },
             React.createElement('div', { className: 'question-path' }, item.categoryPath || item.categoryId),
             React.createElement(
               'div',

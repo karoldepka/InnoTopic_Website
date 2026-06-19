@@ -3,6 +3,7 @@ import {LiHint, LiHintImpl} from '../../../shared-with-testcafe/Hint'
 import {DomSanitizer} from '@angular/platform-browser'
 
 @Component({
+  standalone: false,
   selector: 'app-hint-embed-media',
   templateUrl: './hint-embed-media.component.html',
   styleUrls: ['./hint-embed-media.component.scss'],

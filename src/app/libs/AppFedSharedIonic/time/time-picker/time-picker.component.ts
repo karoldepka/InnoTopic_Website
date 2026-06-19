@@ -1,9 +1,11 @@
-import {Component, EventEmitter, Input, OnInit, Output,} from '@angular/core';
+import {Component, EventEmitter, Input, OnInit, Output, ChangeDetectionStrategy} from '@angular/core';
 import {PickerController} from "@ionic/angular";
 
 @Component({
+  standalone: false,
   selector: 'app-time-picker',
   templateUrl: './time-picker.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./time-picker.component.scss'],
 })
 export class TimePickerComponent implements OnInit {

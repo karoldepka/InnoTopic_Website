@@ -34,10 +34,10 @@ export class CachedSubject<T> extends Subject<T> {
     return this.next(val)
   }
 
-  public override _subscribe(subscriber: Subscriber<T>): Subscription {
-    const subscription = super._subscribe(subscriber);
+  public _subscribe(subscriber: Subscriber<T>): Subscription {
+    const subscription = (Subject.prototype as any)._subscribe.call(this, subscriber) as Subscription;
     if ( this.hasEmitted ) {
-      subscriber.next(this.lastVal)
+      subscriber.next(this.lastVal as T)
     }
     this.onSubscribeCallBack ?. (subscriber)
     return subscription;

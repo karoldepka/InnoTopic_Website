@@ -1,7 +1,4 @@
-import {
-  BrowserModule,
-  HAMMER_GESTURE_CONFIG,
-} from '@angular/platform-browser';
+import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 
 import { AppComponent } from './app.component';
@@ -16,7 +13,6 @@ import { TestComponentInstanceChangingOnInputValueChangeComponent } from './expe
 
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { fas } from '@fortawesome/free-solid-svg-icons';
-import { MyHammerConfig } from './my-hammer-config';
 import { OryolSharedModule } from './shared/oryol-shared.module'
 import { routingModule } from './app.routing';
 import { ServiceWorkerModule } from '@angular/service-worker';
@@ -46,10 +42,6 @@ library.add(fas);
   providers: [
     // TreeDragDropService,
     DialogService,
-    {
-      provide: HAMMER_GESTURE_CONFIG,
-      useClass: MyHammerConfig
-    }
   ],
   bootstrap: [AppComponent]
 })

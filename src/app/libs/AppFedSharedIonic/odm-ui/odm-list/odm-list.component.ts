@@ -1,4 +1,4 @@
-import {Component, ContentChild, Input, OnInit, TemplateRef} from '@angular/core';
+import {Component, ContentChild, Input, OnInit, TemplateRef, ChangeDetectionStrategy} from '@angular/core';
 import {OdmService_OLD} from "../../../AppFedShared/odm/OdmService_OLD";
 import {OdmItem__OLD__} from "../../../AppFedShared/odm/OdmItem__OLD__";
 import {OdmListItemDirective} from "./odm-list-item.directive";
@@ -6,8 +6,10 @@ import {OdmListItemDirective} from "./odm-list-item.directive";
 type TItem = OdmItem__OLD__<any>
 
 @Component({
+  standalone: false,
   selector: 'app-odm-list',
   templateUrl: './odm-list.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./odm-list.component.sass'],
 })
 export class OdmListComponent implements OnInit /* could extend non-ionic OdmListComponent */{

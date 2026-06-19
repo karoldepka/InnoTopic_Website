@@ -1,22 +1,13 @@
-import {Component, Input, OnInit} from '@angular/core';
+import {Component, Input, OnInit, ChangeDetectionStrategy} from '@angular/core';
 import {UntypedFormControl, UntypedFormGroup} from '@angular/forms'
 import {ViewSyncer} from '../../../AppFedShared/odm/ui/ViewSyncer'
-import {LearnItem$} from '../../../../apps/Learn/models/LearnItem$'
 import {Required} from '../../../AppFedShared/utils/angular/Required.decorator'
-import {btn, btnVariant, ButtonsDescriptor} from '../../../AppFedSharedIonic/ratings/numeric-picker/numeric-picker.component'
-import {ImportanceDescriptor, ImportanceDescriptors, importanceDescriptors, importanceDescriptorsArray} from '../../../../apps/Learn/models/fields/importance.model'
+import {btn, ButtonsDescriptor} from '../../../AppFedSharedIonic/ratings/numeric-picker/numeric-picker.component'
+import {importanceDescriptors} from '../../../../apps/Learn/models/fields/importance.model'
 import {PatchableObservable} from '../../../AppFedShared/utils/rxUtils'
 import {LearnItem} from '../../../../apps/Learn/models/LearnItem'
 import {nullish} from '../../../AppFedShared/utils/type-utils'
-
-export function intensityBtnVariant(label: string, descr: any) {
-  return btnVariant({
-    value: descr /* FIXME*/,
-    label: label,
-    subLabel: descr.id.replace(/_/g, ` `),
-    id: descr.id,
-  })
-}
+import {intensityBtnVariant} from '../descriptor-level-edit'
 
 const importanceButtonsDesc = new ButtonsDescriptor<any, string>([
   btn({
@@ -86,8 +77,10 @@ const importanceButtonsDesc = new ButtonsDescriptor<any, string>([
 
 
 @Component({
+  standalone: false,
   selector: 'app-importance-edit',
   templateUrl: './importance-edit.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./importance.component.sass'],
 })
 export class ImportanceEditComponent implements OnInit {

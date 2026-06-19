@@ -1,4 +1,4 @@
-import {Component, Injector, OnInit} from '@angular/core';
+import {Component, Injector, OnInit, ChangeDetectionStrategy} from '@angular/core';
 import {ThemeService} from './theme.service'
 import {BaseComponent} from '../base/base.component'
 import {Theme, ThemeId} from './themes.data'
@@ -6,8 +6,10 @@ import {Theme, ThemeId} from './themes.data'
 
 
 @Component({
+  standalone: false,
   selector: 'app-theme-config',
   templateUrl: './theme-config.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./theme-config.component.sass'],
 })
 export class ThemeConfigComponent extends BaseComponent implements OnInit {

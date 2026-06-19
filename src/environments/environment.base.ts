@@ -7,6 +7,21 @@ export const environmentBase = {
   collectionNameSuffix: '',
   // collectionNameSuffix: '_DEBUG',
 
+  odmBackend: 'firestore',
+
+  supabase: {
+    url: '',
+    publishableKey: '',
+    schema: 'public',
+    odmItemsTable: 'lifesuite_odm_items',
+    odmHistoryTable: 'lifesuite_odm_item_history',
+  },
+
+  neon: {
+    odmApiUrl: 'http://localhost:8000/api/odm',
+    pollIntervalMs: 5000,
+  },
+
   showExperimentalThemes: true,
   firebaseConfig: {
     projectId: 'cloudtime-app',

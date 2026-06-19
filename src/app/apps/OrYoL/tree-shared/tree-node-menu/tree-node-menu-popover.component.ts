@@ -2,6 +2,7 @@ import {
   Component,
   Input,
   OnInit,
+  ChangeDetectionStrategy
 } from '@angular/core';
 import { TreeHostComponent } from '../../tree-host/tree-host/tree-host.component'
 import { DialogService } from '../../core/dialog.service'
@@ -22,8 +23,10 @@ import {ApfNonRootTreeNode} from '../../tree-model/TreeNode'
 
 
 @Component({
+  standalone: false,
   selector: 'app-tree-node-menu-popover',
   templateUrl: './tree-node-menu-popover.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./tree-node-menu-popover.component.sass']
 })
 export class TreeNodeMenuPopoverComponent implements OnInit {

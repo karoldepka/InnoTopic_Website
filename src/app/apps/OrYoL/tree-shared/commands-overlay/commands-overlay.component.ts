@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommandsService } from '../../core/commands.service'
 
 @Component({
+  standalone: false,
   selector: 'app-commands-overlay',
   templateUrl: './commands-overlay.component.html',
   styleUrls: ['./commands-overlay.component.scss']

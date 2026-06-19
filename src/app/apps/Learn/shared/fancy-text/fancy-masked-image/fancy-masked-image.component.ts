@@ -1,8 +1,10 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 
 @Component({
+  standalone: false,
   selector: 'app-fancy-masked-image',
   templateUrl: './fancy-masked-image.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./fancy-masked-image.component.sass'],
 })
 export class FancyMaskedImageComponent implements OnInit {

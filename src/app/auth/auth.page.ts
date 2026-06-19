@@ -1,10 +1,12 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { AuthService } from './auth.service';
 import { Router } from '@angular/router';
 
 @Component({
+  standalone: false,
   selector: 'app-auth',
   templateUrl: './auth.page.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./auth.page.scss'],
 })
 export class AuthPage implements OnInit {

@@ -1,6 +1,7 @@
 import {
   Component,
   OnInit,
+  ChangeDetectionStrategy
 } from '@angular/core';
 import { TreeDragDropService } from 'primeng/api'
 import { TreeService } from '../../tree-model/tree.service'
@@ -20,8 +21,10 @@ import {ApfNonRootTreeNode, RootTreeNode} from '../../tree-model/TreeNode'
 
 
 @Component({
+  standalone: false,
   selector: 'app-tree-host',
   templateUrl: './tree-host.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./tree-host.component.scss']
 })
 export class TreeHostComponent implements OnInit {

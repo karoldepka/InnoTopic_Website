@@ -1,8 +1,10 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 
 @Component({
+  standalone: false,
   selector: 'app-exponential-improvement',
   templateUrl: './exponential-improvement.page.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./exponential-improvement.page.sass'],
 })
 export class ExponentialImprovementPage implements OnInit {

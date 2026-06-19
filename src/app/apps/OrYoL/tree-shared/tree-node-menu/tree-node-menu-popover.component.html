@@ -58,7 +58,7 @@ In n Places:
   Created: {{getWhenCreated()?.toISOString()}}
 </p>
 <p style="margin-top: .5em">
-  Done: {{treeNode.content.itemData?.isDone?.toDate?.apply(treeNode.content.itemData?.isDone)?.toISOString()}}
+  Done: {{treeNode.content.itemData?.isDone?.toDate?.apply($safeNavigationMigration(treeNode.content.itemData?.isDone))?.toISOString()}}
 </p>
 
 <app-node-class-picker

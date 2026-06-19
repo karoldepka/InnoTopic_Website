@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import {SyncStatusService} from '../sync-status.service'
 import {PopoverController} from '@ionic/angular'
 import {SyncPopoverComponent} from './sync-popover/sync-popover.component'
@@ -6,8 +6,10 @@ import {map} from 'rxjs/operators'
 import {AuthService} from '../../../../auth/auth.service'
 
 @Component({
+  standalone: false,
   selector: 'odm-sync-status-icon',
   templateUrl: './sync-status-icon.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./sync-status-icon.component.sass'],
 })
 export class SyncStatusIconComponent implements OnInit {

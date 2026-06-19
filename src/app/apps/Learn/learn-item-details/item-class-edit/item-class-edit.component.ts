@@ -1,12 +1,14 @@
-import {Component, Input, OnInit} from '@angular/core';
+import {Component, Input, OnInit, ChangeDetectionStrategy} from '@angular/core';
 import {UntypedFormControl, UntypedFormGroup} from '@angular/forms'
 import {ViewSyncer} from '../../../../libs/AppFedShared/odm/ui/ViewSyncer'
 import {Required} from '../../../../libs/AppFedShared/utils/angular/Required.decorator'
 import {LearnItem$} from '../../models/LearnItem$'
 
 @Component({
+  standalone: false,
   selector: 'app-item-class-edit',
   templateUrl: './item-class-edit.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./item-class-edit.component.sass'],
 })
 export class ItemClassEditComponent implements OnInit {

@@ -1,4 +1,4 @@
-import {Component, Input, OnInit} from '@angular/core';
+import {Component, Input, OnInit, ChangeDetectionStrategy} from '@angular/core';
 import {Required} from '../../../../libs/AppFedShared/utils/angular/Required.decorator'
 import {QuizService} from '../../core/quiz/quiz.service'
 import {LearnItem$} from '../../models/LearnItem$'
@@ -7,8 +7,10 @@ import {ImportanceDescriptor, importanceDescriptors, importanceDescriptorsArray}
 import {QuizStatus} from '../../core/quiz/QuizStatus'
 
 @Component({
+  standalone: false,
   selector: 'app-quiz-items-left',
   templateUrl: './quiz-items-left.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./quiz-items-left.component.sass'],
 })
 export class QuizItemsLeftComponent implements OnInit {

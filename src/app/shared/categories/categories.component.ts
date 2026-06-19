@@ -1,11 +1,13 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import {MessageService, TreeDragDropService, TreeNode} from 'primeng/api'
 import {NodeService} from './node.service'
 
 @Component({
+  standalone: false,
   selector: 'app-categories',
   providers: [TreeDragDropService,MessageService],
   templateUrl: './categories.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./categories.component.sass'],
 })
 export class CategoriesComponent implements OnInit {
@@ -21,8 +23,8 @@ export class CategoriesComponent implements OnInit {
   constructor(private nodeService: NodeService) { }
 
   ngOnInit() {
-    this.nodeService.getFiles().then(files => this.files1 = files);
-    this.nodeService.getFiles().then(files => this.files2 = files);
+    this.nodeService.getFiles().then((files) => this.files1 = files);
+    this.nodeService.getFiles().then((files) => this.files2 = files);
     this.files3 = [{
       label: "Backup",
       data: "Backup Folder",

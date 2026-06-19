@@ -1,4 +1,4 @@
-import {Component, Input, OnInit} from '@angular/core';
+import {Component, Input, OnInit, ChangeDetectionStrategy} from '@angular/core';
 import {SelectionManager} from '../../SelectionManager'
 import {Required} from '../../../../../libs/AppFedShared/utils/angular/Required.decorator'
 import {LearnItemId} from '../../../models/LearnItem'
@@ -8,8 +8,10 @@ import {map} from 'rxjs/operators'
 import {Observable} from 'rxjs/internal/Observable'
 
 @Component({
+  standalone: false,
   selector: 'app-selection-checkbox',
   templateUrl: './selection-checkbox.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./selection-checkbox.component.sass'],
 })
 export class SelectionCheckboxComponent implements OnInit {

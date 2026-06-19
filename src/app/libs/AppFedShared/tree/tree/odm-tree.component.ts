@@ -1,4 +1,4 @@
-import {Component, Input, OnInit} from '@angular/core';
+import {Component, Input, OnInit, ChangeDetectionStrategy} from '@angular/core';
 import {OdmTreeNode} from '../tree-node/OdmTreeNode'
 import {GenericItem$} from '../GenericItem$'
 import {GenericItemsService} from '../generic-items.service'
@@ -6,8 +6,10 @@ import {LearnItemItemsService} from '../../../../apps/Learn/core/learn-item-item
 import {LearnItem$} from '../../../../apps/Learn/models/LearnItem$'
 
 @Component({
+  standalone: false,
   selector: 'app-tree',
   templateUrl: './odm-tree.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./tree.component.sass'],
 })
 export class OdmTreeComponent implements OnInit {

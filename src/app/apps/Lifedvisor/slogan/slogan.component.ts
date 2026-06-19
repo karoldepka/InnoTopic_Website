@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 
 
 export const slogans = [
@@ -35,8 +35,10 @@ export const slogans = [
 
 
 @Component({
+  standalone: false,
   selector: 'app-slogan',
   templateUrl: './slogan.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./slogan.component.scss'],
 })
 export class SloganComponent implements OnInit {

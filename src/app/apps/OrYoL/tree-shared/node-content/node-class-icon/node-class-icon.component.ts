@@ -2,13 +2,16 @@ import {
   Component,
   Input,
   OnInit,
+  ChangeDetectionStrategy
 } from '@angular/core';
 
 import {OryBaseTreeNode} from '../../../tree-model/TreeModel'
 
 @Component({
+  standalone: false,
   selector: 'app-node-class-icon',
   templateUrl: './node-class-icon.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./node-class-icon.component.sass']
 })
 export class NodeClassIconComponent implements OnInit {

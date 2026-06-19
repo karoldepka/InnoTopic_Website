@@ -1,10 +1,12 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import {TimersService} from "../../core/timers.service";
 import {TimerItem} from "../../core/TimerItem";
 
 @Component({
+  standalone: false,
   selector: 'app-timers-list',
   templateUrl: './timers-list.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./timers-list.component.scss'],
 })
 export class TimersListComponent implements OnInit {

@@ -1,4 +1,4 @@
-import {Component, Injector, OnInit} from '@angular/core';
+import {Component, Injector, OnInit, ChangeDetectionStrategy} from '@angular/core';
 import {JournalEntryItemsService} from '../core/journal-entries.service'
 import {JournalEntry$} from '../models/JournalEntry$'
 import {CachedSubject} from '../../../libs/AppFedShared/utils/cachedSubject2/CachedSubject2'
@@ -18,8 +18,10 @@ export class TimelineListOptionsData {
 }
 
 @Component({
+  standalone: false,
   selector: 'app-journal-entries-list',
   templateUrl: './journal-entries-list.page.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./journal-entries-list.page.sass'],
 })
 export class JournalEntriesListPage extends BaseComponent implements OnInit {

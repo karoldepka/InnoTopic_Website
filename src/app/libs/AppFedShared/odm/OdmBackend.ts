@@ -9,6 +9,7 @@ import {OdmCollectionBackend} from "./OdmCollectionBackend";
 import {CachedSubject} from '../utils/cachedSubject2/CachedSubject2'
 import {AuthService} from '../../../auth/auth.service'
 import firebase from 'firebase/compat/app'
+import 'firebase/compat/firestore'
 import Timestamp = firebase.firestore.Timestamp
 
 export type OdmTimestamp = Timestamp

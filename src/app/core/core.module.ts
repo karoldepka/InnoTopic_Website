@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import {OdmFirestoreModule} from "../libs/AppFedSharedFirebase/odm-firestore/odm-firestore.module";
+import {OdmBackendModule} from "../libs/AppFedShared/odm/odm-backend.module";
 import {TimerNotificationsService} from "./timer-notifications.service";
 import {TimersService} from "./timers.service";
 import {NotificationsService} from "../libs/AppFedSharedIonic/notifications/notifications.service";
@@ -12,7 +12,7 @@ import {TimersPageModule} from "../timers/timers.module";
   declarations: [],
   imports: [
     CommonModule,
-    OdmFirestoreModule,
+    OdmBackendModule,
     AngularFireAuthModule,
     NotificationsModule,
     TimersPageModule /* for TimerEndedService; not circular dep? */,

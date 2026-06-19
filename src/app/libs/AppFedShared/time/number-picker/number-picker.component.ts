@@ -1,8 +1,10 @@
-import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
+import {Component, EventEmitter, Input, OnInit, Output, ChangeDetectionStrategy} from '@angular/core';
 
 @Component({
+  standalone: false,
   selector: 'app-number-picker',
   templateUrl: './number-picker.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./number-picker.component.scss'],
 })
 export class NumberPickerComponent implements OnInit {

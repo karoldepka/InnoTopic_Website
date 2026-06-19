@@ -2,13 +2,16 @@ import {
   Component,
   Input,
   OnInit,
+  ChangeDetectionStrategy
 } from '@angular/core';
 import { debugLog } from '../../../utils/log'
 import {ApfBaseTreeNode, OryBaseTreeNode} from '../../../tree-model/TreeModel'
 
 @Component({
+  standalone: false,
   selector: 'app-node-expansion-icon',
   templateUrl: './node-expansion-icon.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./node-expansion-icon.component.sass']
 })
 export class NodeExpansionIconComponent implements OnInit {

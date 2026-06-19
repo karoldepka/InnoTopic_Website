@@ -10,6 +10,7 @@ dependencies = [
     "langchain-community>=0.4.2",
     "langchain-ollama>=1.1.0",
     "pydantic>=2.13.4",
+    "psycopg[binary]>=3.3.2",
     "python-dotenv>=1.2.2",
     "uvicorn>=0.48.0",
 ]

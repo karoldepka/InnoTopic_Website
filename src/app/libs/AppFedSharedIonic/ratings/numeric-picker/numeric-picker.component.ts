@@ -78,6 +78,7 @@ function numAndFracBtn(x: number): ButtonDescriptor {
 * TODO: rename: ButtonsPicker...
 * */
 @Component({
+  standalone: false,
   selector: 'apf-numeric-picker',
   templateUrl: './numeric-picker.component.html',
   styleUrls: ['./mood-picker.component.sass'],

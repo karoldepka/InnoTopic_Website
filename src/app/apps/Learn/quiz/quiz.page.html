@@ -68,7 +68,7 @@
         <div style="text-transform: uppercase">
           next repetition:
           <app-time-point
-            [time]="newDate(quizService.calculateWhenNextRepetitionMsEpochOrNullish(quizStatus ?. nextItem$))"
+            [time]="newDate(quizService.calculateWhenNextRepetitionMsEpochOrNullish($safeNavigationMigration(quizStatus ?. nextItem$)))"
            />
 
           <app-quiz-items-left

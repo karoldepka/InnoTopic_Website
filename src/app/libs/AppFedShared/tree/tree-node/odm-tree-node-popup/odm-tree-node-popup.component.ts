@@ -1,4 +1,4 @@
-import {Component, HostListener, Input, OnInit} from '@angular/core';
+import {Component, HostListener, Input, OnInit, ChangeDetectionStrategy} from '@angular/core';
 import {OdmTreeNode} from '../OdmTreeNode'
 import {OdmService2} from '../../../odm/OdmService2'
 import {LearnItem} from '../../../../../apps/Learn/models/LearnItem'
@@ -10,8 +10,10 @@ import {Router} from '@angular/router'
 type NewTreeChildType = 'learn' | 'task' | 'category'
 
 @Component({
+  standalone: false,
   selector: 'app-odm-tree-node-popup',
   templateUrl: './odm-tree-node-popup.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./odm-tree-node-popup.component.scss'],
 })
 export class OdmTreeNodePopupComponent implements OnInit {

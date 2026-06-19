@@ -1,4 +1,4 @@
-import {Component, Input, OnInit} from '@angular/core';
+import {Component, Input, OnInit, ChangeDetectionStrategy} from '@angular/core';
 import {OdmTreeNode} from '../../OdmTreeNode'
 import {dictToArrayWithIds, getDictionaryValuesAsArray, setIdsFromKeys} from '../../../../utils/dictionary-utils'
 import {OdmCell} from '../../../cells/OdmCell'
@@ -6,8 +6,10 @@ import {OdmCell} from '../../../cells/OdmCell'
 
 /** TODO: consider naming as COLUMNS cells */
 @Component({
+  standalone: false,
   selector: 'app-tree-node-cells',
   templateUrl: './tree-node-cells.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./tree-node-cells.component.sass'],
 })
 export class TreeNodeCellsComponent implements OnInit {

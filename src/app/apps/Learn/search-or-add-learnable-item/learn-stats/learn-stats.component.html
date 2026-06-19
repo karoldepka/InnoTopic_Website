@@ -12,31 +12,31 @@
 >
   &nbsp;
   <b>Q&A:</b>
-  {{ learnStats ?. countWithQA | json }}
+  {{ $safeNavigationMigration(learnStats ?. countWithQA) | json }}
 
   <b>Audio:</b>
-  {{ learnStats ?. countWithAudio | json }}
+  {{ $safeNavigationMigration(learnStats ?. countWithAudio) | json }}
 
   <b>0+:</b>
   {{ learnStats ?. countWithRatingPresent }}
 
   <b>0.25+:</b>
-  {{ learnStats ?. atLeast0_25 | json }} <!-- TODO: click to filter
+  {{ $safeNavigationMigration(learnStats ?. atLeast0_25) | json }} <!-- TODO: click to filter
     - those could be candidates for simplifying / splitting, making Question more specific,
     they might be CLOGGING the Quiz
   -->
 
   <b>0.5+:</b>
-  {{ learnStats ?. atLeast05 | json }}
+  {{ $safeNavigationMigration(learnStats ?. atLeast05) | json }}
 
   <b>1+:</b>
-  {{ learnStats ?. atLeast1 | json }}
+  {{ $safeNavigationMigration(learnStats ?. atLeast1) | json }}
 
   <b>1.5+:</b>
-  {{ learnStats ?. atLeast1_5 | json }}
+  {{ $safeNavigationMigration(learnStats ?. atLeast1_5) | json }}
 
   <b>2+:</b>
-  {{ learnStats ?. atLeast2 | json }}
+  {{ $safeNavigationMigration(learnStats ?. atLeast2) | json }}
 
   <span
     *ngFor="let kv of (learnStats . countWithRatingEqual) ! | keyvalue"

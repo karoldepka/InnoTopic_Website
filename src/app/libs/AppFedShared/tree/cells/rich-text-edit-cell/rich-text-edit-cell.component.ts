@@ -1,4 +1,4 @@
-import {Component, ElementRef, Input, OnInit, ViewChild} from '@angular/core';
+import {Component, ElementRef, Input, OnInit, ViewChild, ChangeDetectionStrategy} from '@angular/core';
 import {OdmCell} from '../OdmCell'
 import {CellNavigationService} from '../../../cell-navigation.service'
 import {FormControl, UntypedFormControl} from '@angular/forms'
@@ -7,8 +7,10 @@ import {CellComponent} from '../../../../../apps/OrYoL/tree-shared/cells/CellCom
 import {errorAlert} from '../../../utils/log'
 
 @Component({
+  standalone: false,
   selector: 'app-rich-text-edit-cell',
   templateUrl: './rich-text-edit-cell.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./rich-text-edit-cell.component.sass'],
 })
 export class RichTextEditCellComponent /*extends CellComponent*/ implements OnInit {

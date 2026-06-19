@@ -57,17 +57,17 @@
       *ngIf="g.feat.tutorial.unpolishedVisually"
     >
       <app-learn-item-details-hints
-        [hidden]="itemVal ?. isTask"
+        [hidden]="$safeNavigationMigration(itemVal ?. isTask)"
       />
 
       CREATED <app-time-point
-      [time]="itemVal?.whenCreated?.toDate()"
+      [time]="$safeNavigationMigration(itemVal?.whenCreated?.toDate())"
     />
       MODIFIED <app-time-point
-      [time]="itemVal?.whenLastModified?.toDate()"
+      [time]="$safeNavigationMigration(itemVal?.whenLastModified?.toDate())"
     />
 
-      <app-geo-loc [geoLoc]="itemVal?.whereCreated" />
+      <app-geo-loc [geoLoc]="$safeNavigationMigration(itemVal?.whereCreated)" />
     </ng-container>
 
     <div style="display: flex; flex-direction: row; width: 100%">
@@ -134,7 +134,7 @@
 
     <app-self-rating
       *ngIf="feat.potentiallyDangerous"
-      [hidden]="itemVal ?. isTask"
+      [hidden]="$safeNavigationMigration(itemVal ?. isTask)"
       [item$]="item$"
     />
 

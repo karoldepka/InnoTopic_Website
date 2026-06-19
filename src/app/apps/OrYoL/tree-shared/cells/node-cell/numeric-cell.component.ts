@@ -6,6 +6,7 @@ import {
   OnInit,
   Output,
   ViewChild,
+  ChangeDetectionStrategy
 } from '@angular/core';
 import { CellComponent } from '../CellComponent'
 import {
@@ -18,8 +19,10 @@ import {CachedSubject} from '../../../../../libs/AppFedShared/utils/cachedSubjec
 
 /* TODO: rename to eg NumericCell */
 @Component({
+  standalone: false,
   selector: 'app-node-cell',
   templateUrl: './numeric-cell.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./numeric-cell.component.sass']
 })
 export class NumericCellComponent extends CellComponent implements OnInit, CellComponent {

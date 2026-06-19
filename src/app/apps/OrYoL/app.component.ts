@@ -9,6 +9,7 @@ import { SearchService } from './core/search.service'
 declare var $: any
 
 @Component({
+  standalone: false,
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss'],

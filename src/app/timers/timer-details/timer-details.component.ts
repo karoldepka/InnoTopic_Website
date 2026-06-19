@@ -1,4 +1,4 @@
-import {Component, Input, OnInit} from '@angular/core';
+import {Component, Input, OnInit, ChangeDetectionStrategy} from '@angular/core';
 import {TimerItem} from "../../core/TimerItem";
 import {AlertController, ModalController} from "@ionic/angular";
 import {TimersService} from "../../core/timers.service";
@@ -6,8 +6,10 @@ import {UntypedFormControl} from "@angular/forms";
 import {ignorePromise} from "../../libs/AppFedShared/utils/promiseUtils";
 
 @Component({
+  standalone: false,
   selector: 'app-timer-details',
   templateUrl: './timer-details.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./timer-details.component.scss'],
 })
 export class TimerDetailsComponent implements OnInit {

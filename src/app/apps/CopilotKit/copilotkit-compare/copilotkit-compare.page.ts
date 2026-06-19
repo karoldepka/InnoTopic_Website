@@ -1,4 +1,4 @@
-import { Component, OnDestroy } from '@angular/core';
+import { Component, OnDestroy, ChangeDetectionStrategy } from '@angular/core';
 
 type ChatRole = 'user' | 'assistant';
 
@@ -16,8 +16,10 @@ type AgUiEvent = {
 };
 
 @Component({
+  standalone: false,
   selector: 'app-copilotkit-compare-page',
   templateUrl: './copilotkit-compare.page.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./copilotkit-compare.page.scss'],
 })
 export class CopilotKitComparePage implements OnDestroy {

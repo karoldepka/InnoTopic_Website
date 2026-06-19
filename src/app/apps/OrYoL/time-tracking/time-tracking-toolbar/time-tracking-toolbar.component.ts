@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import {
   TimeTrackingService,
 } from '../time-tracking.service'
@@ -12,8 +12,10 @@ import {CachedSubject} from '../../../../libs/AppFedShared/utils/cachedSubject2/
 import {Observable} from 'rxjs/internal/Observable'
 
 @Component({
+  standalone: false,
   selector: 'app-time-tracking-toolbar',
   templateUrl: './time-tracking-toolbar.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./time-tracking-toolbar.component.sass']
 })
 export class TimeTrackingToolbarComponent implements OnInit {

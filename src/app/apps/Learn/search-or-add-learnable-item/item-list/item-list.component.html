@@ -6,20 +6,14 @@
   NOTHING FOUND
 </p>
 
-<ion-virtual-scroll
-  [items]="filteredItem$s"
-  [approxItemHeight]="31"
-  [trackBy]="trackByFn"
->
-  <div *virtualItem="let currItem; let i = index">
-    <app-actionable-item
-      [index]="i"
-      [item]="currItem"
-      [selection]="listModel.selection"
-    ></app-actionable-item>
-    <!-- [hidden]="! matchesSearch(currItem)"-->
-  </div>
-</ion-virtual-scroll>
+<div>
+  <app-actionable-item
+    *ngFor="let currItem of filteredItem$s; let i = index; trackBy: trackByFn"
+    [index]="i"
+    [item]="currItem"
+    [selection]="listModel.selection"
+  ></app-actionable-item>
+</div>
 
 <!--
    ion-virtual-scroll BUGS:

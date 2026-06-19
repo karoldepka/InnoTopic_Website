@@ -217,15 +217,16 @@ export abstract class OdmService2<
     //   oneTimeGet: true,
     // }
     // FIXME: move the opts into this.queriesOpts
+    const initialItemsLimit = 270
     const opts1: QueryOpts = {
-      comments: "all from local cache, one-time get",
-      limit: undefined,
+      comments: "limited local cache, one-time get",
+      limit: initialItemsLimit,
       fromLocalCache: true,
       oneTimeGet: true,
     }
     const opts2Parallel: QueryOpts = {
       comments: "opts2Parallel",
-      limit: 270,
+      limit: initialItemsLimit,
       fromLocalCache: false /* So make sure that this has priority -> when data arrives from here, it should override opts2 */,
       oneTimeGet: false /* NOTE: if this is false, might collide with `nLastModified: undefined` from server */,
     }

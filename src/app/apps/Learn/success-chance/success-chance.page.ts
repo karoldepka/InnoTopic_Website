@@ -1,8 +1,10 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 
 @Component({
+  standalone: false,
   selector: 'app-success-chance',
   templateUrl: './success-chance.page.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./success-chance.page.sass'],
 })
 export class SuccessChancePage implements OnInit {

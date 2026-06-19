@@ -4,3 +4,4 @@ langchain
 langchain-ollama
 python-dotenv
 pydantic
+psycopg[binary]

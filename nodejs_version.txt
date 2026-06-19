@@ -2,6 +2,9 @@
 
 try .nvmrc
 
+Current Angular CLI 22 builds require Node >=22.22.3 <23 or >=24.15.0.
+The repo .nvmrc is pinned to 24.15.0 so local shells, CI, and Angular agree.
+
 
 ! works: v16.17.1
 ~/.nvm/versions/node/v16.17.1/bin/node

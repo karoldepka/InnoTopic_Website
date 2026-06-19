@@ -2,6 +2,7 @@ import {ChangeDetectionStrategy, ChangeDetectorRef, Component, Injector, Input, 
 import {BaseComponent} from '../../base/base.component'
 
 @Component({
+  standalone: false,
   selector: 'app-time-passing',
   templateUrl: './time-passing.component.html',
   styleUrls: ['./time-passing.component.scss'],

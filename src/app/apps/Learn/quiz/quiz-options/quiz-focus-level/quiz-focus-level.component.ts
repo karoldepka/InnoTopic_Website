@@ -1,11 +1,13 @@
-import {Component, Input, OnInit} from '@angular/core';
+import {Component, Input, OnInit, ChangeDetectionStrategy} from '@angular/core';
 import {Required} from '../../../../../libs/AppFedShared/utils/angular/Required.decorator'
 import {UntypedFormControl} from '@angular/forms'
 import {QuizService} from '../../../core/quiz/quiz.service'
 
 @Component({
+  standalone: false,
   selector: 'app-quiz-focus-level',
   templateUrl: './quiz-focus-level.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./quiz-focus-level.component.sass'],
 })
 export class QuizFocusLevelComponent implements OnInit {

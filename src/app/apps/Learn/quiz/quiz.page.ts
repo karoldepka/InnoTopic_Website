@@ -1,4 +1,4 @@
-import {AfterViewInit, Component, Injector, OnInit} from '@angular/core';
+import {AfterViewInit, Component, Injector, OnInit, ChangeDetectionStrategy} from '@angular/core';
 import {QuizService} from '../core/quiz/quiz.service'
 import {Observable} from 'rxjs'
 import {PopoverController} from '@ionic/angular'
@@ -15,8 +15,10 @@ import {QuizStatus} from '../core/quiz/QuizStatus'
 
 
 @Component({
+  standalone: false,
   selector: 'app-quiz',
   templateUrl: './quiz.page.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./quiz.page.sass'],
 })
 export class QuizPage extends BaseComponent implements OnInit, AfterViewInit  {

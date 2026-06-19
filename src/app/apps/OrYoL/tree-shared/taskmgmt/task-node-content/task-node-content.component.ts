@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 
 @Component({
+  standalone: false,
   selector: 'app-task-node-content',
   templateUrl: './task-node-content.component.html',
   styleUrls: ['./task-node-content.component.sass']

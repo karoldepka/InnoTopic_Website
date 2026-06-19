@@ -1,4 +1,4 @@
-import {Component, Input, OnInit, Output} from '@angular/core';
+import {Component, Input, OnInit, Output, ChangeDetectionStrategy} from '@angular/core';
 import {Required} from '../../utils/angular/Required.decorator'
 import {CachedSubject} from '../../utils/cachedSubject2/CachedSubject2'
 
@@ -8,8 +8,10 @@ import {CachedSubject} from '../../utils/cachedSubject2/CachedSubject2'
  * - using in filters (also yes no ~)
  * */
 @Component({
+  standalone: false,
   selector: 'app-chooser',
   templateUrl: './chooser.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./chooser.component.sass'],
 })
 export class ChooserComponent<TChoosable extends any = any> implements OnInit {

@@ -1,4 +1,4 @@
-import {Component, HostListener} from '@angular/core';
+import {Component, HostListener, ChangeDetectionStrategy} from '@angular/core';
 
 import {Platform, PopoverController} from '@ionic/angular';
 import { SplashScreen } from '@ionic-native/splash-screen/ngx';
@@ -15,7 +15,9 @@ import {FeatureService} from './libs/AppFedShared/feature.service'
 // import {fakeExportToNotLookUnused} from '../background/background'
 
 @Component({
+  standalone: false,
   selector: 'app-root',
+  changeDetection: ChangeDetectionStrategy.Eager,
   templateUrl: 'app.component.html'
 })
 export class AppComponent {

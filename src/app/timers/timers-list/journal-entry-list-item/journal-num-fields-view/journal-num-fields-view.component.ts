@@ -6,6 +6,7 @@ import {JournalEntry} from '../../../../apps/Journal/models/JournalEntry'
 import {CachedSubject} from '../../../../libs/AppFedShared/utils/cachedSubject2/CachedSubject2'
 
 @Component({
+  standalone: false,
   selector: 'app-journal-num-fields-view',
   templateUrl: './journal-num-fields-view.component.html',
   styleUrls: ['./journal-num-fields-view.component.sass'],

@@ -1,4 +1,4 @@
-import {Component, Injector, Input, OnInit} from '@angular/core';
+import {Component, Injector, Input, OnInit, ChangeDetectionStrategy} from '@angular/core';
 import {sidesDefs, sidesDefsArray} from '../../core/sidesDefs'
 import {LearnItem} from '../../models/LearnItem'
 import {funLevelsDescriptors} from '../../models/fields/fun-level.model'
@@ -13,8 +13,10 @@ import {BaseComponent} from '../../../../libs/AppFedShared/base/base.component'
 
 /* TODO rename to  list-item */
 @Component({
+  standalone: false,
   selector: 'app-actionable-item',
   templateUrl: './actionable-item.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./actionable-item.component.sass'],
   // changeDetection: ChangeDetectionStrategy.OnPush,
 })

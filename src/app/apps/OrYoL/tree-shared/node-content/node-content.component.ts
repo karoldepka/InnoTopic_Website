@@ -57,6 +57,7 @@ import {ApfNonRootTreeNode} from '../../tree-model/TreeNode'
 */
 
 @Component({
+  standalone: false,
   selector: 'app-node-content',
   templateUrl: './node-content.component.html',
   styleUrls: ['./node-content.component.sass'],

@@ -1,8 +1,10 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 
 @Component({
+  standalone: false,
   selector: 'app-growth-diagram',
   templateUrl: './growth-diagram.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./growth-diagram.component.css']
 })
 export class GrowthDiagramComponent implements OnInit {

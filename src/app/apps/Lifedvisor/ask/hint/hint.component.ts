@@ -2,6 +2,7 @@ import {
   Component,
   Input,
   OnInit,
+  ChangeDetectionStrategy
 } from '@angular/core';
 import {
   LiHint, LiHintImpl,
@@ -11,8 +12,10 @@ import {Filter} from '../../shared-with-testcafe/text_search/Filter';
 
 /** Hint, Wish, Problem / Question */
 @Component({
+  standalone: false,
   selector: 'app-hint[filter][wish]',
   templateUrl: './hint.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./hint.component.css']
 })
 export class HintComponent implements OnInit {

@@ -1,12 +1,14 @@
-import {Component, Injector, OnInit} from '@angular/core';
+import {Component, Injector, OnInit, ChangeDetectionStrategy} from '@angular/core';
 import {ThemeService} from '../../../libs/AppFedShared/theme-config/theme.service'
 import {Router} from '@angular/router'
 import {FeatureService} from '../../../libs/AppFedShared/feature.service'
 import {BaseComponent} from '../../../libs/AppFedShared/base/base.component'
 
 @Component({
+  standalone: false,
   selector: 'app-what-next',
   templateUrl: './what-next.page.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./what-next.page.scss'],
 })
 export class WhatNextPage extends BaseComponent implements OnInit {

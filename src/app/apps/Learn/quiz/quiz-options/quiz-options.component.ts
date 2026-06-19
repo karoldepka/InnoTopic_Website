@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import {Form, UntypedFormControl, UntypedFormGroup} from '@angular/forms'
 import {QuizService} from '../../core/quiz/quiz.service'
 import {ViewSyncer} from '../../../../libs/AppFedShared/odm/ui/ViewSyncer'
@@ -8,8 +8,10 @@ import {buttonsDesc} from '../../../../libs/LifeSuiteShared/edit-shared/fun-leve
 import {QuizOptions} from '../../core/quiz/QuizOptions'
 
 @Component({
+  standalone: false,
   selector: 'app-quiz-options',
   templateUrl: './quiz-options.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./quiz-options.component.sass'],
 })
 export class QuizOptionsComponent implements OnInit {

@@ -1,4 +1,4 @@
-import {Component, Injector, OnInit} from '@angular/core';
+import {Component, Injector, OnInit, ChangeDetectionStrategy} from '@angular/core';
 import {JournalEntryItemsService} from "../core/journal-entries.service";
 import {JournalEntry, JournalEntryId} from "../models/JournalEntry";
 import {debugLog} from "../../../libs/AppFedShared/utils/log";
@@ -12,8 +12,10 @@ import {CachedSubject} from '../../../libs/AppFedShared/utils/cachedSubject2/Cac
 import {BaseComponent} from '../../../libs/AppFedShared/base/base.component'
 
 @Component({
+  standalone: false,
   selector: 'app-journal-write-page',
   templateUrl: './journal-write.page.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./journal-write.page.sass'],
 })
 export class JournalWritePage extends BaseComponent implements OnInit {

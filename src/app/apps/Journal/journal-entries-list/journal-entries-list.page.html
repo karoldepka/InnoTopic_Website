@@ -86,7 +86,7 @@
       <!--autosize-->
       <!-- [itemSize]="90" -->
       <div
-        *cdkVirtualFor="let item$ of (items$Sorted | async)?.slice(); let index = index;
+        *cdkVirtualFor="let item$ of $safeNavigationMigration((items$Sorted | async)?.slice()); let index = index;
                        let count = count;
                        let first = first;
                        let last = last;

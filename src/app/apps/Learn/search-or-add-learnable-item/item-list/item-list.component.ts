@@ -1,12 +1,14 @@
-import {Component, Input, OnInit} from '@angular/core';
+import {Component, Input, OnInit, ChangeDetectionStrategy, TrackByFunction} from '@angular/core';
 import {LearnItemItemsService} from '../../core/learn-item-items.service'
-import {LearnItem} from '../../models/LearnItem'
 import {ListProcessing} from '../list-processing'
 import {Required} from '../../../../libs/AppFedShared/utils/angular/Required.decorator'
+import {LearnItem$} from '../../models/LearnItem$'
 
 @Component({
+  standalone: false,
   selector: 'app-item-list',
   templateUrl: './item-list.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./item-list.component.sass'],
 })
 export class ItemListComponent implements OnInit {
@@ -26,8 +28,6 @@ export class ItemListComponent implements OnInit {
 
   ngOnInit() {}
 
-  trackByFn(index: number, item: LearnItem) {
-    return item.id
-  }
+  readonly trackByFn: TrackByFunction<LearnItem$> = (index, item) => item?.id
 
 }

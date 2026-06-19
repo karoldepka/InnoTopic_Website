@@ -1,9 +1,11 @@
-import {Component, Input, OnInit} from '@angular/core';
+import {Component, Input, OnInit, ChangeDetectionStrategy} from '@angular/core';
 import {nullish} from '../../utils/type-utils'
 
 @Component({
+  standalone: false,
   selector: 'app-time-point',
   templateUrl: './time-point.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./time-point.component.sass'],
 })
 export class TimePointComponent implements OnInit {

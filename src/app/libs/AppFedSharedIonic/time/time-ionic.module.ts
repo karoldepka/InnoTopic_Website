@@ -18,8 +18,6 @@ const exports = [
   schemas: [
     CUSTOM_ELEMENTS_SCHEMA,
   ],
-  exports: [
-    exports
-  ]
+  exports: exports
 })
 export class TimeIonicModule { }

@@ -1,4 +1,4 @@
-import {ChangeDetectorRef, Component, Injector, OnInit} from '@angular/core';
+import {ChangeDetectorRef, Component, Injector, OnInit, ChangeDetectionStrategy} from '@angular/core';
 import {g} from '../g'
 import {FeatureService} from '../feature.service'
 import {FeaturesConfig} from '../FeaturesConfig'
@@ -11,8 +11,10 @@ import {Config, ConfigService} from '../../../apps/OrYoL/core/config.service'
  * Provides basic bookkeeping and lifecycle and DI, reactivity, config
  * */
 @Component({
+  standalone: false,
   selector: 'app-base',
   templateUrl: './base.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./base.component.sass'],
 })
 export class BaseComponent /*implements OnInit*/ {

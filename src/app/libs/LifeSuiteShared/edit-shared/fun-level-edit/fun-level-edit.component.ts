@@ -1,48 +1,25 @@
-import {Component, Input, OnInit} from '@angular/core';
+import {Component, Input, OnInit, ChangeDetectionStrategy} from '@angular/core';
 import {UntypedFormControl, UntypedFormGroup} from '@angular/forms'
 import {ViewSyncer} from '../../../AppFedShared/odm/ui/ViewSyncer'
-import {btn, btnVariant, ButtonsDescriptor} from '../../../AppFedSharedIonic/ratings/numeric-picker/numeric-picker.component'
-import {intensityBtnVariant} from '../importance-edit/importance-edit.component'
 import {LearnItem$} from '../../../../apps/Learn/models/LearnItem$'
 import {funLevels} from '../../../../apps/Learn/models/fields/fun-level.model'
+import {createBalancedIntensityButtonsDescriptor} from '../descriptor-level-edit'
 
 
 const levels = funLevels
 
-export const buttonsDesc = new ButtonsDescriptor<any, string>([
-  btn({
-    btnVariants: [
-      intensityBtnVariant(`😡` /*😒*/, levels.somewhat_low),
-      intensityBtnVariant(`😡😡`, levels.low),
-      intensityBtnVariant(`😡😡😡`, levels.very_low),
-      intensityBtnVariant(`😡😡😡😡`, levels.extremely_low),
-      // inspiration for various kinds of arrows: https://en.wikipedia.org/wiki/Arrow_(symbol)#Arrows_in_Unicode
-    ],
-  }),
-  btn({
-    btnVariants: [
-      intensityBtnVariant(`~`, levels.medium),
-      intensityBtnVariant(`?`, levels.unknown),
-      intensityBtnVariant(`-`, levels.undefined /* TODO: isUnset: true */),
-      // unset is actually no button highlighted and hence no label --> undefined
-    ]
-  }),
-  btn({
-    btnVariants: [
-      intensityBtnVariant(`😊`, levels.somewhat_high),
-      intensityBtnVariant(`😊😊`, levels.high),
-      intensityBtnVariant(`😊😊😊`, levels.very_high),
-      intensityBtnVariant(`😊😊😊😊`, levels.extremely_high),
-
-      // intensityBtnVariant(`X-T-Fun`, levels.testing_extremely_high),
-    ]
-  }),
-])
+export const buttonsDesc = createBalancedIntensityButtonsDescriptor(
+  levels,
+  [`😡`, `😡😡`, `😡😡😡`, `😡😡😡😡`],
+  [`😊`, `😊😊`, `😊😊😊`, `😊😊😊😊`],
+)
 
 
 @Component({
+  standalone: false,
   selector: 'app-fun-level-edit',
   templateUrl: './fun-level-edit.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./fun-level-edit.component.sass'],
 })
 export class FunLevelEditComponent implements OnInit {

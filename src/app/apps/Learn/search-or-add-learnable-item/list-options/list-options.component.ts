@@ -1,4 +1,4 @@
-import {Component, Injector, Input, OnInit} from '@angular/core';
+import {Component, Injector, Input, OnInit, ChangeDetectionStrategy} from '@angular/core';
 import {ListOptionsData} from '../list-options'
 import {PatchableObservable} from '../../../../libs/AppFedShared/utils/rxUtils'
 import {Required} from '../../../../libs/AppFedShared/utils/angular/Required.decorator'
@@ -8,8 +8,10 @@ import {BaseComponent} from '../../../../libs/AppFedShared/base/base.component'
 import {OdmService2} from '../../../../libs/AppFedShared/odm/OdmService2'
 
 @Component({
+  standalone: false,
   selector: 'app-list-options',
   templateUrl: './list-options.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./list-options.component.sass'],
 })
 export class ListOptionsComponent extends BaseComponent implements OnInit {

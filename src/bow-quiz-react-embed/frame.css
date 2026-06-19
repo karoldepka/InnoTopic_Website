@@ -1,0 +1,282 @@
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  width: 100%;
+  height: 100%;
+  min-height: 560px;
+  margin: 0;
+}
+
+body {
+  overflow: hidden;
+  color: #172033;
+  background: #eef3f8;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+button {
+  font: inherit;
+}
+
+.game-shell {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  height: 100%;
+  min-height: 560px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.82), rgba(255, 255, 255, 0.26) 44%, rgba(210, 231, 220, 0.58)),
+    linear-gradient(120deg, #e7f2fb, #f7fbf6);
+}
+
+.game-header {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto auto auto;
+  gap: 10px;
+  align-items: center;
+  min-height: 72px;
+  border-bottom: 1px solid rgba(109, 132, 156, 0.28);
+  padding: 10px 14px;
+  background: rgba(255, 255, 255, 0.72);
+}
+
+.question-block {
+  min-width: 0;
+}
+
+.question-kicker {
+  margin-bottom: 3px;
+  color: #53677e;
+  font-size: 12px;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+
+.question-text {
+  color: #142033;
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 1.25;
+}
+
+.score-pill,
+.status-pill {
+  max-width: 280px;
+  border: 1px solid #c7d6e5;
+  border-radius: 999px;
+  padding: 6px 10px;
+  color: #314961;
+  background: #ffffff;
+  font-size: 13px;
+  line-height: 1.25;
+}
+
+.score-pill {
+  white-space: nowrap;
+}
+
+.status-pill {
+  text-align: center;
+}
+
+.status-pill.correct {
+  border-color: #92c49d;
+  color: #1f6633;
+  background: #eef9f0;
+}
+
+.status-pill.wrong {
+  border-color: #dfa3a3;
+  color: #8a2525;
+  background: #fff1f1;
+}
+
+.reset-button {
+  min-height: 34px;
+  border: 1px solid #285b75;
+  border-radius: 7px;
+  padding: 0 12px;
+  color: #ffffff;
+  background: #285b75;
+  cursor: pointer;
+}
+
+.language-select-wrap {
+  display: inline-grid;
+  grid-template-columns: auto minmax(88px, auto);
+  gap: 7px;
+  align-items: center;
+  color: #53677e;
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+.language-select {
+  min-height: 34px;
+  border: 1px solid #c7d6e5;
+  border-radius: 7px;
+  padding: 0 8px;
+  color: #172033;
+  background: #ffffff;
+  cursor: pointer;
+}
+
+.game-stage {
+  position: relative;
+  min-height: 0;
+  overflow: hidden;
+  touch-action: none;
+  user-select: none;
+}
+
+.aim-layer {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.target-card {
+  filter: drop-shadow(0 6px 10px rgba(55, 73, 92, 0.16));
+}
+
+.target-back {
+  fill: #ffffff;
+  stroke: #bfccda;
+  stroke-width: 1.5;
+}
+
+.target-ring-outer {
+  fill: #e9f2fb;
+  stroke: #adc7dd;
+  stroke-width: 1.5;
+}
+
+.target-ring-middle {
+  fill: #ffffff;
+  stroke: #d95757;
+  stroke-width: 1.5;
+}
+
+.target-ring-inner {
+  fill: #d95757;
+}
+
+.target-card.hit .target-back {
+  fill: #edf9f0;
+  stroke: #79b985;
+}
+
+.target-card.wrong-hit .target-back {
+  fill: #fff0f0;
+  stroke: #d98989;
+}
+
+.target-label {
+  fill: #172033;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.target-sub-label {
+  fill: #62748a;
+  font-size: 11px;
+}
+
+.bow-limb {
+  fill: none;
+  stroke: #7b4525;
+  stroke-width: 11;
+  stroke-linecap: round;
+}
+
+.bow-grip {
+  fill: #2d4155;
+}
+
+.bow-string {
+  fill: none;
+  stroke: #263544;
+  stroke-width: 2.4;
+  stroke-linecap: round;
+}
+
+.bow-arrow-preview {
+  stroke: #293746;
+  stroke-width: 4;
+  stroke-linecap: round;
+}
+
+.arrow-body {
+  stroke: #293746;
+  stroke-width: 4;
+  stroke-linecap: round;
+}
+
+.arrow-head {
+  fill: #293746;
+}
+
+.fletching {
+  fill: #b84242;
+}
+
+.trajectory-dot {
+  fill: rgba(40, 91, 117, 0.28);
+}
+
+.pull-meter-track {
+  fill: rgba(255, 255, 255, 0.76);
+  stroke: rgba(62, 82, 105, 0.26);
+}
+
+.pull-meter-fill {
+  fill: #285b75;
+}
+
+.hint-line {
+  position: absolute;
+  left: 16px;
+  bottom: 14px;
+  max-width: 360px;
+  border: 1px solid rgba(163, 181, 200, 0.58);
+  border-radius: 8px;
+  padding: 8px 10px;
+  color: #314961;
+  background: rgba(255, 255, 255, 0.76);
+  font-size: 13px;
+  line-height: 1.35;
+}
+
+@media (max-width: 760px) {
+  .game-header {
+    grid-template-columns: minmax(0, 1fr) auto auto;
+  }
+
+  .status-pill {
+    grid-column: 1 / -1;
+    max-width: none;
+  }
+
+  .question-text {
+    font-size: 16px;
+  }
+
+  .hint-line {
+    right: 12px;
+    max-width: none;
+  }
+}
+
+@media (max-width: 560px) {
+  .game-header {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+
+  .language-select-wrap {
+    grid-column: 1 / -1;
+    justify-content: start;
+  }
+}

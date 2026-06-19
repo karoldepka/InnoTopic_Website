@@ -1,4 +1,4 @@
-import {Component, Input, OnInit, ViewChild} from '@angular/core';
+import {Component, Input, OnInit, ViewChild, ChangeDetectionStrategy} from '@angular/core';
 import {OdmCell} from '../../cells/OdmCell'
 import {OdmTreeNode} from '../OdmTreeNode'
 import {cellDirections, CellNavigationService} from '../../../cell-navigation.service'
@@ -20,8 +20,10 @@ export function column(colDesc: any) {
 // for (let i = 0; i < 10000; i++) {
 
 @Component({
+  standalone: false,
   selector: 'app-tree-node-content',
   templateUrl: './odm-tree-node-content.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./odm-tree-node-content.component.sass'],
 })
 export class OdmTreeNodeContentComponent implements OnInit {

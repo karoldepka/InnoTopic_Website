@@ -13,7 +13,7 @@
 
   <ion-button
     class="stretch-btn"
-    [routerLink]="item$ ?. getRouterLinkUrl()"
+    [routerLink]="$safeNavigationMigration(item$ ?. getRouterLinkUrl())"
   >
     <ion-icon name="create-outline" />
   </ion-button>
@@ -40,7 +40,7 @@
   >
     <app-self-rating
       [autoSave]="false"
-      [item$]="(quizStatus$ | async) ?. nextItem$ !"
+      [item$]="$safeNavigationMigration((quizStatus$ | async) ?. nextItem$) !"
       (numericValue)="selfRating = $event; quizAnswersService.onSelfRate()"
      />
 

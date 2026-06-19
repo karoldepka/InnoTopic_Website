@@ -1,4 +1,4 @@
-import {Component, HostListener, Injector, OnInit} from '@angular/core';
+import {Component, HostListener, Injector, OnInit, ChangeDetectionStrategy} from '@angular/core';
 import {sortBy} from 'lodash-es'
 import {LearnItemItemsService} from '../core/learn-item-items.service'
 import {field, HtmlString, LearnItem, LearnItemSidesVals} from '../models/LearnItem'
@@ -31,8 +31,10 @@ import 'deep-chat'
 
 /** TODO: rename to smth simpler more standard like LearnDoItemsPage (search-or-add is kinda implied, especially search) */
 @Component({
+  standalone: false,
   selector: 'app-search-or-add-learnable-item',
   templateUrl: './search-or-add-learnable-item.page.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./search-or-add-learnable-item.page.scss'],
 })
 export class SearchOrAddLearnableItemPageComponent extends BaseComponent implements OnInit {
@@ -589,7 +591,7 @@ export class SearchOrAddLearnableItemPageComponent extends BaseComponent impleme
   }
 
   @HostListener('window:keyup.alt.enter', ['$event'])
-  handleKeyboardEvent(event: KeyboardEvent) {
+  handleKeyboardEvent(event: Event) {
     console.log(`alt enter`)
   }
 

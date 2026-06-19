@@ -2,6 +2,7 @@ import {
   Component,
   Input,
   OnInit,
+  ChangeDetectionStrategy
 } from '@angular/core';
 import { DebugService } from '../../core/debug.service'
 import {Config, ConfigService} from '../../core/config.service'
@@ -10,8 +11,10 @@ import {CachedSubject} from '../../../../libs/AppFedShared/utils/cachedSubject2/
 import {stripHtml} from '../../../../libs/AppFedShared/utils/html-utils'
 
 @Component({
+  standalone: false,
   selector: 'app-time-tracking-cell',
   templateUrl: './time-tracking-cell.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./time-tracking-cell.component.sass']
 })
 export class TimeTrackingCellComponent implements OnInit {

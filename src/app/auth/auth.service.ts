@@ -10,6 +10,8 @@ import {CachedSubject} from '../libs/AppFedShared/utils/cachedSubject2/CachedSub
 // import {User} from 'firebase/compat/app'
 import {ChromeExtensionService} from '../apps/Learn/shared/utils/chrome-extension.service'
 import firebase from 'firebase/compat/app'
+import 'firebase/compat/auth'
+import { GoogleAuthProvider } from '@angular/fire/auth'
 import User = firebase.User
 import {nullish} from '../libs/AppFedShared/utils/type-utils'
 
@@ -84,7 +86,7 @@ export class AuthService {
         console.log('Log  in response===', response);
       });
     } else {
-      const authProvider = new firebase.auth.GoogleAuthProvider();
+      const authProvider = new GoogleAuthProvider();
       return this.afAuth
         .signInWithPopup(authProvider)
         .then((response: any) => (this.login()/*, this.Router.navigateByUrl('/timers')*/)

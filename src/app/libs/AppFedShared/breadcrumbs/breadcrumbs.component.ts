@@ -1,4 +1,4 @@
-import {Component, Injector, Input, OnInit} from '@angular/core';
+import {Component, Injector, Input, OnInit, ChangeDetectionStrategy} from '@angular/core';
 import {BaseComponent} from '../base/base.component'
 import {OdmItem$2} from '../odm/OdmItem$2'
 import {stripHtml} from '../utils/html-utils'
@@ -6,8 +6,10 @@ import {LearnItem$} from '../../../apps/Learn/models/LearnItem$'
 import {BehaviorSubject} from 'rxjs'
 
 @Component({
+  standalone: false,
   selector: 'app-breadcrumbs',
   templateUrl: './breadcrumbs.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./breadcrumbs.component.sass'],
 })
 export class BreadcrumbsComponent extends BaseComponent implements OnInit {

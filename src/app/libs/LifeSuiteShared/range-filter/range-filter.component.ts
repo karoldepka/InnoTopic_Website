@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 
 export class RangeFilterVal {
   active: boolean
@@ -7,8 +7,10 @@ export class RangeFilterVal {
 }
 
 @Component({
+  standalone: false,
   selector: 'app-range-filter',
   templateUrl: './range-filter.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./range-filter.component.sass'],
 })
 export class RangeFilterComponent implements OnInit {

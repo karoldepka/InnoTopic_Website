@@ -1,11 +1,13 @@
-import {Component, Input, OnInit} from '@angular/core';
+import {Component, Input, OnInit, ChangeDetectionStrategy} from '@angular/core';
 import {JournalTextDescriptor, JournalTextDescriptors} from '../../models/JournalTextDescriptors'
 import {JournalEntry} from '../../models/JournalEntry'
 import {JournalEntry$} from '../../models/JournalEntry$'
 
 @Component({
+  standalone: false,
   selector: 'app-journal-text-fields',
   templateUrl: './journal-text-fields.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./journal-text-fields.component.sass'],
 })
 export class JournalTextFieldsComponent implements OnInit {

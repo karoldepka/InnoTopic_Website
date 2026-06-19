@@ -1,77 +1,30 @@
-import {Component, Input, OnInit} from '@angular/core';
+import {Component, ChangeDetectionStrategy} from '@angular/core';
 import {mentalEffortLevels} from '../../models/fields/mental-effort-level.model'
-import {btn, ButtonsDescriptor} from '../../../../libs/AppFedSharedIonic/ratings/numeric-picker/numeric-picker.component'
-import {intensityBtnVariant} from '../../../../libs/LifeSuiteShared/edit-shared/importance-edit/importance-edit.component'
-import {UntypedFormControl, UntypedFormGroup} from '@angular/forms'
-import {ViewSyncer} from '../../../../libs/AppFedShared/odm/ui/ViewSyncer'
-import {Required} from '../../../../libs/AppFedShared/utils/angular/Required.decorator'
 import {LearnItem$} from '../../models/LearnItem$'
+import {
+  createBalancedIntensityButtonsDescriptor,
+  SyncedDescriptorFieldEditComponent,
+} from '../../../../libs/LifeSuiteShared/edit-shared/descriptor-level-edit'
 
 const levels = mentalEffortLevels
 
-const buttonsDesc = new ButtonsDescriptor<any, string>([
-  btn({
-    btnVariants: [
-      intensityBtnVariant(`🤒`, levels.somewhat_low),
-      intensityBtnVariant(`🤒🤒`, levels.low),
-      intensityBtnVariant(`🤒🤒🤒`, levels.very_low),
-      intensityBtnVariant(`🤒🤒🤒🤒`, levels.extremely_low),
-      // inspiration for various kinds of arrows: https://en.wikipedia.org/wiki/Arrow_(symbol)#Arrows_in_Unicode
-    ],
-  }),
-  btn({
-    btnVariants: [
-      intensityBtnVariant(`~`, levels.medium),
-      intensityBtnVariant(`?`, levels.unknown),
-      intensityBtnVariant(`-`, levels.undefined /* TODO: isUnset: true */),
-      // unset is actually no button highlighted and hence no label --> undefined
-    ]
-  }),
-  btn({
-    btnVariants: [
-      intensityBtnVariant(`🤸`, levels.somewhat_high),
-      intensityBtnVariant(`🤸🤸`, levels.high),
-      intensityBtnVariant(`🤸🤸🤸`, levels.very_high),
-      intensityBtnVariant(`🤸🤸🤸🤸`, levels.extremely_high),
-      // intensityBtnVariant(`X-T-Mental`, levels.testing_extremely_high),
-    ]
-  }),
-])
+const buttonsDesc = createBalancedIntensityButtonsDescriptor(
+  levels,
+  [`🤒`, `🤒🤒`, `🤒🤒🤒`, `🤒🤒🤒🤒`],
+  [`🤸`, `🤸🤸`, `🤸🤸🤸`, `🤸🤸🤸🤸`],
+)
 
 @Component({
+  standalone: false,
   selector: 'app-physical-health-impact-level-edit',
   templateUrl: './physical-health-impact-level-edit.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./physical-health-impact-level-edit.component.sass'],
 })
-export class PhysicalHealthImpactLevelEditComponent implements OnInit {
-
+export class PhysicalHealthImpactLevelEditComponent extends SyncedDescriptorFieldEditComponent<LearnItem$> {
 
   readonly fieldName = 'physicalHealthImpact'
 
   buttonsDesc = buttonsDesc
-
-  formGroup ! : UntypedFormGroup
-
-  formControls = {
-    physicalHealthImpact: new UntypedFormControl(),
-  }
-
-  viewSyncer ! : ViewSyncer
-
-  @Input()
-  @Required()
-  public item$ ! : LearnItem$
-
-  constructor() { }
-
-  ngOnInit() {
-    this.formGroup = new UntypedFormGroup(this.formControls)
-    this.viewSyncer = new ViewSyncer(
-      this.formGroup,
-      this.item$,
-      false,
-      this.fieldName
-    )
-  }
 
 }

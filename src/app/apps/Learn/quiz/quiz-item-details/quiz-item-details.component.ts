@@ -1,4 +1,4 @@
-import {AfterViewInit, Component, ElementRef, Input, OnDestroy, OnInit, ViewChild} from '@angular/core';
+import {AfterViewInit, Component, ElementRef, Input, OnDestroy, OnInit, ViewChild, ChangeDetectionStrategy} from '@angular/core';
 import {debugLog} from '../../../../libs/AppFedShared/utils/log'
 import {LearnItem} from '../../models/LearnItem'
 import {Observable} from 'rxjs'
@@ -9,8 +9,10 @@ import {Subscription} from 'rxjs'
 import {nullish} from '../../../../libs/AppFedShared/utils/type-utils'
 
 @Component({
+  standalone: false,
   selector: 'app-quiz-item-details',
   templateUrl: './quiz-item-details.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./quiz-item-details.component.sass'],
 })
 export class QuizItemDetailsComponent implements OnInit, OnDestroy, AfterViewInit {

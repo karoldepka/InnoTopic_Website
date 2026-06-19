@@ -1,12 +1,14 @@
-import {Component, Input, OnInit} from '@angular/core';
+import {Component, Input, OnInit, ChangeDetectionStrategy} from '@angular/core';
 import {NumericPickerVal} from '../../../../libs/AppFedSharedIonic/ratings/numeric-picker/numeric-picker.component'
 import {JournalNumericDescriptor, JournalNumericDescriptors} from '../../models/JournalNumericDescriptors'
 import {JournalCompositeFieldVal, JournalEntry} from '../../models/JournalEntry'
 import {JournalEntry$} from '../../models/JournalEntry$'
 
 @Component({
+  standalone: false,
   selector: 'app-journal-numeric-fields',
   templateUrl: './journal-numeric-fields.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./journal-numeric-fields.component.sass'],
 })
 export class JournalNumericFieldsComponent implements OnInit {

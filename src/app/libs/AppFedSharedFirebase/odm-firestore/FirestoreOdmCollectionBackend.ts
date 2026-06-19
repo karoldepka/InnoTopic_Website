@@ -1,13 +1,13 @@
 import {ItemId, OdmCollectionBackend, OdmCollectionBackendListener, QueryOpts} from "../../AppFedShared/odm/OdmCollectionBackend";
-import {Injector} from "@angular/core";
-import {AngularFirestore, AngularFirestoreDocument, DocumentChange, QuerySnapshot} from "@angular/fire/compat/firestore";
+import {EnvironmentInjector, Injector, runInInjectionContext} from "@angular/core";
+import {AngularFirestore, QuerySnapshot} from "@angular/fire/compat/firestore";
 import {OdmItemId} from "../../AppFedShared/odm/OdmItemId";
 import {ignorePromise} from "../../AppFedShared/utils/promiseUtils";
 import {OdmBackend} from "../../AppFedShared/odm/OdmBackend";
 import {debugLog, errorAlert, errorAlertAndThrow} from "../../AppFedShared/utils/log";
 import {isNotNullish} from '../../AppFedShared/utils/utils'
 import {assertTruthy} from '../../AppFedShared/utils/assertUtils'
-import {dateToStringSuitableForId, getNowTimePointSuitableForId} from '../../AppFedShared/odm/utils'
+import {dateToStringSuitableForId} from '../../AppFedShared/odm/utils'
 // import { firestore } from 'firebase';
 // import Timestamp = firestore.Timestamp
 
@@ -15,6 +15,7 @@ import {dateToStringSuitableForId, getNowTimePointSuitableForId} from '../../App
 export class FirestoreOdmCollectionBackend<TRaw> extends OdmCollectionBackend<TRaw> {
 
   protected angularFirestore = this.injector.get(AngularFirestore)
+  private environmentInjector = this.injector.get(EnvironmentInjector)
 
   public collectionName = this.className;
 
@@ -31,11 +32,9 @@ export class FirestoreOdmCollectionBackend<TRaw> extends OdmCollectionBackend<TR
   /** Could also add archive here; and mark as deleted / trash */
   deleteWithoutConfirmation(itemId: OdmItemId) {
     // DANGEROUS return  this. /* danger */ itemDoc(itemId) /* danger */  .delete()
-    // const angularFirestoreDocument = this.itemDoc(itemId) // as AngularFirestoreDocument<TRaw & { whenDeleted: Date}>
-    const angularFirestoreDocument = this.itemDoc(itemId) as AngularFirestoreDocument<any> /* HACK after AngularFire update */
-    return angularFirestoreDocument.update({
+    return this.inInjectionContext(() => this.itemDoc(itemId).update({
       whenDeleted: new Date()
-    })
+    }))
   }
 
   saveNowToDb(item: TRaw, id: string, parentIds?: ItemId[], ancestorIds?: ItemId[]): Promise<any> {
@@ -59,7 +58,7 @@ export class FirestoreOdmCollectionBackend<TRaw> extends OdmCollectionBackend<TR
 
     // FIXME: review this coz modified with sleep deprivation, while introducing saveToHistory()
     try {
-      const dataToSave = {
+      const dataToSave = this.toFirestoreData({
         ... item,
         ... (parentIds ? {
           parentIds
@@ -67,8 +66,8 @@ export class FirestoreOdmCollectionBackend<TRaw> extends OdmCollectionBackend<TR
         ... (ancestorIds ? {
           ancestorIds
         } : {}),
-      }
-      const retPromise = this.itemDoc(id).set(dataToSave/*.toDbFormat()*/)
+      })
+      const retPromise = this.inInjectionContext(() => this.itemDoc(id).set(dataToSave/*.toDbFormat()*/))
       retPromise.catch(error => {
         this.errorAlert('saveNowToDb this.itemDoc(id).set retPromise.catch', error)
       })
@@ -88,7 +87,7 @@ export class FirestoreOdmCollectionBackend<TRaw> extends OdmCollectionBackend<TR
   private saveToHistory(id: string, item: TRaw, parentIds: ItemId[] | undefined, ancestorIds: ItemId[] | undefined): Promise<void> {
     try {
       const nowDate = new Date
-      const dataToSave = {
+      const dataToSave = this.toFirestoreData({
         /* FIXME refactor extract common part with saveNowToDb */
         ...item,
         ...(parentIds ? {
@@ -100,8 +99,10 @@ export class FirestoreOdmCollectionBackend<TRaw> extends OdmCollectionBackend<TR
         itemId: id /* not calling it `id` coz the primary key is different */,
         _historySnapshotTimestamp: nowDate /* FIXME find good name; `when` was too vague */,
 
-      }
-      const retPromise = this.itemHistoryNewDocForNowTimePoint(nowDate, id).set(dataToSave/*.toDbFormat()*/)
+      })
+      const retPromise = this.inInjectionContext(() =>
+        this.itemHistoryNewDocForNowTimePoint(nowDate, id).set(dataToSave/*.toDbFormat()*/)
+      )
       retPromise.catch(error => {
         this.errorAlert('saveToHistory this.itemHistoryNewDocForNowTimePoint(nowDate, id).set(...) retPromise.catch', error)
       })
@@ -113,13 +114,12 @@ export class FirestoreOdmCollectionBackend<TRaw> extends OdmCollectionBackend<TR
     }
   }
 
-  /* FIXME cache this; maybe it causes excessive loads? Anyway it's good to cache externally obtained stuff coz we don't know their impl. */
   private collection() {
-    return this.angularFirestore.collection<TRaw>(this.collectionName);
+    return this.angularFirestore.firestore.collection(this.collectionName)
   }
 
   private historyCollection() {
-    return this.angularFirestore.collection<TRaw>(this.collectionName + '__History' /* double underscore coz it's very meta :) */);
+    return this.angularFirestore.firestore.collection(this.collectionName + '__History')
   }
 
   private itemDoc(itemId: OdmItemId) {
@@ -127,8 +127,57 @@ export class FirestoreOdmCollectionBackend<TRaw> extends OdmCollectionBackend<TR
   }
 
   private itemHistoryNewDocForNowTimePoint(date: Date, itemId: OdmItemId) {
-    const path = itemId + '_' /* just one _ to avoid triple _ coz of the stupid _ trailing */ + dateToStringSuitableForId(date)
+    const path = itemId + '_' + dateToStringSuitableForId(date)
     return this.historyCollection().doc(path)
+  }
+
+  private inInjectionContext<T>(fn: () => T): T {
+    return runInInjectionContext(this.environmentInjector, fn)
+  }
+
+  private toFirestoreData<T>(value: T): T {
+    if ( value === undefined ) {
+      return null as T
+    }
+    if ( value === null || typeof value !== 'object' ) {
+      return value
+    }
+    if ( value instanceof Date ) {
+      return value
+    }
+    if ( this.isTimestampLike(value) ) {
+      return this.timestampLikeToDate(value) as T
+    }
+    if ( Array.isArray(value) ) {
+      return value.map(item => this.toFirestoreData(item)) as T
+    }
+
+    const prototype = Object.getPrototypeOf(value)
+    if ( prototype !== Object.prototype && prototype !== null ) {
+      return value
+    }
+
+    return Object.fromEntries(
+      Object.entries(value).map(([key, entryValue]) => [
+        key,
+        this.toFirestoreData(entryValue),
+      ])
+    ) as T
+  }
+
+  private isTimestampLike(value: any): value is { seconds: number, nanoseconds?: number, toDate?: () => Date } {
+    return typeof value?.seconds === 'number'
+      && ( value.nanoseconds === undefined || typeof value.nanoseconds === 'number' )
+      && ( typeof value.toDate === 'function' || value.constructor?.name === 'Timestamp' )
+  }
+
+  private timestampLikeToDate(value: { seconds: number, nanoseconds?: number, toDate?: () => Date }): Date {
+    const date = value.toDate?.()
+    if ( date instanceof Date && ! Number.isNaN(date.getTime()) ) {
+      return date
+    }
+
+    return new Date(value.seconds * 1000 + Math.floor((value.nanoseconds ?? 0) / 1000000))
   }
 
   /** IDEA: for more flexibility this could return an ARRAY of download DESCRIPTORS

@@ -1,4 +1,4 @@
-import {Component, Input, OnDestroy, OnInit} from '@angular/core';
+import {Component, Input, OnDestroy, OnInit, ChangeDetectionStrategy} from '@angular/core';
 import {Required} from '../../utils/angular/Required.decorator'
 
 // https://developer.mozilla.org/en-US/docs/Web/API/BaseAudioContext/createAnalyser
@@ -13,8 +13,10 @@ import {Required} from '../../utils/angular/Required.decorator'
 const audioCtx = new (window.AudioContext || (window as any).webkitAudioContext)();
 
 @Component({
+  standalone: false,
   selector: 'app-audio-visualizer',
   templateUrl: './audio-visualizer.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./audio-visualizer.component.sass'],
 })
 export class AudioVisualizerComponent implements OnInit, OnDestroy {
@@ -30,8 +32,8 @@ export class AudioVisualizerComponent implements OnInit, OnDestroy {
 
   bufferLength = 32;
 
-  public dataArray: Uint8Array = new Uint8Array(
-    this.bufferLength / (this.useFreqs ? 2 : 1)
+  public dataArray: Uint8Array<ArrayBuffer> = new Uint8Array(
+    new ArrayBuffer(this.bufferLength / (this.useFreqs ? 2 : 1))
     // https://electronics.stackexchange.com/questions/12407/what-is-the-relation-between-fft-length-and-frequency-resolution
   )
   public array ! : Array<number>

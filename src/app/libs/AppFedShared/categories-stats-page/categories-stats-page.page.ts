@@ -1,12 +1,14 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import {LearnItem$} from '../../../apps/Learn/models/LearnItem$'
 import {HtmlString} from '../../../apps/Learn/models/LearnItem'
 import {stripHtml} from '../utils/html-utils'
 import {LearnItemItemsService} from '../../../apps/Learn/core/learn-item-items.service'
 
 @Component({
+  standalone: false,
   selector: 'app-categories-stats-page',
   templateUrl: './categories-stats-page.page.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./categories-stats-page.page.sass'],
 })
 export class CategoriesStatsPagePage implements OnInit {

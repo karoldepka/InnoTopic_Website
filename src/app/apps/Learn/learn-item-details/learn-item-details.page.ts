@@ -1,4 +1,4 @@
-import {Component, Injector, OnInit} from '@angular/core';
+import {Component, Injector, OnInit, ChangeDetectionStrategy} from '@angular/core';
 import {sidesDefsArray} from '../core/sidesDefs'
 import {ActivatedRoute, NavigationStart, Router} from '@angular/router'
 import {LearnItemItemsService} from '../core/learn-item-items.service'
@@ -14,8 +14,10 @@ import {filter} from 'rxjs/operators'
 import {BaseComponent} from '../../../libs/AppFedShared/base/base.component'
 
 @Component({
+  standalone: false,
   selector: 'app-learn-item-details',
   templateUrl: './learn-item-details.page.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./learn-item-details.page.sass'],
 })
 export class LearnItemDetailsPage extends BaseComponent implements OnInit {
@@ -53,6 +55,7 @@ export class LearnItemDetailsPage extends BaseComponent implements OnInit {
   }
 
   private doc: AngularFirestoreDocument<LearnItem> = this.angularFirestore.collection<LearnItem>(`LearnItem`).doc(this.id)
+  private audioDoc = this.angularFirestore.collection(`LearnDoAudio`).doc(this.id)
 
   ngOnInit() {
   }
@@ -73,7 +76,7 @@ export class LearnItemDetailsPage extends BaseComponent implements OnInit {
             //   whenDeleted: new Date(),
             // })
             await this.doc.delete() // TODO: listen to promise for sync status
-            await this.angularFirestore.collection(`LearnDoAudio`).doc(this.id).delete() // TODO: listen to promise for sync status
+            await this.audioDoc.delete() // TODO: listen to promise for sync status
             ignorePromise(this.router.navigate([`/learn`]))
           }
         }

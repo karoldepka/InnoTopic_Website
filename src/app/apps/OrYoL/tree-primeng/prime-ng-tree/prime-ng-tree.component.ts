@@ -1,10 +1,12 @@
-import {Component, Input, OnInit} from '@angular/core';
+import {Component, Input, OnInit, ChangeDetectionStrategy} from '@angular/core';
 import {TreeModel} from '../../tree-model/TreeModel'
 import {TreeHostComponent} from '../../tree-host/tree-host/tree-host.component'
 
 @Component({
+  standalone: false,
   selector: 'app-prime-ng-tree',
   templateUrl: './prime-ng-tree.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./prime-ng-tree.component.scss']
 })
 export class PrimeNgTreeComponent implements OnInit {
@@ -20,7 +22,7 @@ export class PrimeNgTreeComponent implements OnInit {
   ngOnInit() {
   }
 
-  nodeDrop(event: Event) {
+  nodeDrop(event: any) {
     console.log('nodeDrop', event)
     // this.dbService.moveNode(event.dragNode.dbId, event.dropNode.dbId) // FIXME
   }

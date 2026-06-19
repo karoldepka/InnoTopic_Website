@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import {Dict, getDictionaryValuesAsArray, setIdsFromKeys} from '../../../utils/dictionary-utils';
 
 /* make it more like "translation" instead of translator, to avoid fixed labels; and to widen the audience
@@ -31,8 +31,10 @@ export class Occupations {
 export const occupations = getDictionaryValuesAsArray(setIdsFromKeys(new Occupations() as any as Dict<{}>))
 
 @Component({
+  standalone: false,
   selector: 'app-occupations',
   templateUrl: './occupations.page.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./occupations.page.scss'],
 })
 export class OccupationsPage implements OnInit {

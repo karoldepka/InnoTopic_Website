@@ -2,14 +2,17 @@ import {
   Component,
   Input,
   OnInit,
+  ChangeDetectionStrategy
 } from '@angular/core';
 import { TreeHostComponent } from '../../tree-host/tree-host/tree-host.component'
 import { debugLog } from '../../utils/log'
 import {ApfBaseTreeNode, OryBaseTreeNode, OryNonRootTreeNode} from '../../tree-model/TreeModel'
 
 @Component({
+  standalone: false,
   selector: 'app-nested-tree-node',
   templateUrl: './nested-tree-node.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./nested-tree-node.component.scss']
 })
 export class NestedTreeNodeComponent implements OnInit {

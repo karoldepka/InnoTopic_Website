@@ -1,12 +1,14 @@
-import {Component, Input, OnInit} from '@angular/core';
+import {Component, Input, OnInit, ChangeDetectionStrategy} from '@angular/core';
 import {UntypedFormControl, UntypedFormGroup} from '@angular/forms'
 import {ViewSyncer} from '../../../../libs/AppFedShared/odm/ui/ViewSyncer'
 import {Required} from '../../../../libs/AppFedShared/utils/angular/Required.decorator'
 import {OdmItem$2} from '../../../AppFedShared/odm/OdmItem$2'
 
 @Component({
+  standalone: false,
   selector: 'odm-checkbox',
   templateUrl: './odm-checkbox.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./odm-checkbox.sass'],
 })
 export class OdmCheckbox implements OnInit {

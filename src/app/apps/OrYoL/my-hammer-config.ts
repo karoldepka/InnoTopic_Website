@@ -1,6 +1,5 @@
-import { HammerGestureConfig, HAMMER_GESTURE_CONFIG } from '@angular/platform-browser';
-export class MyHammerConfig extends HammerGestureConfig {
-  options = <any> {
+export class MyHammerConfig {
+  options = {
     touchAction: 'auto',
   };
 }
