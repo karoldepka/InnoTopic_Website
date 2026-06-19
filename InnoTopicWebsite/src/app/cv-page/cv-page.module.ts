@@ -45,8 +45,8 @@ import {TopicsSharedModule} from "../topics-shared/topics-shared.module";
         SharedModule,
         TopicsSharedModule,
     ],
-  // schemas: [
-  //   CUSTOM_ELEMENTS_SCHEMA,
-  // ]
+  schemas: [
+    CUSTOM_ELEMENTS_SCHEMA,
+  ]
 })
 export class CvPageModule1 { }

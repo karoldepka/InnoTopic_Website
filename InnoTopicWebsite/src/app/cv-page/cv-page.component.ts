@@ -1,6 +1,5 @@
 import {
   Component,
-  CUSTOM_ELEMENTS_SCHEMA,
   OnInit,
 } from '@angular/core';
 
@@ -9,7 +8,6 @@ import {
   selector: 'app-cv-page',
   templateUrl: './cv-page.component.html',
   styleUrls: ['./cv-page.component.scss'],
-  schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
 export class CvPageComponent implements OnInit {
 
