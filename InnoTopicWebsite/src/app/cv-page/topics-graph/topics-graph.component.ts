@@ -31,9 +31,9 @@ export class TopicsGraphComponent implements OnInit {
 
   ngOnInit() {
     this.graphHasContainer = !! this.activatedRoute.snapshot.queryParams['container']; // Jay and Samyak this is better than Boolean(). e.g. container=1
-    console.log('generateNodes', this.d3Nodes)
+    // console.log('generateNodes', this.d3Nodes)
     this.generateNodes(this.connections)
-    console.log('d3Nodes', this.d3Nodes)
+    // console.log('d3Nodes', this.d3Nodes)
     this.generateLinks(this.connections)
     this.fetchIcons() // this inits graph when finished
   }
@@ -49,7 +49,7 @@ export class TopicsGraphComponent implements OnInit {
     })
 
     let logosPromises = topicNodes.map((topic: any) => {
-      console.log(`topic`, topic)
+      // console.log(`topic`, topic)
       const responsePromise = fetch(topic.logo);
       // responsePromise.then(resp => {
       //   resp.text().then(text => {
@@ -64,7 +64,7 @@ export class TopicsGraphComponent implements OnInit {
       // })
       return responsePromise;
     });
-    console.log(`topic logosPromises`, logosPromises)
+    // console.log(`topic logosPromises`, logosPromises)
     const topicLogosResponses = await Promise.all(logosPromises)
     const topicLogosTexts = await Promise.all(topicLogosResponses.map(resp => resp.text())).then(texts => {
       texts.forEach((text, i) => {
@@ -81,8 +81,8 @@ export class TopicsGraphComponent implements OnInit {
       })
       this.initD3Graph() // FIXME
     })
-    console.log(`topic logos`, topicLogosResponses)
-    console.log(`topic logos topicLogosTexts`, topicLogosTexts)
+    // console.log(`topic logos`, topicLogosResponses)
+    // console.log(`topic logos topicLogosTexts`, topicLogosTexts)
   }
 
   private initD3Graph() {
@@ -133,7 +133,7 @@ export class TopicsGraphComponent implements OnInit {
         })
         .on("zoom", function () {
         // https://www.geeksforgeeks.org/d3-js-transform-scale-function/
-        console.log('transform d3.event.transform', d3.event.transform)
+        // console.log('transform d3.event.transform', d3.event.transform)
         svg.attr("transform", d3.event.transform) // TODO: I could hack the default zoom level here??
         // svg.attr("transform", {k: 0.6087830093314941, x: 176.23706425069088, y: 116.76122945091723})
         // svg.attr("transform", d3.transform({k: 0.6087830093314941, x: 176.23706425069088, y: 116.76122945091723}))
@@ -439,6 +439,6 @@ export class TopicsGraphComponent implements OnInit {
         ...links
       )
     })
-    console.log(`links`, this.d3Links)
+    // console.log(`links`, this.d3Links)
   }
 }

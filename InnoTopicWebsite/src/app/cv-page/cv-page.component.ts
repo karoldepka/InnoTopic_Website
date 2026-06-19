@@ -9,6 +9,7 @@ import {
   selector: 'app-cv-page',
   templateUrl: './cv-page.component.html',
   styleUrls: ['./cv-page.component.scss'],
+  schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
 export class CvPageComponent implements OnInit {
 
