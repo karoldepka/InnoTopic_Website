@@ -26,7 +26,7 @@ export const skillsIconsSignal = {
 @Component({
   selector: 'app-skill-levels-icons',
   standalone: true,
-  imports: [CommonModule, SkillLevelIconComponent],
+  imports: [CommonModule],
   templateUrl: './skill-levels-icons.component.html',
   styleUrls: ['./skill-levels-icons.component.sass'],
   encapsulation: ViewEncapsulation.None

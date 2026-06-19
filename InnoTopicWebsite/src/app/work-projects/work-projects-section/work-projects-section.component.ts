@@ -13,7 +13,7 @@ import { WorkOrganisationsAndProjectsData } from '../work-projects-data';
 @Component({
   selector: 'app-work-projects-section',
   standalone: true,
-  imports: [CommonModule, FlagsComponent, HashtagReplacerComponent, WorkProjectComponent, KeyValOrderedPipe],
+  imports: [CommonModule, FlagsComponent, HashtagReplacerComponent, WorkProjectComponent],
   templateUrl: './work-projects-section.component.html',
   styleUrls: ['./work-projects-section.component.sass'],
   changeDetection: ChangeDetectionStrategy.OnPush,
