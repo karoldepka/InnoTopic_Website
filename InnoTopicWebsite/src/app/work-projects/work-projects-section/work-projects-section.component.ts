@@ -9,11 +9,12 @@ import { HashtagReplacerComponent } from '../../topics-shared/hashtag-replacer/h
 import { WorkProjectComponent } from './work-project/work-project.component';
 import { KeyValOrderedPipe } from '../../utils/KeyValueOrderedPipe';
 import { WorkOrganisationsAndProjectsData } from '../work-projects-data';
+import { ThreeDTextComponent } from '../../shared/threed-text/threed-text.component';
 
 @Component({
   selector: 'app-work-projects-section',
   standalone: true,
-  imports: [CommonModule, FlagsComponent, HashtagReplacerComponent, WorkProjectComponent],
+  imports: [CommonModule, FlagsComponent, HashtagReplacerComponent, WorkProjectComponent, ThreeDTextComponent],
   templateUrl: './work-projects-section.component.html',
   styleUrls: ['./work-projects-section.component.sass'],
   changeDetection: ChangeDetectionStrategy.OnPush,

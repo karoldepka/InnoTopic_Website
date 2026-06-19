@@ -1,12 +1,11 @@
-import { Component, Input, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
+import { Component, Input, CUSTOM_ELEMENTS_SCHEMA, OnInit } from '@angular/core';
 import { AsyncPipe } from '@angular/common';
 import { Store } from '@ngrx/store';
-import { map, Observable } from 'rxjs';
+import { Observable } from 'rxjs';
 import { ThemeConfigState } from '../../models/theme-config-state.model';
 
 @Component({
-  selector: 'app-threed-text',
-  standalone: true,
+  selector: 'app-three-d-text',
   imports: [AsyncPipe],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
   template: `
@@ -15,12 +14,19 @@ import { ThemeConfigState } from '../../models/theme-config-state.model';
       [attr.secondary-color]="secondaryColor$ | async"
       [attr.text]="text"
       [attr.scroll-zoom]="scrollZoom"
+      [attr.font-size]="32"
+      [attr.depth]="0.1"
+      [attr.fov]="19"
+      [attr.drag-rotate]="false"
+      [attr.rotate-z]="rotateZ"
+      [attr.capitalize]="true"
     ></threed-text>
   `,
 })
-export class ThreedTextComponent {
+export class ThreeDTextComponent implements OnInit {
   @Input() text = '';
   @Input() scrollZoom = 'false';
+  @Input() rotateZ = '0';
 
   primaryColor$: Observable<string>;
   secondaryColor$: Observable<string>;
@@ -28,5 +34,14 @@ export class ThreedTextComponent {
   constructor(store: Store<{ themeConfig: ThemeConfigState }>) {
     this.primaryColor$ = store.select(state => state.themeConfig.ion_color_primary);
     this.secondaryColor$ = store.select(state => state.themeConfig.ion_color_secondary);
+  }
+
+  ngOnInit() {
+    if (!customElements.get('threed-text')) {
+      const script = document.createElement('script');
+      script.type = 'module';
+      script.src = 'assets/dist/threed-text.js';
+      document.head.appendChild(script);
+    }
   }
 }

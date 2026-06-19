@@ -3,11 +3,11 @@ import { CommonModule } from '@angular/common';
 import { FlagsComponent } from '../../countries/flags/flags.component';
 import { Language } from "../language-experience";
 import { LanguageExperiences } from "../language-experience-data";
+import { ThreeDTextComponent } from 'src/app/shared/threed-text/threed-text.component';
 
 @Component({
   selector: 'app-language-section',
-  standalone: true,
-  imports: [CommonModule, FlagsComponent],
+  imports: [CommonModule, FlagsComponent, ThreeDTextComponent],
   templateUrl: './language-section.component.html',
   styleUrls: ['./language-section.component.scss'],
 })

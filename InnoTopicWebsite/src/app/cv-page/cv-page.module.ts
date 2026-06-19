@@ -19,7 +19,7 @@ import { TopicsGraphComponent } from './topics-graph/topics-graph.component';
 import { VideoCvComponent } from './video-cv/video-cv.component';
 import {SharedModule} from "../shared/shared.module";
 import {TopicsSharedModule} from "../topics-shared/topics-shared.module";
-import {ThreedTextComponent} from "../shared/threed-text/threed-text.component";
+import {ThreeDTextComponent} from "../shared/threed-text/threed-text.component";
 
 @NgModule({
   declarations: [
@@ -45,7 +45,7 @@ import {ThreedTextComponent} from "../shared/threed-text/threed-text.component";
         OtherProfilesModule,
         SharedModule,
         TopicsSharedModule,
-        ThreedTextComponent,
+        ThreeDTextComponent,
     ],
   schemas: [
     CUSTOM_ELEMENTS_SCHEMA,

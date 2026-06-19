@@ -33,9 +33,11 @@ app-external-profiles {
 
   .container {
     align-items: center;
+    flex-direction: row !important;
 
-    @media screen and (max-width: $break-medium) {
-      flex-direction: column;
+    app-three-d-text {
+      margin-right: 16px;
+      flex-shrink: 0;
     }
   }
 }
