@@ -2,7 +2,7 @@ var pe = Object.defineProperty;
 var ue = (r, e, n) => e in r ? pe(r, e, { enumerable: !0, configurable: !0, writable: !0, value: n }) : r[e] = n;
 var d = (r, e, n) => ue(r, typeof e != "symbol" ? e + "" : e, n);
 import * as i from "three";
-import { TextGeometry as q } from "three/examples/jsm/geometries/TextGeometry.js";
+import { TextGeometry as W } from "three/examples/jsm/geometries/TextGeometry.js";
 import { Font as se } from "three/examples/jsm/loaders/FontLoader.js";
 const re = {}, ie = "droid_sans", ne = [
   {
@@ -155,45 +155,45 @@ async function he(r = ie) {
   }
   const n = e.urls;
   return new Promise((s, t) => {
-    const a = async (l) => {
-      if (l >= n.length) {
+    const a = async (c) => {
+      if (c >= n.length) {
         t(new Error(`All URLs failed for font "${r}"`));
         return;
       }
       try {
-        const c = await fetch(n[l]);
-        if (!c.ok) throw new Error(`HTTP ${c.status}`);
-        const u = await c.json(), v = new se(u);
-        G.set(r, v), s(v);
-      } catch (c) {
-        console.error(`Font "${r}" failed from ${n[l]}:`, c), a(l + 1);
+        const l = await fetch(n[c]);
+        if (!l.ok) throw new Error(`HTTP ${l.status}`);
+        const u = await l.json(), f = new se(u);
+        G.set(r, f), s(f);
+      } catch (l) {
+        console.error(`Font "${r}" failed from ${n[c]}:`, l), a(c + 1);
       }
     };
     a(0);
   });
 }
 async function ve(r) {
-  var a, l, c, u, v, b, z, o, M, A;
-  const e = { ...me, ...Object.fromEntries(Object.entries(r).filter(([B, F]) => F !== void 0)) }, n = e.text.split(`
-`), s = n.some((B) => /<b>/i.test(B)), t = n.map(fe);
+  var a, c, l, u, f, S, E, F, P, o;
+  const e = { ...me, ...Object.fromEntries(Object.entries(r).filter(([_, w]) => w !== void 0)) }, n = e.text.split(`
+`), s = n.some((_) => /<b>/i.test(_)), t = n.map(fe);
   try {
-    const B = e.fontFamily ?? ie, F = _e(B), [y, V] = await Promise.all([
-      he(B),
-      s && F !== B ? he(F).catch(() => null) : Promise.resolve(null)
-    ]), R = V ?? y, E = [], H = t.map(() => 1);
+    const _ = e.fontFamily ?? ie, w = _e(_), [y, X] = await Promise.all([
+      he(_),
+      s && w !== _ ? he(w).catch(() => null) : Promise.resolve(null)
+    ]), R = X ?? y, L = [], H = t.map(() => 1);
     for (let h = 0; h < t.length; h++) {
-      const g = t[h];
-      if (!g.trim()) {
-        E.push(0);
+      const v = t[h];
+      if (!v.trim()) {
+        L.push(0);
         continue;
       }
-      const _ = n[h];
-      if (/<b>/i.test(_)) {
-        const m = ce(_);
-        let S = 0;
+      const b = n[h];
+      if (/<b>/i.test(b)) {
+        const m = ce(b);
+        let z = 0;
         for (const x of m) {
-          const k = x.bold ? R : y, w = new q(x.text, {
-            font: k,
+          const B = x.bold ? R : y, M = new W(x.text, {
+            font: B,
             size: e.size,
             depth: e.height,
             curveSegments: e.curveSegments,
@@ -203,11 +203,11 @@ async function ve(r) {
             bevelOffset: e.bevelOffset,
             bevelSegments: e.bevelSegments
           });
-          w.computeBoundingBox(), S += (((a = w.boundingBox) == null ? void 0 : a.max.x) ?? 0) - (((l = w.boundingBox) == null ? void 0 : l.min.x) ?? 0), w.dispose();
+          M.computeBoundingBox(), z += (((a = M.boundingBox) == null ? void 0 : a.max.x) ?? 0) - (((c = M.boundingBox) == null ? void 0 : c.min.x) ?? 0), M.dispose();
         }
-        E.push(S);
+        L.push(z);
       } else {
-        const m = new q(g, {
+        const m = new W(v, {
           font: y,
           size: e.size,
           depth: e.height,
@@ -219,82 +219,82 @@ async function ve(r) {
           bevelSegments: e.bevelSegments
         });
         m.computeBoundingBox();
-        const S = (((c = m.boundingBox) == null ? void 0 : c.max.x) ?? 0) - (((u = m.boundingBox) == null ? void 0 : u.min.x) ?? 0);
-        E.push(S), m.dispose();
+        const z = (((l = m.boundingBox) == null ? void 0 : l.max.x) ?? 0) - (((u = m.boundingBox) == null ? void 0 : u.min.x) ?? 0);
+        L.push(z), m.dispose();
       }
     }
     if (e.equalizeLineWidths)
-      for (let h = 0; h < E.length; h++) {
-        const g = E[h] || 1;
-        H[h] = e.targetWidth / g;
+      for (let h = 0; h < L.length; h++) {
+        const v = L[h] || 1;
+        H[h] = e.targetWidth / v;
       }
     const Y = new i.Group(), p = [];
     for (let h = 0; h < t.length; h++) {
-      const g = t[h], _ = H[h];
+      const v = t[h], b = H[h];
       if (e.equalizationMethod === "fontSize" || !e.equalizeLineWidths) {
-        if (!g.trim()) {
-          const I = new i.Group(), T = e.size * _;
-          p.push({ geometry: I, minY: 0, maxY: T * 0.8 });
+        if (!v.trim()) {
+          const q = new i.Group(), T = e.size * b;
+          p.push({ geometry: q, minY: 0, maxY: T * 0.8 });
           continue;
         }
         if (/<b>/i.test(n[h])) {
-          const I = ce(n[h]), T = e.size * _, J = {
+          const q = ce(n[h]), T = e.size * b, J = {
             size: T,
             depth: e.height,
             curveSegments: e.curveSegments,
             bevelEnabled: e.bevelEnabled,
             bevelThickness: e.bevelThickness,
-            bevelSize: e.bevelSize * _,
+            bevelSize: e.bevelSize * b,
             bevelOffset: e.bevelOffset,
             bevelSegments: e.bevelSegments
-          }, W = [];
-          let O = 0;
-          for (const U of I) {
-            const te = U.bold ? R : y, X = new q(U.text, { font: te, ...J });
-            X.computeBoundingBox();
-            const j = X.boundingBox, N = j.max.x - j.min.x;
-            W.push({ geo: X, width: N, minY: j.min.y, maxY: j.max.y, startX: j.min.x }), O += N;
+          }, I = [];
+          let j = 0;
+          for (const U of q) {
+            const te = U.bold ? R : y, V = new W(U.text, { font: te, ...J });
+            V.computeBoundingBox();
+            const A = V.boundingBox, N = A.max.x - A.min.x;
+            I.push({ geo: V, width: N, minY: A.min.y, maxY: A.max.y, startX: A.min.x }), j += N;
           }
-          let oe = -O / 2, Q = ((v = W[0]) == null ? void 0 : v.minY) ?? 0, ee = ((b = W[0]) == null ? void 0 : b.maxY) ?? T;
+          let oe = -j / 2, Q = ((f = I[0]) == null ? void 0 : f.minY) ?? 0, ee = ((S = I[0]) == null ? void 0 : S.maxY) ?? T;
           const ae = new i.Group();
-          for (const { geo: U, width: te, minY: X, maxY: j, startX: N } of W)
-            U.translate(oe - N, 0, 0), ae.add(new i.Mesh(U)), oe += te, Q = Math.min(Q, X), ee = Math.max(ee, j);
+          for (const { geo: U, width: te, minY: V, maxY: A, startX: N } of I)
+            U.translate(oe - N, 0, 0), ae.add(new i.Mesh(U)), oe += te, Q = Math.min(Q, V), ee = Math.max(ee, A);
           p.push({ geometry: ae, minY: Q, maxY: ee });
           continue;
         }
-        const m = new q(g, {
+        const m = new W(v, {
           font: y,
-          size: e.size * _,
+          size: e.size * b,
           depth: e.height,
           curveSegments: e.curveSegments,
           bevelEnabled: e.bevelEnabled,
           bevelThickness: e.bevelThickness,
-          bevelSize: e.bevelSize * _,
+          bevelSize: e.bevelSize * b,
           bevelOffset: e.bevelOffset,
           bevelSegments: e.bevelSegments
         });
         m.computeBoundingBox();
-        const S = ((z = m.boundingBox) == null ? void 0 : z.min.x) ?? 0, x = ((o = m.boundingBox) == null ? void 0 : o.max.x) ?? 0, k = x - S, w = (S + x) / 2, K = ((M = m.boundingBox) == null ? void 0 : M.min.y) ?? 0, P = ((A = m.boundingBox) == null ? void 0 : A.max.y) ?? e.size;
-        m.translate(-w, 0, 0), p.push({ geometry: m, minY: K, maxY: P });
+        const z = ((E = m.boundingBox) == null ? void 0 : E.min.x) ?? 0, x = ((F = m.boundingBox) == null ? void 0 : F.max.x) ?? 0, B = x - z, M = (z + x) / 2, K = ((P = m.boundingBox) == null ? void 0 : P.min.y) ?? 0, O = ((o = m.boundingBox) == null ? void 0 : o.max.y) ?? e.size;
+        m.translate(-M, 0, 0), p.push({ geometry: m, minY: K, maxY: O });
       } else {
-        if (!g.trim()) {
-          const P = new i.Group();
-          p.push({ geometry: P, minY: 0, maxY: e.size * 0.8 });
+        if (!v.trim()) {
+          const O = new i.Group();
+          p.push({ geometry: O, minY: 0, maxY: e.size * 0.8 });
           continue;
         }
-        const m = E[h], S = (e.targetWidth - m) / Math.max(1, g.length - 1), x = new i.Group();
-        let k = 0;
-        for (let P = 0; P < g.length; P++) {
-          const I = g[P];
-          if (I === " ") {
-            const O = new q(" ", {
+        const m = L[h], z = (e.targetWidth - m) / Math.max(1, v.length - 1), x = new i.Group();
+        let B = 0;
+        for (let O = 0; O < v.length; O++) {
+          const q = v[O];
+          if (q === " ") {
+            const j = new W(" ", {
               font: y,
               size: e.size
             });
-            O.computeBoundingBox(), k += O.boundingBox.max.x - O.boundingBox.min.x + S, O.dispose();
+            j.computeBoundingBox(), B += j.boundingBox.max.x - j.boundingBox.min.x + z, j.dispose();
             continue;
           }
-          const T = new q(I, {
+          const T = new W(q, {
             font: y,
             size: e.size,
             depth: e.height,
@@ -307,25 +307,25 @@ async function ve(r) {
           });
           T.computeBoundingBox();
           const J = T.boundingBox.max.x - T.boundingBox.min.x;
-          T.translate(k, 0, 0);
-          const W = new i.Mesh(T);
-          x.add(W), k += J + S;
+          T.translate(B, 0, 0);
+          const I = new i.Mesh(T);
+          x.add(I), B += J + z;
         }
-        const w = x.children.length > 0 ? new i.Box3().setFromObject(x) : new i.Box3(new i.Vector3(0, 0, 0), new i.Vector3(0, e.size, 0)), K = (w.max.x + w.min.x) / 2;
-        x.position.x = -K, p.push({ geometry: x, minY: w.min.y, maxY: w.max.y });
+        const M = x.children.length > 0 ? new i.Box3().setFromObject(x) : new i.Box3(new i.Vector3(0, 0, 0), new i.Vector3(0, e.size, 0)), K = (M.max.x + M.min.x) / 2;
+        x.position.x = -K, p.push({ geometry: x, minY: M.min.y, maxY: M.max.y });
       }
     }
-    const f = new Array(p.length).fill(0);
+    const g = new Array(p.length).fill(0);
     for (let h = 1; h < p.length; h++)
-      f[h] = f[h - 1] + p[h - 1].minY - e.lineSpacing - p[h].maxY;
-    const C = p.length > 0 ? f[0] + p[0].maxY : 0, L = p.length > 0 ? f[p.length - 1] + p[p.length - 1].minY : 0, $ = (C + L) / 2;
+      g[h] = g[h - 1] + p[h - 1].minY - e.lineSpacing - p[h].maxY;
+    const C = p.length > 0 ? g[0] + p[0].maxY : 0, k = p.length > 0 ? g[p.length - 1] + p[p.length - 1].minY : 0, $ = (C + k) / 2;
     for (let h = 0; h < p.length; h++) {
-      const g = f[h] - $, { geometry: _ } = p[h];
-      if (_ instanceof i.Group)
-        _.position.y = g, Y.add(_);
+      const v = g[h] - $, { geometry: b } = p[h];
+      if (b instanceof i.Group)
+        b.position.y = v, Y.add(b);
       else {
-        _.translate(0, g, 0);
-        const m = new i.Mesh(_);
+        b.translate(0, v, 0);
+        const m = new i.Mesh(b);
         Y.add(m);
       }
     }
@@ -337,28 +337,28 @@ async function ve(r) {
       envMapIntensity: e.envMapIntensity
     });
     return le(D), { geometry: Y, material: D };
-  } catch (B) {
-    console.error("Failed to load font, creating fallback geometry:", B);
-    const F = new i.Group(), y = e.size * 0.8, V = e.size + e.lineSpacing, R = [], E = t.map(() => 1);
+  } catch (_) {
+    console.error("Failed to load font, creating fallback geometry:", _);
+    const w = new i.Group(), y = e.size * 0.8, X = e.size + e.lineSpacing, R = [], L = t.map(() => 1);
     for (const p of t) {
-      let f = 0;
+      let g = 0;
       for (let C = 0; C < p.length; C++)
-        p[C] !== " " ? f += y : f += y * 0.5;
-      R.push(f);
+        p[C] !== " " ? g += y : g += y * 0.5;
+      R.push(g);
     }
     if (e.equalizeLineWidths) {
       const p = e.targetWidth;
-      for (let f = 0; f < R.length; f++) {
-        const C = R[f] || 1, L = p / C;
-        E[f] = L;
+      for (let g = 0; g < R.length; g++) {
+        const C = R[g] || 1, k = p / C;
+        L[g] = k;
       }
     }
     for (let p = 0; p < t.length; p++) {
-      const f = t[p], C = E[p], L = new i.Group();
+      const g = t[p], C = L[p], k = new i.Group();
       let $ = 0;
       const Z = e.equalizationMethod === "spacing" ? y * C : y, D = e.equalizationMethod === "fontSize" ? e.size * C : e.size;
-      for (let m = 0; m < f.length; m++) {
-        if (f[m] === " ") {
+      for (let m = 0; m < g.length; m++) {
+        if (g[m] === " ") {
           $ += Z * 0.5;
           continue;
         }
@@ -366,13 +366,13 @@ async function ve(r) {
           D * 0.6,
           D,
           e.height
-        ), k = new i.Mesh(x);
-        k.position.x = $, L.add(k), $ += Z;
+        ), B = new i.Mesh(x);
+        B.position.x = $, k.add(B), $ += Z;
       }
-      const g = new i.Box3().setFromObject(L).getCenter(new i.Vector3());
-      L.position.x = -g.x;
-      const _ = (t.length - 1) * V / 2 - p * V;
-      L.position.y = _, F.add(L);
+      const v = new i.Box3().setFromObject(k).getCenter(new i.Vector3());
+      k.position.x = -v.x;
+      const b = (t.length - 1) * X / 2 - p * X;
+      k.position.y = b, w.add(k);
     }
     const H = e.color || new i.Color().setHSL(Math.random(), 0.8, 0.5), Y = new i.MeshStandardMaterial({
       color: H,
@@ -381,7 +381,7 @@ async function ve(r) {
       envMap: e.envMap || void 0,
       envMapIntensity: e.envMapIntensity
     });
-    return le(Y), { geometry: F, material: Y };
+    return le(Y), { geometry: w, material: Y };
   }
 }
 const be = (
@@ -446,7 +446,8 @@ World`,
   depth: 0.8,
   metalness: 0.95,
   roughness: 0.15,
-  envIntensity: 1.5
+  envIntensity: 1.5,
+  fov: 75
 }, we = new i.Plane(new i.Vector3(0, 0, 1), 0), ze = `
   :host {
     --primary-color: #ff6600;
@@ -462,6 +463,8 @@ World`,
   }
   canvas {
     display: block;
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
     width: 100%;
     height: 100%;
   }
@@ -576,10 +579,18 @@ function Me(r, e) {
       </div>
 
       <div class="field">
-        <label class="field-label">Depth</label>
+        <label class="field-label">Extrude</label>
         <div class="range-row">
           <input type="range" id="cfg-depth" min="0.05" max="3" step="0.05" value="${r.depth}">
           <span class="range-val" id="cfg-depth-v">${r.depth.toFixed(2)}</span>
+        </div>
+      </div>
+
+      <div class="field">
+        <label class="field-label">Perspective (FOV)</label>
+        <div class="range-row">
+          <input type="range" id="cfg-fov" min="10" max="120" step="1" value="${r.fov}">
+          <span class="range-val" id="cfg-fov-v">${r.fov}°</span>
         </div>
       </div>
 
@@ -654,7 +665,7 @@ class Ce extends HTMLElement {
     this._shadow = this.attachShadow({ mode: "open" });
   }
   static get observedAttributes() {
-    return ["text", "color", "font", "size", "depth", "metalness", "roughness", "env-intensity", "show-config", "scroll-zoom", "primary-color", "secondary-color", "auto-size"];
+    return ["text", "color", "font", "size", "depth", "metalness", "roughness", "env-intensity", "fov", "show-config", "scroll-zoom", "primary-color", "secondary-color", "auto-size"];
   }
   connectedCallback() {
     this._buildDOM(), this._initScene();
@@ -663,7 +674,7 @@ class Ce extends HTMLElement {
     this._dispose();
   }
   attributeChangedCallback(n, s, t) {
-    var a, l;
+    var a, c;
     if (t !== null) {
       switch (n) {
         case "text":
@@ -691,6 +702,9 @@ class Ce extends HTMLElement {
         case "env-intensity":
           this._cfg.envIntensity = parseFloat(t);
           break;
+        case "fov":
+          this._cfg.fov = parseFloat(t);
+          break;
         case "scroll-zoom":
           this._scrollZoom = t !== "false";
           return;
@@ -704,7 +718,7 @@ class Ce extends HTMLElement {
           this.style.setProperty("--secondary-color", t), this._secondaryColor.set(t), this._updatePlasmaColors();
           return;
         case "show-config":
-          (l = (a = this._shadow) == null ? void 0 : a.querySelector(".cfg-panel")) == null || l.classList.toggle("open", t !== "false");
+          (c = (a = this._shadow) == null ? void 0 : a.querySelector(".cfg-panel")) == null || c.classList.toggle("open", t !== "false");
           return;
       }
       this._scheduleUpdate();
@@ -726,18 +740,18 @@ class Ce extends HTMLElement {
     this._canvas = this._shadow.querySelector("canvas");
     const t = this._shadow.querySelector(".cfg-panel");
     this.hasAttribute("show-config") && this.getAttribute("show-config") !== "false" && t.classList.add("open");
-    const l = () => t.classList.add("open");
+    const c = () => t.classList.add("open");
     this._canvas.addEventListener("contextmenu", (o) => {
-      o.preventDefault(), l();
+      o.preventDefault(), c();
     });
-    let c = null;
+    let l = null;
     this._canvas.addEventListener("touchstart", (o) => {
-      o.touches.length === 1 && (c = setTimeout(() => {
-        c = null, l();
+      o.touches.length === 1 && (l = setTimeout(() => {
+        l = null, c();
       }, 500));
     }, { passive: !0 });
     const u = () => {
-      c !== null && (clearTimeout(c), c = null);
+      l !== null && (clearTimeout(l), l = null);
     };
     this._canvas.addEventListener("touchend", u, { passive: !0 }), this._canvas.addEventListener("touchcancel", u, { passive: !0 }), this._canvas.addEventListener("touchmove", u, { passive: !0 }), this._shadow.querySelector(".cfg-close").addEventListener(
       "click",
@@ -757,12 +771,17 @@ class Ce extends HTMLElement {
     }), this._bindRange("#cfg-env", "#cfg-env-v", (o) => {
       this._cfg.envIntensity = o;
     });
-    const v = this._shadow.querySelector("#cfg-font-size"), b = this._shadow.querySelector("#cfg-font-size-v");
-    if (v) {
+    const f = this._shadow.querySelector("#cfg-fov"), S = this._shadow.querySelector("#cfg-fov-v");
+    f && f.addEventListener("input", () => {
+      const o = parseInt(f.value);
+      this._cfg.fov = o, S && (S.textContent = `${o}°`), this._camera && (this._camera.fov = o, this._camera.updateProjectionMatrix(), this._textBoundingSize && this._fitCameraToTextSize(this._textBoundingSize)), this._dispatchChange();
+    });
+    const E = this._shadow.querySelector("#cfg-font-size"), F = this._shadow.querySelector("#cfg-font-size-v");
+    if (E) {
       const o = Math.round(parseFloat(getComputedStyle(this).fontSize) || 120);
-      v.value = String(o), b && (b.textContent = `${o}px`), v.addEventListener("input", () => {
-        const M = parseInt(v.value);
-        b && (b.textContent = `${M}px`), this.style.fontSize = `${M}px`;
+      E.value = String(o), F && (F.textContent = `${o}px`), E.addEventListener("input", () => {
+        const _ = parseInt(E.value);
+        F && (F.textContent = `${_}px`), this.style.fontSize = `${_}px`;
       });
     }
     this._styleObserver = new MutationObserver(() => this._onFontSizeChange()), this._styleObserver.observe(this, { attributes: !0, attributeFilter: ["style", "class"] }), this._canvas.addEventListener("mousedown", (o) => {
@@ -772,44 +791,44 @@ class Ce extends HTMLElement {
     }), window.addEventListener("mouseup", () => {
       this._drag = !1;
     }), this._canvas.addEventListener("wheel", (o) => {
-      const M = o.ctrlKey;
-      if (!this._scrollZoom && !M || (o.preventDefault(), !this._camera)) return;
-      const A = Math.pow(1.001, o.deltaY * (o.deltaMode === 1 ? 40 : o.deltaMode === 2 ? 800 : 1));
-      this._zoomCameraAtClientPoint(o.clientX, o.clientY, A);
+      const _ = o.ctrlKey;
+      if (!this._scrollZoom && !_ || (o.preventDefault(), !this._camera)) return;
+      const w = Math.pow(1.001, o.deltaY * (o.deltaMode === 1 ? 40 : o.deltaMode === 2 ? 800 : 1));
+      this._zoomCameraAtClientPoint(o.clientX, o.clientY, w);
     }, { passive: !1 });
-    let z = 0;
+    let P = 0;
     this._canvas.addEventListener("touchstart", (o) => {
-      o.touches.length === 2 && (z = Math.hypot(
+      o.touches.length === 2 && (P = Math.hypot(
         o.touches[0].clientX - o.touches[1].clientX,
         o.touches[0].clientY - o.touches[1].clientY
       ));
     }, { passive: !0 }), this._canvas.addEventListener("touchmove", (o) => {
       if (o.touches.length !== 2 || !this._camera) return;
       o.preventDefault();
-      const M = Math.hypot(
+      const _ = Math.hypot(
         o.touches[0].clientX - o.touches[1].clientX,
         o.touches[0].clientY - o.touches[1].clientY
       );
-      if (z > 0) {
-        const A = z / M;
+      if (P > 0) {
+        const w = P / _;
         this._zoomCameraAtClientPoint(
           (o.touches[0].clientX + o.touches[1].clientX) / 2,
           (o.touches[0].clientY + o.touches[1].clientY) / 2,
-          A
+          w
         );
       }
-      z = M;
+      P = _;
     }, { passive: !1 }), this._canvas.addEventListener("touchend", () => {
-      z = 0;
+      P = 0;
     }, { passive: !0 });
   }
   _zoomCameraAtClientPoint(n, s, t) {
     if (!this._camera) return;
-    const a = this._worldPointAtClientPoint(n, s), l = Math.max(2, Math.min(80, this._camera.position.z * t));
-    if (l === this._camera.position.z) return;
-    this._camera.position.z = l;
-    const c = this._worldPointAtClientPoint(n, s);
-    !a || !c || (this._camera.position.x += a.x - c.x, this._camera.position.y += a.y - c.y, this._camera.updateMatrixWorld(!0));
+    const a = this._worldPointAtClientPoint(n, s), c = Math.max(2, Math.min(80, this._camera.position.z * t));
+    if (c === this._camera.position.z) return;
+    this._camera.position.z = c;
+    const l = this._worldPointAtClientPoint(n, s);
+    !a || !l || (this._camera.position.x += a.x - l.x, this._camera.position.y += a.y - l.y, this._camera.updateMatrixWorld(!0));
   }
   _worldPointAtClientPoint(n, s) {
     if (!this._camera || !this._canvas) return null;
@@ -818,8 +837,8 @@ class Ce extends HTMLElement {
     const a = new i.Vector2(
       (n - t.left) / t.width * 2 - 1,
       -((s - t.top) / t.height) * 2 + 1
-    ), l = new i.Raycaster(), c = new i.Vector3();
-    return this._camera.updateMatrixWorld(!0), l.setFromCamera(a, this._camera), l.ray.intersectPlane(we, c);
+    ), c = new i.Raycaster(), l = new i.Vector3();
+    return this._camera.updateMatrixWorld(!0), c.setFromCamera(a, this._camera), c.ray.intersectPlane(we, l);
   }
   // ── Control wiring ────────────────────────────────────────────────────────
   _bindControl(n, s, t) {
@@ -829,10 +848,10 @@ class Ce extends HTMLElement {
     });
   }
   _bindRange(n, s, t) {
-    const a = this._shadow.querySelector(n), l = this._shadow.querySelector(s);
+    const a = this._shadow.querySelector(n), c = this._shadow.querySelector(s);
     a && a.addEventListener("input", () => {
-      const c = parseFloat(a.value);
-      t(c), l && (l.textContent = c.toFixed(a.step.includes(".0") ? 1 : 2)), this._scheduleUpdate(), this._dispatchChange();
+      const l = parseFloat(a.value);
+      t(l), c && (c.textContent = l.toFixed(a.step.includes(".0") ? 1 : 2)), this._scheduleUpdate(), this._dispatchChange();
     });
   }
   _updatePlasmaColors() {
@@ -852,25 +871,25 @@ class Ce extends HTMLElement {
   }
   // ── Three.js scene ────────────────────────────────────────────────────────
   _initScene() {
-    const n = this._canvas, s = new i.WebGLRenderer({ canvas: n, antialias: !0, alpha: !0 });
+    const n = this._canvas, s = new i.WebGLRenderer({ canvas: n, antialias: !0, alpha: !0, premultipliedAlpha: !1 });
     s.toneMapping = i.ACESFilmicToneMapping, s.toneMappingExposure = 1, this._renderer = s;
     const t = new i.Scene();
     this._scene = t;
     const a = new i.PerspectiveCamera(75, 1, 0.1, 1e4);
     a.position.z = 15, this._camera = a, t.add(new i.AmbientLight(16777215, 0.5));
-    const l = new i.DirectionalLight(16777215, 1);
-    l.position.set(10, 10, 10), t.add(l);
-    const c = new i.PointLight(16711935, 1);
-    c.position.set(-8, 5, 8), t.add(c);
+    const c = new i.DirectionalLight(16777215, 1);
+    c.position.set(10, 10, 10), t.add(c);
+    const l = new i.PointLight(16711935, 1);
+    l.position.set(-8, 5, 8), t.add(l);
     const u = new i.PointLight(65535, 0.8);
     u.position.set(8, -5, 8), t.add(u);
-    const v = this._setupPlasmaEnvMap();
-    this._updatePlasma(0), this._pmremGenerator = new i.PMREMGenerator(s), this._pmremGenerator.compileEquirectangularShader(), this._pmremRt = this._pmremGenerator.fromEquirectangular(v), this._envMap = this._pmremRt.texture, t.environment = this._envMap, this._resizeOb = new ResizeObserver(() => this._resize()), this._resizeOb.observe(this), this._resize(), this._updateMesh(), this._loop();
+    const f = this._setupPlasmaEnvMap();
+    this._updatePlasma(0), this._pmremGenerator = new i.PMREMGenerator(s), this._pmremGenerator.compileEquirectangularShader(), this._pmremRt = this._pmremGenerator.fromEquirectangular(f), this._envMap = this._pmremRt.texture, t.environment = this._envMap, this._resizeOb = new ResizeObserver(() => this._resize()), this._resizeOb.observe(this), this._resize(), this._updateMesh(), this._loop();
   }
   _resize() {
     var t, a;
     const n = this.offsetWidth || 800, s = this.offsetHeight || 400;
-    (t = this._renderer) == null || t.setSize(n, s, !1), (a = this._renderer) == null || a.setPixelRatio(window.devicePixelRatio), this._camera && (this._camera.aspect = n / s, this._camera.updateProjectionMatrix());
+    (t = this._renderer) == null || t.setPixelRatio(window.devicePixelRatio), (a = this._renderer) == null || a.setSize(n, s, !1), this._camera && (this._camera.aspect = n / s, this._camera.updateProjectionMatrix());
   }
   _applyAutoSize() {
     if (!this._textBoundingSize || !this._autoSize) return;
@@ -888,12 +907,13 @@ class Ce extends HTMLElement {
   }
   _fitCameraToTextSize(n) {
     if (!this._camera) return;
-    const s = this._camera.fov * Math.PI / 180, t = Math.tan(s / 2), a = this._camera.aspect, l = n.y / 2 / t, c = n.x / 2 / (t * a), u = Math.max(l, c) * 1.25 + n.z / 2;
+    const s = this._camera.fov * Math.PI / 180, t = Math.tan(s / 2), a = this._camera.aspect, c = n.y / 2 / t, l = n.x / 2 / (t * a), u = Math.max(c, l) * 1.25 + n.z / 2;
     this._camera.position.set(0, 0, Math.max(u, 2)), this._camera.lookAt(0, 0, 0), this._camera.updateMatrixWorld(!0);
   }
   async _updateMesh() {
     if (!this._scene || !this._envMap) return;
     const n = ++this._updateId;
+    this._camera && this._camera.fov !== this._cfg.fov && (this._camera.fov = this._cfg.fov, this._camera.updateProjectionMatrix());
     try {
       const { geometry: s, material: t } = await ve({
         text: this._cfg.text,
@@ -910,18 +930,18 @@ class Ce extends HTMLElement {
         return;
       this._removeMesh();
       const a = new i.Group();
-      let l;
-      s instanceof i.Group ? (l = s, l.traverse((b) => {
-        b instanceof i.Mesh && (b.material = t, b.castShadow = !0);
-      })) : (l = new i.Mesh(s, t), l.castShadow = !0), a.add(l), this._scene.add(a), this._mesh = a;
-      const c = new i.Box3().setFromObject(a), u = c.getCenter(new i.Vector3());
-      l.position.sub(u);
-      const v = c.getSize(new i.Vector3());
-      if (this._textBoundingSize = v, this._autoSize && (this._applyAutoSize(), this._camera)) {
-        const b = this.offsetWidth || 800, z = this.offsetHeight || 400;
-        this._camera.aspect = b / z, this._camera.updateProjectionMatrix();
+      let c;
+      s instanceof i.Group ? (c = s, c.traverse((S) => {
+        S instanceof i.Mesh && (S.material = t, S.castShadow = !0);
+      })) : (c = new i.Mesh(s, t), c.castShadow = !0), a.add(c), this._scene.add(a), this._mesh = a;
+      const l = new i.Box3().setFromObject(a), u = l.getCenter(new i.Vector3());
+      c.position.sub(u);
+      const f = l.getSize(new i.Vector3());
+      if (this._textBoundingSize = f, this._autoSize && (this._applyAutoSize(), this._camera)) {
+        const S = this.offsetWidth || 800, E = this.offsetHeight || 400;
+        this._camera.aspect = S / E, this._camera.updateProjectionMatrix();
       }
-      this._fitCameraToTextSize(v);
+      this._fitCameraToTextSize(f);
     } catch (s) {
       console.error("[threed-text-wc] mesh update failed:", s);
     }
@@ -955,23 +975,27 @@ class Ce extends HTMLElement {
       },
       vertexShader: be,
       fragmentShader: ye
-    }), l = new i.Scene();
-    l.add(new i.Mesh(new i.PlaneGeometry(2, 2), a));
-    const c = new i.OrthographicCamera(-1, 1, 1, -1, 0, 1);
-    this._plasmaRt = s, this._plasmaMat = a, this._plasmaScene = l, this._plasmaCamera = c;
+    }), c = new i.Scene();
+    c.add(new i.Mesh(new i.PlaneGeometry(2, 2), a));
+    const l = new i.OrthographicCamera(-1, 1, 1, -1, 0, 1);
+    this._plasmaRt = s, this._plasmaMat = a, this._plasmaScene = c, this._plasmaCamera = l;
     const u = s.texture;
     return u.mapping = i.EquirectangularReflectionMapping, u;
   }
   _updatePlasma(n) {
-    const { _plasmaRt: s, _plasmaMat: t, _plasmaScene: a, _plasmaCamera: l, _renderer: c } = this;
-    if (!s || !t || !a || !l || !c) return;
+    const { _plasmaRt: s, _plasmaMat: t, _plasmaScene: a, _plasmaCamera: c, _renderer: l } = this;
+    if (!s || !t || !a || !c || !l) return;
     t.uniforms.uTime.value = n;
-    const u = c.getRenderTarget();
-    c.setRenderTarget(s), c.render(a, l), c.setRenderTarget(u), this._pmremGenerator && this._pmremRt && this._pmremGenerator.fromEquirectangular(s.texture, this._pmremRt);
+    const u = l.getRenderTarget();
+    if (l.setRenderTarget(s), l.render(a, c), l.setRenderTarget(u), this._pmremGenerator && this._pmremRt) {
+      this._pmremGenerator.fromEquirectangular(s.texture, this._pmremRt);
+      const f = l.domElement;
+      l.setViewport(0, 0, f.clientWidth || f.width, f.clientHeight || f.height), l.setScissorTest(!1);
+    }
   }
   _dispose() {
-    var n, s, t, a, l, c, u;
-    this._animId !== null && cancelAnimationFrame(this._animId), (n = this._resizeOb) == null || n.disconnect(), (s = this._styleObserver) == null || s.disconnect(), this._removeMesh(), (t = this._plasmaRt) == null || t.dispose(), (a = this._plasmaMat) == null || a.dispose(), (l = this._pmremRt) == null || l.dispose(), (c = this._pmremGenerator) == null || c.dispose(), (u = this._renderer) == null || u.dispose();
+    var n, s, t, a, c, l, u;
+    this._animId !== null && cancelAnimationFrame(this._animId), (n = this._resizeOb) == null || n.disconnect(), (s = this._styleObserver) == null || s.disconnect(), this._removeMesh(), (t = this._plasmaRt) == null || t.dispose(), (a = this._plasmaMat) == null || a.dispose(), (c = this._pmremRt) == null || c.dispose(), (l = this._pmremGenerator) == null || l.dispose(), (u = this._renderer) == null || u.dispose();
   }
 }
 customElements.get("threed-text") || customElements.define("threed-text", Ce);
