@@ -3,12 +3,14 @@ import {topics} from '../../TopicFriendsShared3/topics-core/topics-data';
 import {nodeConnections, nodeLinks, preset, sizes, strengths} from "./topics-graph.data";
 import {GraphConnections, GraphNode, GraphNodeId, LinkByIds} from "./topics-graph.types";
 import {ActivatedRoute} from "@angular/router";
-
-declare const d3: any;
-declare const $: any;
+import {color as d3Color} from 'd3-color';
+import {drag as d3Drag} from 'd3-drag';
+import {forceCenter, forceCollide, forceLink, forceManyBody, forceSimulation} from 'd3-force';
+import {event as d3Event, select} from 'd3-selection';
+import {zoom as d3Zoom} from 'd3-zoom';
 
 @Component({
-  standalone: false,
+  standalone: true,
   selector: 'app-topics-graph',
   templateUrl: './topics-graph.component.html',
   styleUrls: ['./topics-graph.component.sass'],
@@ -88,7 +90,7 @@ export class TopicsGraphComponent implements OnInit {
   private initD3Graph() {
 
     const self = this;
-    const svgRootElement = d3.select("#topics-graph-d3"),
+    const svgRootElement: any = select("#topics-graph-d3"),
       width = +svgRootElement.attr("width"),
       height = +svgRootElement.attr("height");
 
@@ -111,15 +113,15 @@ export class TopicsGraphComponent implements OnInit {
 
     if (preset.allowZoom) {
       const wheelZoomSpeed = 10;
-      const zoom = d3.zoom()
+      const zoom = d3Zoom<any, any>()
         .wheelDelta(function () {
-          const event = d3.event;
+          const event = d3Event;
           const deltaModeScale = event.deltaMode ? 120 : 1;
 
           return -event.deltaY * deltaModeScale / 500 * wheelZoomSpeed;
         })
         .filter(function () {
-          const event = d3.event;
+          const event = d3Event;
 
           if (!event) {
             return true;
@@ -134,7 +136,7 @@ export class TopicsGraphComponent implements OnInit {
         .on("zoom", function () {
         // https://www.geeksforgeeks.org/d3-js-transform-scale-function/
         // console.log('transform d3.event.transform', d3.event.transform)
-        svg.attr("transform", d3.event.transform) // TODO: I could hack the default zoom level here??
+        svg.attr("transform", d3Event.transform) // TODO: I could hack the default zoom level here??
         // svg.attr("transform", {k: 0.6087830093314941, x: 176.23706425069088, y: 116.76122945091723})
         // svg.attr("transform", d3.transform({k: 0.6087830093314941, x: 176.23706425069088, y: 116.76122945091723}))
       });
@@ -145,31 +147,30 @@ export class TopicsGraphComponent implements OnInit {
 
     // var color = d3.scaleOrdinal(d3.schemeCategory20);
     // const color = d3.rgb(230, 230, 230, 128);
-    console.log(`d3`, d3)
     // const color = d3.rgb(80, 80, 80)// .copy({opacity: 0.5});
-    const color = d3.color(`rgba(80, 80, 80, 0.5)`) // .copy({opacity: 0.5});
+    const color = d3Color(`rgba(80, 80, 80, 0.5)`) // .copy({opacity: 0.5});
 
     /* Base Example: Force-Directed Graph: https://bl.ocks.org/mbostock/4062045 */
-    const simulation = d3.forceSimulation();
+    const simulation: any = forceSimulation<any>();
       if(this.graphHasContainer) {
         simulation.nodes(this.d3Nodes)
-          .force("link", d3.forceLink().id(function(d: any) { return d.id; })
+          .force("link", forceLink<any, any>().id(function(d: any) { return d.id; })
             .strength(function(d: any) {
               return preset.forceLinkStrength * (d.strengthMul ?? 1)
             })
           )
-          .force("charge", d3.forceManyBody().strength(function(d: GraphNode) {
+          .force("charge", forceManyBody<any>().strength(function(d: GraphNode) {
             const size = d.sizeMult ?? sizes.medium;
             return size**1.5 * preset.forceManyBodyStrength / 1
           }))
-          .force("center", d3.forceCenter(width / 2, height / 2))
-          .force("collide", d3.forceCollide().radius(function(d: any) {
+          .force("center", forceCenter(width / 2, height / 2))
+          .force("collide", forceCollide<any>().radius(function(d: any) {
             return d.sizeMult ? d.sizeMult * 30 : 30; // Adjust the radius as needed
           }));
       } else {
       // .force("gravity", 3)
       // .velocityDecay(3)
-      simulation.force("link", d3.forceLink().id(function(d: any) { return d.id; })
+      simulation.force("link", forceLink<any, any>().id(function(d: any) { return d.id; })
         .strength(function(d: any) {
           if (d.strengthMul) {
             // console.log('d.strengthMul', d.strengthMul)
@@ -178,7 +179,7 @@ export class TopicsGraphComponent implements OnInit {
           // return 1 / Math.min(count(link.source), count(link.target));
           return preset.forceLinkStrength * (d.strengthMul ?? 1)
         }))
-        .force("charge", d3.forceManyBody().strength(function(d: GraphNode) {
+        .force("charge", forceManyBody<any>().strength(function(d: GraphNode) {
           const size = d.sizeMult ?? sizes.medium;
           // return preset.forceManyBodyStrength
           // return size**5 * preset.forceManyBodyStrength / 3
@@ -186,7 +187,7 @@ export class TopicsGraphComponent implements OnInit {
           return size ** 1.5 * preset.forceManyBodyStrength / 1 // this was kinda working
           // return size * 1000000
         }))
-        .force("center", d3.forceCenter(width / 2, height / 2));
+        .force("center", forceCenter(width / 2, height / 2));
         // simulation.force("charge", function() {
         ////        return (d.sizeMult ? d.sizeMult : 1) * 100 }
         //            return -1000000;
@@ -300,8 +301,9 @@ export class TopicsGraphComponent implements OnInit {
       });
 
     function unHighlightHover(d?: any) {
-      $('.techCircleHover').removeClass("techCircleHover", false);
-      d3.select(".techCircleHover").classed("techCircleHover", false);
+      document.querySelectorAll('.techCircleHover').forEach((element) => {
+        element.classList.remove("techCircleHover");
+      });
     }
 
     /* need to set the overlay's position separately in root,
@@ -324,10 +326,12 @@ export class TopicsGraphComponent implements OnInit {
       .on("mouseover", function (this: any, d: any) {
         if (!isDragging) {
           // $('tech').hover(function() {
-          $('#' + d.id).addClass("techCircleHover");
+          document.getElementById(d.id)?.classList.add("techCircleHover");
           // $("[id2='"+ d.id + "']").css('background-color','rgba(0, 0, 0, 0.6)');
-          $("." + d.id + '_background').css('background-color', 'rgba(0, 0, 0, 0.6)');
-          d3.select(this).classed("techCircleHover", true); // "#fff8ee00"
+          Array.from(document.getElementsByClassName(d.id + '_background')).forEach((element) => {
+            (element as HTMLElement).style.backgroundColor = 'rgba(0, 0, 0, 0.6)';
+          });
+          select(this).classed("techCircleHover", true); // "#fff8ee00"
         }
       })
       .on("mouseout", function (this: any, d: any) {
@@ -337,7 +341,7 @@ export class TopicsGraphComponent implements OnInit {
       });
 
     nodeCircleOverlay.call(
-      d3.drag()
+      d3Drag<any, any>()
         .on("start", dragStarted)
         .on("drag", dragged)
         .on("end", dragEnded)
@@ -375,7 +379,7 @@ export class TopicsGraphComponent implements OnInit {
 
     function dragStarted(d: any) {
       isDragging = true;
-      if (!d3.event.active) {
+      if (!d3Event.active) {
         simulation.alphaTarget(0.3).restart();
       }
       d.fx = d.x;
@@ -384,15 +388,15 @@ export class TopicsGraphComponent implements OnInit {
 
     function dragged(d: any) {
       isDragging = true; // just in case...
-      d.fx = d3.event.x;
-      d.fy = d3.event.y;
+      d.fx = d3Event.x;
+      d.fy = d3Event.y;
     }
 
     function dragEnded(d: any) {
       isDragging = false;
       unHighlightHover()
 
-      if (!d3.event.active) {
+      if (!d3Event.active) {
         simulation.alphaTarget(0);
       }
       d.fx = null;

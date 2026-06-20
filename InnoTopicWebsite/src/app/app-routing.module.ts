@@ -1,8 +1,5 @@
 import { NgModule } from '@angular/core';
-import { PreloadAllModules, RouterModule, Routes } from '@angular/router';
-import {TechGraphD3Component} from "./cv-page/tech-graph-d3/tech-graph-d3.component";
-import {TopicsGraphComponent} from "./cv-page/topics-graph/topics-graph.component";
-import {PrintService} from "./TopicFriendsShared3/topics-core/print.service";
+import { RouterModule, Routes } from '@angular/router';
 // import {TechGraphD3Component} from "./cv-page/tech-graph-d3/tech-graph-d3.component";
 // import {TechGraphD3Index1Component} from "./cv-page/tech-graph-d3-index1/tech-graph-d3-index1.component";
 // import {CvPageComponent} from "./cv-page/cv-page.component";
@@ -76,11 +73,11 @@ const routes: Routes = [
   // },
   {
     path: 'topics-graph',
-    component: TopicsGraphComponent,
+    loadComponent: () => import('./cv-page/topics-graph/topics-graph.component').then(m => m.TopicsGraphComponent),
   },
   {
     path: 'graph',
-    component: TopicsGraphComponent,
+    loadComponent: () => import('./cv-page/topics-graph/topics-graph.component').then(m => m.TopicsGraphComponent),
   },
   // {
   //   path: 'tech-graph-d3-index1',

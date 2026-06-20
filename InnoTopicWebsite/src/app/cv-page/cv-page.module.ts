@@ -15,11 +15,11 @@ import { WorldMapComponent } from './world-map/world-map.component';
 import { Logo3dComponent } from './logo3d/logo3d.component';
 import { TechGraphD3Component } from './tech-graph-d3/tech-graph-d3.component';
 import { TechGraphD3Index1Component } from './tech-graph-d3-index1/tech-graph-d3-index1.component';
-import { TopicsGraphComponent } from './topics-graph/topics-graph.component';
 import { VideoCvComponent } from './video-cv/video-cv.component';
 import {SharedModule} from "../shared/shared.module";
 import {TopicsSharedModule} from "../topics-shared/topics-shared.module";
 import {ThreeDTextComponent} from "../shared/threed-text/threed-text.component";
+import { TopicsGraphComponent } from './topics-graph/topics-graph.component';
 
 @NgModule({
   declarations: [
@@ -31,7 +31,6 @@ import {ThreeDTextComponent} from "../shared/threed-text/threed-text.component";
     Logo3dComponent,
     TechGraphD3Component,
     TechGraphD3Index1Component,
-    TopicsGraphComponent,
     VideoCvComponent
   ],
   exports: [
@@ -46,6 +45,7 @@ import {ThreeDTextComponent} from "../shared/threed-text/threed-text.component";
         SharedModule,
         TopicsSharedModule,
         ThreeDTextComponent,
+        TopicsGraphComponent,
     ],
   schemas: [
     CUSTOM_ELEMENTS_SCHEMA,

@@ -32,7 +32,9 @@
 <!--THIS IS PREVENTING SCROLL FOR PDF PRINT EXPORT-->
 
 <!--<router-outlet id="main-content" /> &lt;!&ndash; for PDF print?&ndash;&gt;-->
-<app-cv-page-print *ngIf="isPrint" />
+<ng-container *ngIf="isPrint && printPageComponent">
+  <ng-container *ngComponentOutlet="printPageComponent" />
+</ng-container>
 
 <!---->
 <!--<div style="height: 2000px">TEST</div>-->
