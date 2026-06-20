@@ -6516,7 +6516,7 @@ void main() {
 World`,color:"#ff6600",font:Hr,fontSize:120,depth:.8,metalness:.95,roughness:.15,envIntensity:1.5,fov:75,capitalize:!1,rotateZ:0},rh=new ni(new P(0,0,1),0),sh=`
 varying vec2 vUv;
 void main() { vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position,1.0); }
-`,ah=4;function Ta(n,e){return[new Xe(0,0,0,0),new Xe(.33,n.r*.35,n.g*.35,n.b*.35),new Xe(.66,n.r,n.g,n.b),new Xe(1,e.r,e.g,e.b),new Xe(0,0,0,0)]}const oh=`
+`,ah=4;function Ta(n,e){return[new Xe(0,e.r*.4,e.g*.4,e.b*.4),new Xe(.33,n.r*.6,n.g*.6,n.b*.6),new Xe(.66,n.r,n.g,n.b),new Xe(1,e.r,e.g,e.b),new Xe(0,0,0,0)]}const oh=`
 uniform float uTime;
 uniform float uZoom;
 uniform vec4  uStop0, uStop1, uStop2, uStop3, uStop4;

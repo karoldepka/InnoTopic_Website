@@ -1,7 +1,7 @@
 var b = Object.defineProperty;
-var z = (c, l, e) => l in c ? b(c, l, { enumerable: !0, configurable: !0, writable: !0, value: e }) : c[l] = e;
-var n = (c, l, e) => z(c, typeof l != "symbol" ? l + "" : l, e);
-import { C as v, c as C, R as P, P as T, V as f, W as E, A as R, S, d as A, e as F, D as L, f as x, g as O, G as y, M as d, B as k, h as I, L as w, i as U, j as G, O as Z, E as W, k as u } from "./chunks/three-runtime-DAVnG4av.js";
+var z = (l, h, e) => h in l ? b(l, h, { enumerable: !0, configurable: !0, writable: !0, value: e }) : l[h] = e;
+var n = (l, h, e) => z(l, typeof h != "symbol" ? h + "" : h, e);
+import { C as v, c as C, R as P, P as T, V as f, W as E, A as R, S, d as A, e as F, D as L, f as x, g as O, G as w, M as d, B as k, h as I, L as M, i as U, j as G, O as Z, E as W, k as u } from "./chunks/three-runtime-DAVnG4av.js";
 import { D as B, c as D } from "./chunks/text-geometry-CWYxAHtU.js";
 const Y = {
   text: `Hello
@@ -23,12 +23,12 @@ varying vec2 vUv;
 void main() { vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position,1.0); }
 `
 ), j = 4;
-function M(c, l) {
+function y(l, h) {
   return [
-    new u(0, 0, 0, 0),
-    new u(0.33, c.r * 0.35, c.g * 0.35, c.b * 0.35),
-    new u(0.66, c.r, c.g, c.b),
-    new u(1, l.r, l.g, l.b),
+    new u(0, h.r * 0.4, h.g * 0.4, h.b * 0.4),
+    new u(0.33, l.r * 0.6, l.g * 0.6, l.b * 0.6),
+    new u(0.66, l.r, l.g, l.b),
+    new u(1, h.r, h.g, h.b),
     new u(0, 0, 0, 0)
   ];
 }
@@ -298,7 +298,7 @@ class N extends HTMLElement {
   }
   _updatePlasmaColors() {
     if (!this._plasmaMat) return;
-    const e = M(this._primaryColor, this._secondaryColor), s = this._plasmaMat.uniforms;
+    const e = y(this._primaryColor, this._secondaryColor), s = this._plasmaMat.uniforms;
     s.uStop0.value = e[0], s.uStop1.value = e[1], s.uStop2.value = e[2], s.uStop3.value = e[3], s.uStop4.value = e[4];
   }
   _scheduleUpdate() {
@@ -323,8 +323,8 @@ class N extends HTMLElement {
     o.position.set(-8, 5, 8), t.add(o);
     const r = new x(65535, 0.8);
     r.position.set(8, -5, 8), t.add(r);
-    const h = this._setupPlasmaEnvMap();
-    this._updatePlasma(0), this._pmremGenerator = new O(s), this._pmremGenerator.compileEquirectangularShader(), this._pmremRt = this._pmremGenerator.fromEquirectangular(h), this._envMap = this._pmremRt.texture, t.environment = this._envMap, this._resizeOb = new ResizeObserver(() => this._resize()), this._resizeOb.observe(this), this._resize(), this._updateMesh(), this._loop();
+    const c = this._setupPlasmaEnvMap();
+    this._updatePlasma(0), this._pmremGenerator = new O(s), this._pmremGenerator.compileEquirectangularShader(), this._pmremRt = this._pmremGenerator.fromEquirectangular(c), this._envMap = this._pmremRt.texture, t.environment = this._envMap, this._resizeOb = new ResizeObserver(() => this._resize()), this._resizeOb.observe(this), this._resize(), this._updateMesh(), this._loop();
   }
   _resize() {
     var t, i;
@@ -333,8 +333,8 @@ class N extends HTMLElement {
   }
   _applyAutoSize() {
     if (!this._textBoundingSize || !this._autoSize) return;
-    const e = this._cfg.rotateZ * (Math.PI / 180), s = Math.abs(Math.cos(e)), t = Math.abs(Math.sin(e)), i = this._textBoundingSize.x, a = this._textBoundingSize.y, o = i * s + a * t, r = i * t + a * s, h = this._cfg.fontSize * (r / Math.max(a, 1e-3)), p = this._cfg.fontSize * (o / Math.max(a, 1e-3));
-    Math.abs(this.offsetHeight - h) > 0.5 && (this.style.height = `${h}px`), Math.abs(this.offsetWidth - p) > 0.5 && (this.style.width = `${p}px`);
+    const e = this._cfg.rotateZ * (Math.PI / 180), s = Math.abs(Math.cos(e)), t = Math.abs(Math.sin(e)), i = this._textBoundingSize.x, a = this._textBoundingSize.y, o = i * s + a * t, r = i * t + a * s, c = this._cfg.fontSize * (r / Math.max(a, 1e-3)), p = this._cfg.fontSize * (o / Math.max(a, 1e-3));
+    Math.abs(this.offsetHeight - c) > 0.5 && (this.style.height = `${c}px`), Math.abs(this.offsetWidth - p) > 0.5 && (this.style.width = `${p}px`);
   }
   _onFontSizeChange() {
     if (!(!this._autoSize || !this._textBoundingSize)) {
@@ -347,7 +347,7 @@ class N extends HTMLElement {
   }
   _fitCameraToTextSize(e) {
     if (!this._camera) return;
-    const s = this._camera.fov * Math.PI / 180, t = Math.tan(s / 2), i = this._camera.aspect, a = this._cfg.rotateZ * (Math.PI / 180), o = Math.abs(Math.cos(a)), r = Math.abs(Math.sin(a)), h = e.x * o + e.y * r, m = (e.x * r + e.y * o) / 2 / t, _ = h / 2 / (t * i), g = Math.max(m, _) + e.z / 2;
+    const s = this._camera.fov * Math.PI / 180, t = Math.tan(s / 2), i = this._camera.aspect, a = this._cfg.rotateZ * (Math.PI / 180), o = Math.abs(Math.cos(a)), r = Math.abs(Math.sin(a)), c = e.x * o + e.y * r, m = (e.x * r + e.y * o) / 2 / t, _ = c / 2 / (t * i), g = Math.max(m, _) + e.z / 2;
     this._camera.position.set(0, 0, Math.max(g, 0.5)), this._camera.lookAt(0, 0, 0), this._camera.updateMatrixWorld(!0);
   }
   async _updateMesh() {
@@ -372,14 +372,14 @@ class N extends HTMLElement {
       if (e !== this._updateId)
         return;
       this._removeMesh();
-      const o = new y();
+      const o = new w();
       let r;
-      i instanceof y ? (r = i, r.traverse((_) => {
+      i instanceof w ? (r = i, r.traverse((_) => {
         _ instanceof d && (_.material = a, _.castShadow = !0);
       })) : (r = new d(i, a), r.castShadow = !0), o.add(r), this._scene.add(o), this._mesh = o;
-      const h = new k().setFromObject(o), p = h.getCenter(new f());
+      const c = new k().setFromObject(o), p = c.getCenter(new f());
       r.position.sub(p);
-      const m = h.getSize(new f());
+      const m = c.getSize(new f());
       if (this._textBoundingSize = m, this._autoSize && (this._applyAutoSize(), this._camera)) {
         const _ = this.offsetWidth || 800, g = this.offsetHeight || 400;
         this._camera.aspect = _ / g, this._camera.updateProjectionMatrix();
@@ -402,9 +402,9 @@ class N extends HTMLElement {
   }
   _setupPlasmaEnvMap() {
     const s = new I(256, 256, {
-      minFilter: w,
-      magFilter: w
-    }), t = M(this._primaryColor, this._secondaryColor), i = new U({
+      minFilter: M,
+      magFilter: M
+    }), t = y(this._primaryColor, this._secondaryColor), i = new U({
       uniforms: {
         uTime: { value: 0 },
         uZoom: { value: 8 },
@@ -431,8 +431,8 @@ class N extends HTMLElement {
     const r = o.getRenderTarget();
     if (o.setRenderTarget(s), o.render(i, a), o.setRenderTarget(r), this._pmremGenerator && this._pmremRt) {
       this._pmremGenerator.fromEquirectangular(s.texture, this._pmremRt);
-      const h = o.domElement;
-      o.setViewport(0, 0, h.clientWidth || h.width, h.clientHeight || h.height), o.setScissorTest(!1);
+      const c = o.domElement;
+      o.setViewport(0, 0, c.clientWidth || c.width, c.clientHeight || c.height), o.setScissorTest(!1);
     }
   }
   _dispose() {
