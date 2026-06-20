@@ -1,4 +1,4 @@
-import { Component, Input, CUSTOM_ELEMENTS_SCHEMA, OnInit } from '@angular/core';
+import { Component, Input, CUSTOM_ELEMENTS_SCHEMA, OnInit, NgZone } from '@angular/core';
 import { AsyncPipe } from '@angular/common';
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs';
@@ -35,17 +35,22 @@ export class ThreeDTextComponent implements OnInit {
   primaryColor$: Observable<string>;
   secondaryColor$: Observable<string>;
 
-  constructor(store: Store<{ themeConfig: ThemeConfigState }>) {
+  constructor(
+    store: Store<{ themeConfig: ThemeConfigState }>,
+    private ngZone: NgZone,
+  ) {
     this.primaryColor$ = store.select(state => state.themeConfig.ion_color_primary);
     this.secondaryColor$ = store.select(state => state.themeConfig.ion_color_secondary);
   }
 
   ngOnInit() {
-    if (!customElements.get('threed-text')) {
-      const script = document.createElement('script');
-      script.type = 'module';
-      script.src = 'assets/dist/threed-text.js';
-      document.head.appendChild(script);
-    }
+    this.ngZone.runOutsideAngular(() => {
+      if (!customElements.get('threed-text')) {
+        const script = document.createElement('script');
+        script.type = 'module';
+        script.src = 'assets/dist/threed-text.js';
+        document.head.appendChild(script);
+      }
+    });
   }
 }
