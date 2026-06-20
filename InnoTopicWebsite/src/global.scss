@@ -79,6 +79,20 @@ html, body {
     display: inline-block;
   }
 
+  // Prevent individual skill chips from being cut across page boundaries
+  app-chip,
+  app-topic-tag,
+  app-topic-skill {
+    break-inside: avoid;
+    page-break-inside: avoid;
+    display: inline-block;
+  }
+
+  .neumorphic-chip {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
   // Rows/sections containing icons or graphics should stay together
   .overview > div,
   section.container {
