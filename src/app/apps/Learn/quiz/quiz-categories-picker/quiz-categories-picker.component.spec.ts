@@ -9,9 +9,8 @@ describe('QuizCategoriesPickerComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [ QuizCategoriesPickerComponent ],
-      imports: [IonicModule.forRoot()]
-    }).compileComponents();
+    imports: [IonicModule.forRoot(), QuizCategoriesPickerComponent]
+}).compileComponents();
 
     fixture = TestBed.createComponent(QuizCategoriesPickerComponent);
     component = fixture.componentInstance;

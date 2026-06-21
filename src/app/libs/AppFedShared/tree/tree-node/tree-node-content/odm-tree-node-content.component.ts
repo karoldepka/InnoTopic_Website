@@ -5,12 +5,13 @@ import {cellDirections, CellNavigationService} from '../../../cell-navigation.se
 import {LearnItem} from '../../../../../apps/Learn/models/LearnItem'
 import {CachedSubject} from '../../../utils/cachedSubject2/CachedSubject2'
 import {getDictionaryValuesAsArray, setIdsFromKeys} from '../../../utils/dictionary-utils'
-import {PopoverController} from '@ionic/angular'
+import { PopoverController, IonicModule } from '@ionic/angular'
 import {TreeNodeMenuPopoverComponent} from '../../../../../apps/OrYoL/tree-shared/tree-node-menu/tree-node-menu-popover.component'
 import {OdmTreeNodePopupComponent} from '../odm-tree-node-popup/odm-tree-node-popup.component'
 import {CellComponent} from '../../../../../apps/OrYoL/tree-shared/cells/CellComponent'
 import {RichTextEditComponent} from '../../../rich-text/rich-text-edit/rich-text-edit.component'
 import {RichTextEditCellComponent} from '../../cells/rich-text-edit-cell/rich-text-edit-cell.component'
+import { AsyncPipe } from '@angular/common';
 
 
 export function column(colDesc: any) {
@@ -20,11 +21,15 @@ export function column(colDesc: any) {
 // for (let i = 0; i < 10000; i++) {
 
 @Component({
-  standalone: false,
-  selector: 'app-tree-node-content',
-  templateUrl: './odm-tree-node-content.component.html',
-  changeDetection: ChangeDetectionStrategy.Eager,
-  styleUrls: ['./odm-tree-node-content.component.sass'],
+    selector: 'app-tree-node-content',
+    templateUrl: './odm-tree-node-content.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
+    styleUrls: ['./odm-tree-node-content.component.sass'],
+    imports: [
+        IonicModule,
+        RichTextEditCellComponent,
+        AsyncPipe,
+    ],
 })
 export class OdmTreeNodeContentComponent implements OnInit {
 

@@ -9,9 +9,9 @@ describe('FancyTextComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [ FancyTextComponent ],
-      imports: [IonicModule.forRoot()]
-    }).compileComponents();
+    declarations: [FancyTextComponent],
+    imports: [IonicModule.forRoot()]
+}).compileComponents();
 
     fixture = TestBed.createComponent(FancyTextComponent);
     component = fixture.componentInstance;

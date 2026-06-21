@@ -6,13 +6,15 @@ import {OdmItemId} from '../../../../../libs/AppFedShared/odm/OdmItemId'
 import {ViewSyncer2} from '../../../../../libs/AppFedShared/odm/ui/ViewSyncer2'
 import {map} from 'rxjs/operators'
 import {Observable} from 'rxjs/internal/Observable'
+import { IonicModule } from '@ionic/angular';
+import { ReactiveFormsModule } from '@angular/forms';
 
 @Component({
-  standalone: false,
-  selector: 'app-selection-checkbox',
-  templateUrl: './selection-checkbox.component.html',
-  changeDetection: ChangeDetectionStrategy.Eager,
-  styleUrls: ['./selection-checkbox.component.sass'],
+    selector: 'app-selection-checkbox',
+    templateUrl: './selection-checkbox.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
+    styleUrls: ['./selection-checkbox.component.sass'],
+    imports: [IonicModule, ReactiveFormsModule],
 })
 export class SelectionCheckboxComponent implements OnInit {
 

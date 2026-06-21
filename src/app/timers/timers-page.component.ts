@@ -1,16 +1,19 @@
 import {Component, ChangeDetectionStrategy} from '@angular/core';
-import {ModalController} from '@ionic/angular';
+import { ModalController, IonicModule } from '@ionic/angular';
 import {TimerItem} from '../core/TimerItem';
 import {TimersService} from '../core/timers.service';
 import {TimerDetailsComponent} from "./timer-details/timer-details.component";
 import {debugLog} from "../libs/AppFedShared/utils/log";
+import { RouterLink } from '@angular/router';
+import { SyncStatusIconComponent } from '../libs/AppFedShared/odm/sync-status/sync-status-icon.component';
+import { TimersListComponent } from './timers-list/timers-list.component';
 
 @Component({
-  standalone: false,
-  selector: 'app-tab2',
-  templateUrl: 'timers-page.component.html',
-  changeDetection: ChangeDetectionStrategy.Eager,
-  styleUrls: ['timers-page.component.scss']
+    selector: 'app-tab2',
+    templateUrl: 'timers-page.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
+    styleUrls: ['timers-page.component.scss'],
+    imports: [IonicModule, RouterLink, SyncStatusIconComponent, TimersListComponent]
 })
 export class TimersPageComponent {
 

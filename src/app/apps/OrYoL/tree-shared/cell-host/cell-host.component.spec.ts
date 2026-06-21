@@ -8,8 +8,8 @@ describe('CellHostComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [ CellHostComponent ]
-    })
+    imports: [CellHostComponent]
+})
     .compileComponents();
   }));
 

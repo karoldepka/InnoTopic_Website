@@ -8,13 +8,25 @@ import {QuizAnswersService} from '../../core/quiz/quiz-answers.service'
 import {Store} from '@ngrx/store'
 import {requestNextQuizItem} from '../../core/quiz/quiz.actions'
 import {BaseComponent} from '../../../../libs/AppFedShared/base/base.component'
+import { IonicModule } from '@ionic/angular';
+import { RouterLink } from '@angular/router';
+import { NgIf, AsyncPipe } from '@angular/common';
+import { TimePassingComponent } from '../../../../libs/AppFedShared/time/time-passing/time-passing.component';
+import { SelfRatingComponent } from '../../shared/self-rating/self-rating.component';
 
 @Component({
-  standalone: false,
-  selector: 'app-show-answer-and-rate',
-  templateUrl: './show-answer-and-rate.component.html',
-  changeDetection: ChangeDetectionStrategy.Eager,
-  styleUrls: ['./show-answer-and-rate.component.sass'],
+    selector: 'app-show-answer-and-rate',
+    templateUrl: './show-answer-and-rate.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
+    styleUrls: ['./show-answer-and-rate.component.sass'],
+    imports: [
+        IonicModule,
+        RouterLink,
+        NgIf,
+        TimePassingComponent,
+        SelfRatingComponent,
+        AsyncPipe,
+    ],
 })
 export class ShowAnswerAndRateComponent extends BaseComponent implements OnInit {
 

@@ -9,12 +9,12 @@ import { SleepPageRoutingModule } from './sleep-routing.module';
 import { SleepPage } from './sleep.page';
 
 @NgModule({
-  imports: [
-    CommonModule,
-    FormsModule,
-    IonicModule,
-    SleepPageRoutingModule
-  ],
-  declarations: [SleepPage]
+    imports: [
+        CommonModule,
+        FormsModule,
+        IonicModule,
+        SleepPageRoutingModule,
+        SleepPage
+    ]
 })
 export class SleepPageModule {}

@@ -1,11 +1,12 @@
 import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
+import { IonicModule } from '@ionic/angular';
 
 @Component({
-  standalone: false,
-  selector: 'app-audio',
-  templateUrl: './audio.page.html',
-  changeDetection: ChangeDetectionStrategy.Eager,
-  styleUrls: ['./audio.page.scss'],
+    selector: 'app-audio',
+    templateUrl: './audio.page.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
+    styleUrls: ['./audio.page.scss'],
+    imports: [IonicModule],
 })
 export class AudioPage implements OnInit {
 

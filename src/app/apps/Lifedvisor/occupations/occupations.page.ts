@@ -1,4 +1,6 @@
 import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
+import { NgFor } from '@angular/common';
+import { IonicModule } from '@ionic/angular';
 import {Dict, getDictionaryValuesAsArray, setIdsFromKeys} from '../../../utils/dictionary-utils';
 
 /* make it more like "translation" instead of translator, to avoid fixed labels; and to widen the audience
@@ -31,7 +33,8 @@ export class Occupations {
 export const occupations = getDictionaryValuesAsArray(setIdsFromKeys(new Occupations() as any as Dict<{}>))
 
 @Component({
-  standalone: false,
+  standalone: true,
+  imports: [IonicModule, NgFor],
   selector: 'app-occupations',
   templateUrl: './occupations.page.html',
   changeDetection: ChangeDetectionStrategy.Eager,

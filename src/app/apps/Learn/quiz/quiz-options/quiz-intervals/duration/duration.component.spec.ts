@@ -9,9 +9,8 @@ describe('DurationComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [ DurationComponent ],
-      imports: [IonicModule.forRoot()]
-    }).compileComponents();
+    imports: [IonicModule.forRoot(), DurationComponent]
+}).compileComponents();
 
     fixture = TestBed.createComponent(DurationComponent);
     component = fixture.componentInstance;

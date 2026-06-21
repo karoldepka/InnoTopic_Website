@@ -2,17 +2,23 @@ import {Component, Injector, Input, OnInit, ChangeDetectionStrategy} from '@angu
 import {ListOptionsData} from '../list-options'
 import {PatchableObservable} from '../../../../libs/AppFedShared/utils/rxUtils'
 import {Required} from '../../../../libs/AppFedShared/utils/angular/Required.decorator'
-import {UntypedFormControl} from '@angular/forms'
+import { UntypedFormControl, ReactiveFormsModule } from '@angular/forms'
 import {FeatureService} from '../../../../libs/AppFedShared/feature.service'
 import {BaseComponent} from '../../../../libs/AppFedShared/base/base.component'
 import {OdmService2} from '../../../../libs/AppFedShared/odm/OdmService2'
+import { IonicModule } from '@ionic/angular';
+import { NgIf } from '@angular/common';
 
 @Component({
-  standalone: false,
-  selector: 'app-list-options',
-  templateUrl: './list-options.component.html',
-  changeDetection: ChangeDetectionStrategy.Eager,
-  styleUrls: ['./list-options.component.sass'],
+    selector: 'app-list-options',
+    templateUrl: './list-options.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
+    styleUrls: ['./list-options.component.sass'],
+    imports: [
+        IonicModule,
+        NgIf,
+        ReactiveFormsModule,
+    ],
 })
 export class ListOptionsComponent extends BaseComponent implements OnInit {
 

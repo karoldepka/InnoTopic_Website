@@ -1,7 +1,7 @@
 import {Component, Input, OnInit, ChangeDetectionStrategy} from '@angular/core';
 import {SelectionManager} from '../SelectionManager'
 import {ignorePromise} from '../../../../libs/AppFedShared/utils/promiseUtils'
-import {AlertController} from '@ionic/angular'
+import { AlertController, IonicModule } from '@ionic/angular'
 import {LearnItemItemsService} from '../../core/learn-item-items.service'
 import {DictPatch, PatchableObservable} from '../../../../libs/AppFedShared/utils/rxUtils'
 import {LearnItem} from '../../models/LearnItem'
@@ -14,6 +14,8 @@ import {isNullish} from '../../../../libs/AppFedShared/utils/utils'
 import {ItemId} from '../../../../libs/AppFedShared/odm/OdmCollectionBackend'
 import {ValueDistribution} from '../../../../libs/AppFedShared/utils/time/parse-duration'
 import {OdmInMemItem} from '../../../../libs/AppFedShared/odm/OdmItem$2'
+import { NgIf, JsonPipe } from '@angular/common';
+import { ImportanceEditComponent } from '../../../../libs/LifeSuiteShared/edit-shared/importance-edit/importance-edit.component';
 
 export class MultiSelectItem$<TInMem extends OdmInMemItem> implements PatchableObservable<LearnItem | nullish> {
 
@@ -38,11 +40,16 @@ export class MultiSelectItem$<TInMem extends OdmInMemItem> implements PatchableO
 /* =============== */
 
 @Component({
-  standalone: false,
-  selector: 'app-selection-popup',
-  templateUrl: './selection-popup.component.html',
-  changeDetection: ChangeDetectionStrategy.Eager,
-  styleUrls: ['./selection-popup.component.sass'],
+    selector: 'app-selection-popup',
+    templateUrl: './selection-popup.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
+    styleUrls: ['./selection-popup.component.sass'],
+    imports: [
+        NgIf,
+        IonicModule,
+        ImportanceEditComponent,
+        JsonPipe,
+    ],
 })
 export class SelectionPopupComponent implements OnInit {
 

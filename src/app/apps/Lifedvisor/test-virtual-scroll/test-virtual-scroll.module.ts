@@ -14,8 +14,10 @@ import {TestItemComponent} from './test-item/test-item.component';
     CommonModule,
     FormsModule,
     IonicModule,
-    TestVirtualScrollPageRoutingModule
+    TestVirtualScrollPageRoutingModule,
+    TestVirtualScrollPage,
+    TestItemComponent,
   ],
-  declarations: [TestVirtualScrollPage, TestItemComponent]
+  declarations: []
 })
 export class TestVirtualScrollPageModule {}

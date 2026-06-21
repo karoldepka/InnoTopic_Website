@@ -8,13 +8,11 @@ const exports = [
 ]
 
 @NgModule({
-  declarations: [
-    ...exports
-    ],
-  exports: exports,
-  imports: [
-    CommonModule,
-    IonicModule
-  ]
+    exports: exports,
+    imports: [
+        CommonModule,
+        IonicModule,
+        ...exports
+    ]
 })
 export class RecipesModule { }

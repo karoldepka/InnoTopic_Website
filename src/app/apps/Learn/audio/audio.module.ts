@@ -9,12 +9,12 @@ import { AudioPageRoutingModule } from './audio-routing.module';
 import { AudioPage } from './audio.page';
 
 @NgModule({
-  imports: [
-    CommonModule,
-    FormsModule,
-    IonicModule,
-    AudioPageRoutingModule
-  ],
-  declarations: [AudioPage]
+    imports: [
+        CommonModule,
+        FormsModule,
+        IonicModule,
+        AudioPageRoutingModule,
+        AudioPage
+    ]
 })
 export class AudioPageModule {}

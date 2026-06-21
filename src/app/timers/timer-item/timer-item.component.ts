@@ -1,17 +1,24 @@
 import {Component, Input, OnInit, ChangeDetectionStrategy} from '@angular/core';
 import {TimerItem} from "../../core/TimerItem";
-import {ModalController} from "@ionic/angular";
+import { ModalController, IonicModule } from "@ionic/angular";
 import {TimersService} from "../../core/timers.service";
 import {OverlayEventDetail} from '@ionic/core';
 import {TimerDetailsComponent} from "../timer-details/timer-details.component";
 import {debugLog} from "../../libs/AppFedShared/utils/log";
+import { NgClass, NgIf } from '@angular/common';
+import { TimeLeftOrDurationComponent } from '../time-left-or-duration/time-left-or-duration.component';
 
 @Component({
-  standalone: false,
-  selector: 'app-timer-item',
-  templateUrl: './timer-item.component.html',
-  changeDetection: ChangeDetectionStrategy.Eager,
-  styleUrls: ['./timer-item.component.sass'],
+    selector: 'app-timer-item',
+    templateUrl: './timer-item.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
+    styleUrls: ['./timer-item.component.sass'],
+    imports: [
+        IonicModule,
+        NgClass,
+        NgIf,
+        TimeLeftOrDurationComponent,
+    ],
 })
 export class TimerItemComponent implements OnInit {
 

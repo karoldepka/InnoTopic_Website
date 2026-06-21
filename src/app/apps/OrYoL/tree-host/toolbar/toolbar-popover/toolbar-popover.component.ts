@@ -10,18 +10,17 @@ import {
   Config,
   ConfigService,
 } from '../../../core/config.service'
-import {
-  UntypedFormControl,
-  UntypedFormGroup,
-} from '@angular/forms'
+import { UntypedFormControl, UntypedFormGroup, ReactiveFormsModule } from '@angular/forms'
 import { debugLog } from '../../../utils/log'
+import { IonicModule } from '@ionic/angular';
+import { AsyncPipe } from '@angular/common';
 
 @Component({
-  standalone: false,
-  selector: 'app-toolbar-popover',
-  templateUrl: './toolbar-popover.component.html',
-  changeDetection: ChangeDetectionStrategy.Eager,
-  styleUrls: ['./toolbar-popover.component.sass']
+    selector: 'app-toolbar-popover',
+    templateUrl: './toolbar-popover.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
+    styleUrls: ['./toolbar-popover.component.sass'],
+    imports: [IonicModule, ReactiveFormsModule, AsyncPipe]
 })
 export class ToolbarPopoverComponent implements OnInit {
 

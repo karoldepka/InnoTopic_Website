@@ -11,13 +11,19 @@ import {SearchService} from '../core/search.service';
 import {LiHintImpl} from '../shared-with-testcafe/Hint';
 import {Filter} from '../shared-with-testcafe/text_search/Filter';
 import {sortBy} from 'lodash-es';
+import { IonicModule } from '@ionic/angular';
+import { AppLogoComponent } from '../../Common/app-logo/app-logo.component';
+import { SyncStatusIconComponent } from '../../../libs/AppFedShared/odm/sync-status/sync-status-icon.component';
+import { ReactiveFormsModule, FormsModule } from '@angular/forms';
+import { NgFor, NgIf, NgClass } from '@angular/common';
+import { HintComponent } from './hint/hint.component';
 
 @Component({
-  standalone: false,
-  selector: 'app-ask-page',
-  templateUrl: './ask.page.html',
-  changeDetection: ChangeDetectionStrategy.Eager,
-  styleUrls: ['./ask.page.scss']
+    selector: 'app-ask-page',
+    templateUrl: './ask.page.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
+    styleUrls: ['./ask.page.scss'],
+    imports: [IonicModule, AppLogoComponent, SyncStatusIconComponent, ReactiveFormsModule, FormsModule, NgFor, NgIf, HintComponent, NgClass]
 })
 export class AskPage implements OnInit {
 

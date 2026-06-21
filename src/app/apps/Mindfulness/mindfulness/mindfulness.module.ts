@@ -10,13 +10,13 @@ import { MindfulnessPage } from './mindfulness.page';
 import {TimeModule} from '../../../libs/AppFedShared/time/time.module'
 
 @NgModule({
-  imports: [
-    CommonModule,
-    FormsModule,
-    IonicModule,
-    MindfulnessPageRoutingModule,
-    TimeModule,
-  ],
-  declarations: [MindfulnessPage]
+    imports: [
+        CommonModule,
+        FormsModule,
+        IonicModule,
+        MindfulnessPageRoutingModule,
+        TimeModule,
+        MindfulnessPage,
+    ]
 })
 export class MindfulnessPageModule {}

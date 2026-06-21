@@ -9,9 +9,9 @@ describe('NumberPickerComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [ NumberPickerComponent ],
-      schemas: [CUSTOM_ELEMENTS_SCHEMA],
-    })
+    imports: [NumberPickerComponent],
+    schemas: [CUSTOM_ELEMENTS_SCHEMA],
+})
     .compileComponents();
   }));
 

@@ -23,11 +23,7 @@ library.add(fas);
 
 @NgModule({
   declarations: [
-    AppComponent,
     // TestPermissionsAndFiltersComponent,
-    ConfirmModalComponent,
-    CommandsOverlayComponent,
-    TestComponentInstanceChangingOnInputValueChangeComponent,
   ],
   imports: [
     BrowserModule,

@@ -15,20 +15,18 @@ import {LifeOverviewsPageModule} from '../life-overviews/life-overviews.module'
 import {RationalePageModule} from '../rationale/rationale.module'
 
 @NgModule({
-  imports: [
-    CommonModule,
-    FormsModule,
-    IonicModule,
-    AskPageRoutingModule,
-    SharedModule,
-    OdmModule,
-    LifeOverviewsPageModule,
-    RationalePageModule,
-  ],
-  declarations: [
-    AskPage,
-    HintComponent,
-    HintEmbedMediaComponent,
-  ],
+    imports: [
+        CommonModule,
+        FormsModule,
+        IonicModule,
+        AskPageRoutingModule,
+        SharedModule,
+        OdmModule,
+        LifeOverviewsPageModule,
+        RationalePageModule,
+        AskPage,
+        HintComponent,
+        HintEmbedMediaComponent,
+    ],
 })
 export class AskPageModule {}

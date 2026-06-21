@@ -9,9 +9,8 @@ describe('RadicalCandorComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ RadicalCandorComponent ],
-      imports: [IonicModule.forRoot()]
-    }).compileComponents();
+    imports: [IonicModule.forRoot(), RadicalCandorComponent]
+}).compileComponents();
 
     fixture = TestBed.createComponent(RadicalCandorComponent);
     component = fixture.componentInstance;

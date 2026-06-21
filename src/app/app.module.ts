@@ -24,6 +24,7 @@ import {StoreDevtoolsModule} from '@ngrx/store-devtools'
 import {FaIconLibrary} from '@fortawesome/angular-fontawesome';
 // import { ServiceWorkerModule } from '@angular/service-worker';
 import { environment } from '../environments/environment'
+import {registerIonIcons} from './register-ion-icons'
 
 const swOpts = {
   enabled: environment.production,
@@ -35,10 +36,12 @@ const swOpts = {
 console.log(`service worker swOpts`, swOpts)
 
 @NgModule({
-    declarations: [AppComponent],
+    declarations: [],
     imports: [
         BrowserModule,
-        IonicModule.forRoot(),
+        IonicModule.forRoot({
+            mode: 'md',
+        }),
         AppRoutingModule,
         SharedModule,
         CoreModule,
@@ -72,6 +75,7 @@ export class AppModule {
      * https://github.com/FortAwesome/angular-fontawesome/blob/master/docs/upgrading/0.5.0-0.6.0.md */
     faIconLibrary: FaIconLibrary,
   ) {
+    registerIonIcons()
     faIconLibrary.addIconPacks(fas);
   }
 

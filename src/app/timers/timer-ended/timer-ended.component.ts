@@ -1,15 +1,21 @@
 import {Component, Input, OnInit, ChangeDetectionStrategy} from '@angular/core';
 import {TimerId, TimerItem} from "../../core/TimerItem";
 import {ignorePromise} from "../../libs/AppFedShared/utils/promiseUtils";
-import {ModalController} from "@ionic/angular";
+import { ModalController, IonicModule } from "@ionic/angular";
 import {debugLog} from "../../libs/AppFedShared/utils/log";
+import { NgClass } from '@angular/common';
+import { TimeLeftOrDurationComponent } from '../time-left-or-duration/time-left-or-duration.component';
 
 @Component({
-  standalone: false,
-  selector: 'app-timer-ended',
-  templateUrl: './timer-ended.component.html',
-  changeDetection: ChangeDetectionStrategy.Eager,
-  styleUrls: ['./timer-ended.component.scss'],
+    selector: 'app-timer-ended',
+    templateUrl: './timer-ended.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
+    styleUrls: ['./timer-ended.component.scss'],
+    imports: [
+        NgClass,
+        TimeLeftOrDurationComponent,
+        IonicModule,
+    ],
 })
 export class TimerEndedComponent implements OnInit {
 

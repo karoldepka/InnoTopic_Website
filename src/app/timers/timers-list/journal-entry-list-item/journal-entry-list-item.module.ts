@@ -9,22 +9,20 @@ import {JournalNumFieldsViewComponent} from './journal-num-fields-view/journal-n
 import {JournalTextFieldsViewComponent} from './journal-text-fields-view/journal-text-fields-view.component'
 
 @NgModule({
-  imports: [
-    CommonModule,
-    RouterModule,
-    IonicModule,
-    SharedModule,
-    TimeModule,
-  ],
-  declarations: [
-    JournalEntryListItemComponent,
-    JournalNumFieldsViewComponent,
-    JournalTextFieldsViewComponent,
-  ],
-  exports: [
-    JournalEntryListItemComponent,
-    JournalNumFieldsViewComponent,
-    JournalTextFieldsViewComponent,
-  ],
+    imports: [
+        CommonModule,
+        RouterModule,
+        IonicModule,
+        SharedModule,
+        TimeModule,
+        JournalEntryListItemComponent,
+        JournalNumFieldsViewComponent,
+        JournalTextFieldsViewComponent,
+    ],
+    exports: [
+        JournalEntryListItemComponent,
+        JournalNumFieldsViewComponent,
+        JournalTextFieldsViewComponent,
+    ],
 })
 export class JournalEntryListItemModule {}

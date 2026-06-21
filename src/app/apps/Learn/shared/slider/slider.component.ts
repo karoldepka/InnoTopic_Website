@@ -1,12 +1,13 @@
 import {Component, Input, OnInit, ChangeDetectionStrategy} from '@angular/core';
-import {UntypedFormControl} from '@angular/forms'
+import { UntypedFormControl, ReactiveFormsModule } from '@angular/forms'
+import { IonicModule } from '@ionic/angular';
 
 @Component({
-  standalone: false,
-  selector: 'app-slider',
-  templateUrl: './slider.component.html',
-  changeDetection: ChangeDetectionStrategy.Eager,
-  styleUrls: ['./slider.component.sass'],
+    selector: 'app-slider',
+    templateUrl: './slider.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
+    styleUrls: ['./slider.component.sass'],
+    imports: [IonicModule, ReactiveFormsModule],
 })
 export class SliderComponent implements OnInit {
 

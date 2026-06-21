@@ -8,8 +8,8 @@ describe('RangeCellComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [ RangeCellComponent ]
-    })
+    imports: [RangeCellComponent]
+})
     .compileComponents();
   }));
 

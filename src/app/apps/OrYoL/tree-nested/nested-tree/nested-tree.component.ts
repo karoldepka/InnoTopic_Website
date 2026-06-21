@@ -9,13 +9,15 @@ import {
   TreeModel,
 } from '../../tree-model/TreeModel'
 import { TreeHostComponent } from '../../tree-host/tree-host/tree-host.component'
+import { NgFor } from '@angular/common';
+import { NestedTreeNodeComponent } from '../nested-tree-node/nested-tree-node.component';
 
 @Component({
-  standalone: false,
-  selector: 'app-nested-tree',
-  templateUrl: './nested-tree.component.html',
-  changeDetection: ChangeDetectionStrategy.Eager,
-  styleUrls: ['./nested-tree.component.scss']
+    selector: 'app-nested-tree',
+    templateUrl: './nested-tree.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
+    styleUrls: ['./nested-tree.component.scss'],
+    imports: [NgFor, NestedTreeNodeComponent]
 })
 export class NestedTreeComponent implements OnInit {
 

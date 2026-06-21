@@ -1,13 +1,15 @@
 import {Component, Input, OnInit, ChangeDetectionStrategy} from '@angular/core';
 import {LearnItem$} from '../../models/LearnItem$'
 import {BehaviorSubject} from 'rxjs'
+import { BreadcrumbsComponent } from '../../../../libs/AppFedShared/breadcrumbs/breadcrumbs.component';
+import { OdmTreeComponent } from '../../../../libs/AppFedShared/tree/tree/odm-tree.component';
 
 @Component({
-  standalone: false,
-  selector: 'app-item-sub-items',
-  templateUrl: './item-sub-items.component.html',
-  changeDetection: ChangeDetectionStrategy.Eager,
-  styleUrls: ['./item-sub-items.component.sass'],
+    selector: 'app-item-sub-items',
+    templateUrl: './item-sub-items.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
+    styleUrls: ['./item-sub-items.component.sass'],
+    imports: [BreadcrumbsComponent, OdmTreeComponent],
 })
 export class ItemSubItemsComponent implements OnInit {
 

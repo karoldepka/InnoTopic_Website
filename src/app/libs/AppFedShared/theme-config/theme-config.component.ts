@@ -2,15 +2,22 @@ import {Component, Injector, OnInit, ChangeDetectionStrategy} from '@angular/cor
 import {ThemeService} from './theme.service'
 import {BaseComponent} from '../base/base.component'
 import {Theme, ThemeId} from './themes.data'
+import { IonicModule } from '@ionic/angular';
+import { NgIf, NgFor, NgStyle } from '@angular/common';
 
 
 
 @Component({
-  standalone: false,
-  selector: 'app-theme-config',
-  templateUrl: './theme-config.component.html',
-  changeDetection: ChangeDetectionStrategy.Eager,
-  styleUrls: ['./theme-config.component.sass'],
+    selector: 'app-theme-config',
+    templateUrl: './theme-config.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
+    styleUrls: ['./theme-config.component.sass'],
+    imports: [
+        IonicModule,
+        NgIf,
+        NgFor,
+        NgStyle,
+    ],
 })
 export class ThemeConfigComponent extends BaseComponent implements OnInit {
 

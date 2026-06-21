@@ -1,9 +1,10 @@
 import {Component, Input, OnInit, ChangeDetectionStrategy} from '@angular/core';
-import {UntypedFormControl, UntypedFormGroup} from '@angular/forms'
+import { UntypedFormControl, UntypedFormGroup, ReactiveFormsModule } from '@angular/forms'
 import {ViewSyncer} from '../../../AppFedShared/odm/ui/ViewSyncer'
 import {LearnItem$} from '../../../../apps/Learn/models/LearnItem$'
 import {funLevels} from '../../../../apps/Learn/models/fields/fun-level.model'
 import {createBalancedIntensityButtonsDescriptor} from '../descriptor-level-edit'
+import { NumericPickerComponent } from '../../../AppFedSharedIonic/ratings/numeric-picker/numeric-picker.component';
 
 
 const levels = funLevels
@@ -16,11 +17,11 @@ export const buttonsDesc = createBalancedIntensityButtonsDescriptor(
 
 
 @Component({
-  standalone: false,
-  selector: 'app-fun-level-edit',
-  templateUrl: './fun-level-edit.component.html',
-  changeDetection: ChangeDetectionStrategy.Eager,
-  styleUrls: ['./fun-level-edit.component.sass'],
+    selector: 'app-fun-level-edit',
+    templateUrl: './fun-level-edit.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
+    styleUrls: ['./fun-level-edit.component.sass'],
+    imports: [NumericPickerComponent, ReactiveFormsModule],
 })
 export class FunLevelEditComponent implements OnInit {
 

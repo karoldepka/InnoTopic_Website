@@ -9,9 +9,8 @@ describe('StackedInteractiveChartComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [ StackedInteractiveChartComponent ],
-      imports: [IonicModule.forRoot()]
-    }).compileComponents();
+    imports: [IonicModule.forRoot(), StackedInteractiveChartComponent]
+}).compileComponents();
 
     fixture = TestBed.createComponent(StackedInteractiveChartComponent);
     component = fixture.componentInstance;

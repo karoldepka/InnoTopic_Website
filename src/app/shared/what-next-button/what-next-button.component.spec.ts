@@ -9,9 +9,8 @@ describe('WhatNextButtonComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [ WhatNextButtonComponent ],
-      imports: [IonicModule.forRoot()]
-    }).compileComponents();
+    imports: [IonicModule.forRoot(), WhatNextButtonComponent]
+}).compileComponents();
 
     fixture = TestBed.createComponent(WhatNextButtonComponent);
     component = fixture.componentInstance;

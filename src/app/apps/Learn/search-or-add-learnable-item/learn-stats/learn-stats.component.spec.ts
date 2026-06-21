@@ -9,9 +9,8 @@ describe('LearnStatsComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [ LearnStatsComponent ],
-      imports: [IonicModule.forRoot()]
-    }).compileComponents();
+    imports: [IonicModule.forRoot(), LearnStatsComponent]
+}).compileComponents();
 
     fixture = TestBed.createComponent(LearnStatsComponent);
     component = fixture.componentInstance;

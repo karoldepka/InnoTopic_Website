@@ -13,18 +13,16 @@ const exports = [
 ]
 
 @NgModule({
-  providers: [
-    ShoppingListsService,
-  ],
-  declarations: [
-    ...exports
-  ],
-  imports: [
-    CommonModule,
-    IonicModule,
-    OdmUiModule,
-    RouterModule,
-  ],
-  exports: exports
+    providers: [
+        ShoppingListsService,
+    ],
+    imports: [
+        CommonModule,
+        IonicModule,
+        OdmUiModule,
+        RouterModule,
+        ...exports,
+    ],
+    exports: exports
 })
 export class ShoppingListsModule { }

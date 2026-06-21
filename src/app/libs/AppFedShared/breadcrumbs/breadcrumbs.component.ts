@@ -4,13 +4,22 @@ import {OdmItem$2} from '../odm/OdmItem$2'
 import {stripHtml} from '../utils/html-utils'
 import {LearnItem$} from '../../../apps/Learn/models/LearnItem$'
 import {BehaviorSubject} from 'rxjs'
+import { NgIf, NgFor, AsyncPipe } from '@angular/common';
+import { IonicModule } from '@ionic/angular';
+import { RouterLink } from '@angular/router';
 
 @Component({
-  standalone: false,
-  selector: 'app-breadcrumbs',
-  templateUrl: './breadcrumbs.component.html',
-  changeDetection: ChangeDetectionStrategy.Eager,
-  styleUrls: ['./breadcrumbs.component.sass'],
+    selector: 'app-breadcrumbs',
+    templateUrl: './breadcrumbs.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
+    styleUrls: ['./breadcrumbs.component.sass'],
+    imports: [
+        NgIf,
+        NgFor,
+        IonicModule,
+        RouterLink,
+        AsyncPipe,
+    ],
 })
 export class BreadcrumbsComponent extends BaseComponent implements OnInit {
 

@@ -3,13 +3,15 @@ import {
   Component,
   ViewEncapsulation,
 } from '@angular/core';
+import { RouterOutlet } from '@angular/router';
 import { DialogService } from './core/dialog.service'
 import { SearchService } from './core/search.service'
 
 declare var $: any
 
 @Component({
-  standalone: false,
+  standalone: true,
+  imports: [RouterOutlet],
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss'],

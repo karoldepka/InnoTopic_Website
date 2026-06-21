@@ -10,22 +10,19 @@ import {OryolSharedModule} from '../shared/oryol-shared.module'
 import {SharedModule} from '../../../shared/shared.module'
 
 @NgModule({
-  declarations: [
-    TreePageComponent,
-  ],
-  imports: [
-    CommonModule,
-    TreeHostModule,
-    TreePageRoutingModule,
-    TreeSharedModule,
-    IonicModule,
-    OdmModule,
-    OryolSharedModule,
-    OryolSharedModule,
-    OryolSharedModule,
-    SharedModule,
-  ],
-  exports: [
-  ]
+    imports: [
+        CommonModule,
+        TreeHostModule,
+        TreePageRoutingModule,
+        TreeSharedModule,
+        IonicModule,
+        OdmModule,
+        OryolSharedModule,
+        OryolSharedModule,
+        OryolSharedModule,
+        SharedModule,
+        TreePageComponent,
+    ],
+    exports: []
 })
 export class TreePageModule { }

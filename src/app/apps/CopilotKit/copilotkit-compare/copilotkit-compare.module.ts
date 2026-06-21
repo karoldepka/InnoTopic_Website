@@ -8,15 +8,13 @@ import { CopilotKitComparePage } from './copilotkit-compare.page';
 import { CopilotKitReactHostComponent } from './copilotkit-react-host.component';
 
 @NgModule({
-  imports: [
-    CommonModule,
-    FormsModule,
-    IonicModule,
-    CopilotKitCompareRoutingModule,
-  ],
-  declarations: [
-    CopilotKitComparePage,
-    CopilotKitReactHostComponent,
-  ],
+    imports: [
+        CommonModule,
+        FormsModule,
+        IonicModule,
+        CopilotKitCompareRoutingModule,
+        CopilotKitComparePage,
+        CopilotKitReactHostComponent,
+    ],
 })
 export class CopilotKitCompareModule {}

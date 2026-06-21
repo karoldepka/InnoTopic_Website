@@ -9,13 +9,15 @@ import {Config, ConfigService} from '../../core/config.service'
 import {TimeTrackedEntry, TimeTrackingJsObjVal} from '../TimeTrackedEntry'
 import {CachedSubject} from '../../../../libs/AppFedShared/utils/cachedSubject2/CachedSubject2'
 import {stripHtml} from '../../../../libs/AppFedShared/utils/html-utils'
+import { NgClass, NgIf, AsyncPipe, JsonPipe } from '@angular/common';
+import { TimePassingComponent } from '../../AppFedSharedEmu/time/time-passing/time-passing.component';
 
 @Component({
-  standalone: false,
-  selector: 'app-time-tracking-cell',
-  templateUrl: './time-tracking-cell.component.html',
-  changeDetection: ChangeDetectionStrategy.Eager,
-  styleUrls: ['./time-tracking-cell.component.sass']
+    selector: 'app-time-tracking-cell',
+    templateUrl: './time-tracking-cell.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
+    styleUrls: ['./time-tracking-cell.component.sass'],
+    imports: [NgClass, NgIf, TimePassingComponent, AsyncPipe, JsonPipe]
 })
 export class TimeTrackingCellComponent implements OnInit {
 

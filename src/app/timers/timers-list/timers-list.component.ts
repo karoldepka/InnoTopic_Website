@@ -1,13 +1,21 @@
 import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import {TimersService} from "../../core/timers.service";
 import {TimerItem} from "../../core/TimerItem";
+import { IonicModule } from '@ionic/angular';
+import { NgFor, AsyncPipe } from '@angular/common';
+import { TimerItemComponent } from '../timer-item/timer-item.component';
 
 @Component({
-  standalone: false,
-  selector: 'app-timers-list',
-  templateUrl: './timers-list.component.html',
-  changeDetection: ChangeDetectionStrategy.Eager,
-  styleUrls: ['./timers-list.component.scss'],
+    selector: 'app-timers-list',
+    templateUrl: './timers-list.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
+    styleUrls: ['./timers-list.component.scss'],
+    imports: [
+        IonicModule,
+        NgFor,
+        TimerItemComponent,
+        AsyncPipe,
+    ],
 })
 export class TimersListComponent implements OnInit {
 

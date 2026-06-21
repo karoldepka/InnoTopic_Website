@@ -17,16 +17,14 @@ const routes: Routes = [
 ];
 
 @NgModule({
-  imports: [
-    CommonModule,
-    FormsModule,
-    IonicModule,
-    RouterModule.forChild(routes),
-  ],
-  declarations: [
-    AuthPage,
-    LoginEmailPasswordComponent,
-    SignupEmailPasswordComponent,
-  ],
+    imports: [
+        CommonModule,
+        FormsModule,
+        IonicModule,
+        RouterModule.forChild(routes),
+        AuthPage,
+        LoginEmailPasswordComponent,
+        SignupEmailPasswordComponent,
+    ],
 })
 export class AuthPageModule {}

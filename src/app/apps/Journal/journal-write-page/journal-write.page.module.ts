@@ -17,7 +17,15 @@ import {JournalTextFieldComponent} from './journal-text-fields/journal-text-fiel
 import {JournalItemEditComponent} from './journal-item-edit/journal-item-edit.component'
 
 @NgModule({
-    declarations: [
+    imports: [
+        CommonModule,
+        JournalWritePageRoutingModule,
+        IonicModule,
+        FormsModule,
+        OdmModule,
+        RatingsModule,
+        TimeModule,
+        SharedModule,
         JournalWritePage,
         JournalNumericFieldsComponent,
         JournalTextFieldsComponent,
@@ -25,17 +33,6 @@ import {JournalItemEditComponent} from './journal-item-edit/journal-item-edit.co
         JournalTextFieldComponent,
         JournalItemEditComponent,
     ],
-  imports: [
-    CommonModule,
-    JournalWritePageRoutingModule,
-    IonicModule,
-    FormsModule,
-    OdmModule,
-    RatingsModule,
-    TimeModule,
-    SharedModule,
-  ],
-    exports: [
-    ],
+    exports: [],
 })
 export class JournalWritePageModule { }

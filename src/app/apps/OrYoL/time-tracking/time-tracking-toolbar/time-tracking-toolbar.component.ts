@@ -10,13 +10,15 @@ import {DbTreeService} from '../../tree-model/db-tree-service'
 import {TimeTrackedEntry} from '../TimeTrackedEntry'
 import {CachedSubject} from '../../../../libs/AppFedShared/utils/cachedSubject2/CachedSubject2'
 import {Observable} from 'rxjs/internal/Observable'
+import { NgFor, NgStyle, AsyncPipe } from '@angular/common';
+import { TimeTrackingCellComponent } from '../time-tracking-cell/time-tracking-cell.component';
 
 @Component({
-  standalone: false,
-  selector: 'app-time-tracking-toolbar',
-  templateUrl: './time-tracking-toolbar.component.html',
-  changeDetection: ChangeDetectionStrategy.Eager,
-  styleUrls: ['./time-tracking-toolbar.component.sass']
+    selector: 'app-time-tracking-toolbar',
+    templateUrl: './time-tracking-toolbar.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
+    styleUrls: ['./time-tracking-toolbar.component.sass'],
+    imports: [NgFor, TimeTrackingCellComponent, NgStyle, AsyncPipe]
 })
 export class TimeTrackingToolbarComponent implements OnInit {
 

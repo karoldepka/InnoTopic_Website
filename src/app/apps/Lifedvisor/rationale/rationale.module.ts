@@ -11,19 +11,17 @@ import {RationaleComponent} from './rationale/rationale.component';
 import {FlowStateComponent} from '../life-overviews/flow-state/flow-state.component';
 
 @NgModule({
-  imports: [
-    CommonModule,
-    FormsModule,
-    IonicModule,
-    RationalePageRoutingModule
-  ],
-  exports: [
-    FlowStateComponent
-  ],
-  declarations: [
-    RationalePage,
-    RationaleComponent,
-    FlowStateComponent,
-  ]
+    imports: [
+        CommonModule,
+        FormsModule,
+        IonicModule,
+        RationalePageRoutingModule,
+        RationalePage,
+        RationaleComponent,
+        FlowStateComponent
+    ],
+    exports: [
+        FlowStateComponent
+    ]
 })
 export class RationalePageModule {}

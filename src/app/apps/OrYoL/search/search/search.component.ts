@@ -8,14 +8,17 @@ import {
 } from '@angular/core';
 import { SearchService } from '../../core/search.service'
 import { NavigationService } from '../../core/navigation.service'
+import { ReactiveFormsModule, FormsModule } from '@angular/forms';
+import { NgFor } from '@angular/common';
+import { NodeClassIconComponent } from '../../tree-shared/node-content/node-class-icon/node-class-icon.component';
 
 
 @Component({
-  standalone: false,
-  selector: 'app-search',
-  templateUrl: './search.component.html',
-  changeDetection: ChangeDetectionStrategy.Eager,
-  styleUrls: ['./search.component.sass']
+    selector: 'app-search',
+    templateUrl: './search.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
+    styleUrls: ['./search.component.sass'],
+    imports: [ReactiveFormsModule, FormsModule, NgFor, NodeClassIconComponent]
 })
 export class SearchComponent implements OnInit, AfterViewInit {
   // searchText: string

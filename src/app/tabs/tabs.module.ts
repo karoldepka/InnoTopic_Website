@@ -12,15 +12,15 @@ import {ShoppingListDetailsPageComponent} from "../apps/ShopNext/shopping-list-d
 import {ShoppingListDetailsPageModule} from "../apps/ShopNext/shopping-list-details-page/shopping-list-details-page.module";
 
 @NgModule({
-  imports: [
-    IonicModule,
-    CommonModule,
-    FormsModule,
-    TabsPageRoutingModule,
-    ShoppingListsPageModule,
-    ShoppingListDetailsPageModule,
-    RecipesPageModule,
-  ],
-  declarations: [TabsPage]
+    imports: [
+        IonicModule,
+        CommonModule,
+        FormsModule,
+        TabsPageRoutingModule,
+        ShoppingListsPageModule,
+        ShoppingListDetailsPageModule,
+        RecipesPageModule,
+        TabsPage,
+    ]
 })
 export class TabsPageModule {}

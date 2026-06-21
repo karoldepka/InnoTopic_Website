@@ -9,6 +9,7 @@ import {
   TimeTrackingService,
 } from '../../../time-tracking/time-tracking.service'
 import {ApfBaseTreeNode, OryBaseTreeNode} from '../../../tree-model/TreeModel'
+import { NodeContentTimeTrackingComponent } from '../../node-content-time-tracking/node-content-time-tracking.component';
 
 // function timeTrackedMsFunc ( node: ApfBaseTreeNode ) {
 //   const itemData = node.content.itemData
@@ -20,11 +21,11 @@ import {ApfBaseTreeNode, OryBaseTreeNode} from '../../../tree-model/TreeModel'
 // }
 
 @Component({
-  standalone: false,
-  selector: 'app-time-tracking-menu',
-  templateUrl: './time-tracking-menu.component.html',
-  changeDetection: ChangeDetectionStrategy.Eager,
-  styleUrls: ['./time-tracking-menu.component.scss']
+    selector: 'app-time-tracking-menu',
+    templateUrl: './time-tracking-menu.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
+    styleUrls: ['./time-tracking-menu.component.scss'],
+    imports: [NodeContentTimeTrackingComponent]
 })
 export class TimeTrackingMenuComponent implements OnInit {
 

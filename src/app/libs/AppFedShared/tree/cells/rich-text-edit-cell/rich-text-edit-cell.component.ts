@@ -7,11 +7,11 @@ import {CellComponent} from '../../../../../apps/OrYoL/tree-shared/cells/CellCom
 import {errorAlert} from '../../../utils/log'
 
 @Component({
-  standalone: false,
-  selector: 'app-rich-text-edit-cell',
-  templateUrl: './rich-text-edit-cell.component.html',
-  changeDetection: ChangeDetectionStrategy.Eager,
-  styleUrls: ['./rich-text-edit-cell.component.sass'],
+    selector: 'app-rich-text-edit-cell',
+    templateUrl: './rich-text-edit-cell.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
+    styleUrls: ['./rich-text-edit-cell.component.sass'],
+    imports: [RichTextEditComponent],
 })
 export class RichTextEditCellComponent /*extends CellComponent*/ implements OnInit {
 

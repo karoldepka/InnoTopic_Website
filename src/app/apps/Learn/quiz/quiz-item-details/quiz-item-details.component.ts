@@ -7,13 +7,26 @@ import {LearnItem$} from '../../models/LearnItem$'
 import {QuizService} from '../../core/quiz/quiz.service'
 import {Subscription} from 'rxjs'
 import {nullish} from '../../../../libs/AppFedShared/utils/type-utils'
+import { NgIf, NgFor, AsyncPipe } from '@angular/common';
+import { ImportanceBannerComponent } from '../../shared/importance-banner/importance-banner.component';
+import { PlayButtonComponent } from '../../shared/play-button/play-button.component';
+import { BreadcrumbsComponent } from '../../../../libs/AppFedShared/breadcrumbs/breadcrumbs.component';
+import { ItemSideComponent } from '../../shared/item-side/item-side.component';
 
 @Component({
-  standalone: false,
-  selector: 'app-quiz-item-details',
-  templateUrl: './quiz-item-details.component.html',
-  changeDetection: ChangeDetectionStrategy.Eager,
-  styleUrls: ['./quiz-item-details.component.sass'],
+    selector: 'app-quiz-item-details',
+    templateUrl: './quiz-item-details.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
+    styleUrls: ['./quiz-item-details.component.sass'],
+    imports: [
+        NgIf,
+        ImportanceBannerComponent,
+        PlayButtonComponent,
+        BreadcrumbsComponent,
+        ItemSideComponent,
+        NgFor,
+        AsyncPipe,
+    ],
 })
 export class QuizItemDetailsComponent implements OnInit, OnDestroy, AfterViewInit {
 

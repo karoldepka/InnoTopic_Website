@@ -33,14 +33,12 @@ import {IonicModule} from '@ionic/angular'
         OdmModule,
         // NgbPopoverModule,
         IonicModule,
+        TreeHostComponent,
+        ToolbarComponent,
+        ToolbarPopoverComponent,
     ],
-  declarations: [
-    TreeHostComponent,
-    ToolbarComponent,
-    ToolbarPopoverComponent,
-  ],
-  exports: [
-    TreeHostComponent,
-  ]
+    exports: [
+        TreeHostComponent,
+    ]
 })
 export class TreeHostModule { }

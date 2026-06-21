@@ -1,20 +1,16 @@
 import {Component, EventEmitter, Injector, Input, OnInit, Output, ChangeDetectionStrategy} from '@angular/core';
-import {
-  btn,
-  ButtonsDescriptor,
-  ButtonVariantDescriptor,
-  NumericPickerVal,
-} from '../../../../libs/AppFedSharedIonic/ratings/numeric-picker/numeric-picker.component'
+import { btn, ButtonsDescriptor, ButtonVariantDescriptor, NumericPickerVal, NumericPickerComponent } from '../../../../libs/AppFedSharedIonic/ratings/numeric-picker/numeric-picker.component'
 import {errorAlert} from '../../../../libs/AppFedShared/utils/log'
 import {LearnItem$} from '../../models/LearnItem$'
 import {BaseComponent} from '../../../../libs/AppFedShared/base/base.component'
+import { NgIf } from '@angular/common';
 
 @Component({
-  standalone: false,
-  selector: 'app-self-rating',
-  templateUrl: './self-rating.component.html',
-  changeDetection: ChangeDetectionStrategy.Eager,
-  styleUrls: ['./self-rating.component.sass'],
+    selector: 'app-self-rating',
+    templateUrl: './self-rating.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
+    styleUrls: ['./self-rating.component.sass'],
+    imports: [NgIf, NumericPickerComponent],
 })
 export class SelfRatingComponent extends BaseComponent implements OnInit {
 

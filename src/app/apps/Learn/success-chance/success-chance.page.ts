@@ -1,11 +1,22 @@
 import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
+import { IonicModule } from '@ionic/angular';
+import { AppLogoComponent } from '../../Common/app-logo/app-logo.component';
+import { RouterLink } from '@angular/router';
+import { NgFor, NgStyle, NgIf } from '@angular/common';
 
 @Component({
-  standalone: false,
-  selector: 'app-success-chance',
-  templateUrl: './success-chance.page.html',
-  changeDetection: ChangeDetectionStrategy.Eager,
-  styleUrls: ['./success-chance.page.sass'],
+    selector: 'app-success-chance',
+    templateUrl: './success-chance.page.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
+    styleUrls: ['./success-chance.page.sass'],
+    imports: [
+        IonicModule,
+        AppLogoComponent,
+        RouterLink,
+        NgFor,
+        NgStyle,
+        NgIf,
+    ],
 })
 export class SuccessChancePage implements OnInit {
 

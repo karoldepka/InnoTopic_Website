@@ -9,9 +9,9 @@ xdescribe('TimersPageComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [TimersPageComponent],
-      schemas: [CUSTOM_ELEMENTS_SCHEMA],
-    }).compileComponents();
+    imports: [TimersPageComponent],
+    schemas: [CUSTOM_ELEMENTS_SCHEMA],
+}).compileComponents();
   }));
 
   beforeEach(() => {

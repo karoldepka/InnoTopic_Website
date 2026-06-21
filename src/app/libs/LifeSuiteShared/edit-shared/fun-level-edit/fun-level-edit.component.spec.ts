@@ -9,9 +9,8 @@ describe('FunLevelEditComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [ FunLevelEditComponent ],
-      imports: [IonicModule.forRoot()]
-    }).compileComponents();
+    imports: [IonicModule.forRoot(), FunLevelEditComponent]
+}).compileComponents();
 
     fixture = TestBed.createComponent(FunLevelEditComponent);
     component = fixture.componentInstance;

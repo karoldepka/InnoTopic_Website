@@ -10,7 +10,8 @@ import {ApfNonRootTreeNode} from '../../tree-model/TreeNode'
 import {OryBaseTreeNode} from '../../tree-model/TreeModel'
 
 @Component({
-  standalone: false,
+  standalone: true,
+  imports: [],
   selector: 'app-test-component-instance-changing-on-input-value-change',
   templateUrl: './test-component-instance-changing-on-input-value-change.component.html',
   changeDetection: ChangeDetectionStrategy.Eager,

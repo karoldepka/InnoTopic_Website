@@ -6,20 +6,17 @@ import {TreeModule} from 'primeng/tree'
 import {TreeSharedModule} from '../tree-shared/tree-shared.module'
 
 @NgModule({
-  declarations: [
-    PrimeNgTreeComponent
-  ],
-  imports: [
-    CommonModule,
-    TreeModule,
-    TreeSharedModule,
-  ],
-  exports: [
-    PrimeNgTreeComponent,
-
-  ],
-  providers: [
-    TreeDragDropService,
-  ]
+    imports: [
+        CommonModule,
+        TreeModule,
+        TreeSharedModule,
+        PrimeNgTreeComponent,
+    ],
+    exports: [
+        PrimeNgTreeComponent,
+    ],
+    providers: [
+        TreeDragDropService,
+    ]
 })
 export class TreePrimengModule { }

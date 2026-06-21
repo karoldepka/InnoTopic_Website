@@ -8,8 +8,8 @@ describe('ModerationTimersPageComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [ ModerationTimersPageComponent ]
-    })
+    declarations: [ModerationTimersPageComponent]
+})
     .compileComponents();
   }));
 

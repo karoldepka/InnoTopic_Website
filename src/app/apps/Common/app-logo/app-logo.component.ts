@@ -1,12 +1,19 @@
 import {Component, Input, OnInit, ChangeDetectionStrategy} from '@angular/core';
-import {Router} from '@angular/router'
+import { Router, RouterLink } from '@angular/router'
+import { IonicModule } from '@ionic/angular';
+import { NgIf, NgClass } from '@angular/common';
 
 @Component({
-  standalone: false,
-  selector: 'app-app-logo',
-  templateUrl: './app-logo.component.html',
-  changeDetection: ChangeDetectionStrategy.Eager,
-  styleUrls: ['./app-logo.component.sass'],
+    selector: 'app-app-logo',
+    templateUrl: './app-logo.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
+    styleUrls: ['./app-logo.component.sass'],
+    imports: [
+        IonicModule,
+        RouterLink,
+        NgIf,
+        NgClass,
+    ],
 })
 export class AppLogoComponent implements OnInit {
 

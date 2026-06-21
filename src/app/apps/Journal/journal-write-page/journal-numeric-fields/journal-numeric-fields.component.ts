@@ -1,15 +1,25 @@
 import {Component, Input, OnInit, ChangeDetectionStrategy} from '@angular/core';
-import {NumericPickerVal} from '../../../../libs/AppFedSharedIonic/ratings/numeric-picker/numeric-picker.component'
+import { NumericPickerVal, NumericPickerComponent } from '../../../../libs/AppFedSharedIonic/ratings/numeric-picker/numeric-picker.component'
 import {JournalNumericDescriptor, JournalNumericDescriptors} from '../../models/JournalNumericDescriptors'
 import {JournalCompositeFieldVal, JournalEntry} from '../../models/JournalEntry'
 import {JournalEntry$} from '../../models/JournalEntry$'
+import { IonicModule } from '@ionic/angular';
+import { ReactiveFormsModule, FormsModule } from '@angular/forms';
+import { NgIf, NgFor } from '@angular/common';
 
 @Component({
-  standalone: false,
-  selector: 'app-journal-numeric-fields',
-  templateUrl: './journal-numeric-fields.component.html',
-  changeDetection: ChangeDetectionStrategy.Eager,
-  styleUrls: ['./journal-numeric-fields.component.sass'],
+    selector: 'app-journal-numeric-fields',
+    templateUrl: './journal-numeric-fields.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
+    styleUrls: ['./journal-numeric-fields.component.sass'],
+    imports: [
+        IonicModule,
+        ReactiveFormsModule,
+        FormsModule,
+        NgIf,
+        NgFor,
+        NumericPickerComponent,
+    ],
 })
 export class JournalNumericFieldsComponent implements OnInit {
 

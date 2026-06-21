@@ -8,13 +8,6 @@ import {FeatureConfigComponent} from '../feature-config/feature-config.component
 import {AboutAppComponent} from './sync-status/sync-popover/about-app/about-app.component'
 
 @NgModule({
-    declarations: [
-        SyncStatusIconComponent,
-        SyncPopoverComponent,
-        ThemeConfigComponent,
-        FeatureConfigComponent,
-        AboutAppComponent,
-    ],
     exports: [
         SyncStatusIconComponent,
         FeatureConfigComponent,
@@ -22,6 +15,11 @@ import {AboutAppComponent} from './sync-status/sync-popover/about-app/about-app.
     imports: [
         CommonModule,
         IonicModule,
+        SyncStatusIconComponent,
+        SyncPopoverComponent,
+        ThemeConfigComponent,
+        FeatureConfigComponent,
+        AboutAppComponent,
     ]
 })
 export class OdmModule { }

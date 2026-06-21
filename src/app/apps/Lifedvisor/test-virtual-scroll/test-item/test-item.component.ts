@@ -1,7 +1,8 @@
 import {Component, Input, OnInit, ChangeDetectionStrategy} from '@angular/core';
 
 @Component({
-  standalone: false,
+  standalone: true,
+  imports: [],
   selector: 'app-test-item',
   templateUrl: './test-item.component.html',
   changeDetection: ChangeDetectionStrategy.Eager,

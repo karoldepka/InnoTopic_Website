@@ -1,9 +1,13 @@
 import { Component, OnInit } from '@angular/core';
-import {Meeting} from "../meetings-models/Meeting";
-import {FormControl, FormGroup} from "@angular/forms";
+import { JsonPipe } from '@angular/common';
+import { ReactiveFormsModule, FormControl, FormGroup } from "@angular/forms";
+import { IonicModule } from '@ionic/angular';
+import { Meeting } from "../meetings-models/Meeting";
+import { DescriptionEditorComponent } from './description-editor/description-editor.component';
 
 @Component({
-  standalone: false,
+  standalone: true,
+  imports: [IonicModule, ReactiveFormsModule, JsonPipe, DescriptionEditorComponent],
   selector: 'app-meeting-details-page',
   templateUrl: './meeting-details.page.html',
   styleUrls: ['./meeting-details.page.sass'],

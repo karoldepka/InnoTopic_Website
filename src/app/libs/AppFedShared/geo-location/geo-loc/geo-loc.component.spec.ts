@@ -9,9 +9,8 @@ describe('GeoLocComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [ GeoLocComponent ],
-      imports: [IonicModule.forRoot()]
-    }).compileComponents();
+    imports: [IonicModule.forRoot(), GeoLocComponent]
+}).compileComponents();
 
     fixture = TestBed.createComponent(GeoLocComponent);
     component = fixture.componentInstance;

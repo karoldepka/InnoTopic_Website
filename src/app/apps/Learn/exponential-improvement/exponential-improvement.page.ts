@@ -1,11 +1,18 @@
 import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
+import { IonicModule } from '@ionic/angular';
+import { AppLogoComponent } from '../../Common/app-logo/app-logo.component';
+import { NgFor } from '@angular/common';
 
 @Component({
-  standalone: false,
-  selector: 'app-exponential-improvement',
-  templateUrl: './exponential-improvement.page.html',
-  changeDetection: ChangeDetectionStrategy.Eager,
-  styleUrls: ['./exponential-improvement.page.sass'],
+    selector: 'app-exponential-improvement',
+    templateUrl: './exponential-improvement.page.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
+    styleUrls: ['./exponential-improvement.page.sass'],
+    imports: [
+        IonicModule,
+        AppLogoComponent,
+        NgFor,
+    ],
 })
 export class ExponentialImprovementPage implements OnInit {
 

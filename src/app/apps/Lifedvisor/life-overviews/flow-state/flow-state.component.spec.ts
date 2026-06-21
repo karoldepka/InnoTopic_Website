@@ -9,9 +9,8 @@ describe('FlowStateComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ FlowStateComponent ],
-      imports: [IonicModule.forRoot()]
-    }).compileComponents();
+    imports: [IonicModule.forRoot(), FlowStateComponent]
+}).compileComponents();
 
     fixture = TestBed.createComponent(FlowStateComponent);
     component = fixture.componentInstance;

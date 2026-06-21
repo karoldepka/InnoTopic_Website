@@ -9,9 +9,8 @@ describe('MentalEffortLevelEditComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [ MentalEffortLevelEditComponent ],
-      imports: [IonicModule.forRoot()]
-    }).compileComponents();
+    imports: [IonicModule.forRoot(), MentalEffortLevelEditComponent]
+}).compileComponents();
 
     fixture = TestBed.createComponent(MentalEffortLevelEditComponent);
     component = fixture.componentInstance;

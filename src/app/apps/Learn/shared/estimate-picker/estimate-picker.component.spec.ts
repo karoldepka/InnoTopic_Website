@@ -9,9 +9,9 @@ describe('EstimatePickerComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [ EstimatePickerComponent ],
-      imports: [IonicModule.forRoot()]
-    }).compileComponents();
+    declarations: [EstimatePickerComponent],
+    imports: [IonicModule.forRoot()]
+}).compileComponents();
 
     fixture = TestBed.createComponent(EstimatePickerComponent);
     component = fixture.componentInstance;

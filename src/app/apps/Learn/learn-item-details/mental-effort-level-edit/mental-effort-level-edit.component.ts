@@ -5,6 +5,8 @@ import {
   createBalancedIntensityButtonsDescriptor,
   SyncedDescriptorFieldEditComponent,
 } from '../../../../libs/LifeSuiteShared/edit-shared/descriptor-level-edit'
+import { NumericPickerComponent } from '../../../../libs/AppFedSharedIonic/ratings/numeric-picker/numeric-picker.component';
+import { ReactiveFormsModule } from '@angular/forms';
 
 const levels = mentalEffortLevels
 
@@ -15,11 +17,11 @@ const buttonsDesc = createBalancedIntensityButtonsDescriptor(
 )
 
 @Component({
-  standalone: false,
-  selector: 'app-mental-effort-level-edit',
-  templateUrl: './mental-effort-level-edit.component.html',
-  changeDetection: ChangeDetectionStrategy.Eager,
-  styleUrls: ['./mental-effort-level-edit.component.sass'],
+    selector: 'app-mental-effort-level-edit',
+    templateUrl: './mental-effort-level-edit.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
+    styleUrls: ['./mental-effort-level-edit.component.sass'],
+    imports: [NumericPickerComponent, ReactiveFormsModule],
 })
 export class MentalEffortLevelEditComponent extends SyncedDescriptorFieldEditComponent<LearnItem$> {
 

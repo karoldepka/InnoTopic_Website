@@ -9,9 +9,9 @@ xdescribe('TimersListComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [ TimersListComponent ],
-      schemas: [CUSTOM_ELEMENTS_SCHEMA],
-    })
+    imports: [TimersListComponent],
+    schemas: [CUSTOM_ELEMENTS_SCHEMA],
+})
     .compileComponents();
   }));
 

@@ -1,7 +1,8 @@
 import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 
 @Component({
-  standalone: false,
+  standalone: true,
+  imports: [],
   selector: 'app-tree-toolbar',
   templateUrl: './tree-toolbar.component.html',
   changeDetection: ChangeDetectionStrategy.Eager,

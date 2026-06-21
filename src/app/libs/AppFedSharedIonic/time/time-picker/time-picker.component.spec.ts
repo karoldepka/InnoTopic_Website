@@ -9,9 +9,9 @@ describe('TimePickerComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [ TimePickerComponent ],
-      schemas: [CUSTOM_ELEMENTS_SCHEMA],
-    })
+    imports: [TimePickerComponent],
+    schemas: [CUSTOM_ELEMENTS_SCHEMA],
+})
     .compileComponents();
   }));
 

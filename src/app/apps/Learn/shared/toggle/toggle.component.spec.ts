@@ -9,9 +9,8 @@ describe('ToggleComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [ ToggleComponent ],
-      imports: [IonicModule.forRoot()]
-    }).compileComponents();
+    imports: [IonicModule.forRoot(), ToggleComponent]
+}).compileComponents();
 
     fixture = TestBed.createComponent(ToggleComponent);
     component = fixture.componentInstance;

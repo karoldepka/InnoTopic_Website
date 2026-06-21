@@ -6,14 +6,12 @@ import {RecipesModule} from "./recipes/recipes.module";
 import {IonicModule} from "@ionic/angular";
 
 @NgModule({
-  declarations: [
-    RecipesPageComponent,
-  ],
-  imports: [
-    CommonModule,
-    OdmUiModule,
-    RecipesModule,
-    IonicModule
-  ]
+    imports: [
+        CommonModule,
+        OdmUiModule,
+        RecipesModule,
+        IonicModule,
+        RecipesPageComponent
+    ]
 })
 export class RecipesPageModule { }

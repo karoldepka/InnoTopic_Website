@@ -1,7 +1,9 @@
 import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
+import { IonicModule } from '@ionic/angular';
 
 @Component({
-  standalone: false,
+  standalone: true,
+  imports: [IonicModule],
   selector: 'app-about',
   templateUrl: './about.page.html',
   changeDetection: ChangeDetectionStrategy.Eager,

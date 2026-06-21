@@ -18,7 +18,7 @@ import {LearnSharedModule} from '../shared/learn-shared.module'
         ItemProcessingPageRoutingModule,
         SharedModule,
         LearnSharedModule,
-    ],
-  declarations: [ItemProcessingPage]
+        ItemProcessingPage,
+    ]
 })
 export class ItemProcessingPageModule {}

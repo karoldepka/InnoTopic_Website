@@ -17,38 +17,16 @@ import { NodeOrderer } from '../tree-model/node-orderer'
 import { TimeStamper } from '../tree-model/TimeStamper'
 import firestore from 'firebase/compat/app'
 
-// const firebase1 = require('firebase');
-import * as firebase1 from 'firebase/app'
 import 'firebase/compat/firestore';
 import {nullish} from '../../../libs/AppFedShared/utils/type-utils'
 import {AngularFirestore, DocumentReference, DocumentSnapshot, Query} from '@angular/fire/compat/firestore'
 // Required for side-effects
 // require('firebase/firestore');
-
-
-/// ==== new SDK:
-import { initializeApp } from "firebase/app";
-import { getFirestore } from "firebase/firestore";
-import {firebaseConfig} from '../../../firebase.config'
-import {Firestore} from '@angular/fire/firestore'
 import firebase from 'firebase/compat/app'
 import CollectionReference = firebase.firestore.CollectionReference
 import {SyncStatusService} from '../../../libs/AppFedShared/odm/sync-status.service'
 import {ItemId} from '../db/OryItem$'
 import {OryBaseTreeNode, OryNonRootTreeNode} from '../tree-model/TreeModel'
-
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
-
-
-// =====
-
-
-// Initialize Cloud Firestore and get a reference to the service
-const db = getFirestore(app);
-
-
-console.log('firebase1', firebase1)
 
 // export const firebaseApp = firebase1.initializeApp({
 //   apiKey: 'AIzaSyAVVLpc9MvJw7dickStZcAd3G5ZI5fqE6I',
@@ -59,7 +37,6 @@ console.log('firebase1', firebase1)
 //   messagingSenderId: '970393221829'
 // })
 
-console.log('firebase1', firebase1)
 // console.log('firebaseApp', firebaseApp)
 
 

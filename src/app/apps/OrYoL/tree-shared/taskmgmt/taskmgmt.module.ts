@@ -4,10 +4,11 @@ import { TaskNodeContentComponent } from './task-node-content/task-node-content.
 import { TreeSharedModule } from '../tree-shared.module'
 
 @NgModule({
-  declarations: [TaskNodeContentComponent],
+  declarations: [],
   imports: [
     CommonModule,
     TreeSharedModule,
+    TaskNodeContentComponent,
   ],
 })
 export class TaskmgmtModule { }

@@ -16,7 +16,7 @@ import {SharedModule} from '../../../shared/shared.module'
         IonicModule,
         ExponentialImprovementPageRoutingModule,
         SharedModule,
-    ],
-  declarations: [ExponentialImprovementPage]
+        ExponentialImprovementPage,
+    ]
 })
 export class ExponentialImprovementPageModule {}

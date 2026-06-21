@@ -7,22 +7,41 @@ import {combineLatest} from 'rxjs'
 import {debugLog} from '../../../libs/AppFedShared/utils/log'
 import {JournalEntry} from '../models/JournalEntry'
 import {ListOptionsComponent} from '../../Learn/search-or-add-learnable-item/list-options/list-options.component'
-import {PopoverController} from '@ionic/angular'
+import { PopoverController, IonicModule } from '@ionic/angular'
 import {LocalOptionsPatchableObservable} from '../../Learn/core/options.service'
 import {ListOptionsData} from '../../Learn/search-or-add-learnable-item/list-options'
 import {TimelineListOptionsComponent} from './timeline-list-options/timeline-list-options.component'
 import {BaseComponent} from '../../../libs/AppFedShared/base/base.component'
+import { RouterLink } from '@angular/router';
+import { AppLogoComponent } from '../../Common/app-logo/app-logo.component';
+import { NgIf, NgFor, AsyncPipe } from '@angular/common';
+import { SyncStatusIconComponent } from '../../../libs/AppFedShared/odm/sync-status/sync-status-icon.component';
+import { CdkVirtualScrollViewport, CdkVirtualForOf } from '@angular/cdk/scrolling';
+import { CdkAutoSizeVirtualScroll } from '@angular/cdk-experimental/scrolling';
+import { JournalEntryListItemComponent } from '../../../timers/timers-list/journal-entry-list-item/journal-entry-list-item.component';
 
 export class TimelineListOptionsData {
   sortAscending ? : boolean
 }
 
 @Component({
-  standalone: false,
-  selector: 'app-journal-entries-list',
-  templateUrl: './journal-entries-list.page.html',
-  changeDetection: ChangeDetectionStrategy.Eager,
-  styleUrls: ['./journal-entries-list.page.sass'],
+    selector: 'app-journal-entries-list',
+    templateUrl: './journal-entries-list.page.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
+    styleUrls: ['./journal-entries-list.page.sass'],
+    imports: [
+        IonicModule,
+        RouterLink,
+        AppLogoComponent,
+        NgIf,
+        SyncStatusIconComponent,
+        CdkVirtualScrollViewport,
+        CdkAutoSizeVirtualScroll,
+        CdkVirtualForOf,
+        JournalEntryListItemComponent,
+        NgFor,
+        AsyncPipe,
+    ],
 })
 export class JournalEntriesListPage extends BaseComponent implements OnInit {
 

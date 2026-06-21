@@ -9,9 +9,9 @@ describe('OdmListComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [ OdmListComponent ],
-      schemas: [CUSTOM_ELEMENTS_SCHEMA],
-    })
+    imports: [OdmListComponent],
+    schemas: [CUSTOM_ELEMENTS_SCHEMA],
+})
     .compileComponents();
   }));
 

@@ -8,15 +8,12 @@ import {OdmUiModule} from "../../../libs/AppFedSharedIonic/odm-ui/odm-ui.module"
 import {OdmModule} from "../../../libs/AppFedShared/odm/odm.module";
 
 @NgModule({
-  declarations: [
-    ShoppingListsPageComponent,
-  ],
-  imports: [
-    CommonModule,
-    OdmModule,
-    IonicModule,
-    ShoppingListsModule,
-    // OdmUiModule,
-  ]
+    imports: [
+        CommonModule,
+        OdmModule,
+        IonicModule,
+        ShoppingListsModule,
+        ShoppingListsPageComponent,
+    ]
 })
 export class ShoppingListsPageModule { }

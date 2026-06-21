@@ -5,13 +5,18 @@ import {LearnItem$} from '../../models/LearnItem$'
 import {nullish} from '../../../../libs/AppFedShared/utils/type-utils'
 import {ImportanceDescriptor, importanceDescriptors, importanceDescriptorsArray} from '../../models/fields/importance.model'
 import {QuizStatus} from '../../core/quiz/QuizStatus'
+import { NgIf, NgFor, NgClass } from '@angular/common';
 
 @Component({
-  standalone: false,
-  selector: 'app-quiz-items-left',
-  templateUrl: './quiz-items-left.component.html',
-  changeDetection: ChangeDetectionStrategy.Eager,
-  styleUrls: ['./quiz-items-left.component.sass'],
+    selector: 'app-quiz-items-left',
+    templateUrl: './quiz-items-left.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
+    styleUrls: ['./quiz-items-left.component.sass'],
+    imports: [
+        NgIf,
+        NgFor,
+        NgClass,
+    ],
 })
 export class QuizItemsLeftComponent implements OnInit {
 

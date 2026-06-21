@@ -21,7 +21,7 @@ import {SharedModule} from '../../../shared/shared.module'
         CategoriesModule,
         OdmModule,
         SharedModule,
+        CategoriesPage,
     ],
-  declarations: [CategoriesPage],
 })
 export class CategoriesPageModule {}

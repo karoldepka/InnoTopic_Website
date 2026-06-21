@@ -30,7 +30,7 @@ import {
 } from './Cells'
 import { CellComponent } from '../cells/CellComponent'
 import { NodeContentViewSyncer } from './NodeContentViewSyncer'
-import { NodeDebug } from './node-debug-cell/node-debug-cell.component'
+import { NodeDebug, NodeDebugCellComponent } from './node-debug-cell/node-debug-cell.component'
 import {
   columnDefs,
   Columns,
@@ -47,6 +47,12 @@ import {CachedSubject} from '../../../../libs/AppFedShared/utils/cachedSubject2/
 import {OryTreeTableNodeContent} from '../../tree-model/OryTreeTableNodeContent'
 import {TreeTableNodeContent} from '../../tree-model/TreeTableNodeContent'
 import {ApfNonRootTreeNode} from '../../tree-model/TreeNode'
+import { NgClass, NgIf, AsyncPipe } from '@angular/common';
+import { NodeExpansionIconComponent } from './node-expansion-icon/node-expansion-icon.component';
+import { NodeClassIconComponent } from './node-class-icon/node-class-icon.component';
+import { NumericCellComponent } from '../cells/node-cell/numeric-cell.component';
+import { NodeContentTimeTrackingComponent } from '../node-content-time-tracking/node-content-time-tracking.component';
+import { ContenteditableCellComponent } from '../cells/contenteditable-cell/contenteditable-cell.component';
 
 /* ==== Note there are those sources of truth kind-of (for justified reasons) :
 * - UI state
@@ -57,12 +63,22 @@ import {ApfNonRootTreeNode} from '../../tree-model/TreeNode'
 */
 
 @Component({
-  standalone: false,
-  selector: 'app-node-content',
-  templateUrl: './node-content.component.html',
-  styleUrls: ['./node-content.component.sass'],
-  // encapsulation: ViewEncapsulation.None,
-  changeDetection: ChangeDetectionStrategy.OnPush,
+    selector: 'app-node-content',
+    templateUrl: './node-content.component.html',
+    styleUrls: ['./node-content.component.sass'],
+    // encapsulation: ViewEncapsulation.None,
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    imports: [
+        NgClass,
+        NodeExpansionIconComponent,
+        NodeClassIconComponent,
+        NgIf,
+        NumericCellComponent,
+        NodeContentTimeTrackingComponent,
+        ContenteditableCellComponent,
+        NodeDebugCellComponent,
+        AsyncPipe,
+    ],
 })
 export class NodeContentComponent implements OnInit, AfterViewInit, OnDestroy, INodeContentComponent {
 

@@ -14,23 +14,21 @@ import {RadicalCandorComponent} from './radical-candor/radical-candor.component'
 import {EnergyComponent} from './energy/energy.component';
 
 @NgModule({
-  imports: [
-    CommonModule,
-    FormsModule,
-    IonicModule,
-    LifeOverviewsPageRoutingModule,
-    RationalePageModule
-  ],
-  exports: [
-    GrowthDiagramComponent,
-    IkigaiDiagramComponent,
-  ],
-  declarations: [
-    LifeOverviewsPage,
-    IkigaiDiagramComponent,
-    GrowthDiagramComponent,
-    RadicalCandorComponent,
-    EnergyComponent,
-  ]
+    imports: [
+        CommonModule,
+        FormsModule,
+        IonicModule,
+        LifeOverviewsPageRoutingModule,
+        RationalePageModule,
+        LifeOverviewsPage,
+        IkigaiDiagramComponent,
+        GrowthDiagramComponent,
+        RadicalCandorComponent,
+        EnergyComponent
+    ],
+    exports: [
+        GrowthDiagramComponent,
+        IkigaiDiagramComponent,
+    ]
 })
 export class LifeOverviewsPageModule {}

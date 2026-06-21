@@ -9,9 +9,9 @@ describe('LoginViaEmailPasswordComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [ LoginViaEmailPasswordComponent ],
-      schemas: [CUSTOM_ELEMENTS_SCHEMA],
-    })
+    declarations: [LoginViaEmailPasswordComponent],
+    schemas: [CUSTOM_ELEMENTS_SCHEMA],
+})
     .compileComponents();
   }));
 

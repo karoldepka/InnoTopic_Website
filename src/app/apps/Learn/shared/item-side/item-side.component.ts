@@ -11,17 +11,31 @@ import {OdmCell} from '../../../../libs/AppFedShared/tree/cells/OdmCell'
 import {AiBackendService} from '../../core/ai-backend.service'
 import {stripHtml} from '../../../../libs/AppFedShared/utils/html-utils'
 import {finalize} from 'rxjs/operators'
+import { NgIf, NgClass, AsyncPipe } from '@angular/common';
+import { IonicModule } from '@ionic/angular';
+import { SideIconComponent } from '../side-icon/side-icon.component';
+import { SideLabelComponent } from '../side-label/side-label.component';
+import { QuizAnswerRevealerComponent } from '../../quiz/quiz-item-details/quiz-answer-revealer/quiz-answer-revealer.component';
 
 export type SideFormControlsDict = {[key in keyof SidesDefs]: UntypedFormControl }
 
 
 // TODO: escape key to hide toolbar&menu bar
 @Component({
-  standalone: false,
-  selector: 'app-item-side-editor',
-  templateUrl: './item-side.component.html',
-  changeDetection: ChangeDetectionStrategy.Eager,
-  styleUrls: ['./item-side.component.sass'],
+    selector: 'app-item-side-editor',
+    templateUrl: './item-side.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
+    styleUrls: ['./item-side.component.sass'],
+    imports: [
+        NgIf,
+        IonicModule,
+        NgClass,
+        SideIconComponent,
+        SideLabelComponent,
+        RichTextEditComponent,
+        QuizAnswerRevealerComponent,
+        AsyncPipe,
+    ],
 })
 export class ItemSideComponent implements OnInit {
 

@@ -1,12 +1,14 @@
 import {Component, Input, OnInit, ChangeDetectionStrategy} from '@angular/core';
 import {nullish} from '../../utils/type-utils'
+import { NgIf } from '@angular/common';
+import { IonicModule } from '@ionic/angular';
 
 @Component({
-  standalone: false,
-  selector: 'app-time-point',
-  templateUrl: './time-point.component.html',
-  changeDetection: ChangeDetectionStrategy.Eager,
-  styleUrls: ['./time-point.component.sass'],
+    selector: 'app-time-point',
+    templateUrl: './time-point.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
+    styleUrls: ['./time-point.component.sass'],
+    imports: [NgIf, IonicModule],
 })
 export class TimePointComponent implements OnInit {
 

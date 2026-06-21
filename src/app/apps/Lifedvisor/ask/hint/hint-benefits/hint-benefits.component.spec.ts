@@ -8,8 +8,8 @@ describe('HintBenefitsComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ HintBenefitsComponent ]
-    })
+    declarations: [HintBenefitsComponent]
+})
     .compileComponents();
   }));
 

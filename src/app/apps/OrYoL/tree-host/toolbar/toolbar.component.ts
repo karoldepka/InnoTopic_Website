@@ -10,13 +10,17 @@ import { TreeHostComponent } from '../tree-host/tree-host.component'
 import {PopoverController} from '@ionic/angular'
 import {ToolbarPopoverComponent} from './toolbar-popover/toolbar-popover.component'
 import {BaseComponent} from '../../../../libs/AppFedShared/base/base.component'
+import { FaIconComponent } from '@fortawesome/angular-fontawesome';
+import { SearchComponent } from '../../search/search/search.component';
+import { NgIf, AsyncPipe } from '@angular/common';
+import { TimeTrackingToolbarComponent } from '../../time-tracking/time-tracking-toolbar/time-tracking-toolbar.component';
 
 @Component({
-  standalone: false,
-  selector: 'app-toolbar',
-  templateUrl: './toolbar.component.html',
-  changeDetection: ChangeDetectionStrategy.Eager,
-  styleUrls: ['./toolbar.component.sass']
+    selector: 'app-toolbar',
+    templateUrl: './toolbar.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
+    styleUrls: ['./toolbar.component.sass'],
+    imports: [FaIconComponent, SearchComponent, NgIf, TimeTrackingToolbarComponent, AsyncPipe]
 })
 export class ToolbarComponent extends BaseComponent implements OnInit {
 

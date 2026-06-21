@@ -1,13 +1,15 @@
 import {ChangeDetectorRef, Component, Input, OnDestroy, OnInit, ChangeDetectionStrategy} from '@angular/core';
 import { TimeService } from '../../../core/time.service'
 import {TimeTrackedEntry} from '../../../time-tracking/TimeTrackedEntry'
+import { NgIf } from '@angular/common';
+import { TimeViewComponent } from '../time-view/time-view.component';
 
 @Component({
-  standalone: false,
-  selector: 'app-time-passing',
-  templateUrl: './time-passing.component.html',
-  changeDetection: ChangeDetectionStrategy.Eager,
-  styleUrls: ['./time-passing.component.sass'],
+    selector: 'app-time-passing',
+    templateUrl: './time-passing.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
+    styleUrls: ['./time-passing.component.sass'],
+    imports: [NgIf, TimeViewComponent],
 })
 export class TimePassingComponent implements OnInit, OnDestroy {
 

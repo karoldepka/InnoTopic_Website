@@ -6,17 +6,15 @@ import { SearchResultRowComponent } from './search/search-result-row/search-resu
 import { TreeSharedModule } from '../tree-shared/tree-shared.module'
 
 @NgModule({
-  declarations: [
-    SearchComponent,
-    SearchResultRowComponent
-  ],
-  exports: [
-    SearchComponent,
-  ],
-  imports: [
-    CommonModule,
-    FormsModule,
-    TreeSharedModule,
-  ],
+    exports: [
+        SearchComponent,
+    ],
+    imports: [
+        CommonModule,
+        FormsModule,
+        TreeSharedModule,
+        SearchComponent,
+        SearchResultRowComponent,
+    ],
 })
 export class SearchModule { }

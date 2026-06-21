@@ -10,9 +10,9 @@ describe('TimeViewComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [ TimeViewComponent ],
-      schemas: [CUSTOM_ELEMENTS_SCHEMA],
-    })
+    imports: [TimeViewComponent],
+    schemas: [CUSTOM_ELEMENTS_SCHEMA],
+})
     .compileComponents();
   }));
 

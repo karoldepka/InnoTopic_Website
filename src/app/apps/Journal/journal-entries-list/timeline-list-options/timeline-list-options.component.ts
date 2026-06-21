@@ -4,16 +4,17 @@ import {PatchableObservable} from '../../../../libs/AppFedShared/utils/rxUtils'
 import {createViewSyncerForField, ViewSyncer} from '../../../../libs/AppFedShared/odm/ui/ViewSyncer'
 import {JournalEntry} from '../../models/JournalEntry'
 import {TimelineListOptionsData} from '../journal-entries-list.page'
-import {UntypedFormControl} from '@angular/forms'
+import { UntypedFormControl, ReactiveFormsModule } from '@angular/forms'
 import {OdmService2} from '../../../../libs/AppFedShared/odm/OdmService2'
 import {errorAlert} from '../../../../libs/AppFedShared/utils/log'
+import { IonicModule } from '@ionic/angular';
 
 @Component({
-  standalone: false,
-  selector: 'app-timeline-list-options',
-  templateUrl: './timeline-list-options.component.html',
-  changeDetection: ChangeDetectionStrategy.Eager,
-  styleUrls: ['./timeline-list-options.component.sass'],
+    selector: 'app-timeline-list-options',
+    templateUrl: './timeline-list-options.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
+    styleUrls: ['./timeline-list-options.component.sass'],
+    imports: [IonicModule, ReactiveFormsModule],
 })
 export class TimelineListOptionsComponent implements OnInit {
 

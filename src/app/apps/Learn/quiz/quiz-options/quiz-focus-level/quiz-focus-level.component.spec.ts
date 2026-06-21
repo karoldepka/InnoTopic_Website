@@ -9,9 +9,8 @@ describe('QuizFocusLevelComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [ QuizFocusLevelComponent ],
-      imports: [IonicModule.forRoot()]
-    }).compileComponents();
+    imports: [IonicModule.forRoot(), QuizFocusLevelComponent]
+}).compileComponents();
 
     fixture = TestBed.createComponent(QuizFocusLevelComponent);
     component = fixture.componentInstance;

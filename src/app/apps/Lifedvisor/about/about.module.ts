@@ -13,8 +13,9 @@ import { AboutPage } from './about.page';
     CommonModule,
     FormsModule,
     IonicModule,
-    AboutPageRoutingModule
+    AboutPageRoutingModule,
+    AboutPage,
   ],
-  declarations: [AboutPage]
+  declarations: []
 })
 export class AboutPageModule {}

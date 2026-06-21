@@ -26,7 +26,15 @@ import {IonicModule} from '@ionic/angular'
 
 /** Components reusable to be embedded in different tree implementations (e.g. node content) */
 @NgModule({
-    declarations: [
+    imports: [
+        CommonModule,
+        SharedModule,
+        TimeTrackingModule,
+        TimeModule,
+        SharedModule,
+        FontAwesomeModule,
+        // NgbPopoverModule,
+        IonicModule,
         NodeContentComponent,
         NumericCellComponent,
         TreeNodeMenuPopoverComponent,
@@ -45,16 +53,6 @@ import {IonicModule} from '@ionic/angular'
         NodeClassIconComponent,
         NodeClassPickerComponent,
         RatingCellComponent,
-    ],
-    imports: [
-        CommonModule,
-        SharedModule,
-        TimeTrackingModule,
-        TimeModule,
-        SharedModule,
-        FontAwesomeModule,
-        // NgbPopoverModule,
-        IonicModule,
     ],
     exports: [
         NodeContentComponent,

@@ -9,16 +9,26 @@ import {Required} from '../../../../libs/AppFedShared/utils/angular/Required.dec
 import {LearnItem$} from '../../models/LearnItem$'
 import {FeatureService} from '../../../../libs/AppFedShared/feature.service'
 import {BaseComponent} from '../../../../libs/AppFedShared/base/base.component'
+import { IonicModule } from '@ionic/angular';
+import { RouterLink } from '@angular/router';
+import { NgIf } from '@angular/common';
+import { SelectionCheckboxComponent } from './selection-checkbox/selection-checkbox.component';
+import { PlayButtonComponent } from '../../shared/play-button/play-button.component';
 
 
 /* TODO rename to  list-item */
 @Component({
-  standalone: false,
-  selector: 'app-actionable-item',
-  templateUrl: './actionable-item.component.html',
-  changeDetection: ChangeDetectionStrategy.Eager,
-  styleUrls: ['./actionable-item.component.sass'],
-  // changeDetection: ChangeDetectionStrategy.OnPush,
+    selector: 'app-actionable-item',
+    templateUrl: './actionable-item.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
+    styleUrls: ['./actionable-item.component.sass'],
+    imports: [
+        IonicModule,
+        RouterLink,
+        NgIf,
+        SelectionCheckboxComponent,
+        PlayButtonComponent,
+    ],
 })
 export class ActionableItemComponent extends BaseComponent implements OnInit {
 

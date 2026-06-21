@@ -1,11 +1,12 @@
 import {Component, EventEmitter, Input, OnInit, Output, ChangeDetectionStrategy} from '@angular/core';
+import { IonicModule } from '@ionic/angular';
 
 @Component({
-  standalone: false,
-  selector: 'app-number-picker',
-  templateUrl: './number-picker.component.html',
-  changeDetection: ChangeDetectionStrategy.Eager,
-  styleUrls: ['./number-picker.component.scss'],
+    selector: 'app-number-picker',
+    templateUrl: './number-picker.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
+    styleUrls: ['./number-picker.component.scss'],
+    imports: [IonicModule],
 })
 export class NumberPickerComponent implements OnInit {
 

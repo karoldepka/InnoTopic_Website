@@ -1,14 +1,22 @@
 import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
-import {MessageService, TreeDragDropService, TreeNode} from 'primeng/api'
+import { MessageService, TreeDragDropService, TreeNode, PrimeTemplate } from 'primeng/api'
 import {NodeService} from './node.service'
+import { OdmTreeComponent } from '../../libs/AppFedShared/tree/tree/odm-tree.component';
+import { Bind } from 'primeng/bind';
+import { Tree } from 'primeng/tree';
 
 @Component({
-  standalone: false,
-  selector: 'app-categories',
-  providers: [TreeDragDropService,MessageService],
-  templateUrl: './categories.component.html',
-  changeDetection: ChangeDetectionStrategy.Eager,
-  styleUrls: ['./categories.component.sass'],
+    selector: 'app-categories',
+    providers: [TreeDragDropService, MessageService],
+    templateUrl: './categories.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
+    styleUrls: ['./categories.component.sass'],
+    imports: [
+        OdmTreeComponent,
+        Bind,
+        Tree,
+        PrimeTemplate,
+    ],
 })
 export class CategoriesComponent implements OnInit {
 

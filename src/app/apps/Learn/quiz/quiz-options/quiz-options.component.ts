@@ -1,18 +1,32 @@
 import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
-import {Form, UntypedFormControl, UntypedFormGroup} from '@angular/forms'
+import { Form, UntypedFormControl, UntypedFormGroup, ReactiveFormsModule } from '@angular/forms'
 import {QuizService} from '../../core/quiz/quiz.service'
 import {ViewSyncer} from '../../../../libs/AppFedShared/odm/ui/ViewSyncer'
 import {OptionsService} from '../../core/options.service'
 import {throttleTimeWithLeadingTrailing_ReallyThrottle} from '../../../../libs/AppFedShared/utils/rxUtils'
 import {buttonsDesc} from '../../../../libs/LifeSuiteShared/edit-shared/fun-level-edit/fun-level-edit.component'
 import {QuizOptions} from '../../core/quiz/QuizOptions'
+import { IonicModule } from '@ionic/angular';
+import { NumericPickerComponent } from '../../../../libs/AppFedSharedIonic/ratings/numeric-picker/numeric-picker.component';
+import { QuizIntervalsComponent } from './quiz-intervals/quiz-intervals.component';
+import { QuizDiligenceLevelComponent } from './quiz-diligence-level/quiz-diligence-level.component';
+import { QuizIntervalImportanceScalingComponent } from './quiz-interval-importance-scaling/quiz-interval-importance-scaling.component';
+import { QuizFocusLevelComponent } from './quiz-focus-level/quiz-focus-level.component';
 
 @Component({
-  standalone: false,
-  selector: 'app-quiz-options',
-  templateUrl: './quiz-options.component.html',
-  changeDetection: ChangeDetectionStrategy.Eager,
-  styleUrls: ['./quiz-options.component.sass'],
+    selector: 'app-quiz-options',
+    templateUrl: './quiz-options.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
+    styleUrls: ['./quiz-options.component.sass'],
+    imports: [
+        IonicModule,
+        ReactiveFormsModule,
+        NumericPickerComponent,
+        QuizIntervalsComponent,
+        QuizDiligenceLevelComponent,
+        QuizIntervalImportanceScalingComponent,
+        QuizFocusLevelComponent,
+    ],
 })
 export class QuizOptionsComponent implements OnInit {
 

@@ -16,21 +16,19 @@ import {TimelineListOptionsComponent} from './timeline-list-options/timeline-lis
 import {JournalEntryListItemModule} from '../../../timers/timers-list/journal-entry-list-item/journal-entry-list-item.module'
 
 @NgModule({
-  imports: [
-    CommonModule,
-    FormsModule,
-    IonicModule,
-    JournalEntriesListPageRoutingModule,
-    OdmModule,
-    SharedModule,
-    ScrollingModule,
-    ExperimentalScrollingModule,
-    TimeModule,
-    JournalEntryListItemModule,
-  ],
-  declarations: [
-    JournalEntriesListPage,
-    TimelineListOptionsComponent,
-  ],
+    imports: [
+        CommonModule,
+        FormsModule,
+        IonicModule,
+        JournalEntriesListPageRoutingModule,
+        OdmModule,
+        SharedModule,
+        ScrollingModule,
+        ExperimentalScrollingModule,
+        TimeModule,
+        JournalEntryListItemModule,
+        JournalEntriesListPage,
+        TimelineListOptionsComponent,
+    ],
 })
 export class JournalEntriesListPageModule {}

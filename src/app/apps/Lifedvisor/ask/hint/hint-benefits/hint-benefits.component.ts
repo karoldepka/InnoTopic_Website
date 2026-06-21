@@ -1,7 +1,8 @@
 import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 
 @Component({
-  standalone: false,
+  standalone: true,
+  imports: [],
   selector: 'app-hint-benefits',
   templateUrl: './hint-benefits.component.html',
   changeDetection: ChangeDetectionStrategy.Eager,

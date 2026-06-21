@@ -25,8 +25,6 @@ import {JournalEntryListItemModule} from './timers-list/journal-entry-list-item/
         TimeIonicModule,
         OdmModule,
         JournalEntryListItemModule,
-    ],
-    declarations: [
         TimersPageComponent,
         TimerItemComponent,
         TimersListComponent,

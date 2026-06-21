@@ -21,7 +21,7 @@ import {OdmModule} from '../../../libs/AppFedShared/odm/odm.module'
         LearnSharedModule,
         SharedModule,
         OdmModule,
+        WhatNextPage, EnergyGraphComponent,
     ],
-    declarations: [WhatNextPage, EnergyGraphComponent],
 })
 export class WhatNextPageModule {}

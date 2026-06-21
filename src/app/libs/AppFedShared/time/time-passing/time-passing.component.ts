@@ -1,12 +1,13 @@
 import {ChangeDetectionStrategy, ChangeDetectorRef, Component, Injector, Input, NgZone, OnDestroy, OnInit} from '@angular/core';
 import {BaseComponent} from '../../base/base.component'
+import { TimeViewComponent } from '../time-view/time-view.component';
 
 @Component({
-  standalone: false,
-  selector: 'app-time-passing',
-  templateUrl: './time-passing.component.html',
-  styleUrls: ['./time-passing.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush,
+    selector: 'app-time-passing',
+    templateUrl: './time-passing.component.html',
+    styleUrls: ['./time-passing.component.scss'],
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    imports: [TimeViewComponent],
 })
 export class TimePassingComponent extends BaseComponent implements OnInit, OnDestroy {
 

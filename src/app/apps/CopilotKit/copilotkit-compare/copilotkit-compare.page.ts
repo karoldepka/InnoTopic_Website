@@ -1,4 +1,8 @@
 import { Component, OnDestroy, ChangeDetectionStrategy } from '@angular/core';
+import { IonicModule } from '@ionic/angular';
+import { NgFor, NgIf } from '@angular/common';
+import { ReactiveFormsModule, FormsModule } from '@angular/forms';
+import { CopilotKitReactHostComponent } from './copilotkit-react-host.component';
 
 type ChatRole = 'user' | 'assistant';
 
@@ -16,11 +20,18 @@ type AgUiEvent = {
 };
 
 @Component({
-  standalone: false,
-  selector: 'app-copilotkit-compare-page',
-  templateUrl: './copilotkit-compare.page.html',
-  changeDetection: ChangeDetectionStrategy.Eager,
-  styleUrls: ['./copilotkit-compare.page.scss'],
+    selector: 'app-copilotkit-compare-page',
+    templateUrl: './copilotkit-compare.page.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
+    styleUrls: ['./copilotkit-compare.page.scss'],
+    imports: [
+        IonicModule,
+        NgFor,
+        NgIf,
+        ReactiveFormsModule,
+        FormsModule,
+        CopilotKitReactHostComponent,
+    ],
 })
 export class CopilotKitComparePage implements OnDestroy {
   endpointUrl = '/ai-api/copilotkit-agui';

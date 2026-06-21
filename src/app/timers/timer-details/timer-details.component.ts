@@ -1,16 +1,24 @@
 import {Component, Input, OnInit, ChangeDetectionStrategy} from '@angular/core';
 import {TimerItem} from "../../core/TimerItem";
-import {AlertController, ModalController} from "@ionic/angular";
+import { AlertController, ModalController, IonicModule } from "@ionic/angular";
 import {TimersService} from "../../core/timers.service";
-import {UntypedFormControl} from "@angular/forms";
+import { UntypedFormControl, ReactiveFormsModule } from "@angular/forms";
 import {ignorePromise} from "../../libs/AppFedShared/utils/promiseUtils";
+import { TimePickerComponent } from '../../libs/AppFedSharedIonic/time/time-picker/time-picker.component';
+import { NgIf, DatePipe } from '@angular/common';
 
 @Component({
-  standalone: false,
-  selector: 'app-timer-details',
-  templateUrl: './timer-details.component.html',
-  changeDetection: ChangeDetectionStrategy.Eager,
-  styleUrls: ['./timer-details.component.scss'],
+    selector: 'app-timer-details',
+    templateUrl: './timer-details.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
+    styleUrls: ['./timer-details.component.scss'],
+    imports: [
+        IonicModule,
+        ReactiveFormsModule,
+        TimePickerComponent,
+        NgIf,
+        DatePipe,
+    ],
 })
 export class TimerDetailsComponent implements OnInit {
 

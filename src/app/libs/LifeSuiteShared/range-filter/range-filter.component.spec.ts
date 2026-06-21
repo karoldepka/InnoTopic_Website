@@ -9,9 +9,9 @@ describe('RangeFilterComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [ RangeFilterComponent ],
-      imports: [IonicModule.forRoot()]
-    }).compileComponents();
+    declarations: [RangeFilterComponent],
+    imports: [IonicModule.forRoot()]
+}).compileComponents();
 
     fixture = TestBed.createComponent(RangeFilterComponent);
     component = fixture.componentInstance;

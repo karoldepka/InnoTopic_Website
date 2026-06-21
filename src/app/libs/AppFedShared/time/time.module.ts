@@ -16,14 +16,12 @@ let exports = [
 ]
 
 @NgModule({
-  declarations: [
-    ...exports,
-  ],
-  imports: [
-    CommonModule,
-    SharedModule,
-    IonicModule,
-  ],
-  exports: exports,
+    imports: [
+        CommonModule,
+        SharedModule,
+        IonicModule,
+        ...exports,
+    ],
+    exports: exports,
 })
 export class TimeModule { }

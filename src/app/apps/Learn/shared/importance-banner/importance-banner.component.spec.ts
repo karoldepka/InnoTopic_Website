@@ -9,9 +9,8 @@ describe('ImportanceBannerComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [ ImportanceBannerComponent ],
-      imports: [IonicModule.forRoot()]
-    }).compileComponents();
+    imports: [IonicModule.forRoot(), ImportanceBannerComponent]
+}).compileComponents();
 
     fixture = TestBed.createComponent(ImportanceBannerComponent);
     component = fixture.componentInstance;

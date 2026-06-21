@@ -8,8 +8,8 @@ xdescribe('NestedTreeComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [ NestedTreeComponent ]
-    })
+    imports: [NestedTreeComponent]
+})
     .compileComponents();
   }));
 

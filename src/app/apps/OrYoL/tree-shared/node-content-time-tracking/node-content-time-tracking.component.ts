@@ -10,13 +10,14 @@ import {
 
 import {OryBaseTreeNode} from '../../tree-model/TreeModel'
 import {TimeTrackedEntry} from '../../time-tracking/TimeTrackedEntry'
+import { TimeTrackingCellComponent } from '../../time-tracking/time-tracking-cell/time-tracking-cell.component';
 
 @Component({
-  standalone: false,
-  selector: 'app-node-content-time-tracking',
-  templateUrl: './node-content-time-tracking.component.html',
-  changeDetection: ChangeDetectionStrategy.Eager,
-  styleUrls: ['./node-content-time-tracking.component.scss']
+    selector: 'app-node-content-time-tracking',
+    templateUrl: './node-content-time-tracking.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
+    styleUrls: ['./node-content-time-tracking.component.scss'],
+    imports: [TimeTrackingCellComponent]
 })
 export class NodeContentTimeTrackingComponent implements OnInit {
 

@@ -9,9 +9,8 @@ describe('SideLabelComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [ SideLabelComponent ],
-      imports: [IonicModule.forRoot()]
-    }).compileComponents();
+    imports: [IonicModule.forRoot(), SideLabelComponent]
+}).compileComponents();
 
     fixture = TestBed.createComponent(SideLabelComponent);
     component = fixture.componentInstance;

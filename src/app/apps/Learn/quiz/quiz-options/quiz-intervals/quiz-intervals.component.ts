@@ -3,13 +3,20 @@ import {QuizService} from '../../../core/quiz/quiz.service'
 import {ImportanceDescriptor, importanceDescriptors, importanceDescriptorsArray} from '../../../models/fields/importance.model'
 import {ImportanceVal} from '../../../models/LearnItem'
 import {SelfRating} from '../../../models/fields/self-rating.model'
+import { NgFor, NgIf, NgClass } from '@angular/common';
+import { DurationComponent } from './duration/duration.component';
 
 @Component({
-  standalone: false,
-  selector: 'app-quiz-intervals',
-  templateUrl: './quiz-intervals.component.html',
-  changeDetection: ChangeDetectionStrategy.Eager,
-  styleUrls: ['./quiz-intervals.component.sass'],
+    selector: 'app-quiz-intervals',
+    templateUrl: './quiz-intervals.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
+    styleUrls: ['./quiz-intervals.component.sass'],
+    imports: [
+        NgFor,
+        NgIf,
+        NgClass,
+        DurationComponent,
+    ],
 })
 export class QuizIntervalsComponent implements OnInit {
 

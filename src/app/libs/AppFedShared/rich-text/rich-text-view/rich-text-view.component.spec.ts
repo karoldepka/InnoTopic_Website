@@ -9,9 +9,8 @@ describe('RichTextViewComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [ RichTextViewComponent ],
-      imports: [IonicModule.forRoot()]
-    }).compileComponents();
+    imports: [IonicModule.forRoot(), RichTextViewComponent]
+}).compileComponents();
 
     fixture = TestBed.createComponent(RichTextViewComponent);
     component = fixture.componentInstance;

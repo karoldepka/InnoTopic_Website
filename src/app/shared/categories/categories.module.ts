@@ -8,16 +8,14 @@ import {OdmTreeModule} from '../../libs/AppFedShared/tree/odm-tree.module'
 
 
 @NgModule({
-  declarations: [
-    CategoriesComponent,
-  ],
-  exports: [
-    CategoriesComponent,
-  ],
-  imports: [
-    CommonModule,
-    TreeModule,
-    OdmTreeModule,
-  ],
+    exports: [
+        CategoriesComponent,
+    ],
+    imports: [
+        CommonModule,
+        TreeModule,
+        OdmTreeModule,
+        CategoriesComponent,
+    ],
 })
 export class CategoriesModule { }

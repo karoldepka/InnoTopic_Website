@@ -5,16 +5,14 @@ import {NestedTreeComponent} from './nested-tree/nested-tree.component'
 import {TreeSharedModule} from '../tree-shared/tree-shared.module'
 
 @NgModule({
-  declarations: [
-    NestedTreeComponent,
-    NestedTreeNodeComponent,
-  ],
-  imports: [
-    CommonModule,
-    TreeSharedModule,
-  ],
-  exports: [
-    NestedTreeComponent,
-  ]
+    imports: [
+        CommonModule,
+        TreeSharedModule,
+        NestedTreeComponent,
+        NestedTreeNodeComponent,
+    ],
+    exports: [
+        NestedTreeComponent,
+    ]
 })
 export class TreeNestedModule { }

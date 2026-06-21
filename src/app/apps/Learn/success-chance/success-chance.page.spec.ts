@@ -9,9 +9,8 @@ describe('SuccessChancePage', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [ SuccessChancePage ],
-      imports: [IonicModule.forRoot()]
-    }).compileComponents();
+    imports: [IonicModule.forRoot(), SuccessChancePage]
+}).compileComponents();
 
     fixture = TestBed.createComponent(SuccessChancePage);
     component = fixture.componentInstance;

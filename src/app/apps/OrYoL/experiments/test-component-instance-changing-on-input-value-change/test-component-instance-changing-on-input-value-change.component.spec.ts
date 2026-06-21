@@ -8,8 +8,8 @@ xdescribe('TestComponentInstanceChangingOnInputValueChangeComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [ TestComponentInstanceChangingOnInputValueChangeComponent ]
-    })
+    declarations: [TestComponentInstanceChangingOnInputValueChangeComponent]
+})
     .compileComponents();
   }));
 

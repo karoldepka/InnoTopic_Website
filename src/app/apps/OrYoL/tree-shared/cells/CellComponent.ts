@@ -16,7 +16,8 @@ import {
 import {nullish} from '../../../../libs/AppFedShared/utils/type-utils'
 
 @Component({
-  standalone: false,
+  standalone: true,
+  imports: [],
   selector: 'zzz-app-abstract-node-cell',
   template: '',
   changeDetection: ChangeDetectionStrategy.Eager,

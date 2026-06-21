@@ -9,9 +9,8 @@ describe('ProcessButtonComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [ ProcessButtonComponent ],
-      imports: [IonicModule.forRoot()]
-    }).compileComponents();
+    imports: [IonicModule.forRoot(), ProcessButtonComponent]
+}).compileComponents();
 
     fixture = TestBed.createComponent(ProcessButtonComponent);
     component = fixture.componentInstance;

@@ -4,17 +4,25 @@ import {OdmService2} from '../../../odm/OdmService2'
 import {LearnItem} from '../../../../../apps/Learn/models/LearnItem'
 import {LearnItem$} from '../../../../../apps/Learn/models/LearnItem$'
 import {stripHtml} from '../../../utils/html-utils'
-import {ToastController} from '@ionic/angular'
-import {Router} from '@angular/router'
+import { ToastController, IonicModule } from '@ionic/angular'
+import { Router, RouterLink } from '@angular/router'
+import { NgIf, AsyncPipe } from '@angular/common';
+import { OdmCheckbox } from '../../../../AppFedSharedIonic/odm-ui/bound-checkbox/odm-checkbox';
 
 type NewTreeChildType = 'learn' | 'task' | 'category'
 
 @Component({
-  standalone: false,
-  selector: 'app-odm-tree-node-popup',
-  templateUrl: './odm-tree-node-popup.component.html',
-  changeDetection: ChangeDetectionStrategy.Eager,
-  styleUrls: ['./odm-tree-node-popup.component.scss'],
+    selector: 'app-odm-tree-node-popup',
+    templateUrl: './odm-tree-node-popup.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
+    styleUrls: ['./odm-tree-node-popup.component.scss'],
+    imports: [
+        IonicModule,
+        RouterLink,
+        NgIf,
+        OdmCheckbox,
+        AsyncPipe,
+    ],
 })
 export class OdmTreeNodePopupComponent implements OnInit {
 

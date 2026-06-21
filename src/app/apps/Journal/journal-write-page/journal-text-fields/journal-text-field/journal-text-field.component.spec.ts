@@ -9,9 +9,8 @@ describe('JournalTextFieldComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [ JournalTextFieldComponent ],
-      imports: [IonicModule.forRoot()]
-    }).compileComponents();
+    imports: [IonicModule.forRoot(), JournalTextFieldComponent]
+}).compileComponents();
 
     fixture = TestBed.createComponent(JournalTextFieldComponent);
     component = fixture.componentInstance;

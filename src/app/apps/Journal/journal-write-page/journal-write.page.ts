@@ -7,16 +7,31 @@ import {JournalTextDescriptor, JournalTextDescriptors} from "../models/JournalTe
 import {NumericPickerVal} from "../../../libs/AppFedSharedIonic/ratings/numeric-picker/numeric-picker.component";
 import {JournalNumericDescriptors} from '../models/JournalNumericDescriptors'
 import {JournalEntry$} from '../models/JournalEntry$'
-import {ActivatedRoute, Router} from '@angular/router'
+import { ActivatedRoute, Router, RouterLink } from '@angular/router'
 import {CachedSubject} from '../../../libs/AppFedShared/utils/cachedSubject2/CachedSubject2'
 import {BaseComponent} from '../../../libs/AppFedShared/base/base.component'
+import { IonicModule } from '@ionic/angular';
+import { AppLogoComponent } from '../../Common/app-logo/app-logo.component';
+import { NgIf, NgFor } from '@angular/common';
+import { TimePassingComponent } from '../../../libs/AppFedShared/time/time-passing/time-passing.component';
+import { SyncStatusIconComponent } from '../../../libs/AppFedShared/odm/sync-status/sync-status-icon.component';
+import { JournalItemEditComponent } from './journal-item-edit/journal-item-edit.component';
 
 @Component({
-  standalone: false,
-  selector: 'app-journal-write-page',
-  templateUrl: './journal-write.page.html',
-  changeDetection: ChangeDetectionStrategy.Eager,
-  styleUrls: ['./journal-write.page.sass'],
+    selector: 'app-journal-write-page',
+    templateUrl: './journal-write.page.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
+    styleUrls: ['./journal-write.page.sass'],
+    imports: [
+        IonicModule,
+        RouterLink,
+        AppLogoComponent,
+        NgIf,
+        TimePassingComponent,
+        SyncStatusIconComponent,
+        NgFor,
+        JournalItemEditComponent,
+    ],
 })
 export class JournalWritePage extends BaseComponent implements OnInit {
 

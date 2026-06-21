@@ -1,7 +1,8 @@
 import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 
 @Component({
-  standalone: false,
+  standalone: true,
+  imports: [],
   selector: 'app-fancy-masked-image',
   templateUrl: './fancy-masked-image.component.html',
   changeDetection: ChangeDetectionStrategy.Eager,

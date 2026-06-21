@@ -3,13 +3,21 @@ import {LearnItemItemsService} from '../../core/learn-item-items.service'
 import {ListProcessing} from '../list-processing'
 import {Required} from '../../../../libs/AppFedShared/utils/angular/Required.decorator'
 import {LearnItem$} from '../../models/LearnItem$'
+import { NgIf, NgFor } from '@angular/common';
+import { IonicModule } from '@ionic/angular';
+import { ActionableItemComponent } from '../actionable-item/actionable-item.component';
 
 @Component({
-  standalone: false,
-  selector: 'app-item-list',
-  templateUrl: './item-list.component.html',
-  changeDetection: ChangeDetectionStrategy.Eager,
-  styleUrls: ['./item-list.component.sass'],
+    selector: 'app-item-list',
+    templateUrl: './item-list.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
+    styleUrls: ['./item-list.component.sass'],
+    imports: [
+        NgIf,
+        IonicModule,
+        NgFor,
+        ActionableItemComponent,
+    ],
 })
 export class ItemListComponent implements OnInit {
 

@@ -12,19 +12,17 @@ const exports = [
 ]
 
 @NgModule({
-  declarations: [
-    ... exports,
-  ],
-  exports: [
-    ...exports,
-    SharedModule,
-    RatingsModule,
-  ],
+    exports: [
+        ...exports,
+        SharedModule,
+        RatingsModule,
+    ],
     imports: [
         CommonModule,
         SharedModule,
         RatingsModule,
         IonicModule,
+        ...exports,
     ],
 })
 export class EditSharedModule { }

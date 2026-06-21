@@ -9,9 +9,9 @@ describe('DescriptionEditorComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [ DescriptionEditorComponent ],
-      schemas: [CUSTOM_ELEMENTS_SCHEMA],
-    })
+    declarations: [DescriptionEditorComponent],
+    schemas: [CUSTOM_ELEMENTS_SCHEMA],
+})
     .compileComponents();
   }));
 

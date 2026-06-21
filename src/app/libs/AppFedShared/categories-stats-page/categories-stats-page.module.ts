@@ -16,7 +16,7 @@ import {SharedModule} from '../../../shared/shared.module'
         IonicModule,
         CategoriesStatsPagePageRoutingModule,
         SharedModule,
-    ],
-  declarations: [CategoriesStatsPagePage]
+        CategoriesStatsPagePage,
+    ]
 })
 export class CategoriesStatsPagePageModule {}

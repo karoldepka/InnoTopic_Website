@@ -1,6 +1,8 @@
 import {Component, Input, OnInit, Output, ChangeDetectionStrategy} from '@angular/core';
 import {Required} from '../../utils/angular/Required.decorator'
 import {CachedSubject} from '../../utils/cachedSubject2/CachedSubject2'
+import { NgFor, NgClass } from '@angular/common';
+import { IonicModule } from '@ionic/angular';
 
 /** Considerations:
  * - acting on multiple selected items:
@@ -8,11 +10,15 @@ import {CachedSubject} from '../../utils/cachedSubject2/CachedSubject2'
  * - using in filters (also yes no ~)
  * */
 @Component({
-  standalone: false,
-  selector: 'app-chooser',
-  templateUrl: './chooser.component.html',
-  changeDetection: ChangeDetectionStrategy.Eager,
-  styleUrls: ['./chooser.component.sass'],
+    selector: 'app-chooser',
+    templateUrl: './chooser.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
+    styleUrls: ['./chooser.component.sass'],
+    imports: [
+        NgFor,
+        IonicModule,
+        NgClass,
+    ],
 })
 export class ChooserComponent<TChoosable extends any = any> implements OnInit {
 

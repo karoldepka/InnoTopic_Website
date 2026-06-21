@@ -7,7 +7,8 @@ export class RangeFilterVal {
 }
 
 @Component({
-  standalone: false,
+  standalone: true,
+  imports: [],
   selector: 'app-range-filter',
   templateUrl: './range-filter.component.html',
   changeDetection: ChangeDetectionStrategy.Eager,

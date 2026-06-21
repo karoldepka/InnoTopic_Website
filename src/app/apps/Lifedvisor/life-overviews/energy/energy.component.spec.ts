@@ -9,9 +9,8 @@ describe('EnergyComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ EnergyComponent ],
-      imports: [IonicModule.forRoot()]
-    }).compileComponents();
+    imports: [IonicModule.forRoot(), EnergyComponent]
+}).compileComponents();
 
     fixture = TestBed.createComponent(EnergyComponent);
     component = fixture.componentInstance;

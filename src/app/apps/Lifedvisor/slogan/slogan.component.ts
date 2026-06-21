@@ -35,7 +35,8 @@ export const slogans = [
 
 
 @Component({
-  standalone: false,
+  standalone: true,
+  imports: [],
   selector: 'app-slogan',
   templateUrl: './slogan.component.html',
   changeDetection: ChangeDetectionStrategy.Eager,

@@ -9,9 +9,8 @@ describe('SleepPage', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [ SleepPage ],
-      imports: [IonicModule.forRoot()]
-    }).compileComponents();
+    imports: [IonicModule.forRoot(), SleepPage]
+}).compileComponents();
 
     fixture = TestBed.createComponent(SleepPage);
     component = fixture.componentInstance;

@@ -1,7 +1,7 @@
 import {AfterViewInit, Component, Injector, OnInit, ChangeDetectionStrategy} from '@angular/core';
 import {QuizService} from '../core/quiz/quiz.service'
 import {Observable} from 'rxjs'
-import {PopoverController} from '@ionic/angular'
+import { PopoverController, IonicModule } from '@ionic/angular'
 import {QuizTimerPopoverComponent} from './quiz-timer-popover/quiz-timer-popover.component'
 import {LearnItem$} from '../models/LearnItem$'
 import {debugLog} from '../../../libs/AppFedShared/utils/log'
@@ -12,14 +12,38 @@ import {nullish} from '../../../libs/AppFedShared/utils/type-utils'
 import {isNullish} from '../../../libs/AppFedShared/utils/utils'
 import {BaseComponent} from '../../../libs/AppFedShared/base/base.component'
 import {QuizStatus} from '../core/quiz/QuizStatus'
+import { AppLogoComponent } from '../../Common/app-logo/app-logo.component';
+import { NgIf, NgFor, AsyncPipe } from '@angular/common';
+import { TimePassingComponent } from '../../../libs/AppFedShared/time/time-passing/time-passing.component';
+import { SyncStatusIconComponent } from '../../../libs/AppFedShared/odm/sync-status/sync-status-icon.component';
+import { QuizOptionsComponent } from './quiz-options/quiz-options.component';
+import { TimePointComponent } from '../../../libs/AppFedShared/time/time-point/time-point.component';
+import { QuizItemsLeftComponent } from './quiz-items-left/quiz-items-left.component';
+import { QuizFinishedComponent } from './quiz-finished/quiz-finished.component';
+import { QuizItemDetailsComponent } from './quiz-item-details/quiz-item-details.component';
+import { ShowAnswerAndRateComponent } from './show-answer-and-rate/show-answer-and-rate.component';
 
 
 @Component({
-  standalone: false,
-  selector: 'app-quiz',
-  templateUrl: './quiz.page.html',
-  changeDetection: ChangeDetectionStrategy.Eager,
-  styleUrls: ['./quiz.page.sass'],
+    selector: 'app-quiz',
+    templateUrl: './quiz.page.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
+    styleUrls: ['./quiz.page.sass'],
+    imports: [
+        IonicModule,
+        AppLogoComponent,
+        NgIf,
+        TimePassingComponent,
+        SyncStatusIconComponent,
+        QuizOptionsComponent,
+        TimePointComponent,
+        QuizItemsLeftComponent,
+        QuizFinishedComponent,
+        NgFor,
+        QuizItemDetailsComponent,
+        ShowAnswerAndRateComponent,
+        AsyncPipe,
+    ],
 })
 export class QuizPage extends BaseComponent implements OnInit, AfterViewInit  {
 

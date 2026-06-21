@@ -6,14 +6,27 @@ import {OptionsService} from '../../../../../apps/Learn/core/options.service'
 import {BaseComponent} from '../../../base/base.component'
 import {CachedSubject} from '../../../utils/cachedSubject2/CachedSubject2'
 import firebase from 'firebase/compat/app'
+import { AboutAppComponent } from './about-app/about-app.component';
+import { FeatureConfigComponent } from '../../../feature-config/feature-config.component';
+import { ThemeConfigComponent } from '../../../theme-config/theme-config.component';
+import { NgIf, AsyncPipe, JsonPipe } from '@angular/common';
+import { IonicModule } from '@ionic/angular';
 import User = firebase.User
 
 @Component({
-  standalone: false,
-  selector: 'app-sync-popover',
-  templateUrl: './sync-popover.component.html',
-  changeDetection: ChangeDetectionStrategy.Eager,
-  styleUrls: ['./sync-popover.component.sass'],
+    selector: 'app-sync-popover',
+    templateUrl: './sync-popover.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
+    styleUrls: ['./sync-popover.component.sass'],
+    imports: [
+        AboutAppComponent,
+        FeatureConfigComponent,
+        ThemeConfigComponent,
+        NgIf,
+        IonicModule,
+        AsyncPipe,
+        JsonPipe,
+    ],
 })
 export class SyncPopoverComponent extends BaseComponent implements OnInit {
 

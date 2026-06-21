@@ -9,9 +9,9 @@ describe('QuizTimerPopoverComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [ QuizTimerPopoverComponent ],
-      imports: [IonicModule.forRoot()]
-    }).compileComponents();
+    declarations: [QuizTimerPopoverComponent],
+    imports: [IonicModule.forRoot()]
+}).compileComponents();
 
     fixture = TestBed.createComponent(QuizTimerPopoverComponent);
     component = fixture.componentInstance;

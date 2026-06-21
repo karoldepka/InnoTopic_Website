@@ -9,9 +9,9 @@ describe('PivotTableComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [ PivotTableComponent ],
-      imports: [IonicModule.forRoot()]
-    }).compileComponents();
+    declarations: [PivotTableComponent],
+    imports: [IonicModule.forRoot()]
+}).compileComponents();
 
     fixture = TestBed.createComponent(PivotTableComponent);
     component = fixture.componentInstance;

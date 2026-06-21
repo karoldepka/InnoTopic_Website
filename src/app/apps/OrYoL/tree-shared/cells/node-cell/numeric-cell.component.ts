@@ -16,14 +16,15 @@ import {Config, ConfigService} from '../../../core/config.service'
 import {setCaretPosition} from '../../../../../libs/AppFedShared/utils/utils-from-oryol'
 import {nullish} from '../../../../../libs/AppFedShared/utils/type-utils'
 import {CachedSubject} from '../../../../../libs/AppFedShared/utils/cachedSubject2/CachedSubject2'
+import { NgClass, NgIf, AsyncPipe } from '@angular/common';
 
 /* TODO: rename to eg NumericCell */
 @Component({
-  standalone: false,
-  selector: 'app-node-cell',
-  templateUrl: './numeric-cell.component.html',
-  changeDetection: ChangeDetectionStrategy.Eager,
-  styleUrls: ['./numeric-cell.component.sass']
+    selector: 'app-node-cell',
+    templateUrl: './numeric-cell.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
+    styleUrls: ['./numeric-cell.component.sass'],
+    imports: [NgClass, NgIf, AsyncPipe]
 })
 export class NumericCellComponent extends CellComponent implements OnInit, CellComponent {
 

@@ -1,9 +1,6 @@
 import { Directive } from '@angular/core';
 
-@Directive({
-  standalone: false,
-  selector: '[appOdmListItem]'
-})
+@Directive({ selector: '[appOdmListItem]' })
 export class OdmListItemDirective {
 
   constructor() { }

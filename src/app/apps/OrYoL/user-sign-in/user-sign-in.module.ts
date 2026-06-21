@@ -4,12 +4,11 @@ import { UserSignInComponent } from './user-sign-in/user-sign-in.component'
 import { UserSignInRoutingModule } from './user-sign-in.routing.module'
 
 @NgModule({
-  declarations: [
-    UserSignInComponent,
-  ],
+  declarations: [],
   imports: [
     CommonModule,
     UserSignInRoutingModule,
+    UserSignInComponent,
   ]
 })
 export class UserSignInModule { }

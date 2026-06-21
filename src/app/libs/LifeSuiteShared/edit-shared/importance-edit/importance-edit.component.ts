@@ -1,13 +1,14 @@
 import {Component, Input, OnInit, ChangeDetectionStrategy} from '@angular/core';
-import {UntypedFormControl, UntypedFormGroup} from '@angular/forms'
+import { UntypedFormControl, UntypedFormGroup, ReactiveFormsModule } from '@angular/forms'
 import {ViewSyncer} from '../../../AppFedShared/odm/ui/ViewSyncer'
 import {Required} from '../../../AppFedShared/utils/angular/Required.decorator'
-import {btn, ButtonsDescriptor} from '../../../AppFedSharedIonic/ratings/numeric-picker/numeric-picker.component'
+import { btn, ButtonsDescriptor, NumericPickerComponent } from '../../../AppFedSharedIonic/ratings/numeric-picker/numeric-picker.component'
 import {importanceDescriptors} from '../../../../apps/Learn/models/fields/importance.model'
 import {PatchableObservable} from '../../../AppFedShared/utils/rxUtils'
 import {LearnItem} from '../../../../apps/Learn/models/LearnItem'
 import {nullish} from '../../../AppFedShared/utils/type-utils'
 import {intensityBtnVariant} from '../descriptor-level-edit'
+import { IonicModule } from '@ionic/angular';
 
 const importanceButtonsDesc = new ButtonsDescriptor<any, string>([
   btn({
@@ -77,11 +78,15 @@ const importanceButtonsDesc = new ButtonsDescriptor<any, string>([
 
 
 @Component({
-  standalone: false,
-  selector: 'app-importance-edit',
-  templateUrl: './importance-edit.component.html',
-  changeDetection: ChangeDetectionStrategy.Eager,
-  styleUrls: ['./importance.component.sass'],
+    selector: 'app-importance-edit',
+    templateUrl: './importance-edit.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
+    styleUrls: ['./importance.component.sass'],
+    imports: [
+        IonicModule,
+        NumericPickerComponent,
+        ReactiveFormsModule,
+    ],
 })
 export class ImportanceEditComponent implements OnInit {
 

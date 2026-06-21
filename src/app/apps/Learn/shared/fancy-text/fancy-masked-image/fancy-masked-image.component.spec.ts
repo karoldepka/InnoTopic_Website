@@ -9,9 +9,9 @@ describe('FancyMaskedImageComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [ FancyMaskedImageComponent ],
-      imports: [IonicModule.forRoot()]
-    }).compileComponents();
+    declarations: [FancyMaskedImageComponent],
+    imports: [IonicModule.forRoot()]
+}).compileComponents();
 
     fixture = TestBed.createComponent(FancyMaskedImageComponent);
     component = fixture.componentInstance;

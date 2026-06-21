@@ -6,11 +6,10 @@ import {OdmCell} from '../../../cells/OdmCell'
 
 /** TODO: consider naming as COLUMNS cells */
 @Component({
-  standalone: false,
-  selector: 'app-tree-node-cells',
-  templateUrl: './tree-node-cells.component.html',
-  changeDetection: ChangeDetectionStrategy.Eager,
-  styleUrls: ['./tree-node-cells.component.sass'],
+    selector: 'app-tree-node-cells',
+    templateUrl: './tree-node-cells.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
+    styleUrls: ['./tree-node-cells.component.sass'],
 })
 export class TreeNodeCellsComponent implements OnInit {
 

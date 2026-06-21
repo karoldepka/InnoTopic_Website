@@ -9,15 +9,13 @@ const exports = [
 ]
 
 @NgModule({
-  declarations: [
-    ...exports
-  ],
-  imports: [
-    CommonModule,
-    FormsModule,
-    IonicModule,
-    ReactiveFormsModule,
-  ],
-  exports: exports
+    imports: [
+        CommonModule,
+        FormsModule,
+        IonicModule,
+        ReactiveFormsModule,
+        ...exports,
+    ],
+    exports: exports
 })
 export class RatingsModule { }

@@ -16,15 +16,13 @@ const exports = [
 ];
 
 @NgModule({
-  declarations: [
-    ...exports,
-    OdmListItemDirective,
-  ],
-  exports: exports,
-  imports: [
-    CommonModule,
-    IonicModule,
-    ReactiveFormsModule,
-  ],
+    exports: exports,
+    imports: [
+        CommonModule,
+        IonicModule,
+        ReactiveFormsModule,
+        ...exports,
+        OdmListItemDirective,
+    ],
 })
 export class OdmUiModule { }

@@ -4,13 +4,14 @@ import {UntypedFormControl, UntypedFormGroup} from '@angular/forms'
 import {ViewSyncer} from '../../../../../libs/AppFedShared/odm/ui/ViewSyncer'
 import {JournalEntry} from '../../../models/JournalEntry'
 import {JournalEntry$} from '../../../models/JournalEntry$'
+import { RichTextEditComponent } from '../../../../../libs/AppFedShared/rich-text/rich-text-edit/rich-text-edit.component';
 
 @Component({
-  standalone: false,
-  selector: 'app-journal-text-field',
-  templateUrl: './journal-text-field.component.html',
-  changeDetection: ChangeDetectionStrategy.Eager,
-  styleUrls: ['./journal-text-field.component.sass'],
+    selector: 'app-journal-text-field',
+    templateUrl: './journal-text-field.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
+    styleUrls: ['./journal-text-field.component.sass'],
+    imports: [RichTextEditComponent],
 })
 export class JournalTextFieldComponent implements OnInit {
 

@@ -4,6 +4,8 @@ import {JournalNumericDescriptor} from '../../../../apps/Journal/models/JournalN
 import {range} from 'lodash-es'
 import {debugLog} from '../../../AppFedShared/utils/log'
 import {CustomFormControl} from '../../../AppFedShared/utils/angular/custom-form-control'
+import { NgIf, NgFor, NgClass } from '@angular/common';
+import { IonicModule } from '@ionic/angular';
 
 export class ButtonVariantDescriptor<TVal = any, TLabel = string | number> {
   constructor(
@@ -78,18 +80,18 @@ function numAndFracBtn(x: number): ButtonDescriptor {
 * TODO: rename: ButtonsPicker...
 * */
 @Component({
-  standalone: false,
-  selector: 'apf-numeric-picker',
-  templateUrl: './numeric-picker.component.html',
-  styleUrls: ['./mood-picker.component.sass'],
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  providers: [
-    {
-      provide: NG_VALUE_ACCESSOR,
-      useExisting: forwardRef(() => NumericPickerComponent),
-      multi: true
-    }
-  ]
+    selector: 'apf-numeric-picker',
+    templateUrl: './numeric-picker.component.html',
+    styleUrls: ['./mood-picker.component.sass'],
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    providers: [
+        {
+            provide: NG_VALUE_ACCESSOR,
+            useExisting: forwardRef(() => NumericPickerComponent),
+            multi: true
+        }
+    ],
+    imports: [NgIf, NgFor, IonicModule, NgClass]
 })
 export class NumericPickerComponent<TVal = any> extends CustomFormControl<TVal> implements OnInit {
 

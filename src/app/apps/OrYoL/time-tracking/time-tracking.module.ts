@@ -11,16 +11,14 @@ const exports = [
 ]
 
 @NgModule({
-  declarations: [
-    ...exports
+    imports: [
+        CommonModule,
+        TimeModule,
+        ...exports,
     ],
-  imports: [
-    CommonModule,
-    TimeModule,
-  ],
-  providers: [
-    TimeTrackingService,
-  ],
-  exports: exports
+    providers: [
+        TimeTrackingService,
+    ],
+    exports: exports
 })
 export class TimeTrackingModule { }

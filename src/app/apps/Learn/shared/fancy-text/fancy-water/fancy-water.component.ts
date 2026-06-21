@@ -1,7 +1,8 @@
 import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 
 @Component({
-  standalone: false,
+  standalone: true,
+  imports: [],
   selector: 'app-fancy-water',
   templateUrl: './fancy-water.component.html',
   changeDetection: ChangeDetectionStrategy.Eager,

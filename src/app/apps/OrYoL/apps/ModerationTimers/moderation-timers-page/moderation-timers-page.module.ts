@@ -5,10 +5,11 @@ import { ModerationTimersPageRoutingModule } from './moderation-timers-page-rout
 import { ModerationTimersPageComponent } from './moderation-timers-page.component';
 
 @NgModule({
-  declarations: [ModerationTimersPageComponent],
+  declarations: [],
   imports: [
     CommonModule,
-    ModerationTimersPageRoutingModule
+    ModerationTimersPageRoutingModule,
+    ModerationTimersPageComponent,
   ]
 })
 export class ModerationTimersPageModule { }

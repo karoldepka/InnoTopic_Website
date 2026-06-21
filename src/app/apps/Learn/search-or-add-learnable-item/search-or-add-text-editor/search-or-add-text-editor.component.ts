@@ -4,15 +4,16 @@ import {stripHtml} from '../../../../libs/AppFedShared/utils/html-utils'
 import {RichTextInterceptorService} from '../../shared/utils/rich-text-interceptor.service'
 import {ChromeExtensionService} from '../../shared/utils/chrome-extension.service'
 import {richTextEditCommon} from '../../../../libs/AppFedShared/rich-text/rich-text-edit/RichTextEditCommon'
+import { RichTextEditComponent } from '../../../../libs/AppFedShared/rich-text/rich-text-edit/rich-text-edit.component';
 
 @Component({
-  standalone: false,
-  selector: 'app-search-or-add-text-editor',
-  templateUrl: './search-or-add-text-editor.component.html',
-  styleUrls: ['./search-or-add-text-editor.component.scss'],
-  // disable encapsulation to allow styling of tinymce (no longer needed prolly cos moved to global styles)
-  changeDetection: ChangeDetectionStrategy.Eager,
-  encapsulation: ViewEncapsulation.None,
+    selector: 'app-search-or-add-text-editor',
+    templateUrl: './search-or-add-text-editor.component.html',
+    styleUrls: ['./search-or-add-text-editor.component.scss'],
+    // disable encapsulation to allow styling of tinymce (no longer needed prolly cos moved to global styles)
+    changeDetection: ChangeDetectionStrategy.Eager,
+    encapsulation: ViewEncapsulation.None,
+    imports: [RichTextEditComponent],
 })
 export class SearchOrAddTextEditorComponent implements OnInit {
 

@@ -9,9 +9,9 @@ describe('FancyWaterComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [ FancyWaterComponent ],
-      imports: [IonicModule.forRoot()]
-    }).compileComponents();
+    declarations: [FancyWaterComponent],
+    imports: [IonicModule.forRoot()]
+}).compileComponents();
 
     fixture = TestBed.createComponent(FancyWaterComponent);
     component = fixture.componentInstance;

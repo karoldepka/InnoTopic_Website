@@ -13,8 +13,9 @@ import { OccupationsPage } from './occupations.page';
     CommonModule,
     FormsModule,
     IonicModule,
-    OccupationsPageRoutingModule
+    OccupationsPageRoutingModule,
+    OccupationsPage,
   ],
-  declarations: [OccupationsPage]
+  declarations: []
 })
 export class OccupationsPageModule {}

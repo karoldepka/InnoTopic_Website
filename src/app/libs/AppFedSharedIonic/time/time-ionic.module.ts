@@ -8,16 +8,14 @@ const exports = [
 ];
 
 @NgModule({
-  declarations: [
-    ...exports
-  ],
-  imports: [
-    CommonModule,
-    TimeModule,
-  ],
-  schemas: [
-    CUSTOM_ELEMENTS_SCHEMA,
-  ],
-  exports: exports
+    imports: [
+        CommonModule,
+        TimeModule,
+        ...exports,
+    ],
+    schemas: [
+        CUSTOM_ELEMENTS_SCHEMA,
+    ],
+    exports: exports
 })
 export class TimeIonicModule { }

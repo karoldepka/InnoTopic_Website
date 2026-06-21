@@ -9,9 +9,8 @@ describe('MinMidMaxCellComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [ MinMidMaxCellComponent ],
-      imports: [IonicModule.forRoot()]
-    }).compileComponents();
+    imports: [IonicModule.forRoot(), MinMidMaxCellComponent]
+}).compileComponents();
 
     fixture = TestBed.createComponent(MinMidMaxCellComponent);
     component = fixture.componentInstance;

@@ -3,7 +3,7 @@ import {sidesDefsArray} from '../core/sidesDefs'
 import {ActivatedRoute, NavigationStart, Router} from '@angular/router'
 import {LearnItemItemsService} from '../core/learn-item-items.service'
 import {AngularFirestore, AngularFirestoreDocument} from '@angular/fire/compat/firestore'
-import {AlertController} from '@ionic/angular'
+import { AlertController, IonicModule } from '@ionic/angular'
 import {LearnItem, LearnItemId} from '../models/LearnItem'
 import {ignorePromise} from '../../../libs/AppFedShared/utils/promiseUtils'
 import {Observable} from 'rxjs'
@@ -12,13 +12,57 @@ import {LearnItem$} from '../models/LearnItem$'
 import {NavigationService} from '../../../shared/navigation.service'
 import {filter} from 'rxjs/operators'
 import {BaseComponent} from '../../../libs/AppFedShared/base/base.component'
+import { AppLogoComponent } from '../../Common/app-logo/app-logo.component';
+import { NgIf, NgFor, AsyncPipe } from '@angular/common';
+import { TimePassingComponent } from '../../../libs/AppFedShared/time/time-passing/time-passing.component';
+import { SyncStatusIconComponent } from '../../../libs/AppFedShared/odm/sync-status/sync-status-icon.component';
+import { LearnItemDetailsHintsComponent } from './learn-item-details-hints/learn-item-details-hints.component';
+import { TimePointComponent } from '../../../libs/AppFedShared/time/time-point/time-point.component';
+import { GeoLocComponent } from '../../../libs/AppFedShared/geo-location/geo-loc/geo-loc.component';
+import { ItemClassEditComponent } from './item-class-edit/item-class-edit.component';
+import { ItemClassToLearnEditComponent } from './item-class-to-learn-edit/item-class-edit.component';
+import { OdmCheckbox } from '../../../libs/AppFedSharedIonic/odm-ui/bound-checkbox/odm-checkbox';
+import { ImportanceEditComponent } from '../../../libs/LifeSuiteShared/edit-shared/importance-edit/importance-edit.component';
+import { FunLevelEditComponent } from '../../../libs/LifeSuiteShared/edit-shared/fun-level-edit/fun-level-edit.component';
+import { MentalEffortLevelEditComponent } from './mental-effort-level-edit/mental-effort-level-edit.component';
+import { PhysicalHealthImpactLevelEditComponent } from './physical-health-impact-level-edit/physical-health-impact-level-edit.component';
+import { MentalHealthImpactLevelEditComponent } from './mental-health-impact-level-edit/mental-health-impact-level-edit.component';
+import { StatusesEditComponent } from './statuses-edit/statuses-edit.component';
+import { SelfRatingComponent } from '../shared/self-rating/self-rating.component';
+import { PlayButtonComponent } from '../shared/play-button/play-button.component';
+import { ItemSubItemsComponent } from './item-sub-items/item-sub-items.component';
+import { ItemSideComponent } from '../shared/item-side/item-side.component';
 
 @Component({
-  standalone: false,
-  selector: 'app-learn-item-details',
-  templateUrl: './learn-item-details.page.html',
-  changeDetection: ChangeDetectionStrategy.Eager,
-  styleUrls: ['./learn-item-details.page.sass'],
+    selector: 'app-learn-item-details',
+    templateUrl: './learn-item-details.page.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
+    styleUrls: ['./learn-item-details.page.sass'],
+    imports: [
+        IonicModule,
+        AppLogoComponent,
+        NgIf,
+        TimePassingComponent,
+        SyncStatusIconComponent,
+        LearnItemDetailsHintsComponent,
+        TimePointComponent,
+        GeoLocComponent,
+        ItemClassEditComponent,
+        ItemClassToLearnEditComponent,
+        OdmCheckbox,
+        ImportanceEditComponent,
+        FunLevelEditComponent,
+        MentalEffortLevelEditComponent,
+        PhysicalHealthImpactLevelEditComponent,
+        MentalHealthImpactLevelEditComponent,
+        StatusesEditComponent,
+        SelfRatingComponent,
+        PlayButtonComponent,
+        ItemSubItemsComponent,
+        NgFor,
+        ItemSideComponent,
+        AsyncPipe,
+    ],
 })
 export class LearnItemDetailsPage extends BaseComponent implements OnInit {
 

@@ -3,15 +3,22 @@ import {UploadService} from '../../core/upload.service'
 import {LearnItemItemsService} from '../../core/learn-item-items.service'
 import {OdmBackend} from '../../../../libs/AppFedShared/odm/OdmBackend'
 import {LearnItem} from '../../models/LearnItem'
+import { IonicModule } from '@ionic/angular';
+import { NgIf } from '@angular/common';
+import { AudioVisualizerComponent } from '../../../../libs/AppFedShared/audio/audio-visualizer/audio-visualizer.component';
 
 declare const MediaRecorder: any;
 
 @Component({
-  standalone: false,
-  selector: 'app-mic',
-  templateUrl: './mic.component.html',
-  changeDetection: ChangeDetectionStrategy.Eager,
-  styleUrls: ['./mic.component.sass'],
+    selector: 'app-mic',
+    templateUrl: './mic.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
+    styleUrls: ['./mic.component.sass'],
+    imports: [
+        IonicModule,
+        NgIf,
+        AudioVisualizerComponent,
+    ],
 })
 export class MicComponent implements OnInit {
 

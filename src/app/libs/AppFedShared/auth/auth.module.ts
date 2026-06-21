@@ -10,12 +10,11 @@ let exports = [
 ]
 
 @NgModule({
-  declarations: [
-    ...exports,
-  ],
+  declarations: [],
   imports: [
     CommonModule,
-    IonicModule
+    IonicModule,
+    ...exports,
   ],
   exports: exports
 })

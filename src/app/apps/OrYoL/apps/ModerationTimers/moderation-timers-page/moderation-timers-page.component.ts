@@ -1,7 +1,8 @@
 import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 
 @Component({
-  standalone: false,
+  standalone: true,
+  imports: [],
   selector: 'app-moderation-timers-page',
   templateUrl: './moderation-timers-page.component.html',
   changeDetection: ChangeDetectionStrategy.Eager,

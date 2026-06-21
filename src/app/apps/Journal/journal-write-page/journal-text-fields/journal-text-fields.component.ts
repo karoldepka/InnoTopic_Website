@@ -2,13 +2,21 @@ import {Component, Input, OnInit, ChangeDetectionStrategy} from '@angular/core';
 import {JournalTextDescriptor, JournalTextDescriptors} from '../../models/JournalTextDescriptors'
 import {JournalEntry} from '../../models/JournalEntry'
 import {JournalEntry$} from '../../models/JournalEntry$'
+import { NgFor, NgIf } from '@angular/common';
+import { IonicModule } from '@ionic/angular';
+import { JournalTextFieldComponent } from './journal-text-field/journal-text-field.component';
 
 @Component({
-  standalone: false,
-  selector: 'app-journal-text-fields',
-  templateUrl: './journal-text-fields.component.html',
-  changeDetection: ChangeDetectionStrategy.Eager,
-  styleUrls: ['./journal-text-fields.component.sass'],
+    selector: 'app-journal-text-fields',
+    templateUrl: './journal-text-fields.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
+    styleUrls: ['./journal-text-fields.component.sass'],
+    imports: [
+        NgFor,
+        NgIf,
+        IonicModule,
+        JournalTextFieldComponent,
+    ],
 })
 export class JournalTextFieldsComponent implements OnInit {
 

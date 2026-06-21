@@ -9,9 +9,9 @@ describe('TestVirtualScrollPage', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ TestVirtualScrollPage ],
-      imports: [IonicModule.forRoot()]
-    }).compileComponents();
+    declarations: [TestVirtualScrollPage],
+    imports: [IonicModule.forRoot()]
+}).compileComponents();
 
     fixture = TestBed.createComponent(TestVirtualScrollPage);
     component = fixture.componentInstance;

@@ -16,7 +16,7 @@ import {SharedModule} from '../../../shared/shared.module'
         IonicModule,
         LifedvisorPageRoutingModule,
         SharedModule,
-    ],
-  declarations: [LifedvisorPage]
+        LifedvisorPage,
+    ]
 })
 export class LifedvisorPageModule {}

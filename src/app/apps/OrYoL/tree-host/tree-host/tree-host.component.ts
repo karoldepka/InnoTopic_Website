@@ -18,14 +18,19 @@ import {Command, CommandsService} from '../../core/commands.service'
 import { NavigationService } from '../../core/navigation.service'
 import {TreeTableNodeContent} from '../../tree-model/TreeTableNodeContent'
 import {ApfNonRootTreeNode, RootTreeNode} from '../../tree-model/TreeNode'
+import { ToolbarComponent } from '../toolbar/toolbar.component';
+import { NgIf } from '@angular/common';
+import { PrimeNgTreeComponent } from '../../tree-primeng/prime-ng-tree/prime-ng-tree.component';
+import { NestedTreeComponent } from '../../tree-nested/nested-tree/nested-tree.component';
+import { IonicModule } from '@ionic/angular';
 
 
 @Component({
-  standalone: false,
-  selector: 'app-tree-host',
-  templateUrl: './tree-host.component.html',
-  changeDetection: ChangeDetectionStrategy.Eager,
-  styleUrls: ['./tree-host.component.scss']
+    selector: 'app-tree-host',
+    templateUrl: './tree-host.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
+    styleUrls: ['./tree-host.component.scss'],
+    imports: [ToolbarComponent, NgIf, PrimeNgTreeComponent, NestedTreeComponent, IonicModule]
 })
 export class TreeHostComponent implements OnInit {
 

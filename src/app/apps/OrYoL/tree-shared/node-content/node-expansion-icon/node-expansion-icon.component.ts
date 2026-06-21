@@ -6,13 +6,14 @@ import {
 } from '@angular/core';
 import { debugLog } from '../../../utils/log'
 import {ApfBaseTreeNode, OryBaseTreeNode} from '../../../tree-model/TreeModel'
+import { NgIf, NgClass } from '@angular/common';
 
 @Component({
-  standalone: false,
-  selector: 'app-node-expansion-icon',
-  templateUrl: './node-expansion-icon.component.html',
-  changeDetection: ChangeDetectionStrategy.Eager,
-  styleUrls: ['./node-expansion-icon.component.sass']
+    selector: 'app-node-expansion-icon',
+    templateUrl: './node-expansion-icon.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
+    styleUrls: ['./node-expansion-icon.component.sass'],
+    imports: [NgIf, NgClass]
 })
 export class NodeExpansionIconComponent implements OnInit {
 

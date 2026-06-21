@@ -9,9 +9,9 @@ describe('LoginComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [ LoginComponent ],
-      schemas: [CUSTOM_ELEMENTS_SCHEMA],
-    })
+    declarations: [LoginComponent],
+    schemas: [CUSTOM_ELEMENTS_SCHEMA],
+})
     .compileComponents();
   }));
 

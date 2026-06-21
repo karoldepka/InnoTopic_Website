@@ -11,7 +11,8 @@ import {Config, ConfigService} from '../../../apps/OrYoL/core/config.service'
  * Provides basic bookkeeping and lifecycle and DI, reactivity, config
  * */
 @Component({
-  standalone: false,
+  standalone: true,
+  imports: [],
   selector: 'app-base',
   templateUrl: './base.component.html',
   changeDetection: ChangeDetectionStrategy.Eager,

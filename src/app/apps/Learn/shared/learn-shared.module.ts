@@ -32,21 +32,19 @@ const exports = [
 ]
 
 @NgModule({
-    declarations: [
+    imports: [
+        CommonModule,
+        RatingsModule,
+        IonicModule,
+        EditorModule,
+        ReactiveFormsModule,
+        RouterModule,
+        SharedModule,
         ...exports,
         QuizAnswerRevealerComponent,
     ],
-  imports: [
-    CommonModule,
-    RatingsModule,
-    IonicModule,
-    EditorModule,
-    ReactiveFormsModule,
-    RouterModule,
-    SharedModule,
-  ],
-  exports: [
-    exports,
-  ],
+    exports: [
+        exports,
+    ],
 })
 export class LearnSharedModule { }

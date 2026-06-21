@@ -1,13 +1,14 @@
 import {Component, Input, OnInit, ChangeDetectionStrategy} from '@angular/core';
 import {FormControl} from '@angular/forms'
 import {stripHtml} from '../../../../../libs/AppFedShared/utils/html-utils'
+import { IonicModule } from '@ionic/angular';
 
 @Component({
-  standalone: false,
-  selector: 'app-quiz-answer-revealer',
-  templateUrl: './quiz-answer-revealer.component.html',
-  changeDetection: ChangeDetectionStrategy.Eager,
-  styleUrls: ['./quiz-answer-revealer.component.scss'],
+    selector: 'app-quiz-answer-revealer',
+    templateUrl: './quiz-answer-revealer.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
+    styleUrls: ['./quiz-answer-revealer.component.scss'],
+    imports: [IonicModule],
 })
 export class QuizAnswerRevealerComponent implements OnInit {
 

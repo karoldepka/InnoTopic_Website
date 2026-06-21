@@ -2,13 +2,15 @@ import {ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnInit} fr
 import {LearnItem, LearnItemId} from '../../models/LearnItem'
 import {AngularFirestore} from '@angular/fire/compat/firestore'
 import {LearnItem$} from '../../models/LearnItem$'
+import { NgIf } from '@angular/common';
+import { IonicModule } from '@ionic/angular';
 
 @Component({
-  standalone: false,
-  selector: 'app-play-button',
-  templateUrl: './play-button.component.html',
-  styleUrls: ['./play-button.component.sass'],
-  changeDetection: ChangeDetectionStrategy.OnPush /* keep in mind when implementing more features */,
+    selector: 'app-play-button',
+    templateUrl: './play-button.component.html',
+    styleUrls: ['./play-button.component.sass'],
+    changeDetection: ChangeDetectionStrategy.OnPush /* keep in mind when implementing more features */,
+    imports: [NgIf, IonicModule],
 })
 export class PlayButtonComponent implements OnInit {
 

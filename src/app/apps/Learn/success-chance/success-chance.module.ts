@@ -10,13 +10,13 @@ import { SuccessChancePage } from './success-chance.page';
 import {SharedModule} from '../../../shared/shared.module'
 
 @NgModule({
-  imports: [
-    CommonModule,
-    FormsModule,
-    IonicModule,
-    SuccessChancePageRoutingModule,
-    SharedModule,
-  ],
-  declarations: [SuccessChancePage]
+    imports: [
+        CommonModule,
+        FormsModule,
+        IonicModule,
+        SuccessChancePageRoutingModule,
+        SharedModule,
+        SuccessChancePage,
+    ]
 })
 export class SuccessChancePageModule {}

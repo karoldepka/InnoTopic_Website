@@ -8,8 +8,8 @@ describe('GrowthDiagramComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ GrowthDiagramComponent ]
-    })
+    imports: [GrowthDiagramComponent]
+})
     .compileComponents();
   }));
 

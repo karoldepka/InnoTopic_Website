@@ -1,5 +1,6 @@
 import {Component, Input, OnDestroy, OnInit, ChangeDetectionStrategy} from '@angular/core';
 import {Required} from '../../utils/angular/Required.decorator'
+import { NgIf, NgStyle, NgFor } from '@angular/common';
 
 // https://developer.mozilla.org/en-US/docs/Web/API/BaseAudioContext/createAnalyser
 // ->
@@ -13,11 +14,15 @@ import {Required} from '../../utils/angular/Required.decorator'
 const audioCtx = new (window.AudioContext || (window as any).webkitAudioContext)();
 
 @Component({
-  standalone: false,
-  selector: 'app-audio-visualizer',
-  templateUrl: './audio-visualizer.component.html',
-  changeDetection: ChangeDetectionStrategy.Eager,
-  styleUrls: ['./audio-visualizer.component.sass'],
+    selector: 'app-audio-visualizer',
+    templateUrl: './audio-visualizer.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
+    styleUrls: ['./audio-visualizer.component.sass'],
+    imports: [
+        NgIf,
+        NgStyle,
+        NgFor,
+    ],
 })
 export class AudioVisualizerComponent implements OnInit, OnDestroy {
 

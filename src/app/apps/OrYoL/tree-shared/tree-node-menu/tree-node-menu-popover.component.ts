@@ -15,19 +15,22 @@ import { ConfirmDeleteTreeNodeComponent } from '../confirm-delete-tree-node/conf
 import { NodeContentComponent } from '../node-content/node-content.component'
 import { Router } from '@angular/router'
 import { ClipboardService } from '../../core/clipboard.service'
-import {AlertController, PopoverController} from '@ionic/angular'
+import { AlertController, PopoverController, IonicModule } from '@ionic/angular'
 import {INodeContentComponent} from '../node-content/INodeContentComponent'
 
 import {OryBaseTreeNode, OryNonRootTreeNode} from '../../tree-model/TreeModel'
 import {ApfNonRootTreeNode} from '../../tree-model/TreeNode'
+import { NodeClassIconComponent } from '../node-content/node-class-icon/node-class-icon.component';
+import { NgIf } from '@angular/common';
+import { NodeClassPickerComponent } from './node-class-picker/node-class-picker.component';
 
 
 @Component({
-  standalone: false,
-  selector: 'app-tree-node-menu-popover',
-  templateUrl: './tree-node-menu-popover.component.html',
-  changeDetection: ChangeDetectionStrategy.Eager,
-  styleUrls: ['./tree-node-menu-popover.component.sass']
+    selector: 'app-tree-node-menu-popover',
+    templateUrl: './tree-node-menu-popover.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
+    styleUrls: ['./tree-node-menu-popover.component.sass'],
+    imports: [NodeClassIconComponent, IonicModule, NgIf, NodeClassPickerComponent]
 })
 export class TreeNodeMenuPopoverComponent implements OnInit {
 

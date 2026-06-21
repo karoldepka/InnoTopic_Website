@@ -1,7 +1,7 @@
 import {Component, Inject, Injector, Input, OnInit, ViewChild, ChangeDetectionStrategy} from '@angular/core';
 import {ViewSyncer} from '../../odm/ui/ViewSyncer'
 import {EditorComponent} from '@tinymce/tinymce-angular'
-import {UntypedFormControl} from '@angular/forms'
+import { UntypedFormControl, ReactiveFormsModule } from '@angular/forms'
 import {debugLog} from '../../utils/log'
 import {EditorService} from './editor.service'
 import {richTextEditCommon} from './RichTextEditCommon'
@@ -16,11 +16,11 @@ import {getSelectionCursorState} from '../../utils/caret-utils'
  *
  **/
 @Component({
-  standalone: false,
-  selector: 'app-rich-text-edit',
-  templateUrl: './rich-text-edit.component.html',
-  changeDetection: ChangeDetectionStrategy.Eager,
-  styleUrls: ['./rich-text-edit.component.sass'],
+    selector: 'app-rich-text-edit',
+    templateUrl: './rich-text-edit.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
+    styleUrls: ['./rich-text-edit.component.sass'],
+    imports: [EditorComponent, ReactiveFormsModule],
 })
 export class RichTextEditComponent extends AbstractCellComponent implements OnInit {
 

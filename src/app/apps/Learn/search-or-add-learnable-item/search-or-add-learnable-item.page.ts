@@ -1,4 +1,4 @@
-import {Component, HostListener, Injector, OnInit, ChangeDetectionStrategy} from '@angular/core';
+import {Component, HostListener, Injector, OnInit, ChangeDetectionStrategy, CUSTOM_ELEMENTS_SCHEMA} from '@angular/core';
 import {sortBy} from 'lodash-es'
 import {LearnItemItemsService} from '../core/learn-item-items.service'
 import {field, HtmlString, LearnItem, LearnItemSidesVals} from '../models/LearnItem'
@@ -10,13 +10,13 @@ import {htmlToId, stripHtml} from '../../../libs/AppFedShared/utils/html-utils'
 import {debounceTime, distinctUntilChanged, finalize} from 'rxjs/operators'
 import {LingueeService} from '../natural-langs/linguee.service'
 import {MerriamWebsterDictService} from '../natural-langs/merriam-webster-dict.service'
-import {PopoverController, ToastController} from '@ionic/angular'
+import { PopoverController, ToastController, IonicModule } from '@ionic/angular'
 import {ListOptionsComponent} from './list-options/list-options.component'
 import {ListOptions, ListOptionsData} from './list-options'
 import {JournalEntryItemsService} from '../../Journal/core/journal-entries.service'
 import {LocalOptionsPatchableObservable} from '../core/options.service'
 import {isNullishOrEmptyOrBlank} from '../../../libs/AppFedShared/utils/utils'
-import {Router} from '@angular/router'
+import { Router, RouterLink } from '@angular/router'
 import {importanceDescriptors, importanceDescriptorsArray} from '../models/fields/importance.model'
 import {nullish} from '../../../libs/AppFedShared/utils/type-utils'
 import {LearnItem$} from '../models/LearnItem$'
@@ -28,14 +28,37 @@ import {LearnStatsService} from '../core/learn-stats.service'
 import {AiBackendService} from '../core/ai-backend.service'
 import {ItemProcessingService} from '../core/item-processing.service'
 import 'deep-chat'
+import { AppLogoComponent } from '../../Common/app-logo/app-logo.component';
+import { WhatNextButtonComponent } from '../../../shared/what-next-button/what-next-button.component';
+import { SyncStatusIconComponent } from '../../../libs/AppFedShared/odm/sync-status/sync-status-icon.component';
+import { NgIf, AsyncPipe } from '@angular/common';
+import { SearchOrAddTextEditorComponent } from './search-or-add-text-editor/search-or-add-text-editor.component';
+import { SelectionInfoComponent } from './selection-info/selection-info.component';
+import { LearnStatsComponent } from './learn-stats/learn-stats.component';
+import { MicComponent } from './mic/mic.component';
+import { ItemListComponent } from './item-list/item-list.component';
 
 /** TODO: rename to smth simpler more standard like LearnDoItemsPage (search-or-add is kinda implied, especially search) */
 @Component({
-  standalone: false,
-  selector: 'app-search-or-add-learnable-item',
-  templateUrl: './search-or-add-learnable-item.page.html',
-  changeDetection: ChangeDetectionStrategy.Eager,
-  styleUrls: ['./search-or-add-learnable-item.page.scss'],
+    selector: 'app-search-or-add-learnable-item',
+    templateUrl: './search-or-add-learnable-item.page.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
+    styleUrls: ['./search-or-add-learnable-item.page.scss'],
+    imports: [
+        IonicModule,
+        AppLogoComponent,
+        RouterLink,
+        WhatNextButtonComponent,
+        SyncStatusIconComponent,
+        NgIf,
+        SearchOrAddTextEditorComponent,
+        SelectionInfoComponent,
+        LearnStatsComponent,
+        MicComponent,
+        ItemListComponent,
+        AsyncPipe,
+    ],
+    schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
 export class SearchOrAddLearnableItemPageComponent extends BaseComponent implements OnInit {
 

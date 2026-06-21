@@ -9,9 +9,8 @@ describe('MindfulnessPage', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [ MindfulnessPage ],
-      imports: [IonicModule.forRoot()]
-    }).compileComponents();
+    imports: [IonicModule.forRoot(), MindfulnessPage]
+}).compileComponents();
 
     fixture = TestBed.createComponent(MindfulnessPage);
     component = fixture.componentInstance;

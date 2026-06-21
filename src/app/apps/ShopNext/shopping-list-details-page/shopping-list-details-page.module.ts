@@ -3,11 +3,9 @@ import { CommonModule } from '@angular/common';
 import {ShoppingListDetailsPageComponent} from "./shopping-list-details-page.component";
 
 @NgModule({
-  declarations: [
-    ShoppingListDetailsPageComponent,
-  ],
-  imports: [
-    CommonModule
-  ]
+    imports: [
+        CommonModule,
+        ShoppingListDetailsPageComponent
+    ]
 })
 export class ShoppingListDetailsPageModule { }

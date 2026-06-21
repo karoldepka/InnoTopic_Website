@@ -1,4 +1,5 @@
 import {Component, Input, OnInit, ChangeDetectionStrategy} from '@angular/core';
+import { NgIf } from '@angular/common';
 
 const round = (t: number) => t < 0 ? Math.ceil(t) : Math.floor(t)
 
@@ -11,11 +12,11 @@ const padTime = (time: number) => {
 }
 
 @Component({
-  standalone: false,
-  selector: 'app-time-view',
-  templateUrl: './time-view.component.html',
-  changeDetection: ChangeDetectionStrategy.Eager,
-  styleUrls: ['./time-view.component.scss'],
+    selector: 'app-time-view',
+    templateUrl: './time-view.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
+    styleUrls: ['./time-view.component.scss'],
+    imports: [NgIf],
 })
 export class TimeViewComponent implements OnInit {
 

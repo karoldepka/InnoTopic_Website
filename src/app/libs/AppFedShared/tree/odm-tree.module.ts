@@ -23,18 +23,16 @@ const exportDeclarations = [
 ]
 
 @NgModule({
-  imports: [
-    CommonModule,
-    IonicModule,
-    SharedModule,
-    RouterLink,
-    OdmUiModule,
-  ],
-  declarations: [
-    ...exportDeclarations,
-  ],
-  exports: [
-    ...exportDeclarations,
-  ]
+    imports: [
+        CommonModule,
+        IonicModule,
+        SharedModule,
+        RouterLink,
+        OdmUiModule,
+        ...exportDeclarations,
+    ],
+    exports: [
+        ...exportDeclarations,
+    ]
 })
 export class OdmTreeModule { }

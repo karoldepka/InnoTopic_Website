@@ -48,10 +48,6 @@ const routes: Routes = [
         EditSharedModule,
         OdmUiModule,
         OdmTreeModule,
-    ],
-    exports: [
-    ],
-    declarations: [
         LearnItemDetailsPage,
         LearnItemDetailsHintsComponent,
         MentalEffortLevelEditComponent,
@@ -63,5 +59,6 @@ const routes: Routes = [
         ItemSubItemComponent,
         ItemSubItemsComponent,
     ],
+    exports: [],
 })
 export class LearnItemDetailsPageModule {}

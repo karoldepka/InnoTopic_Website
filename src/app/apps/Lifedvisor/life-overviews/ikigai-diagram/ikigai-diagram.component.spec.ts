@@ -8,8 +8,8 @@ describe('IkigaiDiagramComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ IkigaiDiagramComponent ]
-    })
+    imports: [IkigaiDiagramComponent]
+})
     .compileComponents();
   }));
 

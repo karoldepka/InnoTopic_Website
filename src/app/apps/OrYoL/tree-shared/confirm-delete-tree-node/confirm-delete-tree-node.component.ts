@@ -4,11 +4,10 @@ import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import {OryBaseTreeNode} from '../../tree-model/TreeModel'
 
 @Component({
-  standalone: false,
-  selector: 'app-confirm-delete-tree-node',
-  templateUrl: './confirm-delete-tree-node.component.html',
-  changeDetection: ChangeDetectionStrategy.Eager,
-  styleUrls: ['./confirm-delete-tree-node.component.scss']
+    selector: 'app-confirm-delete-tree-node',
+    templateUrl: './confirm-delete-tree-node.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
+    styleUrls: ['./confirm-delete-tree-node.component.scss']
 })
 export class ConfirmDeleteTreeNodeComponent implements OnInit {
 

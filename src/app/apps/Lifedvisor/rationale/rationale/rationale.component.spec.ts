@@ -8,8 +8,8 @@ describe('RationaleComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ RationaleComponent ]
-    })
+    imports: [RationaleComponent]
+})
     .compileComponents();
   }));
 

@@ -6,11 +6,10 @@ import {OdmListItemDirective} from "./odm-list-item.directive";
 type TItem = OdmItem__OLD__<any>
 
 @Component({
-  standalone: false,
-  selector: 'app-odm-list',
-  templateUrl: './odm-list.component.html',
-  changeDetection: ChangeDetectionStrategy.Eager,
-  styleUrls: ['./odm-list.component.sass'],
+    selector: 'app-odm-list',
+    templateUrl: './odm-list.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
+    styleUrls: ['./odm-list.component.sass'],
 })
 export class OdmListComponent implements OnInit /* could extend non-ionic OdmListComponent */{
 

@@ -9,14 +9,18 @@ import {
 
 } from '../../shared-with-testcafe/Hint';
 import {Filter} from '../../shared-with-testcafe/text_search/Filter';
+import { IonicModule } from '@ionic/angular';
+import { NgClass, NgIf, NgFor } from '@angular/common';
+import { ReactiveFormsModule, FormsModule } from '@angular/forms';
+import { HintEmbedMediaComponent } from './hint-embed-media/hint-embed-media.component';
 
 /** Hint, Wish, Problem / Question */
 @Component({
-  standalone: false,
-  selector: 'app-hint[filter][wish]',
-  templateUrl: './hint.component.html',
-  changeDetection: ChangeDetectionStrategy.Eager,
-  styleUrls: ['./hint.component.css']
+    selector: 'app-hint[filter][wish]',
+    templateUrl: './hint.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
+    styleUrls: ['./hint.component.css'],
+    imports: [IonicModule, NgClass, NgIf, NgFor, ReactiveFormsModule, FormsModule, HintEmbedMediaComponent]
 })
 export class HintComponent implements OnInit {
 

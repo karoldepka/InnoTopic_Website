@@ -1,13 +1,21 @@
 import {ChangeDetectionStrategy, Component, Input, OnInit} from '@angular/core';
 import {LiHint, LiHintImpl} from '../../../shared-with-testcafe/Hint'
 import {DomSanitizer} from '@angular/platform-browser'
+import { NgFor, NgIf } from '@angular/common';
+import { IkigaiDiagramComponent } from '../../../life-overviews/ikigai-diagram/ikigai-diagram.component';
+import { FlowStateComponent } from '../../../life-overviews/flow-state/flow-state.component';
 
 @Component({
-  standalone: false,
-  selector: 'app-hint-embed-media',
-  templateUrl: './hint-embed-media.component.html',
-  styleUrls: ['./hint-embed-media.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush /* Because of constant reloading of yt embed iframe */,
+    selector: 'app-hint-embed-media',
+    templateUrl: './hint-embed-media.component.html',
+    styleUrls: ['./hint-embed-media.component.scss'],
+    changeDetection: ChangeDetectionStrategy.OnPush /* Because of constant reloading of yt embed iframe */,
+    imports: [
+        NgFor,
+        NgIf,
+        IkigaiDiagramComponent,
+        FlowStateComponent,
+    ],
 })
 export class HintEmbedMediaComponent implements OnInit {
 
