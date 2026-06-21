@@ -1,4 +1,5 @@
 import { Component, AfterViewInit, OnDestroy, ElementRef, ViewChild, NgZone } from '@angular/core';
+import { NgIf } from '@angular/common';
 import { Store } from '@ngrx/store';
 import { take } from 'rxjs/operators';
 import { ThemeConfigState } from '../../models/theme-config-state.model';
@@ -14,11 +15,23 @@ function isWorked(props: any): boolean {
 @Component({
   standalone: true,
   selector: 'app-globe-gl',
-  template: `<div #container style="width:100%;height:460px"></div>`,
-  styles: [`:host { display: block; }`],
+  template: `
+    <div style="position:relative;width:100%;height:460px">
+      <div #container style="width:100%;height:100%"></div>
+      <div *ngIf="loading" class="globe-loader">Loading Globe.gl…</div>
+    </div>
+  `,
+  imports: [NgIf],
+  styles: [`:host { display: block; }
+    .globe-loader {
+      position: absolute; inset: 0; display: flex;
+      align-items: center; justify-content: center;
+      font-size: 13px; opacity: 0.5; pointer-events: none;
+    }`],
 })
 export class GlobeGlComponent implements AfterViewInit, OnDestroy {
   @ViewChild('container') containerRef!: ElementRef<HTMLDivElement>;
+  loading = true;
   private globe: any;
 
   constructor(
@@ -61,6 +74,9 @@ export class GlobeGlComponent implements AfterViewInit, OnDestroy {
 
     this.globe.controls().autoRotate = true;
     this.globe.controls().autoRotateSpeed = 0.5;
+    this.globe.controls().enableZoom = false;
+
+    this.ngZone.run(() => { this.loading = false; });
   }
 
   ngOnDestroy() {

@@ -14,7 +14,7 @@ type GlobeMode = 'globegl' | 'd3' | 'threejs' | 'svg';
   styleUrls: ['./globe-switcher.component.scss'],
 })
 export class GlobeSwitcherComponent {
-  activeMode: GlobeMode = 'globegl';
+  activeMode: GlobeMode = 'd3';
 
   readonly modes: { key: GlobeMode; label: string; tech: string }[] = [
     { key: 'globegl', label: 'Globe.gl',  tech: 'WebGL + Three.js via Globe.gl' },
