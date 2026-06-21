@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 
 interface InfoItem {
   label: string;
@@ -6,14 +6,12 @@ interface InfoItem {
 }
 
 @Component({
-  standalone: false,
+  standalone: true,
   selector: 'app-personal-data',
   templateUrl: './personal-data.component.html',
-  styleUrls: ['./personal-data.component.sass']
+  styleUrls: ['./personal-data.component.sass'],
 })
-export class PersonalDataComponent implements OnInit {
-
-
+export class PersonalDataComponent {
   infoItems: InfoItem[] = [
     { label: 'First Name', value: 'Karol' },
     { label: 'Last Name', value: 'Depka Pradzinski' },
@@ -23,10 +21,4 @@ export class PersonalDataComponent implements OnInit {
     { label: 'Education', value: 'Computer Science University Engineering Degree - Computer Programming and Networks (maximum grade)' },
     { label: "Driver's license", value: 'B (Passenger cars)' },
   ];
-
-  constructor() { }
-
-  ngOnInit() {
-  }
-
 }

@@ -1,6 +1,8 @@
 <section>
-  <div *ngFor="let item of infoItems">
-    <label>{{ item.label }}</label>
-    <p>{{ item.value }}</p>
-  </div>
+  @for (item of infoItems; track item.label) {
+    <div>
+      <label>{{ item.label }}</label>
+      <p>{{ item.value }}</p>
+    </div>
+  }
 </section>

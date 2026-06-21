@@ -1,19 +1,14 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
+import { OtherProfilesModule } from '../../TopicFriendsShared3/other-profiles/other-profiles.module';
 import { externalProfilesKarol } from './external-profiles-karol';
 
 @Component({
-  standalone: false,
+  standalone: true,
+  imports: [OtherProfilesModule],
   selector: 'app-external-profiles',
   templateUrl: './external-profiles.component.html',
-  styleUrls: ['./external-profiles.component.sass']
+  styleUrls: ['./external-profiles.component.sass'],
 })
-export class ExternalProfilesComponent implements OnInit {
-
-  otherProfiles = externalProfilesKarol
-
-  constructor() { }
-
-  ngOnInit() {
-  }
-
+export class ExternalProfilesComponent {
+  otherProfiles = externalProfilesKarol;
 }

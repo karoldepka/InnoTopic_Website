@@ -1,0 +1,68 @@
+:host {
+  display: block;
+}
+
+.globe-switcher {
+  width: 100%;
+}
+
+.switcher-tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 10px;
+  flex-wrap: wrap;
+}
+
+.tab-btn {
+  padding: 6px 16px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 20px;
+  cursor: pointer;
+  font-size: 13px;
+  color: inherit;
+  transition: background 0.2s, border-color 0.2s;
+  letter-spacing: 0.03em;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.12);
+  }
+
+  &.active {
+    background: var(--ion-color-primary);
+    border-color: var(--ion-color-primary);
+    color: #fff;
+  }
+}
+
+.globe-viewport {
+  width: 100%;
+  min-height: 460px;
+  overflow: hidden;
+}
+
+.tech-label {
+  font-size: 11px;
+  opacity: 0.45;
+  margin-top: 6px;
+  text-align: center;
+  letter-spacing: 0.04em;
+}
+
+@media print {
+  .switcher-tabs,
+  .tech-label {
+    display: none !important;
+  }
+
+  // Canvas-based renderers won't print; always show the SVG map
+  app-globe-gl,
+  app-globe-d3,
+  app-globe-threejs {
+    display: none !important;
+  }
+
+  app-world-map {
+    display: block !important;
+  }
+}

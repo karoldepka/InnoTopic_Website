@@ -1,4 +1,4 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { waitForAsync, ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { TopicSkillComponent } from './topic-skill.component';
 
@@ -6,7 +6,7 @@ xdescribe('TopicTag2Component', () => {
   let component: TopicSkillComponent;
   let fixture: ComponentFixture<TopicSkillComponent>;
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [ TopicSkillComponent ]
     })

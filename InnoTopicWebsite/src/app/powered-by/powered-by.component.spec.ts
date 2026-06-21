@@ -1,4 +1,4 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { waitForAsync, ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { PoweredByComponent } from './powered-by.component';
 
@@ -6,7 +6,7 @@ describe('PoweredByComponent', () => {
   let component: PoweredByComponent;
   let fixture: ComponentFixture<PoweredByComponent>;
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [ PoweredByComponent ]
     })

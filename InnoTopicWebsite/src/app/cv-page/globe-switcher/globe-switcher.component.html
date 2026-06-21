@@ -1,0 +1,22 @@
+<div class="globe-switcher">
+  <div class="switcher-tabs">
+    @for (m of modes; track m.key) {
+      <button
+        [class.active]="activeMode === m.key"
+        (click)="activeMode = m.key"
+        class="tab-btn"
+        [title]="m.tech"
+      >{{ m.label }}</button>
+    }
+  </div>
+
+  <div class="globe-viewport">
+    @if (activeMode === 'globegl')  { <app-globe-gl /> }
+    @if (activeMode === 'd3')       { <app-globe-d3 /> }
+    @if (activeMode === 'threejs')  { <app-globe-threejs /> }
+    <!-- Always in DOM so print CSS can show it; hidden when not active -->
+    <app-world-map [hidden]="activeMode !== 'svg'" />
+  </div>
+
+  <div class="tech-label">{{ activeTech }}</div>
+</div>

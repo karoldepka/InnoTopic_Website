@@ -1,4 +1,4 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { waitForAsync, ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { SkillLevelIconComponent } from './skill-level-icon.component';
 
@@ -6,7 +6,7 @@ describe('SkillLevelIconComponent', () => {
   let component: SkillLevelIconComponent;
   let fixture: ComponentFixture<SkillLevelIconComponent>;
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [ SkillLevelIconComponent ]
     })
