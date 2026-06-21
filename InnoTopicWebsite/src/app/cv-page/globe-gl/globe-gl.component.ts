@@ -3,8 +3,8 @@ import { NgIf } from '@angular/common';
 import { Store } from '@ngrx/store';
 import { take } from 'rxjs/operators';
 import { ThemeConfigState } from '../../models/theme-config-state.model';
+import { WORK_CITIES, WorkCity } from '../work-cities';
 
-// ISO-A3 codes for countries Karol has worked in; France uses name fallback (ISO bug in dataset)
 const WORKED_ISO3 = new Set(['DEU', 'AUT', 'POL', 'GBR', 'USA', 'ESP', 'LUX', 'IND', 'ARE']);
 const WORKED_NAMES = new Set(['France']);
 
@@ -62,13 +62,31 @@ export class GlobeGlComponent implements AfterViewInit, OnDestroy {
       .showAtmosphere(true)
       .atmosphereColor('rgba(100,160,255,0.5)')
       .atmosphereAltitude(0.15)
-      .globeImageUrl('//cdn.jsdelivr.net/npm/three-globe/example/img/earth-dark.jpg')
+      // Local texture — no CDN latency
+      .globeImageUrl('assets/data/earth-dark.jpg')
+      // Worked-country highlights
       .polygonsData(geojson.features)
       .polygonCapColor((d: any) => isWorked(d.properties) ? color : 'rgba(0,0,0,0)')
       .polygonSideColor(() => 'rgba(0,0,0,0)')
       .polygonStrokeColor(() => 'rgba(0,0,0,0)')
       .polygonAltitude((d: any) => isWorked(d.properties) ? 0.04 : 0)
       .polygonLabel((d: any) => `<b>${d.properties?.name ?? ''}</b>`)
+      // City light rings — expanding outward from each worked city
+      .ringsData(WORK_CITIES)
+      .ringLat((d: WorkCity) => d.lat)
+      .ringLng((d: WorkCity) => d.lng)
+      .ringColor(() => color)
+      .ringMaxRadius(3)
+      .ringPropagationSpeed(2)
+      .ringRepeatPeriod(800)
+      // City point markers
+      .pointsData(WORK_CITIES)
+      .pointLat((d: WorkCity) => d.lat)
+      .pointLng((d: WorkCity) => d.lng)
+      .pointColor(() => color)
+      .pointAltitude(0.01)
+      .pointRadius(0.35)
+      .pointLabel((d: WorkCity) => `<b>${d.name}</b><br/>${d.country}`)
       .width(el.clientWidth || 500)
       .height(460);
 

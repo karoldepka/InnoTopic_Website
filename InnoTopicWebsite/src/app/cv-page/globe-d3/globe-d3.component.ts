@@ -2,9 +2,10 @@ import { Component, AfterViewInit, OnDestroy, ElementRef, ViewChild, NgZone } fr
 import { Store } from '@ngrx/store';
 import { take } from 'rxjs/operators';
 import { select } from 'd3-selection';
-import { geoOrthographic, geoPath, geoGraticule } from 'd3-geo';
+import { geoOrthographic, geoPath, geoGraticule, geoDistance } from 'd3-geo';
 import { drag } from 'd3-drag';
 import { ThemeConfigState } from '../../models/theme-config-state.model';
+import { WORK_CITIES, WorkCity } from '../work-cities';
 
 const WORKED_ISO3 = new Set(['DEU', 'AUT', 'POL', 'GBR', 'USA', 'ESP', 'LUX', 'IND', 'ARE']);
 const WORKED_NAMES = new Set(['France']);
@@ -62,7 +63,6 @@ export class GlobeD3Component implements AfterViewInit, OnDestroy {
       .attr('width', width)
       .attr('height', height);
 
-    // Ocean radial gradient
     const defs = svg.append('defs');
     const grad = defs.append('radialGradient')
       .attr('id', 'd3-ocean-grad').attr('cx', '50%').attr('cy', '42%').attr('r', '62%');
@@ -72,12 +72,10 @@ export class GlobeD3Component implements AfterViewInit, OnDestroy {
     defs.append('clipPath').attr('id', 'd3-globe-clip')
       .append('circle').attr('cx', width / 2).attr('cy', height / 2).attr('r', radius);
 
-    // Ocean fill
     svg.append('circle')
       .attr('cx', width / 2).attr('cy', height / 2).attr('r', radius)
       .attr('fill', 'url(#d3-ocean-grad)');
 
-    // Graticule
     const gratPath = svg.append('path')
       .datum(graticule())
       .attr('fill', 'none')
@@ -86,7 +84,6 @@ export class GlobeD3Component implements AfterViewInit, OnDestroy {
       .attr('clip-path', 'url(#d3-globe-clip)')
       .attr('d', path as any);
 
-    // Countries
     const countriesG = svg.append('g').attr('clip-path', 'url(#d3-globe-clip)');
     countriesG.selectAll<SVGPathElement, any>('path')
       .data(geojson.features)
@@ -96,20 +93,68 @@ export class GlobeD3Component implements AfterViewInit, OnDestroy {
       .attr('stroke-width', 0.4)
       .attr('d', path as any);
 
-    // Atmosphere rim
     svg.append('circle')
       .attr('cx', width / 2).attr('cy', height / 2).attr('r', radius)
       .attr('fill', 'none')
       .attr('stroke', 'rgba(120,180,255,0.25)')
       .attr('stroke-width', 7);
 
+    // City light markers — clipped to visible hemisphere
+    const citiesG = svg.append('g').attr('clip-path', 'url(#d3-globe-clip)');
+    const cityGroups = citiesG.selectAll<SVGGElement, WorkCity>('g')
+      .data(WORK_CITIES)
+      .join('g');
+
+    // Core dot
+    cityGroups.append('circle').attr('r', 3).attr('fill', primaryColor);
+
+    // Three staggered expanding rings using SMIL — phases via negative begin offset
+    [0, -0.67, -1.33].forEach(beginOffset => {
+      cityGroups.append('circle')
+        .attr('r', 3)
+        .attr('fill', 'none')
+        .attr('stroke', primaryColor)
+        .attr('stroke-width', 1.2)
+        .each(function() {
+          const node = this as SVGCircleElement;
+          const ns = 'http://www.w3.org/2000/svg';
+          const begin = `${beginOffset}s`;
+
+          const animR = document.createElementNS(ns, 'animate');
+          animR.setAttribute('attributeName', 'r');
+          animR.setAttribute('from', '3');
+          animR.setAttribute('to', '24');
+          animR.setAttribute('dur', '2s');
+          animR.setAttribute('begin', begin);
+          animR.setAttribute('repeatCount', 'indefinite');
+          node.appendChild(animR);
+
+          const animOp = document.createElementNS(ns, 'animate');
+          animOp.setAttribute('attributeName', 'opacity');
+          animOp.setAttribute('from', '0.75');
+          animOp.setAttribute('to', '0');
+          animOp.setAttribute('dur', '2s');
+          animOp.setAttribute('begin', begin);
+          animOp.setAttribute('repeatCount', 'indefinite');
+          node.appendChild(animOp);
+        });
+    });
+
     const update = () => {
       projection.rotate(this.rotation);
       countriesG.selectAll('path').attr('d', path as any);
       gratPath.attr('d', path as any);
+
+      const front: [number, number] = [-this.rotation[0], -this.rotation[1]];
+      cityGroups
+        .attr('display', (d: WorkCity) =>
+          geoDistance(front, [d.lng, d.lat]) < Math.PI / 2 ? '' : 'none')
+        .attr('transform', (d: WorkCity) => {
+          const p = projection([d.lng, d.lat]);
+          return p ? `translate(${p[0]},${p[1]})` : 'translate(-9999,-9999)';
+        });
     };
 
-    // Drag-to-rotate
     let v0: [number, number] | null = null;
     let r0: [number, number, number] | null = null;
     svg.call(
@@ -131,7 +176,6 @@ export class GlobeD3Component implements AfterViewInit, OnDestroy {
         .on('end', () => { this.isDragging = false; }),
     );
 
-    // Auto-rotate
     const tick = () => {
       if (!this.isDragging) {
         this.rotation[0] += 0.15;

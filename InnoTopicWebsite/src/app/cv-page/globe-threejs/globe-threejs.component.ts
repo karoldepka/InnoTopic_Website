@@ -2,13 +2,16 @@ import { Component, AfterViewInit, OnDestroy, ElementRef, ViewChild, NgZone } fr
 import { Store } from '@ngrx/store';
 import { take } from 'rxjs/operators';
 import {
-  AmbientLight, BackSide, BufferGeometry, Color,
+  AdditiveBlending,
+  AmbientLight, BackSide, BufferGeometry, CanvasTexture, Color,
   DirectionalLight, Group, Line, LineBasicMaterial,
   Mesh, MeshPhongMaterial, PerspectiveCamera,
-  Scene, ShaderMaterial, SphereGeometry, Vector3, WebGLRenderer,
+  Scene, ShaderMaterial, SphereGeometry, Sprite, SpriteMaterial,
+  Vector3, WebGLRenderer,
 } from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { ThemeConfigState } from '../../models/theme-config-state.model';
+import { WORK_CITIES, WorkCity } from '../work-cities';
 
 const WORKED_ISO3 = new Set(['DEU', 'AUT', 'POL', 'GBR', 'USA', 'ESP', 'LUX', 'IND', 'ARE']);
 const WORKED_NAMES = new Set(['France']);
@@ -33,6 +36,23 @@ function extractRings(geometry: any): number[][][] {
   return [];
 }
 
+function buildGlowTexture(hexColor: string): CanvasTexture {
+  const size = 64;
+  const canvas = document.createElement('canvas');
+  canvas.width = canvas.height = size;
+  const ctx = canvas.getContext('2d')!;
+  const c = new Color(hexColor);
+  const r = Math.round(c.r * 255), g = Math.round(c.g * 255), b = Math.round(c.b * 255);
+  const grad = ctx.createRadialGradient(size / 2, size / 2, 0, size / 2, size / 2, size / 2);
+  grad.addColorStop(0,    `rgba(${r},${g},${b},1)`);
+  grad.addColorStop(0.2,  `rgba(${r},${g},${b},0.7)`);
+  grad.addColorStop(0.5,  `rgba(${r},${g},${b},0.2)`);
+  grad.addColorStop(1,    `rgba(${r},${g},${b},0)`);
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, 0, size, size);
+  return new CanvasTexture(canvas);
+}
+
 const ATMOSPHERE_VERT = `
   varying vec3 vNormal;
   void main() {
@@ -47,6 +67,8 @@ const ATMOSPHERE_FRAG = `
     float intensity = pow(0.65 - dot(vNormal, vec3(0.0, 0.0, 1.0)), 2.5);
     gl_FragColor = vec4(glowColor, intensity * 0.75);
   }`;
+
+interface RingSprite { sprite: Sprite; mat: SpriteMaterial; phase: number; }
 
 @Component({
   standalone: true,
@@ -95,19 +117,16 @@ export class GlobeThreejsComponent implements AfterViewInit, OnDestroy {
     controls.autoRotate = true;
     controls.autoRotateSpeed = 0.5;
 
-    // Lights
     scene.add(new AmbientLight(0x334466, 1.5));
     const sun = new DirectionalLight(0xffffff, 0.9);
     sun.position.set(5, 3, 5);
     scene.add(sun);
 
-    // Globe sphere
     scene.add(new Mesh(
       new SphereGeometry(1, 64, 64),
       new MeshPhongMaterial({ color: 0x0d1f3c, specular: 0x223366, shininess: 25 }),
     ));
 
-    // Atmosphere glow (back-face only, renders as outer halo)
     scene.add(new Mesh(
       new SphereGeometry(1.12, 64, 64),
       new ShaderMaterial({
@@ -119,15 +138,60 @@ export class GlobeThreejsComponent implements AfterViewInit, OnDestroy {
       }),
     ));
 
-    // Country border lines from GeoJSON
     scene.add(this.buildCountryLines(geojson, primaryColorHex));
+
+    // City glow lights
+    const rings = this.buildCityLights(scene, primaryColorHex);
 
     const tick = () => {
       this.animId = requestAnimationFrame(tick);
       controls.update();
+      // Animate expanding ring sprites
+      const t = Date.now() / 1500;
+      for (const r of rings) {
+        const phase = (t + r.phase) % 1;
+        r.sprite.scale.setScalar(0.06 + phase * 0.32);
+        r.mat.opacity = 0.85 * (1 - phase);
+      }
       this.renderer.render(scene, camera);
     };
     tick();
+  }
+
+  private buildCityLights(scene: Scene, primaryColorHex: string): RingSprite[] {
+    const glowTex = buildGlowTexture(primaryColorHex);
+    const rings: RingSprite[] = [];
+
+    for (const city of WORK_CITIES) {
+      const pos = lonLatToVec3(city.lng, city.lat, 1.005);
+
+      // Static bright core dot
+      const coreMat = new SpriteMaterial({
+        map: glowTex,
+        blending: AdditiveBlending,
+        transparent: true,
+        opacity: 0.9,
+      });
+      const core = new Sprite(coreMat);
+      core.position.copy(pos);
+      core.scale.setScalar(0.07);
+      scene.add(core);
+
+      // Three staggered expanding ring sprites
+      for (let k = 0; k < 3; k++) {
+        const mat = new SpriteMaterial({
+          map: glowTex,
+          blending: AdditiveBlending,
+          transparent: true,
+          depthWrite: false,
+        });
+        const sprite = new Sprite(mat);
+        sprite.position.copy(pos);
+        scene.add(sprite);
+        rings.push({ sprite, mat, phase: k / 3 });
+      }
+    }
+    return rings;
   }
 
   private buildCountryLines(geojson: any, primaryColorHex: string): Group {
