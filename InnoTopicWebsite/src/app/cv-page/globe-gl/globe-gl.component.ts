@@ -12,6 +12,18 @@ function isWorked(props: any): boolean {
   return WORKED_ISO3.has(props?.['ISO3166-1-Alpha-3']) || WORKED_NAMES.has(props?.name);
 }
 
+interface CityArc { start: WorkCity; end: WorkCity; }
+
+function buildArcs(): CityArc[] {
+  const arcs: CityArc[] = [];
+  for (let i = 0; i < WORK_CITIES.length; i++) {
+    for (let j = i + 1; j < WORK_CITIES.length; j++) {
+      arcs.push({ start: WORK_CITIES[i], end: WORK_CITIES[j] });
+    }
+  }
+  return arcs;
+}
+
 @Component({
   standalone: true,
   selector: 'app-globe-gl',
@@ -44,57 +56,68 @@ export class GlobeGlComponent implements AfterViewInit, OnDestroy {
   }
 
   private async init() {
-    const primaryColor = await this.store
-      .select(s => s.themeConfig.ion_color_primary)
-      .pipe(take(1))
-      .toPromise();
+    try {
+      const primaryColor = await this.store
+        .select(s => s.themeConfig.ion_color_primary)
+        .pipe(take(1))
+        .toPromise();
 
-    const [{ default: Globe }, geojson] = await Promise.all([
-      import('globe.gl'),
-      fetch('assets/data/countries.geojson').then(r => r.json()),
-    ]);
+      const [{ default: Globe }, geojson] = await Promise.all([
+        import('globe.gl'),
+        fetch('assets/data/countries.geojson').then(r => r.json()),
+      ]);
 
-    const el = this.containerRef.nativeElement;
-    const color = primaryColor ?? '#3498db';
+      const el = this.containerRef.nativeElement;
+      const color = primaryColor ?? '#3498db';
 
-    this.globe = (Globe as any)()(el)
-      .backgroundColor('rgba(0,0,0,0)')
-      .showAtmosphere(true)
-      .atmosphereColor('rgba(100,160,255,0.5)')
-      .atmosphereAltitude(0.15)
-      // Local texture — no CDN latency
-      .globeImageUrl('assets/data/earth-dark.jpg')
-      // Worked-country highlights
-      .polygonsData(geojson.features)
-      .polygonCapColor((d: any) => isWorked(d.properties) ? color : 'rgba(0,0,0,0)')
-      .polygonSideColor(() => 'rgba(0,0,0,0)')
-      .polygonStrokeColor(() => 'rgba(0,0,0,0)')
-      .polygonAltitude((d: any) => isWorked(d.properties) ? 0.04 : 0)
-      .polygonLabel((d: any) => `<b>${d.properties?.name ?? ''}</b>`)
-      // City light rings — expanding outward from each worked city
-      .ringsData(WORK_CITIES)
-      .ringLat((d: WorkCity) => d.lat)
-      .ringLng((d: WorkCity) => d.lng)
-      .ringColor(() => color)
-      .ringMaxRadius(3)
-      .ringPropagationSpeed(2)
-      .ringRepeatPeriod(800)
-      // City point markers
-      .pointsData(WORK_CITIES)
-      .pointLat((d: WorkCity) => d.lat)
-      .pointLng((d: WorkCity) => d.lng)
-      .pointColor(() => color)
-      .pointAltitude(0.01)
-      .pointRadius(0.35)
-      .pointLabel((d: WorkCity) => `<b>${d.name}</b><br/>${d.country}`)
-      .width(el.clientWidth || 500)
-      .height(460);
+      // Only pass worked countries to polygonsData — avoids creating WebGL geometry for all ~250 transparent polygons
+      const workedFeatures = geojson.features.filter((f: any) => isWorked(f.properties));
+      const arcs = buildArcs();
 
-    this.globe.controls().autoRotate = true;
-    this.globe.controls().autoRotateSpeed = 0.5;
-    this.globe.controls().enableZoom = false;
+      this.globe = (Globe as any)()(el)
+        .backgroundColor('rgba(0,0,0,0)')
+        .showAtmosphere(true)
+        .atmosphereColor('rgba(100,160,255,0.5)')
+        .atmosphereAltitude(0.15)
+        .globeImageUrl('assets/data/earth-dark.jpg')
+        // Worked-country highlights (filtered — major perf win)
+        .polygonsData(workedFeatures)
+        .polygonCapColor(() => color)
+        .polygonSideColor(() => 'rgba(0,0,0,0)')
+        .polygonStrokeColor(() => 'rgba(255,255,255,0.2)')
+        .polygonAltitude(0.04)
+        .polygonLabel((d: any) => `<b>${d.properties?.name ?? ''}</b>`)
+        // Animated arc connectors between all work cities
+        .arcsData(arcs)
+        .arcStartLat((d: any) => d.start.lat)
+        .arcStartLng((d: any) => d.start.lng)
+        .arcEndLat((d: any) => d.end.lat)
+        .arcEndLng((d: any) => d.end.lng)
+        .arcColor(() => color)
+        .arcDashLength(0.4)
+        .arcDashGap(0.2)
+        .arcDashAnimateTime(3000)
+        .arcStroke(0.4)
+        .arcAltitudeAutoScale(0.3)
+        // City bar markers (world-population style)
+        .pointsData(WORK_CITIES)
+        .pointLat((d: WorkCity) => d.lat)
+        .pointLng((d: WorkCity) => d.lng)
+        .pointColor(() => color)
+        .pointAltitude(0.12)
+        .pointRadius(0.4)
+        .pointLabel((d: WorkCity) => `<b>${d.name}</b><br/>${d.country}`)
+        .width(el.clientWidth || 500)
+        .height(460);
 
-    this.ngZone.run(() => { this.loading = false; });
+      this.globe.controls().autoRotate = true;
+      this.globe.controls().autoRotateSpeed = 0.5;
+      this.globe.controls().enableZoom = false;
+    } catch (e) {
+      console.error('Globe.gl init failed:', e);
+    } finally {
+      this.ngZone.run(() => { this.loading = false; });
+    }
   }
 
   ngOnDestroy() {
