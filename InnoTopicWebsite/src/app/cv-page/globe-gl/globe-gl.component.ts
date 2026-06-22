@@ -5,13 +5,6 @@ import { take } from 'rxjs/operators';
 import { ThemeConfigState } from '../../models/theme-config-state.model';
 import { WORK_CITIES, WorkCity } from '../work-cities';
 
-const WORKED_ISO3 = new Set(['DEU', 'AUT', 'POL', 'GBR', 'USA', 'ESP', 'LUX', 'IND', 'ARE']);
-const WORKED_NAMES = new Set(['France']);
-
-function isWorked(props: any): boolean {
-  return WORKED_ISO3.has(props?.['ISO3166-1-Alpha-3']) || WORKED_NAMES.has(props?.name);
-}
-
 interface CityArc { start: WorkCity; end: WorkCity; }
 
 function buildArcs(): CityArc[] {
@@ -64,14 +57,12 @@ export class GlobeGlComponent implements AfterViewInit, OnDestroy {
 
       const [{ default: Globe }, geojson] = await Promise.all([
         import('globe.gl'),
-        fetch('assets/data/countries.geojson').then(r => r.json()),
+        fetch('assets/data/worked-countries.geojson').then(r => r.json()),
       ]);
 
       const el = this.containerRef.nativeElement;
       const color = primaryColor ?? '#3498db';
 
-      // Only pass worked countries to polygonsData — avoids creating WebGL geometry for all ~250 transparent polygons
-      const workedFeatures = geojson.features.filter((f: any) => isWorked(f.properties));
       const arcs = buildArcs();
 
       this.globe = (Globe as any)()(el)
@@ -80,8 +71,7 @@ export class GlobeGlComponent implements AfterViewInit, OnDestroy {
         .atmosphereColor('rgba(100,160,255,0.5)')
         .atmosphereAltitude(0.15)
         .globeImageUrl('assets/data/earth-dark.jpg')
-        // Worked-country highlights (filtered — major perf win)
-        .polygonsData(workedFeatures)
+        .polygonsData(geojson.features)
         .polygonCapColor(() => color)
         .polygonSideColor(() => 'rgba(0,0,0,0)')
         .polygonStrokeColor(() => 'rgba(255,255,255,0.2)')
