@@ -2,6 +2,7 @@ fastapi
 uvicorn
 langchain
 langchain-ollama
+langchain-tavily
 python-dotenv
 pydantic
 psycopg[binary]

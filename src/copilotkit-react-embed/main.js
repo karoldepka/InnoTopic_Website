@@ -35,13 +35,14 @@ async function getJson(apiBaseUrl, path) {
   return response.json();
 }
 
-async function postEventStream(apiBaseUrl, path, body, onEvent) {
+async function postEventStream(apiBaseUrl, path, body, onEvent, signal) {
   const response = await fetch(`${apiBaseUrl}${path}`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
     },
     body: JSON.stringify(body),
+    signal,
   });
 
   if (!response.ok) {
@@ -441,6 +442,7 @@ function App() {
   const [input, setInput] = React.useState('');
   const [webSearch, setWebSearch] = React.useState(false);
   const [busy, setBusy] = React.useState(false);
+  const abortControllerRef = React.useRef(null);
   const [qaBusy, setQaBusy] = React.useState(false);
   const [error, setError] = React.useState('');
   const [questions, setQuestions] = React.useState([]);
@@ -496,6 +498,12 @@ function App() {
     ));
   }
 
+  function stopStream() {
+    abortControllerRef.current?.abort();
+    abortControllerRef.current = null;
+    setBusy(false);
+  }
+
   async function submitChat(event) {
     event.preventDefault();
     const message = input.trim();
@@ -506,6 +514,7 @@ function App() {
     setInput('');
     setBusy(true);
     setError('');
+    abortControllerRef.current = new AbortController();
     const streamMessageId = `tree-stream-${Date.now()}`;
     let streamedTreeRecords = '';
     let streamedTreeNodeCount = 0;
@@ -541,14 +550,17 @@ function App() {
         } else if (eventData.type === 'error') {
           throw new Error(eventData.message || 'Category tree stream failed');
         }
-      });
+      }, abortControllerRef.current?.signal);
     } catch (e) {
-      setError(e.message || `${e}`);
-      setMessages((prev) => [...prev, {
-        role: 'assistant',
-        text: 'I could not update the tree. Check the backend and Ollama, then try again.',
-      }]);
+      if (e.name !== 'AbortError') {
+        setError(e.message || `${e}`);
+        setMessages((prev) => [...prev, {
+          role: 'assistant',
+          text: 'I could not update the tree. Check the backend and Ollama, then try again.',
+        }]);
+      }
     } finally {
+      abortControllerRef.current = null;
       setBusy(false);
     }
   }
@@ -660,11 +672,9 @@ function App() {
           placeholder: 'Generate a learning tree for Rust interview questions. Then: add more ownership subsubcategories.',
           onChange: (event) => setInput(event.target.value),
         }),
-        React.createElement(
-          'button',
-          { className: 'primary-button send-button', type: 'submit', disabled: busy || !input.trim() },
-          busy ? 'Thinking...' : 'Send',
-        ),
+        busy
+          ? React.createElement('button', { className: 'danger-button stop-button', type: 'button', onClick: stopStream }, 'Stop')
+          : React.createElement('button', { className: 'primary-button send-button', type: 'submit', disabled: !input.trim() }, 'Send'),
       ),
     ),
     React.createElement(

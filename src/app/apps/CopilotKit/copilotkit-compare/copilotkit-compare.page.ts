@@ -79,14 +79,22 @@ export class CopilotKitComparePage implements OnDestroy {
     try {
       await this.streamAngularResponse(assistantMessage);
     } catch (error) {
-      this.angularError = error instanceof Error ? error.message : String(error);
-      if (!assistantMessage.content) {
-        assistantMessage.content = this.angularError;
+      if (error instanceof Error && error.name === 'AbortError') {
+        // user stopped the stream intentionally
+      } else {
+        this.angularError = error instanceof Error ? error.message : String(error);
+        if (!assistantMessage.content) {
+          assistantMessage.content = this.angularError;
+        }
       }
     } finally {
       this.angularBusy = false;
       this.angularAbortController = undefined;
     }
+  }
+
+  stopAngularStream(): void {
+    this.angularAbortController?.abort();
   }
 
   trackMessage(_: number, message: AngularChatMessage): string {

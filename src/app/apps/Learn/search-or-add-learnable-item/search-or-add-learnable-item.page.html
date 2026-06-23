@@ -127,19 +127,23 @@
         ><ion-icon name="add-circle-outline" />&nbsp;LEARN</ion-button>
 
         <ion-button
+          *ngIf="!isAddingWithAI"
           (click)="addWithAI()"
-          [disabled]="isAddingWithAI || isOffline"
+          [disabled]="isOffline"
           title="Fill with AI"
           size="small"
         >
-          <ion-spinner
-            *ngIf="isAddingWithAI"
-            name="dots"
-           />
-          <span
-            *ngIf="! isAddingWithAI"
-            style="font-size: 1.2rem"
-          >✨</span>
+          <span style="font-size: 1.2rem">✨</span>
+        </ion-button>
+        <ion-button
+          *ngIf="isAddingWithAI"
+          (click)="stopAI()"
+          color="danger"
+          title="Stop AI"
+          size="small"
+        >
+          <ion-icon slot="start" name="stop-circle-outline"></ion-icon>
+          Stop
         </ion-button>
       </div>
 

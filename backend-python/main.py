@@ -4,15 +4,15 @@ import json
 import uuid
 import re
 from html import unescape
-from html.parser import HTMLParser
+from pathlib import Path
 from typing import Any
-from urllib.parse import urlencode
-from urllib.request import Request, urlopen
 from fastapi import FastAPI, HTTPException, Query
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel, Field
 from dotenv import load_dotenv
+from langsmith import traceable
 from langchain_ollama import ChatOllama
+from langchain_tavily import TavilySearch
 from langchain_core.prompts import ChatPromptTemplate
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -25,7 +25,7 @@ except ImportError:
     dict_row = None
     Jsonb = None
 
-load_dotenv()
+load_dotenv(Path(__file__).parent / '.env')
 
 logger = logging.getLogger(__name__)
 
@@ -190,69 +190,32 @@ def load_existing_categories() -> list[ExistingCategory]:
 def existing_categories_as_prompt_json(categories: list[ExistingCategory]) -> str:
     return json.dumps([category.model_dump() for category in categories[:300]], ensure_ascii=False)
 
-class DuckDuckGoHtmlParser(HTMLParser):
-    def __init__(self):
-        super().__init__()
-        self.results: list[dict[str, str]] = []
-        self._current: dict[str, str] | None = None
-        self._capture: str | None = None
-
-    def handle_starttag(self, tag: str, attrs: list[tuple[str, str | None]]):
-        attrs_dict = dict(attrs)
-        class_attr = attrs_dict.get("class") or ""
-        if tag == "a" and "result__a" in class_attr:
-            self._current = {"title": "", "url": attrs_dict.get("href") or "", "snippet": ""}
-            self._capture = "title"
-        elif tag in {"a", "div"} and "result__snippet" in class_attr and self._current is not None:
-            self._capture = "snippet"
-
-    def handle_data(self, data: str):
-        if self._current is not None and self._capture:
-            self._current[self._capture] += data
-
-    def handle_endtag(self, tag: str):
-        if tag == "a" and self._capture == "title" and self._current is not None:
-            self._capture = None
-        elif tag in {"a", "div"} and self._capture == "snippet" and self._current is not None:
-            self.results.append(self._current)
-            self._current = None
-            self._capture = None
-
 def clean_search_text(text: str) -> str:
     text = re.sub(r"\s+", " ", unescape(text or "")).strip()
     return text
 
+_tavily_tool = TavilySearch(max_results=5)
+
+@traceable(run_type="tool", name="web_search")
 def web_search(query: str, max_results: int = 5) -> list[str]:
     if not query.strip():
         return []
-
-    url = "https://duckduckgo.com/html/?" + urlencode({"q": query})
-    request = Request(
-        url,
-        headers={
-            "User-Agent": "LifeSuite/1.0 local AI answer filler",
-        },
-    )
-
-    with urlopen(request, timeout=12) as response:
-        html = response.read().decode("utf-8", errors="replace")
-
-    parser = DuckDuckGoHtmlParser()
-    parser.feed(html)
-
+    raw = _tavily_tool.invoke({"query": query})
+    items = raw.get("results", []) if isinstance(raw, dict) else (raw or [])
     results: list[str] = []
-    for result in parser.results[:max_results]:
-        title = clean_search_text(result.get("title", ""))
-        snippet = clean_search_text(result.get("snippet", ""))
-        url = clean_search_text(result.get("url", ""))
-        parts = [part for part in [title, snippet, url] if part]
+    for item in items[:max_results]:
+        title = clean_search_text(item.get("title") or "")
+        content = clean_search_text(item.get("content") or "")
+        url = clean_search_text(item.get("url") or "")
+        parts = [part for part in [title, content, url] if part]
         if parts:
             results.append(" - ".join(parts))
     return results
 
 def create_answer_chain(web_search_enabled: bool = False):
     system_prompt = (
-        "You are a helpful assistant that provides concise answers to quiz questions or learning items."
+        "You are a helpful assistant that provides concise answers to quiz questions or learning items. "
+        "Reply with the answer only. Do not greet, explain what you are doing, or add any closing remarks."
     )
     if web_search_enabled:
         system_prompt += (
@@ -297,7 +260,8 @@ def create_category_tree_chain():
             "`assistantMessage` and `tree`. The tree is an array of nodes shaped as "
             "{{\"id\":\"stable-kebab-id\",\"title\":\"Category title\",\"questionCount\":3,\"children\":[],"
             "\"matchedExistingCategoryId\":null,\"matchedExistingCategoryTitle\":null,\"isExistingCategory\":false}}. "
-            "Do not write introductory prose such as 'Here is your category tree'. "
+            "Output raw JSON only. Do not wrap it in markdown code fences, do not greet, "
+            "do not explain, do not add any text before or after the JSON. "
             "For a new topic, never return only the topic title. Return one root node with at least "
             "6 useful subcategories, and each subcategory should have 2-4 subsubcategories. "
             "For example, for 'rust interview questions', generate categories such as ownership, borrowing, "
@@ -325,6 +289,7 @@ def create_category_tree_record_chain():
             "You design NEW learning category trees from a topic or refinement request. "
             "The user's message is a seed topic/request, not an existing item to classify. "
             "Return a stream-friendly record format, not JSON and not markdown. "
+            "Output records only — no greeting, no explanation, no closing remarks. "
             "First return one optional MESSAGE record, then one NODE record per category. "
             "MESSAGE format: <MESSAGE>short status for the user</MESSAGE>. "
             "NODE format: <NODE id=\"stable-kebab-id\" parent=\"parent-id-or-empty\" questionCount=\"3\" "
@@ -363,7 +328,9 @@ def create_category_tree_match_dedupe_chain():
             "Every returned node must have id, title, questionCount, children, matchedExistingCategoryId, "
             "matchedExistingCategoryTitle, and isExistingCategory. "
             "Never return two nodes for the same semantic category unless they represent genuinely different learning contexts. "
-            "Return only valid JSON with keys `assistantMessage` and `tree`.",
+            "Return only valid JSON with keys `assistantMessage` and `tree`. "
+            "Output raw JSON only. Do not wrap it in markdown code fences, do not greet, "
+            "do not explain, do not add any text before or after the JSON.",
         ),
         (
             "user",
@@ -399,6 +366,8 @@ def create_question_answer_chain():
             "You generate concise learning flashcard question-and-answer pairs. "
             "Return only valid JSON with key `items`, an array of objects shaped as "
             "{{\"categoryId\":\"id\",\"categoryPath\":\"A > B\",\"question\":\"...\",\"answer\":\"...\"}}. "
+            "Output raw JSON only. Do not wrap it in markdown code fences, do not greet, "
+            "do not explain, do not add any text before or after the JSON. "
             "Generate the requested number of items per category. Keep answers accurate and compact. "
             "If web search notes are supplied, use them when relevant and avoid unsupported claims.",
         ),
@@ -417,6 +386,7 @@ def create_question_answer_record_chain():
             "system",
             "You generate concise learning flashcard question-and-answer pairs. "
             "Return a stream-friendly record format, not JSON and not markdown. "
+            "Output records only — no greeting, no explanation, no closing remarks. "
             "Return exactly one ITEM record per generated Q&A. "
             "ITEM format: <ITEM categoryId=\"id\"><PATH>A > B</PATH><QUESTION>question text</QUESTION><ANSWER>answer text</ANSWER></ITEM>. "
             "Do not put raw < or > characters inside question or answer text; use words instead. "
@@ -816,10 +786,14 @@ def build_category_tree_response(
     search_results: list[str],
     existing_categories: list[ExistingCategory],
 ) -> CategoryTreeResponse:
-    parsed = extract_json_object(response_content)
-    raw_tree = get_raw_tree_from_parsed(parsed)
-    tree = normalize_category_nodes(raw_tree)
-    assistant_message = parsed.get("assistantMessage") if isinstance(parsed, dict) else None
+    try:
+        parsed = extract_json_object(response_content)
+        raw_tree = get_raw_tree_from_parsed(parsed)
+        tree = normalize_category_nodes(raw_tree)
+        assistant_message = parsed.get("assistantMessage") if isinstance(parsed, dict) else None
+    except ValueError:
+        tree = []
+        assistant_message = None
     tree, expanded_sparse_tree = expand_sparse_category_tree(category_request.message, tree)
     tree, cleanup_message = cleanup_category_tree_with_llm(tree, existing_categories)
     if expanded_sparse_tree:
@@ -1127,6 +1101,7 @@ async def category_tree_stream(category_request: CategoryTreeRequest):
                     response_parts.append(content)
                     yield sse_data({"type": "delta", "delta": content})
 
+            logger.debug("LLM raw response:\n%s", "".join(response_parts))
             yield sse_data({"type": "step", "message": "Parsing category tree"})
             yield sse_data({"type": "step", "message": "Matching and de-duplicating categories with existing inventory via LLM"})
             response = build_category_tree_record_response(category_request, "".join(response_parts), search_results, existing_categories_list)
@@ -1189,6 +1164,7 @@ async def category_tree_questions_stream(question_request: QuestionAnswerRequest
             if question_request.web_search:
                 yield sse_data({"type": "step", "message": "Searching the web before generating Q&A"})
                 search_query = " ".join(request["categoryPath"] for request in generation_requests[:8])
+                logger.info("Web search query: %s", search_query)
                 search_results = web_search(search_query)
                 yield sse_data({"type": "step", "message": f"Found {len(search_results)} web search notes"})
             else:

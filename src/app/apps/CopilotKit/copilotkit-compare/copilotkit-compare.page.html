@@ -4,7 +4,7 @@
       <ion-back-button mode="md" [defaultHref]="'/'"></ion-back-button>
       <ion-menu-button></ion-menu-button>
     </ion-buttons>
-    <ion-title>AI Category Builder</ion-title>
+    <ion-title>AI Questions&Answers Generator</ion-title>
   </ion-toolbar>
 </ion-header>
 
@@ -36,16 +36,20 @@
           rows="2"
           placeholder="Ask LifeSuite Copilot"
         ></textarea>
-        <ion-button type="submit" [disabled]="angularBusy || !angularInput.trim()">
+        <ion-button *ngIf="!angularBusy" type="submit" [disabled]="!angularInput.trim()">
           <ion-icon slot="start" name="send-outline"></ion-icon>
           Send
+        </ion-button>
+        <ion-button *ngIf="angularBusy" type="button" color="danger" (click)="stopAngularStream()">
+          <ion-icon slot="start" name="stop-circle-outline"></ion-icon>
+          Stop
         </ion-button>
       </form>
     </section>
 
     <section class="copilot-panel react-panel">
       <header class="panel-header">
-        <h2>React Category Builder</h2>
+        <h2>AI Questions&Answers Generator</h2>
       </header>
       <app-copilotkit-react-host></app-copilotkit-react-host>
     </section>

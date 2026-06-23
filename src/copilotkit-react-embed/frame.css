@@ -191,6 +191,12 @@ textarea {
   background: #226a8f;
 }
 
+.danger-button {
+  border-color: #b91c1c;
+  color: #ffffff;
+  background: #dc2626;
+}
+
 .secondary-button {
   background: #f5f8fc;
 }

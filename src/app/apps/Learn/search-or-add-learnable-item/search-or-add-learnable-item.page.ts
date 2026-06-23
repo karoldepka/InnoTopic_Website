@@ -7,6 +7,7 @@ import {AuthService} from '../../../auth/auth.service'
 import {debugLog, errorAlert} from '../../../libs/AppFedShared/utils/log'
 import {UntypedFormControl} from '@angular/forms'
 import {htmlToId, stripHtml} from '../../../libs/AppFedShared/utils/html-utils'
+import {Subscription} from 'rxjs'
 import {debounceTime, distinctUntilChanged, finalize} from 'rxjs/operators'
 import {LingueeService} from '../natural-langs/linguee.service'
 import {MerriamWebsterDictService} from '../natural-langs/merriam-webster-dict.service'
@@ -71,6 +72,7 @@ export class SearchOrAddLearnableItemPageComponent extends BaseComponent impleme
   searchFormControl = new UntypedFormControl()
 
   isAddingWithAI = false
+  private aiSubscription?: Subscription
 
   addErrorMessage?: string
 
@@ -414,8 +416,7 @@ export class SearchOrAddLearnableItemPageComponent extends BaseComponent impleme
       const item$ = await this.learnDoService.add(item)
       this.clearInput()
       this.navigateIntoItem(item$.id!)
-      let answerSubscription: any
-      answerSubscription = this.aiBackend.generateAnswerStream(text).pipe(
+      this.aiSubscription = this.aiBackend.generateAnswerStream(text).pipe(
         finalize(() => this.isAddingWithAI = false)
       ).subscribe(
         answer => item$.patchThrottled({answer}),
@@ -424,12 +425,18 @@ export class SearchOrAddLearnableItemPageComponent extends BaseComponent impleme
           this.showAddError(this.formatAddError(e, 'The item was added, but AI could not fill the answer.'))
         }
       )
-      this.presentAddedToast(item$, 'Learn item added with AI.', () => answerSubscription?.unsubscribe())
+      this.presentAddedToast(item$, 'Learn item added with AI.', () => this.stopAI())
     } catch (e) {
       console.error('Error adding with AI', e)
       this.showAddError(this.formatAddError(e, 'Could not add the item with AI.'))
       this.isAddingWithAI = false
     }
+  }
+
+  stopAI() {
+    this.aiSubscription?.unsubscribe()
+    this.aiSubscription = undefined
+    this.isAddingWithAI = false
   }
 
   private clearAddError() {

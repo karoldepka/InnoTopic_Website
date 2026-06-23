@@ -13,4 +13,5 @@ dependencies = [
     "psycopg[binary]>=3.3.2",
     "python-dotenv>=1.2.2",
     "uvicorn>=0.48.0",
+    "langchain-tavily>=0.2.18",
 ]
