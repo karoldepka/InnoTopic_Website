@@ -118,7 +118,7 @@ export class AiQaGeneratorService {
       if (!this.questionLoading()) return;
       const partial = this.questionObject.object as any;
       const items: any[] = Array.isArray(partial?.items) ? partial.items : [];
-      const validItems = items.filter(i => i?.question && i?.answer);
+      const validItems = items.filter(i => i?.question);
       if (validItems.length > 0) {
         this.questions.set(validItems as QuestionAnswer[]);
         this.questionStatus.set(`Streaming… ${validItems.length} Q&A`);

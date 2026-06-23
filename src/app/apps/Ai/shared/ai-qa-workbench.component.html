@@ -195,7 +195,7 @@
             <ion-icon [name]="answerVisible(item, index) ? 'eye-off-outline' : 'eye-outline'" slot="icon-only"></ion-icon>
           </ion-button>
         </div>
-        <p class="answer-text" *ngIf="answerVisible(item, index)">{{ item.answer }}</p>
+        <p class="answer-text" *ngIf="answerVisible(item, index)">{{ item.answer || '…' }}</p>
       </article>
     </div>
 
