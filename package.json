@@ -10,7 +10,6 @@
     "build": "node scripts/build-copilotkit-react-embed.mjs && ng build",
     "build:copilotkit-react": "node scripts/build-copilotkit-react-embed.mjs",
     "build:prod": "npx ionic build --prod --aot",
-    "build:origFromVercel": "`npm run build` or `ng build`",
     "record:browser:install": "npx playwright-core install chromium ffmpeg",
     "record:browser": "node scripts/browser-recorder.mjs",
     "record:browser:local": "node scripts/browser-recorder.mjs --url http://localhost:4207 --headed",
@@ -18,8 +17,6 @@
     "test:ai-backend": "jest --config scripts/jest.ai-backend.config.js --runTestsByPath scripts/test-ai-backend-mock.test.ts scripts/test-ai-backend-real.test.ts --runInBand",
     "test:ai-backend:mock": "jest --config scripts/jest.ai-backend.config.js --runTestsByPath scripts/test-ai-backend-mock.test.ts",
     "test:ai-backend:real": "jest --config scripts/jest.ai-backend.config.js --runTestsByPath scripts/test-ai-backend-real.test.ts",
-    "lint": "ng lint",
-    "e2e": "ng e2e",
     "debug.android": "ionic cordova run android  -l --debug --",
     "compodoc": "npx compodoc -p tsconfig.doc.json"
   },
@@ -71,7 +68,6 @@
     "cordova-plugin-file": "^6.0.2",
     "cordova-plugin-local-notification": "0.9.0-beta.2",
     "cordova-plugin-zip": "3.1.0",
-    "core-js": "^2.6.11",
     "deep-chat": "^2.4.2",
     "firebase": "^12.14.0",
     "font-awesome": "^4.7.0",
@@ -91,7 +87,7 @@
     "tinymce": "^5.10.9",
     "tslib": "^2.0.0",
     "uuid": "^8.3.2",
-    "webpack-dev-server": "^4.11.1",
+    "webpack-dev-server": "^5.2.5",
     "zod": "^3.25.76",
     "zone.js": "~0.16.2"
   },

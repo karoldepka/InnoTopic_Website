@@ -35,15 +35,6 @@ function copilotAgUiUrl(): string {
     : '/ai-api/copilotkit-agui'
 }
 
-const swOpts = {
-  enabled: environment.production,
-  // Register the ServiceWorker as soon as the application is stable
-  // or after 30 seconds (whichever comes first).
-  registrationStrategy: 'registerWhenStable:30000'
-}
-
-console.log(`service worker swOpts`, swOpts)
-
 @NgModule({
     declarations: [],
     imports: [

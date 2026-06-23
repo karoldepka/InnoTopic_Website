@@ -321,13 +321,8 @@ export class NodeContentComponent implements OnInit, AfterViewInit, OnDestroy, I
     debugLog('onInputChanged, cell', cell, event, component)
     const column = cell.column
     // here start moving responsibilities from component viewSyncer to
-// <<<<<<< HEAD
     this.treeNode.content.onInputChangedByUser(cell, inputNewValue)
     column.setValueOnItemData(this.treeNode.content.itemData, inputNewValue) /* FIXME this was changed on `develop`; + patchThrottled considerations */
-// =======
-//     this.treeNode.onInputChangedByUser(cell, inputNewValue)
-//     // column.setValueOnItemData(this.treeNode.itemData, inputNewValue) --- moved to TreeTableNode
-// >>>>>>> develop
     // note: the applying from UI to model&events could be throttleTime()-d to e.g. 100-200ms to not overwhelm when typing fast
     this.treeNode.fireOnChangeItemDataOfChildOnParents()
     // this.treeNode.onChangeItemData.emit()

@@ -29,5 +29,5 @@ export function setIdsFromKeys<TItem extends {}, TItemWithId extends TItem & {id
     curExp.id = id;
     // console.log('setIdsFromKeys', id, curExp);
   }
-  return dictionary as unknown as Dict<TItemWithId> /* FIXME workaround upgrading to Angular 15*/
+  return dictionary as unknown as Dict<TItemWithId> /* FIXME narrow dictionary item typing */
 }

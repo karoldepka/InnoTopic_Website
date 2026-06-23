@@ -404,11 +404,11 @@ export class RootTreeNode<
    *
    * TODO: might wanna leave this as abstract and require override, just to not hide this requirement
    * FIXME: implement check/conversion to valid children or veto by throwing
-   * this change was triggerred by update to Angular 15 -> going to TBaseNonRootNode -> TChildNode
+   * This keeps legacy tree code explicit about converting base nodes to child nodes.
    */
   /* abstract protected */toValidChildrenOrThrow(nodes: TBaseNonRootNode[]) {
 
-    return nodes as any as TChildNode[] // workaround for angular 15; not sure if they really overlap enough or not
+    return nodes as any as TChildNode[] // FIXME validate whether these node types overlap enough.
   }
 
 
