@@ -1113,6 +1113,50 @@ async def category_tree_stream(category_request: CategoryTreeRequest):
 
     return StreamingResponse(stream_events(), media_type="text/event-stream")
 
+@app.post("/category-tree/stream-json")
+@app.post("/ai-api/category-tree/stream-json")
+async def category_tree_stream_json(category_request: CategoryTreeRequest):
+    """Stream raw LLM JSON for @ai-sdk/angular StructuredObject (text protocol)."""
+    search_results = web_search(category_request.message) if category_request.web_search else []
+    existing_categories_list = load_existing_categories()
+    chain = create_category_tree_chain()
+
+    async def generate():
+        async for chunk in chain.astream({
+            "message": category_request.message,
+            "tree_json": json.dumps([node.model_dump() for node in category_request.tree]),
+            "existing_categories_json": existing_categories_as_prompt_json(existing_categories_list),
+            "web_search_notes": "\n".join(search_results) or "(none)",
+        }):
+            content = getattr(chunk, "content", "")
+            if content:
+                yield content
+
+    return StreamingResponse(generate(), media_type="text/plain")
+
+
+@app.post("/category-tree/questions/stream-json")
+@app.post("/ai-api/category-tree/questions/stream-json")
+async def category_tree_questions_stream_json(question_request: QuestionAnswerRequest):
+    """Stream raw LLM JSON for @ai-sdk/angular StructuredObject (text protocol)."""
+    generation_requests = flatten_category_requests(question_request.tree)
+    search_query = " ".join(r["categoryPath"] for r in generation_requests[:8])
+    search_results = web_search(search_query) if question_request.web_search else []
+    chain = create_question_answer_chain()
+
+    async def generate():
+        async for chunk in chain.astream({
+            "tree_json": json.dumps([node.model_dump() for node in question_request.tree]),
+            "requests_json": json.dumps(generation_requests),
+            "web_search_notes": "\n".join(search_results) or "(none)",
+        }):
+            content = getattr(chunk, "content", "")
+            if content:
+                yield content
+
+    return StreamingResponse(generate(), media_type="text/plain")
+
+
 @app.post("/category-tree/questions", response_model=QuestionAnswerResponse)
 @app.post("/ai-api/category-tree/questions", response_model=QuestionAnswerResponse)
 async def category_tree_questions(question_request: QuestionAnswerRequest):

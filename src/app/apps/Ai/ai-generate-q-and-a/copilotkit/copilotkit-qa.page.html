@@ -9,21 +9,24 @@
 </ion-header>
 
 <ion-content class="copilotkit-qa-page">
-  <div [copilotkitAgentContext]="agentContext"></div>
-
   <div class="copilotkit-layout">
     <section class="copilot-panel">
       <div class="copilot-panel-header">
         <h2>CopilotKit</h2>
-        <span>AG-UI HttpAgent</span>
+        <span>AG-UI · deep-chat</span>
       </div>
-      <copilot-chat [agentId]="agentId"></copilot-chat>
+      <deep-chat
+        [connect]="deepChatConnect"
+        [introMessage]="deepChatIntroMessage"
+        [chatStyle]="deepChatChatStyle"
+        [messageStyles]="deepChatMessageStyles"
+      ></deep-chat>
     </section>
 
     <app-ai-qa-workbench
       integration="copilotkit"
       integrationTitle="CopilotKit"
-      integrationSubtitle="@copilotkit/angular with AG-UI"
+      integrationSubtitle="@copilotkit/angular HttpAgent"
     ></app-ai-qa-workbench>
   </div>
 </ion-content>

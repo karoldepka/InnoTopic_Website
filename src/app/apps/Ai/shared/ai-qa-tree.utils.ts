@@ -4,20 +4,35 @@ export interface CategoryTreeRow {
   node: CategoryNode;
   depth: number;
   path: string;
+  hasChildren: boolean;
+  parentIds: string[];
 }
 
 function safeChildren(node: CategoryNode): CategoryNode[] {
   return Array.isArray(node.children) ? node.children : [];
 }
 
-export function flattenCategoryTree(nodes: CategoryNode[], depth = 0, parents: string[] = []): CategoryTreeRow[] {
+export function flattenCategoryTree(
+  nodes: CategoryNode[],
+  depth = 0,
+  parents: string[] = [],
+  parentIds: string[] = [],
+): CategoryTreeRow[] {
   return nodes.flatMap(node => {
     const path = [...parents, node.title || '(untitled)'].join(' > ');
+    const children = safeChildren(node);
     return [
-      {node, depth, path},
-      ...flattenCategoryTree(safeChildren(node), depth + 1, [...parents, node.title || '(untitled)']),
+      {node, depth, path, hasChildren: children.length > 0, parentIds},
+      ...flattenCategoryTree(children, depth + 1, [...parents, node.title || '(untitled)'], [...parentIds, node.id]),
     ];
   });
+}
+
+export function filterVisibleRows(rows: CategoryTreeRow[], collapsedIds: ReadonlySet<string>): CategoryTreeRow[] {
+  if (!collapsedIds.size) {
+    return rows;
+  }
+  return rows.filter(row => !row.parentIds.some(id => collapsedIds.has(id)));
 }
 
 export function countCategoryNodes(nodes: CategoryNode[]): number {

@@ -4,14 +4,39 @@
 }
 
 .qa-workbench {
-  display: grid;
-  grid-template-columns: minmax(280px, 0.95fr) minmax(360px, 1.25fr) minmax(360px, 1.35fr);
-  gap: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
   min-height: 100%;
-  padding: 14px;
+  padding: 12px;
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.055), rgba(255, 255, 255, 0)),
     var(--ion-background-color);
+}
+
+@media (min-width: 720px) {
+  .qa-workbench {
+    display: grid;
+    grid-template-columns: minmax(260px, 0.9fr) minmax(340px, 1.3fr);
+    grid-template-rows: auto 1fr;
+    padding: 14px;
+    gap: 14px;
+  }
+
+  .questions-panel {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (min-width: 1100px) {
+  .qa-workbench {
+    grid-template-columns: minmax(280px, 0.95fr) minmax(360px, 1.25fr) minmax(360px, 1.35fr);
+    grid-template-rows: 1fr;
+  }
+
+  .questions-panel {
+    grid-column: auto;
+  }
 }
 
 .prompt-panel,
@@ -57,10 +82,17 @@
   letter-spacing: 0;
 }
 
-.panel-heading p {
-  margin: 3px 0 0;
+.heading-actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.info-btn {
+  --padding-start: 4px;
+  --padding-end: 4px;
+  height: 28px;
   color: var(--ion-color-medium);
-  font-size: 0.82rem;
 }
 
 .field-label {
@@ -132,11 +164,23 @@
 
 .category-row {
   display: grid;
-  grid-template-columns: minmax(150px, 1fr) auto 58px 34px 34px;
-  gap: 6px;
+  grid-template-columns: 30px minmax(120px, 1fr) auto 54px 30px 30px;
+  gap: 4px;
   align-items: center;
   min-height: 42px;
   border-bottom: 1px solid rgba(155, 169, 186, 0.12);
+}
+
+.collapse-btn {
+  --padding-start: 0;
+  --padding-end: 0;
+  width: 28px;
+  height: 28px;
+}
+
+.collapse-btn.invisible {
+  visibility: hidden;
+  pointer-events: none;
 }
 
 .category-row:last-child {
@@ -219,40 +263,12 @@
   color: var(--ion-color-medium);
 }
 
-@media (max-width: 1180px) {
-  .qa-workbench {
-    grid-template-columns: minmax(280px, 0.95fr) minmax(420px, 1.4fr);
-  }
-
-  .questions-panel {
-    grid-column: 1 / -1;
-    min-height: 360px;
-  }
-}
-
-@media (max-width: 760px) {
-  .qa-workbench {
-    display: flex;
-    flex-direction: column;
-    padding: 10px;
-  }
-
-  .tree-panel,
-  .questions-panel {
-    min-height: 430px;
-  }
-
+@media (max-width: 500px) {
   .category-row {
-    grid-template-columns: minmax(120px, 1fr) 52px 32px 32px;
+    grid-template-columns: 28px minmax(100px, 1fr) 48px 28px 28px;
   }
 
   .existing-chip {
     display: none;
-  }
-
-  .action-row,
-  .panel-heading {
-    align-items: flex-start;
-    flex-direction: column;
   }
 }

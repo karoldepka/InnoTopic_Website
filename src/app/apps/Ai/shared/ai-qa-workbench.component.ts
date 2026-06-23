@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, Input, OnInit, computed, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input, OnInit, computed, effect, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { IonicModule } from '@ionic/angular';
 import { StructuredObject } from '@ai-sdk/angular';
@@ -24,6 +24,7 @@ import {
   cloneCategoryTree,
   countCategoryNodes,
   deleteCategoryNode,
+  filterVisibleRows,
   flattenCategoryTree,
   sumQuestionCounts,
   updateCategoryNode,
@@ -79,12 +80,14 @@ export class AiQaWorkbenchComponent implements OnInit {
   private readonly copilotKit = inject(CopilotKit);
   private readonly copilotStore = injectAgentStore(COPILOT_AGENT_ID);
   private readonly categoryObject = new StructuredObject<typeof categoryTreeResponseSchema, CategoryTreeResponse, CategoryTreeRequest>({
-    api: this.aiBackend.apiUrl('/category-tree'),
+    api: this.aiBackend.apiUrl('/category-tree/stream-json'),
     schema: categoryTreeResponseSchema,
+    ...({ streamProtocol: 'text' } as object),
   });
   private readonly questionObject = new StructuredObject<typeof questionAnswerResponseSchema, QuestionAnswerResponse, QuestionAnswerRequest>({
-    api: this.aiBackend.apiUrl('/category-tree/questions'),
+    api: this.aiBackend.apiUrl('/category-tree/questions/stream-json'),
     schema: questionAnswerResponseSchema,
+    ...({ streamProtocol: 'text' } as object),
   });
 
   readonly topic = signal('Rust interview questions');
@@ -99,10 +102,15 @@ export class AiQaWorkbenchComponent implements OnInit {
   readonly questionError = signal('');
   readonly categoryLoading = signal(false);
   readonly questionLoading = signal(false);
+
+  private categoryAbortController: AbortController | null = null;
+  private questionAbortController: AbortController | null = null;
   readonly showAnswers = signal(false);
   readonly expandedAnswerKeys = signal<ReadonlySet<string>>(new Set<string>());
 
-  readonly categoryRows = computed(() => flattenCategoryTree(this.tree()));
+  readonly collapsedNodeIds = signal<ReadonlySet<string>>(new Set<string>());
+  readonly allCategoryRows = computed(() => flattenCategoryTree(this.tree()));
+  readonly categoryRows = computed(() => filterVisibleRows(this.allCategoryRows(), this.collapsedNodeIds()));
   readonly categoryCount = computed(() => countCategoryNodes(this.tree()));
   readonly requestedQuestionCount = computed(() => sumQuestionCounts(this.tree()));
 
@@ -112,6 +120,32 @@ export class AiQaWorkbenchComponent implements OnInit {
     }
     return 'CopilotKit Angular agent';
   });
+
+  constructor() {
+    effect(() => {
+      if (!this.categoryLoading()) return;
+      const partial = this.categoryObject.object as any;
+      const nodes: any[] = Array.isArray(partial?.tree) ? partial.tree : [];
+      const validNodes = nodes
+        .filter(n => n?.id && n?.title)
+        .map(n => this.makePartialCategoryNode(n));
+      if (validNodes.length > 0) {
+        this.tree.set(validNodes);
+        this.categoryStatus.set(`Streaming… ${validNodes.length} categories`);
+      }
+    });
+
+    effect(() => {
+      if (!this.questionLoading()) return;
+      const partial = this.questionObject.object as any;
+      const items: any[] = Array.isArray(partial?.items) ? partial.items : [];
+      const validItems = items.filter(i => i?.question && i?.answer);
+      if (validItems.length > 0) {
+        this.questions.set(validItems as QuestionAnswer[]);
+        this.questionStatus.set(`Streaming… ${validItems.length} Q&A`);
+      }
+    });
+  }
 
   async ngOnInit(): Promise<void> {
     try {
@@ -134,6 +168,22 @@ export class AiQaWorkbenchComponent implements OnInit {
     this.webSearch.set(value);
   }
 
+  stopCategories(): void {
+    this.categoryObject.stop();
+    this.categoryAbortController?.abort();
+    this.categoryAbortController = null;
+    this.categoryLoading.set(false);
+    this.categoryStatus.set('Cancelled');
+  }
+
+  stopQuestions(): void {
+    this.questionObject.stop();
+    this.questionAbortController?.abort();
+    this.questionAbortController = null;
+    this.questionLoading.set(false);
+    this.questionStatus.set('Cancelled');
+  }
+
   nodeIndent(depth: number): string {
     return `${Math.min(depth, 8) * 18}px`;
   }
@@ -144,6 +194,7 @@ export class AiQaWorkbenchComponent implements OnInit {
       return;
     }
 
+    this.categoryAbortController = new AbortController();
     this.categoryLoading.set(true);
     this.categoryError.set('');
     this.categoryStatus.set('Generating categories');
@@ -161,9 +212,13 @@ export class AiQaWorkbenchComponent implements OnInit {
 
       this.applyCategoryResponse(response);
     } catch (error) {
+      if (this.categoryAbortController?.signal.aborted) {
+        return;
+      }
       this.categoryError.set(this.formatError(error));
       this.categoryStatus.set('Category generation failed');
     } finally {
+      this.categoryAbortController = null;
       this.categoryLoading.set(false);
     }
   }
@@ -173,6 +228,7 @@ export class AiQaWorkbenchComponent implements OnInit {
       return;
     }
 
+    this.questionAbortController = new AbortController();
     this.questionLoading.set(true);
     this.questionError.set('');
     this.questionStatus.set('Generating Q&A');
@@ -191,9 +247,13 @@ export class AiQaWorkbenchComponent implements OnInit {
 
       this.applyQuestionResponse(response);
     } catch (error) {
+      if (this.questionAbortController?.signal.aborted) {
+        return;
+      }
       this.questionError.set(this.formatError(error));
       this.questionStatus.set('Q&A generation failed');
     } finally {
+      this.questionAbortController = null;
       this.questionLoading.set(false);
     }
   }
@@ -215,6 +275,20 @@ export class AiQaWorkbenchComponent implements OnInit {
       ...node,
       title,
     })));
+  }
+
+  isCategoryCollapsed(nodeId: string): boolean {
+    return this.collapsedNodeIds().has(nodeId);
+  }
+
+  toggleCategoryCollapsed(nodeId: string): void {
+    const next = new Set(this.collapsedNodeIds());
+    if (next.has(nodeId)) {
+      next.delete(nodeId);
+    } else {
+      next.add(nodeId);
+    }
+    this.collapsedNodeIds.set(next);
   }
 
   changeQuestionCount(nodeId: string, rawCount: string | number | null | undefined): void {
@@ -282,6 +356,20 @@ export class AiQaWorkbenchComponent implements OnInit {
 
   trackQuestion(index: number, item: QuestionAnswer): string {
     return this.answerKey(item, index);
+  }
+
+  private makePartialCategoryNode(n: any): CategoryNode {
+    return {
+      id: n.id,
+      title: n.title,
+      questionCount: Number(n.questionCount) || 3,
+      children: Array.isArray(n.children)
+        ? n.children.filter((c: any) => c?.id && c?.title).map((c: any) => this.makePartialCategoryNode(c))
+        : [],
+      matchedExistingCategoryId: n.matchedExistingCategoryId ?? null,
+      matchedExistingCategoryTitle: n.matchedExistingCategoryTitle ?? null,
+      isExistingCategory: Boolean(n.isExistingCategory),
+    };
   }
 
   private async generateCategoriesWithVercel(request: CategoryTreeRequest): Promise<CategoryTreeResponse> {
