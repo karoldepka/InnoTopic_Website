@@ -8,8 +8,9 @@ const routes: Routes = [
     pathMatch: 'full'
   },
 
-  { path: '',
-    loadChildren: () => import('./tabs/tabs.module').then(m => m.TabsPageModule)
+  {
+    path: 'timers',
+    loadChildren: () => import('./timers/timers.module').then(m => m.TimersPageModule)
   },
 
   { path: 'journal/write',
