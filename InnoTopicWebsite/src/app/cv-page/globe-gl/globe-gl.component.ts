@@ -49,6 +49,7 @@ export class GlobeGlComponent implements AfterViewInit, OnDestroy {
   }
 
   private async init() {
+    const tick = () => new Promise<void>(r => setTimeout(r, 0));
     try {
       const primaryColor = await this.store
         .select(s => s.themeConfig.ion_color_primary)
@@ -63,22 +64,34 @@ export class GlobeGlComponent implements AfterViewInit, OnDestroy {
       const el = this.containerRef.nativeElement;
       const color = primaryColor ?? '#3498db';
 
-      const arcs = buildArcs();
-
+      // Phase 1: create renderer + scene (WebGL context init) — yield first so browser can paint spinner
+      await tick();
       this.globe = (Globe as any)()(el)
         .backgroundColor('rgba(0,0,0,0)')
         .showAtmosphere(true)
         .atmosphereColor('rgba(100,160,255,0.5)')
         .atmosphereAltitude(0.15)
         .globeImageUrl('assets/data/earth-dark.jpg')
+        .width(el.clientWidth || 500)
+        .height(460);
+
+      this.globe.controls().autoRotate = true;
+      this.globe.controls().autoRotateSpeed = 0.5;
+      this.globe.controls().enableZoom = false;
+
+      // Phase 2: load geometry data — yield so the empty globe can render one frame first
+      await tick();
+      this.globe
         .polygonsData(geojson.features)
         .polygonCapColor(() => color)
         .polygonSideColor(() => 'rgba(0,0,0,0)')
         .polygonStrokeColor(() => 'rgba(255,255,255,0.2)')
         .polygonAltitude(0.04)
-        .polygonLabel((d: any) => `<b>${d.properties?.name ?? ''}</b>`)
-        // Animated arc connectors between all work cities
-        .arcsData(arcs)
+        .polygonLabel((d: any) => `<b>${d.properties?.name ?? ''}</b>`);
+
+      await tick();
+      this.globe
+        .arcsData(buildArcs())
         .arcStartLat((d: any) => d.start.lat)
         .arcStartLng((d: any) => d.start.lng)
         .arcEndLat((d: any) => d.end.lat)
@@ -89,20 +102,13 @@ export class GlobeGlComponent implements AfterViewInit, OnDestroy {
         .arcDashAnimateTime(3000)
         .arcStroke(0.4)
         .arcAltitudeAutoScale(0.3)
-        // City bar markers (world-population style)
         .pointsData(WORK_CITIES)
         .pointLat((d: WorkCity) => d.lat)
         .pointLng((d: WorkCity) => d.lng)
         .pointColor(() => color)
         .pointAltitude(0.12)
         .pointRadius(0.4)
-        .pointLabel((d: WorkCity) => `<b>${d.name}</b><br/>${d.country}`)
-        .width(el.clientWidth || 500)
-        .height(460);
-
-      this.globe.controls().autoRotate = true;
-      this.globe.controls().autoRotateSpeed = 0.5;
-      this.globe.controls().enableZoom = false;
+        .pointLabel((d: WorkCity) => `<b>${d.name}</b><br/>${d.country}`);
     } catch (e) {
       console.error('Globe.gl init failed:', e);
     } finally {

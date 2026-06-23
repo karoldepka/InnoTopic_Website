@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { WorldMapComponent } from '../world-map/world-map.component';
 import { GlobeGlComponent } from '../globe-gl/globe-gl.component';
 import { GlobeD3Component } from '../globe-d3/globe-d3.component';
@@ -13,8 +13,16 @@ type GlobeMode = 'globegl' | 'd3' | 'threejs' | 'svg';
   templateUrl: './globe-switcher.component.html',
   styleUrls: ['./globe-switcher.component.scss'],
 })
-export class GlobeSwitcherComponent {
+export class GlobeSwitcherComponent implements OnInit {
   activeMode: GlobeMode = 'd3';
+
+  ngOnInit() {
+    const schedule = (cb: () => void) =>
+      'requestIdleCallback' in window
+        ? (window as any).requestIdleCallback(cb, { timeout: 3000 })
+        : setTimeout(cb, 2000);
+    schedule(() => import('globe.gl'));
+  }
 
   readonly modes: { key: GlobeMode; label: string; tech: string }[] = [
     { key: 'globegl', label: 'Globe.gl',  tech: 'WebGL + Three.js via Globe.gl' },
