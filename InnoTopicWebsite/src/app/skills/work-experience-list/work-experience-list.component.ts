@@ -14,12 +14,6 @@ import {
 } from '../../utils/dictionary-utils';
 
 import { groupByKeepingOrder } from '../../utils/utils';
-import {groupBy} from "lodash-es";
-
-(String.prototype as any).replaceAll = function(search: string, replacement: string) {
-  const target = this;
-  return target.split(search).join(replacement);
-};
 
 @Component({
   selector: 'app-work-experience-list',
@@ -54,10 +48,11 @@ export class WorkExperienceListComponent implements OnInit {
       exp.category = exp.topic.category
       return exp
     })
+    const experienceByCategory = groupByKeepingOrder(this.experienceArr, 'category');
     this.byCategory = getDictionaryValuesAsArray(
-      setIdsFromKeys(groupByKeepingOrder(this.experienceArr, 'category'))
+      setIdsFromKeys(experienceByCategory)
     ) // .sortBy(group => this.experience.indexOf(group[0]))
-    this.experienceByCategory = groupBy(this.experienceArr, 'category') // .sortBy(group => this.experience.indexOf(group[0]))
+    this.experienceByCategory = experienceByCategory // .sortBy(group => this.experience.indexOf(group[0]))
     // console.log('this.byCategory', this.byCategory)
   }
 

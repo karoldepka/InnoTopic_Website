@@ -68,7 +68,6 @@ export class UserOtherProfilesComponent implements OnInit {
 
   /* TODO: extract to non-component */
   private applyFromDb(otherProfiles: UserOtherProfiles) {
-    console.log('applyFromDb: otherProfiles ', otherProfiles)
     this.otherProfiles = otherProfiles;
     if (otherProfiles) {
       // FIXME: setValue instead of patchValue (because some might be undefined)

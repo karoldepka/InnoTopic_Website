@@ -1,5 +1,23 @@
-import chroma from 'chroma-js';
 import {hexToRgb} from "./colorUtils";
+
+function hexToRgbParts(hex: string): [number, number, number] {
+  const normalized = hex.startsWith('#') ? hex.slice(1) : hex;
+  const expanded = normalized.length === 3
+    ? normalized.split('').map(char => char + char).join('')
+    : normalized;
+
+  const num = parseInt(expanded, 16);
+  return [
+    (num >> 16) & 255,
+    (num >> 8) & 255,
+    num & 255,
+  ];
+}
+
+function hexToRgba(hex: string, alpha: number): string {
+  const [r, g, b] = hexToRgbParts(hex);
+  return `rgba(${r},${g},${b},${alpha})`;
+}
 
 export function setIonicColorSteps(baseColor: string, step: number = 50, limit: number = 950): void {
   const root = document.documentElement;
@@ -7,14 +25,7 @@ export function setIonicColorSteps(baseColor: string, step: number = 50, limit: 
   for(let i = step; i <= limit; i += step) {
     const factor = i / 1000;
 
-    let color = ''
-    // if(chroma(baseColor).luminance() < 0.5) {
-    //   // FIXME: use chroma.mix 0..1 bg & fg or just opacity
-    //   color = chroma(baseColor).brighten(factor/* *3 */).css();
-    // } else {
-    //   color = chroma(baseColor).darken(factor/* *3 */).css();
-    // }
-    color = chroma(baseColor).alpha(factor).css();
+    const color = hexToRgba(baseColor, factor);
 
     const ccsVarName = `--ion-color-step-${i}`;
     root.style.setProperty(ccsVarName, color);

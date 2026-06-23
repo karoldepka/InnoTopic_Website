@@ -9,7 +9,13 @@
       <span routerLink="/chat" class="clickable" style="margin-right: 15px;">AI CHAT</span>
       <span (click)="showThemeConfig = !showThemeConfig" class="clickable">THEME</span>
     </ion-buttons>
-    <app-theme-config *ngIf="showThemeConfig"></app-theme-config>
+    @if (showThemeConfig) {
+      @defer {
+        <app-theme-config />
+      } @placeholder {
+        <div class="theme-config-placeholder" aria-hidden="true"></div>
+      }
+    }
   </ion-toolbar>
 </ion-header>
 

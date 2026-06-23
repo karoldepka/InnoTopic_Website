@@ -13,7 +13,6 @@ describe('groupByKeepingOrder', () => {
       g: {id: 'g', cat: 'catA'},
     }
     let actual = groupByKeepingOrder(kv, 'cat');
-    console.log('groupByKeepingOrder', actual)
     expect(actual).toEqual({
       catZ: [ { id: 'a', cat: 'catZ' }, { id: 'd', cat: 'catZ' } ],
       catX: [ { id: 'b', cat: 'catX' } ],

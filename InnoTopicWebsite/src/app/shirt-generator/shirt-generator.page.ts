@@ -1,7 +1,6 @@
 import {Component, OnDestroy, OnInit} from '@angular/core';
-import {catchError, debounceTime, distinctUntilChanged, of, Subject, switchMap, takeUntil} from "rxjs";
+import {BehaviorSubject, catchError, debounceTime, distinctUntilChanged, finalize, of, Subject, switchMap, takeUntil} from "rxjs";
 import {ShirtGeneratorService} from "./services/shirt-generator.service";
-import {tap} from "rxjs/operators";
 
 @Component({
   selector: 'app-shirt-generator',
@@ -12,7 +11,7 @@ import {tap} from "rxjs/operators";
 export class ShirtGeneratorPage implements OnInit, OnDestroy {
 
   searchEvent$ = new Subject<string>();
-  isLoading$ = new Subject<boolean>();
+  isLoading$ = new BehaviorSubject(false);
   destroySubject = new Subject<void>();
 
   result$ = this.shirtGeneratorService.generatedContent$;
@@ -29,19 +28,15 @@ export class ShirtGeneratorPage implements OnInit, OnDestroy {
       debounceTime(500),
       switchMap((text) => {
         this.isLoading$.next(true);
-        return this.shirtGeneratorService.generateTopics(text);
+        return this.shirtGeneratorService.generateTopics(text).pipe(
+          catchError(() => {
+            this.shirtGeneratorService.clearGeneratedContent();
+            return of([]);
+          }),
+          finalize(() => this.isLoading$.next(false)),
+        );
       }),
-      catchError((error) => {
-        this.shirtGeneratorService.clearGeneratedContent();
-        return of(error)
-      }),
-      tap((res) => {
-        console.log(`Result: `);
-        console.log(res);
-        this.shirtGeneratorService.setGeneratedContent(res);
-        this.isLoading$.next(false)
-      }),
-    ).subscribe({})
+    ).subscribe((result) => this.shirtGeneratorService.setGeneratedContent(result))
   }
 
   onSearch(searchText: string) {
@@ -50,6 +45,8 @@ export class ShirtGeneratorPage implements OnInit, OnDestroy {
 
   ngOnDestroy() {
     this.destroySubject.next();
+    this.destroySubject.complete();
+    this.isLoading$.complete();
   }
 
 }

@@ -3,19 +3,20 @@
     @for (m of modes; track m.key) {
       <button
         [class.active]="activeMode === m.key"
-        (click)="activeMode = m.key"
+        (click)="setMode(m.key)"
         class="tab-btn"
+        [disabled]="loadingMode === m.key"
         [title]="m.tech"
       >{{ m.label }}</button>
     }
   </div>
 
   <div class="globe-viewport">
-    @if (activeMode === 'globegl')  { <app-globe-gl /> }
-    @if (activeMode === 'd3')       { <app-globe-d3 /> }
-    @if (activeMode === 'threejs')  { <app-globe-threejs /> }
-    <!-- Always in DOM so print CSS can show it; hidden when not active -->
-    <app-world-map [hidden]="activeMode !== 'svg'" />
+    @if (activeComponent) {
+      <ng-container *ngComponentOutlet="activeComponent" />
+    } @else {
+      <div class="globe-mode-placeholder" aria-hidden="true"></div>
+    }
   </div>
 
   <div class="tech-label">{{ activeTech }}</div>

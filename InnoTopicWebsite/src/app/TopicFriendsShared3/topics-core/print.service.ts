@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
-import {ActivatedRoute, NavigationEnd, NavigationStart, Router} from "@angular/router";
-import {filter} from "rxjs";
+import {NavigationStart, Router} from "@angular/router";
+import {BehaviorSubject, filter} from "rxjs";
 
 @Injectable({
   providedIn: 'root'
@@ -8,37 +8,39 @@ import {filter} from "rxjs";
 export class PrintService {
 
   static isPrint = false // !! JSON.parse(window.localStorage.getItem('isPrint') ?? 'false') // true // hack for now
-  static url = undefined
-  static page = undefined
+  static url?: string
+  static page?: string
 
-  static printPages = ['/print', '/shirt'];
+  static readonly printPages = ['/print', '/shirt'];
+
+  private readonly isPrintSubject = new BehaviorSubject(PrintService.isPrint);
+  readonly isPrint$ = this.isPrintSubject.asObservable();
 
   constructor(
     private router: Router,
-    activatedRoute: ActivatedRoute
   ) {
-    console.log('PrintService ctor', activatedRoute)
+    this.updatePrintMode(this.router.url);
     this.router.events.pipe(
-      filter((event) => event instanceof NavigationStart)
-    ).subscribe((event: any) => {
-      console.log('PrintService event', event)
-      const url = event.url;
-      const printPages = PrintService.printPages;
-      if (
-        this.isPrintUrl(url)
-      ) {
-        console.log(`PrintService event.url.includes(${printPages.join(',')})`)
-        PrintService.url = url
-        PrintService.page = url.replace('/', '')
-        PrintService.isPrint = true
-      }
-      // this.currentRouteSubject.next(event.urlAfterRedirects);
+      filter((event): event is NavigationStart => event instanceof NavigationStart)
+    ).subscribe((event) => {
+      this.updatePrintMode(event.url);
     });
+  }
+
+  private updatePrintMode(url: string) {
+    const isPrint = this.isPrintUrl(url);
+    PrintService.isPrint = isPrint;
+    PrintService.url = isPrint ? url : undefined;
+    PrintService.page = isPrint ? url.replace('/', '') : undefined;
+
+    if (this.isPrintSubject.value !== isPrint) {
+      this.isPrintSubject.next(isPrint);
+    }
   }
 
   private isPrintUrl(url: string) {
     return PrintService.printPages.some(
-      path => url.includes(path)
+      path => url.startsWith(path)
     );
   }
 }

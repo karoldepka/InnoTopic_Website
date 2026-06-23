@@ -45,8 +45,8 @@ export class TopicsService {
     // console.log('topicsArr', topicsArr)
     topicsArr.forEach(t => {
       if ( this.getTopicByIdIfExisting(t.id) ) {
-        let errorPrefix = 'TOPIC DUPLICATE WITH OLD topics (old one might be overriding data) : ';
-        console.log(errorPrefix, t.id)
+        const errorPrefix = 'TOPIC DUPLICATE WITH OLD topics (old one might be overriding data) : ';
+        console.warn(errorPrefix, t.id)
         window.alert(errorPrefix + ' ' +  t.id)
       }
     })

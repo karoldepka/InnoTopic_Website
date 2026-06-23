@@ -1,15 +1,25 @@
 import {Component, OnInit} from '@angular/core';
 import {FormBuilder, FormGroup} from '@angular/forms';
+import {ReactiveFormsModule} from '@angular/forms';
 import {Store} from '@ngrx/store';
 import {Observable, take} from 'rxjs';
 
 import {ThemeConfigState} from "../../models/theme-config-state.model";
 import {updateThemeConfig} from "../../store/actions/theme-config-actions";
+import {IonicModule} from "@ionic/angular";
+import {HeaderComponent} from "../../header/header.component";
+import {TintedSwatchesComponent} from "../tinted-swatches/tinted-swatches.component";
 // import {testLibFunc} from "themes-lib";
 
 @Component({
   selector: 'app-theme-config',
-  standalone: false,
+  standalone: true,
+  imports: [
+    HeaderComponent,
+    IonicModule,
+    ReactiveFormsModule,
+    TintedSwatchesComponent,
+  ],
   templateUrl: './theme-config.component.html',
   styleUrls: ['./theme-config.component.scss'],
 })

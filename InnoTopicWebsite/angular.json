@@ -26,11 +26,6 @@
             "inlineStyleLanguage": "scss",
             "assets": [
               {
-                "glob": "index2.html",
-                "input": "index2.html",
-                "output": "index2.html"
-              },
-              {
                 "glob": "**/*",
                 "input": "src/assets",
                 "output": "assets"
@@ -66,6 +61,10 @@
                 {
                   "replace": "src/environments/environment.ts",
                   "with": "src/environments/environment.prod.ts"
+                },
+                {
+                  "replace": "src/app/store/store-devtools.imports.ts",
+                  "with": "src/app/store/store-devtools.imports.prod.ts"
                 }
               ],
               "outputHashing": "all"
@@ -110,7 +109,9 @@
           "builder": "@angular/build:karma",
           "options": {
             "main": "src/test.ts",
-            "polyfills": "src/polyfills.ts",
+            "polyfills": [
+              "src/polyfills.ts"
+            ],
             "tsConfig": "tsconfig.spec.json",
             "karmaConfig": "karma.conf.js",
             "inlineStyleLanguage": "scss",

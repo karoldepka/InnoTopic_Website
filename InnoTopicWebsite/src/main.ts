@@ -9,7 +9,15 @@ if (environment.production) {
   enableProdMode();
 }
 
-defineCustomElements(window);
+const runWhenIdle = (callback: () => void) => {
+  if ('requestIdleCallback' in window) {
+    (window as any).requestIdleCallback(callback, { timeout: 1500 });
+    return;
+  }
+
+  setTimeout(callback, 0);
+};
 
 platformBrowserDynamic().bootstrapModule(AppModule)
-  .catch(err => console.log(err));
+  .then(() => runWhenIdle(() => void defineCustomElements(window)))
+  .catch(err => console.error(err));

@@ -15,6 +15,8 @@
     <img
       *ngIf='useSignalLevels'
       class="skill-icon signal-icon"
+      loading="lazy"
+      decoding="async"
       src="assets/images/icons/signal/{{skillIconSignal(skillLevels?.have)}}.svg">
   </ng-template>
 
@@ -29,6 +31,8 @@
     <img
       *ngIf='useSignalLevels'
       class="skill-icon want signal-icon"
+      loading="lazy"
+      decoding="async"
       src="assets/images/icons/signal/{{skillIconSignal(skillLevels?.want)}}.svg"> <!-- FIXME: contrast in dark mode -->
 
   </ng-template>

@@ -51,3 +51,32 @@ section {
   justify-content: center;
   flex-wrap: wrap;
 }
+
+.graph-placeholder,
+.topics-graph-placeholder {
+  width: min(100%, 1000px);
+}
+
+.graph-placeholder {
+  min-height: 520px;
+}
+
+.topics-graph-placeholder {
+  min-height: 600px;
+}
+
+.section-placeholder {
+  width: 100%;
+}
+
+.work-experience-placeholder {
+  min-height: 720px;
+}
+
+.work-projects-placeholder {
+  min-height: 480px;
+}
+
+.books-placeholder {
+  min-height: 260px;
+}

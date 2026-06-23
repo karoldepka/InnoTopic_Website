@@ -9,7 +9,7 @@ import { CvPageRoutingModule } from './cv-routing.module';
 import { CvPage } from './cv.page';
 import {CvPageModule1} from "../cv-page/cv-page.module";
 import {SharedModule} from "../shared/shared.module";
-import {ThemeDemoPageModule} from "../themes/theme-demo/theme-demo.module";
+import {ThemeConfigComponent} from "../themes/theme-config/theme-config.component";
 
 @NgModule({
   imports: [
@@ -19,7 +19,7 @@ import {ThemeDemoPageModule} from "../themes/theme-demo/theme-demo.module";
     CvPageRoutingModule,
     CvPageModule1,
     SharedModule,
-    ThemeDemoPageModule,
+    ThemeConfigComponent,
   ],
   exports: [
     CvPage

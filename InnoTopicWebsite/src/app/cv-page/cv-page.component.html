@@ -30,11 +30,19 @@
 <!--</model-viewer>-->
 
 <div class="graph-container">
-  <app-globe-switcher />
+  @defer (on idle) {
+    <app-globe-switcher />
+  } @placeholder {
+    <div class="graph-placeholder" aria-hidden="true"></div>
+  }
 <!--  <app-tech-graph></app-tech-graph>-->
 <!--  <app-tech-graph-d3-index1></app-tech-graph-d3-index1>-->
 <!--  <app-tech-graph-d3-index1></app-tech-graph-d3-index1>-->
-  <app-topics-graph />
+  @defer (on viewport; prefetch on idle) {
+    <app-topics-graph />
+  } @placeholder {
+    <div class="topics-graph-placeholder" aria-hidden="true"></div>
+  }
 <!--  <app-video-cv></app-video-cv>-->
   <!-- WebGL svg: https://css-tricks.com/rendering-svg-paths-in-webgl/
     Demo: https://mattdesl.github.io/svg-mesh-3d/
@@ -55,11 +63,23 @@
 <!--  <li>Could also be a quick video per-</li>-->
 <!--</ol>-->
 
-<app-work-experience /> <!-- rename to work-skills ? -->
+@defer (on viewport; prefetch on idle) {
+  <app-work-experience /> <!-- rename to work-skills ? -->
+} @placeholder {
+  <div class="section-placeholder work-experience-placeholder" aria-hidden="true"></div>
+}
 
-<app-work-projects-section />
+@defer (on viewport; prefetch on idle) {
+  <app-work-projects-section />
+} @placeholder {
+  <div class="section-placeholder work-projects-placeholder" aria-hidden="true"></div>
+}
 
-<app-books />
+@defer (on viewport; prefetch on idle) {
+  <app-books />
+} @placeholder {
+  <div class="section-placeholder books-placeholder" aria-hidden="true"></div>
+}
 
 <div class="container">
   <p style="font-size: 10px">I hereby consent to the processing of my personal data  for the

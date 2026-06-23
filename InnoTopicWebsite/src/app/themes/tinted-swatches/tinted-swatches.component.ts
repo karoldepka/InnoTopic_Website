@@ -1,8 +1,10 @@
+import {CommonModule} from '@angular/common';
 import {Component, Input, OnInit} from '@angular/core';
 
 @Component({
   selector: 'app-tinted-swatches',
-  standalone: false,
+  standalone: true,
+  imports: [CommonModule],
   templateUrl: './tinted-swatches.component.html',
   styleUrls: ['./tinted-swatches.component.scss'],
 })

@@ -4,7 +4,7 @@
       <ion-col size="6" size-md="4" size-lg="3" *ngFor="let item of promptResult">
         @if(isCustomAI) {
           <pre>{{item}}</pre>
-          <img height="100" width="100" src="assets/logos/logos/{{item}}" [alt]="item" />
+          <img height="100" width="100" loading="lazy" decoding="async" src="assets/logos/logos/{{item}}" [alt]="item" />
         } @else {
           <app-preview [item]="item" />
         }

@@ -7,7 +7,6 @@ import { CommonModule } from '@angular/common';
 import { FlagsComponent } from '../../countries/flags/flags.component';
 import { HashtagReplacerComponent } from '../../topics-shared/hashtag-replacer/hashtag-replacer.component';
 import { WorkProjectComponent } from './work-project/work-project.component';
-import { KeyValOrderedPipe } from '../../utils/KeyValueOrderedPipe';
 import { WorkOrganisationsAndProjectsData } from '../work-projects-data';
 import { ThreeDTextComponent } from '../../shared/threed-text/threed-text.component';
 

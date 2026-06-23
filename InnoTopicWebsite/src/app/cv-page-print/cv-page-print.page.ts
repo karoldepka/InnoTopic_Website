@@ -22,8 +22,6 @@ export class CvPagePrintPage implements OnInit {
   }
 
   constructor() {
-    console.log('CvPagePrintPage ctor')
-    // PrintService.isPrint = true
   }
 
   ngOnInit() {
