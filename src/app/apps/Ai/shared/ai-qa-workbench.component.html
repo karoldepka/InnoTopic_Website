@@ -85,7 +85,15 @@
       </ion-button>
     </div>
 
-    <div class="tree-list" *ngIf="categoryRows().length; else emptyTree">
+    <div class="tree-table" *ngIf="categoryRows().length; else emptyTree">
+      <div class="tree-table-header" aria-hidden="true">
+        <span></span>
+        <span>Category</span>
+        <span></span>
+        <span class="col-qcount">Q&amp;A&nbsp;#</span>
+        <span></span>
+        <span></span>
+      </div>
       <div
         class="category-row"
         *ngFor="let row of categoryRows(); trackBy: trackCategoryRow"
@@ -135,6 +143,7 @@
     </div>
 
     <ng-template #emptyTree>
+
       <div class="empty-state">No categories yet.</div>
     </ng-template>
 
