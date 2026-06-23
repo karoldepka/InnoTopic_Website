@@ -109,6 +109,8 @@ export class AiQaWorkbenchComponent implements OnInit {
   readonly expandedAnswerKeys = signal<ReadonlySet<string>>(new Set<string>());
 
   readonly collapsedNodeIds = signal<ReadonlySet<string>>(new Set<string>());
+  readonly lastDeletedTree = signal<CategoryNode[] | null>(null);
+  private undoClearHandle: ReturnType<typeof setTimeout> | null = null;
   readonly allCategoryRows = computed(() => flattenCategoryTree(this.tree()));
   readonly categoryRows = computed(() => filterVisibleRows(this.allCategoryRows(), this.collapsedNodeIds()));
   readonly categoryCount = computed(() => countCategoryNodes(this.tree()));
@@ -260,7 +262,24 @@ export class AiQaWorkbenchComponent implements OnInit {
   }
 
   deleteCategory(nodeId: string): void {
+    if (this.undoClearHandle !== null) clearTimeout(this.undoClearHandle);
+    this.lastDeletedTree.set(cloneCategoryTree(this.tree()));
     this.tree.set(deleteCategoryNode(this.tree(), nodeId));
+    this.undoClearHandle = setTimeout(() => {
+      this.lastDeletedTree.set(null);
+      this.undoClearHandle = null;
+    }, 8000);
+  }
+
+  undoDelete(): void {
+    const saved = this.lastDeletedTree();
+    if (!saved) return;
+    this.tree.set(saved);
+    this.lastDeletedTree.set(null);
+    if (this.undoClearHandle !== null) {
+      clearTimeout(this.undoClearHandle);
+      this.undoClearHandle = null;
+    }
   }
 
   renameCategory(nodeId: string, title: string): void {

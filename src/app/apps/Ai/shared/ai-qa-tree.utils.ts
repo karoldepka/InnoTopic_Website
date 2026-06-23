@@ -18,6 +18,7 @@ export function flattenCategoryTree(
   parents: string[] = [],
   parentIds: string[] = [],
 ): CategoryTreeRow[] {
+  if (!Array.isArray(nodes)) return [];
   return nodes.flatMap(node => {
     const path = [...parents, node.title || '(untitled)'].join(' > ');
     const children = safeChildren(node);
@@ -36,10 +37,12 @@ export function filterVisibleRows(rows: CategoryTreeRow[], collapsedIds: Readonl
 }
 
 export function countCategoryNodes(nodes: CategoryNode[]): number {
+  if (!Array.isArray(nodes)) return 0;
   return nodes.reduce((sum, node) => sum + 1 + countCategoryNodes(safeChildren(node)), 0);
 }
 
 export function sumQuestionCounts(nodes: CategoryNode[]): number {
+  if (!Array.isArray(nodes)) return 0;
   return nodes.reduce((sum, node) => sum + Number(node.questionCount || 0) + sumQuestionCounts(safeChildren(node)), 0);
 }
 
