@@ -3,7 +3,6 @@
     <div class="panel-heading">
       <h1>{{ integrationTitle }}</h1>
       <div class="heading-actions">
-        <ion-badge color="tertiary">{{ integrationBadge() }}</ion-badge>
         <ion-button id="impl-info-trigger" fill="clear" size="small" class="info-btn">
           <ion-icon name="information-circle-outline" slot="icon-only"></ion-icon>
         </ion-button>
@@ -12,7 +11,7 @@
             <ion-list lines="none">
               <ion-item>
                 <ion-label class="ion-text-wrap">
-                  <strong>Implementation</strong><br>
+                  <strong>{{ integrationTitle }}</strong><br>
                   <small>{{ integrationSubtitle }}</small>
                 </ion-label>
               </ion-item>

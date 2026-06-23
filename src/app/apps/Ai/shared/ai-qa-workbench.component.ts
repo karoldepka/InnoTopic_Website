@@ -114,13 +114,6 @@ export class AiQaWorkbenchComponent implements OnInit {
   readonly categoryCount = computed(() => countCategoryNodes(this.tree()));
   readonly requestedQuestionCount = computed(() => sumQuestionCounts(this.tree()));
 
-  readonly integrationBadge = computed(() => {
-    if (this.integration === 'vercel-ai-sdk') {
-      return 'StructuredObject';
-    }
-    return 'CopilotKit Angular agent';
-  });
-
   constructor() {
     effect(() => {
       if (!this.categoryLoading()) return;
