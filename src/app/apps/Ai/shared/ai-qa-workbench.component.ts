@@ -91,7 +91,7 @@ export class AiQaWorkbenchComponent implements OnInit {
   });
 
   readonly topic = signal('Rust interview questions');
-  readonly webSearch = signal(false);
+  readonly webSearch = signal(true);
   readonly tree = signal<CategoryNode[]>([]);
   readonly questions = signal<QuestionAnswer[]>([]);
   readonly existingCategories = signal<ExistingCategory[]>([]);
