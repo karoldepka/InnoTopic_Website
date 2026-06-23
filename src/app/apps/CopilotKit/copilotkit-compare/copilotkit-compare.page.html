@@ -1,57 +1,18 @@
 <ion-header>
   <ion-toolbar>
     <ion-buttons slot="start">
-      <ion-back-button mode="md" [defaultHref]="'/'"></ion-back-button>
+      <ion-back-button mode="md" [defaultHref]="'/ai'"></ion-back-button>
       <ion-menu-button></ion-menu-button>
     </ion-buttons>
-    <ion-title>AI Questions&Answers Generator</ion-title>
+    <ion-title>AI Copilot</ion-title>
   </ion-toolbar>
 </ion-header>
 
 <ion-content class="copilot-compare-page">
-  <div class="copilot-layout">
-    <section class="copilot-panel angular-panel">
-      <header class="panel-header">
-        <h2>Angular</h2>
-        <span class="status-dot" [class.busy]="angularBusy"></span>
-      </header>
-
-      <div class="message-list">
-        <article
-          *ngFor="let message of angularMessages; trackBy: trackMessage"
-          class="message"
-          [class.user]="message.role === 'user'"
-          [class.assistant]="message.role === 'assistant'"
-        >
-          <div class="message-body">{{ message.content }}</div>
-        </article>
-      </div>
-
-      <div *ngIf="angularError" class="error-line">{{ angularError }}</div>
-
-      <form class="composer" (ngSubmit)="sendAngularMessage()">
-        <textarea
-          name="angularInput"
-          [(ngModel)]="angularInput"
-          rows="2"
-          placeholder="Ask LifeSuite Copilot"
-        ></textarea>
-        <ion-button *ngIf="!angularBusy" type="submit" [disabled]="!angularInput.trim()">
-          <ion-icon slot="start" name="send-outline"></ion-icon>
-          Send
-        </ion-button>
-        <ion-button *ngIf="angularBusy" type="button" color="danger" (click)="stopAngularStream()">
-          <ion-icon slot="start" name="stop-circle-outline"></ion-icon>
-          Stop
-        </ion-button>
-      </form>
-    </section>
-
-    <section class="copilot-panel react-panel">
-      <header class="panel-header">
-        <h2>AI Questions&Answers Generator</h2>
-      </header>
-      <app-copilotkit-react-host></app-copilotkit-react-host>
-    </section>
-  </div>
+  <deep-chat
+    [connect]="deepChatCopilotConnect"
+    [introMessage]="deepChatIntroMessage"
+    [chatStyle]="deepChatChatStyle"
+    [messageStyles]="deepChatMessageStyles"
+  ></deep-chat>
 </ion-content>

@@ -25,6 +25,16 @@ import {FaIconLibrary} from '@fortawesome/angular-fontawesome';
 // import { ServiceWorkerModule } from '@angular/service-worker';
 import { environment } from '../environments/environment'
 import {registerIonIcons} from './register-ion-icons'
+import { HttpAgent } from '@ag-ui/client'
+import { provideCopilotKit } from '@copilotkit/angular'
+
+const copilotQaAgentId = 'lifesuite-qa'
+
+function copilotAgUiUrl(): string {
+  return environment.aiBackendUrl
+    ? `${environment.aiBackendUrl}/ai-api/copilotkit-agui`
+    : '/ai-api/copilotkit-agui'
+}
 
 const swOpts = {
   enabled: environment.production,
@@ -65,6 +75,15 @@ console.log(`service worker swOpts`, swOpts)
         StatusBar,
         SplashScreen,
         { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
+        provideCopilotKit({
+            selfManagedAgents: {
+                [copilotQaAgentId]: new HttpAgent({
+                    agentId: copilotQaAgentId,
+                    description: 'LifeSuite Q&A category generation copilot',
+                    url: copilotAgUiUrl(),
+                }),
+            },
+        }),
         // { provide: RouteReuseStrategy, useClass: }
     ],
     bootstrap: [AppComponent]

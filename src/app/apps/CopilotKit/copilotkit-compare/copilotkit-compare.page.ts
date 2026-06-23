@@ -1,186 +1,113 @@
-import { Component, OnDestroy, ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnDestroy, ChangeDetectionStrategy, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { IonicModule } from '@ionic/angular';
-import { NgFor, NgIf } from '@angular/common';
-import { ReactiveFormsModule, FormsModule } from '@angular/forms';
-import { CopilotKitReactHostComponent } from './copilotkit-react-host.component';
-
-type ChatRole = 'user' | 'assistant';
-
-type AngularChatMessage = {
-  id: string;
-  role: ChatRole;
-  content: string;
-};
-
-type AgUiEvent = {
-  type: string;
-  messageId?: string;
-  delta?: string;
-  message?: string;
-};
+import 'deep-chat';
 
 @Component({
     selector: 'app-copilotkit-compare-page',
     templateUrl: './copilotkit-compare.page.html',
     changeDetection: ChangeDetectionStrategy.Eager,
     styleUrls: ['./copilotkit-compare.page.scss'],
+    schemas: [CUSTOM_ELEMENTS_SCHEMA],
     imports: [
         IonicModule,
-        NgFor,
-        NgIf,
-        ReactiveFormsModule,
-        FormsModule,
-        CopilotKitReactHostComponent,
     ],
 })
 export class CopilotKitComparePage implements OnDestroy {
-  endpointUrl = '/ai-api/copilotkit-agui';
-  angularInput = '';
-  angularBusy = false;
-  angularError = '';
-  angularMessages: AngularChatMessage[] = [
-    {
-      id: this.makeId('assistant'),
-      role: 'assistant',
-      content: 'Ask LifeSuite Copilot',
-    },
-  ];
+  private readonly endpointUrl = '/ai-api/copilotkit-agui';
+  private readonly threadId = this.makeId('thread');
+  private activeAbortController?: AbortController;
 
-  private angularThreadId = this.makeId('thread');
-  private angularAbortController?: AbortController;
+  deepChatCopilotConnect = {
+    handler: (body: any, signals: any) => this.handleCopilotRequest(body, signals),
+  };
+
+  deepChatIntroMessage = { text: 'Ask LifeSuite Copilot anything.' };
+
+  deepChatChatStyle = {
+    width: '100%',
+    height: '100%',
+    borderRadius: '0',
+    border: 'none',
+    fontSize: '0.95rem',
+  };
+
+  deepChatMessageStyles = {
+    default: {
+      user: {
+        bubble: {
+          backgroundColor: 'var(--ion-color-primary)',
+          color: 'var(--ion-color-primary-contrast)',
+        },
+      },
+    },
+  };
 
   ngOnDestroy(): void {
-    this.angularAbortController?.abort();
+    this.activeAbortController?.abort();
   }
 
-  async sendAngularMessage(): Promise<void> {
-    const input = this.angularInput.trim();
-    if (!input || this.angularBusy) {
-      return;
-    }
+  private handleCopilotRequest(body: any, signals: any): void {
+    const abortController = new AbortController();
+    this.activeAbortController = abortController;
+    signals.stopClicked.listener = () => abortController.abort();
 
-    this.angularInput = '';
-    this.angularBusy = true;
-    this.angularError = '';
+    const messages = (body?.messages ?? []).map((m: any) => ({
+      id: this.makeId(m.role ?? 'msg'),
+      role: m.role === 'ai' ? 'assistant' : (m.role ?? 'user'),
+      content: m.text ?? '',
+    }));
 
-    this.angularMessages.push({
-      id: this.makeId('user'),
-      role: 'user',
-      content: input,
-    });
+    this.streamCopilotToSignals(messages, abortController.signal, signals);
+  }
 
-    const assistantMessage: AngularChatMessage = {
-      id: this.makeId('assistant'),
-      role: 'assistant',
-      content: '',
-    };
-    this.angularMessages.push(assistantMessage);
-
+  private async streamCopilotToSignals(messages: any[], signal: AbortSignal, signals: any): Promise<void> {
+    let accumulated = '';
     try {
-      await this.streamAngularResponse(assistantMessage);
-    } catch (error) {
-      if (error instanceof Error && error.name === 'AbortError') {
-        // user stopped the stream intentionally
-      } else {
-        this.angularError = error instanceof Error ? error.message : String(error);
-        if (!assistantMessage.content) {
-          assistantMessage.content = this.angularError;
+      const response = await fetch(this.endpointUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Accept: 'text/event-stream' },
+        body: JSON.stringify({
+          threadId: this.threadId,
+          runId: this.makeId('run'),
+          state: {},
+          messages,
+          tools: [],
+          context: [],
+          forwardedProps: { client: 'deep-chat' },
+        }),
+        signal,
+      });
+
+      if (!response.ok) throw new Error(`Backend returned HTTP ${response.status}`);
+      if (!response.body) throw new Error('No stream returned');
+
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder();
+      let buffer = '';
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        buffer += decoder.decode(value, { stream: true });
+        const frames = buffer.split(/\n\n/);
+        buffer = frames.pop() ?? '';
+        for (const frame of frames) {
+          const dataLine = frame.split('\n').find(l => l.startsWith('data:'));
+          if (!dataLine) continue;
+          try {
+            const event = JSON.parse(dataLine.slice(5).trim());
+            if (event.type === 'TEXT_MESSAGE_CONTENT' && event.delta) {
+              accumulated += event.delta;
+              signals.onResponse({ text: accumulated, isPartial: true });
+            }
+          } catch { /* malformed SSE frame */ }
         }
       }
-    } finally {
-      this.angularBusy = false;
-      this.angularAbortController = undefined;
-    }
-  }
-
-  stopAngularStream(): void {
-    this.angularAbortController?.abort();
-  }
-
-  trackMessage(_: number, message: AngularChatMessage): string {
-    return message.id;
-  }
-
-  private async streamAngularResponse(assistantMessage: AngularChatMessage): Promise<void> {
-    this.angularAbortController?.abort();
-    this.angularAbortController = new AbortController();
-
-    const response = await fetch(this.endpointUrl, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Accept: 'text/event-stream',
-      },
-      body: JSON.stringify({
-        threadId: this.angularThreadId,
-        runId: this.makeId('run'),
-        state: {},
-        messages: this.angularMessages
-          .filter(message => message.content.trim().length > 0)
-          .map(message => ({
-            id: message.id,
-            role: message.role,
-            content: message.content,
-          })),
-        tools: [],
-        context: [],
-        forwardedProps: {
-          client: 'angular-direct',
-        },
-      }),
-      signal: this.angularAbortController.signal,
-    });
-
-    if (!response.ok) {
-      throw new Error(`Backend returned HTTP ${response.status}`);
-    }
-
-    if (!response.body) {
-      throw new Error('Backend did not return a stream');
-    }
-
-    const reader = response.body.getReader();
-    const decoder = new TextDecoder();
-    let buffer = '';
-
-    while (true) {
-      const readResult = await reader.read();
-      if (readResult.done) {
-        break;
+      signals.onResponse({ text: accumulated || '(No response)' });
+    } catch (e: any) {
+      if (e?.name !== 'AbortError') {
+        signals.onResponse({ error: e?.message ?? 'Copilot error' });
       }
-
-      buffer += decoder.decode(readResult.value, { stream: true });
-      const frames = buffer.split(/\n\n/);
-      buffer = frames.pop() ?? '';
-
-      for (const frame of frames) {
-        this.applyAgUiFrame(frame, assistantMessage);
-      }
-    }
-
-    if (buffer.trim()) {
-      this.applyAgUiFrame(buffer, assistantMessage);
-    }
-  }
-
-  private applyAgUiFrame(frame: string, assistantMessage: AngularChatMessage): void {
-    const data = frame
-      .split('\n')
-      .filter(line => line.startsWith('data:'))
-      .map(line => line.slice(5).trim())
-      .join('\n');
-
-    if (!data) {
-      return;
-    }
-
-    const event = JSON.parse(data) as AgUiEvent;
-    if (event.type === 'TEXT_MESSAGE_CONTENT' && event.delta) {
-      assistantMessage.content += event.delta;
-    }
-
-    if (event.type === 'RUN_ERROR') {
-      throw new Error(event.message ?? 'CopilotKit AG-UI run failed');
     }
   }
 

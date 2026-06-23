@@ -162,7 +162,15 @@
   </ng-container>
 
   <ng-template #notLoaded>
-    <div style="margin: 20px">Loading...</div>
+    <div *ngIf="!itemLoadFinished; else itemMissing" style="margin: 20px">Loading...</div>
+    <ng-template #itemMissing>
+      <div style="margin: 20px">
+        Item not found: {{ id }}
+        <div *ngIf="itemLoadError" style="margin-top: 8px; color: var(--ion-color-danger)">
+          {{ itemLoadError }}
+        </div>
+      </div>
+    </ng-template>
   </ng-template>
 
 </ion-content>

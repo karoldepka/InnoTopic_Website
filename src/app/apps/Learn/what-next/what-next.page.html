@@ -21,7 +21,12 @@
     <span *ngIf="g.feat.showTodosNotes">First stuff that has to be done quickly every day anyway (independent of time available or boredom) - will become a habit</span>
     <ion-button *ngIf="g.feat.showExperimental" [routerLink]="'/learn/item/LearnItem__2022-05-26__17.33.46.061Z_'">Affirmations</ion-button>
     <ion-button *ngIf="g.feat.showExperimental" (click)="cravingFun()">Craving&nbsp;<span style="text-emphasis: 'x' orange"><!--Orange as warning (not negative)-->fun</span>&nbsp;Panic Button <span>&nbsp;</span> <ion-note> (Quiz/Tasks)</ion-note></ion-button>
-    <app-quiz-button style="display: block; margin-bottom: 0.5rem" />
+    <div class="primary-learn-actions">
+      <app-quiz-button />
+      <ion-button routerLink="/ai-generate-q-and-a/vercel-ai-sdk" size="big">
+        Generate questions, answers
+      </ion-button>
+    </div>
 
     <ng-container *ngIf="g.feat.mockups">
       <p><ion-note>Idea: generate a day (or time-chunk) plan proposal, instead of just next item</ion-note></p>

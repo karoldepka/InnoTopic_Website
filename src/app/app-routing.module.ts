@@ -95,8 +95,29 @@ const routes: Routes = [
     loadChildren: () => import('./apps/Lifedvisor/ask/ask.module').then(m => m.AskPageModule)
   },
   {
+    path: 'ai',
+    loadComponent: () => import('./apps/Ai/ai-hub/ai-hub.page').then(m => m.AiHubPage),
+  },
+  {
+    path: 'ai/qa',
+    loadComponent: () => import('./apps/Ai/ai-qa/ai-qa.page').then(m => m.AiQaPage),
+  },
+  {
+    path: 'ai-generate-q-and-a/vercel-ai-sdk',
+    loadComponent: () => import('./apps/Ai/ai-generate-q-and-a/vercel-ai-sdk/vercel-ai-sdk-qa.page').then(m => m.VercelAiSdkQaPage),
+  },
+  {
+    path: 'ai-generate-q-and-a/copilotkit',
+    loadComponent: () => import('./apps/Ai/ai-generate-q-and-a/copilotkit/copilotkit-qa.page').then(m => m.CopilotkitQaPage),
+  },
+  {
     path: 'copilotkit',
     loadChildren: () => import('./apps/CopilotKit/copilotkit-compare/copilotkit-compare.module').then(m => m.CopilotKitCompareModule)
+  },
+  {
+    path: 'vercel-ai-sdk',
+    redirectTo: 'ai-generate-q-and-a/vercel-ai-sdk',
+    pathMatch: 'full',
   },
   {
     path: 'life-overviews',

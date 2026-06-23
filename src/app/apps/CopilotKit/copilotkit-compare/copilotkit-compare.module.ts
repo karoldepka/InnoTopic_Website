@@ -5,7 +5,6 @@ import { IonicModule } from '@ionic/angular';
 
 import { CopilotKitCompareRoutingModule } from './copilotkit-compare-routing.module';
 import { CopilotKitComparePage } from './copilotkit-compare.page';
-import { CopilotKitReactHostComponent } from './copilotkit-react-host.component';
 
 @NgModule({
     imports: [
@@ -14,7 +13,6 @@ import { CopilotKitReactHostComponent } from './copilotkit-react-host.component'
         IonicModule,
         CopilotKitCompareRoutingModule,
         CopilotKitComparePage,
-        CopilotKitReactHostComponent,
     ],
 })
 export class CopilotKitCompareModule {}

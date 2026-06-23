@@ -1,0 +1,258 @@
+:host {
+  display: block;
+  min-height: 100%;
+}
+
+.qa-workbench {
+  display: grid;
+  grid-template-columns: minmax(280px, 0.95fr) minmax(360px, 1.25fr) minmax(360px, 1.35fr);
+  gap: 14px;
+  min-height: 100%;
+  padding: 14px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.055), rgba(255, 255, 255, 0)),
+    var(--ion-background-color);
+}
+
+.prompt-panel,
+.tree-panel,
+.questions-panel {
+  display: flex;
+  min-width: 0;
+  min-height: 0;
+  flex-direction: column;
+  border: 1px solid rgba(155, 169, 186, 0.28);
+  border-radius: 8px;
+  background: rgba(20, 24, 28, 0.72);
+}
+
+.prompt-panel {
+  gap: 12px;
+  padding: 14px;
+}
+
+.panel-heading,
+.panel-bar,
+.action-row,
+.metrics-row,
+.footer-row,
+.question-actions,
+.question-row {
+  display: flex;
+  align-items: center;
+}
+
+.panel-heading,
+.panel-bar {
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.panel-heading h1,
+.panel-bar h2 {
+  margin: 0;
+  color: var(--ion-text-color);
+  font-size: 1.05rem;
+  line-height: 1.2;
+  letter-spacing: 0;
+}
+
+.panel-heading p {
+  margin: 3px 0 0;
+  color: var(--ion-color-medium);
+  font-size: 0.82rem;
+}
+
+.field-label {
+  color: var(--ion-color-medium);
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.example-row,
+.metrics-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.example-row ion-button {
+  --padding-start: 6px;
+  --padding-end: 6px;
+  height: 28px;
+}
+
+.action-row {
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.metrics-row span,
+.existing-chip {
+  border: 1px solid rgba(122, 186, 152, 0.35);
+  border-radius: 999px;
+  padding: 3px 8px;
+  color: #b9dcc9;
+  background: rgba(60, 127, 91, 0.13);
+  font-size: 0.76rem;
+  white-space: nowrap;
+}
+
+.status-line {
+  min-height: 22px;
+  color: #c6d2df;
+  font-size: 0.84rem;
+  line-height: 1.35;
+}
+
+.status-line.error {
+  color: #ffb4a8;
+}
+
+.tree-panel,
+.questions-panel {
+  overflow: hidden;
+}
+
+.tree-panel .panel-bar,
+.questions-panel .panel-bar {
+  min-height: 52px;
+  border-bottom: 1px solid rgba(155, 169, 186, 0.2);
+  padding: 8px 10px;
+}
+
+.tree-list,
+.question-list {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  padding: 8px;
+}
+
+.category-row {
+  display: grid;
+  grid-template-columns: minmax(150px, 1fr) auto 58px 34px 34px;
+  gap: 6px;
+  align-items: center;
+  min-height: 42px;
+  border-bottom: 1px solid rgba(155, 169, 186, 0.12);
+}
+
+.category-row:last-child {
+  border-bottom: 0;
+}
+
+.category-title,
+.question-count {
+  min-width: 0;
+  height: 32px;
+  border: 1px solid rgba(155, 169, 186, 0.25);
+  border-radius: 6px;
+  padding: 5px 8px;
+  color: var(--ion-text-color);
+  background: rgba(4, 8, 12, 0.36);
+  font: inherit;
+}
+
+.question-count {
+  text-align: right;
+}
+
+.existing-chip {
+  max-width: 82px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.footer-row {
+  justify-content: flex-end;
+  border-top: 1px solid rgba(155, 169, 186, 0.2);
+  padding: 10px;
+}
+
+.question-actions {
+  gap: 4px;
+}
+
+.question-card {
+  border: 1px solid rgba(155, 169, 186, 0.22);
+  border-radius: 8px;
+  padding: 10px;
+  background: rgba(4, 8, 12, 0.24);
+}
+
+.question-card + .question-card {
+  margin-top: 8px;
+}
+
+.question-path {
+  margin-bottom: 6px;
+  color: #9fd0bf;
+  font-size: 0.75rem;
+}
+
+.question-row {
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.question-row strong {
+  min-width: 0;
+  font-size: 0.94rem;
+  line-height: 1.35;
+}
+
+.answer-text {
+  margin: 8px 0 0;
+  border-left: 3px solid #7aba98;
+  padding-left: 9px;
+  color: #dce8f0;
+  line-height: 1.42;
+}
+
+.empty-state {
+  margin: 10px;
+  border: 1px dashed rgba(155, 169, 186, 0.34);
+  border-radius: 8px;
+  padding: 14px;
+  color: var(--ion-color-medium);
+}
+
+@media (max-width: 1180px) {
+  .qa-workbench {
+    grid-template-columns: minmax(280px, 0.95fr) minmax(420px, 1.4fr);
+  }
+
+  .questions-panel {
+    grid-column: 1 / -1;
+    min-height: 360px;
+  }
+}
+
+@media (max-width: 760px) {
+  .qa-workbench {
+    display: flex;
+    flex-direction: column;
+    padding: 10px;
+  }
+
+  .tree-panel,
+  .questions-panel {
+    min-height: 430px;
+  }
+
+  .category-row {
+    grid-template-columns: minmax(120px, 1fr) 52px 32px 32px;
+  }
+
+  .existing-chip {
+    display: none;
+  }
+
+  .action-row,
+  .panel-heading {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}

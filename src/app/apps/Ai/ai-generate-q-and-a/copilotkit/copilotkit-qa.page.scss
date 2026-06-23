@@ -1,0 +1,72 @@
+:host {
+  display: block;
+  height: 100%;
+}
+
+.copilotkit-qa-page {
+  --background: var(--ion-background-color);
+}
+
+.copilotkit-layout {
+  display: grid;
+  grid-template-columns: minmax(320px, 0.72fr) minmax(0, 1.8fr);
+  gap: 14px;
+  min-height: 100%;
+  padding: 14px;
+}
+
+.copilot-panel {
+  display: flex;
+  min-width: 0;
+  min-height: 620px;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid rgba(155, 169, 186, 0.28);
+  border-radius: 8px;
+  background: rgba(20, 24, 28, 0.72);
+}
+
+.copilot-panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  min-height: 52px;
+  border-bottom: 1px solid rgba(155, 169, 186, 0.2);
+  padding: 8px 12px;
+}
+
+.copilot-panel-header h2 {
+  margin: 0;
+  font-size: 1rem;
+  line-height: 1.2;
+  letter-spacing: 0;
+}
+
+.copilot-panel-header span {
+  color: var(--ion-color-medium);
+  font-size: 0.78rem;
+}
+
+copilot-chat {
+  display: block;
+  flex: 1;
+  min-height: 0;
+}
+
+app-ai-qa-workbench {
+  min-width: 0;
+  min-height: 620px;
+}
+
+@media (max-width: 1100px) {
+  .copilotkit-layout {
+    display: flex;
+    flex-direction: column;
+    padding: 10px;
+  }
+
+  .copilot-panel {
+    min-height: 460px;
+  }
+}

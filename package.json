@@ -25,7 +25,8 @@
   },
   "private": true,
   "dependencies": {
-    "@ag-ui/client": "^0.0.53",
+    "@ag-ui/client": "^0.0.57",
+    "@ai-sdk/angular": "^2.0.209",
     "@angular/animations": "^22.0.2",
     "@angular/cdk": "^22.0.2",
     "@angular/cdk-experimental": "^22.0.2",
@@ -43,6 +44,7 @@
     "@capacitor/core": "^1.5.2",
     "@capacitor/ios": "^1.5.2",
     "@ckeditor/ckeditor5-angular": "^11.2.0",
+    "@copilotkit/angular": "^0.1.2",
     "@copilotkit/react-core": "^1.59.2",
     "@fortawesome/angular-fontawesome": "^5.0.0",
     "@fortawesome/fontawesome-svg-core": "^1.2.8",

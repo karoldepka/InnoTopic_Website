@@ -1,0 +1,29 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button mode="md" defaultHref="/ai"></ion-back-button>
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+    <ion-title>Q&amp;A · CopilotKit</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="copilotkit-qa-page">
+  <div [copilotkitAgentContext]="agentContext"></div>
+
+  <div class="copilotkit-layout">
+    <section class="copilot-panel">
+      <div class="copilot-panel-header">
+        <h2>CopilotKit</h2>
+        <span>AG-UI HttpAgent</span>
+      </div>
+      <copilot-chat [agentId]="agentId"></copilot-chat>
+    </section>
+
+    <app-ai-qa-workbench
+      integration="copilotkit"
+      integrationTitle="CopilotKit"
+      integrationSubtitle="@copilotkit/angular with AG-UI"
+    ></app-ai-qa-workbench>
+  </div>
+</ion-content>

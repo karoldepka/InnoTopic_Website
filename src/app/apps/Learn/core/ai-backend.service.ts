@@ -9,6 +9,58 @@ export interface AIResponse {
   searchResults?: string[];
 }
 
+export interface ExistingCategory {
+  id: string;
+  title: string;
+  path?: string | null;
+  aliases?: string[];
+}
+
+export interface CategoryNode {
+  id: string;
+  title: string;
+  questionCount: number;
+  children: CategoryNode[];
+  matchedExistingCategoryId?: string | null;
+  matchedExistingCategoryTitle?: string | null;
+  isExistingCategory?: boolean;
+}
+
+export interface CategoryTreeRequest {
+  message: string;
+  tree: CategoryNode[];
+  web_search?: boolean;
+}
+
+export interface CategoryTreeResponse {
+  tree: CategoryNode[];
+  assistantMessage: string;
+  modelName?: string;
+  searchResults?: string[];
+}
+
+export interface QuestionAnswer {
+  categoryId: string;
+  categoryPath: string;
+  question: string;
+  answer: string;
+}
+
+export interface QuestionAnswerRequest {
+  tree: CategoryNode[];
+  web_search?: boolean;
+}
+
+export interface QuestionAnswerResponse {
+  items: QuestionAnswer[];
+  modelName?: string;
+  searchResults?: string[];
+}
+
+export interface ExistingCategoriesResponse {
+  categories: ExistingCategory[];
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -17,15 +69,31 @@ export class AiBackendService {
 
   constructor(private http: HttpClient) { }
 
+  apiUrl(path: string): string {
+    return `${this.baseUrl}${path.startsWith('/') ? path : `/${path}`}`;
+  }
+
+  getExistingCategories(): Observable<ExistingCategoriesResponse> {
+    return this.http.get<ExistingCategoriesResponse>(this.apiUrl('/categories/existing'));
+  }
+
+  generateCategoryTree(request: CategoryTreeRequest): Observable<CategoryTreeResponse> {
+    return this.http.post<CategoryTreeResponse>(this.apiUrl('/category-tree'), request);
+  }
+
+  generateQuestionAnswers(request: QuestionAnswerRequest): Observable<QuestionAnswerResponse> {
+    return this.http.post<QuestionAnswerResponse>(this.apiUrl('/category-tree/questions'), request);
+  }
+
   generateAnswer(question: string, context: string = ''): Observable<AIResponse> {
-    return this.http.post<AIResponse>(`${this.baseUrl}/generate-answer`, {
+    return this.http.post<AIResponse>(this.apiUrl('/generate-answer'), {
       question,
       context
     });
   }
 
   generateAnswerWithWebSearch(question: string, context: string = ''): Observable<AIResponse> {
-    return this.http.post<AIResponse>(`${this.baseUrl}/generate-answer`, {
+    return this.http.post<AIResponse>(this.apiUrl('/generate-answer'), {
       question,
       context,
       web_search: true,
@@ -41,7 +109,7 @@ export class AiBackendService {
       const abortController = new AbortController()
 
       ;(async () => {
-        const response = await fetch(`${this.baseUrl}/generate-answer-stream`, {
+        const response = await fetch(this.apiUrl('/generate-answer-stream'), {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',

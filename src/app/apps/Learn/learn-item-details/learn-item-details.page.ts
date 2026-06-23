@@ -7,6 +7,7 @@ import { AlertController, IonicModule } from '@ionic/angular'
 import {LearnItem, LearnItemId} from '../models/LearnItem'
 import {ignorePromise} from '../../../libs/AppFedShared/utils/promiseUtils'
 import {Observable} from 'rxjs'
+import {take} from 'rxjs/operators'
 import {nullish} from '../../../libs/AppFedShared/utils/type-utils'
 import {LearnItem$} from '../models/LearnItem$'
 import {NavigationService} from '../../../shared/navigation.service'
@@ -77,6 +78,8 @@ export class LearnItemDetailsPage extends BaseComponent implements OnInit {
   public id: LearnItemId = this.activatedRoute.snapshot.params['itemId']
   public item$: LearnItem$ = this.learnDoService.obtainItem$ById(this.id)
   public title? : string
+  public itemLoadFinished = false
+  public itemLoadError = ''
 
   constructor(
     public activatedRoute: ActivatedRoute,
@@ -102,6 +105,20 @@ export class LearnItemDetailsPage extends BaseComponent implements OnInit {
   private audioDoc = this.angularFirestore.collection(`LearnDoAudio`).doc(this.id)
 
   ngOnInit() {
+    this.doc.get().pipe(take(1)).subscribe({
+      next: snapshot => {
+        this.itemLoadFinished = true
+        const rawItem = snapshot.exists ? snapshot.data() : undefined
+        if (rawItem) {
+          this.item$.applyDataFromDbAndEmit(this.learnDoService.convertFromDbFormat(rawItem))
+        }
+      },
+      error: error => {
+        this.itemLoadFinished = true
+        this.itemLoadError = error?.message ?? `${error}`
+        console.error('Failed to load routed learn item', this.id, error)
+      },
+    })
   }
 
   async askDelete() {
