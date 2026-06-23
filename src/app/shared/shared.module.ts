@@ -1,7 +1,6 @@
 import {NgModule} from "@angular/core";
 import {FormsModule, ReactiveFormsModule} from "@angular/forms";
 import {IonicModule} from "@ionic/angular";
-import {EditorModule} from '@tinymce/tinymce-angular'
 import {RichTextViewComponent} from '../libs/AppFedShared/rich-text/rich-text-view/rich-text-view.component'
 import {CommonModule} from '@angular/common'
 import {ImportanceComponent} from '../libs/AppFedShared/importance/importance.component'
@@ -16,17 +15,7 @@ import {WhatNextButtonComponent} from './what-next-button/what-next-button.compo
 import {RouterModule} from '@angular/router'
 import {AppLogoComponent} from '../apps/Common/app-logo/app-logo.component'
 import {BreadcrumbsComponent} from '../libs/AppFedShared/breadcrumbs/breadcrumbs.component'
-import {ItemSubItemComponent} from '../apps/Learn/learn-item-details/item-sub-items/item-sub-item/item-sub-item.component'
-import {LearnItemDetailsPageModule} from '../apps/Learn/learn-item-details/learn-item-details.module'
-import {ItemSubItemsComponent} from '../apps/Learn/learn-item-details/item-sub-items/item-sub-items.component'
-import {OdmTreeModule} from '../libs/AppFedShared/tree/odm-tree.module'
-
-let imports = [
-  ReactiveFormsModule,
-  FormsModule,
-];
-
-const exportedDeclarations = [
+const sharedComponents = [
   RichTextEditComponent,
   RichTextViewComponent,
   ImportanceComponent,
@@ -38,25 +27,22 @@ const exportedDeclarations = [
   ImportanceBannerComponent,
   WhatNextButtonComponent,
   AppLogoComponent,
-]
+];
 
-/** TODO i prolly need a utils module with zero of my own deps (or at least no deps that have more of my own deps)
- * or OdmShared
- *
- * */
 @NgModule({
     imports: [
         CommonModule,
         IonicModule,
-        ...imports,
-        EditorModule,
+        ReactiveFormsModule,
+        FormsModule,
         RouterModule,
-        ...exportedDeclarations,
+        ...sharedComponents,
         BreadcrumbsComponent,
     ],
     exports: [
-        ...imports,
-        ...exportedDeclarations,
+        ReactiveFormsModule,
+        FormsModule,
+        ...sharedComponents,
         BreadcrumbsComponent,
     ],
     providers: [],

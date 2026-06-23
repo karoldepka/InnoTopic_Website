@@ -1,4 +1,4 @@
-import {Component, Input, OnInit, ChangeDetectionStrategy} from '@angular/core';
+import {Component, Input, OnInit, ChangeDetectionStrategy, forwardRef} from '@angular/core';
 import {OdmTreeNode} from './OdmTreeNode'
 import {OdmItem$2} from '../../odm/OdmItem$2'
 import {OdmService2} from '../../odm/OdmService2'
@@ -7,14 +7,20 @@ import {LearnItem} from '../../../../apps/Learn/models/LearnItem'
 import { ToastController, IonicModule } from '@ionic/angular'
 import { OdmTreeNodeContentComponent } from './tree-node-content/odm-tree-node-content.component';
 import { NgIf, NgFor, AsyncPipe } from '@angular/common';
-import { OdmTreeModule } from '../odm-tree.module';
 
 @Component({
     selector: 'app-tree-node',
     templateUrl: './odm-tree-node.component.html',
     changeDetection: ChangeDetectionStrategy.Eager,
     styleUrls: ['./odm-tree-node.component.css'],
-    imports: [OdmTreeNodeContentComponent, NgIf, IonicModule, NgFor, OdmTreeModule, AsyncPipe]
+    imports: [
+        OdmTreeNodeContentComponent,
+        NgIf,
+        IonicModule,
+        NgFor,
+        forwardRef(() => OdmTreeNodeComponent),
+        AsyncPipe,
+    ]
 })
 export class OdmTreeNodeComponent implements OnInit {
 
