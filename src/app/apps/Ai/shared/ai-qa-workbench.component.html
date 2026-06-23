@@ -46,17 +46,17 @@
       >Web search</ion-toggle>
 
       <ion-button
-        [color]="categoryLoading() ? 'danger' : 'primary'"
-        [disabled]="!categoryLoading() && !topic().trim()"
-        (click)="categoryLoading() ? stopCategories() : generateCategories()"
+        [color]="gen.categoryLoading() ? 'danger' : 'primary'"
+        [disabled]="!gen.categoryLoading() && !topic().trim()"
+        (click)="gen.categoryLoading() ? stopCategories() : generateCategories()"
       >
-        <ion-icon [name]="categoryLoading() ? 'stop-circle-outline' : 'sparkles-outline'" slot="start"></ion-icon>
-        {{ categoryLoading() ? 'Stop' : 'Step 1: Generate Categories' }}
+        <ion-icon [name]="gen.categoryLoading() ? 'stop-circle-outline' : 'sparkles-outline'" slot="start"></ion-icon>
+        {{ gen.categoryLoading() ? 'Stop' : 'Step 1: Generate Categories' }}
       </ion-button>
     </div>
 
-    <div class="status-line" [class.error]="categoryError()">
-      {{ categoryError() || categoryStatus() }}
+    <div class="status-line" [class.error]="gen.categoryError()">
+      {{ gen.categoryError() || gen.categoryStatus() }}
       <ion-button
         *ngIf="lastDeletedTree()"
         fill="clear"
@@ -70,10 +70,10 @@
     </div>
 
     <div class="metrics-row">
-      <span>{{ categoryCount() }} categories</span>
+      <span>{{ gen.categoryCount() }} categories</span>
       <span>{{ requestedQuestionCount() }} requested Q&A</span>
-      <span>{{ existingCategories().length }} existing</span>
-      <span *ngIf="modelName()">{{ modelName() }}</span>
+      <span>{{ gen.existingCategories().length }} existing</span>
+      <span *ngIf="gen.modelName()">{{ gen.modelName() }}</span>
     </div>
   </section>
 
@@ -143,18 +143,17 @@
     </div>
 
     <ng-template #emptyTree>
-
       <div class="empty-state">No categories yet.</div>
     </ng-template>
 
     <div class="footer-row">
       <ion-button
-        [color]="questionLoading() ? 'danger' : 'secondary'"
-        [disabled]="!questionLoading() && (!tree().length || requestedQuestionCount() === 0)"
-        (click)="questionLoading() ? stopQuestions() : generateQuestions()"
+        [color]="gen.questionLoading() ? 'danger' : 'secondary'"
+        [disabled]="!gen.questionLoading() && (!gen.tree().length || requestedQuestionCount() === 0)"
+        (click)="gen.questionLoading() ? stopQuestions() : generateQuestions()"
       >
-        <ion-icon [name]="questionLoading() ? 'stop-circle-outline' : 'checkmark-outline'" slot="start"></ion-icon>
-        {{ questionLoading() ? 'Stop' : 'Generate Q&A' }}
+        <ion-icon [name]="gen.questionLoading() ? 'stop-circle-outline' : 'checkmark-outline'" slot="start"></ion-icon>
+        {{ gen.questionLoading() ? 'Stop' : 'Generate Q&A' }}
       </ion-button>
     </div>
   </section>
@@ -168,21 +167,21 @@
           [checked]="showAnswers()"
           (ionChange)="showAnswers.set($any($event).detail.checked)"
         >Show answers</ion-toggle>
-        <ion-button fill="clear" size="small" [disabled]="!questions().length" (click)="copyQuestions()">
+        <ion-button fill="clear" size="small" [disabled]="!gen.questions().length" (click)="copyQuestions()">
           <ion-icon name="copy-outline" slot="icon-only"></ion-icon>
         </ion-button>
-        <ion-button fill="clear" size="small" [disabled]="!questions().length" (click)="exportJson()">
+        <ion-button fill="clear" size="small" [disabled]="!gen.questions().length" (click)="exportJson()">
           <ion-icon name="download-outline" slot="icon-only"></ion-icon>
         </ion-button>
       </div>
     </div>
 
-    <div class="status-line" [class.error]="questionError()">
-      {{ questionError() || questionStatus() }}
+    <div class="status-line" [class.error]="gen.questionError()">
+      {{ gen.questionError() || gen.questionStatus() }}
     </div>
 
-    <div class="question-list" *ngIf="questions().length; else emptyQuestions">
-      <article class="question-card" *ngFor="let item of questions(); let index = index; trackBy: trackQuestion">
+    <div class="question-list" *ngIf="gen.questions().length; else emptyQuestions">
+      <article class="question-card" *ngFor="let item of gen.questions(); let index = index; trackBy: trackQuestion">
         <div class="question-path">{{ item.categoryPath || item.categoryId }}</div>
         <div class="question-row">
           <strong>{{ item.question }}</strong>

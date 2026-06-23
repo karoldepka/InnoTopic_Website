@@ -257,13 +257,20 @@ def create_category_tree_chain():
             "- The topic field is a seed for a study taxonomy, not an existing item to classify. "
             "  Do not categorize the topic phrase itself; build a detailed subject taxonomy around it.\n"
             "- If the existing tree is empty, generate a fresh tree from scratch.\n"
-            "- If the existing tree is non-empty, modify or expand it according to the topic.\n"
+            "- If the existing tree is non-empty, KEEP all existing nodes and only ADD, RENAME, or "
+            "  RESTRUCTURE according to the new topic/refinement. Do NOT drop existing nodes unless "
+            "  the user explicitly says to replace or remove categories. "
+            "  Preserve all existing node ids exactly.\n"
             "- Match generated categories to the pre-existing categories list ONLY when the match is "
-            "  specific and unambiguous — the category title AND subject must align closely. "
-            "  Do NOT match on broad or generic categories (e.g. do not match 'Interview Questions' to "
-            "  anything; do not match 'Programming' to a specific language topic). "
-            "  A good match: generated 'Ownership & Borrowing' → existing 'Rust Ownership'. "
-            "  A bad match: generated 'Rust Interview Questions' → existing 'Interview Questions'. "
+            "  specific and unambiguous — the category title AND subject domain must align closely. "
+            "  Rules for matching:\n"
+            "  * NEVER match across different technologies, languages, or domains "
+            "    (e.g. a Rust node must never match a Python or JavaScript existing category).\n"
+            "  * NEVER match on generic/broad categories (e.g. 'Interview Questions', 'Programming', "
+            "    'Concepts', 'Basics' — these are too generic to be a meaningful match).\n"
+            "  * Only match when the existing category is specifically about the same sub-topic "
+            "    (e.g. generated 'Ownership & Borrowing' → existing 'Rust Ownership' is a good match; "
+            "    generated 'Rust vs Python' → existing 'Python' is NOT a match).\n"
             "  For matched nodes set matchedExistingCategoryId, matchedExistingCategoryTitle, isExistingCategory:true.\n"
             "- Return ONLY valid JSON with keys `assistantMessage` and `tree`. "
             "  No markdown fences, no greeting, no explanation, no text before or after the JSON.\n"
@@ -1122,6 +1129,25 @@ async def category_tree_stream(category_request: CategoryTreeRequest):
 
     return StreamingResponse(stream_events(), media_type="text/event-stream")
 
+async def stream_json_from_chain(chain: Any, inputs: dict[str, Any]):
+    """Yield LLM text chunks, stripping leading markdown fences so only JSON reaches the client."""
+    json_started = False
+    async for chunk in chain.astream(inputs):
+        content = getattr(chunk, "content", "")
+        if not content:
+            continue
+        if not json_started:
+            idx = content.find("{")
+            if idx == -1:
+                continue
+            content = content[idx:]
+            json_started = True
+        # Strip stray backtick sequences the LLM may append after the closing }
+        content = content.replace("```", "")
+        if content:
+            yield content
+
+
 @app.post("/category-tree/stream-json")
 @app.post("/ai-api/category-tree/stream-json")
 async def category_tree_stream_json(category_request: CategoryTreeRequest):
@@ -1129,19 +1155,13 @@ async def category_tree_stream_json(category_request: CategoryTreeRequest):
     search_results = web_search(category_request.message) if category_request.web_search else []
     existing_categories_list = load_existing_categories()
     chain = create_category_tree_chain()
-
-    async def generate():
-        async for chunk in chain.astream({
-            "message": category_request.message,
-            "tree_json": json.dumps([node.model_dump() for node in category_request.tree]),
-            "existing_categories_json": existing_categories_as_prompt_json(existing_categories_list),
-            "web_search_notes": "\n".join(search_results) or "(none)",
-        }):
-            content = getattr(chunk, "content", "")
-            if content:
-                yield content
-
-    return StreamingResponse(generate(), media_type="text/plain")
+    inputs = {
+        "message": category_request.message,
+        "tree_json": json.dumps([node.model_dump() for node in category_request.tree]),
+        "existing_categories_json": existing_categories_as_prompt_json(existing_categories_list),
+        "web_search_notes": "\n".join(search_results) or "(none)",
+    }
+    return StreamingResponse(stream_json_from_chain(chain, inputs), media_type="text/plain")
 
 
 @app.post("/category-tree/questions/stream-json")
@@ -1152,18 +1172,12 @@ async def category_tree_questions_stream_json(question_request: QuestionAnswerRe
     search_query = " ".join(r["categoryPath"] for r in generation_requests[:8])
     search_results = web_search(search_query) if question_request.web_search else []
     chain = create_question_answer_chain()
-
-    async def generate():
-        async for chunk in chain.astream({
-            "tree_json": json.dumps([node.model_dump() for node in question_request.tree]),
-            "requests_json": json.dumps(generation_requests),
-            "web_search_notes": "\n".join(search_results) or "(none)",
-        }):
-            content = getattr(chunk, "content", "")
-            if content:
-                yield content
-
-    return StreamingResponse(generate(), media_type="text/plain")
+    inputs = {
+        "tree_json": json.dumps([node.model_dump() for node in question_request.tree]),
+        "requests_json": json.dumps(generation_requests),
+        "web_search_notes": "\n".join(search_results) or "(none)",
+    }
+    return StreamingResponse(stream_json_from_chain(chain, inputs), media_type="text/plain")
 
 
 @app.post("/category-tree/questions", response_model=QuestionAnswerResponse)
