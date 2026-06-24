@@ -4,7 +4,7 @@
 <!--       height="27" style="margin-left: 5px; cursor: pointer"-->
 <!--  >-->
   <i style="font-size: 35px; padding: 0.5rem; transform: rotate(-45deg)"
-     (tap)="treeHost.navigateUp($event)"
+     (click)="treeHost.navigateUp($event)"
      (window:keydown.meta.arrowup)="treeHost.navigateUp($event)"
      (press)="treeHost.navigateToRoot($event)"
      class="material-icons actionable"

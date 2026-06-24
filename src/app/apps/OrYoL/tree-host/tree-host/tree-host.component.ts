@@ -203,15 +203,13 @@ export class TreeHostComponent implements OnInit {
   planToday(createNew?: boolean) {
     this.commandsService.planToday()
     const plansNode = this.treeModel.getNodesByItemId('item_35023937-195c-4b9c-b265-5e8a01cf397e')[0]
+    if ( !plansNode ) return
     let lastPlanNode = plansNode.lastChildNode
     if ( createNew ) {
       lastPlanNode = plansNode.addChild()
-      // TODO:
-      // lastPlanNode.
     }
-    // lastPlanNode.parent2.navigateInto()
-    lastPlanNode ?. navigateInto()
-    lastPlanNode ?. expansion.setExpanded(true, {recursive: false})
+    lastPlanNode?.navigateInto()
+    lastPlanNode?.expansion.setExpanded(true, {recursive: false})
     this.focusNode(lastPlanNode)
   }
 

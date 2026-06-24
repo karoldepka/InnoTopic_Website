@@ -1,4 +1,4 @@
-import {Injectable, Injector} from '@angular/core';
+import {Injectable, Injector, runInInjectionContext} from '@angular/core';
 // import Timestamp = firebase.firestore.Timestamp
 import { ItemId } from '../db/OryItem$'
 import { errorAlert } from '../utils/log'
@@ -89,9 +89,9 @@ export class TimeTrackingPeriodsService extends BaseService {
       return
     }
     period.end = Timestamp.now()
-    this.coll.doc(period.id).update({
-      end: period.end
-    }) // TODO id
+    runInInjectionContext(this.injector, () => {
+      this.coll.doc(period.id).update({ end: period.end })
+    })
 
     // TODO: update in DB
   }
@@ -103,9 +103,9 @@ export class TimeTrackingPeriodsService extends BaseService {
       Timestamp.now(),
       null,
     )
-    // TODO: push to DB collection "TimeTrackedEntry
-    // this.coll.add(Object.assign({}, period))
-    this.coll.doc(period.id).set(Object.assign({}, period))
+    runInInjectionContext(this.injector, () => {
+      this.coll.doc(period.id).set(Object.assign({}, period))
+    })
     return period
 //
 //     FIXME
