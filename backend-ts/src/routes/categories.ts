@@ -1,13 +1,31 @@
 import { Hono } from 'hono';
-import { streamText } from 'ai';
+import { streamObject, generateObject } from 'ai';
+import { z } from 'zod';
 import { llm, MODEL_NAME } from '../llm.js';
 import { webSearch } from '../web-search.js';
 import { loadExistingCategories } from '../existing-categories.js';
 import { buildCategoryTreeMessages } from '../prompts.js';
-import { stripJsonFences, textStreamResponse } from '../utils.js';
+import { textStreamResponse } from '../utils.js';
 import type { CategoryTreeRequest } from '../types.js';
 
 export const categoriesRouter = new Hono();
+
+// ─── Zod schemas ──────────────────────────────────────────────────────────────
+
+const categoryNodeSchema: z.ZodType<any> = z.lazy(() => z.object({
+  id: z.string(),
+  title: z.string(),
+  questionCount: z.number(),
+  children: z.array(categoryNodeSchema),
+  matchedExistingCategoryId: z.string().nullable().optional(),
+  matchedExistingCategoryTitle: z.string().nullable().optional(),
+  isExistingCategory: z.boolean().optional(),
+}));
+
+const categoryTreeResponseSchema = z.object({
+  tree: z.array(categoryNodeSchema),
+  assistantMessage: z.string().optional(),
+});
 
 // ─── Existing categories ───────────────────────────────────────────────────────
 
@@ -27,8 +45,13 @@ async function handleCategoryTreeStream(c: import('hono').Context) {
   const existingCategories = loadExistingCategories();
   const messages = buildCategoryTreeMessages(body, existingCategories, searchResults);
 
-  const { textStream } = streamText({ model: llm, messages });
-  return textStreamResponse(stripJsonFences(textStream));
+  const { textStream } = streamObject({
+    model: llm,
+    schema: categoryTreeResponseSchema,
+    messages,
+    experimental_telemetry: { isEnabled: true, functionId: 'category-tree-stream' },
+  });
+  return textStreamResponse(textStream);
 }
 
 categoriesRouter.post('/category-tree/stream-json', handleCategoryTreeStream);
@@ -42,26 +65,14 @@ async function handleCategoryTree(c: import('hono').Context) {
   const existingCategories = loadExistingCategories();
   const messages = buildCategoryTreeMessages(body, existingCategories, searchResults);
 
-  const { textStream } = streamText({ model: llm, messages });
-  const chunks: string[] = [];
-  for await (const chunk of textStream as AsyncIterable<string>) {
-    chunks.push(chunk);
-  }
-  const raw = chunks.join('');
+  const { object } = await generateObject({
+    model: llm,
+    schema: categoryTreeResponseSchema,
+    messages,
+    experimental_telemetry: { isEnabled: true, functionId: 'category-tree' },
+  });
 
-  let parsed: unknown;
-  try {
-    // Strip fences then parse
-    const jsonStart = raw.indexOf('{');
-    const jsonEnd = raw.lastIndexOf('}');
-    parsed = jsonStart >= 0 && jsonEnd > jsonStart
-      ? JSON.parse(raw.slice(jsonStart, jsonEnd + 1))
-      : JSON.parse(raw);
-  } catch {
-    return c.json({ error: 'Failed to parse LLM response', raw }, 500);
-  }
-
-  return c.json({ ...(parsed as object), modelName: MODEL_NAME });
+  return c.json({ ...object, modelName: MODEL_NAME });
 }
 
 categoriesRouter.post('/category-tree', handleCategoryTree);
