@@ -18,7 +18,11 @@ async function handleGenerateAnswer(c: import('hono').Context) {
   const searchResults = body.web_search ? await webSearch(body.question) : [];
   const messages = buildAnswerMessages(body.question, body.context ?? '', searchResults);
 
-  const { text } = await generateText({ model: llm, messages });
+  const { text } = await generateText({
+    model: llm,
+    messages,
+    experimental_telemetry: { isEnabled: true, functionId: 'generate-answer' },
+  });
   return c.json({ answer: text, modelName: MODEL_NAME, searchResults });
 }
 
@@ -27,7 +31,11 @@ async function handleGenerateAnswerStream(c: import('hono').Context) {
   const searchResults = body.web_search ? await webSearch(body.question) : [];
   const messages = buildAnswerMessages(body.question, body.context ?? '', searchResults);
 
-  const { textStream } = streamText({ model: llm, messages });
+  const { textStream } = streamText({
+    model: llm,
+    messages,
+    experimental_telemetry: { isEnabled: true, functionId: 'generate-answer-stream' },
+  });
 
   async function* passthrough() {
     for await (const chunk of textStream as AsyncIterable<string>) {

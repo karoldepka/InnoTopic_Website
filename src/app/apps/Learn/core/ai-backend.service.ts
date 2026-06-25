@@ -34,7 +34,7 @@ export interface CategoryTreeRequest {
 
 export interface CategoryTreeResponse {
   tree: CategoryNode[];
-  assistantMessage: string;
+  assistantMessage?: string;
   modelName?: string;
   searchResults?: string[];
 }

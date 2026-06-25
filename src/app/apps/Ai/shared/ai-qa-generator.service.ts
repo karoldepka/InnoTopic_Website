@@ -35,7 +35,7 @@ const categoryNodeSchema: z.ZodType<CategoryNode> = z.lazy(() => z.object({
 
 export const categoryTreeResponseSchema: z.ZodType<CategoryTreeResponse> = z.object({
   tree: z.array(categoryNodeSchema),
-  assistantMessage: z.string(),
+  assistantMessage: z.string().optional(),
   modelName: z.string().optional(),
   searchResults: z.array(z.string()).optional(),
 });
@@ -311,10 +311,13 @@ export class AiQaGeneratorService {
   }
 
   private applyCategoryResponse(response: CategoryTreeResponse | undefined): void {
-    const tree = response?.tree || [];
-    this.tree.set(tree);
+    const tree = response?.tree;
+    if (tree?.length) {
+      this.tree.set(tree);
+    }
     this.modelName.set(response?.modelName || this.modelName());
-    this.categoryStatus.set(response?.assistantMessage || `Generated ${countCategoryNodes(tree)} categories`);
+    const count = countCategoryNodes(this.tree());
+    this.categoryStatus.set(response?.assistantMessage || `Generated ${count} categories`);
   }
 
   private applyQuestionResponse(response: QuestionAnswerResponse | undefined): void {

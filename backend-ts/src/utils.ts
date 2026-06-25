@@ -31,7 +31,7 @@ export async function* stripJsonFences(
 }
 
 /** Builds a Response that streams plain text — what the frontend StructuredObject expects. */
-export function textStreamResponse(gen: AsyncGenerator<string>): Response {
+export function textStreamResponse(gen: AsyncIterable<string>): Response {
   const encoder = new TextEncoder();
   const stream = new ReadableStream<Uint8Array>({
     async start(controller) {

@@ -12,7 +12,11 @@ async function handleCopilotAgui(c: import('hono').Context) {
   const { threadId, runId, messages } = body;
 
   const aiMessages = buildCopilotMessages(messages);
-  const { textStream } = streamText({ model: llm, messages: aiMessages });
+  const { textStream } = streamText({
+    model: llm,
+    messages: aiMessages,
+    experimental_telemetry: { isEnabled: true, functionId: 'copilotkit-agui' },
+  });
 
   const messageId = `msg_${crypto.randomUUID().replace(/-/g, '')}`;
 
