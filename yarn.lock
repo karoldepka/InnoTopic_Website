@@ -3094,20 +3094,20 @@
     "@angular-devkit/schematics" "^20.0.0"
     "@schematics/angular" "^20.0.0"
 
-"@ionic/angular@^8.8.10":
-  version "8.8.10"
-  resolved "https://registry.npmjs.org/@ionic/angular/-/angular-8.8.10.tgz"
-  integrity sha512-ViOexy5QbdCFtSIWGZVQwykww192lfKFp1HEoEX4CH3Hs95YXWTYN7PnwnhSJcecohjx9PkEmSZS5CNNrn4bpQ==
+"@ionic/angular@^8.8.12":
+  version "8.8.12"
+  resolved "https://registry.npmjs.org/@ionic/angular/-/angular-8.8.12.tgz"
+  integrity sha512-itZTT2i7G5c2Uv6VV2wow3FKjW8R8YIkwuQAJjO9o0SlzngSbA6HIZ6lS7h0FkYvle1VZreWdkvS21wbHs0hnA==
   dependencies:
-    "@ionic/core" "8.8.10"
+    "@ionic/core" "8.8.12"
     ionicons "^8.0.13"
     jsonc-parser "^3.0.0"
     tslib "^2.3.0"
 
-"@ionic/core@8.8.10":
-  version "8.8.10"
-  resolved "https://registry.npmjs.org/@ionic/core/-/core-8.8.10.tgz"
-  integrity sha512-pNujZuU/vydXKtE3yOqmeOIySbXodspxuK4QcbRitWoikNZhGalqW2JvtEJqeRRvE4KJ4dJ3gXF8i6+rtVSG3Q==
+"@ionic/core@8.8.12":
+  version "8.8.12"
+  resolved "https://registry.npmjs.org/@ionic/core/-/core-8.8.12.tgz"
+  integrity sha512-nR3Us+NICa4eACvPXb4yUzza1URxQ23ELjjLmK1KRFHlk4DhhlzNrYAad0aibTRFh4toXqvFMTADFPB+JiTTFg==
   dependencies:
     "@stencil/core" "4.43.5"
     ionicons "^8.0.13"

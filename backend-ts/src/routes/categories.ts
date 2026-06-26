@@ -5,7 +5,7 @@ import { llm, MODEL_NAME } from '../llm.js';
 import { webSearch } from '../web-search.js';
 import { loadExistingCategories } from '../existing-categories.js';
 import { buildCategoryTreeMessages } from '../prompts.js';
-import { textStreamResponse } from '../utils.js';
+import { textStreamResponse, sseData, sseStreamResponse } from '../utils.js';
 import type { CategoryTreeRequest } from '../types.js';
 
 export const categoriesRouter = new Hono();
@@ -56,6 +56,35 @@ async function handleCategoryTreeStream(c: import('hono').Context) {
 
 categoriesRouter.post('/category-tree/stream-json', handleCategoryTreeStream);
 categoriesRouter.post('/ai-api/category-tree/stream-json', handleCategoryTreeStream);
+
+// ─── Legacy SSE endpoint (used by copilotkit-react-embed) ─────────────────────
+// The React embed calls /category-tree-stream and reads SSE events
+// with {type:'delta', delta: chunk} format. This wraps the same stream.
+
+async function handleCategoryTreeStreamSSE(c: import('hono').Context) {
+  const body = await c.req.json<CategoryTreeRequest>();
+  const searchResults = body.web_search ? await webSearch(body.message) : [];
+  const existingCategories = loadExistingCategories();
+  const messages = buildCategoryTreeMessages(body, existingCategories, searchResults);
+
+  const { textStream } = streamObject({
+    model: llm,
+    schema: categoryTreeResponseSchema,
+    messages,
+    experimental_telemetry: { isEnabled: true, functionId: 'category-tree-stream' },
+  });
+
+  async function* gen() {
+    for await (const chunk of textStream) {
+      yield sseData({ type: 'delta', delta: chunk });
+    }
+  }
+
+  return sseStreamResponse(gen());
+}
+
+categoriesRouter.post('/category-tree-stream', handleCategoryTreeStreamSSE);
+categoriesRouter.post('/ai-api/category-tree-stream', handleCategoryTreeStreamSSE);
 
 // ─── Non-streaming category tree (kept for compatibility) ─────────────────────
 

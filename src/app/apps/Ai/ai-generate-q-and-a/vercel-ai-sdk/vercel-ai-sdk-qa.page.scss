@@ -1,6 +1,11 @@
+/* Ionic's .inner-scroll has top:-offset-top so it starts at y=0 (above viewport top)
+   and is 100vh tall. Our slotted content starts at y=offset-top (header height).
+   A plain height:100% resolves to 100vh, which means our element ends at
+   y=offset-top+100vh = 56px below the viewport — that's the "scrollbar sticking out" bug.
+   Subtracting offset-top gives the correct height: element ends at y=100vh (viewport bottom). */
 :host {
   display: block;
-  height: 100%;
+  height: calc(100% - var(--offset-top, 0px) - var(--offset-bottom, 0px));
 }
 
 .vercel-qa-page {

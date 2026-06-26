@@ -440,7 +440,7 @@ function App() {
     { role: 'assistant', text: 'Type a topic, then refine the generated tree conversationally.' },
   ]);
   const [input, setInput] = React.useState('');
-  const [webSearch, setWebSearch] = React.useState(false);
+  const [webSearch, setWebSearch] = React.useState(true);
   const [busy, setBusy] = React.useState(false);
   const abortControllerRef = React.useRef(null);
   const [qaBusy, setQaBusy] = React.useState(false);

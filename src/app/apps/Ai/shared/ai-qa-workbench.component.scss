@@ -1,24 +1,34 @@
+/* height:100% always — feeds the chain: ion-content → page :host → workbench :host → .qa-workbench.
+   At mobile the workbench itself scrolls (overflow-y:auto below), so ion-content never
+   page-scrolls. This avoids the 100vh vs visual-viewport gap that pushes the scrollbar
+   below browser chrome on phones. */
 :host {
   display: block;
-  min-height: 100%;
+  height: 100%;
 }
 
 .qa-workbench {
+  /* Mobile: height:100% + overflow-y:auto = workbench scrolls internally.
+     Tablet/Desktop: grid overrides display; overflow-y:auto is harmless (no overflow). */
+  height: 100%;
+  overflow-y: auto;
   display: flex;
   flex-direction: column;
   gap: 12px;
-  min-height: 100%;
   padding: 12px;
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.055), rgba(255, 255, 255, 0)),
     var(--ion-background-color);
 }
 
+/* ── Tablet (720-1099px): 2-col top row + questions panel below ─────────────
+   Grid 1fr 1fr splits the height evenly so questions panel always gets ~half
+   the viewport and scrolls internally. */
 @media (min-width: 720px) {
   .qa-workbench {
     display: grid;
     grid-template-columns: minmax(260px, 0.9fr) minmax(340px, 1.3fr);
-    grid-template-rows: auto 1fr;
+    grid-template-rows: 1fr 1fr;
     padding: 14px;
     gap: 14px;
   }
@@ -28,6 +38,7 @@
   }
 }
 
+/* ── Desktop (≥1100px): 3-col single row, each panel fills full height ───── */
 @media (min-width: 1100px) {
   .qa-workbench {
     grid-template-columns: minmax(280px, 0.95fr) minmax(360px, 1.25fr) minmax(360px, 1.35fr);
@@ -36,8 +47,11 @@
 
   .questions-panel {
     grid-column: auto;
+    min-height: 0;
   }
 }
+
+/* ── Panel base styles ───────────────────────────────────────────────────── */
 
 .prompt-panel,
 .tree-panel,
@@ -155,6 +169,8 @@
   padding: 8px 10px;
 }
 
+/* flex:1 + overflow:auto works here because at tablet+ the parent panel has a
+   definite height (from grid 1fr), so flex:1 resolves to a positive size. */
 .tree-table,
 .tree-list,
 .question-list {
@@ -162,6 +178,21 @@
   min-height: 0;
   overflow: auto;
   padding: 8px;
+}
+
+/* Mobile only: panels have no definite height (workbench uses overflow-y:auto
+   not a fixed grid), so flex:1 on question-list resolves to ~0.
+   flex:none makes the list content-sized; overflow:visible lets it contribute
+   height to the questions-panel so the workbench scroll height is correct. */
+@media (max-width: 719px) {
+  .questions-panel {
+    overflow: visible;
+  }
+
+  .question-list {
+    flex: none;
+    overflow: visible;
+  }
 }
 
 .tree-table-header {
