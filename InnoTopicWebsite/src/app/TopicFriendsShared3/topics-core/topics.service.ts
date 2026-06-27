@@ -35,7 +35,9 @@ function checkForDuplicates(maps: TopicMaps): string[] {
   return duplicates;
 }
 
-@Injectable()
+@Injectable({
+  providedIn: 'root'
+})
 export class TopicsService {
 
   public topics: Topic[] = this.transformTags(topicsOld);
