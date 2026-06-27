@@ -15,7 +15,7 @@
   display: flex;
   flex-direction: column;
   gap: 12px;
-  padding: 12px;
+  padding: 12px 12px 62px;
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0)),
     var(--ion-background-color);
@@ -95,6 +95,20 @@
     color: #b9dcc9;
     background: rgba(60, 127, 91, 0.13);
   }
+}
+
+.debug-raw {
+  margin: 8px 0 0;
+  padding: 10px;
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(255, 200, 100, 0.3);
+  border-radius: 6px;
+  font-size: 0.78rem;
+  color: #ffd080;
+  white-space: pre-wrap;
+  word-break: break-word;
+  max-height: 300px;
+  overflow-y: auto;
 }
 
 .examples {
@@ -245,7 +259,7 @@
     height: calc(100dvh - 56px);
     display: grid;
     grid-template-columns: minmax(260px, 0.9fr) minmax(300px, 1.2fr);
-    grid-template-rows: auto 1fr;
+    grid-template-rows: minmax(0, 45%) 1fr;
     overflow: hidden;
     padding: 14px;
     gap: 14px;

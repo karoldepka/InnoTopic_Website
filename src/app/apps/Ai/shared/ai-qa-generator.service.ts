@@ -120,6 +120,7 @@ export class AiQaGeneratorService {
       const items: any[] = Array.isArray(partial?.items) ? partial.items : [];
       const validItems = items.filter(i => i?.question);
       if (validItems.length > 0) {
+        console.log('[qa effect] sample item:', JSON.stringify(validItems[0]).slice(0, 200));
         this.questions.set(validItems as QuestionAnswer[]);
         this.questionStatus.set(`Streaming… ${validItems.length} Q&A`);
       }
@@ -135,18 +136,20 @@ export class AiQaGeneratorService {
     }
   }
 
-  async generateCategories(topic: string, integration: QaIntegrationMode, webSearch: boolean): Promise<void> {
+  async generateCategories(topic: string, integration: QaIntegrationMode, webSearch: boolean, matchExisting = false): Promise<void> {
     if (!topic.trim() || this.categoryLoading()) return;
 
     this.categoryAbortController = new AbortController();
     this.categoryLoading.set(true);
     this.categoryError.set('');
     this.categoryStatus.set('Generating categories…');
+    this.tree.set([]);
 
     const request: CategoryTreeRequest = {
       message: topic.trim(),
-      tree: cloneCategoryTree(this.tree()),
+      tree: [],
       web_search: webSearch,
+      match_existing: matchExisting,
     };
 
     try {
@@ -322,12 +325,20 @@ export class AiQaGeneratorService {
 
   private applyQuestionResponse(response: QuestionAnswerResponse | undefined): void {
     const items = response?.items || [];
+    console.log('[qa final] items count:', items.length, 'sample:', JSON.stringify(items[0] ?? null).slice(0, 200));
     this.questions.set(items);
     this.modelName.set(response?.modelName || this.modelName());
     this.questionStatus.set(`Generated ${items.length} Q&A`);
   }
 
   private formatError(error: unknown): string {
-    return error instanceof Error ? error.message : String(error || 'Unknown AI error');
+    const msg = error instanceof Error ? error.message : String(error || 'Unknown AI error');
+    // Backend returns 502 JSON like {"error":"Insufficient account balance"}
+    // The StructuredObject may surface the raw JSON string as the error message
+    try {
+      const parsed = JSON.parse(msg);
+      if (typeof parsed?.error === 'string') return parsed.error;
+    } catch { /* not JSON */ }
+    return msg;
   }
 }

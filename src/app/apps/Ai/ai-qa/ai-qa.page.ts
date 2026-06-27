@@ -10,7 +10,7 @@ import {
 import { FormsModule } from '@angular/forms';
 import { IonicModule } from '@ionic/angular';
 
-import { CategoryNode, QuestionAnswer } from '../../Learn/core/ai-backend.service';
+import { AiBackendService, CategoryNode, QuestionAnswer } from '../../Learn/core/ai-backend.service';
 import {
   CategoryTreeRow,
   addCategoryChild,
@@ -33,9 +33,13 @@ import { AiQaGeneratorService } from '../shared/ai-qa-generator.service';
 })
 export class AiQaPage implements OnInit {
   protected readonly gen = inject(AiQaGeneratorService);
+  private readonly aiBackend = inject(AiBackendService);
 
   readonly topic = signal('Agentic AI & UI interview questions');
   readonly webSearch = signal(true);
+  readonly matchExisting = signal(false);
+  readonly rawPromptMode = signal(false);
+  readonly rawResponse = signal('');
   readonly showAnswers = signal(false);
   readonly expandedAnswerKeys = signal<ReadonlySet<string>>(new Set<string>());
   readonly collapsedNodeIds = signal<ReadonlySet<string>>(new Set<string>());
@@ -53,7 +57,36 @@ export class AiQaPage implements OnInit {
   setTopic(v: string | null | undefined): void { this.topic.set(v || ''); }
 
   generateCategories(): void {
-    this.gen.generateCategories(this.topic(), 'vercel-ai-sdk', this.webSearch());
+    this.gen.generateCategories(this.topic(), 'vercel-ai-sdk', this.webSearch(), this.matchExisting());
+  }
+
+  async sendRawPrompt(): Promise<void> {
+    this.rawResponse.set('');
+    try {
+      const res = await fetch(this.aiBackend.apiUrl('/raw-prompt-stream'), {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ prompt: this.topic() }),
+      });
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        this.rawResponse.set('Error: ' + (err?.error ?? res.statusText));
+        return;
+      }
+      const reader = res.body!.getReader();
+      const dec = new TextDecoder();
+      let text = '';
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        text += dec.decode(value, { stream: true });
+        this.rawResponse.set(text);
+      }
+      text += dec.decode();
+      this.rawResponse.set(text || '(empty response)');
+    } catch (e: any) {
+      this.rawResponse.set('Error: ' + (e?.message ?? String(e)));
+    }
   }
 
   generateQuestions(): void {

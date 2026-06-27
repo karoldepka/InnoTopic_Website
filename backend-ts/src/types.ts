@@ -19,6 +19,7 @@ export interface CategoryTreeRequest {
   message: string;
   tree: CategoryNode[];
   web_search?: boolean;
+  match_existing?: boolean;
 }
 
 export interface QuestionAnswer {

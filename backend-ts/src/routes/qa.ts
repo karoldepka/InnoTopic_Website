@@ -1,10 +1,10 @@
 import { Hono } from 'hono';
-import { streamObject, generateObject } from 'ai';
+import { streamText, generateObject } from 'ai';
 import { z } from 'zod';
 import { llm, MODEL_NAME } from '../llm.js';
 import { webSearch } from '../web-search.js';
 import { buildQAMessages } from '../prompts.js';
-import { textStreamResponse } from '../utils.js';
+import { textStreamResponse, stripJsonFences } from '../utils.js';
 import type { QuestionAnswerRequest } from '../types.js';
 
 export const qaRouter = new Hono();
@@ -31,13 +31,14 @@ async function handleQAStream(c: import('hono').Context) {
   const searchResults = body.web_search ? await webSearch(query) : [];
   const messages = buildQAMessages(body, searchResults);
 
-  const { textStream } = streamObject({
+  const { textStream, text } = streamText({
     model: llm,
-    schema: questionAnswerResponseSchema,
     messages,
+    maxRetries: 0,
     experimental_telemetry: { isEnabled: true, functionId: 'qa-stream' },
   });
-  return textStreamResponse(textStream);
+  text.then(t => console.log('[qa] raw model output (first 500):', t.slice(0, 500)));
+  return textStreamResponse(stripJsonFences(textStream), c);
 }
 
 qaRouter.post('/category-tree/questions/stream-json', handleQAStream);
