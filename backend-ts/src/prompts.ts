@@ -99,6 +99,7 @@ Rules:
 - Keep answers concise (2-4 sentences) and factually accurate.
 - If the question contains an acronym (e.g. "What is RAG?"), keep only the acronym in the question. Spell out the full form in the answer (e.g. "RAG stands for Retrieval-Augmented Generation…").
 - Reveal as little as possible in the question — do not hint at the answer or give away key terms.
+- When the answer enumerates items, use a bulleted list (one item per line starting with "- ") for easier reading and memorization.
 
 Output format — return exactly this JSON shape (no other text):
 {"items":[{"categoryId":"<id>","categoryPath":"<path>","question":"<question>","answer":"<answer>"},...]}`;
