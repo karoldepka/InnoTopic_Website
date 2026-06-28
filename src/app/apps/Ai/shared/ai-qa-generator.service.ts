@@ -213,14 +213,26 @@ export class AiQaGeneratorService {
   }
 
   approveQuestions(keep: ReadonlySet<number>): void {
-    this.questions.set(this.questions().filter((_, i) => keep.has(i)));
-    this.questionStatus.set(`Kept ${keep.size} Q&A`);
+    const now = Date.now();
+    const kept = this.questions()
+      .filter((_, i) => keep.has(i))
+      .map(q => ({ ...q, approvedAt: now, lastModifiedAt: now }));
+    this.questions.set(kept);
+    this.questionStatus.set(`Kept ${kept.length} Q&A`);
   }
 
   rejectQuestions(remove: ReadonlySet<number>): void {
     const remaining = this.questions().filter((_, i) => !remove.has(i));
     this.questions.set(remaining);
     this.questionStatus.set(`${remaining.length} Q&A remaining`);
+  }
+
+  restoreFromDraft(tree: CategoryNode[], questions: QuestionAnswer[]): void {
+    this.tree.set(tree);
+    this.questions.set(questions);
+    const catCount = countCategoryNodes(tree);
+    if (catCount) this.categoryStatus.set(`Restored — ${catCount} categories`);
+    if (questions.length) this.questionStatus.set(`Restored — ${questions.length} Q&A`);
   }
 
   // ---- Private helpers --------------------------------------------------
@@ -327,7 +339,8 @@ export class AiQaGeneratorService {
   private applyCategoryResponse(response: CategoryTreeResponse | undefined): void {
     const tree = response?.tree;
     if (tree?.length) {
-      this.tree.set(tree);
+      const now = Date.now();
+      this.tree.set(this.stampTreeDraftedAt(tree, now));
     }
     this.modelName.set(response?.modelName || this.modelName());
     const count = countCategoryNodes(this.tree());
@@ -335,11 +348,28 @@ export class AiQaGeneratorService {
   }
 
   private applyQuestionResponse(response: QuestionAnswerResponse | undefined): void {
-    const items = response?.items || [];
+    const now = Date.now();
+    const items = (response?.items || []).map(q => ({
+      ...q,
+      createdAt: q.createdAt ?? now,
+      draftedAt: q.draftedAt ?? now,
+      draftedByAIAt: q.draftedByAIAt ?? now,
+      lastModifiedAt: q.lastModifiedAt ?? now,
+    }));
     console.log('[qa final] items count:', items.length, 'sample:', JSON.stringify(items[0] ?? null).slice(0, 200));
     this.questions.set(items);
     this.modelName.set(response?.modelName || this.modelName());
     this.questionStatus.set(`Generated ${items.length} Q&A`);
+  }
+
+  private stampTreeDraftedAt(nodes: CategoryNode[], now: number): CategoryNode[] {
+    return nodes.map(n => ({
+      ...n,
+      createdAt: n.createdAt ?? now,
+      draftedAt: n.draftedAt ?? now,
+      draftedByAIAt: n.draftedByAIAt ?? now,
+      children: this.stampTreeDraftedAt(n.children, now),
+    }));
   }
 
   private formatError(error: unknown): string {

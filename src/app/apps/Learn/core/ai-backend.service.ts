@@ -24,6 +24,9 @@ export interface CategoryNode {
   matchedExistingCategoryId?: string | null;
   matchedExistingCategoryTitle?: string | null;
   isExistingCategory?: boolean;
+  createdAt?: number;
+  draftedAt?: number;
+  draftedByAIAt?: number;
 }
 
 export interface CategoryTreeRequest {
@@ -45,6 +48,11 @@ export interface QuestionAnswer {
   categoryPath: string;
   question: string;
   answer: string;
+  createdAt?: number;
+  draftedAt?: number;
+  draftedByAIAt?: number;
+  approvedAt?: number;
+  lastModifiedAt?: number;
 }
 
 export interface QuestionAnswerRequest {

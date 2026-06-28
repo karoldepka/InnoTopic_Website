@@ -4,6 +4,7 @@ import {
   Component,
   OnInit,
   computed,
+  effect,
   inject,
   signal,
 } from '@angular/core';
@@ -22,6 +23,7 @@ import {
   updateCategoryNode,
 } from '../shared/ai-qa-tree.utils';
 import { AiQaGeneratorService } from '../shared/ai-qa-generator.service';
+import { QaDraftStore } from '../shared/qa-draft.store';
 
 @Component({
   selector: 'app-ai-qa',
@@ -34,6 +36,7 @@ import { AiQaGeneratorService } from '../shared/ai-qa-generator.service';
 export class AiQaPage implements OnInit {
   protected readonly gen = inject(AiQaGeneratorService);
   private readonly aiBackend = inject(AiBackendService);
+  private readonly draftStore = inject(QaDraftStore);
 
   readonly topic = signal('Agentic AI & UI interview questions');
   readonly webSearch = signal(true);
@@ -54,8 +57,33 @@ export class AiQaPage implements OnInit {
   readonly visibleRows = computed(() => filterVisibleRows(this.allRows(), this.collapsedNodeIds()));
   readonly totalQCount = computed(() => sumQuestionCounts(this.gen.tree()));
 
+  constructor() {
+    // Auto-save draft to IndexedDB whenever tree or questions change.
+    // The ?? check prevents overwriting a real draft with the empty initial state.
+    effect(() => {
+      const tree = this.gen.tree();
+      const questions = this.gen.questions();
+      if (!tree.length && !questions.length) return;
+      void this.draftStore.save({
+        topic: this.topic(),
+        tree,
+        questions,
+        savedAt: Date.now(),
+      });
+    });
+  }
+
   async ngOnInit(): Promise<void> {
     await this.gen.loadExistingCategories();
+    try {
+      const draft = await this.draftStore.load();
+      if (draft) {
+        if (draft.topic) this.topic.set(draft.topic);
+        this.gen.restoreFromDraft(draft.tree, draft.questions);
+      }
+    } catch (e) {
+      console.warn('[draft] Failed to restore draft:', e);
+    }
   }
 
   setTopic(v: string | null | undefined): void { this.topic.set(v || ''); }
