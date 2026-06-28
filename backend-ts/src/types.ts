@@ -32,6 +32,17 @@ export interface QuestionAnswer {
 export interface QuestionAnswerRequest {
   tree: CategoryNode[];
   web_search?: boolean;
+  existingQuestions?: string[];
+}
+
+export interface MoreSubcategoriesRequest {
+  parentId: string;
+  parentTitle: string;
+  parentPath: string;
+  topic: string;
+  existingChildTitles: string[];
+  count: number;
+  web_search?: boolean;
 }
 
 export interface AgUiMessage {

@@ -4,9 +4,9 @@ import { z } from 'zod';
 import { llm, MODEL_NAME } from '../llm.js';
 import { webSearch } from '../web-search.js';
 import { loadExistingCategories } from '../existing-categories.js';
-import { buildCategoryTreeMessages } from '../prompts.js';
+import { buildCategoryTreeMessages, buildMoreSubcategoriesMessages } from '../prompts.js';
 import { textStreamResponse, sseData, sseStreamResponse, stripJsonFences } from '../utils.js';
-import type { CategoryTreeRequest } from '../types.js';
+import type { CategoryTreeRequest, MoreSubcategoriesRequest } from '../types.js';
 
 export const categoriesRouter = new Hono();
 
@@ -123,3 +123,22 @@ async function handleCategoryTree(c: import('hono').Context) {
 
 categoriesRouter.post('/category-tree', handleCategoryTree);
 categoriesRouter.post('/ai-api/category-tree', handleCategoryTree);
+
+// ─── Generate more subcategories for a specific parent node ───────────────────
+
+async function handleMoreSubcategories(c: import('hono').Context) {
+  const body = await c.req.json<MoreSubcategoriesRequest>();
+  const searchResults = body.web_search ? await webSearch(body.topic) : [];
+  const messages = buildMoreSubcategoriesMessages(body, searchResults);
+
+  const { textStream } = streamText({
+    model: llm,
+    messages,
+    maxRetries: 0,
+    experimental_telemetry: { isEnabled: true, functionId: 'more-subcategories' },
+  });
+  return textStreamResponse(stripJsonFences(textStream), c);
+}
+
+categoriesRouter.post('/category-tree/more-children', handleMoreSubcategories);
+categoriesRouter.post('/ai-api/category-tree/more-children', handleMoreSubcategories);

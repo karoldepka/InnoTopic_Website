@@ -15,7 +15,14 @@ import {
   QuestionAnswerRequest,
   QuestionAnswerResponse,
 } from '../../Learn/core/ai-backend.service';
-import { cloneCategoryTree, countCategoryNodes } from './ai-qa-tree.utils';
+import {
+  cloneCategoryTree,
+  countCategoryNodes,
+  countLeafNodes,
+  flattenCategoryTree,
+  setLeafQuestionCounts,
+  updateCategoryNode,
+} from './ai-qa-tree.utils';
 
 export type QaIntegrationMode = 'vercel-ai-sdk' | 'copilotkit';
 
@@ -92,11 +99,15 @@ export class AiQaGeneratorService {
   readonly questionError = signal('');
   readonly categoryLoading = signal(false);
   readonly questionLoading = signal(false);
+  readonly subcategoryLoading = signal(false);
 
   readonly categoryCount = computed(() => countCategoryNodes(this.tree()));
 
   private categoryAbortController: AbortController | null = null;
   private questionAbortController: AbortController | null = null;
+
+  private appendMode = false;
+  private preAppendQuestions: QuestionAnswer[] = [];
 
   constructor() {
     // Live-update tree from streaming partial JSON
@@ -120,9 +131,11 @@ export class AiQaGeneratorService {
       const items: any[] = Array.isArray(partial?.items) ? partial.items : [];
       const validItems = items.filter(i => i?.question);
       if (validItems.length > 0) {
-        console.log('[qa effect] sample item:', JSON.stringify(validItems[0]).slice(0, 200));
-        this.questions.set(validItems as QuestionAnswer[]);
-        this.questionStatus.set(`Streaming… ${validItems.length} Q&A`);
+        const all = this.appendMode
+          ? [...this.preAppendQuestions, ...(validItems as QuestionAnswer[])]
+          : validItems as QuestionAnswer[];
+        this.questions.set(all);
+        this.questionStatus.set(`${this.appendMode ? 'Adding' : 'Streaming'}… ${validItems.length} Q&A`);
       }
     });
   }
@@ -225,6 +238,106 @@ export class AiQaGeneratorService {
     const remaining = this.questions().filter((_, i) => !remove.has(i));
     this.questions.set(remaining);
     this.questionStatus.set(`${remaining.length} Q&A remaining`);
+  }
+
+  async generateMoreQuestions(integration: QaIntegrationMode, webSearch: boolean, additionalCount: number): Promise<void> {
+    if (this.questionLoading()) return;
+
+    this.appendMode = true;
+    this.preAppendQuestions = [...this.questions()];
+
+    const leafCount = countLeafNodes(this.tree());
+    const perLeaf = Math.max(1, Math.ceil(additionalCount / Math.max(1, leafCount)));
+    const adjustedTree = setLeafQuestionCounts(cloneCategoryTree(this.tree()), perLeaf);
+
+    this.questionAbortController = new AbortController();
+    this.questionLoading.set(true);
+    this.questionError.set('');
+    this.questionStatus.set(`Adding ${additionalCount} more Q&A…`);
+
+    const request: QuestionAnswerRequest = {
+      tree: adjustedTree,
+      web_search: webSearch,
+      existingQuestions: this.preAppendQuestions.map(q => q.question),
+    };
+
+    try {
+      const response = integration === 'vercel-ai-sdk'
+        ? await this.generateQuestionsWithVercel(request)
+        : await this.generateQuestionsWithCopilot(request);
+      this.applyQuestionResponse(response);
+    } catch (error) {
+      if (this.questionAbortController?.signal.aborted) return;
+      this.appendMode = false;
+      this.preAppendQuestions = [];
+      this.questionError.set(this.formatError(error));
+      this.questionStatus.set('Q&A generation failed');
+    } finally {
+      this.questionAbortController = null;
+      this.questionLoading.set(false);
+    }
+  }
+
+  async generateSubcategories(
+    parentNodeId: string,
+    topic: string,
+    count: number,
+    webSearch: boolean,
+  ): Promise<void> {
+    if (this.subcategoryLoading()) return;
+    this.subcategoryLoading.set(true);
+
+    const allRows = flattenCategoryTree(this.tree());
+    const parentRow = allRows.find(r => r.node.id === parentNodeId);
+    if (!parentRow) { this.subcategoryLoading.set(false); return; }
+
+    const request = {
+      parentId: parentNodeId,
+      parentTitle: parentRow.node.title,
+      parentPath: parentRow.path,
+      topic,
+      existingChildTitles: parentRow.node.children.map(c => c.title),
+      count,
+      web_search: webSearch,
+    };
+
+    try {
+      const res = await fetch(this.aiBackend.apiUrl('/category-tree/more-children'), {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(request),
+      });
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err?.error ?? `HTTP ${res.status}`);
+      }
+      const reader = res.body!.getReader();
+      const dec = new TextDecoder();
+      let text = '';
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        text += dec.decode(value, { stream: true });
+      }
+      text += dec.decode();
+
+      const data = JSON.parse(text);
+      const newChildren: CategoryNode[] = (data.children ?? []).filter((c: any) => c?.id && c?.title);
+      if (newChildren.length) {
+        const now = Date.now();
+        const stamped = this.stampTreeDraftedAt(newChildren, now);
+        this.tree.set(
+          updateCategoryNode(this.tree(), parentNodeId, node => ({
+            ...node,
+            children: [...node.children, ...stamped],
+          }))
+        );
+      }
+    } catch (error) {
+      console.error('[subcategories]', error);
+    } finally {
+      this.subcategoryLoading.set(false);
+    }
   }
 
   restoreFromDraft(tree: CategoryNode[], questions: QuestionAnswer[]): void {
@@ -349,7 +462,7 @@ export class AiQaGeneratorService {
 
   private applyQuestionResponse(response: QuestionAnswerResponse | undefined): void {
     const now = Date.now();
-    const items = (response?.items || []).map(q => ({
+    const newItems = (response?.items || []).map(q => ({
       ...q,
       createdAt: q.createdAt ?? now,
       draftedAt: q.draftedAt ?? now,
@@ -357,10 +470,14 @@ export class AiQaGeneratorService {
       lastModifiedAt: q.lastModifiedAt ?? now,
       contentModifiedAt: q.contentModifiedAt ?? now,
     }));
-    console.log('[qa final] items count:', items.length, 'sample:', JSON.stringify(items[0] ?? null).slice(0, 200));
-    this.questions.set(items);
+    const finalItems = this.appendMode
+      ? [...this.preAppendQuestions, ...newItems]
+      : newItems;
+    this.appendMode = false;
+    this.preAppendQuestions = [];
+    this.questions.set(finalItems);
     this.modelName.set(response?.modelName || this.modelName());
-    this.questionStatus.set(`Generated ${items.length} Q&A`);
+    this.questionStatus.set(`Generated ${finalItems.length} Q&A`);
   }
 
   private stampTreeDraftedAt(nodes: CategoryNode[], now: number): CategoryNode[] {

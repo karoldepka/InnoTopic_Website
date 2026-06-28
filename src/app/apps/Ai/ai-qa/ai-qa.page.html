@@ -107,6 +107,7 @@
             <span class="num">Q#</span>
             <span></span>
             <span></span>
+            <span></span>
           </div>
           <div
             class="tree-row"
@@ -152,6 +153,15 @@
 
             <ion-button fill="clear" size="small" [attr.aria-label]="'Add child to ' + row.path" (click)="addChild(row.node.id)">
               <ion-icon name="add-outline" slot="icon-only"></ion-icon>
+            </ion-button>
+            <ion-button
+              fill="clear"
+              size="small"
+              [disabled]="gen.subcategoryLoading()"
+              [attr.aria-label]="'Generate subcategories for ' + row.path"
+              (click)="showMoreSubcategoriesDialog(row)"
+            >
+              <ion-icon name="sparkles-outline" slot="icon-only"></ion-icon>
             </ion-button>
             <ion-button fill="clear" size="small" color="danger" [attr.aria-label]="'Delete ' + row.path" (click)="deleteCategory(row.node.id)">
               <ion-icon name="trash-outline" slot="icon-only"></ion-icon>
@@ -266,6 +276,15 @@
           >
             <ion-icon name="close-outline" slot="start"></ion-icon>
             Reject ({{ selectedQIndices().size }})
+          </ion-button>
+          <ion-button
+            size="small"
+            fill="outline"
+            [disabled]="gen.questionLoading()"
+            (click)="showMoreQADialog()"
+          >
+            <ion-icon name="add-outline" slot="start"></ion-icon>
+            More Q&amp;A…
           </ion-button>
         </div>
       }

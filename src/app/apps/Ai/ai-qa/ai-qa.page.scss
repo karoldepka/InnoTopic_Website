@@ -141,7 +141,7 @@
 
 .tree-header {
   display: grid;
-  grid-template-columns: 28px 1fr auto 52px 28px 28px;
+  grid-template-columns: 28px 1fr auto 52px 28px 28px 28px;
   gap: 4px;
   padding: 2px 0 6px;
   border-bottom: 2px solid rgba(155, 169, 186, 0.25);
@@ -160,7 +160,7 @@
 
 .tree-row {
   display: grid;
-  grid-template-columns: 28px 1fr auto 52px 28px 28px;
+  grid-template-columns: 28px 1fr auto 52px 28px 28px 28px;
   gap: 4px;
   align-items: center;
   min-height: 42px;
@@ -354,7 +354,7 @@
 @media (max-width: 500px) {
   .tree-header,
   .tree-row {
-    grid-template-columns: 26px 1fr 48px 26px 26px;
+    grid-template-columns: 26px 1fr 48px 26px 26px 26px;
   }
 
   .existing-tag { display: none; }

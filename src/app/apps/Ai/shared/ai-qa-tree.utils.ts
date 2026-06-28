@@ -102,6 +102,22 @@ export function deleteCategoryNode(nodes: CategoryNode[], nodeId: string): Categ
     }));
 }
 
+export function countLeafNodes(nodes: CategoryNode[]): number {
+  return nodes.reduce((sum, node) => {
+    const children = safeChildren(node);
+    return sum + (children.length === 0 ? 1 : countLeafNodes(children));
+  }, 0);
+}
+
+export function setLeafQuestionCounts(nodes: CategoryNode[], count: number): CategoryNode[] {
+  return nodes.map(node => {
+    const children = safeChildren(node);
+    return children.length === 0
+      ? { ...node, questionCount: count }
+      : { ...node, children: setLeafQuestionCounts(children, count) };
+  });
+}
+
 export function addCategoryChild(nodes: CategoryNode[], parentId?: string): CategoryNode[] {
   const child = makeCategoryNode();
 

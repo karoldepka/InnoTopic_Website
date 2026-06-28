@@ -9,7 +9,7 @@ import {
   signal,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { IonicModule } from '@ionic/angular';
+import { AlertController, IonicModule } from '@ionic/angular';
 
 import { AiBackendService, CategoryNode, QuestionAnswer } from '../../Learn/core/ai-backend.service';
 import {
@@ -24,6 +24,7 @@ import {
 } from '../shared/ai-qa-tree.utils';
 import { AiQaGeneratorService } from '../shared/ai-qa-generator.service';
 import { QaDraftStore } from '../shared/qa-draft.store';
+import { CategoryTreeRow } from '../shared/ai-qa-tree.utils';
 
 @Component({
   selector: 'app-ai-qa',
@@ -37,6 +38,7 @@ export class AiQaPage implements OnInit {
   protected readonly gen = inject(AiQaGeneratorService);
   private readonly aiBackend = inject(AiBackendService);
   private readonly draftStore = inject(QaDraftStore);
+  private readonly alertCtrl = inject(AlertController);
 
   readonly topic = signal('Agentic AI & UI interview questions');
   readonly webSearch = signal(true);
@@ -125,6 +127,44 @@ export class AiQaPage implements OnInit {
     this.gen.generateQuestions('vercel-ai-sdk', this.webSearch());
     this.expandedAnswerKeys.set(new Set<string>());
     this.selectedQIndices.set(new Set<number>());
+  }
+
+  async showMoreQADialog(): Promise<void> {
+    const totalQ = this.gen.questions().length;
+    const alert = await this.alertCtrl.create({
+      header: 'Generate More Q&A',
+      message: `Currently ${totalQ} question${totalQ === 1 ? '' : 's'}. How many more would you like?`,
+      inputs: [{ name: 'count', type: 'number', placeholder: '10', value: '10', min: 1, max: 200 }],
+      buttons: [
+        { text: 'Cancel', role: 'cancel' },
+        {
+          text: 'Generate',
+          handler: (data) => {
+            const n = Math.max(1, Math.min(200, parseInt(data.count) || 10));
+            this.gen.generateMoreQuestions('vercel-ai-sdk', this.webSearch(), n);
+          },
+        },
+      ],
+    });
+    await alert.present();
+  }
+
+  async showMoreSubcategoriesDialog(row: CategoryTreeRow): Promise<void> {
+    const alert = await this.alertCtrl.create({
+      header: `Subcategories for "${row.node.title}"`,
+      inputs: [{ name: 'count', type: 'number', placeholder: '5', value: '5', min: 1, max: 20 }],
+      buttons: [
+        { text: 'Cancel', role: 'cancel' },
+        {
+          text: 'Generate',
+          handler: (data) => {
+            const n = Math.max(1, Math.min(20, parseInt(data.count) || 5));
+            this.gen.generateSubcategories(row.node.id, this.topic(), n, this.webSearch());
+          },
+        },
+      ],
+    });
+    await alert.present();
   }
 
   toggleQSelected(i: number): void {
