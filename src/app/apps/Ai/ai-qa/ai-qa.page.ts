@@ -54,6 +54,7 @@ export class AiQaPage implements OnInit {
   readonly collapsedNodeIds = signal<ReadonlySet<string>>(new Set<string>());
   readonly lastDeletedTree = signal<CategoryNode[] | null>(null);
   private undoClearHandle: ReturnType<typeof setTimeout> | null = null;
+  private wasQuestionLoading = false;
 
   readonly allRows = computed(() => flattenCategoryTree(this.gen.tree()));
   readonly visibleRows = computed(() => filterVisibleRows(this.allRows(), this.collapsedNodeIds()));
@@ -61,17 +62,21 @@ export class AiQaPage implements OnInit {
 
   constructor() {
     // Auto-save draft to IndexedDB whenever tree or questions change.
-    // The ?? check prevents overwriting a real draft with the empty initial state.
     effect(() => {
       const tree = this.gen.tree();
       const questions = this.gen.questions();
       if (!tree.length && !questions.length) return;
-      void this.draftStore.save({
-        topic: this.topic(),
-        tree,
-        questions,
-        savedAt: Date.now(),
-      });
+      void this.draftStore.save({ topic: this.topic(), tree, questions, savedAt: Date.now() });
+    });
+
+    // Select all questions automatically when generation finishes.
+    effect(() => {
+      const loading = this.gen.questionLoading();
+      const questions = this.gen.questions();
+      if (this.wasQuestionLoading && !loading && questions.length) {
+        this.selectedQIndices.set(new Set(questions.map((_, i) => i)));
+      }
+      this.wasQuestionLoading = loading;
     });
   }
 
