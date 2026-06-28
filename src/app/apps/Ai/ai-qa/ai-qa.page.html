@@ -182,7 +182,17 @@
     <!-- ── QUESTIONS ─────────────────────────────────────────────────────── -->
     <section class="panel questions-panel">
       <div class="panel-head">
-        <h2>Questions</h2>
+        <div class="head-left">
+          <h2>Questions</h2>
+          @if (gen.questions().length) {
+            <ion-checkbox
+              [checked]="allQSelected()"
+              [indeterminate]="selectedQIndices().size > 0 && !allQSelected()"
+              (ionChange)="toggleSelectAll()"
+              aria-label="Select all questions"
+            ></ion-checkbox>
+          }
+        </div>
         <div class="head-actions">
           <ion-toggle
             labelPlacement="end"
@@ -205,9 +215,14 @@
       <div class="questions-scroll">
         @if (gen.questions().length) {
           @for (item of gen.questions(); track $index; let i = $index) {
-            <article class="q-card">
+            <article class="q-card" [class.q-selected]="selectedQIndices().has(i)">
               <div class="q-path">{{ item.categoryPath || item.categoryId }}</div>
               <div class="q-row">
+                <ion-checkbox
+                  [checked]="selectedQIndices().has(i)"
+                  (ionChange)="toggleQSelected(i)"
+                  aria-label="Select question"
+                ></ion-checkbox>
                 <strong>{{ item.question }}</strong>
                 <ion-button
                   fill="clear"
@@ -231,6 +246,29 @@
           <div class="empty">No questions yet.</div>
         }
       </div>
+
+      @if (gen.questions().length) {
+        <div class="panel-foot q-actions">
+          <ion-button
+            size="small"
+            color="success"
+            [disabled]="!selectedQIndices().size"
+            (click)="approveSelected()"
+          >
+            <ion-icon name="checkmark-outline" slot="start"></ion-icon>
+            Approve ({{ selectedQIndices().size }})
+          </ion-button>
+          <ion-button
+            size="small"
+            color="danger"
+            [disabled]="!selectedQIndices().size"
+            (click)="rejectSelected()"
+          >
+            <ion-icon name="close-outline" slot="start"></ion-icon>
+            Reject ({{ selectedQIndices().size }})
+          </ion-button>
+        </div>
+      }
     </section>
 
   </div>

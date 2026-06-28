@@ -212,6 +212,17 @@ export class AiQaGeneratorService {
     this.questionStatus.set('Cancelled');
   }
 
+  approveQuestions(keep: ReadonlySet<number>): void {
+    this.questions.set(this.questions().filter((_, i) => keep.has(i)));
+    this.questionStatus.set(`Kept ${keep.size} Q&A`);
+  }
+
+  rejectQuestions(remove: ReadonlySet<number>): void {
+    const remaining = this.questions().filter((_, i) => !remove.has(i));
+    this.questions.set(remaining);
+    this.questionStatus.set(`${remaining.length} Q&A remaining`);
+  }
+
   // ---- Private helpers --------------------------------------------------
 
   private makePartialCategoryNode(n: any): CategoryNode {

@@ -206,6 +206,14 @@
   text-align: center;
 }
 
+// ── Panel head left group ──────────────────────────────────────────────────────
+
+.head-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
 // ── Q&A cards ─────────────────────────────────────────────────────────────────
 
 .q-card {
@@ -213,8 +221,14 @@
   border-radius: 8px;
   padding: 10px;
   background: rgba(4, 8, 12, 0.24);
+  transition: border-color 0.15s, background 0.15s;
 
   & + & { margin-top: 8px; }
+
+  &.q-selected {
+    border-color: rgba(var(--ion-color-primary-rgb), 0.55);
+    background: rgba(var(--ion-color-primary-rgb), 0.08);
+  }
 }
 
 .q-path {
@@ -229,7 +243,8 @@
   align-items: flex-start;
   gap: 8px;
 
-  strong { font-size: 0.94rem; line-height: 1.35; min-width: 0; }
+  ion-checkbox { flex-shrink: 0; margin-top: 2px; }
+  strong { flex: 1; font-size: 0.94rem; line-height: 1.35; min-width: 0; }
 }
 
 .q-answer {
@@ -238,6 +253,13 @@
   padding-left: 9px;
   color: #dce8f0;
   line-height: 1.42;
+}
+
+// ── Q&A approve/reject bar ────────────────────────────────────────────────────
+
+.q-actions {
+  display: flex;
+  gap: 8px;
 }
 
 // ── Tablet (768–1099px): 2-column grid ───────────────────────────────────────

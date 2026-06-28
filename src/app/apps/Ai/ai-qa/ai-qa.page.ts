@@ -42,6 +42,10 @@ export class AiQaPage implements OnInit {
   readonly rawResponse = signal('');
   readonly showAnswers = signal(false);
   readonly expandedAnswerKeys = signal<ReadonlySet<string>>(new Set<string>());
+  readonly selectedQIndices = signal<ReadonlySet<number>>(new Set<number>());
+  readonly allQSelected = computed(() =>
+    this.gen.questions().length > 0 && this.selectedQIndices().size === this.gen.questions().length
+  );
   readonly collapsedNodeIds = signal<ReadonlySet<string>>(new Set<string>());
   readonly lastDeletedTree = signal<CategoryNode[] | null>(null);
   private undoClearHandle: ReturnType<typeof setTimeout> | null = null;
@@ -92,6 +96,31 @@ export class AiQaPage implements OnInit {
   generateQuestions(): void {
     this.gen.generateQuestions('vercel-ai-sdk', this.webSearch());
     this.expandedAnswerKeys.set(new Set<string>());
+    this.selectedQIndices.set(new Set<number>());
+  }
+
+  toggleQSelected(i: number): void {
+    const s = new Set(this.selectedQIndices());
+    s.has(i) ? s.delete(i) : s.add(i);
+    this.selectedQIndices.set(s);
+  }
+
+  toggleSelectAll(): void {
+    this.selectedQIndices.set(
+      this.selectedQIndices().size === this.gen.questions().length
+        ? new Set<number>()
+        : new Set(this.gen.questions().map((_, i) => i))
+    );
+  }
+
+  approveSelected(): void {
+    this.gen.approveQuestions(this.selectedQIndices());
+    this.selectedQIndices.set(new Set<number>());
+  }
+
+  rejectSelected(): void {
+    this.gen.rejectQuestions(this.selectedQIndices());
+    this.selectedQIndices.set(new Set<number>());
   }
 
   addRootCategory(): void { this.gen.tree.set(addCategoryChild(this.gen.tree())); }
