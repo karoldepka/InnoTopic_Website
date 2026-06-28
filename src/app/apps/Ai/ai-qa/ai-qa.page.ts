@@ -10,28 +10,26 @@ import {
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { AlertController, IonicModule } from '@ionic/angular';
+import { TreeNode } from 'primeng/api';
+import { TreeTableModule } from 'primeng/treetable';
 
 import { AiBackendService, CategoryNode, QuestionAnswer } from '../../Learn/core/ai-backend.service';
 import {
-  CategoryTreeRow,
   addCategoryChild,
   cloneCategoryTree,
   deleteCategoryNode,
-  filterVisibleRows,
-  flattenCategoryTree,
   sumQuestionCounts,
   updateCategoryNode,
 } from '../shared/ai-qa-tree.utils';
 import { AiQaGeneratorService } from '../shared/ai-qa-generator.service';
 import { QaDraftStore } from '../shared/qa-draft.store';
-import { CategoryTreeRow } from '../shared/ai-qa-tree.utils';
 
 @Component({
   selector: 'app-ai-qa',
   templateUrl: './ai-qa.page.html',
   styleUrls: ['./ai-qa.page.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, FormsModule, IonicModule],
+  imports: [CommonModule, FormsModule, IonicModule, TreeTableModule],
   providers: [AiQaGeneratorService],
 })
 export class AiQaPage implements OnInit {
@@ -51,14 +49,11 @@ export class AiQaPage implements OnInit {
   readonly allQSelected = computed(() =>
     this.gen.questions().length > 0 && this.selectedQIndices().size === this.gen.questions().length
   );
-  readonly collapsedNodeIds = signal<ReadonlySet<string>>(new Set<string>());
   readonly lastDeletedTree = signal<CategoryNode[] | null>(null);
+  readonly treeTableNodes = computed(() => this.toTreeNodes(this.gen.tree()));
+  readonly totalQCount = computed(() => sumQuestionCounts(this.gen.tree()));
   private undoClearHandle: ReturnType<typeof setTimeout> | null = null;
   private wasQuestionLoading = false;
-
-  readonly allRows = computed(() => flattenCategoryTree(this.gen.tree()));
-  readonly visibleRows = computed(() => filterVisibleRows(this.allRows(), this.collapsedNodeIds()));
-  readonly totalQCount = computed(() => sumQuestionCounts(this.gen.tree()));
 
   constructor() {
     // Auto-save draft to IndexedDB whenever tree or questions change.
@@ -131,7 +126,6 @@ export class AiQaPage implements OnInit {
   generateQuestions(): void {
     this.gen.generateQuestions('vercel-ai-sdk', this.webSearch());
     this.expandedAnswerKeys.set(new Set<string>());
-    this.selectedQIndices.set(new Set<number>());
   }
 
   async showMoreQADialog(): Promise<void> {
@@ -154,9 +148,9 @@ export class AiQaPage implements OnInit {
     await alert.present();
   }
 
-  async showMoreSubcategoriesDialog(row: CategoryTreeRow): Promise<void> {
+  async showMoreSubcategoriesDialog(node: CategoryNode): Promise<void> {
     const alert = await this.alertCtrl.create({
-      header: `Subcategories for "${row.node.title}"`,
+      header: `Subcategories for "${node.title}"`,
       inputs: [{ name: 'count', type: 'number', placeholder: '5', value: '5', min: 1, max: 20 }],
       buttons: [
         { text: 'Cancel', role: 'cancel' },
@@ -164,7 +158,7 @@ export class AiQaPage implements OnInit {
           text: 'Generate',
           handler: (data) => {
             const n = Math.max(1, Math.min(20, parseInt(data.count) || 5));
-            this.gen.generateSubcategories(row.node.id, this.topic(), n, this.webSearch());
+            this.gen.generateSubcategories(node.id, this.topic(), n, this.webSearch());
           },
         },
       ],
@@ -235,15 +229,18 @@ export class AiQaPage implements OnInit {
     })));
   }
 
-  collapsed(id: string): boolean { return this.collapsedNodeIds().has(id); }
-
-  toggleCollapsed(id: string): void {
-    const s = new Set(this.collapsedNodeIds());
-    s.has(id) ? s.delete(id) : s.add(id);
-    this.collapsedNodeIds.set(s);
+  private toTreeNodes(nodes: CategoryNode[]): TreeNode[] {
+    return nodes.map(node => {
+      const children = Array.isArray(node.children) ? node.children : [];
+      return {
+        data: node,
+        key: node.id,
+        expanded: true,
+        leaf: children.length === 0,
+        children: children.length ? this.toTreeNodes(children) : undefined,
+      };
+    });
   }
-
-  indent(depth: number): string { return `${Math.min(depth, 8) * 18}px`; }
 
   answerKey(item: QuestionAnswer, i: number): string {
     return `${item.categoryId || item.categoryPath || 'qa'}-${i}`;
@@ -280,6 +277,5 @@ export class AiQaPage implements OnInit {
     URL.revokeObjectURL(url);
   }
 
-  trackRow(_i: number, row: CategoryTreeRow): string { return row.node.id; }
   trackQ(i: number, item: QuestionAnswer): string { return this.answerKey(item, i); }
 }

@@ -183,6 +183,13 @@ export class AiQaGeneratorService {
   async generateQuestions(integration: QaIntegrationMode, webSearch: boolean): Promise<void> {
     if (!this.tree().length || this.questionLoading()) return;
 
+    // If questions already exist, append rather than replace.
+    const existing = this.questions();
+    if (existing.length) {
+      this.appendMode = true;
+      this.preAppendQuestions = [...existing];
+    }
+
     this.questionAbortController = new AbortController();
     this.questionLoading.set(true);
     this.questionError.set('');
@@ -192,6 +199,9 @@ export class AiQaGeneratorService {
     const request: QuestionAnswerRequest = {
       tree: cloneCategoryTree(this.tree()),
       web_search: webSearch,
+      ...(this.preAppendQuestions.length && {
+        existingQuestions: this.preAppendQuestions.map(q => q.question),
+      }),
     };
 
     try {

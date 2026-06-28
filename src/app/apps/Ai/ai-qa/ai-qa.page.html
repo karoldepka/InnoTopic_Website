@@ -98,80 +98,72 @@
         </div>
       </div>
 
-      <div class="tree-scroll" role="table" aria-label="Category tree">
-        <ng-container *ngIf="visibleRows().length; else emptyTree">
-          <div class="tree-header" aria-hidden="true">
-            <span></span>
-            <span>Category</span>
-            <span></span>
-            <span class="num">Q#</span>
-            <span></span>
-            <span></span>
-            <span></span>
-          </div>
-          <div
-            class="tree-row"
-            role="row"
-            *ngFor="let row of visibleRows(); trackBy: trackRow"
-            [style.padding-left]="indent(row.depth)"
-          >
-            <ion-button
-              fill="clear"
-              size="small"
-              [class.invisible]="!row.hasChildren"
-              [attr.aria-label]="collapsed(row.node.id) ? 'Expand' : 'Collapse'"
-              (click)="toggleCollapsed(row.node.id)"
-            >
-              <ion-icon
-                [name]="collapsed(row.node.id) ? 'chevron-forward-outline' : 'chevron-down-outline'"
-                slot="icon-only"
-              ></ion-icon>
-            </ion-button>
-
-            <input
-              class="cat-title"
-              [value]="row.node.title"
-              [attr.aria-label]="'Category: ' + row.path"
-              (input)="renameCategory(row.node.id, $any($event.target).value)"
-            />
-
-            <span
-              class="existing-tag"
-              *ngIf="row.node.isExistingCategory || row.node.matchedExistingCategoryId"
-              [title]="row.node.matchedExistingCategoryTitle || row.node.matchedExistingCategoryId || ''"
-            >existing</span>
-
-            <input
-              class="cat-count"
-              type="number"
-              min="0"
-              max="50"
-              [value]="row.node.questionCount"
-              [attr.aria-label]="'Q count for ' + row.path"
-              (input)="changeCount(row.node.id, $any($event.target).value)"
-            />
-
-            <ion-button fill="clear" size="small" [attr.aria-label]="'Add child to ' + row.path" (click)="addChild(row.node.id)">
-              <ion-icon name="add-outline" slot="icon-only"></ion-icon>
-            </ion-button>
-            <ion-button
-              fill="clear"
-              size="small"
-              [disabled]="gen.subcategoryLoading()"
-              [attr.aria-label]="'Generate subcategories for ' + row.path"
-              (click)="showMoreSubcategoriesDialog(row)"
-            >
-              <ion-icon name="sparkles-outline" slot="icon-only"></ion-icon>
-            </ion-button>
-            <ion-button fill="clear" size="small" color="danger" [attr.aria-label]="'Delete ' + row.path" (click)="deleteCategory(row.node.id)">
-              <ion-icon name="trash-outline" slot="icon-only"></ion-icon>
-            </ion-button>
-          </div>
-        </ng-container>
-
-        <ng-template #emptyTree>
+      <div class="tree-scroll">
+        @if (gen.tree().length) {
+          <p-treetable [value]="treeTableNodes()" styleClass="qa-treetable">
+            <ng-template pTemplate="header">
+              <tr>
+                <th>Category</th>
+                <th class="col-num">Q#</th>
+                <th class="col-btn"></th>
+                <th class="col-btn"></th>
+                <th class="col-btn"></th>
+              </tr>
+            </ng-template>
+            <ng-template pTemplate="body" let-rowNode let-rowData="rowData">
+              <tr [ttRow]="rowNode">
+                <td class="cat-cell">
+                  <p-treeTableToggler [rowNode]="rowNode"></p-treeTableToggler>
+                  <input
+                    class="cat-title"
+                    [value]="rowData.title"
+                    [attr.aria-label]="'Category: ' + rowData.title"
+                    (input)="renameCategory(rowData.id, $any($event.target).value)"
+                  />
+                  <span
+                    class="existing-tag"
+                    *ngIf="rowData.isExistingCategory || rowData.matchedExistingCategoryId"
+                    [title]="rowData.matchedExistingCategoryTitle || rowData.matchedExistingCategoryId || ''"
+                  >existing</span>
+                </td>
+                <td class="col-num">
+                  <input
+                    class="cat-count"
+                    type="number"
+                    min="0"
+                    max="50"
+                    [value]="rowData.questionCount"
+                    [attr.aria-label]="'Q count for ' + rowData.title"
+                    (input)="changeCount(rowData.id, $any($event.target).value)"
+                  />
+                </td>
+                <td class="col-btn">
+                  <ion-button fill="clear" size="small" [attr.aria-label]="'Add child to ' + rowData.title" (click)="addChild(rowData.id)">
+                    <ion-icon name="add-outline" slot="icon-only"></ion-icon>
+                  </ion-button>
+                </td>
+                <td class="col-btn">
+                  <ion-button
+                    fill="clear"
+                    size="small"
+                    [disabled]="gen.subcategoryLoading()"
+                    [attr.aria-label]="'Generate subcategories for ' + rowData.title"
+                    (click)="showMoreSubcategoriesDialog(rowData)"
+                  >
+                    <ion-icon name="sparkles-outline" slot="icon-only"></ion-icon>
+                  </ion-button>
+                </td>
+                <td class="col-btn">
+                  <ion-button fill="clear" size="small" color="danger" [attr.aria-label]="'Delete ' + rowData.title" (click)="deleteCategory(rowData.id)">
+                    <ion-icon name="trash-outline" slot="icon-only"></ion-icon>
+                  </ion-button>
+                </td>
+              </tr>
+            </ng-template>
+          </p-treetable>
+        } @else {
           <div class="empty">No categories yet.</div>
-        </ng-template>
+        }
       </div>
 
       <div class="panel-foot">

@@ -137,37 +137,80 @@
   padding: 8px;
 }
 
-// ── Category tree ─────────────────────────────────────────────────────────────
+// ── PrimeNG TreeTable (category tree) ────────────────────────────────────────
 
-.tree-header {
-  display: grid;
-  grid-template-columns: 28px 1fr auto 52px 28px 28px 28px;
-  gap: 4px;
-  padding: 2px 0 6px;
-  border-bottom: 2px solid rgba(155, 169, 186, 0.25);
-  margin-bottom: 4px;
-  font-size: 0.72rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  color: var(--ion-color-medium);
-  position: sticky;
-  top: 0;
-  background: rgba(14, 18, 22, 0.96);
-  z-index: 1;
+/* stylelint-disable selector-class-pattern */
+::ng-deep .qa-treetable {
+  font-size: 0.88rem;
 
-  .num { text-align: right; }
+  .p-treetable-table {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;
+  }
+
+  // ── Header ─────────────────────────────────────────────────────────────────
+
+  .p-treetable-thead > tr > th {
+    padding: 4px 6px;
+    font-size: 0.72rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--ion-color-medium);
+    border-bottom: 2px solid rgba(155, 169, 186, 0.25);
+    text-align: left;
+    background: rgba(14, 18, 22, 0.96);
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    white-space: nowrap;
+
+    &.col-num { text-align: right; width: 60px; }
+    &.col-btn  { width: 32px; padding: 0; }
+  }
+
+  // ── Body rows ──────────────────────────────────────────────────────────────
+
+  .p-treetable-tbody > tr > td {
+    padding: 3px 4px;
+    vertical-align: middle;
+    border: none;
+    border-bottom: 1px solid rgba(155, 169, 186, 0.1);
+
+    &.col-num { text-align: right; width: 60px; }
+    &.col-btn  { width: 32px; padding: 0; }
+    &.cat-cell { display: flex; align-items: center; gap: 3px; }
+  }
+
+  .p-treetable-tbody > tr:last-child > td { border-bottom: none; }
+
+  .p-treetable-tbody > tr:hover > td { background: rgba(255, 255, 255, 0.04); }
+
+  // ── Expand/collapse toggler ────────────────────────────────────────────────
+
+  .p-treetable-toggler {
+    flex-shrink: 0;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--ion-color-medium);
+    padding: 2px;
+    width: 22px;
+    min-width: 22px;
+    height: 22px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 4px;
+    transition: background 0.12s;
+
+    &:hover { color: var(--ion-color-light); background: rgba(255, 255, 255, 0.09); }
+
+    svg { width: 0.8rem; height: 0.8rem; fill: currentColor; }
+  }
 }
-
-.tree-row {
-  display: grid;
-  grid-template-columns: 28px 1fr auto 52px 28px 28px 28px;
-  gap: 4px;
-  align-items: center;
-  min-height: 42px;
-  border-bottom: 1px solid rgba(155, 169, 186, 0.1);
-
-  &:last-child { border-bottom: none; }
-}
+/* stylelint-enable selector-class-pattern */
 
 .cat-title,
 .cat-count {
@@ -349,13 +392,8 @@
   }
 }
 
-// ── Narrow mobile: tighten the tree grid ─────────────────────────────────────
+// ── Narrow mobile ────────────────────────────────────────────────────────────
 
 @media (max-width: 500px) {
-  .tree-header,
-  .tree-row {
-    grid-template-columns: 26px 1fr 48px 26px 26px 26px;
-  }
-
   .existing-tag { display: none; }
 }
