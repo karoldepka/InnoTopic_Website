@@ -176,14 +176,17 @@ export class AiQaPage implements OnInit {
   }
 
   renameCategory(id: string, title: string): void {
-    this.gen.tree.set(updateCategoryNode(this.gen.tree(), id, n => ({ ...n, title })));
+    const now = Date.now();
+    this.gen.tree.set(updateCategoryNode(this.gen.tree(), id, n => ({ ...n, title, contentModifiedAt: now })));
   }
 
   changeCount(id: string, raw: string | number | null | undefined): void {
     const n = Math.max(0, Math.min(50, Number(raw || 0)));
+    const now = Date.now();
     this.gen.tree.set(updateCategoryNode(this.gen.tree(), id, node => ({
       ...node,
       questionCount: Number.isFinite(n) ? n : 0,
+      contentModifiedAt: now,
     })));
   }
 

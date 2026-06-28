@@ -54,6 +54,7 @@ export function cloneCategoryTree(nodes: CategoryNode[]): CategoryNode[] {
 }
 
 export function makeCategoryNode(title = 'New category'): CategoryNode {
+  const now = Date.now();
   const slug = title
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, '-')
@@ -61,13 +62,17 @@ export function makeCategoryNode(title = 'New category'): CategoryNode {
     || 'category';
 
   return {
-    id: `local-${slug}-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 7)}`,
+    id: `local-${slug}-${now.toString(36)}-${Math.random().toString(36).slice(2, 7)}`,
     title,
     questionCount: 3,
     children: [],
     matchedExistingCategoryId: null,
     matchedExistingCategoryTitle: null,
     isExistingCategory: false,
+    createdAt: now,
+    draftedAt: now,
+    contentModifiedAt: now,
+    // draftedByAIAt intentionally absent — manually created
   };
 }
 

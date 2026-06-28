@@ -27,6 +27,7 @@ export interface CategoryNode {
   createdAt?: number;
   draftedAt?: number;
   draftedByAIAt?: number;
+  contentModifiedAt?: number;
 }
 
 export interface CategoryTreeRequest {
@@ -53,6 +54,7 @@ export interface QuestionAnswer {
   draftedByAIAt?: number;
   approvedAt?: number;
   lastModifiedAt?: number;
+  contentModifiedAt?: number;
 }
 
 export interface QuestionAnswerRequest {

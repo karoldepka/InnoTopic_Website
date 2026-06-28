@@ -355,6 +355,7 @@ export class AiQaGeneratorService {
       draftedAt: q.draftedAt ?? now,
       draftedByAIAt: q.draftedByAIAt ?? now,
       lastModifiedAt: q.lastModifiedAt ?? now,
+      contentModifiedAt: q.contentModifiedAt ?? now,
     }));
     console.log('[qa final] items count:', items.length, 'sample:', JSON.stringify(items[0] ?? null).slice(0, 200));
     this.questions.set(items);
@@ -368,6 +369,7 @@ export class AiQaGeneratorService {
       createdAt: n.createdAt ?? now,
       draftedAt: n.draftedAt ?? now,
       draftedByAIAt: n.draftedByAIAt ?? now,
+      contentModifiedAt: n.contentModifiedAt ?? now,
       children: this.stampTreeDraftedAt(n.children, now),
     }));
   }
