@@ -10,7 +10,7 @@ import {nullish} from '../../../AppFedShared/utils/type-utils'
 import {intensityBtnVariant} from '../descriptor-level-edit'
 import { IonicModule } from '@ionic/angular';
 
-const importanceButtonsDesc = new ButtonsDescriptor<any, string>([
+export const importanceButtonsDesc = new ButtonsDescriptor<any, string>([
   btn({
     btnVariants: [
       intensityBtnVariant(`↓`, importanceDescriptors.somewhat_low),
