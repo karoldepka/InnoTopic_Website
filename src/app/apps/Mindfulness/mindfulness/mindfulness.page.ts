@@ -18,7 +18,17 @@ import { TimePassingComponent } from '../../../libs/AppFedShared/time/time-passi
 })
 export class MindfulnessPage extends BaseComponent implements OnInit, OnDestroy {
 
-  readonly timerPresetsMinutes = [1, 3, 5, 10, 15]
+  readonly timerPresets: { label: string; durationSeconds: number }[] = [
+    { label: '30s', durationSeconds: 30 },
+    { label: '1m',  durationSeconds:  1 * 60 },
+    { label: '2m',  durationSeconds:  2 * 60 },
+    { label: '3m',  durationSeconds:  3 * 60 },
+    { label: '5m',  durationSeconds:  5 * 60 },
+    { label: '10m', durationSeconds: 10 * 60 },
+    { label: '15m', durationSeconds: 15 * 60 },
+    { label: '20m', durationSeconds: 20 * 60 },
+    { label: '30m', durationSeconds: 30 * 60 },
+  ]
 
   selectedDurationSeconds = 5 * 60
 
@@ -70,8 +80,8 @@ export class MindfulnessPage extends BaseComponent implements OnInit, OnDestroy 
     return 'Ready'
   }
 
-  selectTimerDuration(minutes: number) {
-    this.selectedDurationSeconds = minutes * 60
+  selectTimerDuration(durationSeconds: number) {
+    this.selectedDurationSeconds = durationSeconds
     this.resetTimer()
   }
 

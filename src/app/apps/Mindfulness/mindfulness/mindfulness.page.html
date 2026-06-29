@@ -37,14 +37,14 @@
 
       <div class="timer-presets" aria-label="Timer duration">
         <ion-button
-          *ngFor="let minutes of timerPresetsMinutes"
+          *ngFor="let preset of timerPresets"
           class="timer-preset"
-          [class.is-selected]="selectedDurationSeconds === minutes * 60"
+          [class.is-selected]="selectedDurationSeconds === preset.durationSeconds"
           size="small"
           fill="clear"
-          (click)="selectTimerDuration(minutes)"
+          (click)="selectTimerDuration(preset.durationSeconds)"
         >
-          {{ minutes }}m
+          {{ preset.label }}
         </ion-button>
       </div>
 
