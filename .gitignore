@@ -94,3 +94,5 @@ electron/app
 # Local archival/generated folders
 offrepo-gitignored/
 documentation/
+
+.vercel

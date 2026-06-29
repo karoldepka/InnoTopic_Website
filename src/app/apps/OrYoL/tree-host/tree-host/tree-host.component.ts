@@ -57,11 +57,9 @@ export class TreeHostComponent implements OnInit {
     const rootNodeInclusionId = this.activatedRoute.snapshot.params['rootNodeId']
     console.log('rootNodeInclusionId', rootNodeInclusionId)
     this.navigationService.navigation$.subscribe((nodeId: string) => {
-      this.treeModel.navigation.navigateInto(nodeId)
-      // TODO: reFocusLastFocused()?
       const node = this.treeModel.getNodesByItemId(nodeId)[0]
-      // node.expansion.setExpanded(true, {recursive: false})
-
+      const dayPlanAncestor = node?.findAncestorMatching((n: any) => (n.content as any)?.isDayPlan)
+      this.treeModel.navigation.navigateInto(dayPlanAncestor ?? nodeId)
       this.focusNode(node)
     })
 

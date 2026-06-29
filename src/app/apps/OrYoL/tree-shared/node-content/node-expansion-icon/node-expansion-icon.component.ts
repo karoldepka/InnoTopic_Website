@@ -6,14 +6,14 @@ import {
 } from '@angular/core';
 import { debugLog } from '../../../utils/log'
 import {ApfBaseTreeNode, OryBaseTreeNode} from '../../../tree-model/TreeModel'
-import { NgIf, NgClass } from '@angular/common';
+import { NgClass } from '@angular/common';
 
 @Component({
     selector: 'app-node-expansion-icon',
     templateUrl: './node-expansion-icon.component.html',
     changeDetection: ChangeDetectionStrategy.Eager,
     styleUrls: ['./node-expansion-icon.component.sass'],
-    imports: [NgIf, NgClass]
+    imports: [NgClass]
 })
 export class NodeExpansionIconComponent implements OnInit {
 
@@ -31,7 +31,10 @@ export class NodeExpansionIconComponent implements OnInit {
 
   onPress(event: any) {
     debugLog('onPress', event)
-    this.treeNode.expansion.toggleExpansion(true)
+    const allExpandedOrLeaf = this.treeNode.allDescendantsMatch(
+      node => (node.expanded ?? false) || !node.hasChildren
+    )
+    this.treeNode.expansion.setExpanded(!allExpandedOrLeaf, true)
   }
 
 }

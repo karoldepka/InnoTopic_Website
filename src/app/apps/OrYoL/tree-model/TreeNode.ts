@@ -101,6 +101,23 @@ export class RootTreeNode<
     return this.children?.length ?? 0
   }
 
+  allDescendantsMatch(predicate: (node: RootTreeNode<any, any, any, any>) => boolean): boolean {
+    return this.children.every(child =>
+      predicate(child as any) && (child as any).allDescendantsMatch(predicate)
+    )
+  }
+
+  findAncestorMatching(predicate: (node: RootTreeNode<any, any, any, any>) => boolean): RootTreeNode<any, any, any, any> | undefined {
+    let node: RootTreeNode<any, any, any, any> | undefined = this.parent2 as any
+    while (node) {
+      if (predicate(node)) {
+        return node
+      }
+      node = node.parent2 as any
+    }
+    return undefined
+  }
+
   expansion: any /* FIXME */ = new class Expansion {
     constructor(
       public treeNode: RootTreeNode<any, any, any, any>,
@@ -267,10 +284,6 @@ export class RootTreeNode<
   }
 
   _appendChildAndSetThisAsParent(nodeToAppend: TChildNode, insertBeforeIndex?: number) {
-    // TODO: consider reacting to multi-node changes here for all nodes with the same
-    // nodeToAppend ??= this.createChildNode()
-    const afterNode = this.lastChildNode
-
     if (nullOrUndef(insertBeforeIndex)) {
       insertBeforeIndex = this.children.length
     }
@@ -280,11 +293,8 @@ export class RootTreeNode<
     nodeToAppend.parent = this
     nodeToAppend.parent2 = this as any as TBaseNode
 
-    // add node to other nodes of the same itemId:
-    for (const node of this.treeModel.getNodesByItemId(this.itemId)) {
-      this.children.splice(insertBeforeIndex!, 0, nodeToAppend)
-      this.treeModel.registerNode(nodeToAppend)
-    }
+    this.children.splice(insertBeforeIndex!, 0, nodeToAppend)
+    this.treeModel.registerNode(nodeToAppend)
     return nodeToAppend
   }
 
@@ -598,19 +608,54 @@ export class ApfNonRootTreeNode<
   reorder(order: NodeOrderInfo) {
     debugLog('reorder order, this.parent2', order, this.parent2)
     // TODO: replace patch with set due to problems with "no document to update" after quickly reordering/indenting after creating
+    const parent = this.parent2!
+    if (!parent || parent.children.length < 2) {
+      return
+    }
+
     const inclusion = this.nodeInclusion !
-    this.treeModel.nodeOrderer.addOrderMetadataToInclusion(order, inclusion)
+    const hadUnsafeOrderNumbers = this.treeModel.nodeOrderer.hasUnsafeOrderNumbers(
+      parent.children,
+      node => node.nodeInclusion!,
+    )
 
     { // reorder locally to avoid UI lag, e.g. when quickly reordering up/down and perhaps will remove keyboard appearing/disappearing on android
-      this.parent2!._removeChild(this)
-      const insertionIndex = this.parent2!.findInsertionIndexForNewInclusion(inclusion)
-      this.parent2!._appendChildAndSetThisAsParent(this, insertionIndex)
+      parent._removeChild(this)
+      const insertionIndex = this.treeModel.nodeOrderer.findInsertionIndexForOrder(
+        parent.children,
+        order,
+        node => node.nodeInclusion!,
+      )
+      parent._appendChildAndSetThisAsParent(this, insertionIndex)
+
+      const previousInclusion = this.getSiblingNodeAboveThis()?.nodeInclusion
+      const nextInclusion = this.getSiblingNodeBelowThis()?.nodeInclusion
+      const canPatchOnlyThisNode = !hadUnsafeOrderNumbers
+        && this.treeModel.nodeOrderer.canCalculateOrderNumberBetween(previousInclusion, nextInclusion)
+
+      if (canPatchOnlyThisNode) {
+        this.treeModel.nodeOrderer.addOrderMetadataToInclusion(
+          {
+            inclusionBefore: previousInclusion,
+            inclusionAfter: nextInclusion,
+          },
+          inclusion,
+        )
+        this.nodeInclusion$.patchThrottled(inclusion)
+      } else {
+        const repairs = this.treeModel.nodeOrderer.normalizeOrderNumbers(
+          parent.children,
+          node => node.nodeInclusion!,
+        )
+        repairs.forEach(repair => {
+          const repairedNode = repair.node as any as ApfNonRootTreeNode
+          repairedNode.nodeInclusion$?.patchThrottled(repair.inclusion)
+        })
+      }
+
       this.treeModel.treeListener.onAfterNodeMoved() // fixes focus being lost after reorder
       // TODO: duplicate with onNodeInclusionModified - extract applyParentAndOrder or smth
     }
-
-    // TODO util func/obj to throttle smth e.g. incremental patch
-    this.nodeInclusion$.patchThrottled(inclusion)
   }
 
   // ======================================================
