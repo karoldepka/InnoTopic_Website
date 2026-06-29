@@ -161,13 +161,17 @@ export class TreeTableNodeContent <
   }
 
 
-  toggleDone() {
+  setIsDone(isDone: boolean) {
     this.patchThrottled({
-      isDone: this.itemData?.isDone ? null : new Date() /* TODO: `this.setDoneNow(! this.isDone)` */ ,
+      isDone: isDone ? new Date() : null,
     })
     // FIXME: fireOnChangeItemDataOfChildOnParents and on this
 
     // TODO: focus node below, but too tied to UI; has to know about column too
+  }
+
+  toggleDone() {
+    this.setIsDone(!this.itemData?.isDone)
   }
 
   /** related to patchThrottled() */

@@ -146,4 +146,14 @@ export class LearnItemDetailsPage extends BaseComponent implements OnInit {
     await alert.present()
   }
 
+  toggleWhenDone() {
+    this.setWhenDone(!this.item$.currentVal?.whenDone)
+  }
+
+  setWhenDone(isDone: boolean) {
+    this.item$.patchThrottled({
+      whenDone: isDone ? new Date() : null,
+    })
+  }
+
 }

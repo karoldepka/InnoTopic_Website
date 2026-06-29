@@ -213,3 +213,5 @@ export class Statuses {
 export const statuses = setIdsFromKeys(new Statuses() as any as Dict<StatusDecl>) as any as Statuses
 
 export const statusesArray = dictToArrayWithIds(statuses as any as Dict<StatusDecl>)
+
+export type StatusId = keyof Statuses

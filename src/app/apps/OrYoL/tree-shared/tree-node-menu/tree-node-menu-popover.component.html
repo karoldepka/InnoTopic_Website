@@ -57,9 +57,15 @@ In n Places:
 <p style="margin-top: .5em">
   Created: {{getWhenCreated()?.toISOString()}}
 </p>
-<p style="margin-top: .5em">
-  Done: {{treeNode.content.itemData?.isDone?.toDate?.apply($safeNavigationMigration(treeNode.content.itemData?.isDone))?.toISOString()}}
-</p>
+
+<ion-item lines="none">
+  <ion-checkbox
+    slot="start"
+    [checked]="!!treeNode.content.itemData?.isDone"
+    (ionChange)="toggleDone()"
+  ></ion-checkbox>
+  <ion-label>Done</ion-label>
+</ion-item>
 
 <app-node-class-picker
 ></app-node-class-picker>

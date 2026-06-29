@@ -126,4 +126,30 @@
   >
     Hide ancestors in quiz
   </odm-checkbox>
+
+  <div class="popup-section templates-section">
+    <ion-button
+      fill="clear"
+      size="small"
+      (click)="showTemplates = !showTemplates"
+    >
+      <ion-icon name="layers-outline" slot="start" />
+      Apply Template
+      <ion-icon [name]="showTemplates ? 'chevron-up-outline' : 'chevron-down-outline'" slot="end" />
+    </ion-button>
+
+    <div *ngIf="showTemplates" class="templates-list">
+      <ion-button
+        *ngFor="let template of templates"
+        fill="outline"
+        size="small"
+        class="template-btn"
+        (click)="applyTemplate(template)"
+        [title]="template.description || template.label"
+      >
+        <ion-icon [name]="template.icon" slot="start" />
+        {{ template.label }}
+      </ion-button>
+    </div>
+  </div>
 </div>

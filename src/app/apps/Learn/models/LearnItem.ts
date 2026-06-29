@@ -14,7 +14,7 @@ import {isNotNullish, isNullish, isNullishOrEmptyOrBlank} from '../../../libs/Ap
 import {parseDate} from '../../../libs/AppFedShared/utils/time/parse-date'
 import {Deferrability, Urgency} from './planning-prioritizing.model'
 import {daysAsMs, hoursAsMs, isInFuture, isInThePastOrNullish} from '../../../libs/AppFedShared/utils/time/date-time-utils'
-import {StatusDef, statuses} from './statuses.model'
+import {StatusDef, StatusId, statuses} from './statuses.model'
 import {Dict} from '../../../libs/AppFedShared/utils/dictionary-utils'
 
 export type LearnItemId = OdmItemId<LearnItem>
@@ -56,7 +56,13 @@ export class LearnItem extends OdmInMemItem implements QuizzableData {
 
   hideAncestorsInQuiz?: boolean
 
-  status: string | nullish
+  status: StatusId | nullish
+
+  /** Set to a Date when done, null when undone. Truthy = done. */
+  whenDone?: Date | null
+
+  /** Identifies this node as originating from a template; stores the templateNodeClass (e.g. 'goal', 'action') */
+  templateNodeClass?: string
 
   hasAudio?: true | null
   whenDeleted?: Date

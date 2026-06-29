@@ -105,6 +105,10 @@ export class TreeNodeMenuPopoverComponent implements OnInit {
   }
 
 
+  toggleDone() {
+    this.treeNode.content.toggleDone()
+  }
+
   async askArchiveItems() {
     // TODO what sub-items are not yet loaded (could archive parent without children)
     const count = this.treeNode.countSubItemsIncludingThis()

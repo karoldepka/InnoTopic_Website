@@ -53,9 +53,13 @@ export class WhatNextService {
       ignorePromise(this.router.navigateByUrl('/mindfulness'))
       console.log(`this.router.navigateByUrl('/mindfulness')`)
     } else {
-      const h = new Date().getHours()
-      console.log('hours', h)
-      if ( h >= 2 && h <= 11 ) {
+      const now = new Date()
+      const hour = now.getHours()
+      const minute = now.getMinutes()
+      const isLateEveningOrNight = hour > 20 || (hour === 20 && minute >= 30)
+      const isEarlyMorning = hour < 5
+      console.log('hours', hour, 'minutes', minute)
+      if ( isLateEveningOrNight || isEarlyMorning ) {
         ignorePromise(this.router.navigateByUrl('/sleep'))
       }
     }

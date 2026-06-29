@@ -6,8 +6,9 @@ import {LearnItem$} from '../../../../../apps/Learn/models/LearnItem$'
 import {stripHtml} from '../../../utils/html-utils'
 import { ToastController, IonicModule } from '@ionic/angular'
 import { Router, RouterLink } from '@angular/router'
-import { NgIf, AsyncPipe } from '@angular/common';
+import { NgIf, NgFor, AsyncPipe } from '@angular/common';
 import { OdmCheckbox } from '../../../../AppFedSharedIonic/odm-ui/bound-checkbox/odm-checkbox';
+import { HARDCODED_TEMPLATES, TemplateDef } from '../../../../../apps/Learn/templates/learn-item-templates';
 
 type NewTreeChildType = 'learn' | 'task' | 'category'
 
@@ -20,6 +21,7 @@ type NewTreeChildType = 'learn' | 'task' | 'category'
         IonicModule,
         RouterLink,
         NgIf,
+        NgFor,
         OdmCheckbox,
         AsyncPipe,
     ],
@@ -27,6 +29,9 @@ type NewTreeChildType = 'learn' | 'task' | 'category'
 export class OdmTreeNodePopupComponent implements OnInit {
 
   stripHtml = stripHtml
+
+  readonly templates = HARDCODED_TEMPLATES
+  showTemplates = false
 
   newChildTitle = ''
   newChildType: NewTreeChildType = 'learn'
@@ -150,6 +155,45 @@ export class OdmTreeNodePopupComponent implements OnInit {
     this.newChildTitle = ''
     this.childTitleError = undefined
     this.clearDraft()
+  }
+
+  async applyTemplate(template: TemplateDef) {
+    const item$ = this.item$
+    const odmService = item$.odmService as OdmService2<any, any, any, any>
+    const parentId = item$.id
+    if (!parentId) {
+      await this.presentToast('Cannot apply template: parent item has no ID yet.', 'warning')
+      return
+    }
+
+    let addedCount = 0
+    for (const childDef of template.children) {
+      const templateItemId = `${parentId}_template_${childDef.id}` as any
+      // Skip if the item already exists with data (idempotent)
+      if ((odmService.mapIdToItem$ as Map<any, any>).get(templateItemId)?.val$?.hasEmitted) {
+        continue
+      }
+      const childData = new LearnItem()
+      childData.title = childDef.title
+      childData.templateNodeClass = childDef.templateNodeClass
+      if (childDef.isTask) {
+        childData.isTask = true
+        childData.isToLearn = false
+      } else {
+        childData.isToLearn = true
+      }
+      const newItem = odmService.newItem(templateItemId, childData, [item$], { createdLocally: true })
+      newItem.saveNowToDb()
+      addedCount++
+    }
+
+    this.treeNode.isExpanded = true
+    this.showTemplates = false
+
+    const message = addedCount > 0
+      ? `Applied "${template.label}" template (${addedCount} nodes added).`
+      : `"${template.label}" template nodes already exist.`
+    await this.presentToast(message, addedCount > 0 ? 'success' : 'medium')
   }
 
   private async presentToast(message: string, color: 'success' | 'danger' | 'warning' | 'medium' = 'success') {
