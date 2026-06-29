@@ -47,6 +47,10 @@ const routes: Routes = [
     loadChildren: () => import('./apps/Learn/learn-stats/learn-stats.module').then( m => m.LearnStatsPageModule)
   },
   {
+    path: 'learn/ai-chat',
+    loadComponent: () => import('./apps/Learn/learn-ai-chat/learn-ai-chat.page').then(m => m.LearnAiChatPage),
+  },
+  {
     path: 'what-next',
     loadChildren: async () => (await import('./apps/Learn/what-next/what-next.module')).WhatNextPageModule
   },

@@ -12,6 +12,7 @@ import { ImportanceBannerComponent } from '../../shared/importance-banner/import
 import { PlayButtonComponent } from '../../shared/play-button/play-button.component';
 import { BreadcrumbsComponent } from '../../../../libs/AppFedShared/breadcrumbs/breadcrumbs.component';
 import { ItemSideComponent } from '../../shared/item-side/item-side.component';
+import { OdmTreeComponent } from '../../../../libs/AppFedShared/tree/tree/odm-tree.component';
 
 @Component({
     selector: 'app-quiz-item-details',
@@ -26,12 +27,16 @@ import { ItemSideComponent } from '../../shared/item-side/item-side.component';
         ItemSideComponent,
         NgFor,
         AsyncPipe,
+        OdmTreeComponent,
     ],
 })
 export class QuizItemDetailsComponent implements OnInit, OnDestroy, AfterViewInit {
 
   @Input()
   item$ ? : LearnItem$ | null | undefined
+
+  @Input()
+  quizLoaded = false
 
   @Input()
   ionContent: any

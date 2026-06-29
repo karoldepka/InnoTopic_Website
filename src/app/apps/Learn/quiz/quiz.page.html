@@ -89,9 +89,9 @@
       <app-quiz-item-details
         *ngFor="let item$ of [ nextItem$WhenRequested | async ]"
         [item$]="item$"
+        [quizLoaded]="!!(status$ | async)"
         [ionContent]="ionContent"
-      ><!-- the entire component will be swapped on new item -->
-      </app-quiz-item-details>
+      /> <!-- Hack: the entire component will be swapped on new item -->
     </div>
 
 

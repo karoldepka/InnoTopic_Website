@@ -51,6 +51,11 @@
   </div>
 
 
+  <app-tree
+    *ngIf="(showAnswer$ | async)"
+    [rootItem]="item$!"
+  />
+
 <!--  <app-show-answer-and-rate-->
 <!--  ></app-show-answer-and-rate>-->
 
@@ -58,6 +63,6 @@
 
 <ng-template #noItem>
   <div style="margin: 1rem">
-    No quiz item <!-- TODO. Loading ... -->
+    {{ quizLoaded ? 'No quiz item' : 'Loading Quiz...' }}
   </div>
 </ng-template>
