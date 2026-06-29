@@ -60,6 +60,7 @@ export interface QuestionAnswer {
 export interface QuestionAnswerRequest {
   tree: CategoryNode[];
   web_search?: boolean;
+  existingQuestions?: string[];
 }
 
 export interface QuestionAnswerResponse {

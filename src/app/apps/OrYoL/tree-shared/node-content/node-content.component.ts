@@ -18,7 +18,6 @@ import { OryColumn } from '../OryColumn'
 import { padStart } from 'lodash-es';
 import { DebugService } from '../../core/debug.service'
 
-import 'hammerjs';
 import { debugLog } from '../../utils/log'
 // import {
 //   NgbModal,

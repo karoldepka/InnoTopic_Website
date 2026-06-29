@@ -5,7 +5,6 @@ import { initialize } from '@ionic/core/components';
 import { AppModule } from './app/app.module';
 import { environment } from './environments/environment';
 import {ChromeExtensionService} from './app/apps/Learn/shared/utils/chrome-extension.service'
-import 'hammerjs'
 
 // import { inject } from '@vercel/analytics';
 

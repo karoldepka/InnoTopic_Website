@@ -26,6 +26,7 @@ import { environment } from '../environments/environment'
 import {registerIonIcons} from './register-ion-icons'
 import { HttpAgent } from '@ag-ui/client'
 import { provideCopilotKit } from '@copilotkit/angular'
+import { PRESS_EVENT_PLUGIN_PROVIDER } from './shared/gestures/press-event.plugin'
 
 const copilotQaAgentId = 'lifesuite-qa'
 
@@ -73,6 +74,7 @@ function copilotAgUiUrl(): string {
                 }),
             },
         }),
+        PRESS_EVENT_PLUGIN_PROVIDER,
         // { provide: RouteReuseStrategy, useClass: }
     ],
     bootstrap: [AppComponent]
