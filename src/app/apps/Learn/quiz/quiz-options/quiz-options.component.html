@@ -53,6 +53,14 @@
   [formControl]="controls.minFunLevel"
 />
 
+<ion-item>
+  <ion-label>MIN IMPORTANCE</ion-label>
+</ion-item>
+<apf-numeric-picker
+  [buttonDescriptors]="importanceButtonsDesc"
+  [formControl]="controls.minImportanceLevel"
+/>
+
 
 <app-quiz-intervals
 />

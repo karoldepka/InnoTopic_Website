@@ -160,6 +160,11 @@ export class QuizService {
         return item$.hasEffectiveFunLevelAtLeast(quizOptions.minFunLevel)
       }
     )
+    item$s = item$s.filter(
+      (item$) => {
+        return item$.hasEffectiveImportanceLevelAtLeast(quizOptions.minImportanceLevel)
+      }
+    )
     item$s = this.filterByCategories(item$s, quizOptions)
     return item$s
   }

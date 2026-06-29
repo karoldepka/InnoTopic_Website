@@ -5,6 +5,7 @@ import {ViewSyncer} from '../../../../libs/AppFedShared/odm/ui/ViewSyncer'
 import {OptionsService} from '../../core/options.service'
 import {throttleTimeWithLeadingTrailing_ReallyThrottle} from '../../../../libs/AppFedShared/utils/rxUtils'
 import {buttonsDesc} from '../../../../libs/LifeSuiteShared/edit-shared/fun-level-edit/fun-level-edit.component'
+import {importanceButtonsDesc} from '../../../../libs/LifeSuiteShared/edit-shared/importance-edit/importance-edit.component'
 import {QuizOptions} from '../../core/quiz/QuizOptions'
 import { IonicModule } from '@ionic/angular';
 import { NumericPickerComponent } from '../../../../libs/AppFedSharedIonic/ratings/numeric-picker/numeric-picker.component';
@@ -31,6 +32,7 @@ import { QuizFocusLevelComponent } from './quiz-focus-level/quiz-focus-level.com
 export class QuizOptionsComponent implements OnInit {
 
   funButtonsDesc = buttonsDesc
+  importanceButtonsDesc = importanceButtonsDesc
 
   /* TODO use some options syncer util, maybe OptionsFormControl directive */
   controls: { [k in keyof QuizOptions]: UntypedFormControl} = {
@@ -43,6 +45,7 @@ export class QuizOptionsComponent implements OnInit {
     categories: new UntypedFormControl(''),
     textFilter: new UntypedFormControl(''),
     minFunLevel: new UntypedFormControl(),
+    minImportanceLevel: new UntypedFormControl(),
   }
 
   formGroup = new UntypedFormGroup(this.controls)

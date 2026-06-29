@@ -183,6 +183,14 @@ export class LearnItem$
     }
   }
 
+  hasEffectiveImportanceLevelAtLeast(minImportanceLevel: ImportanceVal): boolean {
+    if ( ! minImportanceLevel || minImportanceLevel.id === importanceDescriptors.undefined.id ) {
+      return true
+    } else {
+      return this.getEffectiveImportanceNumeric() >= minImportanceLevel.numeric
+    }
+  }
+
   public getFieldVal(side: Side) {
     return this.val?.[side.id as keyof LearnItem]
   }
