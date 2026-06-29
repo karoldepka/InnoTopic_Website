@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="LifeSuite favicon">
+  <defs>
+    <linearGradient id="bgGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#102033"/>
+      <stop offset="100%" stop-color="#1a2f4a"/>
+    </linearGradient>
+    <linearGradient id="blueGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#89d6ff"/>
+      <stop offset="100%" stop-color="#45b6ff"/>
+    </linearGradient>
+    <linearGradient id="orangeGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#ffc170"/>
+      <stop offset="100%" stop-color="#ff8a32"/>
+    </linearGradient>
+    <filter id="softGlow" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="1.1"/>
+    </filter>
+  </defs>
+
+  <!-- Keep all vector geometry inset to prevent edge spillover when rasterized to tiny sizes -->
+  <rect x="4" y="4" width="56" height="56" rx="14" fill="url(#bgGrad)"/>
+
+  <!-- Top-left motif in light blue and orange with slight gradients -->
+  <circle cx="22" cy="22" r="11.5" fill="url(#blueGrad)"/>
+  <circle cx="30" cy="16" r="8.5" fill="url(#orangeGrad)"/>
+
+  <!-- subtle glow for small-size readability -->
+  <circle cx="22" cy="22" r="11.5" fill="#7cd0ff" opacity="0.22" filter="url(#softGlow)"/>
+  <circle cx="30" cy="16" r="8.5" fill="#ffab66" opacity="0.18" filter="url(#softGlow)"/>
+</svg>
