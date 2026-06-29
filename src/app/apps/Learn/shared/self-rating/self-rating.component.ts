@@ -47,7 +47,16 @@ export class SelfRatingComponent extends BaseComponent implements OnInit {
 
 
   @Input()
-  item$ ? : LearnItem$
+  set item$(item$: LearnItem$ | undefined) {
+    this._item$ = item$
+    item$?.requestLoadChildren()
+  }
+
+  get item$(): LearnItem$ | undefined {
+    return this._item$
+  }
+
+  private _item$ ? : LearnItem$
 
   @Input()
   autoSave = true

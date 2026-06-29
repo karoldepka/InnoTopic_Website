@@ -45,6 +45,7 @@ export class ActionableItemComponent extends BaseComponent implements OnInit {
     }
 
     this._item = item
+    item?.requestLoadChildren()
   }
 
   get item() { return this._item }

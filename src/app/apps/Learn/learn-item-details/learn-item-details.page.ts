@@ -105,6 +105,7 @@ export class LearnItemDetailsPage extends BaseComponent implements OnInit {
   private audioDoc = this.angularFirestore.collection(`LearnDoAudio`).doc(this.id)
 
   ngOnInit() {
+    this.item$.requestLoadChildren()
     this.doc.get().pipe(take(1)).subscribe({
       next: snapshot => {
         this.itemLoadFinished = true

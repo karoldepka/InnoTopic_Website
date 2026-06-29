@@ -10,7 +10,16 @@ import {LearnItem$} from '../../models/LearnItem$'
 export class ImportanceBannerComponent implements OnInit {
 
   @Input()
-  item$ ? : LearnItem$
+  set item$(item$: LearnItem$ | undefined) {
+    this._item$ = item$
+    item$?.requestLoadChildren()
+  }
+
+  get item$(): LearnItem$ | undefined {
+    return this._item$
+  }
+
+  private _item$ ? : LearnItem$
 
   get importance() {
     return this.item$?.getEffectiveImportance()?.id?.replace(/_/g, ' ')

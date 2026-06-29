@@ -14,7 +14,17 @@ import { OdmTreeComponent } from '../../../../libs/AppFedShared/tree/tree/odm-tr
 export class ItemSubItemsComponent implements OnInit {
 
   /** maybe could strive to accept just OdmList$ */
-  @Input() item$!: LearnItem$
+  @Input()
+  set item$(item$: LearnItem$) {
+    this._item$ = item$
+    item$?.requestLoadChildren()
+  }
+
+  get item$(): LearnItem$ {
+    return this._item$
+  }
+
+  private _item$!: LearnItem$
 
   // list$!: BehaviorSubject<LearnItem$[]>
 

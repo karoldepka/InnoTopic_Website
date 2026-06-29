@@ -14,6 +14,8 @@ export type Theme = {
   comment?: string;
   background?: HexColor;
   experimental?: boolean;
+  disabled?: boolean;
+  excludeFromRandom?: boolean;
   primary: HexColor;
   secondary: HexColor;
 }
@@ -60,6 +62,7 @@ export const themesMapById: { [key: string]: Theme } = setIdsFromKeys({
     primary: '#000000', /* The black icons look kinda like a bug? Prolly too extreme contrast between primary and secondary color (some icons darker and some lighter than bg) */
     secondary: '#00a001',
     experimental: true,
+    excludeFromRandom: true,
   }),
   'Black and Dark Brown': theme({
     comment: '',
@@ -67,6 +70,7 @@ export const themesMapById: { [key: string]: Theme } = setIdsFromKeys({
     primary: '#000000',
     secondary: '#8d0000',
     experimental: true,
+    disabled: true,
   }),
   // 'Dark Gray and Dark Brown & Red': theme({
   //   comment: '',

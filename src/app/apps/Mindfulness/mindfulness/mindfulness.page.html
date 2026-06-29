@@ -9,33 +9,95 @@
 </ion-header>
 
 <ion-content>
-  <app-time-passing
-    *ngIf="feat.userActivityTiming"
+  <div class="mindfulness-shell">
+    <app-time-passing
+      *ngIf="feat.userActivityTiming"
+      class="elapsed-time"
+      [isCountDown]="false"
+    ></app-time-passing>
 
-    style="opacity: 20%; display: block; font-size: 95%; color: white; margin-left: 1rem; margin-top: 1rem; align-self: center; margin-bottom: 100px"
-    [isCountDown]="false"
-  ></app-time-passing>
+    <section class="mindfulness-timer" aria-label="Mindfulness timer">
+      <div class="timer-topline">
+        <ion-icon name="timer-outline" aria-hidden="true"></ion-icon>
+        <span>{{ timerStatusText }}</span>
+      </div>
 
-  <div class="fancy" style="margin: 15px">
+      <div class="timer-display" aria-live="polite">
+        <span>{{ timerMinutesText }}</span>
+        <span class="timer-separator">:</span>
+        <span>{{ timerSecondsText }}</span>
+      </div>
 
-    <p>Don't hesitate to spend some time on this. It will pay off!</p>
+      <div class="timer-progress" aria-hidden="true">
+        <div
+          class="timer-progress__bar"
+          [style.width.%]="timerProgressPercent"
+        ></div>
+      </div>
 
-    <p>Relax. Heal.</p>
+      <div class="timer-presets" aria-label="Timer duration">
+        <ion-button
+          *ngFor="let minutes of timerPresetsMinutes"
+          class="timer-preset"
+          [class.is-selected]="selectedDurationSeconds === minutes * 60"
+          size="small"
+          fill="clear"
+          (click)="selectTimerDuration(minutes)"
+        >
+          {{ minutes }}m
+        </ion-button>
+      </div>
 
-    <p>Breathe deeply.</p>
+      <div class="timer-actions">
+        <ion-button
+          class="timer-action"
+          [attr.aria-label]="isTimerRunning ? 'Pause mindfulness timer' : 'Start mindfulness timer'"
+          (click)="isTimerRunning ? pauseTimer() : startTimer()"
+        >
+          <ion-icon
+            slot="icon-only"
+            [name]="isTimerRunning ? 'pause' : 'play'"
+          ></ion-icon>
+          <span class="visually-hidden">
+            {{ isTimerRunning ? 'Pause mindfulness timer' : 'Start mindfulness timer' }}
+          </span>
+        </ion-button>
 
-    <p>Direct attention and awareness inwards.</p>
+        <ion-button
+          class="timer-action"
+          fill="outline"
+          aria-label="Reset mindfulness timer"
+          (click)="resetTimer()"
+        >
+          <ion-icon slot="icon-only" name="refresh"></ion-icon>
+          <span class="visually-hidden">Reset mindfulness timer</span>
+        </ion-button>
+      </div>
+    </section>
 
-    <p>Uninterrupted Focus.</p>
+    <div class="fancy">
 
-    <p>Establish Self-Mastery.</p>
+      <p>Don't hesitate to spend some time on this. It will pay off!</p>
 
-    <p>WTP ! Get energized.</p>
+      <p>Relax. Heal.</p>
 
+      <p>Breathe deeply.</p>
+
+      <p>Direct attention and awareness inwards.</p>
+
+      <p>Uninterrupted Focus.</p>
+
+      <p>Establish Self-Mastery.</p>
+
+      <p>WTP ! Get energized.</p>
+
+    </div>
+
+    <div class="mindfulness-images">
+      <img src="assets/images/mindfulness/forest--photo-1542202229-7d93c33f5d07.jpeg" alt="A peaceful forest image">
+      <img src="assets/images/mindfulness/jocelyne-yvonne-MCpBIwisljo-unsplash.jpg" alt="A peaceful forest image">
+    </div>
   </div>
-
-  <img src="assets/images/mindfulness/forest--photo-1542202229-7d93c33f5d07.jpeg" alt="A peaceful forest image">
-  <img src="assets/images/mindfulness/jocelyne-yvonne-MCpBIwisljo-unsplash.jpg" alt="A peaceful forest image">
 
   <!-- Idea: binaural beats -->
   <!-- Idea: tranquil sounds -->

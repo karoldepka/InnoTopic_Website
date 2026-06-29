@@ -33,7 +33,16 @@ import { OdmTreeComponent } from '../../../../libs/AppFedShared/tree/tree/odm-tr
 export class QuizItemDetailsComponent implements OnInit, OnDestroy, AfterViewInit {
 
   @Input()
-  item$ ? : LearnItem$ | null | undefined
+  set item$(item$: LearnItem$ | null | undefined) {
+    this._item$ = item$
+    item$?.requestLoadChildren()
+  }
+
+  get item$(): LearnItem$ | null | undefined {
+    return this._item$
+  }
+
+  private _item$ ? : LearnItem$ | null
 
   @Input()
   quizLoaded = false

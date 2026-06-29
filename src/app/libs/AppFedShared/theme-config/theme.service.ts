@@ -15,6 +15,9 @@ export class ThemeService extends BaseService {
 
   public get themes() {
     return themesArray.filter(theme => {
+      if (theme.disabled) {
+        return false
+      }
       // const showExperimentalThemes = true; // this.feat.showExperimental
       const showExperimentalThemes = environment.showExperimentalThemes; // this.feat.showExperimental
       if ( ! showExperimentalThemes ) {
@@ -22,6 +25,10 @@ export class ThemeService extends BaseService {
       }
       return true
     })
+  }
+
+  public get randomThemes() {
+    return this.themes.filter(theme => !theme.excludeFromRandom)
   }
 
   // public themeId: any/*keyof typeof themes*/ = 'Porzeczki Agrest'
@@ -54,18 +61,25 @@ export class ThemeService extends BaseService {
     // TODO maybe update e.g. 1-2 times per week, to not get bored with all of them too quickly
     // "panic button" "craving fun" could also force new theme
     // later could have checkboxes to exclude themes from random picking
-    const themeIndex = Math.floor(Math.min(Math.random(), 0.999) * this.themes.length)
-    return this.themes[themeIndex]
+    const themes = this.randomThemes
+    const themeIndex = Math.floor(Math.min(Math.random(), 0.999) * themes.length)
+    return themes[themeIndex]
   }
 
   applyRandomTheme() {
-    while (true) {
-      const newTheme = this.getRandomTheme()
-      if ( newTheme !== this.theme ) {
-        this.setTheme(newTheme)
-        break;
+    const themes = this.randomThemes
+    if (themes.length <= 1) {
+      if (themes[0] && themes[0] !== this.theme) {
+        this.setTheme(themes[0])
       }
+      return
     }
+
+    let newTheme = this.getRandomTheme()
+    while (newTheme === this.theme) {
+      newTheme = this.getRandomTheme()
+    }
+    this.setTheme(newTheme)
   }
 
   applyNextTheme() {

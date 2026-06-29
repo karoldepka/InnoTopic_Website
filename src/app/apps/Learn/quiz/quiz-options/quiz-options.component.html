@@ -1,83 +1,90 @@
+<section class="quiz-options-grid">
+  <div class="quiz-option quiz-option--input">
+    <div class="quiz-option__label">CATEGORIES</div>
+    <ion-input
+      class="quiz-option__input"
+      [formControl]="controls.categories"
+      [clearInput]="true"
+      [debounce]="300"
+     />
+  </div>
 
-<ion-item>
-  <ion-label>CATEGORIES</ion-label>
-  <ion-input
-    [formControl]="controls.categories"
-    [clearInput]="true"
-    [debounce]="300"
-   />
-</ion-item>
-<ion-item>
-  <ion-label>TEXT FILTER</ion-label>
-  <ion-input
-    [formControl]="controls.textFilter"
-    [clearInput]="true"
-    [debounce]="300"
-   />
-</ion-item>
+  <div class="quiz-option quiz-option--input">
+    <div class="quiz-option__label">TEXT FILTER</div>
+    <ion-input
+      class="quiz-option__input"
+      [formControl]="controls.textFilter"
+      [clearInput]="true"
+      [debounce]="300"
+     />
+  </div>
 
-<ion-item>
+  <div class="quiz-option quiz-option--toggles">
+    <div class="quiz-toggle-grid">
+      <ion-checkbox
+        class="quiz-toggle-cell"
+        labelPlacement="end"
+        [formControl]="controls.dePrioritizeNewMaterial"
+      >
+        DE-PRIORITIZE NEW MATERIAL
+      </ion-checkbox>
 
-  <ion-checkbox
-    [formControl]="controls.dePrioritizeNewMaterial">
-  </ion-checkbox>
-  <ion-label>
-    &nbsp; DE-PRIORITIZE NEW MATERIAL <!--{{dePrioritizeNewMaterial | json}}-->
-<!--    <ion-note>-->
-<!--      TODO slider 0..1-->
-<!--    </ion-note>-->
-  </ion-label>
+      <ion-checkbox
+        class="quiz-toggle-cell"
+        labelPlacement="end"
+        [formControl]="controls.skipTasks"
+      >
+        SKIP TASKS
+      </ion-checkbox>
 
-</ion-item>
+      <ion-checkbox
+        class="quiz-toggle-cell"
+        labelPlacement="end"
+        [formControl]="controls.onlyWithQA"
+      >
+        ONLY WITH Q&A
+      </ion-checkbox>
+    </div>
+  </div>
+  <!--<ion-button (click)="controls.minFunLevel.setValue('aa')">set fun level</ion-button>-->
 
-<ion-item>
-  <ion-checkbox [formControl]="controls.skipTasks">
-  </ion-checkbox>
-  <ion-label>
-    &nbsp; SKIP TASKS
-  </ion-label>
-</ion-item>
+  <!--<app-fun-level-edit [formControl1]="controls.minFunLevel"></app-fun-level-edit>-->
+  <div class="quiz-option quiz-option--picker quiz-option--fun">
+    <div class="quiz-option__label">MIN FUN LEVEL</div>
+    <apf-numeric-picker
+      [buttonDescriptors]="funButtonsDesc"
+      [formControl]="controls.minFunLevel"
+    />
+  </div>
 
-<ion-item>
-  <ion-checkbox [formControl]="controls.onlyWithQA">
-  </ion-checkbox>
-  <ion-label>
-    &nbsp; ONLY WITH Q&A
-  </ion-label>
-</ion-item>
-<!--<ion-button (click)="controls.minFunLevel.setValue('aa')">set fun level</ion-button>-->
+  <div class="quiz-option quiz-option--picker quiz-option--importance">
+    <div class="quiz-option__label">MIN IMPORTANCE</div>
+    <apf-numeric-picker
+      [buttonDescriptors]="importanceButtonsDesc"
+      [formControl]="controls.minImportanceLevel"
+    />
+  </div>
 
-<!--<app-fun-level-edit [formControl1]="controls.minFunLevel"></app-fun-level-edit>-->
-<ion-item>
-  <ion-label>MIN FUN LEVEL</ion-label>
-</ion-item>
-<apf-numeric-picker
-  [buttonDescriptors]="funButtonsDesc"
-  [formControl]="controls.minFunLevel"
-/>
+  <div class="quiz-option quiz-option--table">
+    <app-quiz-intervals
+    />
+  </div>
 
-<ion-item>
-  <ion-label>MIN IMPORTANCE</ion-label>
-</ion-item>
-<apf-numeric-picker
-  [buttonDescriptors]="importanceButtonsDesc"
-  [formControl]="controls.minImportanceLevel"
-/>
+  <div class="quiz-option quiz-option--slider">
+    <app-quiz-diligence-level
+      [control]="controls.powBaseX100"
+    />
+  </div>
 
+  <div class="quiz-option quiz-option--slider">
+    <app-quiz-interval-importance-scaling
+      [control]="controls.scaleIntervalsByImportance"
+    />
+  </div>
 
-<app-quiz-intervals
-/>
-
-<app-quiz-diligence-level
-  style="margin-top: 10px"
-  [control]="controls.powBaseX100"
-/>
-
-<app-quiz-interval-importance-scaling
-  [control]="controls.scaleIntervalsByImportance"
-/>
-
-<app-quiz-focus-level
-  [control]="controls.focusLevelProbabilities"
-/>
-
+  <div class="quiz-option quiz-option--slider">
+    <app-quiz-focus-level
+      [control]="controls.focusLevelProbabilities"
+    />
+  </div>
+</section>

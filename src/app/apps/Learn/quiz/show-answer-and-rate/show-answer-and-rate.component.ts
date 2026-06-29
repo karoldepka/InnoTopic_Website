@@ -30,7 +30,17 @@ import { SelfRatingComponent } from '../../shared/self-rating/self-rating.compon
 })
 export class ShowAnswerAndRateComponent extends BaseComponent implements OnInit {
 
-  @Input() item$ ? : LearnItem$ | nullish
+  @Input()
+  set item$(item$: LearnItem$ | nullish) {
+    this._item$ = item$
+    item$?.requestLoadChildren()
+  }
+
+  get item$(): LearnItem$ | nullish {
+    return this._item$
+  }
+
+  private _item$ ? : LearnItem$ | nullish
 
   public selfRating: NumericPickerVal | undefined = undefined
 

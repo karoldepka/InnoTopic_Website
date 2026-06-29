@@ -5,13 +5,15 @@ import {SyncPopoverComponent} from './sync-popover/sync-popover.component'
 import {map} from 'rxjs/operators'
 import {AuthService} from '../../../../auth/auth.service'
 import { NgClass, AsyncPipe } from '@angular/common';
+import {FullscreenService} from '../../fullscreen/fullscreen.service'
+import {IonicModule} from '@ionic/angular'
 
 @Component({
     selector: 'odm-sync-status-icon',
     templateUrl: './sync-status-icon.component.html',
     changeDetection: ChangeDetectionStrategy.Eager,
     styleUrls: ['./sync-status-icon.component.sass'],
-    imports: [NgClass, AsyncPipe],
+    imports: [NgClass, AsyncPipe, IonicModule],
 })
 export class SyncStatusIconComponent implements OnInit {
 
@@ -31,6 +33,7 @@ export class SyncStatusIconComponent implements OnInit {
   constructor(
     public syncStatusService: SyncStatusService,
     public popoverController: PopoverController,
+    public fullscreenService: FullscreenService,
   ) { }
 
   ngOnInit() {}

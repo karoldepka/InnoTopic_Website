@@ -1,16 +1,18 @@
 <div
-  style="font-size: 70%; /*margin-top: 5px;*/ margin-left: 5px"
+  class="numeric-picker__field-name"
   *ngIf="numFieldDef"
 >
   {{numFieldDef . uiName}}
 </div>
-{{ selectedVariant ?. subLabel }}&nbsp; <!-- nbsp to ensure constant height -->
+<div class="numeric-picker__sub-label">
+  {{ selectedSubLabel }}&nbsp; <!-- nbsp to ensure constant height -->
+</div>
 <!-- TODO: move this into the button-->
-<div style="display: flex; align-items: center">
+<div class="numeric-picker__buttons">
 
   <ion-button
     *ngFor="let btnDesc of buttonDescriptors.buttons"
-    style="flex-basis: 0; flex-grow: 1; font-size: 11px; height: 3rem"
+    class="numeric-picker__button"
     [ngClass]="{ selectedButton: isSelected(btnDesc) }"
     size="small"
     (click)="onButtonClick(btnDesc)"

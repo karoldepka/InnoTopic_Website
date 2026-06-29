@@ -52,7 +52,7 @@
 
 
   <app-tree
-    *ngIf="(showAnswer$ | async)"
+    *ngIf="(showAnswer$ | async) && (item$?.childrenList$ | async)?.length"
     [rootItem]="item$!"
   />
 

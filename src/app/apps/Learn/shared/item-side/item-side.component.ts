@@ -43,7 +43,16 @@ export class ItemSideComponent implements OnInit {
 
 
   @Input()
-  item$ ! : LearnItem$
+  set item$(item$: LearnItem$) {
+    this._item$ = item$
+    item$?.requestLoadChildren()
+  }
+
+  get item$(): LearnItem$ {
+    return this._item$
+  }
+
+  private _item$ ! : LearnItem$
 
   /** TODO: this should use OdmCell (maybe subclass like ItemSideCell); and this expandable icon-to-editor functionality could be useful also in treetable node cell */
   @Input()

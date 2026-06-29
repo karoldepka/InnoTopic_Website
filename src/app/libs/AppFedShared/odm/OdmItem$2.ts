@@ -324,10 +324,10 @@ export class OdmItem$2<
   }
 
   public requestLoadChildren() {
-    console.log('requestLoadChildren', this.id)
-    if ( this.childrenListener ) {
+    if ( this.childrenListener || ! this.id ) {
       return
     }
+    console.log('requestLoadChildren', this.id)
     /* FIXME: this is copy-paste from entire-collection loading */
     /* TODO: encapsulate into OdmCollection object ?
       children$, allItems$

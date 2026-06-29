@@ -11,7 +11,17 @@ import { ItemSubItemsComponent } from '../item-sub-items.component';
 })
 export class ItemSubItemComponent implements OnInit {
 
-  @Input() item$!: LearnItem$
+  @Input()
+  set item$(item$: LearnItem$) {
+    this._item$ = item$
+    item$?.requestLoadChildren()
+  }
+
+  get item$(): LearnItem$ {
+    return this._item$
+  }
+
+  private _item$!: LearnItem$
   // @Input() item$!: OdmItem$2<any, any, any, any>
 
   constructor() { }

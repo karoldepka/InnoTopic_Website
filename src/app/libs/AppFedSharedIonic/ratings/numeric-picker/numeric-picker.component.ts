@@ -138,6 +138,11 @@ export class NumericPickerComponent<TVal = any> extends CustomFormControl<TVal> 
     }
   }
 
+  get selectedSubLabel() {
+    const subLabel = this.selectedVariant?.subLabel
+    return subLabel === 'undefined' ? '' : subLabel
+  }
+
 
   onButtonClick(buttonDesc: ButtonDescriptor) {
     const previousSelectedButton = this.selectedButton
