@@ -45,7 +45,6 @@ export class ItemSideComponent implements OnInit {
   @Input()
   set item$(item$: LearnItem$) {
     this._item$ = item$
-    item$?.requestLoadChildren()
   }
 
   get item$(): LearnItem$ {

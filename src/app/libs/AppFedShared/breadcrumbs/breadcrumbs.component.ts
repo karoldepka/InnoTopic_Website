@@ -39,7 +39,6 @@ export class BreadcrumbsComponent extends BaseComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.item$.requestLoadChildren()
     this.ancestorsPath$ = this.item$.getAncestorsPath$()
   }
 

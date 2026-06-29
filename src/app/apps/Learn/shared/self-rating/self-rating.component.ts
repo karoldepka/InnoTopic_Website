@@ -49,7 +49,6 @@ export class SelfRatingComponent extends BaseComponent implements OnInit {
   @Input()
   set item$(item$: LearnItem$ | undefined) {
     this._item$ = item$
-    item$?.requestLoadChildren()
   }
 
   get item$(): LearnItem$ | undefined {

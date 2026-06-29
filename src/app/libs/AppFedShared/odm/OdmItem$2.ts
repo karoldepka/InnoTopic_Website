@@ -392,7 +392,7 @@ export class OdmItem$2<
         // service.emitLocalItems() -- now handled by onFinishedProcessingChangeSet
       },
       onFinishedProcessingChangeSet() {
-        console.log('onFinishedProcessingChangeSet() - thisItem$.childrenList$.lastVal', thisItem$.childrenList$.lastVal)
+        // console.log('onFinishedProcessingChangeSet() - thisItem$.childrenList$.lastVal', thisItem$.childrenList$.lastVal)
         thisItem$.childrenList$.lastVal ??= [] /* FIXME: only emit if changed ? */
         thisItem$.childrenList$.reEmit()
         service.emitLocalItems()

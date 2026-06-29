@@ -13,6 +13,9 @@ import { PlayButtonComponent } from '../../shared/play-button/play-button.compon
 import { BreadcrumbsComponent } from '../../../../libs/AppFedShared/breadcrumbs/breadcrumbs.component';
 import { ItemSideComponent } from '../../shared/item-side/item-side.component';
 import { OdmTreeComponent } from '../../../../libs/AppFedShared/tree/tree/odm-tree.component';
+import {IonicModule} from '@ionic/angular'
+import {funLevels} from '../../models/fields/fun-level.model'
+import {importanceDescriptors} from '../../models/fields/importance.model'
 
 @Component({
     selector: 'app-quiz-item-details',
@@ -28,6 +31,7 @@ import { OdmTreeComponent } from '../../../../libs/AppFedShared/tree/tree/odm-tr
         NgFor,
         AsyncPipe,
         OdmTreeComponent,
+        IonicModule,
     ],
 })
 export class QuizItemDetailsComponent implements OnInit, OnDestroy, AfterViewInit {
@@ -93,5 +97,16 @@ export class QuizItemDetailsComponent implements OnInit, OnDestroy, AfterViewIni
         }, 200)
       }
     })
+  }
+
+  loadAll() {
+    this.quizService.setOptions({
+      ...this.quizService.options$.lastVal!,
+      categories: '',
+      textFilter: '',
+      minFunLevel: funLevels.undefined,
+      minImportanceLevel: importanceDescriptors.undefined,
+      onlyWithQA: false,
+    } as any)
   }
 }

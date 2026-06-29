@@ -17,7 +17,6 @@ export class ItemSubItemsComponent implements OnInit {
   @Input()
   set item$(item$: LearnItem$) {
     this._item$ = item$
-    item$?.requestLoadChildren()
   }
 
   get item$(): LearnItem$ {

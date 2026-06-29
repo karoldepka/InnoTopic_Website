@@ -62,7 +62,8 @@
 </div>
 
 <ng-template #noItem>
-  <div style="margin: 1rem">
+  <div style="margin: 1rem; display: flex; align-items: center; gap: 0.5rem">
     {{ quizLoaded ? 'No quiz item' : 'Loading Quiz...' }}
+    <ion-button size="small" (click)="loadAll()">Load All</ion-button>
   </div>
 </ng-template>
