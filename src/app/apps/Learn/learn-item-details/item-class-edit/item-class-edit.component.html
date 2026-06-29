@@ -1,9 +1,9 @@
-<ion-item>
-  <ion-checkbox [formControl]="formControls[fieldName]"
-                slot="start"
+<ion-item button="true" detail="false" (click)="formControls[fieldName].setValue(!formControls[fieldName].value)">
+  <ion-checkbox
+    [formControl]="formControls[fieldName]"
+    slot="start"
+    (click)="$event.stopPropagation()"
   >
-  </ion-checkbox>
-  <ion-label>
     TASK
-  </ion-label>
+  </ion-checkbox>
 </ion-item>

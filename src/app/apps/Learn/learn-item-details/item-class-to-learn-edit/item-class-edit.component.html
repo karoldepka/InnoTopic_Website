@@ -1,11 +1,11 @@
-<ion-item class="to-learn-toggle">
+<ion-item class="to-learn-toggle" button="true" detail="false" (click)="formControls[fieldName].setValue(!formControls[fieldName].value)">
   <ion-checkbox
     [formControl]="formControls[fieldName]"
     slot="start"
     aria-label="Include in learning"
-  />
-  <ion-label>
+    (click)="$event.stopPropagation()"
+  >
     <h3>To learn</h3>
     <p>Include this item in learning and quiz flows.</p>
-  </ion-label>
+  </ion-checkbox>
 </ion-item>
