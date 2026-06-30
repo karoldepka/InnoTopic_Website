@@ -90,7 +90,7 @@ export class TimeTrackingPeriodsService extends BaseService {
     }
     period.end = Timestamp.now()
     runInInjectionContext(this.injector, () => {
-      this.coll.doc(period.id).update({ end: period.end })
+      this.coll.doc(period.id).update({ end: this.toFirestoreTimestampLike(period.end) })
     })
 
     // TODO: update in DB
@@ -104,10 +104,32 @@ export class TimeTrackingPeriodsService extends BaseService {
       null,
     )
     runInInjectionContext(this.injector, () => {
-      this.coll.doc(period.id).set(Object.assign({}, period))
+      this.coll.doc(period.id).set(this.toFirestorePeriodWrite(period))
     })
     return period
 //
 //     FIXME
+  }
+
+  private toFirestoreTimestampLike(value: any) {
+    if (!value) {
+      return value
+    }
+    if (value instanceof Date) {
+      return value
+    }
+    if (typeof value?.toDate === 'function') {
+      return value.toDate()
+    }
+    return value
+  }
+
+  private toFirestorePeriodWrite(period: TimeTrackingPeriod) {
+    return {
+      id: period.id,
+      itemId: period.itemId,
+      start: this.toFirestoreTimestampLike(period.start),
+      end: this.toFirestoreTimestampLike(period.end),
+    }
   }
 }
