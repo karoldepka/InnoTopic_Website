@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, Input, OnInit, computed, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input, OnInit, computed, effect, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { IonicModule } from '@ionic/angular';
 
@@ -15,6 +15,7 @@ import {
   updateCategoryNode,
 } from './ai-qa-tree.utils';
 import { AiQaGeneratorService, QaIntegrationMode } from './ai-qa-generator.service';
+import { QaDraftStore } from './qa-draft.store';
 
 @Component({
   selector: 'app-ai-qa-workbench',
@@ -30,6 +31,7 @@ export class AiQaWorkbenchComponent implements OnInit {
   @Input() integrationSubtitle = '@ai-sdk/angular StructuredObject';
 
   protected readonly gen = inject(AiQaGeneratorService);
+  private readonly draftStore = inject(QaDraftStore);
 
   // UI-only signals
   readonly topic = signal('Agentic AI & UI interview questions');
@@ -40,13 +42,48 @@ export class AiQaWorkbenchComponent implements OnInit {
   readonly lastDeletedTree = signal<CategoryNode[] | null>(null);
   private undoClearHandle: ReturnType<typeof setTimeout> | null = null;
 
+  /** Don't persist until the saved draft has been loaded, to avoid clobbering it. */
+  private hasLoadedDraft = false;
+
   // Derived from service state
   readonly allCategoryRows = computed(() => flattenCategoryTree(this.gen.tree()));
   readonly categoryRows = computed(() => filterVisibleRows(this.allCategoryRows(), this.collapsedNodeIds()));
   readonly requestedQuestionCount = computed(() => sumQuestionCounts(this.gen.tree()));
 
+  constructor() {
+    // Auto-save all generated and user-provided data to IndexedDB whenever it
+    // changes, so nothing is lost on page reload.
+    effect(() => {
+      const topic = this.topic();
+      const webSearch = this.webSearch();
+      const tree = this.gen.tree();
+      const questions = this.gen.questions();
+      if (!this.hasLoadedDraft) return;
+      void this.draftStore.save(
+        { topic, tree, questions, webSearch, savedAt: Date.now() },
+        this.draftKey,
+      );
+    });
+  }
+
+  private get draftKey(): string {
+    return `workbench:${this.integration}`;
+  }
+
   async ngOnInit(): Promise<void> {
     await this.gen.loadExistingCategories();
+    try {
+      const draft = await this.draftStore.load(this.draftKey);
+      if (draft) {
+        if (draft.topic) this.topic.set(draft.topic);
+        if (typeof draft.webSearch === 'boolean') this.webSearch.set(draft.webSearch);
+        this.gen.restoreFromDraft(draft.tree, draft.questions);
+      }
+    } catch (e) {
+      console.warn('[draft] Failed to restore workbench draft:', e);
+    } finally {
+      this.hasLoadedDraft = true;
+    }
   }
 
   // ---- Topic & options --------------------------------------------------

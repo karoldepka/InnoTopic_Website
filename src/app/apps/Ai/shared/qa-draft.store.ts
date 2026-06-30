@@ -5,6 +5,7 @@ export interface QaDraft {
   topic: string;
   tree: CategoryNode[];
   questions: QuestionAnswer[];
+  webSearch?: boolean;
   savedAt: number;
 }
 
@@ -17,31 +18,31 @@ const DRAFT_KEY = 'current';
 export class QaDraftStore {
   private readonly dbp: Promise<IDBDatabase> = openDb();
 
-  async save(draft: QaDraft): Promise<void> {
+  async save(draft: QaDraft, key: string = DRAFT_KEY): Promise<void> {
     const db = await this.dbp;
     return new Promise((resolve, reject) => {
       const tx = db.transaction(STORE, 'readwrite');
-      tx.objectStore(STORE).put(draft, DRAFT_KEY);
+      tx.objectStore(STORE).put(draft, key);
       tx.oncomplete = () => resolve();
       tx.onerror = () => reject(tx.error);
     });
   }
 
-  async load(): Promise<QaDraft | null> {
+  async load(key: string = DRAFT_KEY): Promise<QaDraft | null> {
     const db = await this.dbp;
     return new Promise((resolve, reject) => {
       const tx = db.transaction(STORE, 'readonly');
-      const req = tx.objectStore(STORE).get(DRAFT_KEY);
+      const req = tx.objectStore(STORE).get(key);
       req.onsuccess = () => resolve((req.result as QaDraft) ?? null);
       req.onerror = () => reject(req.error);
     });
   }
 
-  async clear(): Promise<void> {
+  async clear(key: string = DRAFT_KEY): Promise<void> {
     const db = await this.dbp;
     return new Promise((resolve, reject) => {
       const tx = db.transaction(STORE, 'readwrite');
-      tx.objectStore(STORE).delete(DRAFT_KEY);
+      tx.objectStore(STORE).delete(key);
       tx.oncomplete = () => resolve();
       tx.onerror = () => reject(tx.error);
     });
