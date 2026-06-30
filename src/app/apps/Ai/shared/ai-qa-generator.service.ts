@@ -108,6 +108,8 @@ export class AiQaGeneratorService {
 
   private appendMode = false;
   private preAppendQuestions: QuestionAnswer[] = [];
+  private categoryAppendMode = false;
+  private preAppendTree: CategoryNode[] = [];
 
   constructor() {
     // Live-update tree from streaming partial JSON
@@ -119,8 +121,13 @@ export class AiQaGeneratorService {
         .filter(n => n?.id && n?.title)
         .map(n => this.makePartialCategoryNode(n));
       if (validNodes.length > 0) {
-        this.tree.set(validNodes);
-        this.categoryStatus.set(`Streaming… ${validNodes.length} categories`);
+        const all = this.categoryAppendMode
+          ? [...this.preAppendTree, ...validNodes]
+          : validNodes;
+        this.tree.set(all);
+        this.categoryStatus.set(
+          `${this.categoryAppendMode ? 'Adding' : 'Streaming'}… ${validNodes.length} categories`,
+        );
       }
     });
 
@@ -152,15 +159,20 @@ export class AiQaGeneratorService {
   async generateCategories(topic: string, integration: QaIntegrationMode, webSearch: boolean, matchExisting = false): Promise<void> {
     if (!topic.trim() || this.categoryLoading()) return;
 
+    // Preserve any categories already present and append the freshly generated ones.
+    const existing = this.tree();
+    this.categoryAppendMode = existing.length > 0;
+    this.preAppendTree = this.categoryAppendMode ? cloneCategoryTree(existing) : [];
+
     this.categoryAbortController = new AbortController();
     this.categoryLoading.set(true);
     this.categoryError.set('');
     this.categoryStatus.set('Generating categories…');
-    this.tree.set([]);
+    this.tree.set(this.preAppendTree);
 
     const request: CategoryTreeRequest = {
       message: topic.trim(),
-      tree: [],
+      tree: cloneCategoryTree(this.preAppendTree),
       web_search: webSearch,
       match_existing: matchExisting,
     };
@@ -177,6 +189,8 @@ export class AiQaGeneratorService {
     } finally {
       this.categoryAbortController = null;
       this.categoryLoading.set(false);
+      this.categoryAppendMode = false;
+      this.preAppendTree = [];
     }
   }
 
@@ -463,7 +477,10 @@ export class AiQaGeneratorService {
     const tree = response?.tree;
     if (tree?.length) {
       const now = Date.now();
-      this.tree.set(this.stampTreeDraftedAt(tree, now));
+      const generated = this.stampTreeDraftedAt(tree, now);
+      this.tree.set(
+        this.categoryAppendMode ? [...this.preAppendTree, ...generated] : generated,
+      );
     }
     this.modelName.set(response?.modelName || this.modelName());
     const count = countCategoryNodes(this.tree());

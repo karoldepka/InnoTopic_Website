@@ -137,28 +137,22 @@
   padding: 8px;
 }
 
-// ── PrimeNG TreeTable (category tree) ────────────────────────────────────────
+// ── Category tree table (TanStack model + custom markup) ─────────────────────
 
-/* stylelint-disable selector-class-pattern */
-::ng-deep .qa-treetable {
+.qa-tree {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
   font-size: 0.88rem;
 
-  .p-treetable-table {
-    width: 100%;
-    border-collapse: collapse;
-    table-layout: fixed;
-  }
-
-  // ── Header ─────────────────────────────────────────────────────────────────
-
-  .p-treetable-thead > tr > th {
+  thead > tr > th {
     padding: 4px 6px;
     font-size: 0.72rem;
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.04em;
     color: var(--ion-color-medium);
-    border-bottom: 2px solid rgba(155, 169, 186, 0.25);
+    border-bottom: 1px solid rgba(155, 169, 186, 0.2);
     text-align: left;
     background: rgba(14, 18, 22, 0.96);
     position: sticky;
@@ -167,62 +161,84 @@
     white-space: nowrap;
 
     &.col-num { text-align: right; width: 60px; }
-    &.col-btn  { width: 32px; padding: 0; }
+    &.col-btn { width: 32px; padding: 0; }
   }
 
-  // ── Body rows ──────────────────────────────────────────────────────────────
-
-  .p-treetable-tbody > tr > td {
-    padding: 3px 4px;
+  tbody > tr > td {
+    padding: 2px 4px;
     vertical-align: middle;
     border: none;
-    border-bottom: 1px solid rgba(155, 169, 186, 0.1);
 
     &.col-num { text-align: right; width: 60px; }
-    &.col-btn  { width: 32px; padding: 0; }
-    &.cat-cell { display: flex; align-items: center; gap: 3px; }
+    &.col-btn { width: 32px; padding: 0; }
   }
 
-  .p-treetable-tbody > tr:last-child > td { border-bottom: none; }
+  tbody > tr:hover > td { background: rgba(255, 255, 255, 0.035); }
 
-  .p-treetable-tbody > tr:hover > td { background: rgba(255, 255, 255, 0.04); }
-
-  // ── Expand/collapse toggler ────────────────────────────────────────────────
-
-  .p-treetable-toggler {
-    flex-shrink: 0;
-    background: none;
-    border: none;
-    cursor: pointer;
-    color: var(--ion-color-medium);
-    padding: 2px;
-    width: 22px;
-    min-width: 22px;
-    height: 22px;
-    display: inline-flex;
+  .cat-cell {
+    display: flex;
     align-items: center;
-    justify-content: center;
-    border-radius: 4px;
-    transition: background 0.12s;
-
-    &:hover { color: var(--ion-color-light); background: rgba(255, 255, 255, 0.09); }
-
-    svg { width: 0.8rem; height: 0.8rem; fill: currentColor; }
+    gap: 2px;
   }
 }
-/* stylelint-enable selector-class-pattern */
+
+.cat-indent {
+  flex-shrink: 0;
+  display: inline-block;
+  height: 1px;
+}
+
+.cat-toggler {
+  flex-shrink: 0;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--ion-color-medium);
+  padding: 0;
+  width: 22px;
+  min-width: 22px;
+  height: 22px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  transition: background 0.12s, color 0.12s;
+
+  &:hover { color: var(--ion-color-light); background: rgba(255, 255, 255, 0.09); }
+
+  ion-icon { font-size: 0.8rem; }
+}
+
+.cat-toggler-spacer {
+  flex-shrink: 0;
+  display: inline-block;
+  width: 22px;
+  min-width: 22px;
+  height: 22px;
+}
 
 .cat-title,
 .cat-count {
   min-width: 0;
   height: 32px;
-  border: 1px solid rgba(155, 169, 186, 0.25);
+  border: 1px solid transparent;
   border-radius: 6px;
   padding: 5px 8px;
   color: var(--ion-text-color);
-  background: rgba(4, 8, 12, 0.36);
+  background: transparent;
   font: inherit;
+  transition: border-color 0.12s, background 0.12s;
+
+  &:hover { border-color: rgba(155, 169, 186, 0.25); }
+
+  &:focus {
+    outline: none;
+    border-color: rgba(155, 169, 186, 0.45);
+    background: rgba(4, 8, 12, 0.36);
+  }
 }
+
+.cat-title { flex: 1 1 auto; }
 
 .cat-count { text-align: right; }
 

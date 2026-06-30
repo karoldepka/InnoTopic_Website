@@ -100,67 +100,82 @@
 
       <div class="tree-scroll">
         @if (gen.tree().length) {
-          <p-treetable [value]="treeTableNodes()" styleClass="qa-treetable">
-            <ng-template pTemplate="header">
+          <table class="qa-tree">
+            <thead>
               <tr>
-                <th>Category</th>
+                <th class="cat-head">Category</th>
                 <th class="col-num">Q#</th>
                 <th class="col-btn"></th>
                 <th class="col-btn"></th>
                 <th class="col-btn"></th>
               </tr>
-            </ng-template>
-            <ng-template pTemplate="body" let-rowNode let-rowData="rowData">
-              <tr [ttRow]="rowNode">
-                <td class="cat-cell">
-                  <p-treeTableToggler [rowNode]="rowNode"></p-treeTableToggler>
-                  <input
-                    class="cat-title"
-                    [value]="rowData.title"
-                    [attr.aria-label]="'Category: ' + rowData.title"
-                    (input)="renameCategory(rowData.id, $any($event.target).value)"
-                  />
-                  <span
-                    class="existing-tag"
-                    *ngIf="rowData.isExistingCategory || rowData.matchedExistingCategoryId"
-                    [title]="rowData.matchedExistingCategoryTitle || rowData.matchedExistingCategoryId || ''"
-                  >existing</span>
-                </td>
-                <td class="col-num">
-                  <input
-                    class="cat-count"
-                    type="number"
-                    min="0"
-                    max="50"
-                    [value]="rowData.questionCount"
-                    [attr.aria-label]="'Q count for ' + rowData.title"
-                    (input)="changeCount(rowData.id, $any($event.target).value)"
-                  />
-                </td>
-                <td class="col-btn">
-                  <ion-button fill="clear" size="small" [attr.aria-label]="'Add child to ' + rowData.title" (click)="addChild(rowData.id)">
-                    <ion-icon name="add-outline" slot="icon-only"></ion-icon>
-                  </ion-button>
-                </td>
-                <td class="col-btn">
-                  <ion-button
-                    fill="clear"
-                    size="small"
-                    [disabled]="gen.subcategoryLoading()"
-                    [attr.aria-label]="'Generate subcategories for ' + rowData.title"
-                    (click)="showMoreSubcategoriesDialog(rowData)"
-                  >
-                    <ion-icon name="sparkles-outline" slot="icon-only"></ion-icon>
-                  </ion-button>
-                </td>
-                <td class="col-btn">
-                  <ion-button fill="clear" size="small" color="danger" [attr.aria-label]="'Delete ' + rowData.title" (click)="deleteCategory(rowData.id)">
-                    <ion-icon name="trash-outline" slot="icon-only"></ion-icon>
-                  </ion-button>
-                </td>
-              </tr>
-            </ng-template>
-          </p-treetable>
+            </thead>
+            <tbody>
+              @for (row of categoryTable.getRowModel().rows; track row.id) {
+                <tr class="cat-row">
+                  <td class="cat-cell">
+                    <span class="cat-indent" [style.width.px]="row.depth * 16"></span>
+                    @if (row.getCanExpand()) {
+                      <button
+                        type="button"
+                        class="cat-toggler"
+                        [attr.aria-label]="row.getIsExpanded() ? 'Collapse' : 'Expand'"
+                        (click)="row.toggleExpanded()"
+                      >
+                        <ion-icon [name]="row.getIsExpanded() ? 'chevron-down-outline' : 'chevron-forward-outline'"></ion-icon>
+                      </button>
+                    } @else {
+                      <span class="cat-toggler-spacer"></span>
+                    }
+                    <input
+                      class="cat-title"
+                      [value]="row.original.title"
+                      [attr.aria-label]="'Category: ' + row.original.title"
+                      (input)="renameCategory(row.original.id, $any($event.target).value)"
+                    />
+                    @if (row.original.isExistingCategory || row.original.matchedExistingCategoryId) {
+                      <span
+                        class="existing-tag"
+                        [title]="row.original.matchedExistingCategoryTitle || row.original.matchedExistingCategoryId || ''"
+                      >existing</span>
+                    }
+                  </td>
+                  <td class="col-num">
+                    <input
+                      class="cat-count"
+                      type="number"
+                      min="0"
+                      max="50"
+                      [value]="row.original.questionCount"
+                      [attr.aria-label]="'Q count for ' + row.original.title"
+                      (input)="changeCount(row.original.id, $any($event.target).value)"
+                    />
+                  </td>
+                  <td class="col-btn">
+                    <ion-button fill="clear" size="small" [attr.aria-label]="'Add child to ' + row.original.title" (click)="addChild(row.original.id)">
+                      <ion-icon name="add-outline" slot="icon-only"></ion-icon>
+                    </ion-button>
+                  </td>
+                  <td class="col-btn">
+                    <ion-button
+                      fill="clear"
+                      size="small"
+                      [disabled]="gen.subcategoryLoading()"
+                      [attr.aria-label]="'Generate subcategories for ' + row.original.title"
+                      (click)="showMoreSubcategoriesDialog(row.original)"
+                    >
+                      <ion-icon name="sparkles-outline" slot="icon-only"></ion-icon>
+                    </ion-button>
+                  </td>
+                  <td class="col-btn">
+                    <ion-button fill="clear" size="small" color="danger" [attr.aria-label]="'Delete ' + row.original.title" (click)="deleteCategory(row.original.id)">
+                      <ion-icon name="trash-outline" slot="icon-only"></ion-icon>
+                    </ion-button>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
         } @else {
           <div class="empty">No categories yet.</div>
         }
@@ -249,8 +264,18 @@
         }
       </div>
 
-      @if (gen.questions().length) {
+      @if (gen.questions().length || gen.questionLoading()) {
         <div class="panel-foot q-actions">
+          @if (gen.questionLoading()) {
+            <ion-button
+              size="small"
+              color="danger"
+              (click)="gen.stopQuestions()"
+            >
+              <ion-icon name="stop-circle-outline" slot="start"></ion-icon>
+              Stop
+            </ion-button>
+          }
           <ion-button
             size="small"
             color="success"

@@ -10,8 +10,13 @@ import {
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { AlertController, IonicModule } from '@ionic/angular';
-import { TreeNode } from 'primeng/api';
-import { TreeTableModule } from 'primeng/treetable';
+import {
+  ColumnDef,
+  ExpandedState,
+  createAngularTable,
+  getCoreRowModel,
+  getExpandedRowModel,
+} from '@tanstack/angular-table';
 
 import { AiBackendService, CategoryNode, QuestionAnswer } from '../../Learn/core/ai-backend.service';
 import {
@@ -29,7 +34,7 @@ import { QaDraftStore } from '../shared/qa-draft.store';
   templateUrl: './ai-qa.page.html',
   styleUrls: ['./ai-qa.page.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, FormsModule, IonicModule, TreeTableModule],
+  imports: [CommonModule, FormsModule, IonicModule],
   providers: [AiQaGeneratorService],
 })
 export class AiQaPage implements OnInit {
@@ -50,10 +55,28 @@ export class AiQaPage implements OnInit {
     this.gen.questions().length > 0 && this.selectedQIndices().size === this.gen.questions().length
   );
   readonly lastDeletedTree = signal<CategoryNode[] | null>(null);
-  readonly treeTableNodes = computed(() => this.toTreeNodes(this.gen.tree()));
+  readonly categoryExpanded = signal<ExpandedState>(true);
+  private readonly categoryColumns: ColumnDef<CategoryNode>[] = [
+    { id: 'category', accessorKey: 'title' },
+  ];
+  readonly categoryTable = createAngularTable<CategoryNode>(() => ({
+    data: this.gen.tree(),
+    columns: this.categoryColumns,
+    state: { expanded: this.categoryExpanded() },
+    onExpandedChange: (updater) => {
+      this.categoryExpanded.set(
+        typeof updater === 'function' ? updater(this.categoryExpanded()) : updater,
+      );
+    },
+    getSubRows: (row) => row.children,
+    getRowId: (row) => row.id,
+    enableExpanding: true,
+    getCoreRowModel: getCoreRowModel(),
+    getExpandedRowModel: getExpandedRowModel(),
+  }));
   readonly totalQCount = computed(() => sumQuestionCounts(this.gen.tree()));
   private undoClearHandle: ReturnType<typeof setTimeout> | null = null;
-  private wasQuestionLoading = false;
+  private lastQuestionCount = 0;
 
   constructor() {
     // Auto-save draft to IndexedDB whenever tree or questions change.
@@ -64,14 +87,19 @@ export class AiQaPage implements OnInit {
       void this.draftStore.save({ topic: this.topic(), tree, questions, savedAt: Date.now() });
     });
 
-    // Select all questions automatically when generation finishes.
+    // Check (select) questions by default as they appear — whether streamed in,
+    // generated, or restored from a draft — while preserving any manual unchecks.
     effect(() => {
-      const loading = this.gen.questionLoading();
-      const questions = this.gen.questions();
-      if (this.wasQuestionLoading && !loading && questions.length) {
-        this.selectedQIndices.set(new Set(questions.map((_, i) => i)));
+      const count = this.gen.questions().length;
+      const prev = this.lastQuestionCount;
+      if (count > prev) {
+        const sel = new Set(this.selectedQIndices());
+        for (let i = prev; i < count; i++) sel.add(i);
+        this.selectedQIndices.set(sel);
+      } else if (count < prev) {
+        this.selectedQIndices.set(new Set([...this.selectedQIndices()].filter(i => i < count)));
       }
-      this.wasQuestionLoading = loading;
+      this.lastQuestionCount = count;
     });
   }
 
@@ -227,19 +255,6 @@ export class AiQaPage implements OnInit {
       questionCount: Number.isFinite(n) ? n : 0,
       contentModifiedAt: now,
     })));
-  }
-
-  private toTreeNodes(nodes: CategoryNode[]): TreeNode[] {
-    return nodes.map(node => {
-      const children = Array.isArray(node.children) ? node.children : [];
-      return {
-        data: node,
-        key: node.id,
-        expanded: true,
-        leaf: children.length === 0,
-        children: children.length ? this.toTreeNodes(children) : undefined,
-      };
-    });
   }
 
   answerKey(item: QuestionAnswer, i: number): string {
