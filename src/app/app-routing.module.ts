@@ -108,10 +108,6 @@ const routes: Routes = [
     loadComponent: () => import('./apps/Ai/ai-qa/ai-qa.page').then(m => m.AiQaPage),
   },
   {
-    path: 'ai-generate-q-and-a/vercel-ai-sdk',
-    loadComponent: () => import('./apps/Ai/ai-generate-q-and-a/vercel-ai-sdk/vercel-ai-sdk-qa.page').then(m => m.VercelAiSdkQaPage),
-  },
-  {
     path: 'ai-generate-q-and-a/copilotkit',
     loadComponent: () => import('./apps/Ai/ai-generate-q-and-a/copilotkit/copilotkit-qa.page').then(m => m.CopilotkitQaPage),
   },
@@ -121,7 +117,7 @@ const routes: Routes = [
   },
   {
     path: 'vercel-ai-sdk',
-    redirectTo: 'ai-generate-q-and-a/vercel-ai-sdk',
+    redirectTo: 'ai/qa',
     pathMatch: 'full',
   },
   {
@@ -129,7 +125,8 @@ const routes: Routes = [
     loadChildren: () => import('./apps/Lifedvisor/life-overviews/life-overviews.module').then(m => m.LifeOverviewsPageModule)
   },
 
-  { path: '**', redirectTo: '' },  {
+  { path: '**', redirectTo: '' },
+  {
     path: 'audio',
     loadChildren: () => import('./apps/Learn/audio/audio.module').then( m => m.AudioPageModule)
   },
