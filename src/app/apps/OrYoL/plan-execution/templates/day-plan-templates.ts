@@ -14,6 +14,7 @@ export interface DayPlanTemplate {
   description?: string
   icon: string
   nodes: DayPlanTemplateNode[]
+  durationMinutes?: number
 }
 
 /**
@@ -37,6 +38,9 @@ export const DAY_PLAN_TEMPLATES: DayPlanTemplate[] = [
     nodes: [
       { id: 'plan', title: 'Plan', templateNodeClass: 'task' },
       { id: 'general', title: 'General', templateNodeClass: 'dayplan_routine' },
+      { id: 'nongoals', title: 'Non-goals', templateNodeClass: 'dayplan_review' },
+      { id: 'mantras', title: 'Mantras', templateNodeClass: 'dayplan_review' },
+      { id: 'strategic_goals', title: 'Strategic Goals', templateNodeClass: 'dayplan_review' },
     ],
   },    
   {

@@ -23,6 +23,14 @@ import {ApfNonRootTreeNode} from '../../tree-model/TreeNode'
 import { NodeClassIconComponent } from '../node-content/node-class-icon/node-class-icon.component';
 import { NgIf } from '@angular/common';
 import { NodeClassPickerComponent } from './node-class-picker/node-class-picker.component';
+import {
+  buildTemplateItemId,
+  DAY_PLAN_TEMPLATES,
+  DayPlanTemplate,
+  DayPlanTemplateNode,
+} from '../../plan-execution/templates/day-plan-templates'
+import {NodeInclusion} from '../../tree-model/TreeListener'
+import {generateNewInclusionId} from '../../tree-model/TreeModel'
 
 
 @Component({
@@ -33,6 +41,8 @@ import { NodeClassPickerComponent } from './node-class-picker/node-class-picker.
     imports: [NodeClassIconComponent, IonicModule, NgIf, NodeClassPickerComponent]
 })
 export class TreeNodeMenuPopoverComponent implements OnInit {
+
+  private readonly defaultTemplateId = 'default_day_plan'
 
   @Input() treeNode!: OryBaseTreeNode
 
@@ -107,6 +117,80 @@ export class TreeNodeMenuPopoverComponent implements OnInit {
 
   toggleDone() {
     this.treeNode.content.toggleDone()
+  }
+
+  async applyTemplate() {
+    const template = this.getTemplateToApply()
+    if (!template) {
+      console.warn('No day-plan template found to apply.')
+      return
+    }
+    this.addTemplateNodesToParent(this.treeNode, template.nodes)
+    await this.popoverController.dismiss()
+  }
+
+  private getTemplateToApply(): DayPlanTemplate | undefined {
+    return DAY_PLAN_TEMPLATES.find(t => t.id === this.defaultTemplateId) ?? DAY_PLAN_TEMPLATES[0]
+  }
+
+  /** Inserts template nodes at the top of parentNode.children, preserving template order. */
+  private addTemplateNodesToParent(
+    parentNode: OryBaseTreeNode,
+    templateNodes: DayPlanTemplateNode[],
+  ) {
+    // Capture the first existing child before any insertions so template nodes are prepended.
+    const firstExistingChild = parentNode.children[0] as OryNonRootTreeNode | undefined
+    let lastInserted: OryNonRootTreeNode | undefined
+    for (const templateNode of templateNodes) {
+      const node = this.createOrGetTemplateNode(parentNode, templateNode, lastInserted, firstExistingChild)
+      if (node) {
+        lastInserted = node
+        if (templateNode.children?.length) {
+          this.addTemplateNodesToParent(node as any, templateNode.children)
+        }
+      }
+    }
+  }
+
+  /**
+   * Returns existing node if the template ID already exists under parentNode,
+   * otherwise creates and inserts it before firstExistingChild (after afterNode).
+   */
+  private createOrGetTemplateNode(
+    parentNode: OryBaseTreeNode,
+    templateNode: DayPlanTemplateNode,
+    afterNode: OryNonRootTreeNode | undefined,
+    beforeNode: OryNonRootTreeNode | undefined,
+  ): OryNonRootTreeNode | undefined {
+    const templateItemId = buildTemplateItemId(parentNode.itemId, templateNode.id)
+    const existing = parentNode.children.find(child => child.itemId === templateItemId) as OryNonRootTreeNode | undefined
+    if (existing) return existing
+
+    const nodeInclusion = new NodeInclusion(generateNewInclusionId(), parentNode.itemId)
+    const treeModel = (parentNode as any).treeModel
+    treeModel.nodeOrderer.addOrderMetadataToInclusion(
+      {
+        inclusionBefore: afterNode?.nodeInclusion,
+        inclusionAfter: beforeNode?.nodeInclusion,
+      },
+      nodeInclusion,
+    )
+
+    const itemData: any = {
+      title: templateNode.title,
+      isTask: !!templateNode.isTask,
+      templateNodeClass: templateNode.templateNodeClass,
+    }
+    const nodeContent = parentNode.createNodeContent(templateItemId, itemData)
+    const newNode = parentNode.createChildNode(nodeInclusion as any, nodeContent as any)
+
+    treeModel.permissionsManager.onAfterCreated(newNode as any)
+    treeModel.treeService.addChildNode(parentNode as any, newNode as any)
+
+    const insertIndex = afterNode ? (afterNode.getIndexInParent() + 1) : 0
+    parentNode._appendChildAndSetThisAsParent(newNode as any, insertIndex)
+
+    return newNode as any as OryNonRootTreeNode
   }
 
   async askArchiveItems() {

@@ -1,70 +1,78 @@
-<div
-  style="display: flex; align-items: center"
->
-  <input type="checkbox"> <!-- will allow selecting multiple items -->
-  &nbsp; &nbsp;
-  <!--{{treeNode.title}}-->
-  <!--<span [innerHTML]="'<script>window.alert()</script><b>TE</b>st'"></span>-->
-  <app-node-class-icon
-    style="display: inline"
-    [treeNode]="treeNode"
-  ></app-node-class-icon>
-  &nbsp; &nbsp;
-  <span [innerHTML]="treeNode.title"></span>
+<div class="ion-padding">
+  <div
+    style="display: flex; align-items: center"
+  >
+    <input type="checkbox"> <!-- will allow selecting multiple items -->
+    &nbsp; &nbsp;
+    <!--{{treeNode.title}}-->
+    <!--<span [innerHTML]="'<script>window.alert()</script><b>TE</b>st'"></span>-->
+    <app-node-class-icon
+      style="display: inline"
+      [treeNode]="treeNode"
+    ></app-node-class-icon>
+    &nbsp; &nbsp;
+    <span [innerHTML]="treeNode.title"></span>
+  </div>
+  In n Places:
+
+  <!--<app-time-tracking-menu [treeNode]="treeNode"></app-time-tracking-menu>-->
+
+  <ion-button
+    style="height: 3rem; text-transform: uppercase"
+    (click)='addChild()'>
+    Add Sub-Item
+  </ion-button>
+
+  <ion-button
+    (click)="applyTemplate()"
+  >
+    Apply Template
+  </ion-button>
+
+  <!--<ion-button-->
+  <!--  (click)="openDeleteConfirmationDialog()">-->
+  <!--  Delete-->
+  <!--</ion-button>-->
+  <ion-button
+    (click)="askArchiveItems()"
+  >
+    Archive
+  </ion-button>
+
+  <ion-button
+    (click)='navigateInto()'>
+    Navigate Into
+  </ion-button>
+
+  <ion-button
+    (click)='toClipboard()'>
+    To Clipboard
+  </ion-button>
+
+  <ion-button
+    *ngIf="clipboardService.hasContent"
+    (click)='pasteCopyHereFromClipboard()'>
+    Copy here from clipboard
+  </ion-button>
+
+  <ion-button
+    *ngIf="clipboardService.hasContent"
+    class="btn btn-primary"
+    (click)='pasteMoveHereFromClipboard()'>
+    Move here from clipboard
+  </ion-button>
+  <p style="margin-top: .5em">
+    Created: {{getWhenCreated()?.toISOString()}}
+  </p>
+
+  <ion-checkbox
+    labelPlacement="end"
+    [checked]="!!treeNode.content.itemData?.isDone"
+    (ionChange)="toggleDone()"
+  >
+    Done
+  </ion-checkbox>
+
+  <app-node-class-picker
+  ></app-node-class-picker>
 </div>
-In n Places:
-
-<!--<app-time-tracking-menu [treeNode]="treeNode"></app-time-tracking-menu>-->
-
-<ion-button
-  style="height: 3rem; text-transform: uppercase"
-  (click)='addChild()'>
-  Add Sub-Item
-</ion-button>
-
-<!--<ion-button-->
-<!--  (click)="openDeleteConfirmationDialog()">-->
-<!--  Delete-->
-<!--</ion-button>-->
-<ion-button
-  (click)="askArchiveItems()"
->
-  Archive
-</ion-button>
-
-<ion-button
-  (click)='navigateInto()'>
-  Navigate Into
-</ion-button>
-
-<ion-button
-  (click)='toClipboard()'>
-  To Clipboard
-</ion-button>
-
-<ion-button
-  *ngIf="clipboardService.hasContent"
-  (click)='pasteCopyHereFromClipboard()'>
-  Copy here from clipboard
-</ion-button>
-
-<ion-button
-  *ngIf="clipboardService.hasContent"
-  class="btn btn-primary"
-  (click)='pasteMoveHereFromClipboard()'>
-  Move here from clipboard
-</ion-button>
-<p style="margin-top: .5em">
-  Created: {{getWhenCreated()?.toISOString()}}
-</p>
-
-<ion-checkbox
-  labelPlacement="end"
-  [checked]="!!treeNode.content.itemData?.isDone"
-  (ionChange)="toggleDone()"
->
-  Done
-</ion-checkbox>
-
-<app-node-class-picker
-></app-node-class-picker>
