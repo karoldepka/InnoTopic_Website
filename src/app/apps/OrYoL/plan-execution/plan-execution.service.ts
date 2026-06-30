@@ -119,7 +119,7 @@ export class PlanExecutionService {
         const minutesLefToNotify = minutesEstimated - minutesPassed
         const minutesLefToNotifyString = minutesToString(Math.abs(minutesLefToNotify))
         const leftOrOvertime = (minutesLefToNotify >= 0) ? 'left' : 'OVERTIME'
-        console.log('PlanExecutionService minutes', minutesEstimated)
+        // console.log('PlanExecutionService minutes', minutesEstimated)
         ttEntry.notifyTrackedMsElapsedUntilPaused(msDuration, () => {
           /* This should probably be done by https://www.chromestory.com/2019/07/new-chrome-api-to-support-scheduling-future-notifications/
             https://web.dev/notification-triggers/

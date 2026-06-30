@@ -56,6 +56,18 @@ export class AuthService {
     this._userIsAuthenticated = true;
   }
 
+  private isGooglePopupCancelled(error: any): boolean {
+    const code = String(error?.code ?? '').toLowerCase();
+    const message = String(error?.message ?? error ?? '').toLowerCase();
+    const combined = `${code} ${message}`;
+    return (
+      combined.includes('auth/popup-closed-by-user')
+      || combined.includes('auth/cancelled-popup-request')
+      || combined.includes('popup_closed_by_user')
+      || combined.includes('popup has been closed by the user')
+    );
+  }
+
   logout() {
     this._userIsAuthenticated = false;
     // this.afAuth.auth.signOut(); // https://github.com/angular/angularfire/blob/master/docs/version-6-upgrade.md
@@ -92,7 +104,14 @@ export class AuthService {
         .then((response: any) => (this.login()/*, this.Router.navigateByUrl('/timers')*/)
           /* TODO: emit authUser$ */
         )
-        .catch((error: any) => errorAlert('Error logging in via Google ' + error));
+        .catch((error: any) => {
+          if (this.isGooglePopupCancelled(error)) {
+            console.info('Google sign-in popup was closed by the user.');
+            return null;
+          }
+          errorAlert('Error logging in via Google ' + error);
+          return null;
+        });
     }
   }
 }

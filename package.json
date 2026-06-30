@@ -69,7 +69,7 @@
     "cordova-plugin-local-notification": "0.9.0-beta.2",
     "cordova-plugin-zip": "3.1.0",
     "deep-chat": "^2.4.2",
-    "firebase": "^12.14.0",
+    "firebase": "^11.10.0",
     "font-awesome": "^4.7.0",
     "fp-ts": "^2.6.7",
     "lodash-es": "^4.17.15",
