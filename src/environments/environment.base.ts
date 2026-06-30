@@ -8,6 +8,7 @@ export const environmentBase = {
   // collectionNameSuffix: '_DEBUG',
 
   odmBackend: 'firestore',
+  authBackend: 'firebase',
 
   supabase: {
     url: '',

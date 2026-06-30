@@ -92,7 +92,10 @@ export class FirestoreTreeService extends DbTreeService {
   }
 
   deleteWithoutConfirmation(itemId: string) {
-    let promise = this.itemDocById(itemId).update('deleted', new Date()) // TODO
+    let promise = this.itemDocById(itemId).update('deleted', new Date()).catch((error: any) => {
+      errorAlert('Firestore write failed in FirestoreTreeService.deleteWithoutConfirmation', error)
+      throw error
+    }) // TODO
     this.syncStatusService.handleSavingPromise(promise)
     console.log('deleteWithoutConfirmation deleted ' + itemId)
   }
@@ -163,10 +166,15 @@ export class FirestoreTreeService extends DbTreeService {
 
   private handleSubNodes(targetNodeDocRef: DocumentReference, parents: DocumentReference[], nestLevel: number, listener: DbTreeListener) {
     // TODO: do not use subCollection for FirestoreAllInclusionsSyncer - all inclusions are in a single collection
-    this.dbInclusionsSyncer.getChildInclusionsForParentItem$(targetNodeDocRef.id).subscribe(event => {
+    this.dbInclusionsSyncer.getChildInclusionsForParentItem$(targetNodeDocRef.id).subscribe({
+      next: event => {
       const newParents: DocumentReference[] = parents.slice(0)
       newParents.push(targetNodeDocRef)
       this.processNodeEvents(nestLevel + 1, event, newParents, listener)
+      },
+      error: (error: any) => {
+        errorAlert('Firestore read failed in FirestoreTreeService.handleSubNodes', error)
+      },
     })
     // const subCollection = targetNodeDocRef.collection('subNodes' /* note: those are really inclusions of sub nodes */)
     // debugLog('subColl:', subCollection)
@@ -252,6 +260,9 @@ export class FirestoreTreeService extends DbTreeService {
       // console.log('itemDocRef', itemDocRef)
       // newNode.itemId = itemDocRef.id // NOTE: initially it is UUID, overwritten here /* Perhaps this indirectly causes ExpressionChangedAfterItHasBeenCheckedError */
       this.addNodeInclusionToParent(parentId, newNode.nodeInclusion !, itemDocRef)
+    }).catch((error: any) => {
+      errorAlert('Firestore write failed in FirestoreTreeService.addChildNode', error)
+      throw error
     })
     // add node-inclusion to firestore
     // ignore parent for now? But then how do we specify node-inclusion / order?
@@ -288,7 +299,10 @@ export class FirestoreTreeService extends DbTreeService {
      A Promise resolved once the data has been successfully written to the backend
      (Note that it won't resolve while you're offline). */
     console.log('FirestoreTreeService extends DbTreeService: patchItemData', itemData)
-    let promise = this.itemDocById(itemId).update(itemData)
+    let promise = this.itemDocById(itemId).update(itemData).catch((error: any) => {
+      errorAlert('Firestore write failed in FirestoreTreeService.patchItemData', error)
+      throw error
+    })
     return { onPatchSentToRemote: promise }
   }
 

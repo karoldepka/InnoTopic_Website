@@ -5,3 +5,16 @@
   gap: 0.5rem;
   margin-bottom: 0.5rem;
 }
+
+.primary-learn-actions > * {
+  align-self: center;
+}
+
+app-quiz-button {
+  display: flex;
+  align-items: center;
+}
+
+app-quiz-button ion-button {
+  margin: 0;
+}

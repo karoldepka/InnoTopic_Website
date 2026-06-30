@@ -45,6 +45,25 @@
   gap: 4px;
 }
 
+.capture-actions-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+}
+
+.capture-actions-tools,
+.capture-actions-count {
+  display: inline-flex;
+  align-items: center;
+  align-self: center;
+}
+
+.capture-actions-count {
+  line-height: 1;
+  white-space: nowrap;
+}
+
 .add-feedback {
   display: inline-flex;
   max-width: min(520px, 100%);

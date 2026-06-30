@@ -1,17 +1,12 @@
 <div class="ion-padding">
-  <div
-    style="display: flex; align-items: center"
-  >
+  <div class="node-summary-row">
     <input type="checkbox"> <!-- will allow selecting multiple items -->
-    &nbsp; &nbsp;
     <!--{{treeNode.title}}-->
     <!--<span [innerHTML]="'<script>window.alert()</script><b>TE</b>st'"></span>-->
     <app-node-class-icon
-      style="display: inline"
       [treeNode]="treeNode"
     ></app-node-class-icon>
-    &nbsp; &nbsp;
-    <span [innerHTML]="treeNode.title"></span>
+    <span class="node-title" [innerHTML]="treeNode.title"></span>
   </div>
   In n Places:
 

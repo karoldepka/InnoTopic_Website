@@ -1,5 +1,6 @@
 import {
   debugLog,
+  errorAlert,
   FIXME,
 } from '../utils/log'
 import { NodeInclusion } from '../tree-model/TreeListener'
@@ -94,6 +95,8 @@ export class FirestoreAllInclusionsSyncer {
       mapParentIdToDocsModified.map.forEach((inclusions, parentId) => {
         this.putInclusionsForParentAndFireEvent(parentId, inclusions, 'modified')
       })
+    }, (error: any) => {
+      errorAlert('Firestore read failed in FirestoreAllInclusionsSyncer.startQuery', error)
     })
   }
 
@@ -115,7 +118,10 @@ export class FirestoreAllInclusionsSyncer {
       nodeInclusionFirebaseObject: Omit<FirestoreNodeInclusion, 'parentNode'>
   ) {
     ;(nodeInclusionFirebaseObject as FirestoreNodeInclusion).parentNode = parentDoc
-    const promise = this.docByInclusionId(nodeInclusion.nodeInclusionId).set(nodeInclusionFirebaseObject)
+    const promise = this.docByInclusionId(nodeInclusion.nodeInclusionId).set(nodeInclusionFirebaseObject).catch((error: any) => {
+      errorAlert('Firestore write failed in FirestoreAllInclusionsSyncer.addNodeInclusionToParent', error)
+      throw error
+    })
     return promise
   }
 
@@ -156,7 +162,10 @@ export class FirestoreAllInclusionsSyncer {
   }
 
   patchChildInclusionData(parentItemId: string, itemInclusionId: string, itemInclusionData: any) {
-    this.docByInclusionId(itemInclusionId).update(itemInclusionData)
+    this.docByInclusionId(itemInclusionId).update(itemInclusionData).catch((error: any) => {
+      errorAlert('Firestore write failed in FirestoreAllInclusionsSyncer.patchChildInclusionData', error)
+      throw error
+    })
   }
 
   // patchChildInclusionDataWithNewParent(itemInclusionId: string, newParentItem: DocumentReference) {

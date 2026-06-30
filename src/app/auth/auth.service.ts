@@ -1,6 +1,5 @@
 import { Injectable } from '@angular/core';
 import { AngularFirestore } from '@angular/fire/compat/firestore';
-import { AngularFireAuth } from '@angular/fire/compat/auth';
 import { ignorePromise } from '../libs/AppFedShared/utils/promiseUtils';
 import { Router } from '@angular/router';
 
@@ -11,9 +10,9 @@ import {CachedSubject} from '../libs/AppFedShared/utils/cachedSubject2/CachedSub
 import {ChromeExtensionService} from '../apps/Learn/shared/utils/chrome-extension.service'
 import firebase from 'firebase/compat/app'
 import 'firebase/compat/auth'
-import { GoogleAuthProvider } from '@angular/fire/auth'
 import User = firebase.User
 import {nullish} from '../libs/AppFedShared/utils/type-utils'
+import {AuthFacadeService} from './auth-facade.service'
 
 
 export type UserId = string
@@ -38,10 +37,10 @@ export class AuthService {
 
   constructor(
     private angularFirestore: AngularFirestore,
-    private afAuth: AngularFireAuth,
+    private authFacade: AuthFacadeService,
     private Router: Router
   ) {
-    this.afAuth.authState.subscribe(authState => {
+    this.authFacade.observeAuthState(authState => {
       console.log('authState', authState?.uid, authState);
       this.authUser$.next(authState)
     });
@@ -70,21 +69,20 @@ export class AuthService {
 
   logout() {
     this._userIsAuthenticated = false;
-    // this.afAuth.auth.signOut(); // https://github.com/angular/angularfire/blob/master/docs/version-6-upgrade.md
-    this.afAuth.signOut(); // https://github.com/angular/angularfire/blob/master/docs/version-6-upgrade.md
+    ignorePromise(this.authFacade.signOut())
     this.authUser$.next(null)
   }
 
   signUpWithEmailAndPassword(email: string, password: string) {
-    return this.afAuth
-      .createUserWithEmailAndPassword(email, password)
+    return this.authFacade
+      .signUpWithEmailAndPassword(email, password)
       .then((response: any) => (this.login()/*, this.Router.navigateByUrl('/timers') /!* TODO why comma expression *!/)*/))
       .catch((error: any) => console.log('Error on creating account', error));
   }
 
   logInViaEmailAndPassword(email: string, password: string) {
-    return this.afAuth
-      .signInWithEmailAndPassword(email, password)
+    return this.authFacade
+      .logInViaEmailAndPassword(email, password)
       .then((response: any) => (this.login()/*, this.Router.navigateByUrl('/timers'))*/))
       .catch((error: any) => console.log('Error logging in', error));
   }
@@ -98,9 +96,8 @@ export class AuthService {
         console.log('Log  in response===', response);
       });
     } else {
-      const authProvider = new GoogleAuthProvider();
-      return this.afAuth
-        .signInWithPopup(authProvider)
+      return this.authFacade
+        .logInViaGoogle()
         .then((response: any) => (this.login()/*, this.Router.navigateByUrl('/timers')*/)
           /* TODO: emit authUser$ */
         )

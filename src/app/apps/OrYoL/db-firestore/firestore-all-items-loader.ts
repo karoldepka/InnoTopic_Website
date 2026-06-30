@@ -3,6 +3,7 @@ import { FirestoreItemsLoader } from './firestore-items-loader'
 
 import {
   debugLog,
+  errorAlert,
   FIXME,
 } from '../utils/log'
 import { PermissionsManager } from '../tree-model/PermissionsManager'
@@ -74,6 +75,8 @@ export class FirestoreAllItemsLoader extends FirestoreItemsLoader {
         }
       })
 
+    }, (error: any) => {
+      errorAlert('Firestore read failed in FirestoreAllItemsLoader.startQuery', error)
     })
   }
 

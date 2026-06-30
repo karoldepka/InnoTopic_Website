@@ -96,38 +96,58 @@
         [selection]="listModel.selection"
       ></app-selection-info>
 
-      <div class="capture-actions">
-        <ion-button
-          (press)="addTask(true)"
-          (click)="addTask()"
-          [disabled]="isAddingWithAI"
-        ><ion-icon name="add-circle-outline" />&nbsp;TASK</ion-button>
+      <div class="capture-actions-row">
+        <div class="capture-actions">
+          <ion-button
+            (press)="addTask(true)"
+            (click)="addTask()"
+            [disabled]="isAddingWithAI"
+          ><ion-icon name="add-circle-outline" />&nbsp;TASK</ion-button>
 
-        <ion-button
-          (press)="addToLearn(true)"
-          (click)="addToLearn()"
-          [disabled]="isAddingWithAI"
-        ><ion-icon name="add-circle-outline" />&nbsp;LEARN</ion-button>
+          <ion-button
+            (press)="addToLearn(true)"
+            (click)="addToLearn()"
+            [disabled]="isAddingWithAI"
+          ><ion-icon name="add-circle-outline" />&nbsp;LEARN</ion-button>
 
-        <ion-button
-          *ngIf="!isAddingWithAI"
-          (click)="addWithAI()"
-          [disabled]="isOffline"
-          title="Fill with AI"
-          size="small"
-        >
-          <span style="font-size: 1.2rem">✨</span>
-        </ion-button>
-        <ion-button
-          *ngIf="isAddingWithAI"
-          (click)="stopAI()"
-          color="danger"
-          title="Stop AI"
-          size="small"
-        >
-          <ion-icon slot="start" name="stop-circle-outline"></ion-icon>
-          Stop
-        </ion-button>
+          <ion-button
+            *ngIf="!isAddingWithAI"
+            (click)="addWithAI()"
+            [disabled]="isOffline"
+            title="Fill with AI"
+            size="small"
+          >
+            <span style="font-size: 1.2rem">✨</span>
+          </ion-button>
+          <ion-button
+            *ngIf="isAddingWithAI"
+            (click)="stopAI()"
+            color="danger"
+            title="Stop AI"
+            size="small"
+          >
+            <ion-icon slot="start" name="stop-circle-outline"></ion-icon>
+            Stop
+          </ion-button>
+        </div>
+
+        <ion-buttons class="capture-actions-tools">
+          <ion-button
+            (click)="onClickListOptions($event)"
+          >
+            <ion-icon
+              slot="icon-only"
+              style="color: var(--ion-color-primary);"
+              name="filter"
+             />
+          </ion-button>
+        </ion-buttons>
+
+        <ion-text class="capture-actions-count" style="color: gray">
+          <span *ngIf="filteredItem$s.length !== item$s.length">{{filteredItem$s.length}} /</span>
+          {{ item$s.length }}
+          <app-learn-stats *ngIf="feat.stats"><!-- FIXME ugly --></app-learn-stats>
+        </ion-text>
       </div>
 
       <ion-text
@@ -143,25 +163,6 @@
         [routerLink]="['/journal/write/new']"
         (click)="addToJournal()"
       ><ion-icon name="add-circle-outline" />&nbsp;JOURNAL</ion-button>
-
-      <ion-buttons style="display: inline-block">
-        <ion-button
-          (click)="onClickListOptions($event)"
-        >
-          <ion-icon
-            slot="icon-only"
-            style="color: var(--ion-color-primary);"
-            name="filter"
-           />
-        </ion-button>
-      </ion-buttons>
-
-
-      <ion-text style="color: gray">
-        <span *ngIf="filteredItem$s.length !== item$s.length">{{filteredItem$s.length}} /</span>
-        {{ item$s.length }}
-        <app-learn-stats *ngIf="feat.stats"><!-- FIXME ugly --></app-learn-stats>
-      </ion-text>
     </div>
     <app-mic *ngIf="feat.buggy"
       style="display: flex; align-items: stretch; padding-bottom: 8px;"></app-mic>
