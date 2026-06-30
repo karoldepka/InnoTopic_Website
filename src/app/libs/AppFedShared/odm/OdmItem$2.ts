@@ -27,6 +27,9 @@ export class OdmInMemItemWriteOnce {
 export class OdmInMemItem extends OdmInMemItemWriteOnce {
   public whenLastModified?: OdmTimestamp
   public whereCreated?: any
+  /** Fractional sibling-ordering key (OrYoL-style), spaced by ODM_ORDER_STEP so nodes
+   * can be reordered/inserted between neighbours without renumbering siblings. */
+  public orderNum?: number
 }
 
 export type OdmRawItemData = OdmInMemItem // workaround
@@ -61,6 +64,10 @@ export function summarizePatch(patch: any): string {
     return `${key}=${asStr}`
   }).join(', ')
 }
+
+/** Spacing between sibling `orderNum`s (OrYoL-style). Large gap lets us insert
+ * between two neighbours by averaging, without renumbering siblings. */
+export const ODM_ORDER_STEP = 1000 * 1000
 
 export type OdmItem$2CtorOpts = { createdLocally?: boolean }
 
@@ -599,5 +606,64 @@ export class OdmItem$2<
       predicate(child) &&
       (child as unknown as OdmItem$2<any, any, any, any>).allDescendantsMatch(predicate as any),
     )
+  }
+
+  // ============================================================================
+  // Sibling ordering & child creation (unified from the OrYoL tree node-orderer).
+  // Children carry a fractional `orderNum` so they keep a stable, editable order
+  // and can be inserted between neighbours by averaging — all persisted through
+  // the OdmItem$2 incremental patch + save model.
+  // ============================================================================
+
+  /** This item's fractional sibling-ordering key (undefined if never ordered). */
+  getOrderNum(): number | undefined {
+    return this.currentVal?.orderNum
+  }
+
+  /** Children sorted by `orderNum` ascending; unordered children go last (stable). */
+  getChildrenOrdered(): TChild[] {
+    return [...this.getChildren()].sort((a, b) => {
+      const ao = (a as unknown as OdmItem$2<any, any, any, any>).getOrderNum() ?? Number.POSITIVE_INFINITY
+      const bo = (b as unknown as OdmItem$2<any, any, any, any>).getOrderNum() ?? Number.POSITIVE_INFINITY
+      return ao - bo
+    })
+  }
+
+  /** OrYoL-style fractional ordering: midpoint between neighbours, or one step
+   * beyond a single neighbour, or 0 when there are none. */
+  calculateOrderNumBetween(previous: number | nullish, next: number | nullish): number {
+    if ( (previous ?? null) === null && next != null ) {
+      return next - ODM_ORDER_STEP
+    }
+    if ( previous != null && (next ?? null) === null ) {
+      return previous + ODM_ORDER_STEP
+    }
+    if ( (previous ?? null) === null && (next ?? null) === null ) {
+      return 0
+    }
+    return (previous! + next!) / 2
+  }
+
+  /** Create, register and persist a new child item under this one (appended last by
+   * default), mirroring OrYoL's `addChild`. The child is wired into `parents` /
+   * `childrenList$` immediately for snappy UX, then saved to the DB. */
+  createChild(initialData?: Partial<TInMemData>, afterChild?: TChild): TChild {
+    const ordered = this.getChildrenOrdered() as unknown as OdmItem$2<any, any, any, any>[]
+    const previousChild = afterChild
+      ? (afterChild as unknown as OdmItem$2<any, any, any, any>)
+      : ordered[ordered.length - 1]
+    const previousIndex = previousChild ? ordered.indexOf(previousChild) : -1
+    const nextChild = previousIndex >= 0 ? ordered[previousIndex + 1] : ordered[0]
+    const orderNum = this.calculateOrderNumBetween(previousChild?.getOrderNum(), nextChild?.getOrderNum())
+
+    const data = { ...(initialData ?? {}), orderNum } as TInMemData
+    const child = this.odmService.createOdmItem$(
+      undefined,
+      data,
+      [this as unknown as TParent] as any,
+      { createdLocally: true },
+    ) as unknown as TChild
+    ;(child as unknown as OdmItem$2<any, any, any, any>).saveNowToDb()
+    return child
   }
 }
