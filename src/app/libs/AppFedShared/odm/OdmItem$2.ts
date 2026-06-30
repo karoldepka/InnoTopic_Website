@@ -525,4 +525,79 @@ export class OdmItem$2<
     }
     return new BehaviorSubject(retPath.reverse()) // FIXME make it update as ancestors change
   }
+
+  // ============================================================================
+  // Tree traversal & indentation goodies (unified from the OrYoL tree-node model).
+  // These run synchronously over the in-memory parents/childrenList$ graph that
+  // OdmItem$2 already maintains, complementing its incremental patch+save model.
+  // An item can have multiple parents (DAG); path/depth helpers follow the
+  // *primary* (first) parent, which is what a single tree rendering uses.
+  // ============================================================================
+
+  /** Primary (first) parent, or undefined for a root / top-level item. */
+  getPrimaryParent(): TParent | undefined {
+    return this.parents?.[0]
+  }
+
+  /** Immediate children currently loaded in memory ([] if none / not yet loaded). */
+  getChildren(): TChild[] {
+    return (this.childrenList$.lastVal ?? []) as TChild[]
+  }
+
+  get hasChildren(): boolean {
+    return this.getChildren().length > 0
+  }
+
+  /** Ancestor items along the primary path, ordered root-first (excludes this item). */
+  getAncestorItemsPath(): TParent[] {
+    const path: TParent[] = []
+    let node = this.getPrimaryParent() as OdmItem$2<any, any, any, any> | undefined
+    let guard = 0
+    while ( node && guard++ < 10_000 ) {
+      path.push(node as TParent)
+      node = node.getPrimaryParent()
+    }
+    return path.reverse()
+  }
+
+  /** Indentation / nesting level along the primary path (0 = top-level). */
+  getItemDepth(): number {
+    return this.getAncestorItemsPath().length
+  }
+
+  /** Nearest ancestor (primary path) matching the predicate, or undefined. */
+  findAncestorItemMatching(predicate: (item: TParent) => boolean): TParent | undefined {
+    let node = this.getPrimaryParent() as OdmItem$2<any, any, any, any> | undefined
+    let guard = 0
+    while ( node && guard++ < 10_000 ) {
+      if ( predicate(node as TParent) ) {
+        return node as TParent
+      }
+      node = node.getPrimaryParent()
+    }
+    return undefined
+  }
+
+  /** Depth-first (pre-order) visit of all in-memory descendants; depth is relative (children = 1). */
+  forEachDescendant(visit: (item: TChild, depth: number) => void, relativeDepth = 1): void {
+    for ( const child of this.getChildren() ) {
+      visit(child, relativeDepth)
+      ;(child as unknown as OdmItem$2<any, any, any, any>).forEachDescendant(visit as any, relativeDepth + 1)
+    }
+  }
+
+  /** Flattened in-memory descendants (depth-first, pre-order). */
+  getDescendants(): TChild[] {
+    const ret: TChild[] = []
+    this.forEachDescendant(item => ret.push(item))
+    return ret
+  }
+
+  /** True when every descendant satisfies the predicate (vacuously true when no children). */
+  allDescendantsMatch(predicate: (item: TChild) => boolean): boolean {
+    return this.getChildren().every(child =>
+      predicate(child) &&
+      (child as unknown as OdmItem$2<any, any, any, any>).allDescendantsMatch(predicate as any),
+    )
+  }
 }

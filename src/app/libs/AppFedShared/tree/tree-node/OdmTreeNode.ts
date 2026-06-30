@@ -26,6 +26,35 @@ export class OdmTreeNode<
   ) {
   }
 
+  /** True for the root / top-level node (no parent node). */
+  get isRoot(): boolean {
+    return ! this.parentNode
+  }
+
+  /** Number of ancestor nodes above this one — the indentation level (0 = top-level). */
+  getDepth(): number {
+    let depth = 0
+    let node: OdmTreeNode<any> | undefined = this.parentNode
+    let guard = 0
+    while ( node && guard++ < 10_000 ) {
+      depth++
+      node = node.parentNode
+    }
+    return depth
+  }
+
+  /** Ancestor nodes ordered root-first (excludes this node). */
+  getAncestorNodes(): OdmTreeNode<any>[] {
+    const path: OdmTreeNode<any>[] = []
+    let node: OdmTreeNode<any> | undefined = this.parentNode
+    let guard = 0
+    while ( node && guard++ < 10_000 ) {
+      path.push(node)
+      node = node.parentNode
+    }
+    return path.reverse()
+  }
+
   requestLoadChildren(depth = 1) {
     this.item$.requestLoadChildren()
     this.item$.requestLoadTreeDescendants()
