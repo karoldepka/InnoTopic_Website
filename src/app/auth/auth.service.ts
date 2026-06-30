@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { AngularFirestore } from '@angular/fire/compat/firestore';
 import { ignorePromise } from '../libs/AppFedShared/utils/promiseUtils';
 import { Router } from '@angular/router';
+import { ToastController } from '@ionic/angular';
 import { User } from 'firebase/auth';
 
 import {errorAlert} from '../libs/AppFedShared/utils/log'
@@ -22,6 +23,11 @@ export class AuthService {
   private isGoogleLoginInProgress = false
   private isFacebookLoginInProgress = false
 
+  /** True when the user explicitly initiated a login/signup, so we only
+   * give success feedback for fresh logins, not for session restoration. */
+  private loginInitiated = false
+  private hasShownLoginFeedback = false
+
   private _userIsAuthenticated = false;
 
   get userIsAuthenticated() {
@@ -36,17 +42,43 @@ export class AuthService {
   constructor(
     private angularFirestore: AngularFirestore,
     private authFacade: AuthFacadeService,
-    private Router: Router
+    private Router: Router,
+    private toastController: ToastController
   ) {
     this.authFacade.observeAuthState(authState => {
       console.log('authState', authState?.uid, authState);
       this.authUser$.next(authState)
+      if (authState && this.loginInitiated && ! this.hasShownLoginFeedback) {
+        this.hasShownLoginFeedback = true
+        this.loginInitiated = false
+        ignorePromise(this.onLoginSuccess(authState))
+      }
+      if ( ! authState) {
+        this.hasShownLoginFeedback = false
+      }
     });
     // ignorePromise(
     //   /* TODO: only use this if User chooses this instead of Google, to avoid creating data somewhere where it is not gonna be accessible on another device */
     //   this.afAuth.auth.signInAnonymously(),
     //   'this.angularFireAuth.auth.signInAnonymously()'
     // );
+  }
+
+  /** Mark that the user explicitly started a login/signup flow. */
+  markLoginInitiated() {
+    this.loginInitiated = true
+  }
+
+  private async onLoginSuccess(user: User) {
+    const name = user.displayName || user.email || 'You are now signed in'
+    const toast = await this.toastController.create({
+      message: `Signed in as ${name}`,
+      duration: 2500,
+      position: 'top',
+      color: 'success',
+    })
+    await toast.present()
+    ignorePromise(this.Router.navigateByUrl('/timers'))
   }
 
   login() {
@@ -73,6 +105,7 @@ export class AuthService {
   }
 
   signUpWithEmailAndPassword(email: string, password: string) {
+    this.markLoginInitiated()
     return this.authFacade
       .signUpWithEmailAndPassword(email, password)
       .then((response: any) => (this.login()/*, this.Router.navigateByUrl('/timers') /!* TODO why comma expression *!/)*/))
@@ -83,6 +116,7 @@ export class AuthService {
   }
 
   logInViaEmailAndPassword(email: string, password: string) {
+    this.markLoginInitiated()
     return this.authFacade
       .logInViaEmailAndPassword(email, password)
       .then((response: any) => (this.login()/*, this.Router.navigateByUrl('/timers'))*/))
@@ -98,6 +132,7 @@ export class AuthService {
     }
 
     this.isGoogleLoginInProgress = true
+    this.markLoginInitiated()
 
     if (ChromeExtensionService.isApplicationRunAsChromeExtension()) {
       // @ts-ignore
@@ -133,6 +168,7 @@ export class AuthService {
     }
 
     this.isFacebookLoginInProgress = true
+    this.markLoginInitiated()
 
     return this.authFacade
       .logInViaFacebook()
@@ -155,6 +191,13 @@ export class AuthService {
       .linkWithEmailPassword(email, password)
       .then((response: any) => response)
       .catch((error: any) => {
+        const code = String(error?.code ?? '').toLowerCase()
+        // Already linked: treat as success, the user is authenticated and the
+        // email/password provider is already attached to this account.
+        if (code.includes('auth/provider-already-linked') || code.includes('auth/email-already-in-use')) {
+          console.warn('Email/password provider already linked to this account.', error);
+          return this.authUser$.lastVal ?? null;
+        }
         errorAlert('Error linking email/password account: ' + error);
         return null;
       });
