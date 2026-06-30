@@ -9,7 +9,7 @@ import { User } from 'firebase/auth'
 import { AboutAppComponent } from './about-app/about-app.component';
 import { FeatureConfigComponent } from '../../../feature-config/feature-config.component';
 import { ThemeConfigComponent } from '../../../theme-config/theme-config.component';
-import { NgIf, AsyncPipe, JsonPipe } from '@angular/common';
+import { NgIf, NgForOf, AsyncPipe, JsonPipe } from '@angular/common';
 import { IonicModule } from '@ionic/angular';
 
 @Component({
@@ -22,6 +22,7 @@ import { IonicModule } from '@ionic/angular';
         FeatureConfigComponent,
         ThemeConfigComponent,
         NgIf,
+        NgForOf,
         IonicModule,
         AsyncPipe,
         JsonPipe,
@@ -60,5 +61,15 @@ export class SyncPopoverComponent extends BaseComponent implements OnInit {
 
   toArray(t: any) {
     return Array.from(t)
+  }
+
+  /** User-visible descriptions of the changes still waiting to be uploaded. */
+  pendingUploadDescriptions(status: SyncStatus | null | undefined): string[] {
+    if ( ! status ?. pendingUploads ) {
+      return []
+    }
+    return Array.from(status.pendingUploads).map(
+      upload => upload.titleOfChange || 'Unsaved change'
+    )
   }
 }

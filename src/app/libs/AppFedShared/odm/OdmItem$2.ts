@@ -46,6 +46,22 @@ export function convertUndefinedFieldValsToNull(obj: any) {
   return obj
 }
 
+/** Compact, user-visible summary of a patch's changed fields, e.g. `importance=3, title=Buy milk`.
+ * Long values are truncated so the sync status UI stays readable. */
+export function summarizePatch(patch: any): string {
+  if ( ! patch || typeof patch !== 'object' ) {
+    return ''
+  }
+  return Object.keys(patch).map(key => {
+    const value = patch[key]
+    let asStr = typeof value === 'string' ? value : JSON.stringify(value)
+    if ( asStr && asStr.length > 40 ) {
+      asStr = asStr.slice(0, 40) + '…'
+    }
+    return `${key}=${asStr}`
+  }).join(', ')
+}
+
 export type OdmItem$2CtorOpts = { createdLocally?: boolean }
 
 /** Maybe have another conversion like OdmItem$W - W meaning writable,
@@ -193,7 +209,7 @@ export class OdmItem$2<
       const promise = new Promise((resolveFunc) => {
         this.resolveFuncPendingThrottled = resolveFunc
       })
-      this.odmService.syncStatusService.handleSavingPromise(promise)
+      this.odmService.syncStatusService.handleSavingPromise(promise, this.describePendingChange(patch))
     }
     this.setIdAndWhenCreatedIfNecessary()
     this.setLastModifiedIfNecessary(modificationOpts) // before the patching, in case patch contains modification fields
@@ -206,6 +222,15 @@ export class OdmItem$2<
     /* TODO move to odmService.onPatched(this, patch) */
     this.odmService.emitLocalItems()
     this.odmService.itemHistoryService.onPatch(this, patch)
+  }
+
+  /** Builds a short, user-visible description of a pending change, e.g.
+   * `Modified Task "Buy milk" with importance=3, title=Buy milk`. */
+  private describePendingChange(patch: TMemPatch): string {
+    const typeName = this.odmService.className
+    const title = (this.currentVal as any)?.title ?? (this.currentVal as any)?.name ?? this.id
+    const patchSummary = summarizePatch(patch)
+    return `Modified ${typeName} "${title}"` + (patchSummary ? ` with ${patchSummary}` : '')
   }
 
   private setLastModifiedIfNecessary(modificationOpts: ModificationOpts | nullish ) {

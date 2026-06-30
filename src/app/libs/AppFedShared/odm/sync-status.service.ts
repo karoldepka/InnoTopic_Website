@@ -9,7 +9,13 @@ export class SyncStatus {
   pendingUploadsCount ? : number
   pendingDownloadsCount ? : number
   isAllSynced ! : boolean
+  pendingUploads ! : Set<PendingUpload>
   pendingDownloads ! : Set<PendingDownload>
+}
+
+/** A user-visible description of a change that is waiting to be uploaded. */
+export interface PendingUpload {
+  titleOfChange?: string
 }
 
 /** consider putting 'titleOfChange' here */
@@ -24,11 +30,14 @@ export class SyncStatusService extends BaseService {
 
   pendingPromises = new Set<SyncTask>()
 
+  pendingUploads = new Set<PendingUpload>()
+
   pendingDownloads = new Set<PendingDownload>()
 
   public readonly syncStatus$ = new CachedSubject<SyncStatus>(
     {
       isAllSynced: true /* fix for oryol page sync checkmark not showing */,
+      pendingUploads: new Set(),
       pendingDownloads: new Set(),
     }
   )
@@ -52,14 +61,17 @@ export class SyncStatusService extends BaseService {
    * if offline, they can prolly keep accumulating; maybe they should overwrite previous ones
    * */
   handleUnsavedPromise(promise: SyncTask, titleOfChange?: string) {
-    this.handleSavingPromise(promise)
+    this.handleSavingPromise(promise, titleOfChange)
   }
 
   handleSavingPromise(promise: SyncTask, titleOfChange?: string) {
     this.pendingPromises.add(promise)
+    const pendingUpload: PendingUpload = { titleOfChange }
+    this.pendingUploads.add(pendingUpload)
     this.emitSyncStatus()
     promise.then(() => {
       this.pendingPromises.delete(promise)
+      this.pendingUploads.delete(pendingUpload)
       this.emitSyncStatus()
     }).catch((error: any) => {
       errorAlert(`Unable to save: `, error)
@@ -71,6 +83,7 @@ export class SyncStatusService extends BaseService {
       pendingUploadsCount: this.pendingPromises.size,
       pendingDownloadsCount: this.pendingDownloads.size,
       isAllSynced: !this.pendingPromises.size && !this.pendingDownloads.size,
+      pendingUploads: this.pendingUploads,
       pendingDownloads: this.pendingDownloads
     }
     // if ( appGlobals.feat.showDebug ) {

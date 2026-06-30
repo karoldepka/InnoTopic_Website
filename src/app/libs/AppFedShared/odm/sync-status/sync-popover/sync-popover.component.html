@@ -20,6 +20,11 @@
     *ngIf="(syncStatus$ | async)?.pendingUploadsCount let count; else allUploaded"
   >
     TO UPLOAD: {{count}}
+    <ul>
+      <li *ngFor="let description of pendingUploadDescriptions(syncStatus$ | async)">
+        {{description}}
+      </li>
+    </ul>
 
   </ng-container>
 

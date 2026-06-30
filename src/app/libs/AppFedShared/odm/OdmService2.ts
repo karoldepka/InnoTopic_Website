@@ -138,6 +138,7 @@ export abstract class OdmService2<
   deleteWithoutConfirmationById(itemId: TItemId) {
     this.syncStatusService.handleSavingPromise(
       this.odmCollectionBackend.deleteWithoutConfirmation(itemId),
+      `Deleting ${this.className} "${itemId}"`,
     )
   }
 
@@ -157,7 +158,8 @@ export abstract class OdmService2<
         itemToSave.getParentIds() as ItemId[],
         itemToSave.getAncestorIds() as ItemId[]
       )
-      this.syncStatusService.handleSavingPromise(promise)
+      const title = (itemToSave.val as any)?.title ?? (itemToSave.val as any)?.name ?? itemToSave.id
+      this.syncStatusService.handleSavingPromise(promise, `Saving ${this.className} "${title}"`)
     // }, 10000)
   }
 
