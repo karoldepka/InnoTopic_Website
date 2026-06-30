@@ -71,6 +71,7 @@ export class SearchOrAddLearnableItemPageComponent extends BaseComponent impleme
 
   isAddingWithAI = false
   private aiSubscription?: Subscription
+  showLoginOptions = false
 
   addErrorMessage?: string
 
@@ -121,6 +122,25 @@ export class SearchOrAddLearnableItemPageComponent extends BaseComponent impleme
       // console.log('localItems$ ==== '/*, item$s*/)
       this.listModel.setItemsAndSort(item$s)
     })
+  }
+
+  toggleLoginOptions() {
+    this.showLoginOptions = !this.showLoginOptions
+  }
+
+  continueWithGoogle() {
+    this.showLoginOptions = false
+    this.authService.logInViaGoogle()
+  }
+
+  continueWithFacebook() {
+    this.showLoginOptions = false
+    this.authService.logInViaFacebook()
+  }
+
+  openPasswordLogin() {
+    this.showLoginOptions = false
+    this.router.navigateByUrl('/auth')
   }
 
   add(string?: string, isTask?: boolean, navInto?: boolean, addDuplicateAnyway = false) {

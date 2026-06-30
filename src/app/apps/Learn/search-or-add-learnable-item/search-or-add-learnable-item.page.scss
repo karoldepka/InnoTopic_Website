@@ -64,6 +64,20 @@
   white-space: nowrap;
 }
 
+.login-prompt {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 10px;
+}
+
+.login-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: 0 10px 10px;
+}
+
 .add-feedback {
   display: inline-flex;
   max-width: min(520px, 100%);

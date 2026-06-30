@@ -5,13 +5,12 @@ import {SyncStatus, SyncStatusService} from '../../sync-status.service'
 import {OptionsService} from '../../../../../apps/Learn/core/options.service'
 import {BaseComponent} from '../../../base/base.component'
 import {CachedSubject} from '../../../utils/cachedSubject2/CachedSubject2'
-import firebase from 'firebase/compat/app'
+import { User } from 'firebase/auth'
 import { AboutAppComponent } from './about-app/about-app.component';
 import { FeatureConfigComponent } from '../../../feature-config/feature-config.component';
 import { ThemeConfigComponent } from '../../../theme-config/theme-config.component';
 import { NgIf, AsyncPipe, JsonPipe } from '@angular/common';
 import { IonicModule } from '@ionic/angular';
-import User = firebase.User
 
 @Component({
     selector: 'app-sync-popover',

@@ -15,6 +15,8 @@ import { IonicModule } from '@ionic/angular';
     ],
 })
 export class LoginEmailPasswordComponent implements OnInit {
+  showPassword = false
+
   constructor(private AuthService: AuthService) {}
 
   ngOnInit() {}

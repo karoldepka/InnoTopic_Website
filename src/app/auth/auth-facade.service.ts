@@ -1,13 +1,28 @@
 import { Injectable } from '@angular/core'
-import { AngularFireAuth } from '@angular/fire/compat/auth'
-import { GoogleAuthProvider } from '@angular/fire/auth'
+import {
+  getAuth,
+  Auth,
+  User,
+  signInWithPopup,
+  signInWithRedirect,
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  signOut,
+  onAuthStateChanged,
+  EmailAuthProvider,
+  linkWithCredential,
+  linkWithPopup,
+  linkWithRedirect,
+  GoogleAuthProvider,
+  FacebookAuthProvider,
+} from 'firebase/auth'
 import { createClient, SupabaseClient, User as SupabaseUser } from '@supabase/supabase-js'
-import firebase from 'firebase/compat/app'
-import 'firebase/compat/auth'
 import { environment } from '../../environments/environment'
+import { initializeApp } from 'firebase/app'
+import { errorAlert } from '../libs/AppFedShared/utils/log'
 
 export type AuthBackendName = 'firebase' | 'supabase'
-export type AuthFacadeUser = firebase.User
+export type AuthFacadeUser = User
 
 type AuthStateCallback = (user: AuthFacadeUser | null) => void
 
@@ -17,10 +32,28 @@ interface AuthProviderAdapter {
   signUpWithEmailAndPassword(email: string, password: string): Promise<AuthFacadeUser | null>
   logInViaEmailAndPassword(email: string, password: string): Promise<AuthFacadeUser | null>
   logInViaGoogle(): Promise<AuthFacadeUser | null>
+  logInViaFacebook(): Promise<AuthFacadeUser | null>
+  linkWithEmailPassword(email: string, password: string): Promise<AuthFacadeUser | null>
+  linkWithGoogle(): Promise<AuthFacadeUser | null>
+  linkWithFacebook(): Promise<AuthFacadeUser | null>
 }
 
 class FirebaseAuthAdapter implements AuthProviderAdapter {
-  constructor(private afAuth: AngularFireAuth) {}
+  private auth: Auth
+
+  constructor() {
+    try {
+      const firebaseConfig = (environment as any).firebaseConfig
+      if (!firebaseConfig) {
+        throw new Error('Missing environment.firebaseConfig')
+      }
+      const app = initializeApp(firebaseConfig)
+      this.auth = getAuth(app)
+    } catch (error: any) {
+      errorAlert('Firebase initialization failed: ' + error?.message)
+      throw error
+    }
+  }
 
   private isPopupInterrupted(error: any): boolean {
     const code = String(error?.code ?? '').toLowerCase()
@@ -36,32 +69,92 @@ class FirebaseAuthAdapter implements AuthProviderAdapter {
   }
 
   observeAuthState(callback: AuthStateCallback): () => void {
-    const sub = this.afAuth.authState.subscribe(callback)
-    return () => sub.unsubscribe()
+    const unsubscribe = onAuthStateChanged(this.auth, callback)
+    return unsubscribe
   }
 
   async signOut(): Promise<void> {
-    await this.afAuth.signOut()
+    await signOut(this.auth)
   }
 
   async signUpWithEmailAndPassword(email: string, password: string): Promise<AuthFacadeUser | null> {
-    const result = await this.afAuth.createUserWithEmailAndPassword(email, password)
+    const result = await createUserWithEmailAndPassword(this.auth, email, password)
     return result.user ?? null
   }
 
   async logInViaEmailAndPassword(email: string, password: string): Promise<AuthFacadeUser | null> {
-    const result = await this.afAuth.signInWithEmailAndPassword(email, password)
+    const result = await signInWithEmailAndPassword(this.auth, email, password)
     return result.user ?? null
   }
 
   async logInViaGoogle(): Promise<AuthFacadeUser | null> {
     const authProvider = new GoogleAuthProvider()
     try {
-      const result = await this.afAuth.signInWithPopup(authProvider)
+      const result = await signInWithPopup(this.auth, authProvider)
       return result.user ?? null
     } catch (error: any) {
       if (this.isPopupInterrupted(error)) {
-        await this.afAuth.signInWithRedirect(authProvider)
+        await signInWithRedirect(this.auth, authProvider)
+        return null
+      }
+      throw error
+    }
+  }
+
+  async logInViaFacebook(): Promise<AuthFacadeUser | null> {
+    const authProvider = new FacebookAuthProvider()
+    try {
+      const result = await signInWithPopup(this.auth, authProvider)
+      return result.user ?? null
+    } catch (error: any) {
+      if (this.isPopupInterrupted(error)) {
+        await signInWithRedirect(this.auth, authProvider)
+        return null
+      }
+      throw error
+    }
+  }
+
+  async linkWithEmailPassword(email: string, password: string): Promise<AuthFacadeUser | null> {
+    const user = this.auth.currentUser
+    if (!user) {
+      throw new Error('No user currently logged in')
+    }
+    const credential = EmailAuthProvider.credential(email, password)
+    const result = await linkWithCredential(user, credential)
+    return result.user ?? null
+  }
+
+  async linkWithGoogle(): Promise<AuthFacadeUser | null> {
+    const user = this.auth.currentUser
+    if (!user) {
+      throw new Error('No user currently logged in')
+    }
+    const authProvider = new GoogleAuthProvider()
+    try {
+      const result = await linkWithPopup(user, authProvider)
+      return result.user ?? null
+    } catch (error: any) {
+      if (this.isPopupInterrupted(error)) {
+        await linkWithRedirect(user, authProvider)
+        return null
+      }
+      throw error
+    }
+  }
+
+  async linkWithFacebook(): Promise<AuthFacadeUser | null> {
+    const user = this.auth.currentUser
+    if (!user) {
+      throw new Error('No user currently logged in')
+    }
+    const authProvider = new FacebookAuthProvider()
+    try {
+      const result = await linkWithPopup(user, authProvider)
+      return result.user ?? null
+    } catch (error: any) {
+      if (this.isPopupInterrupted(error)) {
+        await linkWithRedirect(user, authProvider)
         return null
       }
       throw error
@@ -157,6 +250,42 @@ class SupabaseAuthAdapter implements AuthProviderAdapter {
     }
     return null
   }
+
+  async logInViaFacebook(): Promise<AuthFacadeUser | null> {
+    const client = this.getClient()
+    const { error } = await client.auth.signInWithOAuth({ provider: 'facebook' })
+    if (error) {
+      throw error
+    }
+    return null
+  }
+
+  async linkWithEmailPassword(email: string, password: string): Promise<AuthFacadeUser | null> {
+    const client = this.getClient()
+    const { data, error } = await client.auth.signInWithPassword({ email, password })
+    if (error) {
+      throw error
+    }
+    return this.toAuthFacadeUser(data.user)
+  }
+
+  async linkWithGoogle(): Promise<AuthFacadeUser | null> {
+    const client = this.getClient()
+    const { error } = await client.auth.linkIdentity({ provider: 'google' })
+    if (error) {
+      throw error
+    }
+    return null
+  }
+
+  async linkWithFacebook(): Promise<AuthFacadeUser | null> {
+    const client = this.getClient()
+    const { error } = await client.auth.linkIdentity({ provider: 'facebook' })
+    if (error) {
+      throw error
+    }
+    return null
+  }
 }
 
 @Injectable({
@@ -166,10 +295,10 @@ export class AuthFacadeService {
   private readonly backend: AuthBackendName = (environment as any).authBackend ?? 'firebase'
   private readonly adapter: AuthProviderAdapter
 
-  constructor(private afAuth: AngularFireAuth) {
+  constructor() {
     this.adapter = this.backend === 'supabase'
       ? new SupabaseAuthAdapter()
-      : new FirebaseAuthAdapter(this.afAuth)
+      : new FirebaseAuthAdapter()
   }
 
   get backendName(): AuthBackendName {
@@ -194,5 +323,21 @@ export class AuthFacadeService {
 
   logInViaGoogle(): Promise<AuthFacadeUser | null> {
     return this.adapter.logInViaGoogle()
+  }
+
+  logInViaFacebook(): Promise<AuthFacadeUser | null> {
+    return this.adapter.logInViaFacebook()
+  }
+
+  linkWithEmailPassword(email: string, password: string): Promise<AuthFacadeUser | null> {
+    return this.adapter.linkWithEmailPassword(email, password)
+  }
+
+  linkWithGoogle(): Promise<AuthFacadeUser | null> {
+    return this.adapter.linkWithGoogle()
+  }
+
+  linkWithFacebook(): Promise<AuthFacadeUser | null> {
+    return this.adapter.linkWithFacebook()
   }
 }

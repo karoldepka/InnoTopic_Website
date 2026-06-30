@@ -2,7 +2,6 @@ import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { AuthService } from './auth.service';
 import { Router } from '@angular/router';
 import { IonicModule } from '@ionic/angular';
-import { NgIf } from '@angular/common';
 import { LoginEmailPasswordComponent } from './login-email-password/login-email-password.component';
 import { SignupEmailPasswordComponent } from './signup-email-password/signup-email-password.component';
 
@@ -13,7 +12,6 @@ import { SignupEmailPasswordComponent } from './signup-email-password/signup-ema
     styleUrls: ['./auth.page.scss'],
     imports: [
         IonicModule,
-        NgIf,
         LoginEmailPasswordComponent,
         SignupEmailPasswordComponent,
     ],

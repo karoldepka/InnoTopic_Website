@@ -188,10 +188,24 @@
     <section class="search-add-results">
       <ng-container *ngIf="(! (authService.authUser$ | async)) else loggedIn">
 
-        <div style="display: flex; flex-direction: row; align-items: center; margin: 10px">
-          Please &nbsp;
-          <ion-button (click)="authService.logInViaGoogle()">LOG IN</ion-button>
+        <div class="login-prompt">
+          <span>Please</span>
+          <ion-button (click)="toggleLoginOptions()">LOG IN</ion-button>
+        </div>
 
+        <div *ngIf="showLoginOptions" class="login-options">
+          <ion-button (click)="continueWithGoogle()">
+            <ion-icon slot="start" name="logo-google"></ion-icon>
+            Continue with Google
+          </ion-button>
+          <ion-button fill="outline" (click)="continueWithFacebook()">
+            <ion-icon slot="start" name="logo-facebook"></ion-icon>
+            Continue with Facebook
+          </ion-button>
+          <ion-button fill="outline" (click)="openPasswordLogin()">
+            <ion-icon slot="start" name="mail-outline"></ion-icon>
+            Login + password
+          </ion-button>
         </div>
 
       </ng-container>

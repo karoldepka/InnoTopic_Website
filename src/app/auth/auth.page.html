@@ -9,8 +9,8 @@
 
 <ion-col size="10" offset="1">
   <ion-content>
-    <app-login-email-password *ngIf="!this.isLogin"></app-login-email-password>
-    <app-signup-email-password *ngIf="this.isLogin"></app-signup-email-password>
+    <app-login-email-password [hidden]="isLogin"></app-login-email-password>
+    <app-signup-email-password [hidden]="!isLogin"></app-signup-email-password>
     <ion-button fill="outline" color="primary" expand="block" (click)="onAuthSwitch()">Switch to
       {{ !isLogin ? 'Signup' : 'Login' }}
     </ion-button>
