@@ -24,10 +24,23 @@ export function buildTemplateItemId(parentId: string, templateNodeId: string): s
   return `${parentId}_template_${templateNodeId}`
 }
 
+
+
+
 /** Hardcoded templates for day plans (initial version). */
 export const DAY_PLAN_TEMPLATES: DayPlanTemplate[] = [
-  {
+{
     id: 'default_day_plan',
+    label: 'Default Day Plan',
+    icon: 'calendar-outline',
+    description: 'Balanced plan for work, focus, admin and recovery.',
+    nodes: [
+      { id: 'plan', title: 'Plan', templateNodeClass: 'task' },
+      { id: 'general', title: 'General', templateNodeClass: 'dayplan_routine' },
+    ],
+  },    
+  {
+    id: 'default_day_plan2',
     label: 'Default Day Plan',
     icon: 'calendar-outline',
     description: 'Balanced plan for work, focus, admin and recovery.',
