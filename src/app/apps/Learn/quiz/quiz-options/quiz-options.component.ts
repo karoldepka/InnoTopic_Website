@@ -46,6 +46,7 @@ export class QuizOptionsComponent implements OnInit {
     textFilter: new UntypedFormControl(''),
     minFunLevel: new UntypedFormControl(),
     minImportanceLevel: new UntypedFormControl(),
+    skipAiGenerated: new UntypedFormControl(false),
   }
 
   formGroup = new UntypedFormGroup(this.controls)

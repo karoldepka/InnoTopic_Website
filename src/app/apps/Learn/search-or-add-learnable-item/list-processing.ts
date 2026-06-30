@@ -175,9 +175,11 @@ export class ListProcessing {
     const opts = this.listOptions$P.locallyVisibleChanges$.lastVal
     const preset = opts?.preset
 
-    const items = this.item$s.filter(item => ! item.val?.whenDeleted)
-      .filter(item => ! opts?.hideAiGenerated || ! item.val?.isAiGenerated())
-      .filter(item => ! opts?.hideDrafts || ! item.val?.isDraft())
+    const items = this.item$s.filter(item =>
+      ! item.val?.whenDeleted
+      && (! opts?.hideAiGenerated || ! item.val?.isAiGenerated())
+      && (! opts?.hideDrafts || ! item.val?.isDraft())
+    )
 
     if (preset === `lastModified`) {
       this.filteredItem$s = items.filter(
