@@ -22,6 +22,19 @@ interface AuthProviderAdapter {
 class FirebaseAuthAdapter implements AuthProviderAdapter {
   constructor(private afAuth: AngularFireAuth) {}
 
+  private isPopupInterrupted(error: any): boolean {
+    const code = String(error?.code ?? '').toLowerCase()
+    const message = String(error?.message ?? '').toLowerCase()
+    const combined = `${code} ${message}`
+    return (
+      combined.includes('auth/popup-closed-by-user')
+      || combined.includes('auth/cancelled-popup-request')
+      || combined.includes('auth/popup-blocked')
+      || combined.includes('popup_closed_by_user')
+      || combined.includes('popup has been closed by the user')
+    )
+  }
+
   observeAuthState(callback: AuthStateCallback): () => void {
     const sub = this.afAuth.authState.subscribe(callback)
     return () => sub.unsubscribe()
@@ -43,8 +56,16 @@ class FirebaseAuthAdapter implements AuthProviderAdapter {
 
   async logInViaGoogle(): Promise<AuthFacadeUser | null> {
     const authProvider = new GoogleAuthProvider()
-    const result = await this.afAuth.signInWithPopup(authProvider)
-    return result.user ?? null
+    try {
+      const result = await this.afAuth.signInWithPopup(authProvider)
+      return result.user ?? null
+    } catch (error: any) {
+      if (this.isPopupInterrupted(error)) {
+        await this.afAuth.signInWithRedirect(authProvider)
+        return null
+      }
+      throw error
+    }
   }
 }
 

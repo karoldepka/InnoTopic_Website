@@ -23,6 +23,7 @@ export type UserId = string
 export class AuthService {
 
   authUser$ = new CachedSubject<User | null>();
+  private isGoogleLoginInProgress = false
 
   private _userIsAuthenticated = false;
 
@@ -62,6 +63,7 @@ export class AuthService {
     return (
       combined.includes('auth/popup-closed-by-user')
       || combined.includes('auth/cancelled-popup-request')
+      || combined.includes('auth/popup-blocked')
       || combined.includes('popup_closed_by_user')
       || combined.includes('popup has been closed by the user')
     );
@@ -88,12 +90,19 @@ export class AuthService {
   }
 
   logInViaGoogle() {
+    if (this.isGoogleLoginInProgress) {
+      return Promise.resolve(null)
+    }
+
+    this.isGoogleLoginInProgress = true
+
     if (ChromeExtensionService.isApplicationRunAsChromeExtension()) {
       // @ts-ignore
       chrome.runtime.sendMessage({
         command: 'login'
       }, (response) => {
         console.log('Log  in response===', response);
+        this.isGoogleLoginInProgress = false
       });
     } else {
       return this.authFacade
@@ -103,11 +112,14 @@ export class AuthService {
         )
         .catch((error: any) => {
           if (this.isGooglePopupCancelled(error)) {
-            console.info('Google sign-in popup was closed by the user.');
+            console.warn('Google sign-in popup was interrupted (closed or blocked). Retrying via redirect may be required.', error);
             return null;
           }
           errorAlert('Error logging in via Google ' + error);
           return null;
+        })
+        .finally(() => {
+          this.isGoogleLoginInProgress = false
         });
     }
   }
