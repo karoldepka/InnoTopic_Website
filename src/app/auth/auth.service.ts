@@ -71,14 +71,19 @@ export class AuthService {
 
   private async onLoginSuccess(user: User) {
     const name = user.displayName || user.email || 'You are now signed in'
+    await this.showSuccessToast(`Signed in as ${name}`)
+    ignorePromise(this.Router.navigateByUrl('/timers'))
+  }
+
+  /** Show a transient success toast to give the user positive feedback. */
+  async showSuccessToast(message: string) {
     const toast = await this.toastController.create({
-      message: `Signed in as ${name}`,
+      message,
       duration: 2500,
       position: 'top',
       color: 'success',
     })
     await toast.present()
-    ignorePromise(this.Router.navigateByUrl('/timers'))
   }
 
   login() {
@@ -189,13 +194,17 @@ export class AuthService {
   linkWithEmailPassword(email: string, password: string) {
     return this.authFacade
       .linkWithEmailPassword(email, password)
-      .then((response: any) => response)
+      .then((response: any) => {
+        ignorePromise(this.showSuccessToast('Email & password linked to your account'))
+        return response
+      })
       .catch((error: any) => {
         const code = String(error?.code ?? '').toLowerCase()
         // Already linked: treat as success, the user is authenticated and the
         // email/password provider is already attached to this account.
         if (code.includes('auth/provider-already-linked') || code.includes('auth/email-already-in-use')) {
           console.warn('Email/password provider already linked to this account.', error);
+          ignorePromise(this.showSuccessToast('Email & password already linked to your account'))
           return this.authUser$.lastVal ?? null;
         }
         errorAlert('Error linking email/password account: ' + error);
@@ -206,7 +215,10 @@ export class AuthService {
   linkWithGoogle() {
     return this.authFacade
       .linkWithGoogle()
-      .then((response: any) => response)
+      .then((response: any) => {
+        ignorePromise(this.showSuccessToast('Google account linked'))
+        return response
+      })
       .catch((error: any) => {
         if (this.isGooglePopupCancelled(error)) {
           console.warn('Google linking popup was interrupted. Retrying via redirect may be required.', error);
@@ -220,7 +232,10 @@ export class AuthService {
   linkWithFacebook() {
     return this.authFacade
       .linkWithFacebook()
-      .then((response: any) => response)
+      .then((response: any) => {
+        ignorePromise(this.showSuccessToast('Facebook account linked'))
+        return response
+      })
       .catch((error: any) => {
         if (this.isGooglePopupCancelled(error)) {
           console.warn('Facebook linking popup was interrupted. Retrying via redirect may be required.', error);

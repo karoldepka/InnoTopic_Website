@@ -7,6 +7,7 @@ import { CommonModule } from '@angular/common';
 import { Subject } from 'rxjs';
 import { addIcons } from 'ionicons';
 import { logoGoogle, logoFacebook, mailOutline } from 'ionicons/icons';
+import { errorAlert } from '../../libs/AppFedShared/utils/log';
 
 @Component({
     selector: 'app-signup-email-password',
@@ -103,6 +104,7 @@ export class SignupEmailPasswordComponent implements OnInit, OnDestroy {
           this.showAccountLinkModal(email, password)
         } else {
           this.signupError = error?.message || 'Error signing up'
+          errorAlert('Error signing up: ' + (error?.message || error))
         }
       })
   }
@@ -172,6 +174,7 @@ export class SignupEmailPasswordComponent implements OnInit, OnDestroy {
         this.closeLinkModal()
       } catch (error: any) {
         this.linkingError = error?.message || 'Error linking account. Try using Google or Facebook instead.'
+        errorAlert('Error linking account: ' + (error?.message || error))
       } finally {
         this.isLinkingWithPassword = false
       }
@@ -186,6 +189,7 @@ export class SignupEmailPasswordComponent implements OnInit, OnDestroy {
       this.closeLinkModal()
     } catch (error: any) {
       this.linkingError = error?.message || 'Incorrect password or email'
+      errorAlert('Error logging in to existing account: ' + (error?.message || error))
     } finally {
       this.isLinkingWithPassword = false
     }
@@ -239,6 +243,7 @@ export class SignupEmailPasswordComponent implements OnInit, OnDestroy {
       this.closeLinkModal()
     } catch (error: any) {
       this.linkingError = error?.message || 'Error linking Google account'
+      errorAlert('Error linking Google account: ' + (error?.message || error))
     } finally {
       this.isLinkingWithPassword = false
     }
@@ -265,6 +270,7 @@ export class SignupEmailPasswordComponent implements OnInit, OnDestroy {
       this.closeLinkModal()
     } catch (error: any) {
       this.linkingError = error?.message || 'Error linking Facebook account'
+      errorAlert('Error linking Facebook account: ' + (error?.message || error))
     } finally {
       this.isLinkingWithPassword = false
     }

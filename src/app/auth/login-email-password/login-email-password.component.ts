@@ -1,9 +1,11 @@
 import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { AuthService } from '../auth.service';
 import { NgForm, ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { IonicModule } from '@ionic/angular';
 import { addIcons } from 'ionicons';
 import { logoGoogle, logoFacebook } from 'ionicons/icons';
+import { errorAlert } from '../../libs/AppFedShared/utils/log';
 
 @Component({
     selector: 'app-login-email-password',
@@ -11,6 +13,7 @@ import { logoGoogle, logoFacebook } from 'ionicons/icons';
     changeDetection: ChangeDetectionStrategy.Eager,
     styleUrls: ['./login-email-password.component.sass'],
     imports: [
+        CommonModule,
         ReactiveFormsModule,
         FormsModule,
         IonicModule,
@@ -27,10 +30,14 @@ export class LoginEmailPasswordComponent implements OnInit {
 
   ngOnInit() {}
 
-  loginEmailAndPassword(form: NgForm) {
+  async loginEmailAndPassword(form: NgForm) {
     const email = form.value.email;
     const password = form.value.password;
-    this.AuthService.logInViaEmailAndPassword(email, password);
+    try {
+      await this.AuthService.logInViaEmailAndPassword(email, password);
+    } catch (error: any) {
+      errorAlert('Error logging in: ' + (error?.message || error));
+    }
   }
 
   async loginViaGoogle() {
