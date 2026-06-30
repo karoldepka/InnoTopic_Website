@@ -217,6 +217,15 @@
   height: 22px;
 }
 
+.cat-ordinal {
+  flex-shrink: 0;
+  font-size: 0.72rem;
+  font-variant-numeric: tabular-nums;
+  color: var(--ion-color-medium);
+  min-width: 1.5em;
+  text-align: right;
+}
+
 .cat-title,
 .cat-count {
   min-width: 0;
@@ -304,6 +313,12 @@
 
   ion-checkbox { flex-shrink: 0; margin-top: 2px; }
   strong { flex: 1; font-size: 0.94rem; line-height: 1.35; min-width: 0; }
+}
+
+.q-ordinal {
+  color: var(--ion-color-medium);
+  font-variant-numeric: tabular-nums;
+  margin-right: 2px;
 }
 
 .q-answer {

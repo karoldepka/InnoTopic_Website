@@ -13,6 +13,7 @@ import { AlertController, IonicModule } from '@ionic/angular';
 import {
   ColumnDef,
   ExpandedState,
+  Row,
   createAngularTable,
   getCoreRowModel,
   getExpandedRowModel,
@@ -219,6 +220,11 @@ export class AiQaPage implements OnInit {
   }
 
   addRootCategory(): void { this.gen.tree.set(addCategoryChild(this.gen.tree())); }
+
+  /** Hierarchical ordinal for a category row, e.g. "1", "1.2", "1.2.1". */
+  categoryOrdinal(row: Row<CategoryNode>): string {
+    return [...row.getParentRows(), row].map(r => r.index + 1).join('.');
+  }
 
   addChild(parentId: string): void {
     this.gen.tree.set(addCategoryChild(this.gen.tree(), parentId));

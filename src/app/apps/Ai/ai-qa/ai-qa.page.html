@@ -127,6 +127,7 @@
                     } @else {
                       <span class="cat-toggler-spacer"></span>
                     }
+                    <span class="cat-ordinal">{{ categoryOrdinal(row) }}</span>
                     <input
                       class="cat-title"
                       [value]="row.original.title"
@@ -240,7 +241,7 @@
                   (ionChange)="toggleQSelected(i)"
                   aria-label="Select question"
                 ></ion-checkbox>
-                <strong>{{ item.question }}</strong>
+                <strong><span class="q-ordinal">{{ i + 1 }}.</span> {{ item.question }}</strong>
                 <ion-button
                   fill="clear"
                   size="small"
