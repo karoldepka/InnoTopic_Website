@@ -13,6 +13,10 @@ export class FieldFilter<TItem> {
 
 export class ListOptionsData {
   preset ! : string
+  /** Hide AI-generated items from the list. */
+  hideAiGenerated ? : boolean
+  /** Hide unreviewed draft items from the list. */
+  hideDrafts ? : boolean
 }
 
 export class ListOptions {

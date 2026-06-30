@@ -64,6 +64,14 @@ export class ListOptionsComponent extends BaseComponent implements OnInit {
     })
   }
 
+  setHideAiGenerated(checked: boolean) {
+    this.listOptions$P.patchThrottled({ hideAiGenerated: checked })
+  }
+
+  setHideDrafts(checked: boolean) {
+    this.listOptions$P.patchThrottled({ hideDrafts: checked })
+  }
+
   loadAll(b: boolean) {
     this.itemsService.loadAllItemsFromServer()
   }

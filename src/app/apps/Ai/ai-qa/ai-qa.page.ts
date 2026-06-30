@@ -9,7 +9,7 @@ import {
   signal,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { AlertController, IonicModule } from '@ionic/angular';
+import { AlertController, IonicModule, ToastController } from '@ionic/angular';
 import {
   ColumnDef,
   ExpandedState,
@@ -29,6 +29,10 @@ import {
 } from '../shared/ai-qa-tree.utils';
 import { AiQaGeneratorService } from '../shared/ai-qa-generator.service';
 import { QaDraftStore } from '../shared/qa-draft.store';
+import { LearnItemItemsService } from '../../Learn/core/learn-item-items.service';
+import { LearnItem } from '../../Learn/models/LearnItem';
+import { LearnItem$ } from '../../Learn/models/LearnItem$';
+import { OdmBackend } from '../../../libs/AppFedShared/odm/OdmBackend';
 
 @Component({
   selector: 'app-ai-qa',
@@ -43,6 +47,8 @@ export class AiQaPage implements OnInit {
   private readonly aiBackend = inject(AiBackendService);
   private readonly draftStore = inject(QaDraftStore);
   private readonly alertCtrl = inject(AlertController);
+  private readonly learnItems = inject(LearnItemItemsService);
+  private readonly toastCtrl = inject(ToastController);
 
   readonly topic = signal('Agentic AI & UI interview questions');
   readonly webSearch = signal(true);
@@ -217,6 +223,59 @@ export class AiQaPage implements OnInit {
   rejectSelected(): void {
     this.gen.rejectQuestions(this.selectedQIndices());
     this.selectedQIndices.set(new Set<number>());
+  }
+
+  /** Persist the generated categories + Q&A into the Learn store as AI drafts,
+   * using the unified OdmItem$2 tree model (createChild => parentIds + orderNum + save).
+   * Categories are saved with isCategory=true so they show in /learn but are excluded
+   * from the quiz; every saved item is stamped draftedByAIAt + draftedAt. */
+  async saveToLearn(): Promise<void> {
+    const now = OdmBackend.nowTimestamp();
+    const categoryIdToItem = new Map<string, LearnItem$>();
+
+    const saveCategory = (node: CategoryNode, parentItem: LearnItem$ | undefined): void => {
+      const data: Partial<LearnItem> = {
+        title: node.title,
+        isCategory: true,
+        draftedByAIAt: now,
+        draftedAt: now,
+      };
+      const item = parentItem
+        ? parentItem.createChild(data)
+        : this.learnItems.add(Object.assign(new LearnItem(), data));
+      categoryIdToItem.set(node.id, item);
+      for (const child of node.children ?? []) {
+        saveCategory(child, item);
+      }
+    };
+    for (const root of this.gen.tree()) {
+      saveCategory(root, undefined);
+    }
+
+    let qaCount = 0;
+    for (const qa of this.gen.questions()) {
+      const data: Partial<LearnItem> = {
+        title: qa.question,
+        answer: qa.answer,
+        draftedByAIAt: now,
+        draftedAt: now,
+      };
+      const categoryItem = categoryIdToItem.get(qa.categoryId);
+      if (categoryItem) {
+        categoryItem.createChild(data);
+      } else {
+        this.learnItems.add(Object.assign(new LearnItem(), data));
+      }
+      qaCount++;
+    }
+
+    const toast = await this.toastCtrl.create({
+      message: `Saved ${categoryIdToItem.size} categories and ${qaCount} Q&A to Learn (as AI drafts).`,
+      duration: 2500,
+      position: 'top',
+      color: 'success',
+    });
+    await toast.present();
   }
 
   addRootCategory(): void { this.gen.tree.set(addCategoryChild(this.gen.tree())); }

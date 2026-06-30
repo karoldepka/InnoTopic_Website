@@ -194,6 +194,15 @@
           ></ion-icon>
           {{ gen.questionLoading() ? 'Stop' : 'Generate Q&A' }}
         </ion-button>
+        <ion-button
+          fill="outline"
+          color="tertiary"
+          [disabled]="gen.questionLoading() || (!gen.tree().length && !gen.questions().length)"
+          (click)="saveToLearn()"
+        >
+          <ion-icon name="save-outline" slot="start"></ion-icon>
+          Save to Learn
+        </ion-button>
       </div>
     </section>
 

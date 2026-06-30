@@ -144,6 +144,13 @@ export class QuizService {
   /** Potentially move to QuizItemChooser or QuizItemsFilter... */
   private filterByOptions(quizOptions: QuizOptions, item$s: LearnItem$[]) {
 
+    // Category nodes are organizational only — never quizzed.
+    item$s = item$s.filter(item => ! item.val?.isCategory)
+    // AI-generated items can be optionally excluded from the quiz.
+    if (quizOptions.skipAiGenerated) {
+      item$s = item$s.filter(item => ! item.val?.isAiGenerated())
+    }
+
     // FIXME: perf: one .filter() call, with multiple predicates
     if (quizOptions.onlyWithQA) {
       item$s = item$s.filter(item => item.val?.hasQAndA())

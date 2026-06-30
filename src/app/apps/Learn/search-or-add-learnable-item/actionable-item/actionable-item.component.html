@@ -17,6 +17,10 @@
     {{index+1}}.
   </span>
 
+  <ion-badge *ngIf="item.val?.isCategory" color="medium" style="margin-right: 5px">CATEGORY</ion-badge>
+  <ion-badge *ngIf="item.val?.isAiGenerated()" color="tertiary" style="margin-right: 5px">AI</ion-badge>
+  <ion-badge *ngIf="item.val?.isDraft()" color="warning" style="margin-right: 5px">DRAFT</ion-badge>
+
   <!-- FIXME icon task / learnable / journal-entry / note -->
   <ion-note *ngIf="g.feat.roiPoints.showUgly && item.val?.isTask">
     TASK {{((item.getEffectiveRoi() || 0) * 1000000).toFixed(3)}} ROI

@@ -176,6 +176,8 @@ export class ListProcessing {
     const preset = opts?.preset
 
     const items = this.item$s.filter(item => ! item.val?.whenDeleted)
+      .filter(item => ! opts?.hideAiGenerated || ! item.val?.isAiGenerated())
+      .filter(item => ! opts?.hideDrafts || ! item.val?.isDraft())
 
     if (preset === `lastModified`) {
       this.filteredItem$s = items.filter(

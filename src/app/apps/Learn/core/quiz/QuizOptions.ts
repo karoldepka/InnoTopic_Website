@@ -15,6 +15,8 @@ export class QuizOptions {
     public categories = '',
     public textFilter = '',
     public minImportanceLevel: ImportanceVal = importanceDescriptors.undefined,
+    /** Skip AI-generated items in the quiz (categories are always skipped regardless). */
+    public skipAiGenerated: boolean = false,
     // TODO: priorityByImportances: 0 .. 1 -- 0 - ignore importances, 1 - items of highest importance go first
     // in-between - probabilities
   ) {
