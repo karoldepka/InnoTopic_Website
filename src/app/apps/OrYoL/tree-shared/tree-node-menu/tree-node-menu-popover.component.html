@@ -58,14 +58,13 @@ In n Places:
   Created: {{getWhenCreated()?.toISOString()}}
 </p>
 
-<ion-item lines="none">
-  <ion-checkbox
-    slot="start"
-    [checked]="!!treeNode.content.itemData?.isDone"
-    (ionChange)="toggleDone()"
-  ></ion-checkbox>
-  <ion-label>Done</ion-label>
-</ion-item>
+<ion-checkbox
+  labelPlacement="end"
+  [checked]="!!treeNode.content.itemData?.isDone"
+  (ionChange)="toggleDone()"
+>
+  Done
+</ion-checkbox>
 
 <app-node-class-picker
 ></app-node-class-picker>
