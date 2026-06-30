@@ -1,6 +1,6 @@
 import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { AuthService } from '../auth.service';
+import { AuthService, describeAuthError } from '../auth.service';
 import { NgForm, ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { IonicModule } from '@ionic/angular';
 import { addIcons } from 'ionicons';
@@ -36,7 +36,7 @@ export class LoginEmailPasswordComponent implements OnInit {
     try {
       await this.AuthService.logInViaEmailAndPassword(email, password);
     } catch (error: any) {
-      errorAlert('Error logging in: ' + (error?.message || error));
+      errorAlert('Error logging in: ' + describeAuthError(error, 'Error logging in'));
     }
   }
 

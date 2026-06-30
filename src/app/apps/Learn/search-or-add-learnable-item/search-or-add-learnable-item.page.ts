@@ -37,6 +37,8 @@ import { SelectionInfoComponent } from './selection-info/selection-info.componen
 import { LearnStatsComponent } from './learn-stats/learn-stats.component';
 import { MicComponent } from './mic/mic.component';
 import { ItemListComponent } from './item-list/item-list.component';
+import { addIcons } from 'ionicons';
+import { logoGoogle, logoFacebook, mailOutline } from 'ionicons/icons';
 
 /** TODO: rename to smth simpler more standard like LearnDoItemsPage (search-or-add is kinda implied, especially search) */
 @Component({
@@ -100,6 +102,7 @@ export class SearchOrAddLearnableItemPageComponent extends BaseComponent impleme
     injector: Injector,
   ) {
     super(injector)
+    addIcons({ logoGoogle, logoFacebook, mailOutline })
   }
 
   ngOnInit() {

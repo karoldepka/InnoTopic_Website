@@ -14,6 +14,36 @@ import {AuthFacadeService} from './auth-facade.service'
 
 export type UserId = string
 
+/** Turn a raw Firebase/Supabase auth error into a clear, user-friendly message. */
+export function describeAuthError(error: any, fallback = 'Authentication failed'): string {
+  const code = String(error?.code ?? '').toLowerCase()
+  const message = String(error?.message ?? '').toLowerCase()
+  const combined = `${code} ${message}`
+
+  if (combined.includes('auth/network-request-failed') || combined.includes('network')) {
+    return 'Network error: could not reach the authentication server. Check your internet connection (and any ad/privacy blockers or VPN) and try again.'
+  }
+  if (combined.includes('auth/wrong-password') || combined.includes('auth/invalid-credential') || combined.includes('invalid login credentials')) {
+    return 'Incorrect email or password.'
+  }
+  if (combined.includes('auth/user-not-found')) {
+    return 'No account found with that email.'
+  }
+  if (combined.includes('auth/invalid-email')) {
+    return 'That email address is not valid.'
+  }
+  if (combined.includes('auth/too-many-requests')) {
+    return 'Too many attempts. Please wait a moment and try again.'
+  }
+  if (combined.includes('auth/user-disabled')) {
+    return 'This account has been disabled.'
+  }
+  if (combined.includes('auth/weak-password')) {
+    return 'Password is too weak. Use at least 6 characters.'
+  }
+  return error?.message || fallback
+}
+
 @Injectable({
   providedIn: 'root',
 })
@@ -158,7 +188,7 @@ export class AuthService {
             console.warn('Google sign-in popup was interrupted (closed or blocked). Retrying via redirect may be required.', error);
             return null;
           }
-          errorAlert('Error logging in via Google ' + error);
+          errorAlert('Error logging in via Google: ' + describeAuthError(error, 'Error logging in via Google'));
           return null;
         })
         .finally(() => {
@@ -183,7 +213,7 @@ export class AuthService {
           console.warn('Facebook sign-in popup was interrupted (closed or blocked). Retrying via redirect may be required.', error);
           return null;
         }
-        errorAlert('Error logging in via Facebook ' + error);
+        errorAlert('Error logging in via Facebook: ' + describeAuthError(error, 'Error logging in via Facebook'));
         return null;
       })
       .finally(() => {

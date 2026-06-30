@@ -1,7 +1,7 @@
 import { Component, OnInit, ChangeDetectionStrategy, OnDestroy } from '@angular/core';
 import { NgForm, ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { AngularFireAuth } from '@angular/fire/compat/auth';
-import { AuthService } from '../auth.service';
+import { AuthService, describeAuthError } from '../auth.service';
 import { IonicModule, ModalController } from '@ionic/angular';
 import { CommonModule } from '@angular/common';
 import { Subject } from 'rxjs';
@@ -103,8 +103,8 @@ export class SignupEmailPasswordComponent implements OnInit, OnDestroy {
           this.signupError = ''
           this.showAccountLinkModal(email, password)
         } else {
-          this.signupError = error?.message || 'Error signing up'
-          errorAlert('Error signing up: ' + (error?.message || error))
+          this.signupError = describeAuthError(error, 'Error signing up')
+          errorAlert('Error signing up: ' + describeAuthError(error, 'Error signing up'))
         }
       })
   }
@@ -173,8 +173,8 @@ export class SignupEmailPasswordComponent implements OnInit, OnDestroy {
         await this.AuthService.linkWithEmailPassword(this.pendingEmail, this.pendingNewPassword)
         this.closeLinkModal()
       } catch (error: any) {
-        this.linkingError = error?.message || 'Error linking account. Try using Google or Facebook instead.'
-        errorAlert('Error linking account: ' + (error?.message || error))
+        this.linkingError = describeAuthError(error, 'Error linking account. Try using Google or Facebook instead.')
+        errorAlert('Error linking account: ' + describeAuthError(error, 'Error linking account'))
       } finally {
         this.isLinkingWithPassword = false
       }
@@ -188,8 +188,8 @@ export class SignupEmailPasswordComponent implements OnInit, OnDestroy {
       await this.AuthService.logInViaEmailAndPassword(this.pendingEmail, this.existingAccountPassword)
       this.closeLinkModal()
     } catch (error: any) {
-      this.linkingError = error?.message || 'Incorrect password or email'
-      errorAlert('Error logging in to existing account: ' + (error?.message || error))
+      this.linkingError = describeAuthError(error, 'Incorrect password or email')
+      errorAlert('Error logging in to existing account: ' + describeAuthError(error, 'Error logging in'))
     } finally {
       this.isLinkingWithPassword = false
     }
@@ -242,8 +242,8 @@ export class SignupEmailPasswordComponent implements OnInit, OnDestroy {
       await this.AuthService.linkWithEmailPassword(this.pendingEmail, this.pendingNewPassword)
       this.closeLinkModal()
     } catch (error: any) {
-      this.linkingError = error?.message || 'Error linking Google account'
-      errorAlert('Error linking Google account: ' + (error?.message || error))
+      this.linkingError = describeAuthError(error, 'Error linking Google account')
+      errorAlert('Error linking Google account: ' + describeAuthError(error, 'Error linking Google account'))
     } finally {
       this.isLinkingWithPassword = false
     }
@@ -269,8 +269,8 @@ export class SignupEmailPasswordComponent implements OnInit, OnDestroy {
       await this.AuthService.linkWithEmailPassword(this.pendingEmail, this.pendingNewPassword)
       this.closeLinkModal()
     } catch (error: any) {
-      this.linkingError = error?.message || 'Error linking Facebook account'
-      errorAlert('Error linking Facebook account: ' + (error?.message || error))
+      this.linkingError = describeAuthError(error, 'Error linking Facebook account')
+      errorAlert('Error linking Facebook account: ' + describeAuthError(error, 'Error linking Facebook account'))
     } finally {
       this.isLinkingWithPassword = false
     }
