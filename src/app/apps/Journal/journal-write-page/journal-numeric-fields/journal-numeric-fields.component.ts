@@ -33,6 +33,8 @@ export class JournalNumericFieldsComponent implements OnInit {
 
   showAll = false
 
+  openCommentFieldIds = new Set<string>()
+
   get isSearchEntered() {
     return this.search ?. trim() ?. length
   }
@@ -43,12 +45,32 @@ export class JournalNumericFieldsComponent implements OnInit {
 
   onChangeNumericValue(numericPickerVal: NumericPickerVal, descriptor: JournalNumericDescriptor) {
     const patch: any = {}
-    // TODO: figure out deep patches by path strings like in firebase (to prevent data loss)
-    const fieldVal: JournalCompositeFieldVal = {
-      numVal: numericPickerVal
-      // later: comments, maybe lastModified etc.
+    const existing: JournalCompositeFieldVal = (this.journalEntry$.currentVal as any)?.[descriptor.id!] ?? {}
+    patch[descriptor.id!] = { ...existing, numVal: numericPickerVal }
+    this.journalEntry$.patchThrottled(patch)
+  }
+
+  toggleComment(descriptor: JournalNumericDescriptor) {
+    const id = descriptor.id!
+    if (this.openCommentFieldIds.has(id)) {
+      this.openCommentFieldIds.delete(id)
+    } else {
+      this.openCommentFieldIds.add(id)
     }
-    patch[descriptor.id !] = fieldVal
+  }
+
+  isCommentOpen(descriptor: JournalNumericDescriptor): boolean {
+    return this.openCommentFieldIds.has(descriptor.id!) || !!this.getComment(descriptor)
+  }
+
+  getComment(descriptor: JournalNumericDescriptor): string {
+    return (this.journalEntry$.currentVal as any)?.[descriptor.id!]?.comment ?? ''
+  }
+
+  onChangeComment(comment: string | null | undefined, descriptor: JournalNumericDescriptor) {
+    const patch: any = {}
+    const existing: JournalCompositeFieldVal = (this.journalEntry$.currentVal as any)?.[descriptor.id!] ?? {}
+    patch[descriptor.id!] = { ...existing, comment: comment ?? '' }
     this.journalEntry$.patchThrottled(patch)
   }
 

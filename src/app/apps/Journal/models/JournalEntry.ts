@@ -13,7 +13,7 @@ export type JournalFieldVal = string
 /* Or: "metrics" */
 export interface JournalCompositeFieldVal {
   numVal: NumericPickerVal
-  // later: comments, maybe lastModified etc.
+  comment?: string
 }
 
 
