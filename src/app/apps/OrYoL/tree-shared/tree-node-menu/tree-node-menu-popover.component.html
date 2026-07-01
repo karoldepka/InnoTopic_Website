@@ -13,7 +13,6 @@
   <!--<app-time-tracking-menu [treeNode]="treeNode"></app-time-tracking-menu>-->
 
   <ion-button
-    style="height: 3rem; text-transform: uppercase"
     (click)='addChild()'>
     Add Sub-Item
   </ion-button>
@@ -47,14 +46,14 @@
   <ion-button
     *ngIf="clipboardService.hasContent"
     (click)='pasteCopyHereFromClipboard()'>
-    Copy here from clipboard
+    Copy Here From Clipboard
   </ion-button>
 
   <ion-button
     *ngIf="clipboardService.hasContent"
     class="btn btn-primary"
     (click)='pasteMoveHereFromClipboard()'>
-    Move here from clipboard
+    Move Here From Clipboard
   </ion-button>
   <p style="margin-top: .5em">
     Created: {{getWhenCreated()?.toISOString()}}
