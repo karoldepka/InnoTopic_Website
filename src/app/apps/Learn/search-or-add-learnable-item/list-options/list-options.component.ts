@@ -8,6 +8,7 @@ import {BaseComponent} from '../../../../libs/AppFedShared/base/base.component'
 import {OdmService2} from '../../../../libs/AppFedShared/odm/OdmService2'
 import { IonicModule } from '@ionic/angular';
 import { NgIf } from '@angular/common';
+import { g } from '../../../../libs/AppFedShared/g'
 
 @Component({
     selector: 'app-list-options',
@@ -37,12 +38,7 @@ export class ListOptionsComponent extends BaseComponent implements OnInit {
 
   features = this.featureService
 
-  // /** idea for global stuff without having to add services to constructor all the time a million times
-  //  * keep names super short, the more popular smth is */
-  // g = {
-  //   // options / preferences
-  //   feat: this.features
-  // }
+  readonly g = g
 
   constructor(
     public featureService: FeatureService,
@@ -72,7 +68,7 @@ export class ListOptionsComponent extends BaseComponent implements OnInit {
     this.listOptions$P.patchThrottled({ hideDrafts: checked })
   }
 
-  loadAll(b: boolean) {
+  loadAll() {
     this.itemsService.loadAllItemsFromServer()
   }
 }
