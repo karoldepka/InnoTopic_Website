@@ -67,7 +67,7 @@ export class FirestoreOdmCollectionBackend<TRaw> extends OdmCollectionBackend<TR
           ancestorIds
         } : {}),
       })
-      const retPromise = this.inInjectionContext(() => this.itemDoc(id).set(dataToSave/*.toDbFormat()*/))
+      const retPromise = this.inInjectionContext(() => this.itemDoc(id).set(dataToSave/*.toDbFormat()*/, { merge: true }))
       retPromise.catch(error => {
         this.errorAlert('saveNowToDb this.itemDoc(id).set retPromise.catch', error)
       })
