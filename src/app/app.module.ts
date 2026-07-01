@@ -37,7 +37,7 @@ function copilotAgUiUrl(): string {
 }
 
 @NgModule({
-    declarations: [],
+    declarations: [AppComponent],
     imports: [
         BrowserModule,
         IonicModule.forRoot({

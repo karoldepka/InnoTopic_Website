@@ -1,6 +1,6 @@
 import {Component, HostListener, ChangeDetectionStrategy} from '@angular/core';
 
-import {Platform, PopoverController, IonicModule} from '@ionic/angular';
+import {Platform, PopoverController} from '@ionic/angular';
 import { SplashScreen } from '@ionic-native/splash-screen/ngx';
 import { StatusBar } from '@ionic-native/status-bar/ngx';
 import {TimerNotificationsService} from "./core/timer-notifications.service";
@@ -15,8 +15,7 @@ import {FeatureService} from './libs/AppFedShared/feature.service'
 // import {fakeExportToNotLookUnused} from '../background/background'
 
 @Component({
-  standalone: true,
-  imports: [IonicModule],
+  standalone: false,
   selector: 'app-root',
   changeDetection: ChangeDetectionStrategy.Eager,
   templateUrl: 'app.component.html'

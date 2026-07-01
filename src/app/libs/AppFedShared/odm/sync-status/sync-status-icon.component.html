@@ -18,9 +18,10 @@
   [title]="(fullscreenService.isFullscreen$ | async) ? 'Exit fullscreen' : 'Enter fullscreen'"
   style="--padding-start: 4px; --padding-end: 4px"
 >
-  <i class="material-icons" style="color: var(--ion-color-primary); font-size: 22px">
-    {{ (fullscreenService.isFullscreen$ | async) ? 'fullscreen_exit' : 'fullscreen' }}
-  </i>
+  <ion-icon
+    [name]="(fullscreenService.isFullscreen$ | async) ? 'contract-outline' : 'expand-outline'"
+    style="color: var(--ion-color-primary); font-size: 22px"
+  ></ion-icon>
 </ion-button>
 
 <div style="position: relative; height: 25px; display: flex; align-items: center"
