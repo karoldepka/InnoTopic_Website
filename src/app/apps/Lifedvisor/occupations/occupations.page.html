@@ -9,11 +9,8 @@
 </ion-header>
 
 <ion-content>
-  <ion-item
+  <ion-checkbox
     *ngFor="let occupation of occupations"
-  >
-    <ion-label>{{occupation.id}}</ion-label>
-    <ion-checkbox
-    ></ion-checkbox>
-  </ion-item>
+    labelPlacement="end"
+  >{{occupation.id}}</ion-checkbox>
 </ion-content>

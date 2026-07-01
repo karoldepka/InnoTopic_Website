@@ -100,16 +100,13 @@
     </div>
   </div>
 
-  <ion-item *ngIf="wish.ifYesSortedByScoreFiltered ?. length || wish.embedMedia" id="howToImproveCheckbox"
-            class="howToImproveCheckbox"
-            lines="none"
-  >
-    <ion-label>How to improve?</ion-label>
-    <ion-checkbox
-      slot="start"
-      [(ngModel)]="isExpandedManually"
-    ></ion-checkbox>
-  </ion-item>
+  <ion-checkbox
+    *ngIf="wish.ifYesSortedByScoreFiltered ?. length || wish.embedMedia"
+    id="howToImproveCheckbox"
+    class="howToImproveCheckbox"
+    labelPlacement="end"
+    [(ngModel)]="isExpandedManually"
+  >How to improve?</ion-checkbox>
 
   <app-hint-embed-media
     *ngIf="wish.embedMedia"

@@ -4,19 +4,10 @@
   (click)="loadAll(false)"
 ><ion-icon slot=start name="download-outline" />Load all</ion-button>
 
-<ion-item>
-
-
-  <ion-checkbox
-    [formControl]="formControl"
-  >
-  </ion-checkbox>
-
-
-  <ion-title>
-    Sort ascending
-  </ion-title>
-</ion-item>
+<ion-checkbox
+  labelPlacement="end"
+  [formControl]="formControl"
+>Sort ascending</ion-checkbox>
 
 
 <!-- filter by mood, productivity, importance, health -->

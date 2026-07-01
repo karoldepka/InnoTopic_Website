@@ -5,22 +5,16 @@
     (click)="loadAll(false)"
   ><ion-icon slot=start name="download-outline" />Load all</ion-button>
 
-  <ion-item lines="none">
-    <ion-checkbox
-      slot="start"
-      [checked]="!! listOptions$P.locallyVisibleChanges$.lastVal?.hideAiGenerated"
-      (ionChange)="setHideAiGenerated($any($event).detail.checked)"
-    ></ion-checkbox>
-    <ion-label>Hide AI-generated</ion-label>
-  </ion-item>
-  <ion-item lines="none">
-    <ion-checkbox
-      slot="start"
-      [checked]="!! listOptions$P.locallyVisibleChanges$.lastVal?.hideDrafts"
-      (ionChange)="setHideDrafts($any($event).detail.checked)"
-    ></ion-checkbox>
-    <ion-label>Hide drafts</ion-label>
-  </ion-item>
+  <ion-checkbox
+    labelPlacement="end"
+    [checked]="!! listOptions$P.locallyVisibleChanges$.lastVal?.hideAiGenerated"
+    (ionChange)="setHideAiGenerated($any($event).detail.checked)"
+  >Hide AI-generated</ion-checkbox>
+  <ion-checkbox
+    labelPlacement="end"
+    [checked]="!! listOptions$P.locallyVisibleChanges$.lastVal?.hideDrafts"
+    (ionChange)="setHideDrafts($any($event).detail.checked)"
+  >Hide drafts</ion-checkbox>
 
 
   <!-- General filtering:

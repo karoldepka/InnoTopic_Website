@@ -31,14 +31,11 @@
   </ion-item>
 
 
-  <ion-item lines="none">
-    <ion-label>Expand All</ion-label>
-    <ion-checkbox
-        id="expandAllButton"
-        slot="start"
-        [(ngModel)]="isExpandAll"
-    ></ion-checkbox>
-  </ion-item>
+  <ion-checkbox
+    id="expandAllButton"
+    labelPlacement="end"
+    [(ngModel)]="isExpandAll"
+  >Expand All</ion-checkbox>
 
 </ion-header>
 

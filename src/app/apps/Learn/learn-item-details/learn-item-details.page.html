@@ -132,25 +132,16 @@
       [item$]="item$"
     />
 
-    <ion-item
-      lines="none"
-      button="true"
-      detail="false"
-      (click)="toggleWhenDone()"
+    <ion-checkbox
+      labelPlacement="end"
+      [checked]="!!itemVal?.whenDone"
+      (ionChange)="toggleWhenDone()"
     >
-      <ion-checkbox
-        slot="start"
-        [checked]="!!itemVal?.whenDone"
-        (click)="$event.stopPropagation()"
-        (ionChange)="toggleWhenDone()"
-      />
-      <ion-label>
-        Done
-        <div *ngIf="itemVal?.whenDone" style="font-size: 0.85em; opacity: 0.75; margin-top: 2px">
-          {{ itemVal?.whenDone?.toISOString?.() }}
-        </div>
-      </ion-label>
-    </ion-item>
+      Done
+      <div *ngIf="itemVal?.whenDone" style="font-size: 0.85em; opacity: 0.75; margin-top: 2px">
+        {{ itemVal?.whenDone?.toISOString?.() }}
+      </div>
+    </ion-checkbox>
 
     <app-self-rating
       *ngIf="feat.potentiallyDangerous"
