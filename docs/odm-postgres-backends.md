@@ -1,10 +1,11 @@
 # LifeSuite ODM Postgres Backends
 
-The app now has three ODM backend options:
+The app now has four ODM backend options:
 
 - `firestore` keeps the existing AngularFire implementation.
 - `supabase` uses `@supabase/supabase-js`, PostgREST, and Supabase Realtime against `public.lifesuite_odm_items`.
 - `neon` uses the Angular `HttpClient` adapter against the FastAPI endpoints under `/api/odm`, keeping the Neon connection string on the server.
+- `fanout` reads from Firestore (still primary) and mirrors every save/delete, plus every item read back from Firestore, into both Supabase and Neon. Use this during the migration to backfill Postgres passively — just by using the app — before cutting reads over to `supabase` or `neon`.
 
 Set the active backend in `src/environments/environment.base.ts`:
 

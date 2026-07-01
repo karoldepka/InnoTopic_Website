@@ -13,6 +13,7 @@ import {FirestoreOdmBackend} from '../../AppFedSharedFirebase/odm-firestore/fire
 import {SupabaseOdmBackend} from '../../AppFedSharedSupabase/odm-supabase/supabase-odm-backend.service'
 import {SupabaseOdmClientService} from '../../AppFedSharedSupabase/odm-supabase/supabase-odm-client.service'
 import {NeonOdmBackend} from '../../AppFedSharedNeon/odm-neon/neon-odm-backend.service'
+import {FanoutOdmBackend} from '../../AppFedSharedFanout/odm-fanout/FanoutOdmBackend'
 
 export function odmBackendFactory(injector: Injector): OdmBackend {
   const backendName = (environment as any).odmBackend ?? 'firestore'
@@ -21,6 +22,9 @@ export function odmBackendFactory(injector: Injector): OdmBackend {
   }
   if (backendName === 'neon') {
     return injector.get(NeonOdmBackend)
+  }
+  if (backendName === 'fanout') {
+    return injector.get(FanoutOdmBackend)
   }
   return new FirestoreOdmBackend(injector, injector.get(AngularFirestore))
 }
@@ -39,6 +43,7 @@ export function odmBackendFactory(injector: Injector): OdmBackend {
     SupabaseOdmClientService,
     SupabaseOdmBackend,
     NeonOdmBackend,
+    FanoutOdmBackend,
     {
       provide: OdmBackend,
       useFactory: odmBackendFactory,

@@ -7,7 +7,7 @@ export const environmentBase = {
   collectionNameSuffix: '',
   // collectionNameSuffix: '_DEBUG',
 
-  odmBackend: 'firestore',
+  odmBackend: 'firestore', // or 'supabase' or 'neon' or 'fanout' (Firestore reads, mirrored to Supabase+Neon)
   authBackend: 'firebase',
 
   supabase: {
