@@ -2,7 +2,7 @@
 >
   <!--  //  (click)="logIn()"-->
 
-  APP & SYNC STATUS
+  App & Sync Status
 </h4>
 <app-about-app></app-about-app>
 <!-- TODO config component -->
@@ -19,7 +19,7 @@
   <ng-container
     *ngIf="(syncStatus$ | async)?.pendingUploadsCount let count; else allUploaded"
   >
-    TO UPLOAD: {{count}}
+    To upload: {{count}}
     <ul>
       <li *ngFor="let description of pendingUploadDescriptions(syncStatus$ | async)">
         {{description}}
@@ -31,19 +31,19 @@
   <ng-container
     *ngIf="(syncStatus$ | async)?.pendingDownloadsCount let count; else allDownloaded"
   >
-    DOWNLOADING: {{count}} collections: {{toArray($safeNavigationMigration((syncStatus$ | async)?.pendingDownloads)) | json}}
+    Downloading: {{count}} collections: {{toArray($safeNavigationMigration((syncStatus$ | async)?.pendingDownloads)) | json}}
   </ng-container>
 
   <ng-template
     #allUploaded
   >
-    <p>ALL UPLOADED!</p>
+    <p>All uploaded!</p>
   </ng-template>
 
   <ng-template
     #allDownloaded
   >
-    <p>ALL DOWNLOADED!</p>
+    <p>All downloaded!</p>
   </ng-template>
 
 </div>
@@ -56,7 +56,7 @@
 
 <ion-button
     (click)="logIn()"
->LOG IN</ion-button>
+>Log In</ion-button>
 
 
 <br />
@@ -65,15 +65,15 @@
   (click)="logOut()"
   size="small"
 >
-  LOG OUT
+  Log Out
 </ion-button>
 
 <!--<ion-button-->
 <!--  *ngIf="g.feat.showDebug"-->
 <!--  (click)="learnStatsService.saveStatsFromItemsNow()">-->
-<!--  SAVE STATS-->
+<!--  Save Stats-->
 <!--</ion-button>-->
 
 <ion-button (click)="openOptions()">
-  OPTIONS
+  Options
 </ion-button>
