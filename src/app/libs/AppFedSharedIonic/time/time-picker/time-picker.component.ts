@@ -1,5 +1,5 @@
 import {Component, EventEmitter, Input, OnInit, Output, ChangeDetectionStrategy, CUSTOM_ELEMENTS_SCHEMA} from '@angular/core';
-import {PickerController, IonButton, IonItem, IonLabel, IonCheckbox} from "@ionic/angular/standalone";
+import {PickerController, IonButton, IonCheckbox} from "@ionic/angular/standalone";
 import { NumberPickerComponent } from '../../../AppFedShared/time/number-picker/number-picker.component';
 import { NgIf } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -9,7 +9,7 @@ import { FormsModule } from '@angular/forms';
     templateUrl: './time-picker.component.html',
     changeDetection: ChangeDetectionStrategy.Eager,
     styleUrls: ['./time-picker.component.scss'],
-    imports: [NumberPickerComponent, NgIf, FormsModule, IonButton, IonItem, IonLabel, IonCheckbox],
+    imports: [NumberPickerComponent, NgIf, FormsModule, IonButton, IonCheckbox],
     schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
 export class TimePickerComponent implements OnInit {
