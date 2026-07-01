@@ -38,7 +38,7 @@ export class ListOptionsComponent extends BaseComponent implements OnInit {
 
   features = this.featureService
 
-  readonly g = g
+  override readonly g = g
 
   constructor(
     public featureService: FeatureService,
