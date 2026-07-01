@@ -72,6 +72,7 @@ export const importanceButtonsDesc = new ButtonsDescriptor<any, string>([
       // intensityBtnVariant(`OvrMeta`, importanceDescriptors.overarching_meta),
       intensityBtnVariant(`OvrMetaMtr`, importanceDescriptors.overarching_meta_mantra),
       intensityBtnVariant(`Pinned`, importanceDescriptors.pinned),
+      intensityBtnVariant(`Poster`, importanceDescriptors.poster),
     ]
   }),
 ])

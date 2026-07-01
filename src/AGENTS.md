@@ -15,7 +15,10 @@ Destructive or disturbing changes should require confirmation and should have un
 Actions that are easy to undo manually (e.g. adding an object), should not have undo.
 
 
-We want features that Firestore offers, but I found Firestore to be expensive an buggy. E.g. "Failed to obtain primary lease for action 'Release target'" - errors without explanation of what that entails or is there gonna be recovery/retry.
+We want features that Firestore offers, but I found Firestore to be expensive and buggy. E.g. "Failed to obtain primary lease for action 'Release target'" - errors without explanation of what that entails or is there gonna be recovery/retry/respite.
+
+We don't silently ignore errors. But if there are multiple instances of same error - we don't spam the user but report the error asynchronously, e.g. via toast, not errorAlert. Or first errorAlert, then just error log.
+
 
 === Future / considerations
 

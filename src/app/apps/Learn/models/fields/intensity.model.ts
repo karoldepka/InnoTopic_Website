@@ -157,6 +157,12 @@ export class IntensityDescriptors<TDescriptor> implements Dict<any> {
           Overarching Meta Mantra.
         `
   })
+  poster
+    = intensity({numeric: 3_000_000, abbrev: `Poster`, icons: `Poster`, shortId: `Poster`,
+    description: `
+          Higher than Pinned. Physical/prominent poster-level importance - meant to be seen constantly, not just pinned in a list.
+        `
+  })
 
   /* TODO: current focus urgent, day / week /
     Could specify DEADLINE for the focus (e.g. next day, next week) -- per item or per category

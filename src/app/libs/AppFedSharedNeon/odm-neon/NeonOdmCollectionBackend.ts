@@ -4,7 +4,7 @@ import {OdmBackend} from '../../AppFedShared/odm/OdmBackend'
 import {ItemId, OdmCollectionBackend, OdmCollectionBackendListener, QueryOpts} from '../../AppFedShared/odm/OdmCollectionBackend'
 import {OdmItemId} from '../../AppFedShared/odm/OdmItemId'
 import {assertTruthy} from '../../AppFedShared/utils/assertUtils'
-import {errorAlert, errorAlertAndThrow} from '../../AppFedShared/utils/log'
+import {errorAlert} from '../../AppFedShared/utils/log'
 import {
   PostgresOdmRow,
   rawFromPostgresOdmRow,
@@ -27,7 +27,7 @@ export class NeonOdmCollectionBackend<TRaw> extends OdmCollectionBackend<TRaw> {
     injector: Injector,
     className: string,
     odmBackend: OdmBackend,
-    public readonly opts: { dontStoreVersionHistory: boolean },
+    public readonly opts: { dontStoreVersionHistory: boolean, silentErrors?: boolean },
   ) {
     super(injector, className, odmBackend)
   }
@@ -161,11 +161,18 @@ export class NeonOdmCollectionBackend<TRaw> extends OdmCollectionBackend<TRaw> {
     return userId
   }
 
+  // When used as a fanout secondary, another backend is already the primary source of truth,
+  // so a Neon-side failure shouldn't interrupt the user with a window.alert() - just log it.
   private errorAlert(...args: any[]) {
+    if (this.opts.silentErrors) {
+      console.error('[Neon ODM]', 'collectionName', this.collectionName, ...args)
+      return
+    }
     errorAlert('collectionName', this.collectionName, ...args)
   }
 
-  private errorAlertAndThrow(...args: any[]) {
-    return errorAlertAndThrow('collectionName', this.collectionName, ...args)
+  private errorAlertAndThrow(...args: any[]): never {
+    this.errorAlert(...args)
+    throw new Error(['collectionName', this.collectionName, ...args].map(String).join(' '))
   }
 }

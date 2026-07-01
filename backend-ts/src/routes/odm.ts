@@ -19,24 +19,24 @@ async function ensureTables() {
   if (!process.env['ODM_ENSURE_TABLES']) return;
   const sql = getSql();
   await sql`
-    create table if not exists public.lifesuite_odm_items (
+    create table if not exists public.odm_items (
       collection text not null,
-      item_id text not null,
+      id text not null,
       owner text not null,
       data jsonb not null default '{}'::jsonb,
       parent_ids text[] not null default '{}',
       ancestor_ids text[] not null default '{}',
       when_last_modified timestamptz not null default now(),
       when_deleted timestamptz,
-      primary key (collection, item_id)
+      primary key (collection, id)
     )
   `;
   await sql`
-    create index if not exists lifesuite_odm_items_owner_idx
-      on public.lifesuite_odm_items (owner, collection, when_last_modified desc)
+    create index if not exists odm_items_owner_idx
+      on public.odm_items (owner, collection, when_last_modified desc)
   `;
   await sql`
-    create table if not exists public.lifesuite_odm_item_history (
+    create table if not exists public.odm_item_history (
       history_id text primary key,
       collection text not null,
       item_id text not null,
@@ -64,8 +64,8 @@ odmRouter.get('/api/odm/items', async c => {
 
   // Build dynamic query
   const rows = await sql`
-    select collection, item_id, owner, data, parent_ids, ancestor_ids, when_deleted, when_last_modified
-    from public.lifesuite_odm_items
+    select collection, id as item_id, owner, data, parent_ids, ancestor_ids, when_deleted, when_last_modified
+    from public.odm_items
     where collection = ${collection}
       and owner = ${owner}
       and when_deleted is null
@@ -100,7 +100,7 @@ odmRouter.put('/api/odm/items/:collection/:item_id', async c => {
   if (body.storeVersionHistory) {
     const historyId = `${item_id}_${crypto.randomUUID()}`;
     await sql`
-      insert into public.lifesuite_odm_item_history
+      insert into public.odm_item_history
         (history_id, collection, item_id, owner, data, parent_ids, ancestor_ids)
       values (
         ${historyId}, ${collection}, ${item_id}, ${body.owner},
@@ -110,13 +110,13 @@ odmRouter.put('/api/odm/items/:collection/:item_id', async c => {
   }
 
   await sql`
-    insert into public.lifesuite_odm_items
-      (collection, item_id, owner, data, parent_ids, ancestor_ids, when_last_modified, when_deleted)
+    insert into public.odm_items
+      (collection, id, owner, data, parent_ids, ancestor_ids, when_last_modified, when_deleted)
     values (
       ${collection}, ${item_id}, ${body.owner},
       ${sql.json(body.data as Parameters<typeof sql.json>[0])}, ${body.parentIds}, ${body.ancestorIds}, now(), null
     )
-    on conflict (collection, item_id) do update set
+    on conflict (collection, id) do update set
       owner = excluded.owner,
       data = excluded.data,
       parent_ids = excluded.parent_ids,
@@ -137,9 +137,9 @@ odmRouter.post('/api/odm/items/:collection/:item_id/delete', async c => {
   const sql = getSql();
 
   await sql`
-    update public.lifesuite_odm_items
+    update public.odm_items
     set when_deleted = now(), when_last_modified = now()
-    where collection = ${collection} and item_id = ${item_id} and owner = ${body.owner}
+    where collection = ${collection} and id = ${item_id} and owner = ${body.owner}
   `;
 
   return c.json({ ok: true });

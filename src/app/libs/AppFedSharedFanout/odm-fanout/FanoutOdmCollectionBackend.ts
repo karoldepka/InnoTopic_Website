@@ -1,7 +1,6 @@
 import {Injector} from '@angular/core'
 import {ItemId, OdmCollectionBackend, OdmCollectionBackendListener, QueryOpts} from '../../AppFedShared/odm/OdmCollectionBackend'
 import {OdmItemId} from '../../AppFedShared/odm/OdmItemId'
-import {errorAlert} from '../../AppFedShared/utils/log'
 import {FanoutOdmBackend} from './FanoutOdmBackend'
 
 export class FanoutOdmCollectionBackend<TRaw> extends OdmCollectionBackend<TRaw> {
@@ -20,8 +19,11 @@ export class FanoutOdmCollectionBackend<TRaw> extends OdmCollectionBackend<TRaw>
   ) {
     super(injector, className, fanoutBackend)
     this.primary = fanoutBackend.primaryBackend.createCollectionBackend<TRaw>(injector, className, opts)
+    // Secondaries are best-effort mirrors - Firestore staying the primary is what the user's
+    // save actually depends on, so a Supabase/Neon hiccup shouldn't pop a window.alert().
+    const secondaryOpts = {...opts, silentErrors: true}
     this.secondaries = fanoutBackend.secondaryBackends.map(backend =>
-      backend.createCollectionBackend<TRaw>(injector, className, opts)
+      backend.createCollectionBackend<TRaw>(injector, className, secondaryOpts)
     )
   }
 
@@ -32,8 +34,8 @@ export class FanoutOdmCollectionBackend<TRaw> extends OdmCollectionBackend<TRaw>
 
   deleteWithoutConfirmation(itemId: OdmItemId): Promise<any> {
     for (const secondary of this.secondaries) {
-      secondary.deleteWithoutConfirmation(itemId)
-        .catch(error => this.errorAlert('fanout secondary deleteWithoutConfirmation failed', error))
+      // Secondaries already log their own failures (silentErrors) - nothing more to do here.
+      secondary.deleteWithoutConfirmation(itemId).catch(() => undefined)
     }
     return this.primary.deleteWithoutConfirmation(itemId)
   }
@@ -82,12 +84,8 @@ export class FanoutOdmCollectionBackend<TRaw> extends OdmCollectionBackend<TRaw>
     changedFieldsOnly?: Partial<TRaw>,
   ): void {
     for (const secondary of this.secondaries) {
-      secondary.saveNowToDb(item, id as ItemId, parentIds, ancestorIds, changedFieldsOnly)
-        .catch(error => this.errorAlert('fanout secondary saveNowToDb failed', error))
+      // Secondaries already log their own failures (silentErrors) - nothing more to do here.
+      secondary.saveNowToDb(item, id as ItemId, parentIds, ancestorIds, changedFieldsOnly).catch(() => undefined)
     }
-  }
-
-  private errorAlert(...args: any[]) {
-    errorAlert('collectionName', this.collectionName, ...args)
   }
 }

@@ -6,6 +6,7 @@ import {FirestoreOdmBackend} from '../../AppFedSharedFirebase/odm-firestore/fire
 import {SupabaseOdmBackend} from '../../AppFedSharedSupabase/odm-supabase/supabase-odm-backend.service'
 import {NeonOdmBackend} from '../../AppFedSharedNeon/odm-neon/neon-odm-backend.service'
 import {FanoutOdmCollectionBackend} from './FanoutOdmCollectionBackend'
+import {environment} from '../../../../environments/environment'
 
 /**
  * Firestore stays the primary/source-of-truth backend for reads during the migration.
@@ -26,7 +27,10 @@ export class FanoutOdmBackend extends OdmBackend {
   ) {
     super(injector)
     this.primaryBackend = new FirestoreOdmBackend(injector, angularFirestore)
-    this.secondaryBackends = [supabaseOdmBackend, neonOdmBackend]
+    // Neon isn't wired up (no server / connection string) yet - keep the adapter implemented
+    // but leave it out of the fanout until environment.neon.enabled is turned back on.
+    const neonEnabled = (environment as any).neon?.enabled ?? true
+    this.secondaryBackends = [supabaseOdmBackend, ...(neonEnabled ? [neonOdmBackend] : [])]
     this.initDb()
   }
 

@@ -4,14 +4,14 @@ import {JournalNumericDescriptors} from '../../../../apps/Journal/models/Journal
 import {nullish} from '../../../../libs/AppFedShared/utils/type-utils'
 import {JournalEntry} from '../../../../apps/Journal/models/JournalEntry'
 import {CachedSubject} from '../../../../libs/AppFedShared/utils/cachedSubject2/CachedSubject2'
-import { NgFor, AsyncPipe } from '@angular/common';
+import { NgFor, NgIf, AsyncPipe } from '@angular/common';
 
 @Component({
     selector: 'app-journal-num-fields-view',
     templateUrl: './journal-num-fields-view.component.html',
     styleUrls: ['./journal-num-fields-view.component.sass'],
     changeDetection: ChangeDetectionStrategy.OnPush,
-    imports: [NgFor, AsyncPipe],
+    imports: [NgFor, NgIf, AsyncPipe],
 })
 export class JournalNumFieldsViewComponent implements OnInit {
 

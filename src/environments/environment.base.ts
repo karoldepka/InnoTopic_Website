@@ -7,18 +7,19 @@ export const environmentBase = {
   collectionNameSuffix: '',
   // collectionNameSuffix: '_DEBUG',
 
-  odmBackend: 'firestore', // or 'supabase' or 'neon' or 'fanout' (Firestore reads, mirrored to Supabase+Neon)
+  odmBackend: 'fanout', // 'firestore' reads, mirrored to Supabase+Neon; or 'firestore'/'supabase'/'neon' alone
   authBackend: 'firebase',
 
   supabase: {
-    url: '',
-    publishableKey: '',
+    url: 'https://xjqivegtpzstkzabqncb.supabase.co',
+    publishableKey: 'sb_publishable_suMlx8EqAnd4jZqdPPZBrw_lWZOPxi-',
     schema: 'public',
-    odmItemsTable: 'lifesuite_odm_items',
-    odmHistoryTable: 'lifesuite_odm_item_history',
+    odmItemsTable: 'odm_items',
+    odmHistoryTable: 'odm_item_history',
   },
 
   neon: {
+    enabled: false, // no server / NEON_DATABASE_URL configured yet; flip on once it is
     odmApiUrl: 'http://localhost:8000/api/odm',
     pollIntervalMs: 5000,
   },

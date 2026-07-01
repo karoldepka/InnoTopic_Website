@@ -1,5 +1,6 @@
 import {Component, EventEmitter, Injector, Input, OnInit, Output, ChangeDetectionStrategy} from '@angular/core';
-import { btn, ButtonsDescriptor, ButtonVariantDescriptor, NumericPickerVal, NumericPickerComponent } from '../../../../libs/AppFedSharedIonic/ratings/numeric-picker/numeric-picker.component'
+import { NumericPickerVal } from '../../../../libs/AppFedSharedIonic/ratings/numeric-picker/numeric-picker.component'
+import { StarRatingComponent } from '../../../../libs/AppFedSharedIonic/ratings/star-rating/star-rating.component'
 import {errorAlert} from '../../../../libs/AppFedShared/utils/log'
 import {LearnItem$} from '../../models/LearnItem$'
 import {BaseComponent} from '../../../../libs/AppFedShared/base/base.component'
@@ -10,41 +11,16 @@ import { NgIf } from '@angular/common';
     templateUrl: './self-rating.component.html',
     changeDetection: ChangeDetectionStrategy.Eager,
     styleUrls: ['./self-rating.component.sass'],
-    imports: [NgIf, NumericPickerComponent],
+    imports: [NgIf, StarRatingComponent],
 })
 export class SelfRatingComponent extends BaseComponent implements OnInit {
 
-  buttonDescriptors = new ButtonsDescriptor<number, string>([
-    btn({
-      btnVariants: [
-        new ButtonVariantDescriptor(0),
-        new ButtonVariantDescriptor(0.5),
-        new ButtonVariantDescriptor(0.25),
-        new ButtonVariantDescriptor(0.75),
-      ],
-      color: 'danger',
-    }),
-    btn({
-      btnVariants: [
-        new ButtonVariantDescriptor(1),
-        new ButtonVariantDescriptor(1.5),
-        new ButtonVariantDescriptor(1.25),
-        new ButtonVariantDescriptor(1.75),
-      ],
-      color: 'warning',
+  maxStars = 5
 
-    }),
-    btn({
-      btnVariants: [
-        new ButtonVariantDescriptor(2),
-        new ButtonVariantDescriptor(2.5),
-        new ButtonVariantDescriptor(2.25),
-        new ButtonVariantDescriptor(2.75),
-      ],
-      color: 'success',
-    }),
-  ])
-
+  /** The interval calculator (QuizIntervalCalculator.calculateIntervalHours) exponentiates
+   * the raw rating, and was tuned against the old 0-2.75 button scale. Rescaling the 0-5
+   * star value onto that same range keeps existing interval calibration unchanged. */
+  private static readonly maxRatingValue = 2.75
 
   @Input()
   set item$(item$: LearnItem$ | undefined) {
@@ -70,13 +46,14 @@ export class SelfRatingComponent extends BaseComponent implements OnInit {
 
   ngOnInit() {}
 
-  onChangeSelfRating($event: NumericPickerVal) {
-    this.numericValue.emit($event)
+  onChangeSelfRating(starValue: NumericPickerVal) {
+    const rating = starValue * (SelfRatingComponent.maxRatingValue / this.maxStars)
+    this.numericValue.emit(rating)
     if ( this.autoSave ) {
       if ( ! this. item$ ) {
         errorAlert(`cannot onChangeSelfRating on this. item$` + this. item$)
       } else {
-        this.item$.setNewSelfRating($event)
+        this.item$.setNewSelfRating(rating)
       }
     }
   }

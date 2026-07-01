@@ -187,9 +187,6 @@ export class SearchOrAddLearnableItemPageComponent extends BaseComponent impleme
       if ( navInto ) {
         this.navigateIntoItem(item$.id !)
       }
-      if (isTask) {
-        this.presentAddedToast(item$, 'Task added.')
-      }
     } else {
       this.showAddError('I could not turn that text into an item.')
     }

@@ -2,7 +2,7 @@
   *ngIf="feat.itemsTree.mockups"
   style="color: rgba(255, 255, 255, .5); margin-left: 10px">SELF-RATING:
 </label>
-<apf-numeric-picker
+<apf-star-rating
+  [maxStars]="maxStars"
   (numericValue)="onChangeSelfRating($event)"
-  [buttonDescriptors]="buttonDescriptors"
 />

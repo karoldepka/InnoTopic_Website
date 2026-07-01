@@ -2,7 +2,7 @@ import {Injector} from '@angular/core'
 import {OdmBackend} from '../../AppFedShared/odm/OdmBackend'
 import {ItemId, OdmCollectionBackend, OdmCollectionBackendListener, QueryOpts} from '../../AppFedShared/odm/OdmCollectionBackend'
 import {OdmItemId} from '../../AppFedShared/odm/OdmItemId'
-import {errorAlert, errorAlertAndThrow} from '../../AppFedShared/utils/log'
+import {errorAlert} from '../../AppFedShared/utils/log'
 import {assertTruthy} from '../../AppFedShared/utils/assertUtils'
 import {
   createPostgresOdmRow,
@@ -25,7 +25,7 @@ export class SupabaseOdmCollectionBackend<TRaw> extends OdmCollectionBackend<TRa
     injector: Injector,
     className: string,
     odmBackend: OdmBackend,
-    public readonly opts: { dontStoreVersionHistory: boolean },
+    public readonly opts: { dontStoreVersionHistory: boolean, silentErrors?: boolean },
   ) {
     super(injector, className, odmBackend)
   }
@@ -36,7 +36,7 @@ export class SupabaseOdmCollectionBackend<TRaw> extends OdmCollectionBackend<TRa
       .from(this.tableName)
       .update({when_deleted: new Date().toISOString()})
       .eq('collection', this.collectionName)
-      .eq('item_id', itemId as string)
+      .eq('id', itemId as string)
       .eq('owner', owner)
     if (error) {
       throw this.errorAlertAndThrow('deleteWithoutConfirmation error', error)
@@ -47,16 +47,19 @@ export class SupabaseOdmCollectionBackend<TRaw> extends OdmCollectionBackend<TRa
     const owner = this.requireUserId()
     const row = createPostgresOdmRow(this.collectionName, id, owner, item, parentIds, ancestorIds)
 
-    if (!this.opts.dontStoreVersionHistory) {
-      await this.saveToHistory(row)
-    }
-
+    // odm_items' primary key column is `id` (not `item_id` like odm_item_history) - rename on the way out.
+    const {item_id, ...rowWithoutItemId} = row as any
     const {error} = await this.supabase
       .from(this.tableName)
-      .upsert(row as any, {onConflict: 'collection,item_id'})
+      .upsert({...rowWithoutItemId, id: item_id}, {onConflict: 'collection,id'})
 
     if (error) {
       throw this.errorAlertAndThrow('saveNowToDb upsert error', error, item, id)
+    }
+
+    // History is best-effort - a failure here (e.g. RLS) shouldn't stop the item itself from saving.
+    if (!this.opts.dontStoreVersionHistory) {
+      await this.saveToHistory(row).catch(error => this.errorAlert('saveToHistory insert error', error))
     }
   }
 
@@ -75,7 +78,7 @@ export class SupabaseOdmCollectionBackend<TRaw> extends OdmCollectionBackend<TRa
       } as any)
 
     if (error) {
-      throw this.errorAlertAndThrow('saveToHistory insert error', error)
+      throw error
     }
   }
 
@@ -142,7 +145,13 @@ export class SupabaseOdmCollectionBackend<TRaw> extends OdmCollectionBackend<TRa
     if (error) {
       throw error
     }
-    return (data ?? []) as PostgresOdmRow<TRaw>[]
+    return ((data ?? []) as any[]).map(row => this.fromOdmItemsRow(row))
+  }
+
+  /** odm_items' primary key column is `id` (odm_item_history's is still `item_id`) - rename on the way in. */
+  private fromOdmItemsRow(row: any): PostgresOdmRow<TRaw> {
+    const {id, ...rest} = row
+    return {...rest, item_id: id} as PostgresOdmRow<TRaw>
   }
 
   private subscribeToChanges(listener: OdmCollectionBackendListener<TRaw, OdmItemId<TRaw>>, callback: () => void): void {
@@ -158,7 +167,8 @@ export class SupabaseOdmCollectionBackend<TRaw> extends OdmCollectionBackend<TRa
           filter: `collection=eq.${this.collectionName}`,
         },
         (payload: any) => {
-          const row = (payload.new ?? payload.old) as PostgresOdmRow<TRaw>
+          const rawRow = payload.new ?? payload.old
+          const row = rawRow ? this.fromOdmItemsRow(rawRow) : undefined
           if (!row || row.collection !== this.collectionName || row.owner !== owner) {
             return
           }
@@ -201,11 +211,19 @@ export class SupabaseOdmCollectionBackend<TRaw> extends OdmCollectionBackend<TRa
     return `${itemId}_${new Date().toISOString().replace(/[:.]/g, '-')}`
   }
 
+  // When used as a fanout secondary, Firestore (or Neon) is already the primary source of
+  // truth, so a Supabase-side failure shouldn't interrupt the user with a window.alert() -
+  // just log it and let the fanout retry on the next save.
   private errorAlert(...args: any[]) {
+    if (this.opts.silentErrors) {
+      console.error('[Supabase ODM]', 'collectionName', this.collectionName, ...args)
+      return
+    }
     errorAlert('collectionName', this.collectionName, ...args)
   }
 
-  private errorAlertAndThrow(...args: any[]) {
-    return errorAlertAndThrow('collectionName', this.collectionName, ...args)
+  private errorAlertAndThrow(...args: any[]): never {
+    this.errorAlert(...args)
+    throw new Error(['collectionName', this.collectionName, ...args].map(String).join(' '))
   }
 }

@@ -5701,6 +5701,13 @@ anymatch@^3.0.3, anymatch@~3.1.2:
     normalize-path "^3.0.0"
     picomatch "^2.0.4"
 
+appwrite@^26.1.0:
+  version "26.1.0"
+  resolved "https://registry.npmjs.org/appwrite/-/appwrite-26.1.0.tgz"
+  integrity sha512-BLcSz1/F83V4W0mHAW3SO9kahVfpqStIDI2+m0N0m2UfxIJl7XU5KW/EhPoek8qje+6JPtf3VWoRaPq4k8L86g==
+  dependencies:
+    json-bigint "1.0.0"
+
 archiver-utils@^5.0.0, archiver-utils@^5.0.2:
   version "5.0.2"
   resolved "https://registry.npmjs.org/archiver-utils/-/archiver-utils-5.0.2.tgz"
@@ -10928,7 +10935,7 @@ jsesc@^3.0.2, jsesc@~3.1.0:
   resolved "https://registry.npmjs.org/jsesc/-/jsesc-3.1.0.tgz"
   integrity sha512-/sM3dO2FOzXjKQhJuo0Q173wf2KOo8t4I8vHy6lF9poUp7bKT0/NHE8fPX23PwfhnykfqnC2xRxOnVw5XuGIaA==
 
-json-bigint@^1.0.0:
+json-bigint@^1.0.0, json-bigint@1.0.0:
   version "1.0.0"
   resolved "https://registry.npmjs.org/json-bigint/-/json-bigint-1.0.0.tgz"
   integrity sha512-SiPv/8VpZuWbvLSMtTDU8hEfrZWg/mH/nV/b4o0CYbSxu1UIQPLdwKOCIyLQX+VIPO5vrLX3i8qtqFyhdPSUSQ==

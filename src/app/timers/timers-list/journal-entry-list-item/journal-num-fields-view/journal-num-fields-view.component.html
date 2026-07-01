@@ -10,6 +10,7 @@
     <!--     *ngIf="(val$ | async)?.getCompositeField(field) let fieldVal" -->
     {{fieldEntry[0].title}}:
     <b>{{fieldEntry[1]}}</b>
+    <span *ngIf="fieldEntry[2]" class="field-note">&nbsp;&mdash; {{fieldEntry[2]}}</span>
   </span>
 
 </ng-container>

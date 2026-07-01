@@ -57,12 +57,16 @@ export class JournalEntry extends OdmInMemItem /*OdmItem<JournalEntry>*/ {
     return (this as any) [field.id !]
   }
 
-  getPresentCompositeFieldEntries(): [JournalNumericDescriptor, number][] {
-    const retArray = [] as Array<[JournalNumericDescriptor, number]>
+  getCompositeFieldComment(field: JournalNumericDescriptor): string | undefined {
+    return this.getCompositeField(field)?.comment || undefined
+  }
+
+  getPresentCompositeFieldEntries(): [JournalNumericDescriptor, number, string | undefined][] {
+    const retArray = [] as Array<[JournalNumericDescriptor, number, string | undefined]>
     for ( let desc of JournalNumericDescriptors.instance.array ) {
       const fieldVal = this.getCompositeFieldNumVal(desc)
       if ( fieldVal !== undefined ) {
-        retArray.push([desc, fieldVal])
+        retArray.push([desc, fieldVal, this.getCompositeFieldComment(desc)])
       }
     }
     return retArray
