@@ -9,7 +9,7 @@
      (window:keydown.meta.arrowup)="treeHost.navigateUp($event)"
      (press)="treeHost.navigateToRoot($event)"
      class="actionable"
-     name="arrow-up-outline"
+     name="arrow-up"
   ></ion-icon>
 
 <!--  <app-app-logo style="width: 30px; height: 30px"></app-app-logo> aa-->
@@ -77,7 +77,7 @@
     *ngIf="feat.showExperimental"
     class="actionable"
     style="font-size: 24px"
-    name="create-outline"
+    name="create"
     (click)='treeHost.newJournalEntry()'
   ></ion-icon>
 
@@ -85,21 +85,21 @@
     *ngIf="feat.outlinerTreeNotes.unpolished"
     class="actionable"
     style="font-size: 24px"
-    name="document-text-outline"
+    name="document-text"
     (click)='treeHost.newNote()'
   ></ion-icon>
 
   <ion-icon
     class="actionable"
     style="font-size: 24px"
-    name="calendar-outline"
+    name="calendar"
     (click)='treeHost.goToMilestones()'
   ></ion-icon>
 
   <ion-icon
     class="actionable"
     style="font-size: 24px"
-    name="today-outline"
+    name="today"
     (click)='treeHost.planToday()'
     (press)="treeHost.planToday(true)"
   ></ion-icon>

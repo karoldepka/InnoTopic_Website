@@ -27,17 +27,17 @@ export class NodeClassIconComponent implements OnInit {
   /** TODO: move to NodeIconCellComponent */
   getIconName() {
     if ( this.treeNode.content.isTask) {
-      return 'settings-outline'
+      return 'settings'
     } else if ( this.treeNode.isChildOfRoot ) {
-      return 'folder-outline'
+      return 'folder'
     } else if ( this.treeNode.content.isDayPlan ) {
-      return 'today-outline'
+      return 'today'
     } else if ( this.treeNode.content.isMilestone ) {
-      return 'calendar-outline'
+      return 'calendar'
     } else if ( this.treeNode.content.isJournalEntry ) {
-      return 'create-outline'
+      return 'create'
     } else {
-      return 'document-text-outline'
+      return 'document-text'
     }
   }
 

@@ -9,7 +9,7 @@
      *ngIf="(timeTrackVal$ | async)?.isTrackingNow"
      style="vertical-align: middle; color: var(--ion-color-primary-contrast); font-size: 24px"
      class="actionable startPauseIcon"
-     name="pause-outline"
+     name="pause"
      (click)="onPauseClicked($event)"
   ></ion-icon>
 
@@ -17,7 +17,7 @@
      *ngIf="! (timeTrackVal$ | async)?.isTrackingNow"
      style="vertical-align: middle; font-size: 24px"
      class="actionable"
-     name="play-outline"
+     name="play"
      (click)="onPlayClicked($event)"
      (press)="onPlayClicked($event, {inParallel: true})"
   ></ion-icon>
