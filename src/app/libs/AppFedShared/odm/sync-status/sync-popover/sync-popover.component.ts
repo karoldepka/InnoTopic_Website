@@ -35,6 +35,8 @@ export class SyncPopoverComponent extends BaseComponent implements OnInit {
 
   authUser$: CachedSubject<User | null> = this.authService.authUser$
 
+  aboutAppExpanded = false
+
   constructor(
     public authService: AuthService,
     public syncStatusService: SyncStatusService,

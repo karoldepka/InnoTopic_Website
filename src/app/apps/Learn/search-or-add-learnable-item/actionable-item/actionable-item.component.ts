@@ -14,6 +14,7 @@ import { RouterLink } from '@angular/router';
 import { NgIf } from '@angular/common';
 import { SelectionCheckboxComponent } from './selection-checkbox/selection-checkbox.component';
 import { PlayButtonComponent } from '../../shared/play-button/play-button.component';
+import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 
 
 /* TODO rename to  list-item */
@@ -68,8 +69,7 @@ export class ActionableItemComponent extends BaseComponent implements OnInit {
 
   constructor(
     public featureService: FeatureService,
-    // protected angularFirestore: AngularFirestore,
-    // protected changeDetectorRef: ChangeDetectorRef,
+    private sanitizer: DomSanitizer,
     injector: Injector,
   ) {
     super(injector)
@@ -79,15 +79,14 @@ export class ActionableItemComponent extends BaseComponent implements OnInit {
 
   joinedSides() {
     return this.item?.val?.joinedSides?.()
-    // this seems very slow
-    // return LearnItem?.prototype?.joinedSides?.call(this.item) // this.item.joinedSides()
-    // TODO: why possibly undefined? (error after strict settings )
   }
 
-  joinedSidesOneLine() {
-    return this.joinedSides()
-      ?.replace('<p>', ' ')
-      ?.replace('</p>', ' ')
+  joinedSidesOneLine(): SafeHtml | undefined {
+    const html = this.joinedSides()
+      ?.replaceAll('<p>', ' ')
+      ?.replaceAll('</p>', ' ')
+    if ( ! html ) return undefined
+    return this.sanitizer.bypassSecurityTrustHtml(html)
   }
 
   getFunLevelDescriptor() {
