@@ -215,9 +215,37 @@ export class AiQaPage implements OnInit {
     );
   }
 
-  approveSelected(): void {
-    this.gen.approveQuestions(this.selectedQIndices());
+  async approveSelected(): Promise<void> {
+    const selected = this.selectedQIndices();
+    const approved = this.gen.questions().filter((_, i) => selected.has(i));
+    if (!approved.length) return;
+    this.persistQuestionsAsDrafts(approved);
+    // The approved Q&A are now saved as Learn drafts — remove them from the pending list.
+    this.gen.questions.set(this.gen.questions().filter((_, i) => !selected.has(i)));
     this.selectedQIndices.set(new Set<number>());
+    const toast = await this.toastCtrl.create({
+      message: `Approved ${approved.length} Q&A → saved to Learn as AI drafts.`,
+      duration: 2500,
+      position: 'top',
+      color: 'success',
+    });
+    await toast.present();
+  }
+
+  /** Persist Q&A into the Learn store as AI-created drafts (createdByAiAt + draftedAt),
+   * using LearnItem$ and tagging each with its category path. */
+  private persistQuestionsAsDrafts(questions: QuestionAnswer[]): void {
+    const now = OdmBackend.nowTimestamp();
+    for (const qa of questions) {
+      const data: Partial<LearnItem> = {
+        title: qa.question,
+        answer: qa.answer,
+        categories: qa.categoryPath || qa.categoryId,
+        createdByAiAt: now,
+        draftedAt: now,
+      };
+      this.learnItems.add(Object.assign(new LearnItem(), data));
+    }
   }
 
   rejectSelected(): void {
@@ -237,7 +265,7 @@ export class AiQaPage implements OnInit {
       const data: Partial<LearnItem> = {
         title: node.title,
         isCategory: true,
-        draftedByAIAt: now,
+        createdByAiAt: now,
         draftedAt: now,
       };
       const item = parentItem
@@ -257,7 +285,7 @@ export class AiQaPage implements OnInit {
       const data: Partial<LearnItem> = {
         title: qa.question,
         answer: qa.answer,
-        draftedByAIAt: now,
+        createdByAiAt: now,
         draftedAt: now,
       };
       const categoryItem = categoryIdToItem.get(qa.categoryId);

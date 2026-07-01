@@ -56,8 +56,8 @@ export class LearnItem extends OdmInMemItem implements QuizzableData {
 
   hideAncestorsInQuiz?: boolean
 
-  /** Set when this item was generated / drafted by AI — lets us distinguish & filter AI content. */
-  draftedByAIAt?: OdmTimestamp
+  /** Set when this item was created by AI — lets us distinguish & filter AI content. */
+  createdByAiAt?: OdmTimestamp
 
   /** Set while the item is an unreviewed draft (e.g. AI output awaiting approval). */
   draftedAt?: OdmTimestamp
@@ -222,9 +222,9 @@ export class LearnItem extends OdmInMemItem implements QuizzableData {
     return (this.getSidesWithAnswers().length > 0) && !! this.getQuestion();
   }
 
-  /** True if this item was generated / drafted by AI. */
+  /** True if this item was created by AI. */
   isAiGenerated(): boolean {
-    return !! this.draftedByAIAt
+    return !! this.createdByAiAt
   }
 
   /** True while this item is an unreviewed draft. */
