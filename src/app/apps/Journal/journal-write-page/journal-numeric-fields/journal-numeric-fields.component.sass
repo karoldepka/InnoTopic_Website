@@ -2,30 +2,32 @@
   border-bottom: 1px solid var(--ion-border-color, rgba(0, 0, 0, 0.1))
   padding-bottom: 2px
 
-.comment-row
-  display: flex
-  justify-content: flex-end
-  padding: 0 8px 4px
-
+// Sits as a trailing grid cell alongside the numeric-picker's number buttons
+// (see numeric-picker__buttons), so it needs a matching touch target size.
 .comment-toggle
   display: flex
+  flex-direction: column
   align-items: center
-  gap: 4px
+  justify-content: center
+  gap: 2px
+  min-height: 2.75rem
+  min-width: 3.5rem
   background: none
-  border: none
+  border: 1px solid var(--ion-color-medium)
   cursor: pointer
   color: var(--ion-color-medium)
-  font-size: 0.78em
-  padding: 2px 6px
-  border-radius: 4px
-  opacity: 0.6
+  font-size: 0.75em
+  padding: 4px 6px
+  border-radius: 8px
+  opacity: 0.7
 
   &:hover, &.has-comment
     opacity: 1
     color: var(--ion-color-primary)
+    border-color: var(--ion-color-primary)
 
   ion-icon
-    font-size: 1.1em
+    font-size: 1.5em
 
 .field-comment
   --padding-start: 12px

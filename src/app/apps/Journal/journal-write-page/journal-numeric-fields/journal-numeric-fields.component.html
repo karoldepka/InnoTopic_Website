@@ -19,17 +19,17 @@
       <apf-numeric-picker
         (numericValue)="onChangeNumericValue($event, descriptor)"
         [numFieldDef]="descriptor"
-      ></apf-numeric-picker>
-      <div class="comment-row">
-        <button class="comment-toggle" (click)="toggleComment(descriptor)" [class.has-comment]="getComment(descriptor)">
+      >
+        <button trailingAction class="comment-toggle" (click)="toggleComment(descriptor)" [class.has-comment]="getComment(descriptor)">
           <ion-icon name="chatbubble-ellipses-outline"></ion-icon>
           <span *ngIf="!isCommentOpen(descriptor)">Note</span>
           <span *ngIf="isCommentOpen(descriptor)">Hide</span>
         </button>
-      </div>
+      </apf-numeric-picker>
       <ion-textarea
         *ngIf="isCommentOpen(descriptor)"
         class="field-comment"
+        [attr.data-descriptor-id]="descriptor.id"
         [value]="getComment(descriptor)"
         (ionInput)="onChangeComment($any($event).detail.value, descriptor)"
         placeholder="Add a note..."

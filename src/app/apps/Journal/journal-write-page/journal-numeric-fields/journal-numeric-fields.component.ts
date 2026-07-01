@@ -1,4 +1,4 @@
-import {Component, Input, OnInit, ChangeDetectionStrategy} from '@angular/core';
+import {Component, ElementRef, Input, OnInit, ChangeDetectionStrategy} from '@angular/core';
 import { NumericPickerVal, NumericPickerComponent } from '../../../../libs/AppFedSharedIonic/ratings/numeric-picker/numeric-picker.component'
 import {JournalNumericDescriptor, JournalNumericDescriptors} from '../../models/JournalNumericDescriptors'
 import {JournalCompositeFieldVal, JournalEntry} from '../../models/JournalEntry'
@@ -39,7 +39,7 @@ export class JournalNumericFieldsComponent implements OnInit {
     return this.search ?. trim() ?. length
   }
 
-  constructor() { }
+  constructor(private elementRef: ElementRef<HTMLElement>) { }
 
   ngOnInit() {}
 
@@ -56,7 +56,18 @@ export class JournalNumericFieldsComponent implements OnInit {
       this.openCommentFieldIds.delete(id)
     } else {
       this.openCommentFieldIds.add(id)
+      this.focusComment(id)
     }
+  }
+
+  /** The textarea is only in the DOM once opened (*ngIf), so wait a tick before focusing it. */
+  private focusComment(descriptorId: string) {
+    setTimeout(() => {
+      const textarea = this.elementRef.nativeElement.querySelector(
+        `ion-textarea[data-descriptor-id="${descriptorId}"]`
+      ) as (HTMLElement & { setFocus?: () => Promise<void> }) | null
+      textarea?.setFocus?.()
+    })
   }
 
   isCommentOpen(descriptor: JournalNumericDescriptor): boolean {
