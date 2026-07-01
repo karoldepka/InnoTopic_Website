@@ -1,20 +1,11 @@
-<i
-  style="color: var(--ion-color-secondary); vertical-align: middle; padding-top: 3px"
-  class="material-icons tappable-icon actionable"
+<ion-icon
+  style="color: var(--ion-color-secondary); vertical-align: middle; padding-top: 3px; font-size: 24px"
+  class="tappable-icon actionable"
   (tap)="toggleExpand($event)"
   (press)="onPress($event)"
   [ngClass]="{collapsedIcon: ! treeNode.expanded}"
->
-  <!-- any useful use-case of expansion icon at visual root, would be expand/collapse recursively
-    but this is niche use, and could be put into popup menu
-     (also via icon - webstorm has arrows up/down icon for expand/collapse all)
-    -->
-
-
-  <!--  {{ treeNode.hasChildren ? 'expand_more' : 'add_circle' }}-->
-  <!-- Idea: add_circle icon if no children (therefore no expand/collapse) and would create child node -->
-  expand_more
-</i>
+  name="chevron-down-outline"
+></ion-icon>
 
 <!-- TODO: for some reason expanding by 3-dots below this icon does not update the icon
     - could be change detection problem?

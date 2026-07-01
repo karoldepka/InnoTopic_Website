@@ -7,13 +7,14 @@ import {
 import { debugLog } from '../../../utils/log'
 import {ApfBaseTreeNode, OryBaseTreeNode} from '../../../tree-model/TreeModel'
 import { NgClass } from '@angular/common';
+import { IonicModule } from '@ionic/angular';
 
 @Component({
     selector: 'app-node-expansion-icon',
     templateUrl: './node-expansion-icon.component.html',
     changeDetection: ChangeDetectionStrategy.Eager,
     styleUrls: ['./node-expansion-icon.component.sass'],
-    imports: [NgClass]
+    imports: [NgClass, IonicModule]
 })
 export class NodeExpansionIconComponent implements OnInit {
 

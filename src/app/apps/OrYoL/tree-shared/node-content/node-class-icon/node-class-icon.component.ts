@@ -4,6 +4,7 @@ import {
   OnInit,
   ChangeDetectionStrategy
 } from '@angular/core';
+import { IonicModule } from '@ionic/angular';
 
 import {OryBaseTreeNode} from '../../../tree-model/TreeModel'
 
@@ -11,7 +12,8 @@ import {OryBaseTreeNode} from '../../../tree-model/TreeModel'
     selector: 'app-node-class-icon',
     templateUrl: './node-class-icon.component.html',
     changeDetection: ChangeDetectionStrategy.Eager,
-    styleUrls: ['./node-class-icon.component.sass']
+    styleUrls: ['./node-class-icon.component.sass'],
+    imports: [IonicModule],
 })
 export class NodeClassIconComponent implements OnInit {
 
@@ -24,19 +26,18 @@ export class NodeClassIconComponent implements OnInit {
 
   /** TODO: move to NodeIconCellComponent */
   getIconName() {
-    // return this.treeNode.dbItem.itemClass.iconName
     if ( this.treeNode.content.isTask) {
-      return 'settings_applications'
+      return 'settings-outline'
     } else if ( this.treeNode.isChildOfRoot ) {
-      return 'folder'
+      return 'folder-outline'
     } else if ( this.treeNode.content.isDayPlan ) {
-      return 'calendar_today'
+      return 'today-outline'
     } else if ( this.treeNode.content.isMilestone ) {
-      return 'event_note'
+      return 'calendar-outline'
     } else if ( this.treeNode.content.isJournalEntry ) {
-      return 'edit'
+      return 'create-outline'
     } else {
-      return 'note'
+      return 'document-text-outline'
     }
   }
 

@@ -11,13 +11,14 @@ import {CachedSubject} from '../../../../libs/AppFedShared/utils/cachedSubject2/
 import {stripHtml} from '../../../../libs/AppFedShared/utils/html-utils'
 import { NgClass, NgIf, AsyncPipe, JsonPipe } from '@angular/common';
 import { TimePassingComponent } from '../../AppFedSharedEmu/time/time-passing/time-passing.component';
+import { IonicModule } from '@ionic/angular';
 
 @Component({
     selector: 'app-time-tracking-cell',
     templateUrl: './time-tracking-cell.component.html',
     changeDetection: ChangeDetectionStrategy.Eager,
     styleUrls: ['./time-tracking-cell.component.sass'],
-    imports: [NgClass, NgIf, TimePassingComponent, AsyncPipe, JsonPipe]
+    imports: [NgClass, NgIf, TimePassingComponent, AsyncPipe, JsonPipe, IonicModule]
 })
 export class TimeTrackingCellComponent implements OnInit {
 

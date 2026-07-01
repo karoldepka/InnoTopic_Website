@@ -5,30 +5,30 @@
 
   <!--  val json: {{(timeTrackVal$ | async) | json}}-->
 
-  <i *ngIf="(timeTrackVal$ | async)?.isTrackingNow"
-     style="vertical-align: middle; color: var(--ion-color-primary-contrast)"
-     class="material-icons actionable startPauseIcon"
+  <ion-icon
+     *ngIf="(timeTrackVal$ | async)?.isTrackingNow"
+     style="vertical-align: middle; color: var(--ion-color-primary-contrast); font-size: 24px"
+     class="actionable startPauseIcon"
+     name="pause-outline"
      (click)="onPauseClicked($event)"
-  >
-    pause
-  </i>
+  ></ion-icon>
 
-  <i *ngIf="! (timeTrackVal$ | async)?.isTrackingNow"
-     style="vertical-align: middle"
-     class="material-icons actionable"
+  <ion-icon
+     *ngIf="! (timeTrackVal$ | async)?.isTrackingNow"
+     style="vertical-align: middle; font-size: 24px"
+     class="actionable"
+     name="play-outline"
      (click)="onPlayClicked($event)"
      (press)="onPlayClicked($event, {inParallel: true})"
-  >
-    play_arrow
-  </i>
+  ></ion-icon>
 
-  <i style="vertical-align: middle"
-     class="material-icons actionable startPauseIcon"
+  <ion-icon
+     style="vertical-align: middle; font-size: 24px"
+     class="actionable startPauseIcon"
+     name="stop"
      (press)="onStopClicked()"
      *ngIf="false"
-  >
-    stop
-  </i>
+  ></ion-icon>
 
   <!-- ==== End start/pause icon-->
 

@@ -1,8 +1,7 @@
 <!-- TODO: use app-item-class-icon and use it in class-picker too -->
-<i
-  style="vertical-align: middle"
-  class="material-icons tappable-icon actionable"
+<ion-icon
+  style="vertical-align: middle; font-size: 24px"
+  class="tappable-icon actionable"
+  [name]="getIconName()"
   (press)='treeNode.navigateInto()'
->
-  {{getIconName()}}
-</i>
+></ion-icon>
