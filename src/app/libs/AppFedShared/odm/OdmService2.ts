@@ -152,12 +152,16 @@ export abstract class OdmService2<
 
     // setTimeout(() => {
       const dbFormat = itemToSave.toDbFormat()
+      const changedFieldsOnly = itemToSave.buildIncrementalDbPatch()
+      const pendingSnapshot = itemToSave.snapshotPendingDbPatch()
       const promise = this.odmCollectionBackend.saveNowToDb(
         dbFormat,
         (itemToSave.id!) as ItemId,
         itemToSave.getParentIds() as ItemId[],
-        itemToSave.getAncestorIds() as ItemId[]
+        itemToSave.getAncestorIds() as ItemId[],
+        changedFieldsOnly as any,
       )
+      promise.then(() => itemToSave.onDbWriteResolved(pendingSnapshot), () => {})
       const title = (itemToSave.val as any)?.title ?? (itemToSave.val as any)?.name ?? itemToSave.id
       this.syncStatusService.handleSavingPromise(promise, `Saving ${this.className} "${title}"`)
     // }, 10000)

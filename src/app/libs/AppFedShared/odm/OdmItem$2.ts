@@ -115,6 +115,13 @@ export class OdmItem$2<
   /** Has patch that has not yet had a call to backend DB API (as opposed to not having been synchronized via network) */
   hasPendingPatch = false
 
+  /** Fields changed (locally) since the last successful DB write — written incrementally (merge). */
+  private pendingDbPatch: Partial<TInMemData> = {}
+
+  /** Whether the item is known to already exist in the DB (loaded or previously saved). Until
+   * true, saves write the whole document so first-time metadata (whenCreated/owner) is stored. */
+  private hasBeenPersistedToDb = false
+
 
   get val() { return this.currentVal }
 
@@ -220,7 +227,8 @@ export class OdmItem$2<
     }
     this.setIdAndWhenCreatedIfNecessary()
     this.setLastModifiedIfNecessary(modificationOpts) // before the patching, in case patch contains modification fields
-    Object.assign(this.currentVal, patch) // patching the value locally, but current impl saves whole object to firestore
+    Object.assign(this.currentVal, patch) // patching the value locally
+    Object.assign(this.pendingDbPatch as any, patch) // accumulate for incremental (merge) DB write
     this.hasPendingPatch = true
 
     // this.localUserSavesToThrottle$.next(this.asT) // other code listens to this and throttles - saves
@@ -260,6 +268,7 @@ export class OdmItem$2<
     this.setIdAndWhenCreatedIfNecessary()
     this.setLastModifiedIfNecessary(modificationOpts)
     Object.assign(this.currentVal !, patch)
+    Object.assign(this.pendingDbPatch as any, patch) // accumulate for incremental (merge) DB write
     this.odmService.saveNowToDb(this)
     this.resolveFuncPendingThrottledIfNecessary()
     this.locallyVisibleChanges$.next(this.currentVal) // other code listens to this and throttles - saves
@@ -310,6 +319,7 @@ export class OdmItem$2<
     // console.error(`FIXME: applyDataFromDbAndEmit() - this should be really where canApplyDataToViewGivenColumnLocalEdits() protection stuff is done!! Though another protection is to prevent infinite loop in e.g. rich text edit -> FormControl -> (loop). But this could be a flag like \`isApplying = true\` or isCurrentlyPatchingFromLocalEdit, try-finally at UI COMPONENT level? And use monotonic clock? Or setTimeOut()`)
     // Object.assign(this, incomingConverted) // TODO:
     this.emitNewVal(incomingConverted)
+    this.hasBeenPersistedToDb = true // it came from the DB, so it exists there
     this.parents = incomingConverted?.parentIds?.map(id => this.odmService.obtainItem$ById(id))
     // console.error(`FIXME: set this.parents (otherwise they will be destroyed when patching). And this.parents$. Though, 2 sources of truth: inMemData and parents$. this.parents value: `, this.parents, this.getParentIds() )
   }
@@ -336,6 +346,49 @@ export class OdmItem$2<
     }
     // TODO: item$ ?. hasOrHadUserProvidedContent() --> "had" - for undo in text fields (for the text field to not disappear), and for deleting item via backspace like OrYoL will have, and prolly LifeSuite Categories
     // FIXME: check if has pending patches
+  }
+
+  // ============================================================================
+  // Incremental DB patching: write only changed fields (merge) rather than the whole
+  // document. The FIRST save of a new item still writes the whole document, so metadata
+  // (whenCreated/owner) is stored; subsequent saves send only the accumulated changes.
+  // ============================================================================
+
+  /** True once the item is known to exist in the DB (loaded or previously saved). */
+  get isPersistedInDb(): boolean {
+    return this.hasBeenPersistedToDb
+  }
+
+  /** Snapshot of the fields changed since the last successful write (excludes metadata). */
+  snapshotPendingDbPatch(): Partial<TInMemData> {
+    return { ...this.pendingDbPatch }
+  }
+
+  /** Fields to write for an incremental (merge) save: pending changes plus always-changing
+   * metadata (whenLastModified / whereLastModified). Returns undefined when a whole-document
+   * write is required (item not yet persisted). */
+  buildIncrementalDbPatch(): Partial<TInMemData> | undefined {
+    if ( ! this.hasBeenPersistedToDb ) {
+      return undefined
+    }
+    const v = this.currentVal as any
+    const patch: any = { ...this.pendingDbPatch }
+    patch.whenLastModified = v?.whenLastModified ?? null
+    if ( v && 'whereLastModified' in v ) {
+      patch.whereLastModified = v.whereLastModified ?? null
+    }
+    return patch as Partial<TInMemData>
+  }
+
+  /** After a successful DB write, mark the item persisted and drop the written fields from the
+   * pending patch — keeping any edits made while the write was in flight (i.e. changed value). */
+  onDbWriteResolved(writtenPatch: Partial<TInMemData>): void {
+    this.hasBeenPersistedToDb = true
+    for ( const key of Object.keys(writtenPatch) as (keyof TInMemData)[] ) {
+      if ( this.pendingDbPatch[key] === writtenPatch[key] ) {
+        delete this.pendingDbPatch[key]
+      }
+    }
   }
 
 

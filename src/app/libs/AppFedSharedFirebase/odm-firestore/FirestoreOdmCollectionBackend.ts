@@ -37,7 +37,7 @@ export class FirestoreOdmCollectionBackend<TRaw> extends OdmCollectionBackend<TR
     }))
   }
 
-  saveNowToDb(item: TRaw, id: string, parentIds?: ItemId[], ancestorIds?: ItemId[]): Promise<any> {
+  saveNowToDb(item: TRaw, id: string, parentIds?: ItemId[], ancestorIds?: ItemId[], changedFieldsOnly?: Partial<TRaw>): Promise<any> {
     if ( ! isNotNullish(id) ) {
       this.errorAlert('id cannot be ' + id)
     }
@@ -58,8 +58,11 @@ export class FirestoreOdmCollectionBackend<TRaw> extends OdmCollectionBackend<TR
 
     // FIXME: review this coz modified with sleep deprivation, while introducing saveToHistory()
     try {
+      // Incremental save: write only the changed fields (merge) when provided; otherwise the
+      // whole item. Version history (below/above) always stores the full snapshot.
+      const sourceForDocWrite = changedFieldsOnly ?? item
       const dataToSave = this.toFirestoreData({
-        ... item,
+        ... sourceForDocWrite,
         ... (parentIds ? {
           parentIds
         } : {}),

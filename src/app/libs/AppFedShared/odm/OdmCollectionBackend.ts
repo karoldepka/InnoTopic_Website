@@ -50,7 +50,10 @@ export abstract class OdmCollectionBackend<
     item: TRaw,
     id: ItemId,
     parentIds?: ItemId[],
-    ancestorIds?: ItemId[]
+    ancestorIds?: ItemId[],
+    /** When provided, only these fields are written to the document (merge), instead of the
+     * whole `item`. `item` is still used for full version-history snapshots. */
+    changedFieldsOnly?: Partial<TRaw>,
   ): Promise<any>
 
   abstract deleteWithoutConfirmation(itemId: OdmItemId): Promise<any>
