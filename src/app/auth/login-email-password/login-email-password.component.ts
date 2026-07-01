@@ -21,8 +21,13 @@ import { errorAlert } from '../../libs/AppFedShared/utils/log';
 })
 export class LoginEmailPasswordComponent implements OnInit {
   showPassword = false
+  isEmailPasswordInProgress = false
   isGoogleInProgress = false
   isFacebookInProgress = false
+
+  get isAnyInProgress() {
+    return this.isEmailPasswordInProgress || this.isGoogleInProgress || this.isFacebookInProgress
+  }
 
   constructor(private AuthService: AuthService) {
     addIcons({ logoGoogle, logoFacebook })
@@ -33,10 +38,13 @@ export class LoginEmailPasswordComponent implements OnInit {
   async loginEmailAndPassword(form: NgForm) {
     const email = form.value.email;
     const password = form.value.password;
+    this.isEmailPasswordInProgress = true
     try {
       await this.AuthService.logInViaEmailAndPassword(email, password);
     } catch (error: any) {
       errorAlert('Error logging in: ' + describeAuthError(error, 'Error logging in'));
+    } finally {
+      this.isEmailPasswordInProgress = false
     }
   }
 
