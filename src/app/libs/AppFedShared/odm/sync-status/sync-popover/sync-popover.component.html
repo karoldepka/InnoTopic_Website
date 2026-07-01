@@ -54,26 +54,8 @@
   Not logged in.
 </ng-template>
 
-<ion-button
-    (click)="logIn()"
->Log In</ion-button>
-
-
-<br />
-
-<ion-button
-  (click)="logOut()"
-  size="small"
->
-  Log Out
-</ion-button>
-
-<!--<ion-button-->
-<!--  *ngIf="g.feat.showDebug"-->
-<!--  (click)="learnStatsService.saveStatsFromItemsNow()">-->
-<!--  Save Stats-->
-<!--</ion-button>-->
-
-<ion-button (click)="openOptions()">
-  Options
-</ion-button>
+<div class="actions">
+  <ion-button size="small" (click)="logIn()">Log In</ion-button>
+  <ion-button size="small" fill="outline" (click)="logOut()">Log Out</ion-button>
+  <ion-button size="small" fill="outline" (click)="openOptions()">Options</ion-button>
+</div>

@@ -20,18 +20,10 @@
   [step]="0.2"
   (ionChange)="onSliderChange($event)"
 ></ion-range>
-{{ themeService.theme.id }}
-<ion-button
-  (click)="themeService.applyRandomTheme()"
->Random Theme</ion-button>
-<ion-button
-  (click)="themeService.applyNextTheme()"
->Next Theme<!-- good for testing quickly-->
-  <!--  *ngIf="feat.mockups"-->
-
-</ion-button>
-
-<ion-button (click)="themesVisible = ! themesVisible">Themes</ion-button>
+<div class="theme-id">{{ themeService.theme.id }}</div>
+<ion-button size="small" (click)="themeService.applyRandomTheme()">Random Theme</ion-button>
+<ion-button size="small" fill="outline" (click)="themeService.applyNextTheme()">Next Theme</ion-button>
+<ion-button size="small" fill="outline" (click)="themesVisible = ! themesVisible">Themes</ion-button>
 <div *ngIf="themesVisible">
   <div *ngFor="let curTheme of themes"
        style="cursor: pointer; margin-bottom: 4px"
