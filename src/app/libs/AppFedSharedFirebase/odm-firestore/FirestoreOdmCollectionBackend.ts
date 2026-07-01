@@ -31,6 +31,7 @@ export class FirestoreOdmCollectionBackend<TRaw> extends OdmCollectionBackend<TR
 
   /** Could also add archive here; and mark as deleted / trash */
   deleteWithoutConfirmation(itemId: OdmItemId) {
+    console.log(`[DB] delete ${this.collectionName}/${itemId}`)
     // DANGEROUS return  this. /* danger */ itemDoc(itemId) /* danger */  .delete()
     return this.inInjectionContext(() => this.itemDoc(itemId).update({
       whenDeleted: new Date()
@@ -57,6 +58,7 @@ export class FirestoreOdmCollectionBackend<TRaw> extends OdmCollectionBackend<TR
     // debugLog('FirestoreOdmCollectionBackend saveNowToDb', item)
 
     // FIXME: review this coz modified with sleep deprivation, while introducing saveToHistory()
+    console.log(`[DB] save ${this.collectionName}/${id}`, changedFieldsOnly ? `(partial: ${Object.keys(changedFieldsOnly).join(', ')})` : '(full)')
     try {
       // Incremental save: write only the changed fields (merge) when provided; otherwise the
       // whole item. Version history (below/above) always stores the full snapshot.
@@ -280,7 +282,7 @@ export class FirestoreOdmCollectionBackend<TRaw> extends OdmCollectionBackend<TR
   loadChildrenOf(parentId: ItemId, listener: OdmCollectionBackendListener<TRaw>) {
     assertTruthy(parentId, 'parentId')
     const userId = this.authService.authUser$.lastVal?.uid
-    console.info('loadChildrenOf', arguments)
+    console.log(`[DB] loadChildrenOf ${this.collectionName} parent=${parentId}`)
     let query = this.angularFirestore.firestore.collection(this.collectionName)
       .where('parentIds', 'array-contains', parentId) // child parent here
     if ( userId ) {
@@ -317,7 +319,7 @@ export class FirestoreOdmCollectionBackend<TRaw> extends OdmCollectionBackend<TR
   loadTreeDescendantsOf(ancestorId: ItemId, listener: OdmCollectionBackendListener<TRaw>) {
     assertTruthy(ancestorId, 'ancestorId')
     const userId = this.authService.authUser$.lastVal?.uid
-    console.info('loadTreeDescendantsOf', arguments)
+    console.log(`[DB] loadTreeDescendantsOf ${this.collectionName} ancestor=${ancestorId}`)
     let query = this.angularFirestore.firestore.collection(this.collectionName)
       .where('ancestorIds', 'array-contains', ancestorId)
     if ( userId ) {
