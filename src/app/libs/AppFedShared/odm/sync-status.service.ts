@@ -1,6 +1,5 @@
 import {Injectable, Injector} from '@angular/core';
 import {CachedSubject} from '../utils/cachedSubject2/CachedSubject2'
-import {errorAlert} from '../utils/log'
 import {appGlobals} from '../g'
 import {BaseService} from '../base.service'
 import {QueryOpts} from './OdmCollectionBackend'
@@ -74,7 +73,15 @@ export class SyncStatusService extends BaseService {
       this.pendingUploads.delete(pendingUpload)
       this.emitSyncStatus()
     }).catch((error: any) => {
-      errorAlert(`Unable to save: `, error)
+      // Bug fix: this branch never cleared pendingUpload/pendingPromises on failure, leaving
+      // the "saving..." indicator stuck forever. The backend that rejected this promise
+      // already alerted/logged as appropriate for its own silentErrors setting (e.g. a
+      // degraded-offline Supabase write shouldn't pop a second blocking alert here on top of
+      // that) - just log, don't alert again.
+      console.error('Unable to save:', titleOfChange, error)
+      this.pendingPromises.delete(promise)
+      this.pendingUploads.delete(pendingUpload)
+      this.emitSyncStatus()
     })
   }
 

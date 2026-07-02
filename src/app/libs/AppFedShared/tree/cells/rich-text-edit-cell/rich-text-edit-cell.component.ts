@@ -43,9 +43,25 @@ export class RichTextEditCellComponent /*extends CellComponent*/ implements OnIn
 
     this.formControl = new UntypedFormControl()
     this.formControl.setValue(this.cell.patchableObservable.locallyVisibleChanges$.lastVal)
-    console.error(`FIXME RichTextEditCellComponent should react to external changes from DB / UI`)
     this.formControl.valueChanges.subscribe(val => {
       this.cell.patchThrottled(val)
+    })
+
+    // locallyVisibleChanges$ re-emits on every change to the item, including this cell's own
+    // edit just above (an echo) and genuinely external ones (another device, a delayed
+    // realtime/sync update). While hasUnsyncedChanges is true there's an edit here (or
+    // elsewhere on the item) that hasn't been confirmed written yet - applying an incoming
+    // value in that window would either be a pointless echo or risk overwriting/interrupting
+    // what the user just typed with a delayed, possibly-stale notification. Once clear, only
+    // apply a value that's actually different, and never re-emit valueChanges for it - an
+    // external sync updating the field must not be turned into a new local edit.
+    this.cell.patchableObservable.locallyVisibleChanges$.subscribe(val => {
+      if (this.cell.hasUnsyncedChanges) {
+        return
+      }
+      if (val !== this.formControl.value) {
+        this.formControl.setValue(val, {emitEvent: false})
+      }
     })
   }
 

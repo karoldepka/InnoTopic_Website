@@ -132,13 +132,25 @@ export abstract class OdmService2<
 
   /** Local edits that hadn't been confirmed written before the last reload/crash are durably
    * journaled (BrowserOdmStorage) - resume them here so an interrupted sync actually retries,
-   * rather than staying silently stuck until the item happens to be opened again. */
-  private async resumePendingEdits() {
-    const pendingEdits = await this.browserOdmStorage.getAllPendingEdits(this.className)
-    for (const edit of pendingEdits) {
-      const item$ = this.obtainItem$ById(edit.item_id as TItemId)
-      await item$.resumeUnsyncedPatch(edit.patch)
-    }
+   * rather than staying silently stuck until the item happens to be opened again.
+   *
+   * Waits for a real Firebase user first (this runs at service-construction time, i.e. app
+   * bootstrap, which can well be before auth has resolved) - resuming any earlier requires a
+   * userId for the save/owner check, same as every other backend call. */
+  private hasResumedPendingEdits = false
+
+  private resumePendingEdits() {
+    this.authService.authUser$.subscribe(async user => {
+      if (!user || this.hasResumedPendingEdits) {
+        return
+      }
+      this.hasResumedPendingEdits = true
+      const pendingEdits = await this.browserOdmStorage.getAllPendingEdits(this.className)
+      for (const edit of pendingEdits) {
+        const item$ = this.obtainItem$ById(edit.item_id as TItemId)
+        await item$.resumeUnsyncedPatch(edit.patch)
+      }
+    })
   }
 
   _ensureItemAdded(item$: TOdmItem$) {
@@ -249,9 +261,13 @@ export abstract class OdmService2<
       fromLocalCache: true,
       oneTimeGet: true,
     }
+    // No limit here: the cursor-filtered incremental fetch (SupabaseOdmCollectionBackend)
+    // already keeps this query small in the common case, and a cap on top of that risks
+    // silently truncating the delta after e.g. a long offline period or a bulk import - the
+    // same class of bug as the PostgREST 1000-row default this codebase already had to work
+    // around. Paginates safely regardless of size (see SupabaseOdmCollectionBackend.fetchRows).
     const opts2Parallel: QueryOpts = {
       comments: "opts2Parallel",
-      limit: initialItemsLimit,
       fromLocalCache: false /* So make sure that this has priority -> when data arrives from here, it should override opts2 */,
       oneTimeGet: false /* NOTE: if this is false, might collide with `nLastModified: undefined` from server */,
     }

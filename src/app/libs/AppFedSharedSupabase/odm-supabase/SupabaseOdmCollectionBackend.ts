@@ -159,6 +159,7 @@ export class SupabaseOdmCollectionBackend<TRaw> extends OdmCollectionBackend<TRa
     // loadTreeDescendantsOf need completeness for their scoped query, not just recent changes.
     const isScoped = !!(queryOpts.parentId || queryOpts.ancestorId)
     const cursor = isScoped ? undefined : await this.browserOdmStorage.getSyncCursor(this.collectionName)
+    console.log(`[ODM query started] dbType=supabase collection=${this.collectionName}`, {...queryOpts, cursor})
 
     let rows: any[]
     if (queryOpts.limit) {
@@ -195,6 +196,7 @@ export class SupabaseOdmCollectionBackend<TRaw> extends OdmCollectionBackend<TRa
         .catch(error => this.errorAlert('updateSyncCursor error', error))
     }
 
+    console.log(`[ODM query ended] dbType=supabase collection=${this.collectionName}`, {...queryOpts, cursor}, 'yielded', rows.length, 'rows')
     return rows.map(row => this.fromOdmItemsRow(row))
   }
 

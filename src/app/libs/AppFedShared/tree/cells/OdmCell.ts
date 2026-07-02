@@ -47,4 +47,12 @@ export class OdmCell<TValue = any> {
     this.patchableObservable.patchThrottled(newValue)
   }
 
+  /** True while this cell's item has a local edit that hasn't been confirmed written yet -
+   * either this cell's own in-progress edit (an echo, since `locallyVisibleChanges$` re-emits
+   * on every parent-item update) or another field's. A UI bound to `patchableObservable`
+   * should not apply incoming values from it while this is true - see class doc above. */
+  get hasUnsyncedChanges(): boolean {
+    return this.treeNode.item$.hasUnsyncedChanges
+  }
+
 }

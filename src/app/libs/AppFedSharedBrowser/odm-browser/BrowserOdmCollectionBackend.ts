@@ -82,9 +82,12 @@ export class BrowserOdmCollectionBackend<TRaw> extends OdmCollectionBackend<TRaw
    * Nothing reads from this backend as a primary source today; it's kept fully functional so
    * it's a real, usable OdmCollectionBackend if it's ever wired in as a fallback/recovery source. */
   private async fetchRows(): Promise<BrowserOdmRow<TRaw>[]> {
+    console.log(`[ODM query started] dbType=indexeddb collection=${this.collectionName}`)
     const owner = this.requireUserId()
     const rows = await this.storage.getAllForCollection<TRaw>(this.collectionName)
-    return rows.filter(row => row.owner === owner && !row.when_deleted)
+    const filtered = rows.filter(row => row.owner === owner && !row.when_deleted)
+    console.log(`[ODM query ended] dbType=indexeddb collection=${this.collectionName}`, 'yielded', filtered.length, 'rows')
+    return filtered
   }
 
   private emitRowsAsAdded(rows: BrowserOdmRow<TRaw>[], listener: OdmCollectionBackendListener<TRaw>, limit?: number): void {
