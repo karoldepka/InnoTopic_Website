@@ -23,10 +23,13 @@ export class CachingOdmCollectionBackend<TRaw> extends OdmCollectionBackend<TRaw
     public readonly opts: { dontStoreVersionHistory: boolean },
   ) {
     super(injector, className, cachingBackend)
-    this.primary = cachingBackend.primaryBackend.createCollectionBackend<TRaw>(injector, className, opts)
-    // A cache-write failure must never block or alert on the primary save/read.
-    const cacheOpts = {...opts, silentErrors: true}
-    this.cache = cachingBackend.cacheBackend.createCollectionBackend<TRaw>(injector, className, cacheOpts)
+    // The cache is now the real read/write source the app depends on (see setListener below),
+    // so a primary (e.g. Supabase) failure means "sync degraded, will catch up later," not
+    // "app is broken" - silentErrors on both sides is what makes the app actually work
+    // completely offline instead of throwing a blocking window.alert() on every failed request.
+    const silentOpts = {...opts, silentErrors: true}
+    this.primary = cachingBackend.primaryBackend.createCollectionBackend<TRaw>(injector, className, silentOpts)
+    this.cache = cachingBackend.cacheBackend.createCollectionBackend<TRaw>(injector, className, silentOpts)
   }
 
   saveNowToDb(item: TRaw, id: ItemId, parentIds?: ItemId[], ancestorIds?: ItemId[], changedFieldsOnly?: Partial<TRaw>): Promise<any> {
@@ -46,7 +49,15 @@ export class CachingOdmCollectionBackend<TRaw> extends OdmCollectionBackend<TRaw
     callback: () => void,
   ): void {
     super.setListener(listener, queryOpts, callback)
-    this.primary.setListener(this.wrapListenerWithMirroring(listener), queryOpts, callback)
+    // Replay everything already known locally first (fast, works offline, and is what makes
+    // "app must work completely offline" true even on a launch that hasn't synced yet) - then
+    // layer the primary's live/incremental read on top inside the cache's own callback, so the
+    // cache replay always lands first. No `limit` on the cache read: that cap exists to bound
+    // expensive remote reads, not cheap local ones - the cache should always give everything
+    // it has. Cache-sourced items aren't re-mirrored (they just came from there).
+    this.cache.setListener(listener, {...queryOpts, limit: undefined, oneTimeGet: true}, () => {
+      this.primary.setListener(this.wrapListenerWithMirroring(listener), queryOpts, callback)
+    })
   }
 
   loadChildrenOf(parentId: ItemId, listener: OdmCollectionBackendListener<TRaw>): void {

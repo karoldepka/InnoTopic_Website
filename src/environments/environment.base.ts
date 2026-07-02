@@ -7,7 +7,7 @@ export const environmentBase = {
   collectionNameSuffix: '',
   // collectionNameSuffix: '_DEBUG',
 
-  odmBackend: 'fanout', // TEMP: back to fanout for full Firestore->Supabase backfill (record counts didn't match); switch to 'supabase' once done
+  odmBackend: 'supabase', // 'firestore' reads, mirrored to Supabase+Neon via 'fanout'; or 'firestore'/'supabase'/'neon' alone
   authBackend: 'firebase',
 
   supabase: {

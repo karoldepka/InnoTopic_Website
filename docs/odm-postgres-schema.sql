@@ -7,17 +7,38 @@ create table if not exists public.odm_items (
   ancestor_ids text[] not null default '{}',
   when_last_modified timestamptz not null default now(),
   when_deleted timestamptz,
+  -- Client-supplied when_last_modified isn't safe as a sync watermark (cross-device clock
+  -- skew - see docs/odm-incremental-sync-plan.md). This column is set by Postgres only
+  -- (default now() on insert, trigger below forces it on every update regardless of what a
+  -- client sends), making it the single authoritative clock for incremental-sync cursors.
+  server_modified_at timestamptz not null default now(),
   primary key (collection, id)
 );
 
 create index if not exists odm_items_owner_collection_modified_idx
   on public.odm_items (owner, collection, when_last_modified desc);
 
+create index if not exists odm_items_owner_collection_server_modified_idx
+  on public.odm_items (owner, collection, server_modified_at desc);
+
 create index if not exists odm_items_parent_ids_idx
   on public.odm_items using gin (parent_ids);
 
 create index if not exists odm_items_ancestor_ids_idx
   on public.odm_items using gin (ancestor_ids);
+
+create or replace function public.odm_items_set_server_modified_at()
+returns trigger as $$
+begin
+  new.server_modified_at := now();
+  return new;
+end;
+$$ language plpgsql;
+
+drop trigger if exists odm_items_server_modified_at on public.odm_items;
+create trigger odm_items_server_modified_at
+  before update on public.odm_items
+  for each row execute function public.odm_items_set_server_modified_at();
 
 create table if not exists public.odm_item_history (
   history_id text primary key,

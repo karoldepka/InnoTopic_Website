@@ -13,6 +13,7 @@ import {DictPatch} from '../utils/rxUtils'
 import {isNotNullish} from '../utils/utils'
 import {ItemId, QueryOpts} from './OdmCollectionBackend'
 import {environment} from '../../../../environments/environment'
+import {BrowserOdmStorage} from '../../AppFedSharedBrowser/odm-browser/BrowserOdmStorage'
 
 export class OdmServiceOpts {
   dontLoadAllAutomatically = false
@@ -111,6 +112,8 @@ export abstract class OdmService2<
 
   itemHistoryService = new OdmItemHistoryService()
 
+  browserOdmStorage = this.injector.get(BrowserOdmStorage)
+
   readonly treeRootItemId = '_root_' + this.className as TItemId
 
   readonly treeRootItem = this.obtainItem$ById(this.treeRootItemId)
@@ -123,7 +126,19 @@ export abstract class OdmService2<
     console.log('OdmService2 service constructor for className: ', className)
     // this.className += '_DEBUG'
     this.setBackendListenerIfNecessary()
+    this.resumePendingEdits()
     // this.subscribeToBackendCollection();
+  }
+
+  /** Local edits that hadn't been confirmed written before the last reload/crash are durably
+   * journaled (BrowserOdmStorage) - resume them here so an interrupted sync actually retries,
+   * rather than staying silently stuck until the item happens to be opened again. */
+  private async resumePendingEdits() {
+    const pendingEdits = await this.browserOdmStorage.getAllPendingEdits(this.className)
+    for (const edit of pendingEdits) {
+      const item$ = this.obtainItem$ById(edit.item_id as TItemId)
+      await item$.resumeUnsyncedPatch(edit.patch)
+    }
   }
 
   _ensureItemAdded(item$: TOdmItem$) {
@@ -263,30 +278,24 @@ export abstract class OdmService2<
     const service = this
     return {
       onAdded(addedItemId: TItemId, addedItemRawData: TRawData) {
-
-        let existingItem: TOdmItem$ | undefined = service.mapIdToItem$.get(addedItemId)
         // debugLog('setBackendListenerIfNecessary onAdded', service, ...arguments, 'service.itemsCount()', service.itemsCount())
 
-        // service.obtainOdmItem$(addedItemId) TODO
-        // if ( ! existingItem ) {
-        if (!existingItem?.val$?.hasEmitted) { /* FIXME: isn't this gonna cause it to never emit changes coming from another machine ? - prolly no, coz this is about ADDING, not modified */
-          // FIXME: this is is causing item to never load if subscribed via item details url early
-
+        let existingItem: TOdmItem$ | undefined = service.mapIdToItem$.get(addedItemId)
+        const isNewToList = !existingItem
+        if (!existingItem) {
           existingItem = service.obtainItem$ById(addedItemId)
+        }
 
+        // Always apply - applyDataFromDbAndEmit itself now guards against clobbering an
+        // unconfirmed local edit or regressing to older data (see OdmItem$2), so this
+        // correctly picks up changes from another machine for an id we already know about,
+        // not just brand new ids (previously skipped entirely once `hasEmitted` was true).
+        existingItem.applyDataFromDbAndEmit(service.convertFromDbFormat(addedItemRawData))
+
+        if (isNewToList) {
           let items = service.localItems$.lastVal;
-          // if ( ! existingItem /* FIXME: now existingItem always returns smth */ ) {
-          //   existingItem = service.createOdmItem$ForExisting(addedItemId, service.convertFromDbFormat(addedItemRawData))// service.convertFromDbFormat(addedItemRawData); // FIXME this.
-          // }
-
-          existingItem.applyDataFromDbAndEmit(service.convertFromDbFormat(addedItemRawData))
           items!.push(existingItem) /* FIXME: this out-of-band modification might confuse RxJS */
-        } // else: it was added locally as lag compensation, don't do anything, to not destroy potential local changes
-
-        // } else {
-        // errorAlert('onAdded item unexpectedly existed already: ' + addedItemId, existingItem, 'incoming data: ', addedItemRawData)
-        // existingItem.applyDataFromDbAndEmit(service.convertFromDbFormat(addedItemRawData))
-        // }
+        }
         // service.emitLocalItems() -- now handled by onFinishedProcessingChangeSet
 
       },

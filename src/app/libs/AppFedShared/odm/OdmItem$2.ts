@@ -8,8 +8,9 @@ import {nullish} from '../utils/type-utils'
 import {appGlobals} from '../g'
 import {OdmList$} from './odm-list$'
 import {tap} from 'rxjs/operators'
-import {getNowTimePointSuitableForId} from './utils'
+import {getNowTimePointSuitableForId, odmTimestampToMillis} from './utils'
 import {BehaviorSubject} from 'rxjs'
+import {debugLog} from '../utils/log'
 
 export type UserId = string
 
@@ -117,6 +118,14 @@ export class OdmItem$2<
 
   /** Fields changed (locally) since the last successful DB write — written incrementally (merge). */
   private pendingDbPatch: Partial<TInMemData> = {}
+
+  /** True from the moment a local edit is made until the write is *confirmed* (pruned in
+   * onDbWriteResolved) — spans the whole in-flight window, unlike `hasPendingPatch` which
+   * flips back to false the instant the throttled save is merely *initiated*. This is the
+   * signal `applyDataFromDbAndEmit` uses to avoid clobbering an unconfirmed local edit. */
+  get hasUnsyncedChanges(): boolean {
+    return Object.keys(this.pendingDbPatch).length > 0
+  }
 
   /** Whether the item is known to already exist in the DB (loaded or previously saved). Until
    * true, saves write the whole document so first-time metadata (whenCreated/owner) is stored. */
@@ -230,6 +239,7 @@ export class OdmItem$2<
     Object.assign(this.currentVal, patch) // patching the value locally
     Object.assign(this.pendingDbPatch as any, patch) // accumulate for incremental (merge) DB write
     this.hasPendingPatch = true
+    this.persistPendingEditDurably()
 
     // this.localUserSavesToThrottle$.next(this.asT) // other code listens to this and throttles - saves
     this.localUserSavesToThrottle$.next(this.currentVal) // other code listens to this and throttles - saves
@@ -237,6 +247,40 @@ export class OdmItem$2<
     /* TODO move to odmService.onPatched(this, patch) */
     this.odmService.emitLocalItems()
     this.odmService.itemHistoryService.onPatch(this, patch)
+  }
+
+  /** Durably journals the full accumulated pendingDbPatch (BrowserOdmStorage) so it survives a
+   * reload/crash before the write confirms - see OdmService2.resumePendingEdits(). Best-effort:
+   * a failure here shouldn't block the local edit the user just made. */
+  private persistPendingEditDurably(): void {
+    const whenLastModified = odmTimestampToMillis((this.currentVal as any)?.whenLastModified)
+    this.odmService.browserOdmStorage
+      .savePendingEdit(
+        this.odmService.className,
+        this.id as string,
+        this.pendingDbPatch as Record<string, any>,
+        whenLastModified !== undefined ? new Date(whenLastModified).toISOString() : new Date().toISOString(),
+      )
+      .catch(error => debugLog('persistPendingEditDurably failed', this.id, error))
+  }
+
+  /** Restores a durably-journaled unsynced edit after a reload/crash and retries the save.
+   * Seeds `currentVal` from the local cache first if nothing has loaded it yet, so the item
+   * doesn't render blank while the retry is in flight. */
+  async resumeUnsyncedPatch(patch: Record<string, any>): Promise<void> {
+    if (!this.currentVal) {
+      const cached = await this.odmService.browserOdmStorage.get(this.odmService.className, this.id as string)
+      if (cached) {
+        this.currentVal = this.odmService.convertFromDbFormat(cached.data as TRawData)
+        this.hasBeenPersistedToDb = true
+      }
+    }
+    this.currentVal ??= {} as TInMemData
+    Object.assign(this.currentVal, patch)
+    Object.assign(this.pendingDbPatch as any, patch)
+    this.hasPendingPatch = true
+    this.locallyVisibleChanges$.next(this.currentVal)
+    this.odmService.saveNowToDb(this)
   }
 
   /** Builds a short, user-visible description of a pending change, e.g.
@@ -269,6 +313,7 @@ export class OdmItem$2<
     this.setLastModifiedIfNecessary(modificationOpts)
     Object.assign(this.currentVal !, patch)
     Object.assign(this.pendingDbPatch as any, patch) // accumulate for incremental (merge) DB write
+    this.persistPendingEditDurably()
     this.odmService.saveNowToDb(this)
     this.resolveFuncPendingThrottledIfNecessary()
     this.locallyVisibleChanges$.next(this.currentVal) // other code listens to this and throttles - saves
@@ -316,7 +361,21 @@ export class OdmItem$2<
   }
 
   applyDataFromDbAndEmit(incomingConverted: TInMemData) {
-    // console.error(`FIXME: applyDataFromDbAndEmit() - this should be really where canApplyDataToViewGivenColumnLocalEdits() protection stuff is done!! Though another protection is to prevent infinite loop in e.g. rich text edit -> FormControl -> (loop). But this could be a flag like \`isApplying = true\` or isCurrentlyPatchingFromLocalEdit, try-finally at UI COMPONENT level? And use monotonic clock? Or setTimeOut()`)
+    if (this.hasUnsyncedChanges) {
+      // This device has a local edit that hasn't been confirmed written yet - applying
+      // incoming data now (e.g. a delayed server echo) would clobber it. Clock-independent:
+      // no timestamp comparison needed, since we already know our own edit is unconfirmed.
+      debugLog('applyDataFromDbAndEmit: skipped, hasUnsyncedChanges', this.id, incomingConverted)
+      return
+    }
+    const incomingMillis = odmTimestampToMillis((incomingConverted as any)?.whenLastModified)
+    const currentMillis = odmTimestampToMillis((this.currentVal as any)?.whenLastModified)
+    if (currentMillis !== undefined && incomingMillis !== undefined && incomingMillis < currentMillis) {
+      // Stale/out-of-order data (e.g. a late realtime echo overtaken by a newer read) -
+      // never let it regress what's already shown.
+      debugLog('applyDataFromDbAndEmit: skipped, incoming older than current', this.id, incomingConverted)
+      return
+    }
     // Object.assign(this, incomingConverted) // TODO:
     this.emitNewVal(incomingConverted)
     this.hasBeenPersistedToDb = true // it came from the DB, so it exists there
@@ -388,6 +447,15 @@ export class OdmItem$2<
       if ( this.pendingDbPatch[key] === writtenPatch[key] ) {
         delete this.pendingDbPatch[key]
       }
+    }
+    if (this.hasUnsyncedChanges) {
+      // Further edits arrived while this write was in flight - keep the durable journal in
+      // sync with what's actually still unconfirmed, rather than clearing it prematurely.
+      this.persistPendingEditDurably()
+    } else {
+      this.odmService.browserOdmStorage
+        .clearPendingEdit(this.odmService.className, this.id as string)
+        .catch(error => debugLog('clearPendingEdit failed', this.id, error))
     }
   }
 

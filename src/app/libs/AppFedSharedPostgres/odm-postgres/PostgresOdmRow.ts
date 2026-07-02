@@ -12,6 +12,10 @@ export interface PostgresOdmRow<TRaw> {
   ancestor_ids?: ItemId[] | null
   when_deleted?: string | null
   when_last_modified?: string | null
+  /** Postgres-set only (default now() on insert, forced by trigger on update) - the
+   * authoritative sync-cursor watermark, never written by the client. See
+   * docs/odm-incremental-sync-plan.md. */
+  server_modified_at?: string | null
 }
 
 export function createPostgresOdmRow<TRaw>(

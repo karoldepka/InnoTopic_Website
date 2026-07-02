@@ -11,9 +11,18 @@ import {
 } from '../../AppFedSharedPostgres/odm-postgres/PostgresOdmRow'
 import {SupabaseOdmClientService} from './supabase-odm-client.service'
 import {environment} from '../../../../environments/environment'
+import {BrowserOdmStorage} from '../../AppFedSharedBrowser/odm-browser/BrowserOdmStorage'
+
+// Postgres's own now() reflects transaction *start*, not commit, so under concurrent writes
+// commit order isn't guaranteed to match server_modified_at order - a strict .gte(cursor)
+// could permanently miss a row that commits just after the cursor advances past it. Query
+// with a trailing buffer instead; the small overlap of already-seen rows is a harmless,
+// idempotent no-op against the cache. See docs/odm-incremental-sync-plan.md.
+const SYNC_CURSOR_BUFFER_MS = 10 * 60 * 1000
 
 export class SupabaseOdmCollectionBackend<TRaw> extends OdmCollectionBackend<TRaw> {
   private supabase = this.injector.get(SupabaseOdmClientService).getClient()
+  private browserOdmStorage = this.injector.get(BrowserOdmStorage)
   private tableName = (environment as any).supabase?.odmItemsTable ?? 'lifesuite_odm_items'
   private historyTableName = (environment as any).supabase?.odmHistoryTable ?? 'lifesuite_odm_item_history'
   private schema = (environment as any).supabase?.schema ?? 'public'
@@ -122,8 +131,7 @@ export class SupabaseOdmCollectionBackend<TRaw> extends OdmCollectionBackend<TRa
     })
   }
 
-  private async fetchRows(queryOpts: QueryOpts & {parentId?: ItemId, ancestorId?: ItemId}): Promise<PostgresOdmRow<TRaw>[]> {
-    const owner = this.requireUserId()
+  private buildFetchQuery(queryOpts: QueryOpts & {parentId?: ItemId, ancestorId?: ItemId}, owner: string, cursor: string | undefined) {
     let query = this.supabase
       .from(this.tableName)
       .select('*')
@@ -132,26 +140,62 @@ export class SupabaseOdmCollectionBackend<TRaw> extends OdmCollectionBackend<TRa
       .is('when_deleted', null)
       .order('when_last_modified', {ascending: false})
 
-    if (queryOpts.limit) {
-      const offset = queryOpts.offset ?? 0
-      if (offset > 0) {
-        query = query.range(offset, offset + queryOpts.limit - 1)
-      } else {
-        query = query.limit(queryOpts.limit)
-      }
-    }
     if (queryOpts.parentId) {
       query = query.contains('parent_ids', [queryOpts.parentId])
     }
     if (queryOpts.ancestorId) {
       query = query.contains('ancestor_ids', [queryOpts.ancestorId])
     }
-
-    const {data, error} = await query
-    if (error) {
-      throw error
+    if (cursor) {
+      const bufferedCursor = new Date(new Date(cursor).getTime() - SYNC_CURSOR_BUFFER_MS).toISOString()
+      query = query.gte('server_modified_at', bufferedCursor)
     }
-    return ((data ?? []) as any[]).map(row => this.fromOdmItemsRow(row))
+    return query
+  }
+
+  private async fetchRows(queryOpts: QueryOpts & {parentId?: ItemId, ancestorId?: ItemId}): Promise<PostgresOdmRow<TRaw>[]> {
+    const owner = this.requireUserId()
+    // The sync cursor only makes sense for the general/unscoped query - loadChildrenOf/
+    // loadTreeDescendantsOf need completeness for their scoped query, not just recent changes.
+    const isScoped = !!(queryOpts.parentId || queryOpts.ancestorId)
+    const cursor = isScoped ? undefined : await this.browserOdmStorage.getSyncCursor(this.collectionName)
+
+    let rows: any[]
+    if (queryOpts.limit) {
+      const offset = queryOpts.offset ?? 0
+      let query = this.buildFetchQuery(queryOpts, owner, cursor)
+      query = offset > 0 ? query.range(offset, offset + queryOpts.limit - 1) : query.limit(queryOpts.limit)
+      const {data, error} = await query
+      if (error) {
+        throw error
+      }
+      rows = (data ?? []) as any[]
+    } else {
+      // No limit means "get everything" (e.g. loadAllItemsFromServer) - PostgREST silently
+      // caps unpaginated responses at its own db-max-rows setting (defaults to 1000), so this
+      // has to page through with .range() rather than rely on a single unbounded select.
+      const pageSize = 1000
+      rows = []
+      for (let from = 0; ; from += pageSize) {
+        const {data, error} = await this.buildFetchQuery(queryOpts, owner, cursor).range(from, from + pageSize - 1)
+        if (error) {
+          throw error
+        }
+        const page = (data ?? []) as any[]
+        rows.push(...page)
+        if (page.length < pageSize) {
+          break
+        }
+      }
+    }
+
+    if (!isScoped && rows.length > 0) {
+      const maxServerModifiedAt = rows.reduce((max, row) => row.server_modified_at > max ? row.server_modified_at : max, rows[0].server_modified_at)
+      this.browserOdmStorage.updateSyncCursor(this.collectionName, maxServerModifiedAt)
+        .catch(error => this.errorAlert('updateSyncCursor error', error))
+    }
+
+    return rows.map(row => this.fromOdmItemsRow(row))
   }
 
   /** odm_items' primary key column is `id` (odm_item_history's is still `item_id`) - rename on the way in. */

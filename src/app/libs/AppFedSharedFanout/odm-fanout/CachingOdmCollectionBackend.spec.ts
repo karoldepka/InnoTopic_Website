@@ -42,9 +42,13 @@ class FakeOdmCollectionBackend<TRaw> extends OdmCollectionBackend<TRaw> {
     this.storedItems.delete(itemId as string)
   }
 
+  lastSetListenerQueryOpts?: QueryOpts
+
   override setListener(listener: OdmCollectionBackendListener<TRaw, OdmItemId<TRaw>>, queryOpts: QueryOpts, callback: () => void): void {
     super.setListener(listener, queryOpts, callback)
-    for (const [id, item] of this.storedItems) {
+    this.lastSetListenerQueryOpts = queryOpts
+    const entries = queryOpts.limit ? [...this.storedItems].slice(0, queryOpts.limit) : [...this.storedItems]
+    for (const [id, item] of entries) {
       listener.onAdded(id as unknown as OdmItemId<TRaw>, item)
     }
     listener.onFinishedProcessingChangeSet()
@@ -209,5 +213,69 @@ describe('CachingOdmCollectionBackend - mirrors realtime events (not just the in
     await flushMicrotasks()
 
     expect(removedId).toBe('item1')
+  })
+})
+
+describe('CachingOdmCollectionBackend - the cache is the list source', () => {
+  it('setListener emits everything already cached before anything from the primary', async () => {
+    const {collectionBackend, primary, cache} = setup()
+    cache.storedItems.set('cachedItem', {title: 'from local cache'})
+    primary.storedItems.set('serverItem', {title: 'from primary'})
+
+    const addedInOrder: string[] = []
+    collectionBackend.setListener(
+      {
+        onAdded: id => addedInOrder.push(id as unknown as string),
+        onModified: () => undefined,
+        onRemoved: () => undefined,
+        onFinishedProcessingChangeSet: () => undefined,
+      },
+      {comments: 'test', oneTimeGet: true},
+      () => undefined,
+    )
+    await flushMicrotasks()
+
+    expect(addedInOrder).toEqual(['cachedItem', 'serverItem'])
+  })
+
+  it('setListener still emits cached items even if the primary never responds (offline)', async () => {
+    const {collectionBackend, cache} = setup()
+    cache.storedItems.set('cachedItem', {title: 'from local cache'})
+
+    const added: string[] = []
+    collectionBackend.setListener(
+      {
+        onAdded: id => added.push(id as unknown as string),
+        onModified: () => undefined,
+        onRemoved: () => undefined,
+        onFinishedProcessingChangeSet: () => undefined,
+      },
+      {comments: 'test', oneTimeGet: true},
+      () => undefined,
+    )
+    await flushMicrotasks()
+
+    expect(added).toEqual(['cachedItem'])
+  })
+
+  it('the cache read itself ignores queryOpts.limit - it should return everything it has', async () => {
+    const {collectionBackend, cache} = setup()
+    cache.storedItems.set('a', {title: 'a'})
+    cache.storedItems.set('b', {title: 'b'})
+
+    const added: string[] = []
+    collectionBackend.setListener(
+      {
+        onAdded: id => added.push(id as unknown as string),
+        onModified: () => undefined,
+        onRemoved: () => undefined,
+        onFinishedProcessingChangeSet: () => undefined,
+      },
+      {comments: 'test', oneTimeGet: true, limit: 1},
+      () => undefined,
+    )
+    await flushMicrotasks()
+
+    expect(added.sort()).toEqual(['a', 'b'])
   })
 })

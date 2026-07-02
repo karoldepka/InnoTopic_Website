@@ -12,6 +12,7 @@ import {SyncPopoverComponent} from './libs/AppFedShared/odm/sync-status/sync-pop
 import {OptionsComponent} from './libs/AppFedShared/options/options.component'
 import {ThemeService} from './libs/AppFedShared/theme-config/theme.service'
 import {FeatureService} from './libs/AppFedShared/feature.service'
+import {OdmConflictToastService} from './libs/AppFedSharedBrowser/odm-browser/OdmConflictToastService'
 // import {fakeExportToNotLookUnused} from '../background/background'
 
 @Component({
@@ -29,6 +30,7 @@ export class AppComponent {
     private ThemeService /* force the service to run */: ThemeService,
     private timerNotificationService /* force the service to run */: TimerNotificationsService /* FIXME commenting this out causes errors */,
     private authService  /* force the service to run */: AuthService,
+    private odmConflictToastService /* force the service to run */: OdmConflictToastService,
     // private learnStatsService  /* force the service to run */: LearnStatsService,
     public syncStatusService: SyncStatusService,
     public optionsService: OptionsService,

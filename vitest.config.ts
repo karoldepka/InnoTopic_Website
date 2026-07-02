@@ -7,6 +7,7 @@ export default defineConfig({
   test: {
     include: [
       'src/app/libs/AppFedShared/utils/promiseUtils.spec.ts',
+      'src/app/libs/AppFedShared/odm/utils.spec.ts',
       'src/app/libs/AppFedSharedBrowser/odm-browser/**/*.spec.ts',
       'src/app/libs/AppFedSharedFanout/odm-fanout/**/*.spec.ts',
     ],
