@@ -1,4 +1,5 @@
 Project constitution
+
 This is an offline-first (but sync-enabled), mobile-first (but cross-platform).
 User data is precious so we save it as quickly as reasonably possible (throttleTime).
 
@@ -19,6 +20,7 @@ We want features that Firestore offers, but I found Firestore to be expensive an
 
 We don't silently ignore errors. But if there are multiple instances of same error - we don't spam the user but report the error asynchronously, e.g. via toast, not errorAlert. Or first errorAlert, then just error log.
 
+We want the IndexedDb to such a level of fidelity, to be able to recover from it in case server fails, even if server database is lost/corrupted (don't implement that yet, but keep as a possibility).
 
 === Future / considerations
 

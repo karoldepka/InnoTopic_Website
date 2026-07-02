@@ -226,7 +226,7 @@ export class AiQaPage implements OnInit {
     const toast = await this.toastCtrl.create({
       message: `Approved ${approved.length} Q&A → saved to Learn as AI drafts.`,
       duration: 2500,
-      position: 'top',
+      position: 'bottom',
       color: 'success',
     });
     await toast.present();
@@ -300,7 +300,7 @@ export class AiQaPage implements OnInit {
     const toast = await this.toastCtrl.create({
       message: `Saved ${categoryIdToItem.size} categories and ${qaCount} Q&A to Learn (as AI drafts).`,
       duration: 2500,
-      position: 'top',
+      position: 'bottom',
       color: 'success',
     });
     await toast.present();

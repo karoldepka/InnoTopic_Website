@@ -32,4 +32,15 @@ export class FeatureService {
     g.feat = featuresConfig1
     this.config$.nextWithCache(featuresConfig1)
   }
+
+  static readonly firestoreEnabledKey = 'firestoreEnabled'
+
+  get firestoreEnabled(): boolean {
+    const stored = localStorage.getItem(FeatureService.firestoreEnabledKey)
+    return stored === null ? true : stored === 'true'
+  }
+
+  setFirestoreEnabled(enabled: boolean) {
+    localStorage.setItem(FeatureService.firestoreEnabledKey, String(enabled))
+  }
 }

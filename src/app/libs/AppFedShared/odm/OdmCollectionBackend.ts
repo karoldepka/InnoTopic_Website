@@ -10,6 +10,7 @@ export type ItemId = string & { type: 'ItemId' }
 export type QueryOpts = {
   comments: string,
   limit?: number,
+  offset?: number,
   fromLocalCache?: boolean,
   oneTimeGet: boolean,
 }

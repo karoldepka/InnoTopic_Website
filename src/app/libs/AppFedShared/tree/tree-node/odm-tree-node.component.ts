@@ -56,7 +56,7 @@ export class OdmTreeNodeComponent implements OnInit {
         message: 'Draft learn item added.',
         duration: 5000,
         color: 'success',
-        position: 'top',
+        position: 'bottom',
         buttons: [
           {
             text: 'Undo',
@@ -75,7 +75,7 @@ export class OdmTreeNodeComponent implements OnInit {
         message: error?.message ?? 'Could not add a child item.',
         duration: 2400,
         color: 'danger',
-        position: 'top',
+        position: 'bottom',
       })
       await toast.present()
     }
@@ -86,7 +86,7 @@ export class OdmTreeNodeComponent implements OnInit {
       message,
       duration: 2200,
       color,
-      position: 'top',
+      position: 'bottom',
     })
     await toast.present()
   }

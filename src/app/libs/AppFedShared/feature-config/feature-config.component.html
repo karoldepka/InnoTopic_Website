@@ -10,4 +10,9 @@
   labelPlacement="end"
   (ionChange)="onChangeAllFeatures($event)"
 >Features I use</ion-checkbox>
+<ion-checkbox
+  labelPlacement="end"
+  [checked]="firestoreEnabled"
+  (ionChange)="onChangeFirestoreEnabled($event)"
+>Firestore enabled (reload to apply)</ion-checkbox>
 <!--Version {{version}}-->

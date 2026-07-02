@@ -1,6 +1,7 @@
 import {Injector} from '@angular/core'
 import {ItemId, OdmCollectionBackend, OdmCollectionBackendListener, QueryOpts} from '../../AppFedShared/odm/OdmCollectionBackend'
 import {OdmItemId} from '../../AppFedShared/odm/OdmItemId'
+import {ConcurrencyLimiter} from '../../AppFedShared/utils/promiseUtils'
 import {FanoutOdmBackend} from './FanoutOdmBackend'
 
 export class FanoutOdmCollectionBackend<TRaw> extends OdmCollectionBackend<TRaw> {
@@ -10,6 +11,11 @@ export class FanoutOdmCollectionBackend<TRaw> extends OdmCollectionBackend<TRaw>
   private primary: OdmCollectionBackend<TRaw>
   /** Written to on every save/delete, and backfilled with everything read from `primary`. */
   private secondaries: OdmCollectionBackend<TRaw>[]
+
+  // A full-collection load can stream thousands of items in one burst - without a cap,
+  // one fetch() per secondary per item exhausts the browser's connection pool
+  // (net::ERR_INSUFFICIENT_RESOURCES) and writes past that point just fail.
+  private replicationLimiter = new ConcurrencyLimiter(6)
 
   constructor(
     injector: Injector,
@@ -35,7 +41,7 @@ export class FanoutOdmCollectionBackend<TRaw> extends OdmCollectionBackend<TRaw>
   deleteWithoutConfirmation(itemId: OdmItemId): Promise<any> {
     for (const secondary of this.secondaries) {
       // Secondaries already log their own failures (silentErrors) - nothing more to do here.
-      secondary.deleteWithoutConfirmation(itemId).catch(() => undefined)
+      this.replicationLimiter.run(() => secondary.deleteWithoutConfirmation(itemId)).catch(() => undefined)
     }
     return this.primary.deleteWithoutConfirmation(itemId)
   }
@@ -85,7 +91,9 @@ export class FanoutOdmCollectionBackend<TRaw> extends OdmCollectionBackend<TRaw>
   ): void {
     for (const secondary of this.secondaries) {
       // Secondaries already log their own failures (silentErrors) - nothing more to do here.
-      secondary.saveNowToDb(item, id as ItemId, parentIds, ancestorIds, changedFieldsOnly).catch(() => undefined)
+      this.replicationLimiter
+        .run(() => secondary.saveNowToDb(item, id as ItemId, parentIds, ancestorIds, changedFieldsOnly))
+        .catch(() => undefined)
     }
   }
 }

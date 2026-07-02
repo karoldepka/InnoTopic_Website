@@ -423,7 +423,7 @@ export class SearchOrAddLearnableItemPageComponent extends BaseComponent impleme
       message,
       duration: 2400,
       color,
-      position: 'top',
+      position: 'bottom',
     })
     await toast.present()
   }
@@ -433,7 +433,7 @@ export class SearchOrAddLearnableItemPageComponent extends BaseComponent impleme
       message: this.withOfflineSaveHint(message),
       duration: 5000,
       color: 'success',
-      position: 'top',
+      position: 'bottom',
       buttons: [
         {
           text: 'Undo',
@@ -458,7 +458,7 @@ export class SearchOrAddLearnableItemPageComponent extends BaseComponent impleme
       message: `Looks like "${title}" already exists.`,
       duration: 7000,
       color: 'warning',
-      position: 'top',
+      position: 'bottom',
       buttons: [
         {
           text: 'Open',

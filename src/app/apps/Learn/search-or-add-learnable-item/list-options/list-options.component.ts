@@ -71,4 +71,8 @@ export class ListOptionsComponent extends BaseComponent implements OnInit {
   loadAll() {
     this.itemsService.loadAllItemsFromServer()
   }
+
+  loadMore() {
+    this.itemsService.loadNextPageFromServer()
+  }
 }

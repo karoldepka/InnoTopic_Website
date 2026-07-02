@@ -4,6 +4,8 @@
   (click)="loadAll(false)"
 ><ion-icon slot=start name="download-outline" />Load all</ion-button>
 
+<ion-note>{{(itemsService.localItems$ | async)?.length}} items loaded</ion-note>
+
 <ion-checkbox
   labelPlacement="end"
   [formControl]="formControl"

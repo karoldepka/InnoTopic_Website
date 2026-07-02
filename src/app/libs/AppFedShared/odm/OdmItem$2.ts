@@ -492,12 +492,9 @@ export class OdmItem$2<
     if ( this.treeDescendantsListener ) {
       return
     }
-    /* FIXME: this is copy-paste from entire-collection loading */
-    /* TODO: encapsulate into OdmCollection object ? ...
-      children$, allItems$
-    *   */
-    const service = this.odmService
-    const thisItem$ = this
+    // Descendants (any depth) just join the service's general item pool, same as a normal
+    // collection-wide load - reuse that listener rather than a bespoke per-node list.
+    this.treeDescendantsListener = this.odmService.createBackendListener()
 
     this.odmService.odmCollectionBackend.loadTreeDescendantsOf(this.id !, this.treeDescendantsListener)
   }

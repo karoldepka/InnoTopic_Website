@@ -1,4 +1,5 @@
 import {Component, Input, OnInit, ChangeDetectionStrategy} from '@angular/core';
+import {AsyncPipe} from '@angular/common';
 import {Required} from '../../../../libs/AppFedShared/utils/angular/Required.decorator'
 import {PatchableObservable} from '../../../../libs/AppFedShared/utils/rxUtils'
 import {createViewSyncerForField, ViewSyncer} from '../../../../libs/AppFedShared/odm/ui/ViewSyncer'
@@ -14,7 +15,7 @@ import { IonicModule } from '@ionic/angular';
     templateUrl: './timeline-list-options.component.html',
     changeDetection: ChangeDetectionStrategy.Eager,
     styleUrls: ['./timeline-list-options.component.sass'],
-    imports: [IonicModule, ReactiveFormsModule],
+    imports: [IonicModule, ReactiveFormsModule, AsyncPipe],
 })
 export class TimelineListOptionsComponent implements OnInit {
 

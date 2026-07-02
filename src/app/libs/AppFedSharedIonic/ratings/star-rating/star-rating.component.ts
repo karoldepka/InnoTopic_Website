@@ -36,9 +36,6 @@ export class StarRatingComponent extends CustomFormControl<StarRatingVal> {
 
   @Output() numericValue = new EventEmitter<StarRatingVal>()
 
-  private lastClickedStarIndex: number | null = null
-  private lastClickCycle = 0
-
   constructor() {
     super()
     addIcons({star, 'star-outline': starOutline})
@@ -57,14 +54,8 @@ export class StarRatingComponent extends CustomFormControl<StarRatingVal> {
     return Math.max(0, Math.min(1, this.currentValue - (starIndex - 1)))
   }
 
-  onStarClick(starIndex: number) {
-    if (this.lastClickedStarIndex === starIndex) {
-      this.lastClickCycle = (this.lastClickCycle + 1) % 4
-    } else {
-      this.lastClickedStarIndex = starIndex
-      this.lastClickCycle = 0
-    }
-    const newValue = starIndex - this.lastClickCycle * 0.25
+  onHalfClick(starIndex: number, half: 'left' | 'right') {
+    const newValue = half === 'left' ? starIndex - 0.5 : starIndex
     this.currentValue = newValue
     this.numericValue.emit(newValue)
     this.fireOnChange(newValue)

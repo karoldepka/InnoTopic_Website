@@ -110,7 +110,7 @@ export class AuthService {
     const toast = await this.toastController.create({
       message,
       duration: 2500,
-      position: 'top',
+      position: 'bottom',
       color: 'success',
     })
     await toast.present()

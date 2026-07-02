@@ -46,6 +46,7 @@ export class SupabaseOdmCollectionBackend<TRaw> extends OdmCollectionBackend<TRa
   async saveNowToDb(item: TRaw, id: string, parentIds?: ItemId[], ancestorIds?: ItemId[]): Promise<any> {
     const owner = this.requireUserId()
     const row = createPostgresOdmRow(this.collectionName, id, owner, item, parentIds, ancestorIds)
+    console.log(`[Supabase ODM] -> ${this.collectionName}/${id}`)
 
     // odm_items' primary key column is `id` (not `item_id` like odm_item_history) - rename on the way out.
     const {item_id, ...rowWithoutItemId} = row as any
@@ -132,7 +133,12 @@ export class SupabaseOdmCollectionBackend<TRaw> extends OdmCollectionBackend<TRa
       .order('when_last_modified', {ascending: false})
 
     if (queryOpts.limit) {
-      query = query.limit(queryOpts.limit)
+      const offset = queryOpts.offset ?? 0
+      if (offset > 0) {
+        query = query.range(offset, offset + queryOpts.limit - 1)
+      } else {
+        query = query.limit(queryOpts.limit)
+      }
     }
     if (queryOpts.parentId) {
       query = query.contains('parent_ids', [queryOpts.parentId])
@@ -185,7 +191,9 @@ export class SupabaseOdmCollectionBackend<TRaw> extends OdmCollectionBackend<TRa
       )
       .subscribe((status: string) => {
         if (status === 'CHANNEL_ERROR') {
-          this.errorAlert('Supabase realtime channel error', this.collectionName)
+          // Realtime is a live-update enhancement; the initial fetch already loaded data.
+          // A channel error is non-fatal, so log only rather than showing a blocking alert.
+          console.error('[Supabase ODM] Realtime channel error', 'collectionName', this.collectionName)
         }
       })
 

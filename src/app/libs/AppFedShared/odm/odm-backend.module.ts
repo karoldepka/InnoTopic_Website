@@ -14,9 +14,28 @@ import {SupabaseOdmBackend} from '../../AppFedSharedSupabase/odm-supabase/supaba
 import {SupabaseOdmClientService} from '../../AppFedSharedSupabase/odm-supabase/supabase-odm-client.service'
 import {NeonOdmBackend} from '../../AppFedSharedNeon/odm-neon/neon-odm-backend.service'
 import {FanoutOdmBackend} from '../../AppFedSharedFanout/odm-fanout/FanoutOdmBackend'
+import {CachingOdmBackend} from '../../AppFedSharedFanout/odm-fanout/CachingOdmBackend'
+import {BrowserOdmBackend} from '../../AppFedSharedBrowser/odm-browser/BrowserOdmBackend'
 
+/** `browser` is a valid, reachable backend (a real IndexedDB-only ODM backend) but nothing
+ * selects it as the primary today - it's reserved for a future "recover from local cache when
+ * the server is unreachable" mode. Every other backend is wrapped with `CachingOdmBackend` so
+ * everything read/written mirrors into that same local cache as a side effect in the meantime. */
 export function odmBackendFactory(injector: Injector): OdmBackend {
   const backendName = (environment as any).odmBackend ?? 'firestore'
+  if (backendName === 'browser') {
+    return injector.get(BrowserOdmBackend)
+  }
+  const primaryBackend = resolvePrimaryBackend(injector, backendName)
+  return new CachingOdmBackend(injector, primaryBackend, injector.get(BrowserOdmBackend))
+}
+
+function isFirestoreEnabled(): boolean {
+  const stored = localStorage.getItem('firestoreEnabled')
+  return stored === null ? true : stored === 'true'
+}
+
+function resolvePrimaryBackend(injector: Injector, backendName: string): OdmBackend {
   if (backendName === 'supabase') {
     return injector.get(SupabaseOdmBackend)
   }
@@ -24,7 +43,16 @@ export function odmBackendFactory(injector: Injector): OdmBackend {
     return injector.get(NeonOdmBackend)
   }
   if (backendName === 'fanout') {
+    if (!isFirestoreEnabled()) {
+      console.warn('[ODM] Firestore disabled via settings — using Supabase as primary')
+      return injector.get(SupabaseOdmBackend)
+    }
     return injector.get(FanoutOdmBackend)
+  }
+  // backendName === 'firestore'
+  if (!isFirestoreEnabled()) {
+    console.warn('[ODM] Firestore disabled via settings — using Supabase as primary')
+    return injector.get(SupabaseOdmBackend)
   }
   return new FirestoreOdmBackend(injector, injector.get(AngularFirestore))
 }
@@ -44,6 +72,7 @@ export function odmBackendFactory(injector: Injector): OdmBackend {
     SupabaseOdmBackend,
     NeonOdmBackend,
     FanoutOdmBackend,
+    BrowserOdmBackend,
     {
       provide: OdmBackend,
       useFactory: odmBackendFactory,

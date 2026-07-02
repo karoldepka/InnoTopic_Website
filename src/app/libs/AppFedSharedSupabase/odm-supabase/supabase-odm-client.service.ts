@@ -62,8 +62,6 @@ export class SupabaseOdmClientService {
       const payload = JSON.parse(atob(token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/')))
       if (payload.sub !== uid) {
         console.error('[Supabase Auth Bridge] token sub MISMATCH', {uid, tokenSub: payload.sub, payload})
-      } else {
-        console.log('[Supabase Auth Bridge] token sub matches uid', uid, payload)
       }
     } catch (error) {
       console.error('[Supabase Auth Bridge] failed to decode token for debug check', error)

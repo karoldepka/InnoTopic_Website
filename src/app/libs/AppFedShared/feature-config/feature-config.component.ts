@@ -29,4 +29,12 @@ export class FeatureConfigComponent extends BaseComponent implements OnInit {
     // enableAll = $event.target.value
   }
 
+  get firestoreEnabled(): boolean {
+    return this.featureConfigService.firestoreEnabled
+  }
+
+  onChangeFirestoreEnabled($event: any) {
+    this.featureConfigService.setFirestoreEnabled($event.detail.checked)
+  }
+
 }

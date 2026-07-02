@@ -201,7 +201,7 @@ export class OdmTreeNodePopupComponent implements OnInit {
       message,
       duration: 2200,
       color,
-      position: 'top',
+      position: 'bottom',
     })
     await toast.present()
   }
@@ -211,7 +211,7 @@ export class OdmTreeNodePopupComponent implements OnInit {
       message: this.withOfflineSaveHint(message),
       duration: 5000,
       color: 'success',
-      position: 'top',
+      position: 'bottom',
       buttons: [
         {
           text: 'Open',
@@ -236,7 +236,7 @@ export class OdmTreeNodePopupComponent implements OnInit {
       message: `"${title}" is already in this branch.`,
       duration: 7000,
       color: 'warning',
-      position: 'top',
+      position: 'bottom',
       buttons: [
         {
           text: 'Open',

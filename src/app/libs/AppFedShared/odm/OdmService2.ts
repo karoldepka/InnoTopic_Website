@@ -61,6 +61,10 @@ export abstract class OdmService2<
 
   }
 
+  readonly serverPageSize = 1000
+  private serverLoadOffset = 0
+  public hasMoreItemsOnServer = false
+
   /* Unused?
   * TODO: more specific name, like throttle to db or ui */
   throttleIntervalMs = 500
@@ -252,7 +256,10 @@ export abstract class OdmService2<
     this.backendListenerWasSet = true
   }
 
-  private createBackendListener() {
+  /** public so per-item listeners (e.g. OdmItem$2.requestLoadTreeDescendants) can reuse the
+   * same "discovered items join the general item pool" wiring this service already uses for
+   * its own collection-wide listener. */
+  public createBackendListener() {
     const service = this
     return {
       onAdded(addedItemId: TItemId, addedItemRawData: TRawData) {
@@ -378,14 +385,39 @@ export abstract class OdmService2<
       return
     }
     this.loadingAllItemsFromServerInitiated = true
+    this.serverLoadOffset = 0
+    this._fetchPageFromServer(0)
+  }
 
-    const queryOpts = this.queriesOpts.loadAllItemsFromServer
-    const listener = this.createBackendListener()
+  loadNextPageFromServer() {
+    this._fetchPageFromServer(this.serverLoadOffset)
+  }
 
+  private _fetchPageFromServer(offset: number) {
+    const pageSize = this.serverPageSize
+    const queryOpts: QueryOpts = {
+      comments: `paginated server load (offset ${offset})`,
+      limit: pageSize,
+      offset,
+      fromLocalCache: false,
+      oneTimeGet: true,
+    }
+    let pageItemsAdded = 0
+    const base = this.createBackendListener()
+    const listener = {
+      onAdded: (id: any, data: any) => { pageItemsAdded++; base.onAdded(id, data) },
+      onModified: (id: any, data: any) => base.onModified(id, data),
+      onRemoved: (id: any) => base.onRemoved(id),
+      onFinishedProcessingChangeSet: () => {
+        base.onFinishedProcessingChangeSet()
+        this.hasMoreItemsOnServer = pageItemsAdded >= pageSize
+        this.serverLoadOffset = offset + pageSize
+      },
+    }
     this.syncStatusService.addPendingDownload(queryOpts)
-    this.odmCollectionBackend.setListener(listener, queryOpts, () => {
+    this.odmCollectionBackend.setListener(listener as any, queryOpts, () => {
       this.syncStatusService.removePendingDownload(queryOpts)
-    }) // TODO: mark as isLoading for UI - return promise from setListener
+    })
     this.backendListenerWasSet = true
   }
 
