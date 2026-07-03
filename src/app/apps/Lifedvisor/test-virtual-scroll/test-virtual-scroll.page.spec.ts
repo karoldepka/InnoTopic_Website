@@ -1,4 +1,4 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { IonicModule } from '@ionic/angular';
 
 import { TestVirtualScrollPage } from './test-virtual-scroll.page';
@@ -7,10 +7,9 @@ describe('TestVirtualScrollPage', () => {
   let component: TestVirtualScrollPage;
   let fixture: ComponentFixture<TestVirtualScrollPage>;
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-    declarations: [TestVirtualScrollPage],
-    imports: [IonicModule.forRoot()]
+    imports: [IonicModule.forRoot(), TestVirtualScrollPage]
 }).compileComponents();
 
     fixture = TestBed.createComponent(TestVirtualScrollPage);

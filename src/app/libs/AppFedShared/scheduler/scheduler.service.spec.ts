@@ -8,7 +8,7 @@ describe('SchedulerService', () => {
   }));
 
   it('should be created', () => {
-    const service = TestBed.get(SchedulerService);
+    const service = TestBed.inject(SchedulerService);
     expect(service).toBeTruthy();
   });
 });
