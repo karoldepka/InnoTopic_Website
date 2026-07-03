@@ -61,6 +61,12 @@ export class TreeHostComponent implements OnInit {
     private commandsService: CommandsService,
     private navigationService: NavigationService,
   ) {
+    // Assigned before any subscription below: navigation$/commands$ are CachedSubjects that
+    // replay their last value synchronously on subscribe, so a navigation/command that already
+    // happened before this component was constructed would otherwise fire into these callbacks
+    // while treeModel is still undefined.
+    this.treeModel = this.treeService.getRootTreeModel()
+
     this.navigationService.navigation$.subscribe((nodeId: string) => {
       const node = this.treeModel.getNodesByItemId(nodeId)[0]
       const dayPlanAncestor = node?.findAncestorMatching((n: any) => (n.content as any)?.isDayPlan)
@@ -86,7 +92,6 @@ export class TreeHostComponent implements OnInit {
       console.log('dragStop$', args)
     })
 
-    this.treeModel = this.treeService.getRootTreeModel()
     const thisComponent = this
     this.treeModel.treeListener = {
       onAfterNodeMoved() {
