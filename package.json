@@ -4,6 +4,10 @@
   "author": "npm install -g @ionic/cli@latest Framework",
   "homepage": "https://cloudtime.innotopic.com",
   "scripts": {
+    "prestart": "node scripts/write-build-info.mjs",
+    "prestartWithAutoReload": "node scripts/write-build-info.mjs",
+    "prebuild": "node scripts/write-build-info.mjs",
+    "prebuild:prod": "node scripts/write-build-info.mjs",
     "ng": "ng",
     "start": "node scripts/build-copilotkit-react-embed.mjs && ng serve --port 4207 --live-reload false",
     "startWithAutoReload": "node scripts/build-copilotkit-react-embed.mjs && ng serve --port 4207",
