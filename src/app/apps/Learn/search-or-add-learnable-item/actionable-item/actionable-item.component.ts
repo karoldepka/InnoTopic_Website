@@ -1,4 +1,4 @@
-import {Component, Injector, Input, OnInit, ChangeDetectionStrategy} from '@angular/core';
+import {ChangeDetectorRef, Component, Injector, Input, OnDestroy, OnInit, ChangeDetectionStrategy} from '@angular/core';
 import {sidesDefs, sidesDefsArray} from '../../core/sidesDefs'
 import {LearnItem} from '../../models/LearnItem'
 import {funLevelsDescriptors} from '../../models/fields/fun-level.model'
@@ -15,13 +15,22 @@ import { NgIf } from '@angular/common';
 import { SelectionCheckboxComponent } from './selection-checkbox/selection-checkbox.component';
 import { PlayButtonComponent } from '../../shared/play-button/play-button.component';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
+import { Subscription } from 'rxjs';
 
 
 /* TODO rename to  list-item */
 @Component({
     selector: 'app-actionable-item',
     templateUrl: './actionable-item.component.html',
-    changeDetection: ChangeDetectionStrategy.Eager,
+    // OnPush: this renders once per item in a list that can be in the thousands - with the
+    // previous Eager (check-always) strategy, every zone.js tick anywhere in the app (e.g. each
+    // keystroke in the unrelated search box) walked and re-evaluated every single item's
+    // template (several method calls + several *ngIf-s each), which is what made typing feel
+    // slow. Reactivity for data that isn't covered by a plain @Input reference change (the
+    // item's own field values, and selection-mode toggling) is restored via explicit
+    // markForCheck() below, driven off the same observables the rest of the ODM/selection layer
+    // already emits on.
+    changeDetection: ChangeDetectionStrategy.OnPush,
     styleUrls: ['./actionable-item.component.sass'],
     imports: [
         IonicModule,
@@ -31,21 +40,22 @@ import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
         PlayButtonComponent,
     ],
 })
-export class ActionableItemComponent extends BaseComponent implements OnInit {
+export class ActionableItemComponent extends BaseComponent implements OnInit, OnDestroy {
 
   sidesDefsArray = sidesDefsArray
 
   _item ! : LearnItem$
 
+  private itemValSubscription ? : Subscription
+  private selectionSubscription ? : Subscription
+
   @Required()
   @Input() selection ! : SelectionManager
 
   @Input() set item(item: LearnItem$) {
-    if ( this._item ) {
-      // console.log('set item to new one')
-    }
-
     this._item = item
+    this.itemValSubscription?.unsubscribe()
+    this.itemValSubscription = item.val$.subscribe(() => this.changeDetectorRef.markForCheck())
   }
 
   get item() { return this._item }
@@ -55,27 +65,24 @@ export class ActionableItemComponent extends BaseComponent implements OnInit {
   // @Required()
   @Input() index ! : number
 
-  // @Input() search: string
-
-  // @Input() set item(i: LearnItem) {
-  //   console.log(`@Input() set item`, i)
-  //   this._item = i
-  //   this.changeDetectorRef.detectChanges()
-  // }
-  //
-  // get item() {
-  //   return this._item
-  // }
-
   constructor(
     public featureService: FeatureService,
     private sanitizer: DomSanitizer,
+    private changeDetectorRef: ChangeDetectorRef,
     injector: Injector,
   ) {
     super(injector)
   }
 
-  ngOnInit() {}
+  ngOnInit() {
+    this.selectionSubscription = this.selection.effectiveSelectionChange$
+      .subscribe(() => this.changeDetectorRef.markForCheck())
+  }
+
+  ngOnDestroy() {
+    this.itemValSubscription?.unsubscribe()
+    this.selectionSubscription?.unsubscribe()
+  }
 
   joinedSides() {
     return this.item?.val?.joinedSides?.()

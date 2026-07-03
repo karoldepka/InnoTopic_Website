@@ -44,7 +44,7 @@ export class SelectionInfoComponent implements OnInit {
 
   unselectAllAndHideCheckboxes() {
     this.selection.unselectAll()
-    this.selection.isSelectionActive = false
+    this.selection.setSelectionActive(false)
   }
 
   onChangeCheckBox(event: any) {
@@ -55,7 +55,7 @@ export class SelectionInfoComponent implements OnInit {
       if ( selection.isSelectionActive ) {
         selection.setAllSelected(checked)
       } else {
-        selection.isSelectionActive = true
+        selection.setSelectionActive(true)
       }
     } else {
       selection.setAllSelected(false)

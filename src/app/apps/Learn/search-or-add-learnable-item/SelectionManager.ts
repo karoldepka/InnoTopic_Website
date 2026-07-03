@@ -6,6 +6,13 @@ export class SelectionManager<T = any> {
 
   private isAllSelected = false
 
+  /** Mutating isSelectionActive directly leaves OnPush list items (which only re-check on
+   * an @Input change or an explicit signal) unaware the checkbox row should now show/hide. */
+  setSelectionActive(active: boolean) {
+    this.isSelectionActive = active
+    this.effectiveSelectionChange$.nextWithCache()
+  }
+
   get selected() { return this.selected$.lastVal as Set<T> }
 
   selected$ = new CachedSubject<Set<T>>(new Set<T>())
