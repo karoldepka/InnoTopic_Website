@@ -1,7 +1,11 @@
 import {Component, ElementRef, Input, OnInit, ChangeDetectionStrategy} from '@angular/core';
-import { NumericPickerVal, NumericPickerComponent } from '../../../../libs/AppFedSharedIonic/ratings/numeric-picker/numeric-picker.component'
+import { NumericPickerVal } from '../../../../libs/AppFedSharedIonic/ratings/numeric-picker/numeric-picker.component'
+import {
+  StarRatingComponent,
+  StarRatingVal,
+} from '../../../../libs/AppFedSharedIonic/ratings/star-rating/star-rating.component'
 import {JournalNumericDescriptor, JournalNumericDescriptors} from '../../models/JournalNumericDescriptors'
-import {JournalCompositeFieldVal, JournalEntry} from '../../models/JournalEntry'
+import {JournalCompositeFieldVal} from '../../models/JournalEntry'
 import {JournalEntry$} from '../../models/JournalEntry$'
 import { IonicModule } from '@ionic/angular';
 import { ReactiveFormsModule, FormsModule } from '@angular/forms';
@@ -18,12 +22,16 @@ import { NgIf, NgFor } from '@angular/common';
         FormsModule,
         NgIf,
         NgFor,
-        NumericPickerComponent,
+        StarRatingComponent,
     ],
 })
 export class JournalNumericFieldsComponent implements OnInit {
 
+  private static readonly maxStoredRatingValue = 10
+
   numDescriptors = JournalNumericDescriptors.instance.array
+
+  maxStars = 5
 
   search = ''
 
@@ -43,10 +51,35 @@ export class JournalNumericFieldsComponent implements OnInit {
 
   ngOnInit() {}
 
-  onChangeNumericValue(numericPickerVal: NumericPickerVal, descriptor: JournalNumericDescriptor) {
+  starValueFor(descriptor: JournalNumericDescriptor): StarRatingVal {
+    const numericValue = this.journalEntry$?.currentVal?.getCompositeFieldNumVal(descriptor) ?? 0
+    return numericValue * (this.maxStars / JournalNumericFieldsComponent.maxStoredRatingValue)
+  }
+
+  onChangeStarValue(starValue: StarRatingVal, descriptor: JournalNumericDescriptor) {
+    if ( starValue === 0 ) {
+      this.clearNumericValue(descriptor)
+      return
+    }
+    const numericPickerVal = starValue * (JournalNumericFieldsComponent.maxStoredRatingValue / this.maxStars)
+    this.onChangeNumericValue(numericPickerVal, descriptor)
+  }
+
+  private onChangeNumericValue(numericPickerVal: NumericPickerVal, descriptor: JournalNumericDescriptor) {
     const patch: any = {}
     const existing: JournalCompositeFieldVal = (this.journalEntry$.currentVal as any)?.[descriptor.id!] ?? {}
     patch[descriptor.id!] = { ...existing, numVal: numericPickerVal }
+    this.journalEntry$.patchThrottled(patch)
+  }
+
+  private clearNumericValue(descriptor: JournalNumericDescriptor) {
+    const patch: any = {}
+    const existing: JournalCompositeFieldVal = (this.journalEntry$.currentVal as any)?.[descriptor.id!] ?? {}
+    const { numVal, ...withoutNumVal } = existing
+    const hasRemainingValue = Object.values(withoutNumVal).some(
+      value => value !== undefined && value !== null && value !== ''
+    )
+    patch[descriptor.id!] = hasRemainingValue ? { ...withoutNumVal, numVal: null } : null
     this.journalEntry$.patchThrottled(patch)
   }
 

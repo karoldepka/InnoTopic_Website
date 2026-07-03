@@ -16,16 +16,23 @@
       *ngIf="descriptor?.isShortListed || showAll || (isSearchEntered && descriptor.matchesSearch(search))"
       [hidden]="! descriptor.matchesSearch(search)"
     >
-      <apf-numeric-picker
-        (numericValue)="onChangeNumericValue($event, descriptor)"
-        [numFieldDef]="descriptor"
-      >
-        <button trailingAction class="comment-toggle" (click)="toggleComment(descriptor)" [class.has-comment]="getComment(descriptor)">
+      <div class="journal-rating">
+        <div class="journal-rating__field-name">
+          {{descriptor.uiName}}
+        </div>
+        <apf-star-rating
+          class="journal-rating__stars"
+          [allowZero]="true"
+          [maxStars]="maxStars"
+          [ngModel]="starValueFor(descriptor)"
+          (numericValue)="onChangeStarValue($event, descriptor)"
+        />
+        <button type="button" class="comment-toggle" (click)="toggleComment(descriptor)" [class.has-comment]="getComment(descriptor)">
           <ion-icon name="chatbubble-ellipses-outline"></ion-icon>
           <span *ngIf="!isCommentOpen(descriptor)">Note</span>
           <span *ngIf="isCommentOpen(descriptor)">Hide</span>
         </button>
-      </apf-numeric-picker>
+      </div>
       <ion-textarea
         *ngIf="isCommentOpen(descriptor)"
         class="field-comment"

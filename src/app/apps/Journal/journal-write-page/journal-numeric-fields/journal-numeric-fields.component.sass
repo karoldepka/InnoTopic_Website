@@ -2,8 +2,20 @@
   border-bottom: 1px solid var(--ion-border-color, rgba(0, 0, 0, 0.1))
   padding-bottom: 2px
 
-// Sits as a trailing grid cell alongside the numeric-picker's number buttons
-// (see numeric-picker__buttons), so it needs a matching touch target size.
+.journal-rating
+  display: flex
+  align-items: center
+  flex-wrap: wrap
+  gap: 4px 8px
+  padding: 4px 8px
+
+.journal-rating__field-name
+  flex: 1 1 9rem
+  min-width: 8rem
+
+.journal-rating__stars
+  flex: 0 0 auto
+
 .comment-toggle
   display: flex
   flex-direction: column

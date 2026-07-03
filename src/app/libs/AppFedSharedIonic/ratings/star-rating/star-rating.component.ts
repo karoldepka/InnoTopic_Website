@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, Component, EventEmitter, forwardRef, Input, Output} from '@angular/core'
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, forwardRef, Input, Output} from '@angular/core'
 import {NG_VALUE_ACCESSOR} from '@angular/forms'
 import {NgFor} from '@angular/common'
 import {IonicModule} from '@ionic/angular'
@@ -10,9 +10,8 @@ export type StarRatingVal = number
 
 /**
  * A tap-to-rate star widget. Clicking a star sets the rating to that star's full value;
- * clicking the *same* star again cycles it down through quarter-steps (-.25, -.5, -.75)
- * before wrapping back to the full value, so quarter/half precision doesn't need a
- * separate control.
+ * clicking the same active star again cycles its partial fill through .5, .25, .75,
+ * then back to full. With allowZero, the first star can also cycle to 0.
  */
 @Component({
   selector: 'apf-star-rating',
@@ -32,11 +31,16 @@ export class StarRatingComponent extends CustomFormControl<StarRatingVal> {
 
   @Input() maxStars = 5
 
+  @Input() allowZero = false
+
+  private readonly sameStarFractions = [0.5, 0.25, 0.75, 1]
+  private readonly firstStarFractionsWithZero = [0.5, 0.25, 0.75, 0]
+
   currentValue: StarRatingVal = 0
 
   @Output() numericValue = new EventEmitter<StarRatingVal>()
 
-  constructor() {
+  constructor(private changeDetectorRef: ChangeDetectorRef) {
     super()
     addIcons({star, 'star-outline': starOutline})
   }
@@ -48,14 +52,45 @@ export class StarRatingComponent extends CustomFormControl<StarRatingVal> {
   override writeValue(value: StarRatingVal): void {
     super.writeValue(value)
     this.currentValue = value ?? 0
+    // OnPush + ControlValueAccessor gotcha: writeValue() can be called by Angular's forms
+    // machinery (e.g. a [ngModel] binding on a parent that re-evaluates every change-detection
+    // pass, as journal-numeric-fields.component.html's does) from *outside* any event this
+    // component's own template raised - that update alone doesn't mark an OnPush view dirty, so
+    // the star fill can silently fail to visually reflect the new currentValue.
+    this.changeDetectorRef.markForCheck()
   }
 
   fillFractionFor(starIndex: number): number {
     return Math.max(0, Math.min(1, this.currentValue - (starIndex - 1)))
   }
 
-  onHalfClick(starIndex: number, half: 'left' | 'right') {
-    const newValue = half === 'left' ? starIndex - 0.5 : starIndex
+  onStarClick(starIndex: number) {
+    const newValue = this.isActiveStar(starIndex)
+      ? this.nextSameStarValue(starIndex)
+      : starIndex
+    this.setValue(newValue)
+  }
+
+  private isActiveStar(starIndex: number): boolean {
+    return this.currentValue > starIndex - 1 && this.currentValue <= starIndex
+  }
+
+  private nextSameStarValue(starIndex: number): StarRatingVal {
+    const currentFraction = this.currentValue - (starIndex - 1)
+    const fractions = this.allowZero && starIndex === 1
+      ? this.firstStarFractionsWithZero
+      : this.sameStarFractions
+    const currentFractionIndex = fractions.findIndex(
+      fraction => Math.abs(fraction - currentFraction) < 0.001
+    )
+    const nextFractionIndex = currentFractionIndex === -1
+      ? 0
+      : (currentFractionIndex + 1) % fractions.length
+
+    return starIndex - 1 + fractions[nextFractionIndex]
+  }
+
+  private setValue(newValue: StarRatingVal) {
     this.currentValue = newValue
     this.numericValue.emit(newValue)
     this.fireOnChange(newValue)
