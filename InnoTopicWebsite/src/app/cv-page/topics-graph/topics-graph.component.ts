@@ -1,7 +1,9 @@
 import {Component, Input, OnInit, ViewEncapsulation,} from '@angular/core';
+import {CommonModule} from '@angular/common';
 import {topics} from '../../TopicFriendsShared3/topics-core/topics-data';
 import {nodeConnections, nodeLinks, preset, sizes, strengths} from "./topics-graph.data";
 import {GraphConnections, GraphNode, GraphNodeId, LinkByIds} from "./topics-graph.types";
+import {topicInfoById} from './topics-graph-info.data';
 import {ActivatedRoute} from "@angular/router";
 import {color as d3Color} from 'd3-color';
 import {drag as d3Drag} from 'd3-drag';
@@ -12,6 +14,7 @@ import {zoom as d3Zoom} from 'd3-zoom';
 @Component({
   standalone: true,
   selector: 'app-topics-graph',
+  imports: [CommonModule],
   templateUrl: './topics-graph.component.html',
   styleUrls: ['./topics-graph.component.sass'],
   encapsulation: ViewEncapsulation.None,
@@ -19,6 +22,11 @@ import {zoom as d3Zoom} from 'd3-zoom';
 export class TopicsGraphComponent implements OnInit {
 
   @Input() connections: GraphConnections = {...nodeConnections};
+
+  readonly topicInfoById = topicInfoById;
+  readonly clickInfoHint = '(tap or click to show more info)';
+  selectedTopicId: string | null = null;
+  selectedTopicInfo: string | null = null;
 
   public d3Nodes: any[] = [];
   private d3Links: LinkByIds[] = [...nodeLinks];
@@ -38,6 +46,16 @@ export class TopicsGraphComponent implements OnInit {
     // console.log('d3Nodes', this.d3Nodes)
     this.generateLinks(this.connections)
     this.fetchIcons() // this inits graph when finished
+  }
+
+  getTopicHoverTitle(topicId: string): string {
+    return `${topicId} ${this.clickInfoHint}`;
+  }
+
+  showTopicInfo(topicId: string) {
+    this.selectedTopicId = topicId;
+    this.selectedTopicInfo = this.topicInfoById[topicId]
+      || `No extra info yet for ${topicId}.`;
   }
 
   private async fetchIcons() {
@@ -347,11 +365,14 @@ export class TopicsGraphComponent implements OnInit {
         .on("end", dragEnded)
     );
 
-    const titleFunc = function(d: any) { return d.id; };
+    const titleFunc = function(d: any) { return self.getTopicHoverTitle(d.id); };
     nodeCircle.append("title")
       .text(titleFunc);
     nodeCircleOverlay.append("title")
       .text(titleFunc);
+    nodeCircleOverlay.on("click", function (this: any, d: any) {
+      self.showTopicInfo(d.id);
+    });
 
     function ticked() {
       // allLinksGroup

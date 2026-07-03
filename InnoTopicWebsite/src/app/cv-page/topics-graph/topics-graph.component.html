@@ -6,3 +6,8 @@
      ></svg>
 
 </div>
+
+<div *ngIf="selectedTopicId" class="topic-info-box">
+  <strong>{{selectedTopicId}}</strong>
+  <div>{{selectedTopicInfo}}</div>
+</div>

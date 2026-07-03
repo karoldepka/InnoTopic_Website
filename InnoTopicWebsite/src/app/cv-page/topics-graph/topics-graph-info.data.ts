@@ -1,0 +1,15 @@
+export const topicInfoById: Record<string, string> = {
+  InnoTopic: 'InnoTopic is my personal technology map and portfolio graph. It visualizes how topics connect in real-world projects and where my strongest experience is.',
+  Frontend: 'Frontend covers building interactive user interfaces and accessible user flows. I focus on maintainable architecture, performance, and strong UX fundamentals.',
+  Backend: 'Backend includes API design, data modeling, and integration work. I prioritize reliability, observability, and practical scalability.',
+  JavaScript: 'JavaScript is one of my core languages for web and tooling. I use it across frontend applications, backend services, and automation.',
+  TypeScript: 'TypeScript adds strong typing and safer refactoring to JavaScript codebases. It helps me move faster with confidence in larger projects.',
+  Angular: 'Angular is one of my primary frameworks for structured frontend development. I use it for modular architecture, reusable components, and robust enterprise-style apps.',
+  Ionic: 'Ionic allows me to deliver cross-platform apps with one codebase. I use it to combine web speed with mobile-ready user experience.',
+  React: 'React is a flexible UI library I use for component-driven applications. I rely on it when fast iteration and ecosystem tooling are a priority.',
+  'Node.js': 'Node.js powers backend APIs, tooling, and scripts in my projects. I use it for event-driven services and efficient full-stack workflows.',
+  Python: 'Python is key in my AI and data-related work. I use it for experimentation, API backends, and machine learning integrations.',
+  'Artificial Intelligence': 'Artificial Intelligence in my work means practical LLM-powered features and data pipelines. I focus on useful product outcomes rather than hype.',
+  AWS: 'AWS is one of the cloud platforms I use for hosting and managed services. I apply it for secure deployments and production-grade infrastructure.',
+  Docker: 'Docker helps me package applications consistently across environments. It is central to reproducible local development and deployment workflows.',
+};
