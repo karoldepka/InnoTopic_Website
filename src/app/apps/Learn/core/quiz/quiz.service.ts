@@ -12,7 +12,7 @@ import {DurationMs, nullish, TimeMsEpoch} from '../../../../libs/AppFedShared/ut
 import {CachedSubject} from '../../../../libs/AppFedShared/utils/cachedSubject2/CachedSubject2'
 import {countBy2} from '../../../../libs/AppFedShared/utils/utils'
 import {hoursAsMs, isInFuture, secondsAsMs} from '../../../../libs/AppFedShared/utils/time/date-time-utils'
-import {debounceTime, filter, map, shareReplay, tap} from 'rxjs/operators'
+import {filter, map, shareReplay, tap} from 'rxjs/operators'
 import {throttleTimeWithLeadingTrailing_ReallyThrottle} from '../../../../libs/AppFedShared/utils/rxUtils'
 import {LocalOptionsPatchableObservable, OptionsService} from '../options.service'
 import {Rating} from '../../models/fields/self-rating.model'
@@ -74,10 +74,13 @@ export class QuizService {
     // https://stackoverflow.com/questions/50276165/combinelatest-deprecated-in-favor-of-static-combinelatest
     this.options$,
     (this.learnDoService.localItems$.pipe(
-      debounceTime(4000),
-      // FIXME: performance: debounce and more ms
-        // also anything using `localItems$.pipe` is suspicious
-      throttleTimeWithLeadingTrailing_ReallyThrottle(secondsAsMs(1))) as Observable<LearnItem$[]>
+      // Was debounceTime(4000): debounce only emits once the source goes quiet, so with the
+      // collection's always-on realtime listener it could get reset indefinitely under active
+      // sync (another device editing, the initial local-cache-then-server two-phase load
+      // landing <4s apart, etc.) and never emit at all - permanently stuck "Loading Quiz...".
+      // throttleTime with leading:true guarantees an immediate first value while still capping
+      // recompute frequency to ~once per 4s under heavy churn.
+      throttleTimeWithLeadingTrailing_ReallyThrottle(secondsAsMs(4))) as Observable<LearnItem$[]>
     ),
     combineLatest([
       timer(0, secondsAsMs(60) /* FIXME make the timer longer for performance/battery */),

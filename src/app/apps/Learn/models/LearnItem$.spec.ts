@@ -18,6 +18,7 @@ function makeFakeService(): any {
     itemHistoryService: { onPatch: jasmine.createSpy('onPatch') },
     syncStatusService: { handleSavingPromise: jasmine.createSpy('handleSavingPromise') },
     authService: { authUser$: { lastVal: { uid: 'user-1' } } },
+    browserOdmStorage: { savePendingEdit: jasmine.createSpy('savePendingEdit').and.resolveTo(undefined) },
   }
 }
 
@@ -110,9 +111,11 @@ describe('LearnItem$ — getRoi()', () => {
     expect(item$.getRoi()).toBeUndefined()
   })
 
-  it('returns undefined when there is no importance set', () => {
+  it('defaults to medium importance (not undefined) when no importance is set', () => {
+    // importanceDescriptors.undefined.numeric deliberately equals medium's, so an unset
+    // importance still yields a usable ROI instead of an undefined one.
     const item$ = makeItem$(svc, { time_estimate: '1h' })
-    expect(item$.getRoi()).toBeUndefined()
+    expect(item$.getRoi()).toBeCloseTo(5 / (60 * 60 * 1000), 15)
   })
 
   it('calculates importance.numeric / durationMs when both are present', () => {
@@ -138,7 +141,7 @@ describe('LearnItem$ — getEffectiveCategories()', () => {
     expect(item$.getEffectiveCategories()).toBe('')
   })
 
-  it('includes the item's own categories', () => {
+  it('includes the item\'s own categories', () => {
     const item$ = makeItem$(svc, { categories: 'Polish' })
     expect(item$.getEffectiveCategories()).toContain('Polish')
   })
