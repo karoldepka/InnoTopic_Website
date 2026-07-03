@@ -45,13 +45,18 @@ describe('NodeContentComponent keyboard shortcuts', () => {
     expect(event.stopImmediatePropagation).toHaveBeenCalled()
   })
 
-  it('does not also insert a sibling when enter is modified', () => {
+  it('does not also insert a sibling when enter is modified or already handled', () => {
     const component = createComponent()
     component.treeNode = {isVisualRoot: false} as any
-    const event = createKeyboardEvent({altKey: true})
     spyOn(component, 'addNodeAfterThis')
-
-    component.keyPressEnter(event)
+    ;[
+      createKeyboardEvent({altKey: true}),
+      createKeyboardEvent({ctrlKey: true}),
+      createKeyboardEvent({metaKey: true}),
+      createKeyboardEvent({defaultPrevented: true}),
+    ].forEach(event => {
+      component.keyPressEnter(event)
+    })
 
     expect(component.addNodeAfterThis).not.toHaveBeenCalled()
   })

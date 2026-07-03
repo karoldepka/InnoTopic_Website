@@ -210,7 +210,7 @@ export class NodeContentComponent implements OnInit, AfterViewInit, OnDestroy, I
 
   keyPressAltEnter(event: Event) {
     event.preventDefault()
-    ;(event as KeyboardEvent).stopImmediatePropagation?.()
+    (event as KeyboardEvent).stopImmediatePropagation?.()
     this.addChild()
   }
 
