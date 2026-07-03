@@ -6,6 +6,8 @@ import {LearnItem$} from '../../models/LearnItem$'
 import { NgIf, NgFor } from '@angular/common';
 import { IonicModule } from '@ionic/angular';
 import { ActionableItemComponent } from '../actionable-item/actionable-item.component';
+import { CdkVirtualScrollViewport, CdkVirtualForOf } from '@angular/cdk/scrolling';
+import { CdkAutoSizeVirtualScroll } from '@angular/cdk-experimental/scrolling';
 
 @Component({
     selector: 'app-item-list',
@@ -17,6 +19,9 @@ import { ActionableItemComponent } from '../actionable-item/actionable-item.comp
         IonicModule,
         NgFor,
         ActionableItemComponent,
+        CdkVirtualScrollViewport,
+        CdkAutoSizeVirtualScroll,
+        CdkVirtualForOf,
     ],
 })
 export class ItemListComponent implements OnInit {

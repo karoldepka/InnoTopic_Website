@@ -86,12 +86,13 @@
       <!--autosize-->
       <!-- [itemSize]="90" -->
       <div
-        *cdkVirtualFor="let item$ of $safeNavigationMigration((items$Sorted | async)?.slice()); let index = index;
+        *cdkVirtualFor="let item$ of $safeNavigationMigration((items$Sorted | async)?.slice()); trackBy: trackById;
+                       let index = index;
                        let count = count;
                        let first = first;
                        let last = last;
                        let even = even;
-                       let odd = odd;"> <!-- TODO trackBy -->
+                       let odd = odd;">
         <!-- TODO: /A/R/FlexLife/cloud-time-ion/node_modules/@angular/cdk-experimental/scrolling/auto-size-virtual-scroll.d.ts
             AutoSizeVirtualScrollStrategy
         -->
@@ -116,8 +117,6 @@
 
       </div>
     </cdk-virtual-scroll-viewport>
-
-    ====== after viewport ======
   </ng-container>
 
 
