@@ -13,14 +13,15 @@ import {
 import { UntypedFormControl, UntypedFormGroup, ReactiveFormsModule } from '@angular/forms'
 import { debugLog } from '../../../utils/log'
 import { IonicModule } from '@ionic/angular';
-import { AsyncPipe } from '@angular/common';
+import { AsyncPipe, NgIf } from '@angular/common';
+import { OryolFirestoreBackfillService } from '../../../db-supabase/oryol-firestore-backfill.service'
 
 @Component({
     selector: 'app-toolbar-popover',
     templateUrl: './toolbar-popover.component.html',
     changeDetection: ChangeDetectionStrategy.Eager,
     styleUrls: ['./toolbar-popover.component.sass'],
-    imports: [IonicModule, ReactiveFormsModule, AsyncPipe]
+    imports: [IonicModule, ReactiveFormsModule, AsyncPipe, NgIf]
 })
 export class ToolbarPopoverComponent implements OnInit {
 
@@ -41,7 +42,15 @@ export class ToolbarPopoverComponent implements OnInit {
   constructor(
     public debugService: DebugService,
     public configService: ConfigService,
+    public backfillService: OryolFirestoreBackfillService,
   ) { }
+
+  /** Click the button once the item count above has visibly stopped climbing - see
+   * OryolFirestoreBackfillService's doc comment for why that's a manual judgment call rather
+   * than something this can detect and gate on automatically. */
+  runBackfillToSupabase() {
+    this.backfillService.run(this.treeHost.treeModel.root)
+  }
 
   ngOnInit() {
     console.log('ToolbarPopoverComponent ngOnInit')

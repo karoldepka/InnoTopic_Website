@@ -12,7 +12,7 @@ import {
 import { NodeContentComponent } from '../../tree-shared/node-content/node-content.component'
 import { OryColumn } from '../../tree-shared/OryColumn'
 import { debugLog } from '../../utils/log'
-import { ActivatedRoute } from '@angular/router'
+import { ActivatedRoute, Router } from '@angular/router'
 import { DebugService } from '../../core/debug.service'
 import {Command, CommandsService} from '../../core/commands.service'
 import { NavigationService } from '../../core/navigation.service'
@@ -46,16 +46,21 @@ export class TreeHostComponent implements OnInit {
 
   public showAllCols: boolean = true
 
+  /** Set while a deep-linked rootNodeId from the URL hasn't resolved to a loaded node yet
+   * (e.g. a fresh page load, before the tree stream has delivered it) - retried as items
+   * arrive. Also suppresses the visualRoot->URL sync below from clobbering the still-pending
+   * deep link back to '/tree'. */
+  private pendingRootNodeIdFromRoute: string | undefined
+
   constructor(
     public treeService: TreeService,
     public treeDragDropService: TreeDragDropService,
     private activatedRoute : ActivatedRoute,
+    private router: Router,
     private debugService: DebugService,
     private commandsService: CommandsService,
     private navigationService: NavigationService,
   ) {
-    const rootNodeInclusionId = this.activatedRoute.snapshot.params['rootNodeId']
-    console.log('rootNodeInclusionId', rootNodeInclusionId)
     this.navigationService.navigation$.subscribe((nodeId: string) => {
       const node = this.treeModel.getNodesByItemId(nodeId)[0]
       const dayPlanAncestor = node?.findAncestorMatching((n: any) => (n.content as any)?.isDayPlan)
@@ -100,16 +105,63 @@ export class TreeHostComponent implements OnInit {
   }
 
   ngOnInit() {
+    // router -> visualRoot. Drives both the initial deep link and browser back/forward.
     this.activatedRoute.params.subscribe(params => {
-      const rootNodeInclusionId = params['rootNodeId']
-      // console.log('activatedRoute.params.subscribe rootNodeId', rootNodeInclusionId)
-      // const node = this.treeModel.mapNodeInclusionIdToNode.get(rootNodeInclusionId)
-      // node && node.navigateInto()
+      this.applyRouteParamToVisualRoot(params['rootNodeId'])
+    })
+
+    // Data streams in async (Firestore/ODM), so a fresh deep link may target a node that
+    // hasn't loaded yet - retry as items arrive rather than erroring out immediately.
+    this.treeModel.dataItemsService.onItemAddedOrModified$.subscribe(() => {
+      if (this.pendingRootNodeIdFromRoute) {
+        this.applyRouteParamToVisualRoot(this.pendingRootNodeIdFromRoute)
+      }
+    })
+
+    // visualRoot -> router. Centralized here so every navigateInto() call site (menu, toolbar,
+    // "go to milestones", etc.) gets URL sync for free without touching each one - a past
+    // attempt to call router.navigate() directly from a single call site (tree-node-menu-popover)
+    // was flaky/racy, so this is intentionally the one place that owns the sync.
+    this.treeModel.navigation.visualRoot$.subscribe((visualRoot: RootTreeNode) => {
+      if (this.pendingRootNodeIdFromRoute) {
+        return // don't clobber a still-resolving deep link back to '/tree'
+      }
+      const itemId = visualRoot === this.treeModel.root ? undefined : visualRoot.itemId
+      const currentParam = this.activatedRoute.snapshot.params['rootNodeId']
+      if ((itemId ?? undefined) === (currentParam ?? undefined)) {
+        return
+      }
+      this.router.navigate(itemId ? ['/tree', itemId] : ['/tree'])
+    })
+
+    // Fast subtree-scoped fetch when navigating into a node - a no-op on backends that don't
+    // support it (e.g. Firestore, which already loads everything upfront). The whole-tree
+    // cache-then-incremental sync from loadNodesTree() keeps running regardless, so this is
+    // purely "paint this subtree sooner", not a different data path.
+    this.treeModel.navigation.visualRoot$.subscribe((visualRoot: RootTreeNode) => {
+      if (visualRoot !== this.treeModel.root) {
+        this.treeModel.treeService.loadSubtreeFast(visualRoot.itemId)
+      }
     })
 
     setTimeout(() => {
       this.showTree = true
     }, 0 /*2000*/)
+  }
+
+  private applyRouteParamToVisualRoot(rootNodeId: string | undefined) {
+    if (!rootNodeId) {
+      this.pendingRootNodeIdFromRoute = undefined
+      this.treeModel.navigation.navigateToRoot()
+      return
+    }
+    const node = this.treeModel.getNodesByItemId(rootNodeId)[0]
+    if (!node) {
+      this.pendingRootNodeIdFromRoute = rootNodeId
+      return
+    }
+    this.pendingRootNodeIdFromRoute = undefined
+    this.treeModel.navigation.navigateInto(node)
   }
 
   appendNode() {

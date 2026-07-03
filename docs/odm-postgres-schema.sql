@@ -67,34 +67,154 @@ grant select, insert on public.odm_item_history to authenticated;
 -- requests aren't rejected before the owner check even runs - a truly anonymous request
 -- has no `sub` claim, so it can never match an owner and stays denied.
 
+-- OrYoL subtree sharing: lets an OryItem's owner grant read/write access to that item and
+-- all its descendants (via ancestor_ids) to another user. Group grants are schema-reserved
+-- (granted_to_group_id) but not yet queried by any RLS policy - adding group support later
+-- is additive, not a schema change.
+create table if not exists public.ory_subtree_shares (
+  id uuid primary key default gen_random_uuid(),
+  subtree_root_item_id text not null,
+  granted_to_uid text,
+  granted_to_group_id text,
+  granted_by_uid text not null,
+  permission text not null default 'write' check (permission in ('read', 'write')),
+  created_at timestamptz not null default now(),
+  check (granted_to_uid is not null or granted_to_group_id is not null)
+);
+
+create index if not exists ory_subtree_shares_granted_to_uid_idx
+  on public.ory_subtree_shares (granted_to_uid);
+
+create index if not exists ory_subtree_shares_subtree_root_idx
+  on public.ory_subtree_shares (subtree_root_item_id);
+
+alter table public.ory_subtree_shares enable row level security;
+
+grant select, insert, delete on public.ory_subtree_shares to authenticated, anon;
+
+drop policy if exists "Users can read shares involving them" on public.ory_subtree_shares;
+create policy "Users can read shares involving them"
+  on public.ory_subtree_shares
+  for select
+  to authenticated, anon
+  using (
+    granted_to_uid = (select auth.jwt() ->> 'sub')
+    or granted_by_uid = (select auth.jwt() ->> 'sub')
+  );
+
+-- Only the subtree's actual owner can grant/revoke access to it (not a re-share by someone
+-- who merely has write access) - simplest safe default for this pass.
+drop policy if exists "Users can grant access to subtrees they own" on public.ory_subtree_shares;
+create policy "Users can grant access to subtrees they own"
+  on public.ory_subtree_shares
+  for insert
+  to authenticated, anon
+  with check (
+    granted_by_uid = (select auth.jwt() ->> 'sub')
+    and exists (
+      select 1 from public.odm_items i
+      where i.collection = 'OryItem'
+        and i.id = subtree_root_item_id
+        and i.owner = (select auth.jwt() ->> 'sub')
+    )
+  );
+
+drop policy if exists "Users can revoke shares they granted" on public.ory_subtree_shares;
+create policy "Users can revoke shares they granted"
+  on public.ory_subtree_shares
+  for delete
+  to authenticated, anon
+  using (granted_by_uid = (select auth.jwt() ->> 'sub'));
+
+-- Extend odm_items RLS: access via ownership (unchanged) OR a matching subtree share, scoped
+-- to OryItem/OryNodeInclusion rows only so this can't widen access on unrelated collections.
 drop policy if exists "Users can read their ODM items" on public.odm_items;
 create policy "Users can read their ODM items"
   on public.odm_items
   for select
   to authenticated, anon
-  using (owner = (select auth.jwt() ->> 'sub'));
+  using (
+    owner = (select auth.jwt() ->> 'sub')
+    or (
+      collection in ('OryItem', 'OryNodeInclusion')
+      and exists (
+        select 1 from public.ory_subtree_shares s
+        where s.granted_to_uid = (select auth.jwt() ->> 'sub')
+          and (s.subtree_root_item_id = odm_items.id
+               or s.subtree_root_item_id = any (odm_items.ancestor_ids))
+      )
+    )
+  );
 
 drop policy if exists "Users can insert their ODM items" on public.odm_items;
 create policy "Users can insert their ODM items"
   on public.odm_items
   for insert
   to authenticated, anon
-  with check (owner = (select auth.jwt() ->> 'sub'));
+  with check (
+    owner = (select auth.jwt() ->> 'sub')
+    or (
+      collection in ('OryItem', 'OryNodeInclusion')
+      and exists (
+        select 1 from public.ory_subtree_shares s
+        where s.granted_to_uid = (select auth.jwt() ->> 'sub')
+          and s.permission = 'write'
+          and (s.subtree_root_item_id = odm_items.id
+               or s.subtree_root_item_id = any (odm_items.ancestor_ids))
+      )
+    )
+  );
 
 drop policy if exists "Users can update their ODM items" on public.odm_items;
 create policy "Users can update their ODM items"
   on public.odm_items
   for update
   to authenticated, anon
-  using (owner = (select auth.jwt() ->> 'sub'))
-  with check (owner = (select auth.jwt() ->> 'sub'));
+  using (
+    owner = (select auth.jwt() ->> 'sub')
+    or (
+      collection in ('OryItem', 'OryNodeInclusion')
+      and exists (
+        select 1 from public.ory_subtree_shares s
+        where s.granted_to_uid = (select auth.jwt() ->> 'sub')
+          and s.permission = 'write'
+          and (s.subtree_root_item_id = odm_items.id
+               or s.subtree_root_item_id = any (odm_items.ancestor_ids))
+      )
+    )
+  )
+  with check (
+    owner = (select auth.jwt() ->> 'sub')
+    or (
+      collection in ('OryItem', 'OryNodeInclusion')
+      and exists (
+        select 1 from public.ory_subtree_shares s
+        where s.granted_to_uid = (select auth.jwt() ->> 'sub')
+          and s.permission = 'write'
+          and (s.subtree_root_item_id = odm_items.id
+               or s.subtree_root_item_id = any (odm_items.ancestor_ids))
+      )
+    )
+  );
 
 drop policy if exists "Users can delete their ODM items" on public.odm_items;
 create policy "Users can delete their ODM items"
   on public.odm_items
   for delete
   to authenticated, anon
-  using (owner = (select auth.jwt() ->> 'sub'));
+  using (
+    owner = (select auth.jwt() ->> 'sub')
+    or (
+      collection in ('OryItem', 'OryNodeInclusion')
+      and exists (
+        select 1 from public.ory_subtree_shares s
+        where s.granted_to_uid = (select auth.jwt() ->> 'sub')
+          and s.permission = 'write'
+          and (s.subtree_root_item_id = odm_items.id
+               or s.subtree_root_item_id = any (odm_items.ancestor_ids))
+      )
+    )
+  );
 
 drop policy if exists "Users can read their ODM history" on public.odm_item_history;
 create policy "Users can read their ODM history"

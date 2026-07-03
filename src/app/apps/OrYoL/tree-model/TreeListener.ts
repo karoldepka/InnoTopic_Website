@@ -1,7 +1,14 @@
 /**
  * Created by kd on 2017-10-28.
  */
-import {
+// type-only: ItemId/NodeInclusionId are plain `string` aliases, but a regular import here
+// pulled in OryItem$.ts's whole runtime dependency chain (TreeTableNodeContent -> Columns ->
+// cell components -> CellComponent -> TreeModel) just for two type names - fine as long as
+// nothing else eagerly imports this file before that chain's classes are defined, but adding a
+// new eager entry point (SupabaseTreeService, wired into the always-loaded db-firestore.module)
+// exposed the latent circular dependency ("Class extends value undefined"). `import type` is
+// erased entirely, so it can't do that regardless of load order.
+import type {
   ItemId,
   NodeInclusionId,
 } from '../db/OryItem$'

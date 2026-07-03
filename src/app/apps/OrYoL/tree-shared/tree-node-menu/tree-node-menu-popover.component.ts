@@ -86,10 +86,9 @@ export class TreeNodeMenuPopoverComponent implements OnInit {
 
   navigateInto() {
     console.log('navigateInto', this.treeNode)
-    // this.router.navigate(['/tree', this.treeNode!.nodeInclusion!.nodeInclusionId
-    // /* note: inclusion id, because give item can be in multiple places */]);
-    // FIXME: router.navigate might be causing problem with this sometimes working and sometimes not; maybe race condition?
-    // maybe multiple instances of page component
+    // URL sync (router.navigate) now happens centrally in TreeHostComponent, driven off
+    // treeModel.navigation.visualRoot$ - calling router.navigate() here directly used to be
+    // flaky/racy, so this only needs to update the in-memory visual root.
     this.treeNode.navigateInto()
   }
 

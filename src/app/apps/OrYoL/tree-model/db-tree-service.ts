@@ -1,7 +1,10 @@
-import {DbTreeListener} from './TreeListener'
+import type {DbTreeListener} from './TreeListener'
 import {nullish} from '../../../libs/AppFedShared/utils/type-utils'
 
-import {OryBaseTreeNode} from './TreeModel'
+// type-only - see the note in TreeListener.ts/SupabaseTreeService.ts: a real import here pulls
+// in TreeModel.ts's heavy runtime chain (OryItem$ -> ... -> cell components -> CellComponent),
+// which is fine only as long as nothing loads this file before that chain is fully defined.
+import type {OryBaseTreeNode} from './TreeModel'
 
 /* TODO: write new db code in such a way to not depend on tree-model stuff (e.g. pass ItemId (==string) instead of OryTreeNode) */
 /* TODO: use ItemData and ItemInclusionData (== any) placeholder types instead of `any` */
@@ -35,6 +38,15 @@ export abstract class DbTreeService {
   // abstract patchChildInclusionDataWithNewParent(nodeInclusionId: string, newParentNode: OryTreeNode): void
 
   abstract deleteWithoutConfirmation(itemId: string): void
+
+  /** Optional fast path: when navigating into a subtree, fetch just that subtree first (a
+   * single `ancestor_ids`-`.contains()` query) so it paints quickly, layered on top of
+   * `loadNodesTree`'s normal whole-tree cache-then-incremental-sync (which keeps running in the
+   * background regardless, so the app stays offline-capable beyond just this subtree). Default
+   * no-op - `loadNodesTree` alone is already a complete implementation (e.g. Firestore's
+   * load-everything-upfront), this is purely an optimization some backends can opt into. */
+  loadSubtreeFast(itemId: string): void {
+  }
 
 }
 

@@ -96,3 +96,6 @@ offrepo-gitignored/
 documentation/
 
 .vercel
+
+# Vitest browser-mode auto-generated failure screenshots
+__screenshots__/
