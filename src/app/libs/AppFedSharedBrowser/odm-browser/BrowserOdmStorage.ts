@@ -19,7 +19,7 @@ export interface BrowserOdmRow<TRaw> extends PostgresOdmRow<TRaw> {
 }
 
 const DB_NAME = 'lifesuite-odm-cache'
-const DB_VERSION = 2
+const DB_VERSION = 3
 const STORE = 'odm_items'
 const COLLECTION_INDEX = 'by_collection'
 const SYNC_CURSORS_STORE = 'sync_cursors'
@@ -67,6 +67,16 @@ function openDb(): Promise<IDBDatabase> {
         db.createObjectStore(SYNC_CURSORS_STORE, {keyPath: 'collection'})
         db.createObjectStore(PENDING_EDITS_STORE, {keyPath: 'key'})
       }
+      if (event.oldVersion < 3) {
+        // A prior bug let a *limited* preview fetch (opts1: top-270-most-recently-modified)
+        // also advance the sync cursor from its own max server_modified_at, even though it
+        // never saw most of the collection - not a real "everything up to here is synced"
+        // watermark. That silently cursor-skipped the rest of the collection on every
+        // following incremental fetch (see SupabaseOdmCollectionBackend.fetchRows). Wipe any
+        // cursor written under the old, buggy logic so every device does one full resync and
+        // self-heals, rather than requiring a manual storage clear.
+        req.transaction!.objectStore(SYNC_CURSORS_STORE).clear()
+      }
     }
     req.onsuccess = () => {
       const db = req.result
@@ -90,6 +100,12 @@ export class BrowserOdmStorage {
   /** Emits whenever `put()` resolves a genuine conflict (see below) - subscribed to by
    * OdmConflictToastService to notify the user. */
   readonly conflictDetected$ = new Subject<OdmConflict>()
+
+  /** Emits whenever the pending-edits journal changes (savePendingEdit/clearPendingEdit) -
+   * subscribed to by SyncStatusService to keep a reload-surviving "still needs to sync" count/
+   * list, distinct from (and a superset of) the in-memory-only "actively saving right now"
+   * promise tracking it already had. */
+  readonly pendingEditsChanged$ = new Subject<void>()
 
   /** Upserts a row, preserving `whenFirstStoredLocally` from any existing row and always
    * bumping `whenLastStoredLocally`. Accepts either a fresh row or a previously-stored one
@@ -199,12 +215,14 @@ export class BrowserOdmStorage {
     const tx = db.transaction(PENDING_EDITS_STORE, 'readwrite')
     const edit: OdmPendingEdit = {key: rowKey(collection, itemId), collection, item_id: itemId, patch, whenLastModified}
     await requestToPromise(tx.objectStore(PENDING_EDITS_STORE).put(edit))
+    this.pendingEditsChanged$.next()
   }
 
   async clearPendingEdit(collection: string, itemId: string): Promise<void> {
     const db = await this.dbp
     const tx = db.transaction(PENDING_EDITS_STORE, 'readwrite')
     await requestToPromise(tx.objectStore(PENDING_EDITS_STORE).delete(rowKey(collection, itemId)))
+    this.pendingEditsChanged$.next()
   }
 
   async getPendingEdit(collection: string, itemId: string): Promise<OdmPendingEdit | undefined> {
@@ -213,10 +231,19 @@ export class BrowserOdmStorage {
     return requestToPromise(tx.objectStore(PENDING_EDITS_STORE).get(rowKey(collection, itemId)))
   }
 
-  async getAllPendingEdits(collection: string): Promise<OdmPendingEdit[]> {
+  /** Every still-unsynced edit across all collections - the reload-surviving source of truth for
+   * "what still needs to reach the server" (the in-memory promise tracking in SyncStatusService
+   * alone doesn't survive a reload, and previously cleared its count on a failed save even though
+   * the edit was still durably queued for retry). */
+  async getAllPendingEditsEverywhere(): Promise<OdmPendingEdit[]> {
     const db = await this.dbp
     const tx = db.transaction(PENDING_EDITS_STORE, 'readonly')
     const all = await requestToPromise<OdmPendingEdit[]>(tx.objectStore(PENDING_EDITS_STORE).getAll())
-    return (all ?? []).filter(edit => edit.collection === collection)
+    return all ?? []
+  }
+
+  async getAllPendingEdits(collection: string): Promise<OdmPendingEdit[]> {
+    const all = await this.getAllPendingEditsEverywhere()
+    return all.filter(edit => edit.collection === collection)
   }
 }

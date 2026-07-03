@@ -393,6 +393,15 @@ export class OdmItem$2<
     console.log(`saveNowToDb`)
     this.setIdAndWhenCreatedIfNecessary()
     this.setLastModifiedIfNecessary(modificationOpts)
+    // Unlike patchNow/patchThrottled (incremental edits to an already-loaded item), this is the
+    // whole-document save used for first-time creation (add(), createChild()) - there's no prior
+    // persisted state to diff against, so the entire current value is what's actually unsynced
+    // until the write confirms. Without journaling it the same way a patch is, a brand-new item
+    // created while offline that failed its first write attempt was never marked as needing a
+    // retry - it just sat local-only-cached forever, since nothing else ever calls this again
+    // for an item nobody edits further.
+    Object.assign(this.pendingDbPatch as any, this.currentVal)
+    this.persistPendingEditDurably()
     this.odmService.saveNowToDb(this)
     this.resolveFuncPendingThrottledIfNecessary()
   }

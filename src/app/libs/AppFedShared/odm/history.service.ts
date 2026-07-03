@@ -39,7 +39,7 @@ export abstract class HistoryService<TInMem extends {}, TRaw extends {} = TInMem
   }
 
   protected createOdmItem$ForExisting(itemId: OdmItemId<TRaw>, inMemVal: TInMem | undefined): HistoryItem$ {
-    return new HistoryItem$(this)
+    return new HistoryItem$(this, itemId, inMemVal)
   }
   // throttle
 

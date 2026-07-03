@@ -118,6 +118,7 @@ export class BrowserOdmCollectionBackend<TRaw> extends OdmCollectionBackend<TRaw
 
   private errorAlertAndThrow(...args: any[]): never {
     this.errorAlert(...args)
-    throw new Error(['collectionName', this.collectionName, ...args].map(String).join(' '))
+    const cause = args.find(a => a && typeof a === 'object' && typeof a.message === 'string')
+    throw new Error(['collectionName', this.collectionName, ...args].map(String).join(' '), cause ? {cause} : undefined)
   }
 }

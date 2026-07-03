@@ -130,27 +130,39 @@ export abstract class OdmService2<
     // this.subscribeToBackendCollection();
   }
 
-  /** Local edits that hadn't been confirmed written before the last reload/crash are durably
-   * journaled (BrowserOdmStorage) - resume them here so an interrupted sync actually retries,
-   * rather than staying silently stuck until the item happens to be opened again.
-   *
-   * Waits for a real Firebase user first (this runs at service-construction time, i.e. app
-   * bootstrap, which can well be before auth has resolved) - resuming any earlier requires a
-   * userId for the save/owner check, same as every other backend call. */
-  private hasResumedPendingEdits = false
+  /** Local edits that hadn't been confirmed written before the last reload/crash (or that
+   * failed to save while offline) are durably journaled (BrowserOdmStorage) - resume them here
+   * so an interrupted sync actually retries, rather than staying silently stuck until the item
+   * happens to be opened again. Two triggers, both plausible moments a previously-stuck edit
+   * could now go through:
+   * - app load, once a real Firebase user is available (this runs at service-construction time,
+   *   i.e. app bootstrap, which can well be before auth has resolved - resuming any earlier
+   *   requires a userId for the save/owner check, same as every other backend call);
+   * - the browser regaining connectivity (`online` event) - the case a write failed while
+   *   offline and nothing else would otherwise re-trigger it. */
+  private isResumingPendingEdits = false
 
   private resumePendingEdits() {
-    this.authService.authUser$.subscribe(async user => {
-      if (!user || this.hasResumedPendingEdits) {
-        return
-      }
-      this.hasResumedPendingEdits = true
+    this.authService.authUser$.subscribe(() => this.resumePendingEditsNow())
+    if (typeof window !== 'undefined') {
+      window.addEventListener('online', () => this.resumePendingEditsNow())
+    }
+  }
+
+  private async resumePendingEditsNow() {
+    if (this.isResumingPendingEdits || !this.authService.authUser$.lastVal) {
+      return
+    }
+    this.isResumingPendingEdits = true
+    try {
       const pendingEdits = await this.browserOdmStorage.getAllPendingEdits(this.className)
       for (const edit of pendingEdits) {
         const item$ = this.obtainItem$ById(edit.item_id as TItemId)
         await item$.resumeUnsyncedPatch(edit.patch)
       }
-    })
+    } finally {
+      this.isResumingPendingEdits = false
+    }
   }
 
   _ensureItemAdded(item$: TOdmItem$) {

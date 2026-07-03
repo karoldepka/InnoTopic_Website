@@ -108,7 +108,7 @@ export class SupabaseOdmCollectionBackend<TRaw> extends OdmCollectionBackend<TRa
         .catch(error => this.errorAlert('setListener fetchRows error', error))
 
       if (!queryOpts.oneTimeGet) {
-        this.subscribeToChanges(listener, callback)
+        this.subscribeToChanges(listener, queryOpts, callback)
       }
     })
   }
@@ -190,7 +190,13 @@ export class SupabaseOdmCollectionBackend<TRaw> extends OdmCollectionBackend<TRa
       }
     }
 
-    if (!isScoped && rows.length > 0) {
+    // Only a full, unlimited pass (the .range()-paginated branch above) actually saw every row
+    // up to "now" and can safely advance the cursor. A limited/`queryOpts.limit` fetch (e.g.
+    // opts1's fast "most recently modified N" preview, ordered by when_last_modified desc) only
+    // saw the newest rows - advancing the cursor from its max server_modified_at would make the
+    // very next unscoped fetch's `.gte(cursor - buffer)` skip everything older than ~10 minutes
+    // before that preview's newest row, silently hiding the rest of the collection.
+    if (!isScoped && !queryOpts.limit && rows.length > 0) {
       const maxServerModifiedAt = rows.reduce((max, row) => row.server_modified_at > max ? row.server_modified_at : max, rows[0].server_modified_at)
       this.browserOdmStorage.updateSyncCursor(this.collectionName, maxServerModifiedAt)
         .catch(error => this.errorAlert('updateSyncCursor error', error))
@@ -206,8 +212,16 @@ export class SupabaseOdmCollectionBackend<TRaw> extends OdmCollectionBackend<TRa
     return {...rest, item_id: id} as PostgresOdmRow<TRaw>
   }
 
-  private subscribeToChanges(listener: OdmCollectionBackendListener<TRaw, OdmItemId<TRaw>>, callback: () => void): void {
+  private subscribeToChanges(
+    listener: OdmCollectionBackendListener<TRaw, OdmItemId<TRaw>>,
+    queryOpts: QueryOpts,
+    callback: () => void,
+  ): void {
     const owner = this.requireUserId()
+    // Set once the channel first reaches SUBSCRIBED - distinguishes the initial connect (the
+    // setListener() fetchRows() call above already loaded the starting state) from a later
+    // reconnect after a drop.
+    let hasConnectedBefore = false
     const channel = this.supabase
       .channel(`${this.collectionName}-odm-${++this.channelNameCounter}`)
       .on(
@@ -240,6 +254,21 @@ export class SupabaseOdmCollectionBackend<TRaw> extends OdmCollectionBackend<TRa
           // Realtime is a live-update enhancement; the initial fetch already loaded data.
           // A channel error is non-fatal, so log only rather than showing a blocking alert.
           console.error('[Supabase ODM] Realtime channel error', 'collectionName', this.collectionName)
+        } else if (status === 'SUBSCRIBED') {
+          if (hasConnectedBefore) {
+            // Reconnecting after a drop (network hiccup, tab backgrounded and throttled, etc.).
+            // Realtime does not replay events missed while disconnected, so anything changed in
+            // that window (e.g. an item another device synced while this one was offline) would
+            // otherwise be silently missed until the next full page reload. Re-run the same
+            // incremental, cursor-based fetch used on initial load to catch up.
+            this.fetchRows(queryOpts)
+              .then(rows => {
+                this.emitRowsAsAdded(rows, listener)
+                callback?.()
+              })
+              .catch(error => this.errorAlert('subscribeToChanges reconnect catch-up error', error))
+          }
+          hasConnectedBefore = true
         }
       })
 
@@ -278,6 +307,11 @@ export class SupabaseOdmCollectionBackend<TRaw> extends OdmCollectionBackend<TRa
 
   private errorAlertAndThrow(...args: any[]): never {
     this.errorAlert(...args)
-    throw new Error(['collectionName', this.collectionName, ...args].map(String).join(' '))
+    // Stringifying an object arg (e.g. Supabase's {message, details, hint, code} error) via
+    // String(...) collapses it to "[object Object]", losing the actual failure reason (e.g.
+    // "TypeError: Failed to fetch" for an offline write) - preserve it as `cause` so callers
+    // further up (SyncStatusService's network-error detection) can still see it.
+    const cause = args.find(a => a && typeof a === 'object' && typeof a.message === 'string')
+    throw new Error(['collectionName', this.collectionName, ...args].map(String).join(' '), cause ? {cause} : undefined)
   }
 }
