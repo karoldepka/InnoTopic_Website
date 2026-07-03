@@ -11,6 +11,7 @@ import { FeatureConfigComponent } from '../../../feature-config/feature-config.c
 import { ThemeConfigComponent } from '../../../theme-config/theme-config.component';
 import { NgIf, NgForOf, AsyncPipe, JsonPipe } from '@angular/common';
 import { IonicModule } from '@ionic/angular';
+import {stripHtml} from '../../../utils/html-utils'
 
 @Component({
     selector: 'app-sync-popover',
@@ -81,7 +82,8 @@ export class SyncPopoverComponent extends BaseComponent implements OnInit {
   get durablePendingSyncItems$() { return this.syncStatusService.durablePendingSyncItems$ }
 
   describePendingSyncItem(patch: Record<string, any>, collection: string): string {
-    const title = patch?.['title'] ?? patch?.['name']
-    return title ? `${collection}: "${String(title).replace(/<[^>]*>/g, '')}"` : collection
+    const title = patch?.['title'] ?? patch?.['name'] ?? patch?.['question']
+    const plainTitle = stripHtml(title)?.trim()
+    return plainTitle ? `${collection}: "${plainTitle}"` : collection
   }
 }

@@ -15,6 +15,7 @@ import { debugLog } from '../../../utils/log'
 import { IonicModule } from '@ionic/angular';
 import { AsyncPipe, NgIf } from '@angular/common';
 import { OryolFirestoreBackfillService } from '../../../db-supabase/oryol-firestore-backfill.service'
+import type {OryBaseTreeNode} from '../../../tree-model/TreeModel'
 
 @Component({
     selector: 'app-toolbar-popover',
@@ -49,7 +50,7 @@ export class ToolbarPopoverComponent implements OnInit {
    * OryolFirestoreBackfillService's doc comment for why that's a manual judgment call rather
    * than something this can detect and gate on automatically. */
   runBackfillToSupabase() {
-    this.backfillService.run(this.treeHost.treeModel.root)
+    this.backfillService.run(this.treeHost.treeModel.root as unknown as OryBaseTreeNode)
   }
 
   ngOnInit() {
