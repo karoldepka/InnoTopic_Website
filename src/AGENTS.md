@@ -3,7 +3,7 @@ Project constitution
 This is an offline-first (but sync-enabled), mobile-first (but cross-platform).
 User data is precious so we save it as quickly as reasonably possible (throttleTime).
 
-The target group is self-improvement-conscious consumers with some power-users. We initially don't show power-user specific UI elements - we hide them under an appropriate expand action or dot dot dot / hamburger menu.
+The target group is self-improvement-conscious consumers with some power-users. We initially don't show power-user specific UI elements - we hide them under an appropriate expand action or dot dot dot / hamburger menu. Also target group is people with ADHD (want to stay focused on a task list, and timetrack to detect distraction wasting time) and people who are into self-improvement and quantified-Self.
 
 The app has to work really well on mobile, so we need to conserve horizontal space (e.g. not overload top toolbar with icons).
 
