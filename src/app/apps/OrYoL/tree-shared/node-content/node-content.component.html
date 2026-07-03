@@ -13,7 +13,7 @@
 
 <div
   style="display: flex; align-items: stretch; font-size: 13px"
-  (keydown.alt.enter)="addChild()"
+  (keydown.alt.enter)="keyPressAltEnter($event)"
   (keydown.meta.enter)="keyPressMetaEnter($event)"
   (keydown.control.enter)="keyPressMetaEnter($event)"
   (keydown.control.arrowup)="reorderUp($event)"
