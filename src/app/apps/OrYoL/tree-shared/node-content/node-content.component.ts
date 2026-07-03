@@ -209,14 +209,15 @@ export class NodeContentComponent implements OnInit, AfterViewInit, OnDestroy, I
   }
 
   keyPressAltEnter(event: Event) {
+    const keyboardEvent = event as KeyboardEvent
     event.preventDefault()
-    (event as KeyboardEvent).stopImmediatePropagation?.()
+    keyboardEvent.stopImmediatePropagation()
     this.addChild()
   }
 
   keyPressEnter(event: Event) {
     const keyboardEvent = event as KeyboardEvent
-    if (event.defaultPrevented || keyboardEvent.altKey || keyboardEvent.ctrlKey || keyboardEvent.metaKey) {
+    if (keyboardEvent.defaultPrevented || keyboardEvent.altKey || keyboardEvent.ctrlKey || keyboardEvent.metaKey) {
       return
     }
     if ( this.treeNode.isVisualRoot ) {
