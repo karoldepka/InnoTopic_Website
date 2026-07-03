@@ -22,9 +22,22 @@
   *ngIf="(authUser$ | async) else notLoggedIn"
 >
   <ng-container
+    *ngIf="(durablePendingSyncItems$ | async) as pendingSyncItems"
+  >
+    <ng-container *ngIf="pendingSyncItems.length">
+      Queued to sync (saved on this device, will retry automatically): {{pendingSyncItems.length}}
+      <ul>
+        <li *ngFor="let item of pendingSyncItems">
+          {{describePendingSyncItem(item.patch, item.collection)}}
+        </li>
+      </ul>
+    </ng-container>
+  </ng-container>
+
+  <ng-container
     *ngIf="(syncStatus$ | async)?.pendingUploadsCount let count; else allUploaded"
   >
-    To upload: {{count}}
+    Uploading now: {{count}}
     <ul>
       <li *ngFor="let description of pendingUploadDescriptions(syncStatus$ | async)">
         {{description}}

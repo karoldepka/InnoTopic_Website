@@ -82,10 +82,10 @@
   >
 <!--    <div       [ngClass]="{ hide: ! (pendingDownloadsCount$ | async), fade: true, 'action-icon': true }">DDD</div>-->
       <img
-        [ngClass]="{ hide: ! (pendingUploadsCount$ | async), fade: true, 'action-icon': true }"
+        [ngClass]="{ hide: ! (needsUpload$ | async), fade: true, bob: (isUploading$ | async), 'action-icon': true }"
         style="height: 25px; color: var(--secondary)"
         src="assets/libs/sync/icons/cloud_up_arrow.svg"
-        alt="pending uploads"
+        [alt]="(isUploading$ | async) ? 'uploading' : 'pending uploads'"
       >
 
 <!--    </div>-->
@@ -120,14 +120,19 @@
 
 
     <img
-      [ngClass]="{ hide: ! (pendingDownloadsCount$ | async), fade: true, 'action-icon': true }"
+      [ngClass]="{ hide: ! (pendingDownloadsCount$ | async), fade: true, bob: (isDownloading$ | async), 'action-icon': true }"
       style="height: 25px; color: var(--secondary)"
       src="assets/libs/sync/icons/cloud_down_arrow.svg"
-      alt="pending downloads"
+      alt="downloading"
     >
 
     <!--    </div>-->
   </div>
+
+  <div
+    *ngIf="(totalPendingCount$ | async) as pendingCount"
+    class="pending-count-badge"
+  >{{pendingCount}}</div>
 
 </div>
 <!--bb-->

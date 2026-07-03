@@ -74,4 +74,14 @@ export class SyncPopoverComponent extends BaseComponent implements OnInit {
       upload => upload.titleOfChange || 'Unsaved change'
     )
   }
+
+  /** durablePendingSyncItems$ - unlike pendingUploads above, this survives a page reload and
+   * stays populated while an edit is offline/failed and waiting to retry, not just while a save
+   * is actively in flight this session. */
+  get durablePendingSyncItems$() { return this.syncStatusService.durablePendingSyncItems$ }
+
+  describePendingSyncItem(patch: Record<string, any>, collection: string): string {
+    const title = patch?.['title'] ?? patch?.['name']
+    return title ? `${collection}: "${String(title).replace(/<[^>]*>/g, '')}"` : collection
+  }
 }

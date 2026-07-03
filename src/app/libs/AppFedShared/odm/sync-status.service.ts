@@ -1,8 +1,10 @@
 import {Injectable, Injector} from '@angular/core';
+import {ToastController} from '@ionic/angular'
 import {CachedSubject} from '../utils/cachedSubject2/CachedSubject2'
 import {appGlobals} from '../g'
 import {BaseService} from '../base.service'
 import {QueryOpts} from './OdmCollectionBackend'
+import {BrowserOdmStorage, OdmPendingEdit} from '../../AppFedSharedBrowser/odm-browser/BrowserOdmStorage'
 
 export class SyncStatus {
   pendingUploadsCount ? : number
@@ -45,11 +47,31 @@ export class SyncStatusService extends BaseService {
     return this.syncStatus$.lastVal ?. pendingUploadsCount
   }
 
+  /** Reload-surviving "still needs to reach the server" list, sourced from BrowserOdmStorage's
+   * durable pending-edits journal rather than in-memory promises. Unlike `pendingUploads` above
+   * (which only reflects a save actively in flight *this session*, and previously cleared itself
+   * the instant a save failed even though the edit was still durably queued for retry), this
+   * stays populated across a page reload and across a failed/offline attempt - until the write
+   * actually confirms. */
+  public readonly durablePendingSyncItems$ = new CachedSubject<OdmPendingEdit[]>([])
+
+  private browserOdmStorage = this.injector.get(BrowserOdmStorage)
+
+  private lastNetworkErrorToastAt = 0
+
   constructor(
     injector: Injector,
   ) {
     super(injector)
     console.log('SyncStatusService service constructor')
+    this.refreshDurablePendingSyncItems()
+    this.browserOdmStorage.pendingEditsChanged$.subscribe(() => this.refreshDurablePendingSyncItems())
+  }
+
+  private refreshDurablePendingSyncItems() {
+    this.browserOdmStorage.getAllPendingEditsEverywhere()
+      .then(items => this.durablePendingSyncItems$.next(items))
+      .catch(error => console.error('refreshDurablePendingSyncItems failed', error))
   }
 
   /** crude placeholder to distinguish "Unsaved" From "Saving...";
@@ -82,7 +104,39 @@ export class SyncStatusService extends BaseService {
       this.pendingPromises.delete(promise)
       this.pendingUploads.delete(pendingUpload)
       this.emitSyncStatus()
+      this.maybeShowNetworkErrorToast(error)
     })
+  }
+
+  /** A failed save while offline is expected, not an error the user needs to act on - the edit
+   * is already durably queued (durablePendingSyncItems$) and will retry automatically on
+   * reconnect. Surface that plainly instead of leaving it silent (console-only) or looking like
+   * a real failure. Throttled so a burst of failures (e.g. several offline edits all retrying at
+   * once) doesn't spam multiple toasts. */
+  private maybeShowNetworkErrorToast(error: any) {
+    if (!this.isLikelyNetworkError(error)) {
+      return
+    }
+    const now = Date.now()
+    if (now - this.lastNetworkErrorToastAt < 15000) {
+      return
+    }
+    this.lastNetworkErrorToastAt = now
+    this.injector.get(ToastController).create({
+      message: 'Network problem - your change is saved on this device and will sync automatically once you\'re back online.',
+      duration: 6000,
+      color: 'warning',
+      position: 'bottom',
+    }).then(toast => toast.present())
+      .catch(toastError => console.error('maybeShowNetworkErrorToast failed', toastError))
+  }
+
+  private isLikelyNetworkError(error: any): boolean {
+    if (typeof navigator !== 'undefined' && !navigator.onLine) {
+      return true
+    }
+    const message = String(error?.cause?.message ?? error?.message ?? error ?? '')
+    return /failed to fetch|networkerror|network request failed|load failed|err_internet_disconnected|err_network/i.test(message)
   }
 
   private emitSyncStatus() {
