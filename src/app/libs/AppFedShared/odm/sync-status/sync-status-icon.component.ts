@@ -61,6 +61,16 @@ export class SyncStatusIconComponent implements OnInit {
     return this.pendingDownloadsCount$.pipe(map(count => !!count))
   }
 
+  /** Checkmark visibility. Previously based on syncStatus$.isAllSynced, which only reflects the
+   * ephemeral in-flight-promise tracking - it could read true (nothing currently in flight)
+   * while needsUpload$ was also true (something durably queued but not actively retrying, e.g.
+   * offline), showing the checkmark and the up-arrow on top of each other at once. */
+  get isFullySynced$() {
+    return combineLatest([this.needsUpload$, this.pendingDownloadsCount$]).pipe(
+      map(([needsUpload, downloadsCount]) => !needsUpload && !downloadsCount)
+    )
+  }
+
   constructor(
     public syncStatusService: SyncStatusService,
     public popoverController: PopoverController,

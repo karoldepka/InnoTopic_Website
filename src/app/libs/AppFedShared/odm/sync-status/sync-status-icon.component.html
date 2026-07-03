@@ -69,7 +69,7 @@
 <!--      </svg>-->
 
       <img
-        [ngClass]="{ hide: ! ((syncStatus$ | async)?.isAllSynced), fade: true, 'action-icon': true }"
+        [ngClass]="{ hide: ! (isFullySynced$ | async), fade: true, 'action-icon': true }"
         style="height: 25px; color: var(--secondary)"
         src="assets/libs/sync/icons/cloud_checkmark.svg"
         alt="all uploaded to cloud"
@@ -129,10 +129,6 @@
     <!--    </div>-->
   </div>
 
-  <div
-    *ngIf="(totalPendingCount$ | async) as pendingCount"
-    class="pending-count-badge"
-  >{{pendingCount}}</div>
 
 </div>
 <!--bb-->
