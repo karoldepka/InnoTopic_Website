@@ -6,7 +6,7 @@
   [attr.aria-label]="'Rate ' + starIndex + ' stars'"
 >
   <ion-icon name="star-outline" class="star-rating__bg"></ion-icon>
-  <span class="star-rating__fill" [style.width.%]="fillFractionFor(starIndex) * 100">
+  <span class="star-rating__fill" [style.width.em]="fillFractionFor(starIndex)">
     <ion-icon name="star"></ion-icon>
   </span>
 </button>
