@@ -3,7 +3,7 @@ import {LearnItemItemsService} from '../../core/learn-item-items.service'
 import {ListProcessing} from '../list-processing'
 import {Required} from '../../../../libs/AppFedShared/utils/angular/Required.decorator'
 import {LearnItem$} from '../../models/LearnItem$'
-import { NgIf, NgFor } from '@angular/common';
+import { NgIf } from '@angular/common';
 import { IonicModule } from '@ionic/angular';
 import { ActionableItemComponent } from '../actionable-item/actionable-item.component';
 import { CdkVirtualScrollViewport, CdkVirtualForOf } from '@angular/cdk/scrolling';
@@ -17,7 +17,6 @@ import { CdkAutoSizeVirtualScroll } from '@angular/cdk-experimental/scrolling';
     imports: [
         NgIf,
         IonicModule,
-        NgFor,
         ActionableItemComponent,
         CdkVirtualScrollViewport,
         CdkAutoSizeVirtualScroll,
