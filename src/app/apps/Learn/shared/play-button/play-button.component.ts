@@ -1,6 +1,7 @@
 import {ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnInit} from '@angular/core';
 import {LearnItem, LearnItemId} from '../../models/LearnItem'
-import {AngularFirestore} from '@angular/fire/compat/firestore'
+import {collection, doc, getDoc} from 'firebase/firestore'
+import {getAppFirestore} from '../../../../libs/AppFedSharedFirebase/firebase-app'
 import {LearnItem$} from '../../models/LearnItem$'
 import { NgIf } from '@angular/common';
 import { IonicModule } from '@ionic/angular';
@@ -24,7 +25,6 @@ export class PlayButtonComponent implements OnInit {
   private source ? : AudioBufferSourceNode
 
   constructor(
-    protected angularFirestore: AngularFirestore,
     protected changeDetectorRef: ChangeDetectorRef,
   ) { }
 
@@ -39,7 +39,7 @@ export class PlayButtonComponent implements OnInit {
     }
     this.isPlaying = true
     // TODO: move to service
-    this.angularFirestore.collection('LearnDoAudio').doc(this.itemId || this.item?.id).get().subscribe(audioItem => {
+    getDoc(doc(collection(getAppFirestore(), 'LearnDoAudio'), this.itemId || this.item?.id)).then(audioItem => {
       if ( ! this.isPlaying ) {
         return
       }

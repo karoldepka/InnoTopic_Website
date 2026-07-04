@@ -1,8 +1,7 @@
 import {OdmBackend} from "../../AppFedShared/odm/OdmBackend";
 import {FirestoreOdmCollectionBackend} from "./FirestoreOdmCollectionBackend";
 import {Injectable, Injector} from "@angular/core";
-import {debugLog, errorAlert} from "../../AppFedShared/utils/log";
-import {AngularFirestore} from "@angular/fire/compat/firestore";
+import {debugLog} from "../../AppFedShared/utils/log";
 import {OdmItem__OLD__} from "../../AppFedShared/odm/OdmItem__OLD__";
 
 /**
@@ -25,7 +24,6 @@ export class FirestoreOdmBackend extends OdmBackend {
 
   constructor(
     injector: Injector,
-    protected angularFirestore: AngularFirestore
   ) {
     super(injector)
     this.initDb()
@@ -42,18 +40,13 @@ export class FirestoreOdmBackend extends OdmBackend {
   }
 
   protected initDb() {
-    this.angularFirestore.firestore.enablePersistence({
-      synchronizeTabs: true
-    }).then(() => {
-      // window.alert('persistence enabled')
-      debugLog('Firestore persistence enabled')
-      this.authService.authUser$.subscribe(user => {
-        if ( user ) {
-          this.backendReady$.nextWithCache(true)
-        }
-      })
-    }).catch((caught: any) => {
-      errorAlert('Firestore enablePersistence error', caught)
+    // Persistence is configured at Firestore-instance-creation time now (see
+    // getAppFirestore() in firebase-app.ts), so there's no separate enablePersistence() step.
+    debugLog('Firestore persistence enabled')
+    this.authService.authUser$.subscribe(user => {
+      if ( user ) {
+        this.backendReady$.nextWithCache(true)
+      }
     })
   }
 }

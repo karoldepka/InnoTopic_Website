@@ -15,15 +15,20 @@ import {FirestoreAllInclusionsSyncer, loadArchivedItems} from './FirestoreAllInc
 import { ChildrenChangesEvent } from '../tree-model/children-changes-event'
 import { NodeOrderer } from '../tree-model/node-orderer'
 import { TimeStamper } from '../tree-model/TimeStamper'
-import firestore from 'firebase/compat/app'
-
-import 'firebase/compat/firestore';
 import {nullish} from '../../../libs/AppFedShared/utils/type-utils'
-import {AngularFirestore, DocumentReference, DocumentSnapshot, Query} from '@angular/fire/compat/firestore'
-// Required for side-effects
-// require('firebase/firestore');
-import firebase from 'firebase/compat/app'
-import CollectionReference = firebase.firestore.CollectionReference
+import {
+  CollectionReference,
+  DocumentReference,
+  DocumentSnapshot,
+  Query,
+  collection,
+  doc,
+  query,
+  setDoc,
+  updateDoc,
+  where,
+} from 'firebase/firestore'
+import {getAppFirestore} from '../../../libs/AppFedSharedFirebase/firebase-app'
 import {SyncStatusService} from '../../../libs/AppFedShared/odm/sync-status.service'
 import {ItemId} from '../db/OryItem$'
 import {OryBaseTreeNode, OryNonRootTreeNode} from '../tree-model/TreeModel'
@@ -66,7 +71,7 @@ export class FirestoreTreeService extends DbTreeService {
 
   pendingListeners = 0
 
-  db = this.angularFirestore.firestore
+  db = getAppFirestore()
 
   private ITEMS_COLLECTION = FirestoreTreeService.dbPrefix + '_items'
   private ROOTS_COLLECTION = FirestoreTreeService.dbPrefix + '_roots'
@@ -77,7 +82,6 @@ export class FirestoreTreeService extends DbTreeService {
 
 
   constructor(
-    protected angularFirestore: AngularFirestore,
     protected syncStatusService: SyncStatusService,
   ) {
     super()
@@ -92,7 +96,7 @@ export class FirestoreTreeService extends DbTreeService {
   }
 
   deleteWithoutConfirmation(itemId: string) {
-    let promise = this.itemDocById(itemId).update('deleted', new Date()).catch((error: any) => {
+    let promise = updateDoc(this.itemDocById(itemId), 'deleted', new Date()).catch((error: any) => {
       errorAlert('Firestore write failed in FirestoreTreeService.deleteWithoutConfirmation', error)
       throw error
     }) // TODO
@@ -133,7 +137,7 @@ export class FirestoreTreeService extends DbTreeService {
           const nodeInclusion = new NodeInclusion(nodeInclusionId, nodeInclusionData.parentNode.id, nodeInclusionData.orderNum)
           Object.assign(nodeInclusion, nodeInclusionData) // NOTE: this should assign orderNum
           // console.log('includedItemDoc', includedItemDoc)
-          const itemData = includedItemDoc.exists ? includedItemDoc.data() : null
+          const itemData = includedItemDoc.exists() ? includedItemDoc.data() : null
           // console.log('itemData:::', itemData)
           debugLog('listener.onNodeAddedOrModified change includedItemDoc.id ' + includedItemDoc.id, childrenChangesEvent)
           listener.onNodeAddedOrModified(
@@ -193,19 +197,19 @@ export class FirestoreTreeService extends DbTreeService {
   }
 
   private itemsCollection(): CollectionReference {
-    return this.db.collection(this.ITEMS_COLLECTION)
+    return collection(this.db, this.ITEMS_COLLECTION)
   }
 
   private itemsQuery(): Query {
     let ret: Query = this.itemsCollection()
     if ( ! loadArchivedItems ) {
-      ret = ret.where('isArchived', '==', false)
+      ret = query(ret, where('isArchived', '==', false))
     }
     return ret
   }
 
   private itemDocById(dbId: string): DocumentReference {
-    return this.itemsCollection().doc(dbId)
+    return doc(this.itemsCollection(), dbId)
   }
 
   private addNodeInclusionToParent(parentId: string, nodeInclusion: NodeInclusion /*{ node: firebase.firestore.DocumentReference }*/,
@@ -255,7 +259,7 @@ export class FirestoreTreeService extends DbTreeService {
     // newNode.itemData = newItem // this was added while adding timestamps; FIXME: overwriting whatever might be there
     this.timeStamper.onAfterCreated(newNode.content.itemData)
     newNode.content.itemData.isArchived = false // TODO isArchivedWhen
-    this.itemsCollection().doc(newNode.itemId).set(newNode.content.itemData).then(() => {
+    setDoc(doc(this.itemsCollection(), newNode.itemId), newNode.content.itemData).then(() => {
       const itemDocRef = this.itemDocById(newNode.itemId)
       // console.log('itemDocRef', itemDocRef)
       // newNode.itemId = itemDocRef.id // NOTE: initially it is UUID, overwritten here /* Perhaps this indirectly causes ExpressionChangedAfterItHasBeenCheckedError */
@@ -299,7 +303,7 @@ export class FirestoreTreeService extends DbTreeService {
      A Promise resolved once the data has been successfully written to the backend
      (Note that it won't resolve while you're offline). */
     console.log('FirestoreTreeService extends DbTreeService: patchItemData', itemData)
-    let promise = this.itemDocById(itemId).update(itemData).catch((error: any) => {
+    let promise = updateDoc(this.itemDocById(itemId), itemData).catch((error: any) => {
       errorAlert('Firestore write failed in FirestoreTreeService.patchItemData', error)
       throw error
     })

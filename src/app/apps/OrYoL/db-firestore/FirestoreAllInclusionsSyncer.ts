@@ -16,11 +16,22 @@ import {
   Subject,
 } from 'rxjs'
 import { MultiMap } from '../utils/multi-map'
-import {Firestore} from '@angular/fire/firestore'
-import {CollectionReference, DocumentChange, DocumentReference, Query, QuerySnapshot} from '@angular/fire/compat/firestore'
-import firebase from 'firebase/compat/app'
-import DocumentSnapshot = firebase.firestore.DocumentSnapshot
-import "firebase/firestore";
+import {
+  CollectionReference,
+  DocumentChange,
+  DocumentReference,
+  DocumentSnapshot,
+  Firestore,
+  Query,
+  QuerySnapshot,
+  collection,
+  doc,
+  onSnapshot,
+  query,
+  setDoc,
+  updateDoc,
+  where,
+} from 'firebase/firestore'
 
 class InclusionsValueAndCallbacks {
   /* Used as initial value if someone subscribes */
@@ -41,26 +52,26 @@ export class FirestoreAllInclusionsSyncer {
   private onSnapshotCount = 0
 
   constructor(
-    private db: any,
+    private db: Firestore,
     private dbPrefix: string,
   ) {
 
   }
 
   private inclusionsCollection(): CollectionReference {
-    return this.db.collection(this.INCLUSIONS_COLLECTION)
+    return collection(this.db, this.INCLUSIONS_COLLECTION)
   }
 
   private inclusionsQuery(): Query {
     let ret: Query = this.inclusionsCollection()
     if ( ! loadArchivedItems ) {
-      ret = ret.where('isArchived', '==', false)
+      ret = query(ret, where('isArchived', '==', false))
     }
     return ret
   }
 
   startQuery() {
-    this.inclusionsQuery().onSnapshot((snapshot: QuerySnapshot<any>) => {
+    onSnapshot(this.inclusionsQuery(), (snapshot: QuerySnapshot<any>) => {
       this.onSnapshotCount ++
       console.log('inclusionsQuery().onSnapshot onSnapshotCount', this.onSnapshotCount)
       // debugLog('FirestoreAllInclusionsSyncer onSnapshot snapshot', snapshot, snapshot.metadata)
@@ -118,7 +129,7 @@ export class FirestoreAllInclusionsSyncer {
       nodeInclusionFirebaseObject: Omit<FirestoreNodeInclusion, 'parentNode'>
   ) {
     ;(nodeInclusionFirebaseObject as FirestoreNodeInclusion).parentNode = parentDoc
-    const promise = this.docByInclusionId(nodeInclusion.nodeInclusionId).set(nodeInclusionFirebaseObject).catch((error: any) => {
+    const promise = setDoc(this.docByInclusionId(nodeInclusion.nodeInclusionId), nodeInclusionFirebaseObject).catch((error: any) => {
       errorAlert('Firestore write failed in FirestoreAllInclusionsSyncer.addNodeInclusionToParent', error)
       throw error
     })
@@ -127,7 +138,7 @@ export class FirestoreAllInclusionsSyncer {
 
 
   private docByInclusionId(nodeInclusionId: string) {
-    return this.inclusionsCollection().doc(nodeInclusionId)
+    return doc(this.inclusionsCollection(), nodeInclusionId)
   }
 
   private putInclusionsForParentAndFireEvent(parentId: string, inclusions: DocumentSnapshot[], eventType: 'added' | 'modified') {
@@ -162,7 +173,7 @@ export class FirestoreAllInclusionsSyncer {
   }
 
   patchChildInclusionData(parentItemId: string, itemInclusionId: string, itemInclusionData: any) {
-    this.docByInclusionId(itemInclusionId).update(itemInclusionData).catch((error: any) => {
+    updateDoc(this.docByInclusionId(itemInclusionId), itemInclusionData).catch((error: any) => {
       errorAlert('Firestore write failed in FirestoreAllInclusionsSyncer.patchChildInclusionData', error)
       throw error
     })

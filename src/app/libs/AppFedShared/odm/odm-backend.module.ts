@@ -1,11 +1,6 @@
 import {CommonModule} from '@angular/common'
 import {Injector, NgModule} from '@angular/core'
 import {HttpClientModule} from '@angular/common/http'
-import {AngularFireModule} from '@angular/fire/compat'
-import {AngularFireDatabaseModule} from '@angular/fire/compat/database'
-import {AngularFirestoreModule} from '@angular/fire/compat/firestore'
-import {AngularFirestore} from '@angular/fire/compat/firestore'
-import {firebaseConfig} from '../../../firebase.config'
 import {environment} from '../../../../environments/environment'
 import {OdmBackend} from './OdmBackend'
 import {OdmModule} from './odm.module'
@@ -54,7 +49,7 @@ function resolvePrimaryBackend(injector: Injector, backendName: string): OdmBack
     console.warn('[ODM] Firestore disabled via settings — using Supabase as primary')
     return injector.get(SupabaseOdmBackend)
   }
-  return new FirestoreOdmBackend(injector, injector.get(AngularFirestore))
+  return new FirestoreOdmBackend(injector)
 }
 
 @NgModule({
@@ -63,9 +58,6 @@ function resolvePrimaryBackend(injector: Injector, backendName: string): OdmBack
     CommonModule,
     HttpClientModule,
     OdmModule,
-    AngularFireModule.initializeApp(firebaseConfig),
-    AngularFireDatabaseModule,
-    AngularFirestoreModule,
   ],
   providers: [
     SupabaseOdmClientService,

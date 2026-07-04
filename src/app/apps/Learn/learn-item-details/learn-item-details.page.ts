@@ -2,11 +2,12 @@ import {Component, Injector, OnInit, ChangeDetectionStrategy} from '@angular/cor
 import {sidesDefsArray} from '../core/sidesDefs'
 import {ActivatedRoute, NavigationStart, Router} from '@angular/router'
 import {LearnItemItemsService} from '../core/learn-item-items.service'
-import {AngularFirestore, AngularFirestoreDocument} from '@angular/fire/compat/firestore'
+import {DocumentReference, collection, doc, getDoc} from 'firebase/firestore'
+import {getAppFirestore} from '../../../libs/AppFedSharedFirebase/firebase-app'
 import { AlertController, IonicModule } from '@ionic/angular'
 import {LearnItem, LearnItemId} from '../models/LearnItem'
 import {ignorePromise} from '../../../libs/AppFedShared/utils/promiseUtils'
-import {Observable} from 'rxjs'
+import {Observable, from} from 'rxjs'
 import {take} from 'rxjs/operators'
 import {nullish} from '../../../libs/AppFedShared/utils/type-utils'
 import {LearnItem$} from '../models/LearnItem$'
@@ -84,7 +85,6 @@ export class LearnItemDetailsPage extends BaseComponent implements OnInit {
   constructor(
     public activatedRoute: ActivatedRoute,
     public learnDoService: LearnItemItemsService,
-    public angularFirestore: AngularFirestore,
     public alertController: AlertController,
     public router: Router,
     public navigationService: NavigationService,
@@ -101,13 +101,13 @@ export class LearnItemDetailsPage extends BaseComponent implements OnInit {
     });
   }
 
-  private doc: AngularFirestoreDocument<LearnItem> = this.angularFirestore.collection<LearnItem>(`LearnItem`).doc(this.id)
+  private doc: DocumentReference<LearnItem> = doc(collection(getAppFirestore(), `LearnItem`), this.id) as DocumentReference<LearnItem>
 
   ngOnInit() {
-    this.doc.get().pipe(take(1)).subscribe({
+    from(getDoc(this.doc)).pipe(take(1)).subscribe({
       next: snapshot => {
         this.itemLoadFinished = true
-        const rawItem = snapshot.exists ? snapshot.data() : undefined
+        const rawItem = snapshot.exists() ? snapshot.data() : undefined
         if (rawItem) {
           this.item$.applyDataFromDbAndEmit(this.learnDoService.convertFromDbFormat(rawItem))
         }

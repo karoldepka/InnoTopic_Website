@@ -1,5 +1,4 @@
 import { Injectable } from '@angular/core';
-import { AngularFirestore } from '@angular/fire/compat/firestore';
 import { ignorePromise } from '../libs/AppFedShared/utils/promiseUtils';
 import { Router } from '@angular/router';
 import { ToastController } from '@ionic/angular';
@@ -70,7 +69,6 @@ export class AuthService {
   }
 
   constructor(
-    private angularFirestore: AngularFirestore,
     private authFacade: AuthFacadeService,
     private Router: Router,
     private toastController: ToastController
@@ -102,7 +100,7 @@ export class AuthService {
   private async onLoginSuccess(user: User) {
     const name = user.displayName || user.email || 'You are now signed in'
     await this.showSuccessToast(`Signed in as ${name}`)
-    ignorePromise(this.Router.navigateByUrl('/timers'))
+    ignorePromise(this.Router.navigateByUrl('/journal'))
   }
 
   /** Show a transient success toast to give the user positive feedback. */

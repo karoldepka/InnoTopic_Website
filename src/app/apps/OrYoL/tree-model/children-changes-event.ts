@@ -1,6 +1,6 @@
 
 /* This could be made more Firebase-independent by unpacking what is in DocumentSnapshot into db-vendor-independent form*/
-import {DocumentSnapshot} from '@angular/fire/compat/firestore'
+import {DocumentSnapshot} from 'firebase/firestore'
 
 export class ChildrenChangesEvent {
   constructor(

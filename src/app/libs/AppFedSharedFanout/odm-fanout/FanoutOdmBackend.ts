@@ -1,5 +1,4 @@
 import {Injectable, Injector} from '@angular/core'
-import {AngularFirestore} from '@angular/fire/compat/firestore'
 import {OdmBackend} from '../../AppFedShared/odm/OdmBackend'
 import {OdmItem__OLD__} from '../../AppFedShared/odm/OdmItem__OLD__'
 import {FirestoreOdmBackend} from '../../AppFedSharedFirebase/odm-firestore/firestore-odm-backend.service'
@@ -21,12 +20,11 @@ export class FanoutOdmBackend extends OdmBackend {
 
   constructor(
     injector: Injector,
-    angularFirestore: AngularFirestore,
     supabaseOdmBackend: SupabaseOdmBackend,
     neonOdmBackend: NeonOdmBackend,
   ) {
     super(injector)
-    this.primaryBackend = new FirestoreOdmBackend(injector, angularFirestore)
+    this.primaryBackend = new FirestoreOdmBackend(injector)
     // Neon isn't wired up (no server / connection string) yet - keep the adapter implemented
     // but leave it out of the fanout until environment.neon.enabled is turned back on.
     const neonEnabled = (environment as any).neon?.enabled ?? true

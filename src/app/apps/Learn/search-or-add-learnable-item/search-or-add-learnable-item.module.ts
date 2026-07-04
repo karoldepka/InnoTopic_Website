@@ -9,7 +9,6 @@ import { SearchOrAddLearnableItemPageComponent } from './search-or-add-learnable
 import {OdmModule} from '../../../libs/AppFedShared/odm/odm.module'
 import {ActionableItemComponent} from './actionable-item/actionable-item.component'
 import {MicComponent} from './mic/mic.component'
-import {AngularFireStorageModule} from '@angular/fire/compat/storage'
 import {LearnSharedModule} from '../shared/learn-shared.module'
 import {TestItemComponent} from './test-item/test-item.component'
 import {LearnStatsComponent} from './learn-stats/learn-stats.component'
@@ -38,7 +37,6 @@ const routes: Routes = [
         IonicModule,
         RouterModule.forChild(routes),
         OdmModule,
-        AngularFireStorageModule,
         SharedModule2,
         EditorModule,
         ReactiveFormsModule,

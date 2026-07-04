@@ -15,7 +15,8 @@ import {
   Query,
   QueryDocumentSnapshot,
   QuerySnapshot,
-} from '@angular/fire/compat/firestore'
+  onSnapshot,
+} from 'firebase/firestore'
 
 export class ItemValueAndCallbacks {
   constructor(
@@ -40,9 +41,7 @@ export class FirestoreAllItemsLoader extends FirestoreItemsLoader {
     /* this will have to be filtered to only what the user has read permission for */
     itemsCollection: Query
   ) {
-    itemsCollection
-      // .where('perms.read.' + this.permissionsManager.userId, '>', new Date(0))
-      .onSnapshot((snapshot: QuerySnapshot<any>) =>
+    onSnapshot(itemsCollection, (snapshot: QuerySnapshot<any>) =>
     {
       console.log(`FirestoreAllItemsLoader snapshot.docChanges().length`, snapshot.docChanges().length)
       snapshot.docChanges().forEach((change: DocumentChange<any>) => {

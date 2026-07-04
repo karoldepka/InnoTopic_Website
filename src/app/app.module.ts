@@ -8,7 +8,6 @@ import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import {SharedModule} from "./shared/shared.module";
 import {CoreModule} from "./core/core.module";
-import {AngularFireStorage, AngularFireStorageModule} from '@angular/fire/compat/storage';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations'
 import {HttpClientModule} from '@angular/common/http';
 import {DbFirestoreModule} from './apps/OrYoL/db-firestore/db-firestore.module'
@@ -44,7 +43,7 @@ function copilotAgUiUrl(): string {
         AppRoutingModule,
         SharedModule,
         CoreModule,
-        AngularFireStorageModule, BrowserAnimationsModule,
+        BrowserAnimationsModule,
         DbFirestoreModule,
         HttpClientModule /* Only for primeng tree demo */,
         StoreModule.forRoot({ count: counterReducer }),

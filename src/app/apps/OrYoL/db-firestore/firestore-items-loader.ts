@@ -1,4 +1,4 @@
-import {DocumentReference, DocumentSnapshot} from '@angular/fire/compat/firestore'
+import {DocumentReference, DocumentSnapshot} from 'firebase/firestore'
 
 
 export abstract class FirestoreItemsLoader {

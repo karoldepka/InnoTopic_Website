@@ -1,6 +1,5 @@
 import { Component, OnInit, ChangeDetectionStrategy, OnDestroy } from '@angular/core';
 import { NgForm, ReactiveFormsModule, FormsModule } from '@angular/forms';
-import { AngularFireAuth } from '@angular/fire/compat/auth';
 import { AuthService, describeAuthError } from '../auth.service';
 import { IonicModule, ModalController } from '@ionic/angular';
 import { CommonModule } from '@angular/common';
@@ -37,7 +36,6 @@ export class SignupEmailPasswordComponent implements OnInit, OnDestroy {
   private destroy$ = new Subject<void>()
 
   constructor(
-    public afAuth: AngularFireAuth,
     private AuthService: AuthService,
     private modalController: ModalController
   ) {

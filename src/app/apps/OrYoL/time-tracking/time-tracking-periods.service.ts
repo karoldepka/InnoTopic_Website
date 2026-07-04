@@ -6,10 +6,8 @@ import {CachedSubject} from '../../../libs/AppFedShared/utils/cachedSubject2/Cac
 import {uuidv4} from '../../../libs/AppFedShared/utils/utils-from-oryol'
 import {BaseService} from '../../../libs/AppFedShared/base.service'
 import {FeatureLevelsConfig} from '../../../libs/AppFedShared/FeatureLevelsConfig'
-import firebase from 'firebase/compat/app'
-import Timestamp = firebase.firestore.Timestamp
-import firestore from 'firebase/compat/app'
-import {AngularFirestore, Query} from '@angular/fire/compat/firestore'
+import {Timestamp, collection, doc, setDoc, updateDoc} from 'firebase/firestore'
+import {getAppFirestore} from '../../../libs/AppFedSharedFirebase/firebase-app'
 import {TimeTrackedEntry} from './TimeTrackedEntry'
 
 // https://lifesuite.innotopic.com/learn/item/lmm0ETQ1dvl9x6mJnNs5
@@ -44,13 +42,12 @@ export class TimeTrackingPeriod {
 })
 export class TimeTrackingPeriodsService extends BaseService {
 
-  coll = this.angularFire.collection(`TimeTrackingPeriodTest`)
+  coll = collection(getAppFirestore(), `TimeTrackingPeriodTest`)
 
   activePeriods$ = new CachedSubject<TimeTrackingPeriod[] | null | undefined>(undefined)
 
   constructor(
     injector: Injector,
-    protected angularFire: AngularFirestore,
   ) {
     super(injector)
     this.featLocal = this.g.feat.timeTrackingPeriods
@@ -90,7 +87,7 @@ export class TimeTrackingPeriodsService extends BaseService {
     }
     period.end = Timestamp.now()
     runInInjectionContext(this.injector, () => {
-      this.coll.doc(period.id).update({ end: this.toFirestoreTimestampLike(period.end) })
+      updateDoc(doc(this.coll, period.id), { end: this.toFirestoreTimestampLike(period.end) })
     })
 
     // TODO: update in DB
@@ -104,7 +101,7 @@ export class TimeTrackingPeriodsService extends BaseService {
       null,
     )
     runInInjectionContext(this.injector, () => {
-      this.coll.doc(period.id).set(this.toFirestorePeriodWrite(period))
+      setDoc(doc(this.coll, period.id), this.toFirestorePeriodWrite(period))
     })
     return period
 //

@@ -1,5 +1,6 @@
-import { AngularFirestore } from '@angular/fire/compat/firestore';
-import { AngularFireStorage } from '@angular/fire/compat/storage';
+import { collection, doc, getDocs, setDoc } from 'firebase/firestore';
+import { getDownloadURL, ref, uploadString } from 'firebase/storage';
+import { getAppFirestore, getAppStorage } from '../../../libs/AppFedSharedFirebase/firebase-app';
 import { Injectable } from '@angular/core';
 
 @Injectable({
@@ -8,10 +9,10 @@ import { Injectable } from '@angular/core';
 export class MigrateImgBase64Service {
   disableUpload: boolean = true;
 
-  constructor(
-    private firestore: AngularFirestore,
-    private storage: AngularFireStorage
-  ) {}
+  private firestore = getAppFirestore()
+  private storage = getAppStorage()
+
+  constructor() {}
 
   private getBase64Size(base64: string): number {
     const padding = (base64.match(/=/g) || []).length;
@@ -19,7 +20,7 @@ export class MigrateImgBase64Service {
   }
 
   async processLearnItems(): Promise<void> {
-    const learnItems = await this.firestore.collection('LearnItem').get().toPromise();
+    const learnItems = await getDocs(collection(this.firestore, 'LearnItem'));
     if (!learnItems) {
       console.warn('No LearnItem documents returned for base64 migration.');
       return;
@@ -96,9 +97,9 @@ export class MigrateImgBase64Service {
                   let url: string;
 
                   if (!this.disableUpload) {
-                    const fileRef = this.storage.ref(filePath);
-                    await fileRef.putString(base64, 'base64');
-                    url = await fileRef.getDownloadURL().toPromise();
+                    const fileRef = ref(this.storage, filePath);
+                    await uploadString(fileRef, base64, 'base64');
+                    url = await getDownloadURL(fileRef);
                   } else {
                     url = `https://mockurl.com/${filePath}`;
                   }
@@ -115,7 +116,7 @@ export class MigrateImgBase64Service {
         }
 
         if (documentChanged) {
-          await this.firestore.collection('LearnItem_Processed').doc(document.id).set(data);
+          await setDoc(doc(collection(this.firestore, 'LearnItem_Processed'), document.id), data);
           sizeProcessed += totalSizeSaved;
         }
 

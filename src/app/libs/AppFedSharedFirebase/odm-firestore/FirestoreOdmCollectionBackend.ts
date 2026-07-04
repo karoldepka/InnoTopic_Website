@@ -1,6 +1,21 @@
 import {ItemId, OdmCollectionBackend, OdmCollectionBackendListener, QueryOpts} from "../../AppFedShared/odm/OdmCollectionBackend";
 import {EnvironmentInjector, Injector, runInInjectionContext} from "@angular/core";
-import {AngularFirestore, QuerySnapshot} from "@angular/fire/compat/firestore";
+import {
+  Firestore,
+  QuerySnapshot,
+  collection,
+  doc,
+  getDocs,
+  getDocsFromCache,
+  limit as fsLimit,
+  onSnapshot,
+  orderBy,
+  query,
+  setDoc,
+  updateDoc,
+  where,
+} from "firebase/firestore";
+import {getAppFirestore} from "../firebase-app";
 import {OdmItemId} from "../../AppFedShared/odm/OdmItemId";
 import {ignorePromise} from "../../AppFedShared/utils/promiseUtils";
 import {OdmBackend} from "../../AppFedShared/odm/OdmBackend";
@@ -8,13 +23,11 @@ import {debugLog, errorAlert, errorAlertAndThrow} from "../../AppFedShared/utils
 import {isNotNullish} from '../../AppFedShared/utils/utils'
 import {assertTruthy} from '../../AppFedShared/utils/assertUtils'
 import {dateToStringSuitableForId} from '../../AppFedShared/odm/utils'
-// import { firestore } from 'firebase';
-// import Timestamp = firestore.Timestamp
 
 
 export class FirestoreOdmCollectionBackend<TRaw> extends OdmCollectionBackend<TRaw> {
 
-  protected angularFirestore = this.injector.get(AngularFirestore)
+  protected firestore: Firestore = getAppFirestore()
   private environmentInjector = this.injector.get(EnvironmentInjector)
 
   public collectionName = this.className;
@@ -33,7 +46,7 @@ export class FirestoreOdmCollectionBackend<TRaw> extends OdmCollectionBackend<TR
   deleteWithoutConfirmation(itemId: OdmItemId) {
     console.log(`[DB] delete ${this.collectionName}/${itemId}`)
     // DANGEROUS return  this. /* danger */ itemDoc(itemId) /* danger */  .delete()
-    return this.inInjectionContext(() => this.itemDoc(itemId).update({
+    return this.inInjectionContext(() => updateDoc(this.itemDoc(itemId), {
       whenDeleted: new Date()
     }))
   }
@@ -72,7 +85,7 @@ export class FirestoreOdmCollectionBackend<TRaw> extends OdmCollectionBackend<TR
           ancestorIds
         } : {}),
       })
-      const retPromise = this.inInjectionContext(() => this.itemDoc(id).set(dataToSave/*.toDbFormat()*/, { merge: true }))
+      const retPromise = this.inInjectionContext(() => setDoc(this.itemDoc(id), dataToSave/*.toDbFormat()*/, { merge: true }))
       retPromise.catch(error => {
         this.errorAlert('saveNowToDb this.itemDoc(id).set retPromise.catch', error)
       })
@@ -106,7 +119,7 @@ export class FirestoreOdmCollectionBackend<TRaw> extends OdmCollectionBackend<TR
 
       })
       const retPromise = this.inInjectionContext(() =>
-        this.itemHistoryNewDocForNowTimePoint(nowDate, id).set(dataToSave/*.toDbFormat()*/)
+        setDoc(this.itemHistoryNewDocForNowTimePoint(nowDate, id), dataToSave/*.toDbFormat()*/)
       )
       retPromise.catch(error => {
         this.errorAlert('saveToHistory this.itemHistoryNewDocForNowTimePoint(nowDate, id).set(...) retPromise.catch', error)
@@ -120,20 +133,20 @@ export class FirestoreOdmCollectionBackend<TRaw> extends OdmCollectionBackend<TR
   }
 
   private collection() {
-    return this.angularFirestore.firestore.collection(this.collectionName)
+    return collection(this.firestore, this.collectionName)
   }
 
   private historyCollection() {
-    return this.angularFirestore.firestore.collection(this.collectionName + '__History')
+    return collection(this.firestore, this.collectionName + '__History')
   }
 
   private itemDoc(itemId: OdmItemId) {
-    return this.collection().doc(itemId)
+    return doc(this.collection(), itemId)
   }
 
   private itemHistoryNewDocForNowTimePoint(date: Date, itemId: OdmItemId) {
     const path = itemId + '_' + dateToStringSuitableForId(date)
-    return this.historyCollection().doc(path)
+    return doc(this.historyCollection(), path)
   }
 
   private inInjectionContext<T>(fn: () => T): T {
@@ -212,19 +225,18 @@ export class FirestoreOdmCollectionBackend<TRaw> extends OdmCollectionBackend<TR
       // getDocs
       // .where('whenArchived', '==', null)
       // .where('whenDeleted', '==', null)
-      let query = this.angularFirestore.firestore.collection(this.collectionName)
-        .where('owner', '==', userId) // TODO: use opts.limit / nLastModified
+      let firestoreQuery = query(this.collection(), where('owner', '==', userId)) // TODO: use opts.limit / nLastModified
       if ( queryOpts.limit ) {
-        query = query
-          .orderBy("whenLastModified", 'desc') // TODO: use this also for listening
-          .limit(queryOpts.limit) // FIXME hack limit count instead of date (coz what if user doesn't use app for some days)
+        firestoreQuery = query(firestoreQuery,
+          orderBy("whenLastModified", 'desc'), // TODO: use this also for listening
+          fsLimit(queryOpts.limit)) // FIXME hack limit count instead of date (coz what if user doesn't use app for some days)
       }
       if ( queryOpts.oneTimeGet ) { // TODO FIX Hack to use opts.nLastModified
-        const promise = query
+        const promise = (queryOpts.fromLocalCache ? getDocsFromCache(firestoreQuery) : getDocs(firestoreQuery))
           // .orderBy("whenLastModified", 'desc') // TODO: use this also for listening
           // .where('whenLastModified', '>=', new Timestamp(Date.now()/1000 - nDaysOldModified * 24*60*60, 0))
           // .limit(50) // FIXME hack limit count instead of date (coz what if user doesn't use app for some days)
-          .get(queryOpts.fromLocalCache ? {source: 'cache'} : undefined) // this is just one-time get, not listening
+          // this is just one-time get, not listening
         promise.then((data: any /* HACK after AngularFire update */) => {
           const docs = data.docs
           console.log('query.get() docs.length', docs.length, queryOpts)
@@ -247,7 +259,7 @@ export class FirestoreOdmCollectionBackend<TRaw> extends OdmCollectionBackend<TR
           this.errorAlert('setListener, onSnapshot onError', error)
         }
 
-        query.onSnapshot(((snapshot: QuerySnapshot<TRaw>) =>
+        onSnapshot(firestoreQuery, ((snapshot: QuerySnapshot<TRaw>) =>
         {
           console.log('firestore.collection(this.collectionName).onSnapshot', 'snapshot.docChanges().length',
             this.collectionName, snapshot.docChanges().length)
@@ -270,7 +282,6 @@ export class FirestoreOdmCollectionBackend<TRaw> extends OdmCollectionBackend<TR
           // FIXME: only emit after processing finished
 
         }) as any /* workaround after strict settings */, onError)
-        return undefined
       }
 
       // this.collection().valueChanges().subscribe((coll: TRaw[]) => {
@@ -283,15 +294,15 @@ export class FirestoreOdmCollectionBackend<TRaw> extends OdmCollectionBackend<TR
     assertTruthy(parentId, 'parentId')
     const userId = this.authService.authUser$.lastVal?.uid
     console.log(`[DB] loadChildrenOf ${this.collectionName} parent=${parentId}`)
-    let query = this.angularFirestore.firestore.collection(this.collectionName)
-      .where('parentIds', 'array-contains', parentId) // child parent here
+    const constraints = [where('parentIds', 'array-contains', parentId)] // child parent here
     if ( userId ) {
-      query = query.where('owner', '==', userId)
+      constraints.push(where('owner', '==', userId))
     }
+    const firestoreQuery = query(this.collection(), ...constraints)
     const onError = (error: any) => {
       this.errorLog('loadChildrenOf, onSnapshot onError', error)
     }
-    query.onSnapshot(((snapshot: QuerySnapshot<TRaw>) =>
+    onSnapshot(firestoreQuery, ((snapshot: QuerySnapshot<TRaw>) =>
       {
         console.log(`loadChildrenOf ${parentId} firestore.collection(this.collectionName).onSnapshot`, 'snapshot.docChanges().length',
           this.collectionName, snapshot.docChanges().length)
@@ -320,16 +331,16 @@ export class FirestoreOdmCollectionBackend<TRaw> extends OdmCollectionBackend<TR
     assertTruthy(ancestorId, 'ancestorId')
     const userId = this.authService.authUser$.lastVal?.uid
     console.log(`[DB] loadTreeDescendantsOf ${this.collectionName} ancestor=${ancestorId}`)
-    let query = this.angularFirestore.firestore.collection(this.collectionName)
-      .where('ancestorIds', 'array-contains', ancestorId)
+    const constraints = [where('ancestorIds', 'array-contains', ancestorId)]
     if ( userId ) {
-      query = query.where('owner', '==', userId)
+      constraints.push(where('owner', '==', userId))
     }
+    const firestoreQuery = query(this.collection(), ...constraints)
     const onError = (error: any) => {
       this.errorLog('loadTreeDescendantsOf, onSnapshot onError', error)
     }
 
-    query.onSnapshot(((snapshot: QuerySnapshot<TRaw>) =>
+    onSnapshot(firestoreQuery, ((snapshot: QuerySnapshot<TRaw>) =>
     {
       console.log(`loadTreeDescendantsOf results ${ancestorId} firestore.collection(this.collectionName).onSnapshot`, 'snapshot.docChanges().length',
         this.collectionName,

@@ -37,7 +37,6 @@
     "@angular/cdk-experimental": "^22.0.2",
     "@angular/common": "^22.0.2",
     "@angular/core": "^22.0.2",
-    "@angular/fire": "^20.0.1",
     "@angular/forms": "^22.0.2",
     "@angular/material": "^22.0.2",
     "@angular/platform-browser": "^22.0.2",
