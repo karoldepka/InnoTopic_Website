@@ -74,6 +74,15 @@ export class QuizService {
     // https://stackoverflow.com/questions/50276165/combinelatest-deprecated-in-favor-of-static-combinelatest
     this.options$,
     (this.learnDoService.localItems$.pipe(
+      // localItems$ is seeded with `[]` synchronously at construction, before the local-cache/
+      // server load has actually run (see OdmService2.localItems$) - so its very first
+      // replayed-on-subscribe value is indistinguishable from "genuinely empty collection".
+      // Once quizStatus$ started emitting immediately (the #10 fix below), that pre-load `[]`
+      // became visible as a real "0 items pending" status, surfacing as "No quiz item" instead
+      // of "Loading Quiz..." (issue #23). Wait for the flag OdmService2.emitLocalItems() sets
+      // once the initial load has actually completed at least once, so combineLatest doesn't
+      // produce any status until then.
+      filter(() => this.learnDoService.itemsLoaded),
       // Was debounceTime(4000): debounce only emits once the source goes quiet, so with the
       // collection's always-on realtime listener it could get reset indefinitely under active
       // sync (another device editing, the initial local-cache-then-server two-phase load
