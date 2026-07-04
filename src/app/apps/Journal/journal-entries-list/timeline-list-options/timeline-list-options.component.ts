@@ -2,7 +2,6 @@ import {Component, Input, OnInit, ChangeDetectionStrategy} from '@angular/core';
 import {AsyncPipe, NgIf} from '@angular/common';
 import {Required} from '../../../../libs/AppFedShared/utils/angular/Required.decorator'
 import {PatchableObservable} from '../../../../libs/AppFedShared/utils/rxUtils'
-import {createViewSyncerForField, ViewSyncer} from '../../../../libs/AppFedShared/odm/ui/ViewSyncer'
 import {JournalEntry} from '../../models/JournalEntry'
 import {TimelineListOptionsData} from '../journal-entries-list.page'
 import { UntypedFormControl, ReactiveFormsModule } from '@angular/forms'
@@ -33,8 +32,6 @@ export class TimelineListOptionsComponent implements OnInit {
 
   formControl = new UntypedFormControl()
 
-  viewSyncer ! : ViewSyncer
-
   formControls = {
     range: new UntypedFormControl()
   }
@@ -43,7 +40,20 @@ export class TimelineListOptionsComponent implements OnInit {
   constructor() { }
 
   ngOnInit() {
-    this.viewSyncer = createViewSyncerForField(this.listOptions$P, 'sortAscending', this.formControl)
+    // The checkbox reads "Sort descending", but the stored/sorted-on field is sortAscending -
+    // sync the inverse instead of using createViewSyncerForField's direct pass-through, which
+    // would make checking "Sort descending" set sortAscending=true (i.e. actually sort
+    // ascending). Keeping the stored field name as sortAscending avoids a localStorage
+    // migration for the 'TimelineList_Options' key.
+    this.listOptions$P.locallyVisibleChanges$.subscribe(options => {
+      const sortDescendingChecked = options.sortAscending !== true
+      if (this.formControl.value !== sortDescendingChecked) {
+        this.formControl.setValue(sortDescendingChecked, {emitEvent: false})
+      }
+    })
+    this.formControl.valueChanges.subscribe(sortDescendingChecked => {
+      this.listOptions$P.patchThrottled({sortAscending: !sortDescendingChecked})
+    })
 
     this.formControls.range.valueChanges.subscribe(value => {
       console.log('value', value)
