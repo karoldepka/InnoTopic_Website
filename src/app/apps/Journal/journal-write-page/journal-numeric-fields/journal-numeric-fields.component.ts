@@ -10,6 +10,7 @@ import {JournalEntry$} from '../../models/JournalEntry$'
 import { IonicModule } from '@ionic/angular';
 import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { NgIf, NgFor } from '@angular/common';
+import { TranslatePipe } from '@ngx-translate/core';
 
 @Component({
     selector: 'app-journal-numeric-fields',
@@ -23,6 +24,7 @@ import { NgIf, NgFor } from '@angular/common';
         NgIf,
         NgFor,
         StarRatingComponent,
+        TranslatePipe,
     ],
 })
 export class JournalNumericFieldsComponent implements OnInit {

@@ -2,6 +2,7 @@ import {Component, Injector, OnInit, ChangeDetectionStrategy} from '@angular/cor
 import {BaseComponent} from '../base/base.component'
 import {FeatureService} from '../feature.service'
 import { IonicModule } from '@ionic/angular';
+import { TranslatePipe } from '@ngx-translate/core';
 // import packageJson from '../../../../package.json'
 
 @Component({
@@ -9,7 +10,7 @@ import { IonicModule } from '@ionic/angular';
     templateUrl: './feature-config.component.html',
     changeDetection: ChangeDetectionStrategy.Eager,
     styleUrls: ['./feature-config.component.sass'],
-    imports: [IonicModule],
+    imports: [IonicModule, TranslatePipe],
 })
 export class FeatureConfigComponent extends BaseComponent implements OnInit {
 

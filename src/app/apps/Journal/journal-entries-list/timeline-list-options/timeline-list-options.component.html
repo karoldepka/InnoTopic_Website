@@ -3,14 +3,14 @@
   [disabled]="itemsService.loadingAllItemsFromServerInitiated"
   (press)="loadAll(true)"
   (click)="loadAll(false)"
-><ion-icon slot=start name="download-outline" />Load all</ion-button>
+><ion-icon slot=start name="download-outline" />{{ 'JOURNAL.LOAD_ALL' | translate }}</ion-button>
 
-<ion-note>{{(itemsService.localItems$ | async)?.length}} items</ion-note>
+<ion-note>{{(itemsService.localItems$ | async)?.length}} {{ 'JOURNAL.ITEMS' | translate }}</ion-note>
 
 <ion-checkbox
   labelPlacement="end"
   [formControl]="formControl"
->Sort descending</ion-checkbox>
+>{{ 'JOURNAL.SORT_DESCENDING' | translate }}</ion-checkbox>
 
 
 <!-- filter by mood, productivity, importance, health -->

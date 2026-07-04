@@ -9,7 +9,9 @@ import { User } from 'firebase/auth'
 import { AboutAppComponent } from './about-app/about-app.component';
 import { FeatureConfigComponent } from '../../../feature-config/feature-config.component';
 import { ThemeConfigComponent } from '../../../theme-config/theme-config.component';
+import { LanguageSwitcherComponent } from '../../../i18n/language-switcher/language-switcher.component';
 import { NgIf, NgForOf, AsyncPipe, JsonPipe } from '@angular/common';
+import { TranslatePipe } from '@ngx-translate/core';
 import { IonicModule } from '@ionic/angular';
 import {stripHtml} from '../../../utils/html-utils'
 
@@ -22,11 +24,13 @@ import {stripHtml} from '../../../utils/html-utils'
         AboutAppComponent,
         FeatureConfigComponent,
         ThemeConfigComponent,
+        LanguageSwitcherComponent,
         NgIf,
         NgForOf,
         IonicModule,
         AsyncPipe,
         JsonPipe,
+        TranslatePipe,
     ],
 })
 export class SyncPopoverComponent extends BaseComponent implements OnInit {

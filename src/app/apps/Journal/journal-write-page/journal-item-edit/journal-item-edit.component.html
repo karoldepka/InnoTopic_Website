@@ -4,8 +4,8 @@
     <ng-container
       *ngIf="feat.showExperimental"
     >
-      Play the <b>Self-Improvement</b> game and its mini-games!
-      <ion-note>{{ fieldDescriptors.length }} fields</ion-note>
+      {{ 'JOURNAL.SELF_IMPROVEMENT_GAME_PROMPT' | translate }}
+      <ion-note>{{ fieldDescriptors.length }} {{ 'JOURNAL.FIELDS' | translate }}</ion-note>
 
     </ng-container>
     <p>
@@ -26,6 +26,6 @@
 
 <ng-template #loading
 >
-  Loading...
+  {{ 'COMMON.LOADING' | translate }}
   // TODO: also "Please log in"
 </ng-template>

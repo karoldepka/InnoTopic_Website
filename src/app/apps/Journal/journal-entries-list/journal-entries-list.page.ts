@@ -23,6 +23,7 @@ import { CdkVirtualScrollViewport, CdkVirtualForOf } from '@angular/cdk/scrollin
 import { CdkAutoSizeVirtualScroll } from '@angular/cdk-experimental/scrolling';
 import { JournalEntryListItemComponent } from '../../../timers/timers-list/journal-entry-list-item/journal-entry-list-item.component';
 import {AuthService} from '../../../auth/auth.service'
+import {TranslatePipe} from '@ngx-translate/core'
 
 export class TimelineListOptionsData {
   sortAscending ? : boolean
@@ -45,6 +46,7 @@ export class TimelineListOptionsData {
         JournalEntryListItemComponent,
         NgFor,
         AsyncPipe,
+        TranslatePipe,
     ],
 })
 export class JournalEntriesListPage extends BaseComponent implements OnInit {

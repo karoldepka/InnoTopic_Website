@@ -16,6 +16,7 @@ import { NgIf, NgFor } from '@angular/common';
 import { TimePassingComponent } from '../../../libs/AppFedShared/time/time-passing/time-passing.component';
 import { SyncStatusIconComponent } from '../../../libs/AppFedShared/odm/sync-status/sync-status-icon.component';
 import { JournalItemEditComponent } from './journal-item-edit/journal-item-edit.component';
+import { TranslatePipe } from '@ngx-translate/core';
 
 @Component({
     selector: 'app-journal-write-page',
@@ -31,6 +32,7 @@ import { JournalItemEditComponent } from './journal-item-edit/journal-item-edit.
         SyncStatusIconComponent,
         NgFor,
         JournalItemEditComponent,
+        TranslatePipe,
     ],
 })
 export class JournalWritePage extends BaseComponent implements OnInit {

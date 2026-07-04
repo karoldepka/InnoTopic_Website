@@ -2,17 +2,18 @@
 >
   <!--  //  (click)="logIn()"-->
 
-  App & Sync Status
+  {{ 'SYNC.APP_AND_SYNC_STATUS' | translate }}
 </h4>
 <div class="expandable-section">
   <button class="expand-toggle" (click)="onClickAboutAppToggle()">
-    About App <ion-icon [name]="aboutAppExpanded ? 'chevron-up' : 'chevron-down'" style="vertical-align: middle; font-size: 14px"></ion-icon>
+    {{ 'SYNC.ABOUT_APP' | translate }} <ion-icon [name]="aboutAppExpanded ? 'chevron-up' : 'chevron-down'" style="vertical-align: middle; font-size: 14px"></ion-icon>
   </button>
   <app-about-app *ngIf="aboutAppExpanded"></app-about-app>
 </div>
 <!-- Revealed after 5 clicks on "About App" above, like Android's developer-options gesture. -->
 <app-feature-config *ngIf="showFeatureConfig"></app-feature-config>
 <app-theme-config></app-theme-config>
+<app-language-switcher></app-language-switcher>
 
 <p>
   {{(authUser$ | async)?.email}}
@@ -25,7 +26,7 @@
     *ngIf="(durablePendingSyncItems$ | async) as pendingSyncItems"
   >
     <ng-container *ngIf="pendingSyncItems.length">
-      Queued to sync (saved on this device, will retry automatically): {{pendingSyncItems.length}}
+      {{ 'SYNC.QUEUED_TO_SYNC' | translate }} {{pendingSyncItems.length}}
       <ul>
         <li *ngFor="let item of pendingSyncItems">
           {{describePendingSyncItem(item.patch, item.collection)}}
@@ -37,7 +38,7 @@
   <ng-container
     *ngIf="(syncStatus$ | async)?.pendingUploadsCount let count; else allUploaded"
   >
-    Uploading now: {{count}}
+    {{ 'SYNC.UPLOADING_NOW' | translate }} {{count}}
     <ul>
       <li *ngFor="let description of pendingUploadDescriptions(syncStatus$ | async)">
         {{description}}
@@ -49,19 +50,19 @@
   <ng-container
     *ngIf="(syncStatus$ | async)?.pendingDownloadsCount let count; else allDownloaded"
   >
-    Downloading: {{count}} collections: {{toArray($safeNavigationMigration((syncStatus$ | async)?.pendingDownloads)) | json}}
+    {{ 'SYNC.DOWNLOADING' | translate }} {{count}} {{ 'SYNC.COLLECTIONS' | translate }}: {{toArray($safeNavigationMigration((syncStatus$ | async)?.pendingDownloads)) | json}}
   </ng-container>
 
   <ng-template
     #allUploaded
   >
-    <p>All uploaded!</p>
+    <p>{{ 'SYNC.ALL_UPLOADED' | translate }}</p>
   </ng-template>
 
   <ng-template
     #allDownloaded
   >
-    <p>All downloaded!</p>
+    <p>{{ 'SYNC.ALL_DOWNLOADED' | translate }}</p>
   </ng-template>
 
 </div>
@@ -69,11 +70,11 @@
 <ng-template
   #notLoggedIn
 >
-  Not logged in.
+  {{ 'SYNC.NOT_LOGGED_IN' | translate }}
 </ng-template>
 
 <div class="actions">
-  <ion-button size="small" (click)="logIn()">Log In</ion-button>
-  <ion-button size="small" fill="outline" (click)="logOut()">Log Out</ion-button>
-  <ion-button size="small" fill="outline" (click)="openOptions()">Options</ion-button>
+  <ion-button size="small" (click)="logIn()">{{ 'AUTH.LOGIN' | translate }}</ion-button>
+  <ion-button size="small" fill="outline" (click)="logOut()">{{ 'SYNC.LOG_OUT' | translate }}</ion-button>
+  <ion-button size="small" fill="outline" (click)="openOptions()">{{ 'SYNC.OPTIONS' | translate }}</ion-button>
 </div>

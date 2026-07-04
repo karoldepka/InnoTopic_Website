@@ -13,7 +13,7 @@
 
     </ion-buttons>
 
-    <ion-title>Timeline
+    <ion-title>{{ 'JOURNAL.TIMELINE_TITLE' | translate }}
       <ng-container
         *ngIf="feat.distracting"
       >
@@ -50,9 +50,11 @@
   </ion-toolbar>
   <ion-toolbar>
     <ion-searchbar
-      placeholder="Search journal"
+      [placeholder]="'JOURNAL.SEARCH_PLACEHOLDER' | translate"
       [debounce]="200"
+      showClearButton="always"
       (ionInput)="onSearchInput($event)"
+      (ionClear)="onSearchInput($event)"
     ></ion-searchbar>
   </ion-toolbar>
 </ion-header>
@@ -60,7 +62,7 @@
 <ion-content>
 
   <p *ngIf="!(authService.authUser$ | async)" class="ion-text-center" style="margin: 12px">
-    Please <a [routerLink]="'/auth'">&lt; log in &gt;</a> to sync your journal.
+    {{ 'JOURNAL.LOGIN_PROMPT_PREFIX' | translate }} <a [routerLink]="'/auth'">&lt; {{ 'JOURNAL.LOGIN_PROMPT_LINK' | translate }} &gt;</a> {{ 'JOURNAL.LOGIN_PROMPT_SUFFIX' | translate }}
   </p>
 
   <ion-fab vertical="bottom" horizontal="end" slot="fixed">

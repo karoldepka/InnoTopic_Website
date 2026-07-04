@@ -63,6 +63,8 @@
     "@ngrx/schematics": "^21.1.1",
     "@ngrx/store": "^21.1.1",
     "@ngrx/store-devtools": "^21.1.1",
+    "@ngx-translate/core": "^18.0.0",
+    "@ngx-translate/http-loader": "^18.0.0",
     "@schematics/angular": "^22.0.3",
     "@supabase/supabase-js": "^2.45.4",
     "@tanstack/angular-table": "^8.21.4",

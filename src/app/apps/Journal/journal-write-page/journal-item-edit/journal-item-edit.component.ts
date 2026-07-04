@@ -10,6 +10,7 @@ import { TimePointComponent } from '../../../../libs/AppFedShared/time/time-poin
 import { GeoLocComponent } from '../../../../libs/AppFedShared/geo-location/geo-loc/geo-loc.component';
 import { JournalNumericFieldsComponent } from '../journal-numeric-fields/journal-numeric-fields.component';
 import { JournalTextFieldsComponent } from '../journal-text-fields/journal-text-fields.component';
+import { TranslatePipe } from '@ngx-translate/core';
 
 @Component({
     selector: 'app-journal-item-edit',
@@ -24,6 +25,7 @@ import { JournalTextFieldsComponent } from '../journal-text-fields/journal-text-
         JournalNumericFieldsComponent,
         JournalTextFieldsComponent,
         AsyncPipe,
+        TranslatePipe,
     ],
 })
 export class JournalItemEditComponent extends BaseComponent implements OnInit {

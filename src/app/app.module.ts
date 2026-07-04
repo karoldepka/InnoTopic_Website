@@ -24,6 +24,9 @@ import {registerIonIcons} from './register-ion-icons'
 import { HttpAgent } from '@ag-ui/client'
 import { provideCopilotKit } from '@copilotkit/angular'
 import { PRESS_EVENT_PLUGIN_PROVIDER } from './shared/gestures/press-event.plugin'
+import { provideTranslateService } from '@ngx-translate/core'
+import { provideTranslateHttpLoader } from '@ngx-translate/http-loader'
+import { DEFAULT_LANGUAGE, resolveInitialLanguage } from './libs/AppFedShared/i18n/supported-languages'
 
 const copilotQaAgentId = 'lifesuite-qa'
 
@@ -70,6 +73,14 @@ function copilotAgUiUrl(): string {
             },
         }),
         PRESS_EVENT_PLUGIN_PROVIDER,
+        provideTranslateService({
+            loader: provideTranslateHttpLoader({
+                prefix: 'assets/i18n/',
+                suffix: '.json',
+            }),
+            fallbackLang: DEFAULT_LANGUAGE,
+            lang: resolveInitialLanguage(),
+        }),
         // { provide: RouteReuseStrategy, useClass: }
     ],
     bootstrap: [AppComponent]

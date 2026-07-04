@@ -21,9 +21,9 @@
   (ionChange)="onSliderChange($event)"
 ></ion-range>
 <div class="theme-id">{{ themeService.theme.id }}</div>
-<ion-button size="small" (click)="themeService.applyRandomTheme()">Random Theme</ion-button>
-<ion-button size="small" fill="outline" (click)="themeService.applyNextTheme()">Next Theme</ion-button>
-<ion-button size="small" fill="outline" (click)="themesVisible = ! themesVisible">Themes</ion-button>
+<ion-button size="small" (click)="themeService.applyRandomTheme()">{{ 'SETTINGS.RANDOM_THEME' | translate }}</ion-button>
+<ion-button size="small" fill="outline" (click)="themeService.applyNextTheme()">{{ 'SETTINGS.NEXT_THEME' | translate }}</ion-button>
+<ion-button size="small" fill="outline" (click)="themesVisible = ! themesVisible">{{ 'SETTINGS.THEMES' | translate }}</ion-button>
 <div *ngIf="themesVisible">
   <div *ngFor="let curTheme of themes"
        style="cursor: pointer; margin-bottom: 4px"
@@ -31,9 +31,9 @@
        [ngStyle]="{'background-color': curTheme.background}"
   >
     {{getThemeId(curTheme)}}<br>
-    <span [ngStyle]="{color: curTheme.primary}">Primary</span>
+    <span [ngStyle]="{color: curTheme.primary}">{{ 'SETTINGS.PRIMARY' | translate }}</span>
     &nbsp;
-    <span [ngStyle]="{color: curTheme.secondary}">Secondary</span>
+    <span [ngStyle]="{color: curTheme.secondary}">{{ 'SETTINGS.SECONDARY' | translate }}</span>
 
   </div>
 </div>

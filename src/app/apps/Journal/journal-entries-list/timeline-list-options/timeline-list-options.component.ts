@@ -9,13 +9,14 @@ import {OdmService2} from '../../../../libs/AppFedShared/odm/OdmService2'
 import {errorAlert} from '../../../../libs/AppFedShared/utils/log'
 import { IonicModule } from '@ionic/angular';
 import {g} from '../../../../libs/AppFedShared/g'
+import {TranslatePipe} from '@ngx-translate/core'
 
 @Component({
     selector: 'app-timeline-list-options',
     templateUrl: './timeline-list-options.component.html',
     changeDetection: ChangeDetectionStrategy.Eager,
     styleUrls: ['./timeline-list-options.component.sass'],
-    imports: [IonicModule, ReactiveFormsModule, AsyncPipe, NgIf],
+    imports: [IonicModule, ReactiveFormsModule, AsyncPipe, NgIf, TranslatePipe],
 })
 export class TimelineListOptionsComponent implements OnInit {
 

@@ -7,6 +7,7 @@ import { Subject } from 'rxjs';
 import { addIcons } from 'ionicons';
 import { logoGoogle, logoFacebook, mailOutline } from 'ionicons/icons';
 import { errorAlert } from '../../libs/AppFedShared/utils/log';
+import { TranslatePipe } from '@ngx-translate/core';
 
 @Component({
     selector: 'app-signup-email-password',
@@ -18,6 +19,7 @@ import { errorAlert } from '../../libs/AppFedShared/utils/log';
         FormsModule,
         IonicModule,
         CommonModule,
+        TranslatePipe,
     ],
 })
 export class SignupEmailPasswordComponent implements OnInit, OnDestroy {

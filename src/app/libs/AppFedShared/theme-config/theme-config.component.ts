@@ -4,6 +4,7 @@ import {BaseComponent} from '../base/base.component'
 import {Theme, ThemeId} from './themes.data'
 import { IonicModule } from '@ionic/angular';
 import { NgIf, NgFor, NgStyle } from '@angular/common';
+import { TranslatePipe } from '@ngx-translate/core';
 
 
 
@@ -17,6 +18,7 @@ import { NgIf, NgFor, NgStyle } from '@angular/common';
         NgIf,
         NgFor,
         NgStyle,
+        TranslatePipe,
     ],
 })
 export class ThemeConfigComponent extends BaseComponent implements OnInit {

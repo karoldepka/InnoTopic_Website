@@ -2,25 +2,25 @@
   labelPlacement="end"
   [checked]="beforeProductization"
   (ionChange)="onChangeBeforeProductization($event)"
->Features before productization</ion-checkbox>
+>{{ 'SETTINGS.FEATURES_BEFORE_PRODUCTIZATION' | translate }}</ion-checkbox>
 <ion-checkbox
   labelPlacement="end"
   [checked]="enableAll"
   (ionChange)="onChangeAllFeatures($event)"
->All features</ion-checkbox>
+>{{ 'SETTINGS.ALL_FEATURES' | translate }}</ion-checkbox>
 <ion-checkbox
   labelPlacement="end"
   [checked]="enableAll"
   (ionChange)="onChangeAllFeatures($event)"
->Nice-looking</ion-checkbox>
+>{{ 'SETTINGS.NICE_LOOKING' | translate }}</ion-checkbox>
 <ion-checkbox
   labelPlacement="end"
   [checked]="enableAll"
   (ionChange)="onChangeAllFeatures($event)"
->Features I use</ion-checkbox>
+>{{ 'SETTINGS.FEATURES_I_USE' | translate }}</ion-checkbox>
 <ion-checkbox
   labelPlacement="end"
   [checked]="firestoreEnabled"
   (ionChange)="onChangeFirestoreEnabled($event)"
->Firestore enabled (reload to apply)</ion-checkbox>
+>{{ 'SETTINGS.FIRESTORE_ENABLED' | translate }}</ion-checkbox>
 <!--Version {{version}}-->

@@ -6,6 +6,7 @@ import { IonicModule } from '@ionic/angular';
 import { addIcons } from 'ionicons';
 import { logoGoogle, logoFacebook } from 'ionicons/icons';
 import { errorAlert } from '../../libs/AppFedShared/utils/log';
+import { TranslatePipe } from '@ngx-translate/core';
 
 @Component({
     selector: 'app-login-email-password',
@@ -17,6 +18,7 @@ import { errorAlert } from '../../libs/AppFedShared/utils/log';
         ReactiveFormsModule,
         FormsModule,
         IonicModule,
+        TranslatePipe,
     ],
 })
 export class LoginEmailPasswordComponent implements OnInit {

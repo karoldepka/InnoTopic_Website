@@ -4,6 +4,7 @@ import { Router } from '@angular/router';
 import { IonicModule } from '@ionic/angular';
 import { LoginEmailPasswordComponent } from './login-email-password/login-email-password.component';
 import { SignupEmailPasswordComponent } from './signup-email-password/signup-email-password.component';
+import { TranslatePipe } from '@ngx-translate/core';
 
 @Component({
     selector: 'app-auth',
@@ -14,6 +15,7 @@ import { SignupEmailPasswordComponent } from './signup-email-password/signup-ema
         IonicModule,
         LoginEmailPasswordComponent,
         SignupEmailPasswordComponent,
+        TranslatePipe,
     ],
 })
 export class AuthPage implements OnInit {

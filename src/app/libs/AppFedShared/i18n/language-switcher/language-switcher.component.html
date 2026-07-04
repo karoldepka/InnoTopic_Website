@@ -1,0 +1,11 @@
+<ion-item lines="none">
+  <ion-select
+    label="Language"
+    labelPlacement="start"
+    interface="popover"
+    [value]="currentLang"
+    (ionChange)="onChangeLanguage($event)"
+  >
+    <ion-select-option *ngFor="let lang of languages" [value]="lang.code">{{ lang.label }}</ion-select-option>
+  </ion-select>
+</ion-item>

@@ -1,9 +1,9 @@
 <p>
-  About App
+  {{ 'SYNC.ABOUT_APP' | translate }}
   <br />
-  Branch: {{ buildInfo.branch }}
+  {{ 'SYNC.BRANCH' | translate }}: {{ buildInfo.branch }}
   <br />
-  Last commit: {{ buildInfo.commit }}
+  {{ 'SYNC.LAST_COMMIT' | translate }}: {{ buildInfo.commit }}
   <br />
-  Built: {{ buildInfo.builtAt }}
+  {{ 'SYNC.BUILT' | translate }}: {{ buildInfo.builtAt }}
 </p>
