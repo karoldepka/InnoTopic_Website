@@ -91,10 +91,6 @@ export class JournalEntriesListPage extends BaseComponent implements OnInit {
   ngOnInit() {
   }
 
-  logIn() {
-    this.authService.logInViaGoogle()
-  }
-
   trackById(index: number, item: JournalEntry$) {
     return item.id
   }
