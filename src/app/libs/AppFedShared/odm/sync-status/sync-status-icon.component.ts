@@ -5,7 +5,7 @@ import {SyncPopoverComponent} from './sync-popover/sync-popover.component'
 import {combineLatest} from 'rxjs'
 import {map} from 'rxjs/operators'
 import {AuthService} from '../../../../auth/auth.service'
-import { NgClass, NgIf, AsyncPipe } from '@angular/common';
+import { NgClass, AsyncPipe } from '@angular/common';
 import {FullscreenService} from '../../fullscreen/fullscreen.service'
 import {IonicModule} from '@ionic/angular'
 import { addIcons } from 'ionicons'
@@ -16,7 +16,7 @@ import { expandOutline, contractOutline } from 'ionicons/icons'
     templateUrl: './sync-status-icon.component.html',
     changeDetection: ChangeDetectionStrategy.Eager,
     styleUrls: ['./sync-status-icon.component.sass'],
-    imports: [NgClass, NgIf, AsyncPipe, IonicModule],
+    imports: [NgClass, AsyncPipe, IonicModule],
 })
 export class SyncStatusIconComponent implements OnInit {
 
