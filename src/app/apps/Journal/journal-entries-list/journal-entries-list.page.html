@@ -38,7 +38,7 @@
 
       </ion-button>
 
-      <ion-button [routerLink]="['/learn']">
+      <ion-button *ngIf="feat.beforeProductization" [routerLink]="['/learn']">
         <ion-icon class="action-color" name="book-outline" slot="icon-only" />
       </ion-button>
 
@@ -51,6 +51,10 @@
 </ion-header>
 
 <ion-content>
+
+  <p *ngIf="!(authService.authUser$ | async)" class="ion-text-center" style="margin: 12px">
+    Please <a href="javascript:void(0)" (click)="logIn()">&lt; log in &gt;</a> to sync your journal.
+  </p>
 
   <ion-fab vertical="bottom" horizontal="end" slot="fixed">
     <!--    <ion-fab-button id='fabAddTimer2' (click)="onAddTimer()">-->

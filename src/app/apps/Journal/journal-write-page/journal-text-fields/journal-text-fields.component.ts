@@ -28,6 +28,11 @@ export class JournalTextFieldsComponent implements OnInit {
 
   ngOnInit() {}
 
+  hasValue(textDesc: JournalTextDescriptor): boolean {
+    const value = (this.journalEntry$.currentVal as any)?.[textDesc.id!]
+    return !! (value && String(value).trim().length)
+  }
+
   // /** TODO: user reactive forms with ODM wrapper for listening to diffs */
   // onChangeText($event: Event, textDesc: JournalTextDescriptor) {
   //   const value = ($event.srcElement as any) ?. ['value'];

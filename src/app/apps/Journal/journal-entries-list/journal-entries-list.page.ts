@@ -19,6 +19,7 @@ import { SyncStatusIconComponent } from '../../../libs/AppFedShared/odm/sync-sta
 import { CdkVirtualScrollViewport, CdkVirtualForOf } from '@angular/cdk/scrolling';
 import { CdkAutoSizeVirtualScroll } from '@angular/cdk-experimental/scrolling';
 import { JournalEntryListItemComponent } from '../../../timers/timers-list/journal-entry-list-item/journal-entry-list-item.component';
+import {AuthService} from '../../../auth/auth.service'
 
 export class TimelineListOptionsData {
   sortAscending ? : boolean
@@ -73,6 +74,7 @@ export class JournalEntriesListPage extends BaseComponent implements OnInit {
   constructor(
     public journalEntriesService: JournalEntryItemsService,
     public popoverController: PopoverController,
+    public authService: AuthService,
     injector: Injector,
   ) {
     super(injector)
@@ -87,6 +89,10 @@ export class JournalEntriesListPage extends BaseComponent implements OnInit {
   }
 
   ngOnInit() {
+  }
+
+  logIn() {
+    this.authService.logInViaGoogle()
   }
 
   trackById(index: number, item: JournalEntry$) {
