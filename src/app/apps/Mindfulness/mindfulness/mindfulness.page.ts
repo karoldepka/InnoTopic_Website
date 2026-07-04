@@ -2,6 +2,7 @@ import {ChangeDetectorRef, Component, Injector, OnDestroy, OnInit, ChangeDetecti
 import {BaseComponent} from '../../../libs/AppFedShared/base/base.component'
 import { IonicModule } from '@ionic/angular';
 import { NgFor, NgIf } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { TimePassingComponent } from '../../../libs/AppFedShared/time/time-passing/time-passing.component';
 
 @Component({
@@ -13,12 +14,15 @@ import { TimePassingComponent } from '../../../libs/AppFedShared/time/time-passi
         IonicModule,
         NgFor,
         NgIf,
+        FormsModule,
         TimePassingComponent,
     ],
 })
 export class MindfulnessPage extends BaseComponent implements OnInit, OnDestroy {
 
   readonly timerPresets: { label: string; durationSeconds: number }[] = [
+    { label: '10s', durationSeconds: 10 },
+    { label: '20s', durationSeconds: 20 },
     { label: '30s', durationSeconds: 30 },
     { label: '1m',  durationSeconds:  1 * 60 },
     { label: '2m',  durationSeconds:  2 * 60 },
@@ -35,6 +39,10 @@ export class MindfulnessPage extends BaseComponent implements OnInit, OnDestroy 
   remainingSeconds = this.selectedDurationSeconds
 
   isTimerRunning = false
+
+  manualMinutes: number | null = null
+
+  manualSeconds: number | null = null
 
   private timerEndsAtMs?: number
 
@@ -85,6 +93,16 @@ export class MindfulnessPage extends BaseComponent implements OnInit, OnDestroy 
     this.resetTimer()
   }
 
+  applyManualDuration() {
+    const minutes = Math.max(0, Math.floor(this.manualMinutes ?? 0))
+    const seconds = Math.max(0, Math.min(59, Math.floor(this.manualSeconds ?? 0)))
+    const durationSeconds = minutes * 60 + seconds
+    if (durationSeconds <= 0) {
+      return
+    }
+    this.selectTimerDuration(durationSeconds)
+  }
+
   startTimer() {
     if (this.remainingSeconds <= 0) {
       this.remainingSeconds = this.selectedDurationSeconds
@@ -119,6 +137,7 @@ export class MindfulnessPage extends BaseComponent implements OnInit, OnDestroy 
     if (this.remainingSeconds <= 0) {
       this.isTimerRunning = false
       this.clearTimerInterval()
+      this.playCompletionChime()
     }
 
     this.changeDetectorRef.detectChanges()
@@ -128,6 +147,31 @@ export class MindfulnessPage extends BaseComponent implements OnInit, OnDestroy 
     if (this.timerIntervalHandle) {
       clearInterval(this.timerIntervalHandle)
       this.timerIntervalHandle = undefined
+    }
+  }
+
+  /** Neither existing audio asset (a phone ring, an intro clip) fits a meditation timer ending,
+   * so this synthesizes a soft bell-like tone via the Web Audio API instead of forcing a
+   * mismatched sound effect. */
+  private playCompletionChime() {
+    try {
+      const AudioContextCtor = window.AudioContext ?? (window as any).webkitAudioContext
+      const audioContext: AudioContext = new AudioContextCtor()
+      const now = audioContext.currentTime
+      const oscillator = audioContext.createOscillator()
+      const gainNode = audioContext.createGain()
+      oscillator.type = 'sine'
+      oscillator.frequency.setValueAtTime(660, now)
+      gainNode.gain.setValueAtTime(0.0001, now)
+      gainNode.gain.exponentialRampToValueAtTime(0.3, now + 0.02)
+      gainNode.gain.exponentialRampToValueAtTime(0.0001, now + 2.5)
+      oscillator.connect(gainNode)
+      gainNode.connect(audioContext.destination)
+      oscillator.start(now)
+      oscillator.stop(now + 2.5)
+      oscillator.onended = () => audioContext.close()
+    } catch (error) {
+      console.error('playCompletionChime failed', error)
     }
   }
 

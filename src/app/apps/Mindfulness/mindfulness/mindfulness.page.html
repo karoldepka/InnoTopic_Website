@@ -48,6 +48,32 @@
         </ion-button>
       </div>
 
+      <div class="timer-manual-entry" aria-label="Custom timer duration">
+        <ion-input
+          type="number"
+          inputmode="numeric"
+          min="0"
+          placeholder="min"
+          aria-label="Minutes"
+          [(ngModel)]="manualMinutes"
+        ></ion-input>
+        <span aria-hidden="true">:</span>
+        <ion-input
+          type="number"
+          inputmode="numeric"
+          min="0"
+          max="59"
+          placeholder="sec"
+          aria-label="Seconds"
+          [(ngModel)]="manualSeconds"
+        ></ion-input>
+        <ion-button
+          size="small"
+          fill="outline"
+          (click)="applyManualDuration()"
+        >Set</ion-button>
+      </div>
+
       <div class="timer-actions">
         <ion-button
           class="timer-action"
