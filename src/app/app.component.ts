@@ -1,6 +1,7 @@
 import {Component, HostListener, ChangeDetectionStrategy} from '@angular/core';
 
 import {Platform, PopoverController} from '@ionic/angular';
+import { Capacitor } from '@capacitor/core';
 import { SplashScreen } from '@capacitor/splash-screen';
 import { StatusBar, Style } from '@capacitor/status-bar';
 import {TimerNotificationsService} from "./core/timer-notifications.service";
@@ -41,8 +42,10 @@ export class AppComponent {
 
   initializeApp() {
     this.platform.ready().then(() => {
-      StatusBar.setStyle({style: Style.Default});
-      StatusBar.setOverlaysWebView({overlay: false})
+      if (Capacitor.isNativePlatform()) {
+        StatusBar.setStyle({style: Style.Default});
+        StatusBar.setOverlaysWebView({overlay: false})
+      }
 
       SplashScreen.hide();
       this.setupOptionsHandler()
