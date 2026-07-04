@@ -9,13 +9,14 @@ import {Required} from '../../../../libs/AppFedShared/utils/angular/Required.dec
 import {LearnItem$} from '../../models/LearnItem$'
 import {FeatureService} from '../../../../libs/AppFedShared/feature.service'
 import {BaseComponent} from '../../../../libs/AppFedShared/base/base.component'
-import { IonicModule } from '@ionic/angular';
+import { AlertController, IonicModule, ToastController } from '@ionic/angular';
 import { RouterLink } from '@angular/router';
 import { NgIf } from '@angular/common';
 import { SelectionCheckboxComponent } from './selection-checkbox/selection-checkbox.component';
 import { PlayButtonComponent } from '../../shared/play-button/play-button.component';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { Subscription } from 'rxjs';
+import {stripHtml} from '../../../../libs/AppFedShared/utils/html-utils'
 
 
 /* TODO rename to  list-item */
@@ -68,6 +69,8 @@ export class ActionableItemComponent extends BaseComponent implements OnInit, On
   constructor(
     public featureService: FeatureService,
     private sanitizer: DomSanitizer,
+    private alertController: AlertController,
+    private toastController: ToastController,
     private changeDetectorRef: ChangeDetectorRef,
     injector: Injector,
   ) {
@@ -143,5 +146,72 @@ export class ActionableItemComponent extends BaseComponent implements OnInit, On
 
   addToToday(event: any) {
     event.stopPropagation()
+  }
+
+  async archive(event: Event) {
+    this.stopRowNavigation(event)
+    const title = this.getShortTitle()
+    const alert = await this.alertController.create({
+      header: 'Archive item?',
+      message: title
+        ? `"${title}" will be hidden from active lists.`
+        : 'This item will be hidden from active lists.',
+      buttons: [
+        {
+          text: 'Cancel',
+          role: 'cancel',
+        },
+        {
+          text: 'Archive',
+          role: 'destructive',
+          handler: () => this.confirmArchive(title),
+        },
+      ],
+    })
+    await alert.present()
+  }
+
+  async restore(event: Event) {
+    this.stopRowNavigation(event)
+    const title = this.getShortTitle()
+    this.item.unarchive()
+    const toast = await this.toastController.create({
+      message: title ? `"${title}" restored.` : 'Item restored.',
+      duration: 2400,
+      color: 'success',
+      position: 'bottom',
+    })
+    await toast.present()
+  }
+
+  private async confirmArchive(title: string) {
+    this.item.archive()
+    const toast = await this.toastController.create({
+      message: title ? `"${title}" archived.` : 'Item archived.',
+      duration: 6000,
+      color: 'medium',
+      position: 'bottom',
+      buttons: [
+        {
+          text: 'Undo',
+          role: 'cancel',
+          handler: () => this.item.unarchive(),
+        },
+      ],
+    })
+    await toast.present()
+  }
+
+  private stopRowNavigation(event: Event) {
+    event.stopPropagation()
+    event.preventDefault()
+  }
+
+  private getShortTitle(): string {
+    const item = this.item.val
+    const title = stripHtml(item?.title || (item as any)?.question || item?.joinedSides?.())
+      ?.replace(/\s+/g, ' ')
+      .trim() ?? ''
+    return title.length > 80 ? title.slice(0, 77) + '...' : title
   }
 }

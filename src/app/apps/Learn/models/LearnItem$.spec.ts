@@ -18,7 +18,10 @@ function makeFakeService(): any {
     itemHistoryService: { onPatch: jasmine.createSpy('onPatch') },
     syncStatusService: { handleSavingPromise: jasmine.createSpy('handleSavingPromise') },
     authService: { authUser$: { lastVal: { uid: 'user-1' } } },
-    browserOdmStorage: { savePendingEdit: jasmine.createSpy('savePendingEdit').and.resolveTo(undefined) },
+    browserOdmStorage: {
+      savePendingEdit: jasmine.createSpy('savePendingEdit').and.resolveTo(undefined),
+      clearPendingEdit: jasmine.createSpy('clearPendingEdit').and.resolveTo(undefined),
+    },
   }
 }
 
@@ -275,5 +278,29 @@ describe('LearnItem$ — setNewSelfRating()', () => {
     const item$ = makeItem$(svc, { selfRatingsCount: 3 as any }, undefined, 'i')
     item$.setNewSelfRating(1 as any)
     expect(item$.currentVal?.selfRatingsCount).toBe(4)
+  })
+})
+
+// ---------------------------------------------------------------------------
+
+describe('LearnItem$ — archive()', () => {
+  let svc: any
+  beforeEach(() => {
+    svc = makeFakeService()
+    spyOn(OdmBackend, 'nowTimestamp').and.returnValue(aTimestamp)
+  })
+
+  it('sets whenArchived to the current timestamp', () => {
+    const item$ = makeItem$(svc, {}, undefined, 'i')
+    item$.archive()
+    expect(item$.currentVal?.whenArchived).toBe(aTimestamp)
+    expect(item$.isArchived()).toBeTrue()
+  })
+
+  it('unarchive clears whenArchived', () => {
+    const item$ = makeItem$(svc, { whenArchived: aTimestamp }, undefined, 'i')
+    item$.unarchive()
+    expect(item$.currentVal?.whenArchived).toBeNull()
+    expect(item$.isArchived()).toBeFalse()
   })
 })

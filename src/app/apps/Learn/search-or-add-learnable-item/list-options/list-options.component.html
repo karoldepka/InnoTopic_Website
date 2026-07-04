@@ -19,6 +19,11 @@
     [checked]="!! listOptions$P.locallyVisibleChanges$.lastVal?.hideDrafts"
     (ionChange)="setHideDrafts($any($event).detail.checked)"
   >Hide drafts</ion-checkbox>
+  <ion-checkbox
+    labelPlacement="end"
+    [checked]="!! listOptions$P.locallyVisibleChanges$.lastVal?.showArchived"
+    (ionChange)="setShowArchived($any($event).detail.checked)"
+  >Show archived</ion-checkbox>
 
 
   <!-- General filtering:

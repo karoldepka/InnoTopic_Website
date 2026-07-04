@@ -20,6 +20,7 @@ export class OdmInMemItemWriteOnce {
    * and whenDeleted, whenArchived
    * */
   public isDeleted?: OdmTimestamp
+  public whenArchived?: OdmTimestamp | null
   public owner?: UserId
   public parentIds?: string[]
 }
@@ -578,14 +579,25 @@ export class OdmItem$2<
 
 
   public getParentIds(): TItemId[] {
-    // check if parents are set correctly:
-    if ( ! this.parents?.length && !this.isTreeRoot() ) {
-      if ( appGlobals.feat.categoriesTree.showFixmes ) {
-        console.error('Item$ has no parents, but is not root!', this)
-      }
+    if ( this.parents ) {
+      return this.parents.map(parent => parent.id! as TItemId)
     }
-    // FIXME: handle case where this.parents are nullish
-    return (this.parents?.map(parent => parent.id! as TItemId)) ?? ([] as TItemId[])
+
+    const persistedParentIds = this.currentVal?.parentIds
+    if ( persistedParentIds ) {
+      return persistedParentIds as TItemId[]
+    }
+
+    // Top-level items intentionally have no parents. New saves call
+    // setIdAndWhenCreatedIfNecessary() first, which writes parentIds: [] explicitly.
+    if ( this.isTreeRoot() || Array.isArray(persistedParentIds) ) {
+      return [] as TItemId[]
+    }
+
+    if ( appGlobals.feat.categoriesTree.showFixmes ) {
+      console.error('Item$ has no parent metadata; treating as top-level item.', this)
+    }
+    return [] as TItemId[]
   }
 
   public getAncestorIds(): TItemId[] {

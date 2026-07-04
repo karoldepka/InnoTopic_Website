@@ -127,6 +127,20 @@ describe('ListOptionsComponent', () => {
     })
   })
 
+  describe('setShowArchived', () => {
+    it('patches showArchived: true', async () => {
+      const { component, listOptions } = await createComponent()
+      component.setShowArchived(true)
+      expect(listOptions.patches).toEqual([{ showArchived: true }])
+    })
+
+    it('patches showArchived: false', async () => {
+      const { component, listOptions } = await createComponent()
+      component.setShowArchived(false)
+      expect(listOptions.patches).toEqual([{ showArchived: false }])
+    })
+  })
+
   describe('loadAll', () => {
     it('delegates to itemsService.loadAllItemsFromServer', async () => {
       const { component, itemsService } = await createComponent()
@@ -157,6 +171,11 @@ describe('ListOptionsComponent', () => {
       const { listOptions } = await createComponent({ preset: 'all', hideDrafts: true } as ListOptionsData)
       expect(listOptions.locallyVisibleChanges$.lastVal?.hideDrafts).toBeTrue()
     })
+
+    it('reflects showArchived: true from initial data', async () => {
+      const { listOptions } = await createComponent({ preset: 'all', showArchived: true } as ListOptionsData)
+      expect(listOptions.locallyVisibleChanges$.lastVal?.showArchived).toBeTrue()
+    })
   })
 
   describe('independent patches do not interfere', () => {
@@ -166,6 +185,21 @@ describe('ListOptionsComponent', () => {
       component.setHideDrafts(true)
       expect(listOptions.patches[0]).toEqual({ hideAiGenerated: true })
       expect(listOptions.patches[1]).toEqual({ hideDrafts: true })
+    })
+
+    it('setShowArchived does not affect hideAiGenerated or hideDrafts', async () => {
+      const { component, listOptions } = await createComponent({
+        preset: 'all',
+        hideAiGenerated: true,
+        hideDrafts: true,
+      } as ListOptionsData)
+      component.setShowArchived(true)
+      expect(listOptions.locallyVisibleChanges$.lastVal).toEqual({
+        preset: 'all',
+        hideAiGenerated: true,
+        hideDrafts: true,
+        showArchived: true,
+      })
     })
 
     it('setPreset does not affect hideAiGenerated', async () => {

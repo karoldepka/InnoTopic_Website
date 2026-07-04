@@ -60,6 +60,22 @@ export class LearnItem$
 
   }
 
+  archive() {
+    this.patchThrottled({
+      whenArchived: OdmBackend.nowTimestamp(),
+    } as Partial<LearnItem>)
+  }
+
+  unarchive() {
+    this.patchThrottled({
+      whenArchived: null,
+    } as Partial<LearnItem>)
+  }
+
+  isArchived(): boolean {
+    return !! this.val?.whenArchived
+  }
+
   /* TODO return descriptor always; take from ActionableItemComponent.getImportanceDescriptor */
   getEffectiveImportance(): ImportanceVal {
     // TODO get it from parents

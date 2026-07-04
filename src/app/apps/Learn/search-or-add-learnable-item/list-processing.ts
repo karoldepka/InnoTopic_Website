@@ -177,6 +177,8 @@ export class ListProcessing {
 
     const items = this.item$s.filter(item =>
       ! item.val?.whenDeleted
+      && ! item.val?.isDeleted
+      && (opts?.showArchived || ! item.val?.whenArchived)
       && (! opts?.hideAiGenerated || ! item.val?.isAiGenerated())
       && (! opts?.hideDrafts || ! item.val?.isDraft())
     )

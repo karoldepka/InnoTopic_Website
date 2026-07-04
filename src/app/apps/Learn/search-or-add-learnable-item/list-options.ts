@@ -17,6 +17,8 @@ export class ListOptionsData {
   hideAiGenerated ? : boolean
   /** Hide unreviewed draft items from the list. */
   hideDrafts ? : boolean
+  /** Show archived items in the list. Hidden by default. */
+  showArchived ? : boolean
 }
 
 export class ListOptions {

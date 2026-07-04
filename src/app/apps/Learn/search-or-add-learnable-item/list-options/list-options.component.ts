@@ -68,6 +68,10 @@ export class ListOptionsComponent extends BaseComponent implements OnInit {
     this.listOptions$P.patchThrottled({ hideDrafts: checked })
   }
 
+  setShowArchived(checked: boolean) {
+    this.listOptions$P.patchThrottled({ showArchived: checked })
+  }
+
   loadAll() {
     this.itemsService.loadAllItemsFromServer()
   }

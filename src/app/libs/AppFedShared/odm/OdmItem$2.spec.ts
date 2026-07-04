@@ -17,6 +17,11 @@ function makeFakeService(): any {
     itemHistoryService: { onPatch: jasmine.createSpy('onPatch') },
     syncStatusService: { handleSavingPromise: jasmine.createSpy('handleSavingPromise') },
     authService: { authUser$: { lastVal: { uid: 'user-1' } } },
+    browserOdmStorage: {
+      savePendingEdit: jasmine.createSpy('savePendingEdit').and.resolveTo(undefined),
+      clearPendingEdit: jasmine.createSpy('clearPendingEdit').and.resolveTo(undefined),
+      get: jasmine.createSpy('get').and.resolveTo(undefined),
+    },
   }
   svc.createOdmItem$ = (id: any, data: any, parents: any, opts: any) =>
     new (OdmItem$2 as any)(svc, id, data, parents, opts)
@@ -60,6 +65,16 @@ describe('OdmItem$2 — tree traversal', () => {
     expect(grand.findAncestorItemMatching((n: any) => n.id === 'root')).toBe(root)
     expect(grand.findAncestorItemMatching((n: any) => n.id === 'child')).toBe(child)
     expect(grand.findAncestorItemMatching((n: any) => n.id === 'nope')).toBeUndefined()
+  })
+
+  it('getParentIds returns explicit top-level metadata without requiring a root item', () => {
+    const item = makeItem(svc, { parentIds: [] }, undefined, 'top-level')
+    expect(item.getParentIds()).toEqual([])
+  })
+
+  it('getParentIds falls back to persisted parentIds when parents are not hydrated', () => {
+    const item = makeItem(svc, { parentIds: ['p1', 'p2'] }, undefined, 'child')
+    expect(item.getParentIds()).toEqual(['p1', 'p2'])
   })
 
   it('forEachDescendant / getDescendants visit depth-first, pre-order', () => {

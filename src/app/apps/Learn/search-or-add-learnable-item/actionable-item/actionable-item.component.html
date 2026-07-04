@@ -1,7 +1,8 @@
 <!--<ng-container *ngIf="item"> &lt;!&ndash; hack for item being undefined in ion virtual scroll &ndash;&gt;-->
 
-<div style="margin-left: 5px; padding: 5px; border-bottom: solid #222222 2px;"
-     [routerLink]="['/learn/item/'+item.id]"
+<div
+  class="learn-list-item"
+  [routerLink]="['/learn/item/'+item.id]"
 >
 
   <app-selection-checkbox
@@ -20,6 +21,31 @@
   <ion-badge *ngIf="item.val?.isCategory" color="medium" style="margin-right: 5px">CATEGORY</ion-badge>
   <ion-badge *ngIf="item.val?.isAiGenerated()" color="tertiary" style="margin-right: 5px">AI</ion-badge>
   <ion-badge *ngIf="item.val?.isDraft()" color="warning" style="margin-right: 5px">DRAFT</ion-badge>
+  <ion-badge *ngIf="item.isArchived()" color="medium" style="margin-right: 5px">ARCHIVED</ion-badge>
+
+  <ion-button
+    *ngIf="! item.isArchived()"
+    class="row-icon-button"
+    fill="clear"
+    size="small"
+    title="Archive"
+    aria-label="Archive"
+    (click)="archive($event)"
+  >
+    <ion-icon slot="icon-only" name="archive-outline"></ion-icon>
+  </ion-button>
+
+  <ion-button
+    *ngIf="item.isArchived()"
+    class="row-icon-button"
+    fill="clear"
+    size="small"
+    title="Restore"
+    aria-label="Restore"
+    (click)="restore($event)"
+  >
+    <ion-icon slot="icon-only" name="arrow-undo-outline"></ion-icon>
+  </ion-button>
 
   <!-- FIXME icon task / learnable / journal-entry / note -->
   <ion-note *ngIf="g.feat.roiPoints.showUgly && item.val?.isTask">
