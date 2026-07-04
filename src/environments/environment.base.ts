@@ -1,3 +1,5 @@
+import { buildInfo } from './build-info'
+
 // This file can be replaced during build by using the `fileReplacements` array.
 // `ng build --prod` replaces `environment.ts` with `environment.prod.ts`.
 // The list of file replacements can be found in `angular.json`.
@@ -31,6 +33,7 @@ export const environmentBase = {
   },
 
   showExperimentalThemes: true,
+  buildInfo,
   firebaseConfig: {
     projectId: 'cloudtime-app',
     apiKey: "AIzaSyD8hiBc7WoQQISCDpDLMtiaakyKvKZwdkw",
