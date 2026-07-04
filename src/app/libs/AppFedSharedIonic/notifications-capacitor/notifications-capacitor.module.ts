@@ -11,4 +11,4 @@ import {AudioModule} from "../../AppFedShared/audio/audio.module";
     AudioModule,
   ]
 })
-export class NotificationsCordovaModule { }
+export class NotificationsCapacitorModule { }

@@ -1,8 +1,8 @@
 import {Component, HostListener, ChangeDetectionStrategy} from '@angular/core';
 
 import {Platform, PopoverController} from '@ionic/angular';
-import { SplashScreen } from '@ionic-native/splash-screen/ngx';
-import { StatusBar } from '@ionic-native/status-bar/ngx';
+import { SplashScreen } from '@capacitor/splash-screen';
+import { StatusBar, Style } from '@capacitor/status-bar';
 import {TimerNotificationsService} from "./core/timer-notifications.service";
 import {SyncStatusService} from './libs/AppFedShared/odm/sync-status.service'
 // import {LearnStatsService} from './apps/Learn/core/learn-stats.service'
@@ -24,8 +24,6 @@ import {OdmConflictToastService} from './libs/AppFedSharedBrowser/odm-browser/Od
 export class AppComponent {
   constructor(
     private platform: Platform,
-    private splashScreen: SplashScreen,
-    private statusBar: StatusBar,
     private featureService /* force the service to run */: FeatureService,
     private ThemeService /* force the service to run */: ThemeService,
     private timerNotificationService /* force the service to run */: TimerNotificationsService /* FIXME commenting this out causes errors */,
@@ -43,10 +41,10 @@ export class AppComponent {
 
   initializeApp() {
     this.platform.ready().then(() => {
-      this.statusBar.styleDefault();
-      this.statusBar.overlaysWebView(false)
+      StatusBar.setStyle({style: Style.Default});
+      StatusBar.setOverlaysWebView({overlay: false})
 
-      this.splashScreen.hide();
+      SplashScreen.hide();
       this.setupOptionsHandler()
       console.log('initializeApp ...')
     });

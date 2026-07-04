@@ -1,7 +1,6 @@
 {
-  "appId": "com.innotopic.cloudtime",
-  "appName": "CloudTimeIon",
-  "bundledWebRuntime": false,
-  "npmClient": "yarn",
-  "webDir": "www"
+	"appId": "com.innotopic.lifesuite",
+	"appName": "LifeSuite",
+	"npmClient": "npm",
+	"webDir": "www"
 }
