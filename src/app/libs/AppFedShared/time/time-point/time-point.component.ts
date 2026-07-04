@@ -30,7 +30,13 @@ export class TimePointComponent implements OnInit {
 
   process(time ? : Date) {
     try {
-      return time?.toISOString()?.replace('T', ' ')?.replace(/\.\d\d\dZ/gi, '')
+      if ( ! time ) {
+        return undefined
+      }
+      const pad = (n: number) => String(n).padStart(2, '0')
+      const datePart = `${time.getFullYear()}-${pad(time.getMonth() + 1)}-${pad(time.getDate())}`
+      const timePart = `${pad(time.getHours())}:${pad(time.getMinutes())}:${pad(time.getSeconds())}`
+      return `${datePart} ${timePart}`
     } catch (e) {
       return 'invalid-date'
     }
