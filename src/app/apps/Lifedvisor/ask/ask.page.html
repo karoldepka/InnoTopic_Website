@@ -14,24 +14,17 @@
 
   </ion-toolbar>
 
-<!--  <label for="askText">Describe your problem or wish, to get hints:</label>-->
-  <ion-item>
-    <!--  <ion-label>Search problems/qualities/hints</ion-label>-->
-    <!-- TODO maybe search icon - - - ion-searchbar
-    -->
-    <ion-input
-        [autofocus]="true"
-        (change)="onChangeFilterText($event)"
-        [(ngModel)]="textFieldDummy"
-        (ngModelChange)="onChangeFilterText($event)"
-        id="askText"
-        [placeholder]="'Search problems/qualities/values/hints/questions/wishes'"
-        [clearInput]="true"
-    ></ion-input>
-  </ion-item>
-
+  <ion-searchbar
+      [autofocus]="true"
+      [(ngModel)]="textFieldDummy"
+      (ngModelChange)="onChangeFilterText($event)"
+      id="askText"
+      [placeholder]="'Search problems/qualities/values/hints/questions/wishes'"
+      [debounce]="0"
+  ></ion-searchbar>
 
   <ion-checkbox
+    class="expand-all-toggle"
     id="expandAllButton"
     labelPlacement="end"
     [(ngModel)]="isExpandAll"
