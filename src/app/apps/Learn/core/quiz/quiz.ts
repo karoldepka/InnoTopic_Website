@@ -4,6 +4,7 @@ import {ImportanceVal, PositiveInt, PositiveIntOrZero} from '../../models/LearnI
 import {DurationMs, nullish, TimeMsEpoch} from '../../../../libs/AppFedShared/utils/type-utils'
 import {QuizIntervalCalculator} from './quiz-interval-calculator'
 import {QuizOptions} from './QuizOptions'
+import {odmTimestampToMillis} from '../../../../libs/AppFedShared/odm/utils'
 
 (Date.prototype as any).toMillis = function() {
   return this.getTime()
@@ -58,11 +59,12 @@ export class Quiz {
       (dePrioritizeNewMaterial ? null : itemVal.whenAdded) // ||
     // itemVal.whenCreated /* garbled by accidental patching of all items */
 
-    if ( ! whenLastTouched ) {
+    const whenLastTouchedMillis = odmTimestampToMillis(whenLastTouched)
+    if ( whenLastTouchedMillis === undefined ) {
       return dePrioritizeNewMaterial ? new Date(2199, 1, 1).getTime() : 0 // Date.now() + 365 * 24 * 3600 * 1000 : 0 // 1970
     }
     const interval = this.calculateInterval(this.quizzable$, quizOptions)
-    const ret = whenLastTouched.toMillis() + interval
+    const ret = whenLastTouchedMillis + interval
     return ret
 
     // TODO: could store this in DB, so that I can make faster firestore queries later, sort by next repetition time (although what if the algorithm changes...)
