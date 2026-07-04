@@ -5,13 +5,13 @@
   App & Sync Status
 </h4>
 <div class="expandable-section">
-  <button class="expand-toggle" (click)="aboutAppExpanded = !aboutAppExpanded">
+  <button class="expand-toggle" (click)="onClickAboutAppToggle()">
     About App <ion-icon [name]="aboutAppExpanded ? 'chevron-up' : 'chevron-down'" style="vertical-align: middle; font-size: 14px"></ion-icon>
   </button>
   <app-about-app *ngIf="aboutAppExpanded"></app-about-app>
 </div>
-<!-- TODO config component -->
-<app-feature-config></app-feature-config>
+<!-- Revealed after 5 clicks on "About App" above, like Android's developer-options gesture. -->
+<app-feature-config *ngIf="showFeatureConfig"></app-feature-config>
 <app-theme-config></app-theme-config>
 
 <p>

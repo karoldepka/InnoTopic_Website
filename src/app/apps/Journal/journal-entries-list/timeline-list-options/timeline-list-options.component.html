@@ -1,21 +1,23 @@
 <ion-button
+  *ngIf="g.feat.beforeProductization"
   [disabled]="itemsService.loadingAllItemsFromServerInitiated"
   (press)="loadAll(true)"
   (click)="loadAll(false)"
 ><ion-icon slot=start name="download-outline" />Load all</ion-button>
 
-<ion-note>{{(itemsService.localItems$ | async)?.length}} items loaded</ion-note>
+<ion-note>{{(itemsService.localItems$ | async)?.length}} items</ion-note>
 
 <ion-checkbox
   labelPlacement="end"
   [formControl]="formControl"
->Sort ascending</ion-checkbox>
+>Sort descending</ion-checkbox>
 
 
 <!-- filter by mood, productivity, importance, health -->
 <ion-range
+  *ngIf="g.feat.beforeProductization"
   [formControl]="formControls.range"
   dualKnobs="true" min="-1" max="10" step="0.5" snaps="true"
   pin="true"
-></ion-range> <!-- -1 for undefined -->
+/> <!-- -1 for undefined -->
 

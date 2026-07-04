@@ -2,6 +2,7 @@ import {Injectable} from '@angular/core';
 import {g} from './g'
 import {CachedSubject} from './utils/cachedSubject2/CachedSubject2'
 import {FeaturesConfig} from './FeaturesConfig'
+import {FeaturesProps} from './FeaturesProps'
 
 @Injectable({
   providedIn: 'root'
@@ -13,11 +14,16 @@ export class FeatureService {
   constructor() {
     console.log('FeatureService ctor')
     // g.feat = this // DX FTW!
-    const featuresConfig = new FeaturesConfig(
-      {
-        enableAll: false
-      }
-    )
+    const featuresConfig = new FeaturesConfig(new FeaturesProps())
+    g.feat = featuresConfig
+    this.config$.nextWithCache(featuresConfig)
+  }
+
+  /** Applies a patch on top of the current props, so toggling one flag doesn't reset the
+   * others back to their defaults. */
+  private patchProps(patch: Partial<FeaturesProps>) {
+    const props = Object.assign(new FeaturesProps(), this.config$.lastVal?.props, patch)
+    const featuresConfig = new FeaturesConfig(props)
     g.feat = featuresConfig
     this.config$.nextWithCache(featuresConfig)
   }
@@ -28,13 +34,15 @@ export class FeatureService {
 
   setEnableAll(enabled: boolean) {
     console.log('FeaturesConfig setEnableAll', enabled)
-    const featuresConfig1 = new FeaturesConfig(
-      {
-        enableAll: enabled
-      }
-    )
-    g.feat = featuresConfig1
-    this.config$.nextWithCache(featuresConfig1)
+    this.patchProps({enableAll: enabled})
+  }
+
+  get beforeProductization(): boolean {
+    return this.config$.lastVal?.props?.beforeProductization ?? false
+  }
+
+  setBeforeProductization(enabled: boolean) {
+    this.patchProps({beforeProductization: enabled})
   }
 
   static readonly firestoreEnabledKey = 'firestoreEnabled'

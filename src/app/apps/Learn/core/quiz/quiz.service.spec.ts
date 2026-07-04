@@ -40,7 +40,7 @@ describe('QuizService — quizStatus$', () => {
     localStorage.removeItem('QuizOptions')
     // Normally set once by FeatureService's constructor during app bootstrap; quizStatus$ reads
     // it (via countBy2) so it must exist before anything subscribes.
-    appGlobals.feat = new FeaturesConfig({enableAll: false})
+    appGlobals.feat = new FeaturesConfig({enableAll: false, beforeProductization: false})
     fakeLearnDoService = makeFakeLearnDoService()
     quizService = new QuizService(fakeLearnDoService as any, {} as any)
   })

@@ -33,6 +33,14 @@ export class FeatureConfigComponent extends BaseComponent implements OnInit {
     // enableAll = $event.target.value
   }
 
+  get beforeProductization(): boolean {
+    return this.featureConfigService.beforeProductization
+  }
+
+  onChangeBeforeProductization($event: any) {
+    this.featureConfigService.setBeforeProductization($event.detail.checked)
+  }
+
   get firestoreEnabled(): boolean {
     return this.featureConfigService.firestoreEnabled
   }

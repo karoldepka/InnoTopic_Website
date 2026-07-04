@@ -8,6 +8,11 @@ export class FeatureLevelsConfig {
     ) {
     }
 
+    /** Stuff that should stay hidden until this app is ready to show to end users - e.g.
+     * dev-only navigation shortcuts. Independently toggleable, unlike the properties below
+     * which all derive from the single shared enableAll. */
+    beforeProductization = this.props.beforeProductization
+
     showDeprecated = this.props.enableAll
 
     potentiallyDangerous = this.props.enableAll

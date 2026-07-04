@@ -38,6 +38,12 @@ export class SyncPopoverComponent extends BaseComponent implements OnInit {
 
   aboutAppExpanded = false
 
+  private static readonly clicksToRevealFeatureConfig = 5
+
+  private aboutAppClickCount = 0
+
+  showFeatureConfig = false
+
   constructor(
     public authService: AuthService,
     public syncStatusService: SyncStatusService,
@@ -49,6 +55,14 @@ export class SyncPopoverComponent extends BaseComponent implements OnInit {
   }
 
   ngOnInit() {}
+
+  onClickAboutAppToggle() {
+    this.aboutAppExpanded = ! this.aboutAppExpanded
+    if ( ! this.showFeatureConfig ) {
+      this.aboutAppClickCount++
+      this.showFeatureConfig = this.aboutAppClickCount >= SyncPopoverComponent.clicksToRevealFeatureConfig
+    }
+  }
 
   logIn() {
     this.authService.logInViaGoogle()

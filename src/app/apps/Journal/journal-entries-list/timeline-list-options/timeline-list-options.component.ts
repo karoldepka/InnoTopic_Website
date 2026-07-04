@@ -1,5 +1,5 @@
 import {Component, Input, OnInit, ChangeDetectionStrategy} from '@angular/core';
-import {AsyncPipe} from '@angular/common';
+import {AsyncPipe, NgIf} from '@angular/common';
 import {Required} from '../../../../libs/AppFedShared/utils/angular/Required.decorator'
 import {PatchableObservable} from '../../../../libs/AppFedShared/utils/rxUtils'
 import {createViewSyncerForField, ViewSyncer} from '../../../../libs/AppFedShared/odm/ui/ViewSyncer'
@@ -9,15 +9,18 @@ import { UntypedFormControl, ReactiveFormsModule } from '@angular/forms'
 import {OdmService2} from '../../../../libs/AppFedShared/odm/OdmService2'
 import {errorAlert} from '../../../../libs/AppFedShared/utils/log'
 import { IonicModule } from '@ionic/angular';
+import {g} from '../../../../libs/AppFedShared/g'
 
 @Component({
     selector: 'app-timeline-list-options',
     templateUrl: './timeline-list-options.component.html',
     changeDetection: ChangeDetectionStrategy.Eager,
     styleUrls: ['./timeline-list-options.component.sass'],
-    imports: [IonicModule, ReactiveFormsModule, AsyncPipe],
+    imports: [IonicModule, ReactiveFormsModule, AsyncPipe, NgIf],
 })
 export class TimelineListOptionsComponent implements OnInit {
+
+  public g = g
 
   @Required()
   @Input()
