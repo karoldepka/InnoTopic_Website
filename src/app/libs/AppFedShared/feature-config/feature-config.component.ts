@@ -24,6 +24,10 @@ export class FeatureConfigComponent extends BaseComponent implements OnInit {
 
   ngOnInit() {}
 
+  get enableAll(): boolean {
+    return this.featureConfigService.enableAll
+  }
+
   onChangeAllFeatures($event: any) {
     this.featureConfigService.setEnableAll($event.detail.checked)
     // enableAll = $event.target.value

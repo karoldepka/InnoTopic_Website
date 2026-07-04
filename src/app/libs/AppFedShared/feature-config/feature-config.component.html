@@ -1,13 +1,21 @@
 <ion-checkbox
   labelPlacement="end"
+  [checked]="enableAll"
+  (ionChange)="onChangeAllFeatures($event)"
+>Features before productization</ion-checkbox>
+<ion-checkbox
+  labelPlacement="end"
+  [checked]="enableAll"
   (ionChange)="onChangeAllFeatures($event)"
 >All features</ion-checkbox>
 <ion-checkbox
   labelPlacement="end"
+  [checked]="enableAll"
   (ionChange)="onChangeAllFeatures($event)"
 >Nice-looking</ion-checkbox>
 <ion-checkbox
   labelPlacement="end"
+  [checked]="enableAll"
   (ionChange)="onChangeAllFeatures($event)"
 >Features I use</ion-checkbox>
 <ion-checkbox

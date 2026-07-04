@@ -22,6 +22,10 @@ export class FeatureService {
     this.config$.nextWithCache(featuresConfig)
   }
 
+  get enableAll(): boolean {
+    return this.config$.lastVal?.props?.enableAll ?? false
+  }
+
   setEnableAll(enabled: boolean) {
     console.log('FeaturesConfig setEnableAll', enabled)
     const featuresConfig1 = new FeaturesConfig(
