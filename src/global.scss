@@ -101,6 +101,18 @@ html {
   //--ion-color-primary: orange;
 }
 
+// Ionic's own fab-vertical-bottom/-top CSS is a flat 10px with no safe-area term at all
+// (unlike fab-horizontal-start/-end, which do add --ion-safe-area-left/right) - on Android's
+// enforced edge-to-edge display this puts bottom FABs partly under the system nav bar. This is
+// Ionic's own documented fix: add the safe-area inset on top of the existing offset.
+ion-fab[vertical="bottom"] {
+  bottom: calc(10px + var(--ion-safe-area-bottom, 0px));
+}
+
+ion-fab[vertical="top"] {
+  top: calc(10px + var(--ion-safe-area-top, 0px));
+}
+
 .action-icon {
   cursor: pointer;
   user-select: none;
