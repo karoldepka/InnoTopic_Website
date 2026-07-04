@@ -21,10 +21,10 @@ import {
 } from 'firebase/auth'
 import { createClient, SupabaseClient, User as SupabaseUser } from '@supabase/supabase-js'
 import { environment } from '../../environments/environment'
-import { initializeApp } from 'firebase/app'
 import { errorAlert } from '../libs/AppFedShared/utils/log'
 import { Capacitor } from '@capacitor/core'
 import { FirebaseAuthentication } from '@capacitor-firebase/authentication'
+import { getFirebaseApp } from '../libs/AppFedSharedFirebase/firebase-app'
 
 export type AuthBackendName = 'firebase' | 'supabase'
 export type AuthFacadeUser = User
@@ -48,17 +48,23 @@ class FirebaseAuthAdapter implements AuthProviderAdapter {
 
   constructor() {
     try {
-      const firebaseConfig = (environment as any).firebaseConfig
-      if (!firebaseConfig) {
-        throw new Error('Missing environment.firebaseConfig')
-      }
-      const app = initializeApp(firebaseConfig)
+      const app = getFirebaseApp()
       // On native, the JS SDK's default persistence is unreliable inside the Capacitor
       // WebView; the plugin's docs (capacitor-firebase/authentication) recommend IndexedDB
       // persistence explicitly for the native-sign-in-synced-into-JS-SDK flow below.
-      this.auth = Capacitor.isNativePlatform()
-        ? initializeAuth(app, {persistence: indexedDBLocalPersistence})
-        : getAuth(app)
+      // Guard against auth/already-initialized in case something else in the app ever calls
+      // getAuth()/initializeAuth() on this app before this constructor runs - initializeAuth()
+      // throws if called twice with different options, so just adopt whatever's already there.
+      try {
+        this.auth = Capacitor.isNativePlatform()
+          ? initializeAuth(app, {persistence: indexedDBLocalPersistence})
+          : getAuth(app)
+      } catch (error: any) {
+        if (String(error?.code) !== 'auth/already-initialized') {
+          throw error
+        }
+        this.auth = getAuth(app)
+      }
     } catch (error: any) {
       errorAlert('Firebase initialization failed: ' + error?.message)
       throw error
@@ -97,6 +103,22 @@ class FirebaseAuthAdapter implements AuthProviderAdapter {
     return result.user ?? null
   }
 
+  private isNoCredentialAvailable(error: any): boolean {
+    const message = String(error?.message ?? '').toLowerCase()
+    return message.includes('no credentials available') || message.includes('nocredentialexception')
+  }
+
+  private async signInWithGoogleNative(useCredentialManager: boolean): Promise<AuthFacadeUser | null> {
+    const nativeResult = await FirebaseAuthentication.signInWithGoogle({ useCredentialManager })
+    const idToken = nativeResult.credential?.idToken
+    if (!idToken) {
+      throw new Error('Google sign-in did not return an ID token')
+    }
+    const credential = GoogleAuthProvider.credential(idToken)
+    const result = await signInWithCredential(this.auth, credential)
+    return result.user ?? null
+  }
+
   async logInViaGoogle(): Promise<AuthFacadeUser | null> {
     if (Capacitor.isNativePlatform()) {
       // The web SDK's popup/redirect flow below doesn't work in a native WebView: Google
@@ -106,14 +128,19 @@ class FirebaseAuthAdapter implements AuthProviderAdapter {
       // native Google Sign-In SDK instead, then mirror the result into the JS SDK's Auth
       // instance so the rest of the app (onAuthStateChanged, Firestore, etc.) sees the user
       // as logged in too - see capacitor-firebase/authentication's firebase-js-sdk.md.
-      const nativeResult = await FirebaseAuthentication.signInWithGoogle()
-      const idToken = nativeResult.credential?.idToken
-      if (!idToken) {
-        throw new Error('Google sign-in did not return an ID token')
+      try {
+        return await this.signInWithGoogleNative(true)
+      } catch (error: any) {
+        // Android's Credential Manager can report "No credentials available" for reasons that
+        // have nothing to do with the account actually being missing (an outdated Play Services
+        // build, or no Credential Manager provider being registered on the device at all) - fall
+        // back to the older, more broadly-compatible intent-based Google Sign-In picker rather
+        // than dead-ending here.
+        if (!this.isNoCredentialAvailable(error)) {
+          throw error
+        }
+        return await this.signInWithGoogleNative(false)
       }
-      const credential = GoogleAuthProvider.credential(idToken)
-      const result = await signInWithCredential(this.auth, credential)
-      return result.user ?? null
     }
     const authProvider = new GoogleAuthProvider()
     try {
