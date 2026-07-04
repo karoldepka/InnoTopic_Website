@@ -102,7 +102,6 @@ export class LearnItemDetailsPage extends BaseComponent implements OnInit {
   }
 
   private doc: AngularFirestoreDocument<LearnItem> = this.angularFirestore.collection<LearnItem>(`LearnItem`).doc(this.id)
-  private audioDoc = this.angularFirestore.collection(`LearnDoAudio`).doc(this.id)
 
   ngOnInit() {
     this.doc.get().pipe(take(1)).subscribe({
@@ -133,11 +132,7 @@ export class LearnItemDetailsPage extends BaseComponent implements OnInit {
         }, {
           text: 'DELETE',
           handler: async () => {
-            // this.doc.update({
-            //   whenDeleted: new Date(),
-            // })
-            await this.doc.delete() // TODO: listen to promise for sync status
-            await this.audioDoc.delete() // TODO: listen to promise for sync status
+            this.item$.patchThrottled({whenDeleted: new Date()})
             ignorePromise(this.router.navigate([`/learn`]))
           }
         }

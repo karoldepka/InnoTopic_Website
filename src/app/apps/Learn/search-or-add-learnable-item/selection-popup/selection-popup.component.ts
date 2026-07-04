@@ -83,11 +83,8 @@ export class SelectionPopupComponent implements OnInit {
         }, {
           text: 'DELETE',
           handler: async () => {
-            this.itemsService.deleteAll(new Set(effectivelySelected))
+            this.multiSelectItems$.patchThrottled({whenDeleted: new Date()})
             this.selection.unselectAll()
-            // this.doc.update({
-            //   whenDeleted: new Date(),
-            // })
           }
         }
       ]
