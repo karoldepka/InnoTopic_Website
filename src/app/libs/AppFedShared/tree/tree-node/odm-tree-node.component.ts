@@ -1,4 +1,4 @@
-import {Component, Input, OnInit, ChangeDetectionStrategy, forwardRef} from '@angular/core';
+import {Component, Input, OnInit, ChangeDetectionStrategy, forwardRef, ViewChild, ViewChildren, QueryList} from '@angular/core';
 import {OdmTreeNode} from './OdmTreeNode'
 import {OdmItem$2} from '../../odm/OdmItem$2'
 import {OdmService2} from '../../odm/OdmService2'
@@ -27,6 +27,14 @@ export class OdmTreeNodeComponent implements OnInit {
   @Input()
   treeNode!: OdmTreeNode<OdmItem$2<any, any, any, any>>
 
+  @ViewChild(OdmTreeNodeContentComponent)
+  private nodeContent!: OdmTreeNodeContentComponent
+
+  /** Direct <app-tree-node> children rendered by this node's own *ngFor - used to locate a
+   * just-created child so its title can be focused once it has actually mounted. */
+  @ViewChildren(forwardRef(() => OdmTreeNodeComponent))
+  private childTreeNodes!: QueryList<OdmTreeNodeComponent>
+
   constructor(
     public authService: AuthService,
     private toastController: ToastController,
@@ -41,6 +49,22 @@ export class OdmTreeNodeComponent implements OnInit {
     // })
   }
 
+  focusTitle() {
+    this.nodeContent.focusTitle()
+  }
+
+  /** The new child's item is inserted into childrenList$ synchronously (see
+   * OdmItem$2's constructor), but its <app-tree-node> only actually mounts on the next
+   * change-detection pass, so childTreeNodes won't have it yet on this call stack - wait a
+   * tick, matching the setTimeout-based focus pattern used elsewhere (e.g.
+   * JournalNumericFieldsComponent.focusComment()). */
+  private focusNewChildTitleWhenRendered(newItemId: unknown) {
+    setTimeout(() => {
+      const newChild = this.childTreeNodes?.find(child => child.treeNode.item$.id === newItemId)
+      newChild?.focusTitle()
+    })
+  }
+
   async addChild() {
     const item$ = this.treeNode.item$
     const odmService = item$.odmService as OdmService2<any, any, any, any>
@@ -51,6 +75,7 @@ export class OdmTreeNodeComponent implements OnInit {
     try {
       newItem.saveNowToDb()
       this.treeNode.isExpanded = true
+      this.focusNewChildTitleWhenRendered(newItem.id)
       console.log('newItem', newItem)
       const toast = await this.toastController.create({
         message: 'Draft learn item added.',

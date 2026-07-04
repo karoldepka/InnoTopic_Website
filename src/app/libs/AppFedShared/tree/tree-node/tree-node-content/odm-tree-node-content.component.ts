@@ -40,6 +40,8 @@ export class OdmTreeNodeContentComponent implements OnInit {
 
   @ViewChild('answerCell') answerCell!: RichTextEditCellComponent;
 
+  @ViewChild('titleCell') titleCell!: RichTextEditCellComponent;
+
   mapColumnIdToCell!: Map<string, OdmCell>
 
   showAnswer = false
@@ -103,5 +105,9 @@ export class OdmTreeNodeContentComponent implements OnInit {
   toggleShowAnswer() {
     this.showAnswer = !this.showAnswer
     this.answerCell.focus()
+  }
+
+  focusTitle() {
+    this.titleCell.focus()
   }
 }
