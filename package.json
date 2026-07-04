@@ -76,6 +76,7 @@
     "firebase": "^11.10.0",
     "font-awesome": "^4.7.0",
     "fp-ts": "^2.6.7",
+    "fuse.js": "^7.4.2",
     "jasmine-core": "^4.6.1",
     "lodash-es": "^4.17.15",
     "material-icons": "^1.13.14",

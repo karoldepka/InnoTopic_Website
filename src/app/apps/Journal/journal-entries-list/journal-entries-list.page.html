@@ -48,6 +48,13 @@
     </ion-buttons>
 
   </ion-toolbar>
+  <ion-toolbar>
+    <ion-searchbar
+      placeholder="Search journal"
+      [debounce]="200"
+      (ionInput)="onSearchInput($event)"
+    ></ion-searchbar>
+  </ion-toolbar>
 </ion-header>
 
 <ion-content>
@@ -90,7 +97,7 @@
       <!--autosize-->
       <!-- [itemSize]="90" -->
       <div
-        *cdkVirtualFor="let item$ of $safeNavigationMigration((items$Sorted | async)?.slice()); trackBy: trackById;
+        *cdkVirtualFor="let item$ of $safeNavigationMigration((items$Filtered | async)?.slice()); trackBy: trackById;
                        let index = index;
                        let count = count;
                        let first = first;
@@ -129,7 +136,7 @@
   >
     <ion-list >
       <ng-container
-        *ngFor="let item$ of (items$Sorted | async); trackBy: trackById"
+        *ngFor="let item$ of (items$Filtered | async); trackBy: trackById"
       >
         <app-journal-entry-list-item
           [item$]="item$"

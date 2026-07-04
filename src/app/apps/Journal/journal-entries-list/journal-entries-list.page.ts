@@ -4,6 +4,9 @@ import {JournalEntry$} from '../models/JournalEntry$'
 import {CachedSubject} from '../../../libs/AppFedShared/utils/cachedSubject2/CachedSubject2'
 import {of} from 'rxjs'
 import {combineLatest} from 'rxjs'
+import {BehaviorSubject} from 'rxjs'
+import {map} from 'rxjs/operators'
+import Fuse from 'fuse.js'
 import {debugLog} from '../../../libs/AppFedShared/utils/log'
 import {JournalEntry} from '../models/JournalEntry'
 import {ListOptionsComponent} from '../../Learn/search-or-add-learnable-item/list-options/list-options.component'
@@ -70,6 +73,42 @@ export class JournalEntriesListPage extends BaseComponent implements OnInit {
           return options.sortAscending ? number : -number
         })
     })
+
+  /** Runs entirely client-side against whatever's already loaded in items$ (the local ODM
+   * cache), so it works offline exactly like the rest of the list does - no network involved. */
+  searchTerm$ = new BehaviorSubject<string>('')
+
+  private searchableTextFor(item$: JournalEntry$): string {
+    const entry = item$.val
+    if ( ! entry ) {
+      return ''
+    }
+    const textFieldValues = entry.getPresentTextFieldEntries().map(([, text]) => text)
+    const numericFieldComments = entry.getPresentCompositeFieldEntries()
+      .map(([, , comment]) => comment)
+      .filter((comment): comment is string => !!comment)
+    return [entry.general, entry.text, ...textFieldValues, ...numericFieldComments]
+      .filter((part): part is string => !!part)
+      .join(' \n ')
+  }
+
+  items$Filtered = combineLatest([this.items$Sorted, this.searchTerm$]).pipe(
+    map(([items, searchTerm]) => {
+      const trimmedTerm = searchTerm.trim()
+      if ( ! trimmedTerm ) {
+        return items
+      }
+      const searchableItems = items.map(item$ => ({item$, text: this.searchableTextFor(item$)}))
+      // Fuzzy/typo-tolerant: threshold 0.4 (0 = exact match only, 1 = matches anything) is
+      // Fuse's own suggested starting point for forgiving free-text search.
+      const fuse = new Fuse(searchableItems, {keys: ['text'], threshold: 0.4, ignoreLocation: true})
+      return fuse.search(trimmedTerm).map(result => result.item.item$)
+    })
+  )
+
+  onSearchInput(event: CustomEvent) {
+    this.searchTerm$.next((event.detail as any)?.value ?? '')
+  }
 
   constructor(
     public journalEntriesService: JournalEntryItemsService,
