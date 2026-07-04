@@ -15,6 +15,7 @@ import {OryNodeInclusionsOdmService} from './ory-node-inclusions-odm.service'
 import {OryOdmItem, OryOdmItemId} from './OryOdmItem'
 import {OryNodeInclusion$} from './OryNodeInclusion$'
 import {OryNodeInclusionId} from './OryNodeInclusionData'
+import type {ItemId} from '../../../libs/AppFedShared/odm/OdmCollectionBackend'
 
 /** ODM/Supabase-backed `DbTreeService` - see the OrYoL tree migration plan. Storage is split
  * across two ODM collections (`OryOdmItemsService`/`OryNodeInclusionsOdmService`); this class's
@@ -179,14 +180,14 @@ export class SupabaseTreeService extends DbTreeService {
     ]
 
     await Promise.all([
-      this.oryItemsService.odmCollectionBackend.saveNowToDb(itemData as any, node.itemId as OryOdmItemId, [], []),
-      this.oryNodeInclusionsService.odmCollectionBackend.saveNowToDb(inclusionData, nodeInclusionId, [remappedParentId], ancestorIds),
+      this.oryItemsService.odmCollectionBackend.saveNowToDb(itemData as any, node.itemId as ItemId, [], []),
+      this.oryNodeInclusionsService.odmCollectionBackend.saveNowToDb(inclusionData, nodeInclusionId as ItemId, [remappedParentId as ItemId], ancestorIds as ItemId[]),
     ])
   }
 
   /** The source (Firestore) tree's root node has that tree's own hardcoded root id, not this
    * service's `'ory_root'` - every other node keeps its real id unchanged across backends. */
-  private remapSourceRootItemId(node: OryBaseTreeNode): string {
+  private remapSourceRootItemId(node: {itemId: string, parent2?: unknown}): string {
     return node.parent2 ? node.itemId : this.HARDCODED_ROOT_NODE_ITEM_ID
   }
 

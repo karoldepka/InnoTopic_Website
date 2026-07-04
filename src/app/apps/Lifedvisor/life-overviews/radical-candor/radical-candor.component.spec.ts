@@ -1,4 +1,4 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { IonicModule } from '@ionic/angular';
 
 import { RadicalCandorComponent } from './radical-candor.component';
@@ -7,7 +7,7 @@ describe('RadicalCandorComponent', () => {
   let component: RadicalCandorComponent;
   let fixture: ComponentFixture<RadicalCandorComponent>;
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
     imports: [IonicModule.forRoot(), RadicalCandorComponent]
 }).compileComponents();

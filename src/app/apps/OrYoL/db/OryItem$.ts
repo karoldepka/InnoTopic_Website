@@ -10,6 +10,7 @@ import {TreeTableNodeContent} from '../tree-model/TreeTableNodeContent'
 import {OryItemsService} from '../core/ory-items.service'
 import {FirestoreTreeService} from '../db-firestore/firestore-tree.service'
 import {HasItemData, HasPatchThrottled, ItemData} from '../tree-model/has-item-data'
+import {stripHtml} from '../../../libs/AppFedShared/utils/html-utils'
 
 export type ItemId = string //& { type: 'ItemId' }
 
@@ -104,6 +105,15 @@ export class OryItem$<TData = any> implements HasPatchThrottled<TData> {
 *
 * @deprecated
 *  */
+  /** Best-effort user-visible label for sync-status messages - falls back through the field
+   * names used across item types (tree node title, or a question/name on domain items) down to
+   * the raw id if none are set yet. */
+  private getDisplayTitle(): string {
+    const data = this.itemData as any
+    const title = data?.title ?? data?.name ?? data?.question
+    return stripHtml(title)?.trim() || this.id
+  }
+
   private subscribeDebouncedOnChangePerColumns() {
     // for ( const column of this.columns.allColumns ) {
     const throttleTimeConfig = {
@@ -127,7 +137,7 @@ export class OryItem$<TData = any> implements HasPatchThrottled<TData> {
       if (!this.itemsService.isApplyingFromDbNow) {
         // const itemData = this.buildItemDataFromUi()
         const ret = this.patchItemDataNonThrottled(this.pendingThrottledItemDataPatch) // patching here
-        this.syncStatusService.handleSavingPromise(ret.onPatchSentToRemote, 'saving item to server')
+        this.syncStatusService.handleSavingPromise(ret.onPatchSentToRemote, `Saving "${this.getDisplayTitle()}"`)
         this.unsavedChangesPromiseResolveFunc!.call(undefined)
         this.unsavedChangesPromiseResolveFunc = undefined
         this.pendingThrottledItemDataPatch = {}

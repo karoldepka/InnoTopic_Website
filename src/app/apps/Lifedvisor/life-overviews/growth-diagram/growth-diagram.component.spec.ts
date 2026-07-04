@@ -1,4 +1,4 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 
 import { GrowthDiagramComponent } from './growth-diagram.component';
 
@@ -6,7 +6,7 @@ describe('GrowthDiagramComponent', () => {
   let component: GrowthDiagramComponent;
   let fixture: ComponentFixture<GrowthDiagramComponent>;
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
     imports: [GrowthDiagramComponent]
 })

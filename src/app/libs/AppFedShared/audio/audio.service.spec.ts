@@ -8,7 +8,7 @@ describe('AudioService', () => {
   }));
 
   it('should be created', () => {
-    const service = TestBed.get(AudioService);
+    const service = TestBed.inject(AudioService);
     expect(service).toBeTruthy();
   });
 });
