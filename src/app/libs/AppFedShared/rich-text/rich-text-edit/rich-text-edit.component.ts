@@ -226,6 +226,24 @@ export class RichTextEditComponent extends AbstractCellComponent implements OnIn
         */,
       setup: (editor: any) => {
         console.log('setup')
+        editor.on('PastePreProcess', (event: any) => {
+          // Work around a long-standing, still-unfixed TinyMCE bug (tinymce/tinymce#6629):
+          // its paste-image scanner assumes any `data:...;base64,` <img> src it finds has a
+          // real payload after the comma, but pasted content can carry a `data:` image src
+          // that's empty, non-base64 (e.g. an unencoded `data:image/svg+xml,...`), or
+          // otherwise malformed - unpacking that then hands the scanner an undefined base64
+          // string, and it throws "blob and base64 representations of the image are required
+          // for BlobInfo to be created" instead of just skipping that one image. Strip only
+          // the malformed ones here so a bad image drops silently rather than erroring.
+          event.content = event.content.replace(/<img\b[^>]*>/gi, (imgTag: string) => {
+            const srcMatch = /\ssrc=(["'])(data:[^"']*)\1/i.exec(imgTag)
+            if (!srcMatch) {
+              return imgTag
+            }
+            const isWellFormedBase64DataUri = /data:[^;]+;base64,[a-z0-9+/=\s]+/i.test(srcMatch[2])
+            return isWellFormedBase64DataUri ? imgTag : ''
+          })
+        })
         editor.on('keydown', (event: any) => {
           if ( this.enterKeyOnlyWithShift ) {
             if (event.keyCode == 13) {
