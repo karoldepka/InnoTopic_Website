@@ -16,7 +16,7 @@ doAll () {
 
   #ng build \
   ionic build --prod --aot \
-    && npx firebase deploy --only hosting \
+    && pnpm exec firebase deploy --only hosting \
     && git tag deploy_`date -u +%Y-%m-%d__%H.%M.%SZ` \
     && git push origin develop --tags
 
