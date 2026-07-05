@@ -68,7 +68,17 @@ export class JournalWritePage extends BaseComponent implements OnInit {
     if ( this.itemId === `new`) {
       // #UX: #Focus: having a special url for `new` entry could actually be good: when browser/page loads, we always start fresh, without getting distracted by what happened to be the previous entry
       // ... (which might be totally irrelevant and distracting now, since we want to write new entry and not make a retrospective
-      this.newItem()
+      //
+      // Sets the item directly rather than going through newItem()'s router.navigateByUrl - the
+      // browser is already sitting at this exact URL (that's how ngOnInit got here), so
+      // self-navigating to it is a no-op for the router, but its promise still only resolves
+      // asynchronously, landing setItem$() (and the item$FakeArray it populates) inside the very
+      // change-detection cycle that's still activating this component - which is what produced
+      // NG0100 ("Previous value: undefined, Current value: [object Object]") on this page's first
+      // load. newItem() itself still needs to navigate when called later from the "+" button,
+      // since this component doesn't subscribe to route param changes (itemId is only a one-time
+      // snapshot read below).
+      this.setItem$(new JournalEntry$(this.journalEntriesService, undefined, new JournalEntry()))
     } else {
       this.setItem$(this.journalEntriesService.obtainItem$ById(this.itemId))
     }
