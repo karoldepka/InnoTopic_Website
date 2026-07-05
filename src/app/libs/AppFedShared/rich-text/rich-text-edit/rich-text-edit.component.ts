@@ -8,6 +8,9 @@ import {richTextEditCommon} from './RichTextEditCommon'
 import {cellDirections, CellNavigationService} from '../../cell-navigation.service'
 import {AbstractCellComponent} from '../../AbstractCellComponent'
 import {getSelectionCursorState} from '../../utils/caret-utils'
+import {LinkPreviewService} from '../link-preview/link-preview.service'
+import {renderLinkPreviewCardHtml, renderLinkPreviewLoadingHtml} from '../link-preview/LinkPreviewCard'
+import {escapeHtml} from '../../utils/html-utils'
 
 /**
  * http://ckeditor.github.io/editor-recommendations/about/
@@ -51,6 +54,12 @@ export class RichTextEditComponent extends AbstractCellComponent implements OnIn
    * new sibling node) can dispatch on its modifiers itself. */
   @Output() enterKeydownIntercepted = new EventEmitter<KeyboardEvent>()
 
+  /** Off by default so a bare pasted URL still just becomes a plain autolink anywhere this
+   * component is used for something link previews don't make sense for (kept opt-in rather than
+   * risk surprising behavior in an untested context) - Learn/Quiz/Journal/OrYoL explicitly
+   * enable it where a link preview card is wanted. */
+  @Input() enableLinkPreview = false
+
   private _editorViewChild: EditorComponent | undefined
 
   /* TODO rename editorWasOrIsOpened */
@@ -87,9 +96,46 @@ export class RichTextEditComponent extends AbstractCellComponent implements OnIn
 
   constructor(
     public editorService: EditorService,
+    private linkPreviewService: LinkPreviewService,
     injector: Injector
   ) {
     super(injector)
+  }
+
+  /** Finds bare-URL autolink anchors (text === href) under `root` that haven't been through this
+   * already (tracked via `data-link-preview-attempted`, since the fallback-on-failure anchor
+   * below is otherwise indistinguishable from a fresh one and would get endlessly re-fetched on
+   * every subsequent space/Enter elsewhere in the document) and swaps each for a preview card. */
+  private convertBareUrlAnchorsToLinkPreviews(editor: any, root: HTMLElement) {
+    const anchors: HTMLAnchorElement[] = Array.from(root.querySelectorAll('a[href]:not([data-link-preview-attempted])'))
+    for ( const anchor of anchors ) {
+      const href = anchor.getAttribute('href') || ''
+      const text = anchor.textContent?.trim() || ''
+      if ( ! /^https?:\/\//i.test(href) || text !== href ) {
+        continue
+      }
+      this.replaceAnchorWithLinkPreviewCard(editor, anchor, href)
+    }
+  }
+
+  /** Swaps a bare-URL autolink for a loading placeholder immediately, then for the real
+   * link-preview card (or, on failure/timeout, back to a plain link) once the fetch resolves -
+   * never blocks typing/pasting on the network round-trip. */
+  private replaceAnchorWithLinkPreviewCard(editor: any, anchor: HTMLAnchorElement, url: string) {
+    const placeholderId = 'link-preview-' + Math.random().toString(36).slice(2)
+    anchor.outerHTML = renderLinkPreviewLoadingHtml(url, placeholderId)
+    this.linkPreviewService.fetchPreview(url).then(result => {
+      const placeholderEl = editor.getBody()?.querySelector('#' + placeholderId)
+      if ( ! placeholderEl ) {
+        return // user already edited/undid this before the fetch resolved
+      }
+      if ( result.fetchStatus !== 'ok' || ! result.title ) {
+        const escapedUrl = escapeHtml(url)
+        placeholderEl.outerHTML = `<a href="${escapedUrl}" data-link-preview-attempted="true">${escapedUrl}</a>`
+        return
+      }
+      placeholderEl.outerHTML = renderLinkPreviewCardHtml(result)
+    })
   }
 
 
@@ -261,6 +307,24 @@ export class RichTextEditComponent extends AbstractCellComponent implements OnIn
             const isWellFormedBase64DataUri = /data:[^;]+;base64,[a-z0-9+/=\s]+/i.test(srcMatch[2])
             return isWellFormedBase64DataUri ? imgTag : ''
           })
+        })
+        editor.on('PastePostProcess', (event: any) => {
+          // Covers pasting HTML that already contains a bare-url anchor (e.g. copied from
+          // another app) - autolink itself does NOT convert a plain-text pasted URL immediately
+          // (confirmed: it only fires on a trailing space/Enter keystroke, handled below), so this
+          // alone would miss the common "paste a bare URL" case.
+          if ( ! this.enableLinkPreview ) {
+            return
+          }
+          this.convertBareUrlAnchorsToLinkPreviews(editor, event.node)
+        })
+        editor.on('keyup', (event: any) => {
+          // Mirrors autolink's own trigger: it converts a just-typed/pasted bare URL into
+          // <a href>url</a> only once a trailing space or Enter follows it, not at paste time.
+          if ( ! this.enableLinkPreview || (event.key !== ' ' && event.key !== 'Enter') ) {
+            return
+          }
+          this.convertBareUrlAnchorsToLinkPreviews(editor, editor.getBody())
         })
         editor.on('keydown', (event: any) => {
           if ( this.enterKeyOnlyWithShift ) {
