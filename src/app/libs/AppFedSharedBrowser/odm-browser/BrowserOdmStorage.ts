@@ -23,11 +23,13 @@ const DB_NAME = 'lifesuite-odm-cache'
  * schema-upgrade scenarios (a fresh DB, an upgrade from an older version, a version already
  * bumped by another tab) against the exact real migration logic, instead of a re-implemented
  * copy of it that could silently drift from what `connect()` actually runs in production. */
-export const DB_VERSION = 3
+export const DB_VERSION = 4
 export const STORE = 'odm_items'
 export const COLLECTION_INDEX = 'by_collection'
 export const SYNC_CURSORS_STORE = 'sync_cursors'
 export const PENDING_EDITS_STORE = 'pending_edits'
+export const PENDING_BLOB_UPLOADS_STORE = 'pending_blob_uploads'
+export const BLOB_CACHE_STORE = 'blob_cache'
 
 export interface OdmPendingEdit {
   key: string
@@ -37,6 +39,29 @@ export interface OdmPendingEdit {
    * `.update()` convention - not forced through a flatten/diff step here, just typed to allow it. */
   patch: Record<string, any>
   whenLastModified: string
+}
+
+export type BlobKind = 'image-original' | 'image-thumbnail' | 'audio'
+
+/** Durable "this blob still needs to reach Supabase Storage" journal entry - structurally
+ * parallel to `OdmPendingEdit` above, and drained the same way (on `online` + app-ready). */
+export interface PendingBlobUpload {
+  key: string
+  collection: string
+  item_id: string
+  blob_id: string
+  blob: Blob
+  content_type: string
+  kind: BlobKind
+  whenCreatedLocally: string
+}
+
+/** Local cache of blob bytes, keyed by `blob_id` - separate from `pending_blob_uploads` since a
+ * blob can also arrive via download (resolving a reference on read), not just a pending upload. */
+export interface CachedBlob {
+  blob_id: string
+  blob: Blob
+  whenLastStoredLocally: string
 }
 
 function rowKey(collection: string, itemId: string): string {
@@ -90,6 +115,10 @@ export function openDb(version: number | undefined, dbName: string = DB_NAME): P
         // cursor written under the old, buggy logic so every device does one full resync and
         // self-heals, rather than requiring a manual storage clear.
         req.transaction!.objectStore(SYNC_CURSORS_STORE).clear()
+      }
+      if (event.oldVersion < 4) {
+        db.createObjectStore(PENDING_BLOB_UPLOADS_STORE, {keyPath: 'key'})
+        db.createObjectStore(BLOB_CACHE_STORE, {keyPath: 'blob_id'})
       }
     }
     req.onsuccess = () => resolve(req.result)
@@ -211,6 +240,11 @@ export class BrowserOdmStorage {
    * list, distinct from (and a superset of) the in-memory-only "actively saving right now"
    * promise tracking it already had. */
   readonly pendingEditsChanged$ = new Subject<void>()
+
+  /** Emits whenever the pending-blob-uploads journal changes - same purpose as
+   * `pendingEditsChanged$` above, but for blob uploads (BlobSyncService), subscribed to by
+   * SyncStatusService's own `durablePendingBlobUploads$`. */
+  readonly pendingBlobUploadsChanged$ = new Subject<void>()
 
   /** Upserts a row, preserving `whenFirstStoredLocally` from any existing row and always
    * bumping `whenLastStoredLocally`. Accepts either a fresh row or a previously-stored one
@@ -360,5 +394,55 @@ export class BrowserOdmStorage {
   async getAllPendingEdits(collection: string): Promise<OdmPendingEdit[]> {
     const all = await this.getAllPendingEditsEverywhere()
     return all.filter(edit => edit.collection === collection)
+  }
+
+  // ---- Durable pending-blob-upload journal (mirrors the pending-edit journal above, for
+  // BlobSyncService's upload of images/audio to Supabase Storage instead of row patches) ----
+
+  async savePendingBlobUpload(upload: Omit<PendingBlobUpload, 'key'>): Promise<void> {
+    await this.withDb(async db => {
+      const tx = db.transaction(PENDING_BLOB_UPLOADS_STORE, 'readwrite')
+      const key = `${upload.collection}::${upload.item_id}::${upload.blob_id}`
+      await requestToPromise(tx.objectStore(PENDING_BLOB_UPLOADS_STORE).put({...upload, key}))
+    })
+    this.pendingBlobUploadsChanged$.next()
+  }
+
+  async clearPendingBlobUpload(collection: string, itemId: string, blobId: string): Promise<void> {
+    await this.withDb(async db => {
+      const tx = db.transaction(PENDING_BLOB_UPLOADS_STORE, 'readwrite')
+      await requestToPromise(tx.objectStore(PENDING_BLOB_UPLOADS_STORE).delete(`${collection}::${itemId}::${blobId}`))
+    })
+    this.pendingBlobUploadsChanged$.next()
+  }
+
+  /** Every still-unsynced blob upload across all collections - the reload-surviving source of
+   * truth for "what still needs to reach Storage", same role `getAllPendingEditsEverywhere`
+   * plays for row patches. */
+  async getAllPendingBlobUploadsEverywhere(): Promise<PendingBlobUpload[]> {
+    return this.withDb(async db => {
+      const tx = db.transaction(PENDING_BLOB_UPLOADS_STORE, 'readonly')
+      const all = await requestToPromise<PendingBlobUpload[]>(tx.objectStore(PENDING_BLOB_UPLOADS_STORE).getAll())
+      return all ?? []
+    })
+  }
+
+  // ---- Local blob cache (populated on upload for instant local render, or on download to avoid
+  // re-fetching the same blob from Storage repeatedly) ----
+
+  async cacheBlob(blobId: string, blob: Blob): Promise<void> {
+    return this.withDb(async db => {
+      const tx = db.transaction(BLOB_CACHE_STORE, 'readwrite')
+      const cached: CachedBlob = {blob_id: blobId, blob, whenLastStoredLocally: new Date().toISOString()}
+      await requestToPromise(tx.objectStore(BLOB_CACHE_STORE).put(cached))
+    })
+  }
+
+  async getCachedBlob(blobId: string): Promise<Blob | undefined> {
+    return this.withDb(async db => {
+      const tx = db.transaction(BLOB_CACHE_STORE, 'readonly')
+      const cached = await requestToPromise<CachedBlob | undefined>(tx.objectStore(BLOB_CACHE_STORE).get(blobId))
+      return cached?.blob
+    })
   }
 }

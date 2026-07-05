@@ -4,7 +4,7 @@ import {CachedSubject} from '../utils/cachedSubject2/CachedSubject2'
 import {appGlobals} from '../g'
 import {BaseService} from '../base.service'
 import {QueryOpts} from './OdmCollectionBackend'
-import {BrowserOdmStorage, OdmPendingEdit} from '../../AppFedSharedBrowser/odm-browser/BrowserOdmStorage'
+import {BrowserOdmStorage, OdmPendingEdit, PendingBlobUpload} from '../../AppFedSharedBrowser/odm-browser/BrowserOdmStorage'
 
 export class SyncStatus {
   pendingUploadsCount ? : number
@@ -55,6 +55,10 @@ export class SyncStatusService extends BaseService {
    * actually confirms. */
   public readonly durablePendingSyncItems$ = new CachedSubject<OdmPendingEdit[]>([])
 
+  /** Same reload-surviving "still needs to reach the server" role as `durablePendingSyncItems$`
+   * above, but for BlobSyncService's image/audio uploads instead of row patches. */
+  public readonly durablePendingBlobUploads$ = new CachedSubject<PendingBlobUpload[]>([])
+
   private browserOdmStorage = this.injector.get(BrowserOdmStorage)
 
   private lastNetworkErrorToastAt = 0
@@ -66,12 +70,20 @@ export class SyncStatusService extends BaseService {
     console.log('SyncStatusService service constructor')
     this.refreshDurablePendingSyncItems()
     this.browserOdmStorage.pendingEditsChanged$.subscribe(() => this.refreshDurablePendingSyncItems())
+    this.refreshDurablePendingBlobUploads()
+    this.browserOdmStorage.pendingBlobUploadsChanged$.subscribe(() => this.refreshDurablePendingBlobUploads())
   }
 
   private refreshDurablePendingSyncItems() {
     this.browserOdmStorage.getAllPendingEditsEverywhere()
       .then(items => this.durablePendingSyncItems$.next(items))
       .catch(error => console.error('refreshDurablePendingSyncItems failed', error))
+  }
+
+  private refreshDurablePendingBlobUploads() {
+    this.browserOdmStorage.getAllPendingBlobUploadsEverywhere()
+      .then(items => this.durablePendingBlobUploads$.next(items))
+      .catch(error => console.error('refreshDurablePendingBlobUploads failed', error))
   }
 
   /** crude placeholder to distinguish "Unsaved" From "Saving...";

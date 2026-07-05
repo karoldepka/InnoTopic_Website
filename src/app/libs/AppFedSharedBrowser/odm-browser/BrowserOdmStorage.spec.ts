@@ -7,6 +7,8 @@ import {
   COLLECTION_INDEX,
   SYNC_CURSORS_STORE,
   PENDING_EDITS_STORE,
+  PENDING_BLOB_UPLOADS_STORE,
+  BLOB_CACHE_STORE,
 } from './BrowserOdmStorage'
 import {createPostgresOdmRow} from '../../AppFedSharedPostgres/odm-postgres/PostgresOdmRow'
 
@@ -226,6 +228,53 @@ describe('BrowserOdmStorage', () => {
     })
   })
 
+  describe('pending-blob-upload journal and blob cache', () => {
+    it('savePendingBlobUpload then getAllPendingBlobUploadsEverywhere round-trips', async () => {
+      const collection = uniqueCollection()
+      const blob = new Blob(['fake-image-bytes'], {type: 'image/webp'})
+      await storage.savePendingBlobUpload({
+        collection, item_id: 'item1', blob_id: 'blob1', blob,
+        content_type: 'image/webp', kind: 'image-thumbnail',
+        whenCreatedLocally: '2024-01-01T00:00:00.000Z',
+      })
+
+      const all = await storage.getAllPendingBlobUploadsEverywhere()
+      const found = all.find(u => u.collection === collection)
+
+      expect(found?.blob_id).toBe('blob1')
+      expect(found?.kind).toBe('image-thumbnail')
+      expect(found?.blob.size).toBe(blob.size)
+    })
+
+    it('clearPendingBlobUpload removes it', async () => {
+      const collection = uniqueCollection()
+      const blob = new Blob(['x'], {type: 'image/webp'})
+      await storage.savePendingBlobUpload({
+        collection, item_id: 'item1', blob_id: 'blob1', blob,
+        content_type: 'image/webp', kind: 'image-thumbnail',
+        whenCreatedLocally: '2024-01-01T00:00:00.000Z',
+      })
+
+      await storage.clearPendingBlobUpload(collection, 'item1', 'blob1')
+
+      const all = await storage.getAllPendingBlobUploadsEverywhere()
+      expect(all.find(u => u.collection === collection)).toBeUndefined()
+    })
+
+    it('cacheBlob then getCachedBlob round-trips', async () => {
+      const blob = new Blob(['cached-bytes'], {type: 'image/webp'})
+
+      await storage.cacheBlob('blob-abc', blob)
+      const cached = await storage.getCachedBlob('blob-abc')
+
+      expect(cached?.size).toBe(blob.size)
+    })
+
+    it('getCachedBlob returns undefined for a blob that was never cached', async () => {
+      expect(await storage.getCachedBlob('never-cached')).toBeUndefined()
+    })
+  })
+
   it('getAllForCollection only returns rows for that collection', async () => {
     const collectionA = uniqueCollection()
     const collectionB = uniqueCollection()
@@ -355,7 +404,7 @@ describe('BrowserOdmStorage schema version upgrades (raw openDb, isolated databa
     })
   })
 
-  it('a fresh database creates all three stores plus the collection index', async () => {
+  it('a fresh database creates all stores plus the collection index', async () => {
     const db = await openDb(DB_VERSION, dbName)
     dbsToClose.push(db)
 
@@ -363,7 +412,46 @@ describe('BrowserOdmStorage schema version upgrades (raw openDb, isolated databa
     expect(db.objectStoreNames.contains(STORE)).toBe(true)
     expect(db.objectStoreNames.contains(SYNC_CURSORS_STORE)).toBe(true)
     expect(db.objectStoreNames.contains(PENDING_EDITS_STORE)).toBe(true)
+    expect(db.objectStoreNames.contains(PENDING_BLOB_UPLOADS_STORE)).toBe(true)
+    expect(db.objectStoreNames.contains(BLOB_CACHE_STORE)).toBe(true)
     expect(db.transaction(STORE, 'readonly').objectStore(STORE).indexNames.contains(COLLECTION_INDEX)).toBe(true)
+  })
+
+  it('upgrading from a legacy v3 database adds the blob stores without touching existing rows', async () => {
+    const v3Db = await new Promise<IDBDatabase>((resolve, reject) => {
+      const req = indexedDB.open(dbName, 3)
+      req.onupgradeneeded = (event) => {
+        const db = req.result
+        if (event.oldVersion < 1) {
+          db.createObjectStore(STORE, {keyPath: 'key'}).createIndex(COLLECTION_INDEX, 'collection')
+        }
+        if (event.oldVersion < 2) {
+          db.createObjectStore(SYNC_CURSORS_STORE, {keyPath: 'collection'})
+          db.createObjectStore(PENDING_EDITS_STORE, {keyPath: 'key'})
+        }
+      }
+      req.onsuccess = () => resolve(req.result)
+      req.onerror = () => reject(req.error)
+    })
+    await new Promise<void>((resolve, reject) => {
+      const tx = v3Db.transaction(STORE, 'readwrite')
+      tx.objectStore(STORE).put({key: 'Foo::item1', collection: 'Foo', item_id: 'item1', data: {title: 'preserved'}})
+      tx.oncomplete = () => resolve()
+      tx.onerror = () => reject(tx.error)
+    })
+    v3Db.close()
+
+    const upgradedDb = await openDb(DB_VERSION, dbName)
+    dbsToClose.push(upgradedDb)
+
+    expect(upgradedDb.objectStoreNames.contains(PENDING_BLOB_UPLOADS_STORE)).toBe(true)
+    expect(upgradedDb.objectStoreNames.contains(BLOB_CACHE_STORE)).toBe(true)
+    const preserved = await new Promise<any>((resolve, reject) => {
+      const req = upgradedDb.transaction(STORE, 'readonly').objectStore(STORE).get('Foo::item1')
+      req.onsuccess = () => resolve(req.result)
+      req.onerror = () => reject(req.error)
+    })
+    expect(preserved?.data?.title).toBe('preserved')
   })
 
   it('upgrading from a legacy v1 database (item store only) adds the newer stores without touching existing rows', async () => {

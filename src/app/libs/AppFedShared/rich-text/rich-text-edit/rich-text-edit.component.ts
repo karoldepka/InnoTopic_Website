@@ -11,6 +11,7 @@ import {getSelectionCursorState} from '../../utils/caret-utils'
 import {LinkPreviewService} from '../link-preview/link-preview.service'
 import {renderLinkPreviewCardHtml, renderLinkPreviewLoadingHtml} from '../link-preview/LinkPreviewCard'
 import {escapeHtml} from '../../utils/html-utils'
+import {BlobSyncService} from '../../odm/blob-sync.service'
 
 /**
  * http://ckeditor.github.io/editor-recommendations/about/
@@ -60,6 +61,26 @@ export class RichTextEditComponent extends AbstractCellComponent implements OnIn
    * enable it where a link preview card is wanted. */
   @Input() enableLinkPreview = false
 
+  /** Both required together to upload a pasted image as an external blob instead of inline
+   * base64 - callers with no current item (e.g. Learn's quick-add bar) simply don't set either,
+   * and pasted images fall back to today's inline-base64 behavior unchanged. */
+  @Input() collection?: string
+
+  /** A brand new, not-yet-saved item's `id` is only lazily assigned the first time its throttled
+   * patch actually reaches OdmService2.saveNowToDb() (confirmed live: `item$.id` starts
+   * `undefined` and gets set several seconds later, from inside an RxJS `throttleTime` callback
+   * that never triggers Angular change detection - see AskPage's near-identical bug). A plain
+   * `@Input() itemId: string` snapshot taken at bind time would freeze at `undefined` forever in
+   * that window. Prefer this - it's read fresh off the live object at upload time instead - for
+   * any caller whose item might not have an id yet (Learn/Journal); OrYoL's tree nodes always
+   * have a real id from creation, so `itemId` below is fine for that simpler case. */
+  @Input() itemRef?: {id?: string | null}
+  @Input() itemId?: string
+
+  private resolveItemId(): string | undefined {
+    return this.itemRef?.id ?? this.itemId ?? undefined
+  }
+
   private _editorViewChild: EditorComponent | undefined
 
   /* TODO rename editorWasOrIsOpened */
@@ -97,6 +118,7 @@ export class RichTextEditComponent extends AbstractCellComponent implements OnIn
   constructor(
     public editorService: EditorService,
     private linkPreviewService: LinkPreviewService,
+    private blobSyncService: BlobSyncService,
     injector: Injector
   ) {
     super(injector)
@@ -138,6 +160,119 @@ export class RichTextEditComponent extends AbstractCellComponent implements OnIn
     })
   }
 
+  /** Finds not-yet-processed pasted images under `root` and hands each to `uploadPastedImage` -
+   * separated out mainly so the per-image logic below can `await` without holding up the
+   * `SetContent` handler itself. Two distinct src shapes to handle: a `data:` URI (HTML pasted
+   * from elsewhere - e.g. Word - that already embeds a base64 image), or a `blob:` URI (confirmed
+   * live: a real OS-clipboard image paste, e.g. a screenshot, goes through TinyMCE's own internal
+   * blob-cache mechanism instead and never appears as a data: URI at all - an earlier
+   * data:-only implementation missed this, the actually-common, case entirely). Marks each image
+   * immediately (synchronously) so `SetContent` firing again before the async upload below
+   * finishes - it fires on every keystroke, not just paste - doesn't kick off a duplicate upload
+   * of the same image; the swapped-in final `src` is itself a fresh `blob:` URL, which the
+   * `:not(...)` here excludes it from ever matching again regardless. */
+  private convertInlineImagesToBlobs(editor: any, root: HTMLElement) {
+    const images: HTMLImageElement[] = Array.from(root.querySelectorAll('img[src^="data:image"]:not([data-blob-upload-pending]), img[src^="blob:"]:not([data-blob-upload-pending])'))
+    for ( const img of images ) {
+      img.setAttribute('data-blob-upload-pending', 'true')
+      this.uploadPastedImage(editor, img)
+    }
+  }
+
+  /** Resizes a pasted image down to a thumbnail (~400x300, aspect-preserving) and uploads just
+   * that as an external blob - not the full-size original as well (unlike the two-blob-variant
+   * design a "paste full-size vs. thumbnail" choice would need), so this is deliberately the
+   * simpler "always thumbnail-size" slice of that ask. Swaps the pasted image's `src` for the
+   * uploaded blob's local object URL immediately once the (still-local, cache-first) upload call
+   * resolves a blob_id - never a data: URI or TinyMCE's own transient blob-cache entry in the
+   * saved HTML from here on. */
+  private async uploadPastedImage(editor: any, img: HTMLImageElement) {
+    const itemId = this.resolveItemId()
+    if ( ! this.collection || ! itemId ) {
+      return
+    }
+    const src = img.getAttribute('src') || ''
+    let imageSource: Blob | string
+    if ( src.startsWith('data:image') ) {
+      imageSource = src
+    } else if ( src.startsWith('blob:') ) {
+      const blobInfo = editor.editorUpload?.blobCache?.getByUri(src)
+      if ( ! blobInfo ) {
+        return
+      }
+      imageSource = blobInfo.blob()
+    } else {
+      return
+    }
+    const thumbnailBlob = await this.makeThumbnailBlob(imageSource)
+    if ( ! thumbnailBlob ) {
+      return // leave the pasted image as-is rather than losing it
+    }
+    const blobId = await this.blobSyncService.upload(this.collection, itemId, thumbnailBlob, 'image-thumbnail', 'image/webp')
+    img.setAttribute('data-blob-id', blobId)
+    img.setAttribute('src', URL.createObjectURL(thumbnailBlob))
+  }
+
+  private makeThumbnailBlob(source: Blob | string): Promise<Blob | undefined> {
+    return new Promise(resolve => {
+      const image = new Image()
+      const objectUrlToRevoke = typeof source === 'string' ? undefined : URL.createObjectURL(source)
+      const cleanup = () => { if ( objectUrlToRevoke ) URL.revokeObjectURL(objectUrlToRevoke) }
+      image.onload = () => {
+        const maxWidth = 400, maxHeight = 300
+        const scale = Math.min(maxWidth / image.width, maxHeight / image.height, 1)
+        const width = Math.round(image.width * scale)
+        const height = Math.round(image.height * scale)
+        const canvas = document.createElement('canvas')
+        canvas.width = width
+        canvas.height = height
+        const ctx = canvas.getContext('2d')
+        if ( ! ctx ) {
+          cleanup()
+          resolve(undefined)
+          return
+        }
+        ctx.drawImage(image, 0, 0, width, height)
+        canvas.toBlob(blob => {
+          cleanup()
+          resolve(blob ?? undefined)
+        }, 'image/webp', 0.85)
+      }
+      image.onerror = () => {
+        cleanup()
+        resolve(undefined)
+      }
+      image.src = objectUrlToRevoke ?? (source as string)
+    })
+  }
+
+  private retryPendingBlobWork(editor: any) {
+    this.hydrateBlobImages(editor)
+    if ( this.collection && this.resolveItemId() ) {
+      this.convertInlineImagesToBlobs(editor, editor.getBody())
+    }
+  }
+
+  /** Resolves `data-blob-id` references (saved instead of inline base64 - see
+   * `uploadPastedImage`) to a live object URL on every render, since object URLs don't survive a
+   * reload. Marks each image immediately upon starting so `SetContent` firing again mid-resolve
+   * (e.g. the user typing elsewhere) doesn't kick off a duplicate resolve for the same image. */
+  private hydrateBlobImages(editor: any) {
+    const images: HTMLImageElement[] = Array.from(editor.getBody()?.querySelectorAll('img[data-blob-id]:not([data-blob-hydrated])') ?? [])
+    for ( const img of images ) {
+      const blobId = img.getAttribute('data-blob-id')
+      if ( ! blobId ) {
+        continue
+      }
+      img.setAttribute('data-blob-hydrated', 'true')
+      this.blobSyncService.resolve(blobId).then(blob => {
+        if ( ! blob ) {
+          return
+        }
+        img.setAttribute('src', URL.createObjectURL(blob))
+      })
+    }
+  }
 
   override ngOnInit() {
     super.ngOnInit()
@@ -321,10 +456,27 @@ export class RichTextEditComponent extends AbstractCellComponent implements OnIn
         editor.on('keyup', (event: any) => {
           // Mirrors autolink's own trigger: it converts a just-typed/pasted bare URL into
           // <a href>url</a> only once a trailing space or Enter follows it, not at paste time.
-          if ( ! this.enableLinkPreview || (event.key !== ' ' && event.key !== 'Enter') ) {
-            return
+          if ( this.enableLinkPreview && (event.key === ' ' || event.key === 'Enter') ) {
+            this.convertBareUrlAnchorsToLinkPreviews(editor, editor.getBody())
           }
-          this.convertBareUrlAnchorsToLinkPreviews(editor, editor.getBody())
+          // Retries pending blob uploads/hydration on every keystroke - both are already no-ops
+          // when there's nothing new to do (the `:not(...)` exclusions inside each), and this is
+          // the only reliable retry point for a brand new, not-yet-saved item: `SetContent` only
+          // fires for bulk operations (paste, programmatic setContent), never per-keystroke
+          // typing, but a new item's `id` is assigned asynchronously well after paste time (see
+          // `itemRef`'s doc comment above) - without a broader retry trigger, an image pasted
+          // before that id exists would never get uploaded at all.
+          this.retryPendingBlobWork(editor)
+        })
+        editor.on('SetContent', () => {
+          // Runs on every content change (including the user's own typing, harmlessly re-running
+          // against an empty selector match), not just paste - also covers the initial load of
+          // previously-saved content containing data-blob-id references from an earlier session.
+          // Deliberately NOT hooked to PastePostProcess: confirmed live that a real OS-clipboard
+          // image paste (e.g. a screenshot) never fires PastePreProcess/PastePostProcess at all -
+          // those only cover pasted *HTML*. TinyMCE inserts a raw image paste through a separate
+          // internal path directly into the editor body, landing it in SetContent instead.
+          this.retryPendingBlobWork(editor)
         })
         editor.on('keydown', (event: any) => {
           if ( this.enterKeyOnlyWithShift ) {
