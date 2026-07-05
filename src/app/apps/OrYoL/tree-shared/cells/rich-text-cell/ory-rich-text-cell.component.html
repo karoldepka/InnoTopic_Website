@@ -1,0 +1,8 @@
+<app-rich-text-edit
+  style="flex-grow: 1"
+  [formControl1]="formControl"
+  [showToolbar]="true"
+  [showMenuBar]="false"
+  [enterKeyOnlyWithShift]="true"
+  (enterKeydownIntercepted)="onEnterKeydownIntercepted($event)"
+></app-rich-text-edit>

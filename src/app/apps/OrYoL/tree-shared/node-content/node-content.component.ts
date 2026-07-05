@@ -51,6 +51,7 @@ import { NodeExpansionIconComponent } from './node-expansion-icon/node-expansion
 import { NodeClassIconComponent } from './node-class-icon/node-class-icon.component';
 import { NumericCellComponent } from '../cells/node-cell/numeric-cell.component';
 import { NodeContentTimeTrackingComponent } from '../node-content-time-tracking/node-content-time-tracking.component';
+import { OryRichTextCellComponent } from '../cells/rich-text-cell/ory-rich-text-cell.component';
 import { ContenteditableCellComponent } from '../cells/contenteditable-cell/contenteditable-cell.component';
 
 /* ==== Note there are those sources of truth kind-of (for justified reasons) :
@@ -74,6 +75,7 @@ import { ContenteditableCellComponent } from '../cells/contenteditable-cell/cont
         NgIf,
         NumericCellComponent,
         NodeContentTimeTrackingComponent,
+        OryRichTextCellComponent,
         ContenteditableCellComponent,
         NodeDebugCellComponent,
         AsyncPipe,
@@ -220,6 +222,15 @@ export class NodeContentComponent implements OnInit, AfterViewInit, OnDestroy, I
     if (keyboardEvent.defaultPrevented || keyboardEvent.altKey || keyboardEvent.ctrlKey || keyboardEvent.metaKey) {
       return
     }
+    this.createSiblingOrChildOnEnter()
+    event.preventDefault()
+  }
+
+  /** Split out of keyPressEnter() so a rich-text cell (whose own TinyMCE instance already calls
+   * preventDefault() on a plain Enter before it bubbles here) can invoke this directly - going
+   * through keyPressEnter() itself would immediately bail via its own defaultPrevented guard,
+   * which exists to skip a keydown some *other* handler already dealt with, not this one. */
+  createSiblingOrChildOnEnter() {
     if ( this.treeNode.isVisualRoot ) {
       this.addChild()
     } else {
@@ -227,7 +238,6 @@ export class NodeContentComponent implements OnInit, AfterViewInit, OnDestroy, I
       const newTreeNode = this.addNodeAfterThis() as any as ApfBaseTreeNode
       this.focusNewlyCreatedNode(newTreeNode)
     }
-    event.preventDefault()
   }
 
   /** NOTE: time-tracking is a cross-cutting built-in concern, so it's ok for it to spill into some generic code.

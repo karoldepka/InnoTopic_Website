@@ -47,6 +47,13 @@
       Plan Execution Notifications Enabled
     </label>
 
+    <label class="checkbox" >
+      <input type="checkbox"
+             [formControl]="controls.useTinyMceTitleEditor"
+      >
+      Rich Text Editor for Titles (TinyMCE)
+    </label>
+
     Items: {{treeHost.treeModel.mapItemIdToNodes.keyCount}}
 
     <div *ngIf="debugService.isDebug$ | async" class="backfill-section">

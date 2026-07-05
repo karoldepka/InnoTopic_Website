@@ -36,6 +36,7 @@ export class ToolbarPopoverComponent implements OnInit {
     showTimeTrackedValue: new UntypedFormControl(),
     planExecutionNotificationsEnabled: new UntypedFormControl(),
     planExecutionNotificationTimePercentages: new UntypedFormControl(),
+    useTinyMceTitleEditor: new UntypedFormControl(),
   }
 
   formGroup = new UntypedFormGroup(this.controls)

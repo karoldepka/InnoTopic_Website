@@ -6,7 +6,7 @@
   [inline]="true"
   [formControl]="formControl1"
   [modelEvents]="'change input undo redo' + (enableModelEventNodeChange ? ' nodechange' : '')"
-  (onInit)="logEditor('tinyMce <editor (onInit)...'); viewSyncer?.onInitialDataWasSet()"
+  (onInit)="logEditor('tinyMce <editor (onInit)...'); viewSyncer?.onInitialDataWasSet(); onEditorInit()"
   (onFocusIn)="onFocus(true)"
   (onFocusOut)="onFocus(false)"
   (blur)="onFocus(true)"

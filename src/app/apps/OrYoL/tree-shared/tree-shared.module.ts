@@ -12,6 +12,7 @@ import { RangeCellComponent } from './cells/range-cell/range-cell.component';
 import { CellsGroupComponent } from './cells/cells-group/cells-group.component';
 import { CellHostComponent } from './cell-host/cell-host.component';
 import { ExampleCellComponent } from './cells/example-cell/example-cell.component';
+import { OryRichTextCellComponent } from './cells/rich-text-cell/ory-rich-text-cell.component';
 import { ContenteditableCellComponent } from './cells/contenteditable-cell/contenteditable-cell.component';
 import { NodeDebugCellComponent } from './node-content/node-debug-cell/node-debug-cell.component';
 import { NodeExpansionIconComponent } from './node-content/node-expansion-icon/node-expansion-icon.component';
@@ -47,6 +48,7 @@ import {IonicModule} from '@ionic/angular'
         CellsGroupComponent,
         CellHostComponent,
         ExampleCellComponent,
+        OryRichTextCellComponent,
         ContenteditableCellComponent,
         NodeDebugCellComponent,
         NodeExpansionIconComponent,

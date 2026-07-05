@@ -8,7 +8,6 @@ import {throttleTime} from 'rxjs/operators'
 import {SyncStatusService} from '../../../../libs/AppFedShared/odm/sync-status.service'
 
 import {OryBaseTreeNode} from '../../tree-model/TreeModel'
-import {ContenteditableCellComponent} from '../cells/contenteditable-cell/contenteditable-cell.component'
 
 /** other names: CellsViewSyncer
  *
@@ -41,10 +40,6 @@ export class NodeContentViewSyncer {
         const newVal = col.getValueFromItemData(this.treeNode.content.itemData)
         const origValue = component.getInputValue()
         if ( origValue !== newVal ) { /* TODO later consider non-primitive data types (objects) */
-          if ( component instanceof ContenteditableCellComponent ) {
-            // console.log(`ContenteditableCellComponent applyItemDataValuesToViews origValue !== newVal`,
-            //   `origValue:`, origValue, `newVal:`, newVal)
-          }
           component.setInputValue(newVal)
         }
       } else {

@@ -8,6 +8,11 @@ export class Config {
   showTimeTrackedValue = true
   planExecutionNotificationsEnabled = true
   planExecutionNotificationTimePercentages: Array<number> = [75, 95, 100, 110, 150]
+  /** Rollout switch for OryRichTextCellComponent (TinyMCE, shared with LearnDo/Quiz/Journal) vs.
+   * the older ContenteditableCellComponent for tree node titles - kept alongside each other so
+   * either can be switched back to instantly from the toolbar popover if the new editor
+   * regresses something (e.g. its slightly different caret-position/focus behavior). */
+  useTinyMceTitleEditor = true
 }
 
 const ORYOL_CONFIG_KEY = 'OrYoL_Config'

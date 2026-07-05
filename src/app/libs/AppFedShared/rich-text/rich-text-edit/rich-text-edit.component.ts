@@ -1,4 +1,4 @@
-import {Component, Inject, Injector, Input, OnInit, ViewChild, ChangeDetectionStrategy} from '@angular/core';
+import {Component, Inject, Injector, Input, OnInit, Output, EventEmitter, ViewChild, ChangeDetectionStrategy} from '@angular/core';
 import {ViewSyncer} from '../../odm/ui/ViewSyncer'
 import {EditorComponent} from '@tinymce/tinymce-angular'
 import { UntypedFormControl, ReactiveFormsModule } from '@angular/forms'
@@ -43,10 +43,28 @@ export class RichTextEditComponent extends AbstractCellComponent implements OnIn
   /** Used in search-or-add (because enter creates a new item). */
   @Input() enterKeyOnlyWithShift: boolean = false
 
+  /** Fires whenever `enterKeyOnlyWithShift` suppresses a non-shift Enter (any other modifiers
+   * included) below - a plain ancestor `(keydown.enter)` binding can't react to this itself,
+   * since TinyMCE's own `preventDefault()` here happens before the event bubbles, and consumers
+   * like OrYoL's tree explicitly skip already-prevented keydowns to avoid double-handling. Emits
+   * the raw event so a caller that actually wants this Enter to do something else (e.g. create a
+   * new sibling node) can dispatch on its modifiers itself. */
+  @Output() enterKeydownIntercepted = new EventEmitter<KeyboardEvent>()
+
   private _editorViewChild: EditorComponent | undefined
 
   /* TODO rename editorWasOrIsOpened */
   editorOpened = false
+
+  /** Set by `onEditorInit()` (bound to the `<editor>`'s own `(onInit)` output) - `focusEditor()`
+   * calling `editor.focus()` before TinyMCE has actually finished constructing this instance
+   * throws ("Cannot read properties of undefined (reading 'getRng')", from TinyMCE's selection
+   * bookmarking) instead of silently no-oping. Surfaced by OrYoL's `/tree`, which - unlike this
+   * component's other callers - focuses a cell immediately after creating it (Enter/Alt+Enter/
+   * Append all auto-focus the brand new row), landing well inside that initialization window. */
+  private editorReady = false
+
+  private focusPending = false
 
   @ViewChild(EditorComponent)
   set editorViewChild(ed: EditorComponent | undefined) {
@@ -253,6 +271,7 @@ export class RichTextEditComponent extends AbstractCellComponent implements OnIn
                 // console.log(`Enter key`, event)
                 event.preventDefault();
                 event.stopPropagation();
+                this.enterKeydownIntercepted.emit(event)
                 return false;
               }
             }
@@ -386,10 +405,25 @@ export class RichTextEditComponent extends AbstractCellComponent implements OnIn
   }
 
   focusEditor() {
+    if ( ! this.editorReady ) {
+      // Editor isn't constructed yet - defer instead of calling into a half-built TinyMCE
+      // instance. onEditorInit() below replays this once (onInit) actually fires.
+      this.focusPending = true
+      return
+    }
     setTimeout(() => {
       // debugLog(`focusEditor`, this.editorViewChild)
       this.editorViewChild ?. editor ?. focus()
     }, 10)
+  }
+
+  /** Bound to `<editor>`'s `(onInit)` output - see `editorReady`'s doc comment above. */
+  onEditorInit() {
+    this.editorReady = true
+    if ( this.focusPending ) {
+      this.focusPending = false
+      this.focusEditor()
+    }
   }
 
   onFocus(b: any) {

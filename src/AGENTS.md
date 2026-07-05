@@ -28,3 +28,5 @@ Maybe we build on AFFiNE.
 Consider CRDT.
 
 Default sort is on whenLastTouchedByUser - that implies user has permission. New user will need new index?
+
+We use feature flags to hide not-fully-polished features, and to switch to new version of a feature (e.g. from contenteditable to TinyMCE).

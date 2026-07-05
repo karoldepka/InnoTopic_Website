@@ -99,7 +99,22 @@
     <!--Sum: {{treeNode.timeLeftSumText()}}-->
   </div>
 
+  <app-ory-rich-text-cell
+    *ngIf="(config$ | async)?.useTinyMceTitleEditor"
+    style='
+      flex-grow: 1;
+      background-color: var(--apf-text-edit-background);
+      margin-right: 0.3em;
+      margin-left: 0.3em;
+      margin-top: 2px; /* help not overlap input focus outline and hackish help centering text a bit vertically */
+      font-size: 13px;
+    '
+    [nodeContentComponent]="this"
+    [cell]="cells.forColumn(columnDefs.title) !"
+  />
+
   <app-contenteditable-cell
+    *ngIf="!(config$ | async)?.useTinyMceTitleEditor"
     style='
       flex-grow: 1;
       background-color: var(--apf-text-edit-background);
