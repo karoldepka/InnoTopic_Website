@@ -4,9 +4,10 @@ import {ActivatedRoute, NavigationStart, Router} from '@angular/router'
 import {LearnItemItemsService} from '../core/learn-item-items.service'
 import {DocumentReference, collection, doc, getDoc} from 'firebase/firestore'
 import {getAppFirestore} from '../../../libs/AppFedSharedFirebase/firebase-app'
-import { AlertController, IonicModule } from '@ionic/angular'
+import { AlertController, IonicModule, ToastController } from '@ionic/angular'
 import {LearnItem, LearnItemId} from '../models/LearnItem'
 import {ignorePromise} from '../../../libs/AppFedShared/utils/promiseUtils'
+import {stripHtml} from '../../../libs/AppFedShared/utils/html-utils'
 import {Observable, from} from 'rxjs'
 import {take} from 'rxjs/operators'
 import {nullish} from '../../../libs/AppFedShared/utils/type-utils'
@@ -86,6 +87,7 @@ export class LearnItemDetailsPage extends BaseComponent implements OnInit {
     public activatedRoute: ActivatedRoute,
     public learnDoService: LearnItemItemsService,
     public alertController: AlertController,
+    public toastController: ToastController,
     public router: Router,
     public navigationService: NavigationService,
     injector: Injector,
@@ -139,6 +141,66 @@ export class LearnItemDetailsPage extends BaseComponent implements OnInit {
       ]
     })
     await alert.present()
+  }
+
+  async askArchive() {
+    const title = this.getShortTitle()
+    const alert = await this.alertController.create({
+      header: 'Archive item?',
+      message: title
+        ? `"${title}" will be hidden from active lists.`
+        : 'This item will be hidden from active lists.',
+      buttons: [
+        {
+          text: 'Cancel',
+          role: 'cancel',
+        },
+        {
+          text: 'Archive',
+          role: 'destructive',
+          handler: () => this.confirmArchive(title),
+        },
+      ],
+    })
+    await alert.present()
+  }
+
+  async restore() {
+    const title = this.getShortTitle()
+    this.item$.unarchive()
+    const toast = await this.toastController.create({
+      message: title ? `"${title}" restored.` : 'Item restored.',
+      duration: 2400,
+      color: 'success',
+      position: 'bottom',
+    })
+    await toast.present()
+  }
+
+  private async confirmArchive(title: string) {
+    this.item$.archive()
+    const toast = await this.toastController.create({
+      message: title ? `"${title}" archived.` : 'Item archived.',
+      duration: 6000,
+      color: 'medium',
+      position: 'bottom',
+      buttons: [
+        {
+          text: 'Undo',
+          role: 'cancel',
+          handler: () => this.item$.unarchive(),
+        },
+      ],
+    })
+    await toast.present()
+  }
+
+  private getShortTitle(): string {
+    const item = this.item$.currentVal
+    const title = stripHtml(item?.title || (item as any)?.question || item?.joinedSides?.())
+      ?.replace(/\s+/g, ' ')
+      .trim() ?? ''
+    return title.length > 80 ? title.slice(0, 77) + '...' : title
   }
 
   toggleWhenDone() {

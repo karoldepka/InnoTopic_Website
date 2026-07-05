@@ -156,6 +156,15 @@
 
     <ion-button (click)="askDelete()">DELETE</ion-button>
 
+    <ion-button *ngIf="!item$.isArchived()" (click)="askArchive()">
+      <ion-icon slot="start" name="archive-outline"></ion-icon>
+      Archive
+    </ion-button>
+    <ion-button *ngIf="item$.isArchived()" (click)="restore()">
+      <ion-icon slot="start" name="arrow-undo-outline"></ion-icon>
+      Restore
+    </ion-button>
+
     {{item$.getEffectiveCategories()}}
 
     <app-item-sub-items
