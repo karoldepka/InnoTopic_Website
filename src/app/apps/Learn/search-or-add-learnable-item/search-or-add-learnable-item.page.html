@@ -28,14 +28,13 @@
       <span style="flex-grow: 1"><!--Search or add--></span>
 
       <ion-button
-        *ngIf="feat.beforeProductization"
         [routerLink]="'/tree'"
         size="small"
       >
         Plan
       </ion-button>
 
-      <app-what-next-button *ngIf="feat.beforeProductization"></app-what-next-button>
+      <app-what-next-button></app-what-next-button>
 
       <ion-buttons slot="end">
 <!--        <ion-button-->
