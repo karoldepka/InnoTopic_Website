@@ -14,6 +14,7 @@ import {OptionsComponent} from './libs/AppFedShared/options/options.component'
 import {ThemeService} from './libs/AppFedShared/theme-config/theme.service'
 import {FeatureService} from './libs/AppFedShared/feature.service'
 import {OdmConflictToastService} from './libs/AppFedSharedBrowser/odm-browser/OdmConflictToastService'
+import {IndexedDbHealthToastService} from './libs/AppFedSharedBrowser/odm-browser/IndexedDbHealthToastService'
 // import {fakeExportToNotLookUnused} from '../background/background'
 
 @Component({
@@ -30,6 +31,7 @@ export class AppComponent {
     private timerNotificationService /* force the service to run */: TimerNotificationsService /* FIXME commenting this out causes errors */,
     private authService  /* force the service to run */: AuthService,
     private odmConflictToastService /* force the service to run */: OdmConflictToastService,
+    private indexedDbHealthToastService /* force the service to run */: IndexedDbHealthToastService,
     // private learnStatsService  /* force the service to run */: LearnStatsService,
     public syncStatusService: SyncStatusService,
     public optionsService: OptionsService,

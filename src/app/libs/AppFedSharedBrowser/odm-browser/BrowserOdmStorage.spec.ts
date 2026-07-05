@@ -1,5 +1,13 @@
-import {describe, it, expect, beforeEach} from 'vitest'
-import {BrowserOdmStorage} from './BrowserOdmStorage'
+import {describe, it, expect, beforeEach, afterEach} from 'vitest'
+import {
+  BrowserOdmStorage,
+  openDb,
+  DB_VERSION,
+  STORE,
+  COLLECTION_INDEX,
+  SYNC_CURSORS_STORE,
+  PENDING_EDITS_STORE,
+} from './BrowserOdmStorage'
 import {createPostgresOdmRow} from '../../AppFedSharedPostgres/odm-postgres/PostgresOdmRow'
 
 interface SutItem {
@@ -238,5 +246,208 @@ describe('BrowserOdmStorage', () => {
     await storage.delete(collection, 'item1')
 
     expect(await storage.get(collection, 'item1')).toBeUndefined()
+  })
+
+  describe('recovery from a dead connection', () => {
+    // Uses closeConnectionForTesting() (a direct .close() on the current connection) rather than
+    // opening a second connection at a higher version: a version bump fires `versionchange` on
+    // every other open connection sharing this physical database - including every earlier
+    // test's never-closed `storage` instance in this same run - which cascades into a storm of
+    // background reconnects unrelated to what's under test here. A plain close() only affects
+    // this test's own connection.
+
+    it('put()/get() still succeed after the connection closes, instead of failing forever', async () => {
+      const collection = uniqueCollection()
+      await storage.put(createPostgresOdmRow<SutItem>(collection, 'item1', 'owner1', {title: 'before'}))
+
+      await storage.closeConnectionForTesting()
+
+      const result = await storage.put(createPostgresOdmRow<SutItem>(collection, 'item1', 'owner1', {title: 'after'}))
+      expect(result.data.title).toBe('after')
+      expect((await storage.get<SutItem>(collection, 'item1'))?.data.title).toBe('after')
+    })
+
+    it('every kind of operation recovers, not just put()/get()', async () => {
+      const collection = uniqueCollection()
+
+      await storage.closeConnectionForTesting()
+      await storage.updateSyncCursor(collection, '2024-01-01T00:00:00.000Z')
+      expect(await storage.getSyncCursor(collection)).toBe('2024-01-01T00:00:00.000Z')
+
+      await storage.closeConnectionForTesting()
+      await storage.savePendingEdit(collection, 'item1', {title: 'unsynced'}, '2024-01-01T00:00:00.000Z')
+      expect((await storage.getPendingEdit(collection, 'item1'))?.patch).toEqual({title: 'unsynced'})
+
+      await storage.closeConnectionForTesting()
+      await storage.clearPendingEdit(collection, 'item1')
+      expect(await storage.getPendingEdit(collection, 'item1')).toBeUndefined()
+
+      await storage.closeConnectionForTesting()
+      await storage.put(createPostgresOdmRow<SutItem>(collection, 'item1', 'owner1', {title: 'v1'}))
+      await storage.closeConnectionForTesting()
+      await storage.delete(collection, 'item1')
+      expect(await storage.get(collection, 'item1')).toBeUndefined()
+    })
+
+    it('emits connectionRecovered$ once reconnected, but not on the initial connection', async () => {
+      const recoveries: void[] = []
+      storage.connectionRecovered$.subscribe(() => recoveries.push(undefined))
+
+      expect(recoveries.length).toBe(0)
+
+      await storage.closeConnectionForTesting()
+      await storage.get(uniqueCollection(), 'missing') // awaits `dbPromise`, forcing the reconnect to finish
+
+      expect(recoveries.length).toBe(1)
+    })
+
+    it('a save racing the connection closing still succeeds instead of surfacing the race', async () => {
+      // Fires put() without first awaiting the close, unlike the tests above - this gives the
+      // narrow window where put() already grabbed the dying connection before reconnect()
+      // replaced it a real chance to happen, exercising withDb()'s own retry rather than only
+      // the connect()-level reconnect that a strictly-sequential close-then-put would rely on.
+      const collection = uniqueCollection()
+      await storage.put(createPostgresOdmRow<SutItem>(collection, 'item1', 'owner1', {title: 'before'}))
+
+      const closePromise = storage.closeConnectionForTesting()
+      const putPromise = storage.put(createPostgresOdmRow<SutItem>(collection, 'item1', 'owner1', {title: 'after'}))
+
+      await closePromise
+      const result = await putPromise
+
+      expect(result.data.title).toBe('after')
+      expect((await storage.get<SutItem>(collection, 'item1'))?.data.title).toBe('after')
+    })
+  })
+})
+
+// These exercise the real cascading migration logic inside openDb() directly (rather than through
+// a whole BrowserOdmStorage instance, which always targets the shared production database name)
+// against disposable, uniquely-named databases, so schema-upgrade scenarios never disturb - or get
+// disturbed by - the tests above sharing 'lifesuite-odm-cache'.
+describe('BrowserOdmStorage schema version upgrades (raw openDb, isolated databases)', () => {
+  let dbName: string
+  let dbsToClose: IDBDatabase[]
+
+  function uniqueDbName(): string {
+    return `BrowserOdmStorage_schema_test_${Date.now()}_${Math.random().toString(36).slice(2)}`
+  }
+
+  function requestToPromise<T>(req: IDBRequest<T>): Promise<T> {
+    return new Promise((resolve, reject) => {
+      req.onsuccess = () => resolve(req.result)
+      req.onerror = () => reject(req.error)
+    })
+  }
+
+  beforeEach(() => {
+    dbName = uniqueDbName()
+    dbsToClose = []
+  })
+
+  afterEach(async () => {
+    dbsToClose.forEach(db => db.close())
+    await new Promise<void>((resolve, reject) => {
+      const req = indexedDB.deleteDatabase(dbName)
+      req.onsuccess = () => resolve()
+      req.onerror = () => reject(req.error)
+      req.onblocked = () => resolve() // best-effort cleanup; never worth failing a test over
+    })
+  })
+
+  it('a fresh database creates all three stores plus the collection index', async () => {
+    const db = await openDb(DB_VERSION, dbName)
+    dbsToClose.push(db)
+
+    expect(db.version).toBe(DB_VERSION)
+    expect(db.objectStoreNames.contains(STORE)).toBe(true)
+    expect(db.objectStoreNames.contains(SYNC_CURSORS_STORE)).toBe(true)
+    expect(db.objectStoreNames.contains(PENDING_EDITS_STORE)).toBe(true)
+    expect(db.transaction(STORE, 'readonly').objectStore(STORE).indexNames.contains(COLLECTION_INDEX)).toBe(true)
+  })
+
+  it('upgrading from a legacy v1 database (item store only) adds the newer stores without touching existing rows', async () => {
+    // Hand-built to match exactly what v1-era code (before sync_cursors/pending_edits existed)
+    // would have created - reusing today's openDb() with a low target version wouldn't reproduce
+    // this, since its migration steps are gated only by oldVersion, not by the requested version,
+    // so it would create every store immediately regardless of what version we ask for.
+    const v1Db = await new Promise<IDBDatabase>((resolve, reject) => {
+      const req = indexedDB.open(dbName, 1)
+      req.onupgradeneeded = () => {
+        req.result.createObjectStore(STORE, {keyPath: 'key'}).createIndex(COLLECTION_INDEX, 'collection')
+      }
+      req.onsuccess = () => resolve(req.result)
+      req.onerror = () => reject(req.error)
+    })
+    await requestToPromise(
+      v1Db.transaction(STORE, 'readwrite').objectStore(STORE)
+        .put({key: 'Foo::item1', collection: 'Foo', item_id: 'item1', data: {title: 'preserved'}})
+    )
+    v1Db.close()
+
+    const upgradedDb = await openDb(DB_VERSION, dbName)
+    dbsToClose.push(upgradedDb)
+
+    expect(upgradedDb.objectStoreNames.contains(SYNC_CURSORS_STORE)).toBe(true)
+    expect(upgradedDb.objectStoreNames.contains(PENDING_EDITS_STORE)).toBe(true)
+    const preserved = await requestToPromise<any>(
+      upgradedDb.transaction(STORE, 'readonly').objectStore(STORE).get('Foo::item1')
+    )
+    expect(preserved?.data?.title).toBe('preserved')
+  })
+
+  it('upgrading from v2 wipes any sync cursor written under the old buggy logic, leaving item rows and pending edits untouched', async () => {
+    const v2Db = await new Promise<IDBDatabase>((resolve, reject) => {
+      const req = indexedDB.open(dbName, 2)
+      req.onupgradeneeded = (event) => {
+        const db = req.result
+        if (event.oldVersion < 1) {
+          db.createObjectStore(STORE, {keyPath: 'key'}).createIndex(COLLECTION_INDEX, 'collection')
+        }
+        if (event.oldVersion < 2) {
+          db.createObjectStore(SYNC_CURSORS_STORE, {keyPath: 'collection'})
+          db.createObjectStore(PENDING_EDITS_STORE, {keyPath: 'key'})
+        }
+      }
+      req.onsuccess = () => resolve(req.result)
+      req.onerror = () => reject(req.error)
+    })
+    await requestToPromise(
+      v2Db.transaction(SYNC_CURSORS_STORE, 'readwrite').objectStore(SYNC_CURSORS_STORE)
+        .put({collection: 'Foo', cursor: 'buggy-cursor-from-limited-preview-fetch'})
+    )
+    await requestToPromise(
+      v2Db.transaction(PENDING_EDITS_STORE, 'readwrite').objectStore(PENDING_EDITS_STORE)
+        .put({key: 'Foo::item1', collection: 'Foo', item_id: 'item1', patch: {title: 'unsynced'}, whenLastModified: '2024-01-01T00:00:00.000Z'})
+    )
+    v2Db.close()
+
+    const upgradedDb = await openDb(DB_VERSION, dbName)
+    dbsToClose.push(upgradedDb)
+
+    const cursorAfterUpgrade = await requestToPromise<any>(
+      upgradedDb.transaction(SYNC_CURSORS_STORE, 'readonly').objectStore(SYNC_CURSORS_STORE).get('Foo')
+    )
+    expect(cursorAfterUpgrade).toBeUndefined()
+
+    const pendingEditAfterUpgrade = await requestToPromise<any>(
+      upgradedDb.transaction(PENDING_EDITS_STORE, 'readonly').objectStore(PENDING_EDITS_STORE).get('Foo::item1')
+    )
+    expect(pendingEditAfterUpgrade?.patch).toEqual({title: 'unsynced'})
+  })
+
+  it('reconnecting at "whatever version is already there" recovers after another tab already bumped past this bundle\'s DB_VERSION', async () => {
+    // Simulates the exact scenario connect()'s VersionError catch handles: another tab reloaded
+    // after a later deploy and already upgraded the schema past what this bundle's DB_VERSION
+    // constant knows about. (Requesting DB_VERSION directly against it at that point would throw
+    // a real VersionError, per the IndexedDB spec - that's the failure connect()'s catch exists
+    // to recover from; not re-triggered here to avoid a real uncaught-exception console error
+    // from an intentionally-unhandled browser-level event during the test run.)
+    const futureDb = await openDb(DB_VERSION + 1, dbName)
+    futureDb.close()
+
+    const recovered = await openDb(undefined, dbName)
+    dbsToClose.push(recovered)
+    expect(recovered.version).toBe(DB_VERSION + 1)
   })
 })
