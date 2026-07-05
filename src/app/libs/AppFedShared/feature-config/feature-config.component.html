@@ -10,13 +10,13 @@
 >{{ 'SETTINGS.ALL_FEATURES' | translate }}</ion-checkbox>
 <ion-checkbox
   labelPlacement="end"
-  [checked]="enableAll"
-  (ionChange)="onChangeAllFeatures($event)"
+  [checked]="niceLooking"
+  (ionChange)="onChangeNiceLooking($event)"
 >{{ 'SETTINGS.NICE_LOOKING' | translate }}</ion-checkbox>
 <ion-checkbox
   labelPlacement="end"
-  [checked]="enableAll"
-  (ionChange)="onChangeAllFeatures($event)"
+  [checked]="showWhatIUse"
+  (ionChange)="onChangeShowWhatIUse($event)"
 >{{ 'SETTINGS.FEATURES_I_USE' | translate }}</ion-checkbox>
 <ion-checkbox
   labelPlacement="end"

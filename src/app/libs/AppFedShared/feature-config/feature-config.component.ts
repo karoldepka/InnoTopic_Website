@@ -34,6 +34,22 @@ export class FeatureConfigComponent extends BaseComponent implements OnInit {
     // enableAll = $event.target.value
   }
 
+  get niceLooking(): boolean {
+    return this.featureConfigService.niceLooking
+  }
+
+  onChangeNiceLooking($event: any) {
+    this.featureConfigService.setNiceLooking($event.detail.checked)
+  }
+
+  get showWhatIUse(): boolean {
+    return this.featureConfigService.showWhatIUse
+  }
+
+  onChangeShowWhatIUse($event: any) {
+    this.featureConfigService.setShowWhatIUse($event.detail.checked)
+  }
+
   get beforeProductization(): boolean {
     return this.featureConfigService.beforeProductization
   }

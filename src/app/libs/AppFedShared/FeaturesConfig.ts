@@ -1,8 +1,6 @@
 import {FeatureLevelsConfig} from './FeatureLevelsConfig'
 import {FeaturesProps} from './FeaturesProps'
 
-export let showWhatIUse = true
-
 export class FeaturesConfig extends FeatureLevelsConfig {
 
 
@@ -39,11 +37,11 @@ export class FeaturesConfig extends FeatureLevelsConfig {
 
     tutorial = this.fc(this.props)
 
-    lifedvisor = showWhatIUse
+    lifedvisor = this.props.showWhatIUse
 
-    journal = showWhatIUse
+    journal = this.props.showWhatIUse
 
-    tasks = showWhatIUse
+    tasks = this.props.showWhatIUse
 
     roiPoints = this.fc(this.props)
 
@@ -52,7 +50,7 @@ export class FeaturesConfig extends FeatureLevelsConfig {
 
 
     /** estimates / milestones */
-    estimating = showWhatIUse
+    estimating = this.props.showWhatIUse
 
     milestones = this.fc(this.props)
 
