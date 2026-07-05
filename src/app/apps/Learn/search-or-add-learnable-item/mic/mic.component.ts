@@ -1,7 +1,7 @@
-import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
-import {UploadService} from '../../core/upload.service'
+import { Component, Input, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import {LearnItemItemsService} from '../../core/learn-item-items.service'
 import {OdmBackend} from '../../../../libs/AppFedShared/odm/OdmBackend'
+import {VoiceAttachableItem, VoiceAttachmentService} from '../../../../libs/AppFedShared/audio/voice-attachment.service'
 import {LearnItem} from '../../models/LearnItem'
 import { IonicModule } from '@ionic/angular';
 import { NgIf } from '@angular/common';
@@ -22,6 +22,16 @@ declare const MediaRecorder: any;
 })
 export class MicComponent implements OnInit {
 
+  /** Attach the recording to this item instead of the default "create a brand new LearnItem"
+   * behavior below - set by any editing surface (Learn item details, Quiz, Journal, OrYoL tree
+   * node) that already has a current item to record onto. Left unset only on Learn's quick-add
+   * bar, which has no "current item" for a recording to attach to. */
+  @Input() item$?: VoiceAttachableItem
+
+  /** Required alongside item$ when it has no odmService.className to infer a collection from
+   * (OrYoL's OryItem$ tree nodes) - see VoiceAttachableItem's doc comment. */
+  @Input() collection?: string
+
   isRecording = false
   private mediaRecorder: any = null
   private audioChunks: any[] = []
@@ -30,8 +40,8 @@ export class MicComponent implements OnInit {
   stream: MediaStream | undefined
 
   constructor(
-    public uploadService: UploadService,
     public learnDoService: LearnItemItemsService,
+    public voiceAttachmentService: VoiceAttachmentService,
   ) { }
 
   ngOnInit() {}
@@ -107,14 +117,20 @@ export class MicComponent implements OnInit {
     this.audioChunks = [];
     const audioURL = window.URL.createObjectURL(blob);
     console.log(`audioURL`, audioURL)
-    console.log(`learnDoService`, this.learnDoService)
 
+    if ( this.item$ ) {
+      this.item$.patchThrottled({hasAudio: true})
+      this.voiceAttachmentService.attachRecording(this.collection ?? this.item$.odmService!.className, this.item$.id!, blob)
+      return
+    }
+
+    console.log(`learnDoService`, this.learnDoService)
     const learnItemData = new LearnItem()
     learnItemData.hasAudio = true
     learnItemData.whenAdded = OdmBackend.nowTimestamp()
     const learnItem$ = this.learnDoService.newItem(undefined, learnItemData)
     learnItem$.saveNowToDb()
-    this.uploadService.uploadAudio2(blob, learnItem$.id !)
+    this.voiceAttachmentService.attachRecording(this.learnDoService.className, learnItem$.id!, blob)
   }
 
   stopRecordingIfNeededAndReleaseMic() {

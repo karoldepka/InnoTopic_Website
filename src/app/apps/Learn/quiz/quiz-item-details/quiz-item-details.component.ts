@@ -10,6 +10,7 @@ import {nullish} from '../../../../libs/AppFedShared/utils/type-utils'
 import { NgIf, NgFor, AsyncPipe } from '@angular/common';
 import { ImportanceBannerComponent } from '../../shared/importance-banner/importance-banner.component';
 import { PlayButtonComponent } from '../../shared/play-button/play-button.component';
+import { MicComponent } from '../../search-or-add-learnable-item/mic/mic.component';
 import { BreadcrumbsComponent } from '../../../../libs/AppFedShared/breadcrumbs/breadcrumbs.component';
 import { ItemSideComponent } from '../../shared/item-side/item-side.component';
 import { OdmTreeComponent } from '../../../../libs/AppFedShared/tree/tree/odm-tree.component';
@@ -26,6 +27,7 @@ import {importanceDescriptors} from '../../models/fields/importance.model'
         NgIf,
         ImportanceBannerComponent,
         PlayButtonComponent,
+        MicComponent,
         BreadcrumbsComponent,
         ItemSideComponent,
         NgFor,

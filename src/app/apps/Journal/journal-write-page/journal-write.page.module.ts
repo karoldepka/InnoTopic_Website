@@ -15,6 +15,8 @@ import {TimeModule} from '../../../libs/AppFedShared/time/time.module'
 import {SharedModule} from '../../../shared/shared.module'
 import {JournalTextFieldComponent} from './journal-text-fields/journal-text-field/journal-text-field.component'
 import {JournalItemEditComponent} from './journal-item-edit/journal-item-edit.component'
+import {MicComponent} from '../../Learn/search-or-add-learnable-item/mic/mic.component'
+import {PlayButtonComponent} from '../../Learn/shared/play-button/play-button.component'
 
 @NgModule({
     imports: [
@@ -32,6 +34,8 @@ import {JournalItemEditComponent} from './journal-item-edit/journal-item-edit.co
         JournalSituationsComponent,
         JournalTextFieldComponent,
         JournalItemEditComponent,
+        MicComponent,
+        PlayButtonComponent,
     ],
     exports: [],
 })

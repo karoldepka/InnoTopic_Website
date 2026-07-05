@@ -45,6 +45,11 @@
       [item$P]="item$"
     ></app-journal-item-edit>
 
+    <div *ngIf="item$" style="display: flex; align-items: stretch;">
+      <app-play-button [item$]="item$"></app-play-button>
+      <app-mic [item$]="item$"></app-mic>
+    </div>
+
   <ion-fab *ngIf=showFab vertical="bottom" horizontal="end" slot="fixed">
     <ion-fab-button id='fabNewJournalEntry'
                     (click)="newItem()"

@@ -55,6 +55,17 @@
     (click)='pasteMoveHereFromClipboard()'>
     Move Here From Clipboard
   </ion-button>
+  <div style="display: flex; align-items: stretch; margin-top: .5em">
+    <app-play-button
+      [item$]="treeNode.content.dbItem"
+      [collection]="'OryItem'"
+    ></app-play-button>
+    <app-mic
+      [item$]="treeNode.content.dbItem"
+      [collection]="'OryItem'"
+    ></app-mic>
+  </div>
+
   <p style="margin-top: .5em">
     Created: {{getWhenCreated()?.toISOString()}}
   </p>

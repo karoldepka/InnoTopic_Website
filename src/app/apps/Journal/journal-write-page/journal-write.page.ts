@@ -17,6 +17,8 @@ import { TimePassingComponent } from '../../../libs/AppFedShared/time/time-passi
 import { SyncStatusIconComponent } from '../../../libs/AppFedShared/odm/sync-status/sync-status-icon.component';
 import { JournalItemEditComponent } from './journal-item-edit/journal-item-edit.component';
 import { TranslatePipe } from '@ngx-translate/core';
+import { MicComponent } from '../../Learn/search-or-add-learnable-item/mic/mic.component';
+import { PlayButtonComponent } from '../../Learn/shared/play-button/play-button.component';
 
 @Component({
     selector: 'app-journal-write-page',
@@ -33,6 +35,8 @@ import { TranslatePipe } from '@ngx-translate/core';
         NgFor,
         JournalItemEditComponent,
         TranslatePipe,
+        MicComponent,
+        PlayButtonComponent,
     ],
 })
 export class JournalWritePage extends BaseComponent implements OnInit {
