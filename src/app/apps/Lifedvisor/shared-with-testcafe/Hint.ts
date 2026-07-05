@@ -92,15 +92,26 @@ export const question = hint
 
 export class LiHintImpl extends LiHint {
 
-  ifYesSortedByScoreFiltered: LiHintImpl[] = this.ifYes ?? [] // []
+  /** hint()'s `Object.assign(new LiHintImpl(), data)` (below) constructs with zero args, so a
+   * plain field initializer here (`= this.ifYes ?? []`) would run before `ifYes` is actually
+   * assigned, permanently freezing this to `[]` for every node a search hasn't visited yet - which
+   * is every node before the first search settles, since HintFinder.sortByScoreRecursively() is
+   * the only thing that ever assigns it. Both this.page.html and hint.component.ts render
+   * exclusively from this field, never from `ifYes` directly, so that bug made the whole /ask tree
+   * render as empty until the very first debounced search ran. Falls back to the live `ifYes`
+   * (unsorted, but non-empty) until a search actually sorts/assigns it. */
+  private _ifYesSortedByScoreFiltered?: LiHintImpl[]
+
+  get ifYesSortedByScoreFiltered(): LiHintImpl[] {
+    return this._ifYesSortedByScoreFiltered ?? this.ifYes ?? []
+  }
+
+  set ifYesSortedByScoreFiltered(value: LiHintImpl[]) {
+    this._ifYesSortedByScoreFiltered = value
+  }
 
   searchScore ? : SearchScore
   appliedFilter ? : Filter
-
-  // /** sorting should happen *after* we process descendants */
-  // get ifYesSortedByScoreFiltered(): LiHintImpl[] {
-  //   // return (this.ifYes ?? []).sort(hint => hint.get)
-  // }
 
 
   memoized_searchScore = new Map<Filter, SearchScore>();

@@ -1,4 +1,5 @@
 import {
+  ChangeDetectorRef,
   Component,
   EventEmitter,
   OnInit,
@@ -46,7 +47,7 @@ export class AskPage implements OnInit {
 
   constructor(
     public searchService: SearchService,
-
+    private changeDetectorRef: ChangeDetectorRef,
   ) {
     this.filterToThrottle$.pipe(
       debounceTime(300)
@@ -54,6 +55,12 @@ export class AskPage implements OnInit {
       this.textField = search
       this.filter = Filter.fromString(this.textField ?? '')
       this.hintFinder.applySearch(Filter.fromString(search))
+      // Without this, the debounced RxJS callback above never triggers a view refresh - typing a
+      // search term visibly updates nothing (rootHint/filter are correctly updated internally,
+      // confirmed by forcing change detection manually) until some unrelated Angular-bound event
+      // elsewhere happens to trigger one incidentally. Same fix BaseComponent already applies for
+      // its own FeatureService subscription, for the same reason.
+      this.changeDetectorRef.markForCheck()
     })
 
     this.filterToThrottle$.pipe(
