@@ -45,6 +45,22 @@ export class FeatureService {
     this.patchProps({beforeProductization: enabled})
   }
 
+  get showWhatIUse(): boolean {
+    return this.config$.lastVal?.props?.showWhatIUse ?? true
+  }
+
+  setShowWhatIUse(enabled: boolean) {
+    this.patchProps({showWhatIUse: enabled})
+  }
+
+  get niceLooking(): boolean {
+    return this.config$.lastVal?.props?.niceLooking ?? false
+  }
+
+  setNiceLooking(enabled: boolean) {
+    this.patchProps({niceLooking: enabled})
+  }
+
   static readonly firestoreEnabledKey = 'firestoreEnabled'
 
   get firestoreEnabled(): boolean {
