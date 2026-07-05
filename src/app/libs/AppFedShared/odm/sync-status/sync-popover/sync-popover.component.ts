@@ -12,7 +12,8 @@ import { ThemeConfigComponent } from '../../../theme-config/theme-config.compone
 import { LanguageSwitcherComponent } from '../../../i18n/language-switcher/language-switcher.component';
 import { NgIf, NgForOf, AsyncPipe, JsonPipe } from '@angular/common';
 import { TranslatePipe } from '@ngx-translate/core';
-import { IonicModule } from '@ionic/angular';
+import { IonicModule, PopoverController } from '@ionic/angular';
+import { Router } from '@angular/router';
 import {stripHtml} from '../../../utils/html-utils'
 
 @Component({
@@ -53,6 +54,8 @@ export class SyncPopoverComponent extends BaseComponent implements OnInit {
     public syncStatusService: SyncStatusService,
     // public learnStatsService: LearnStatsService,
     public optionsService: OptionsService,
+    private popoverController: PopoverController,
+    private router: Router,
     injector: Injector,
   ) {
     super(injector)
@@ -68,8 +71,9 @@ export class SyncPopoverComponent extends BaseComponent implements OnInit {
     }
   }
 
-  logIn() {
-    this.authService.logInViaGoogle()
+  async logIn() {
+    await this.popoverController.dismiss()
+    await this.router.navigateByUrl('/auth')
   }
 
   logOut() {
