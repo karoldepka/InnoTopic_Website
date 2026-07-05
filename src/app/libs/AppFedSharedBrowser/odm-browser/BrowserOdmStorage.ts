@@ -54,9 +54,9 @@ function requestToPromise<T>(req: IDBRequest<T>): Promise<T> {
   })
 }
 
-function openDb(): Promise<IDBDatabase> {
+function openDb(version: number | undefined = DB_VERSION): Promise<IDBDatabase> {
   return new Promise((resolve, reject) => {
-    const req = indexedDB.open(DB_NAME, DB_VERSION)
+    const req = version === undefined ? indexedDB.open(DB_NAME) : indexedDB.open(DB_NAME, version)
     req.onupgradeneeded = (event) => {
       const db = req.result
       if (event.oldVersion < 1) {
@@ -78,13 +78,7 @@ function openDb(): Promise<IDBDatabase> {
         req.transaction!.objectStore(SYNC_CURSORS_STORE).clear()
       }
     }
-    req.onsuccess = () => {
-      const db = req.result
-      // Another tab may need a future schema upgrade - don't hold this connection open and
-      // block it forever.
-      db.onversionchange = () => db.close()
-      resolve(db)
-    }
+    req.onsuccess = () => resolve(req.result)
     req.onerror = () => reject(req.error)
   })
 }
@@ -95,7 +89,41 @@ function openDb(): Promise<IDBDatabase> {
  * into on every read/write today. */
 @Injectable({providedIn: 'root'})
 export class BrowserOdmStorage {
-  private readonly dbp: Promise<IDBDatabase> = openDb()
+  private dbp: Promise<IDBDatabase> = this.connect()
+
+  /** Opens the database and arranges to transparently reconnect if the connection ever dies -
+   * either because another tab (e.g. one left open across a deploy that bumped DB_VERSION)
+   * triggers a schema upgrade, or the browser reclaims an idle connection. Without this, every
+   * put()/get() after either event throws "the database connection is closing" forever, until
+   * the page is fully reloaded. */
+  private connect(): Promise<IDBDatabase> {
+    return openDb(DB_VERSION)
+      .catch(error => {
+        if (error instanceof DOMException && error.name === 'VersionError') {
+          // Another, newer connection (e.g. a tab that reloaded after a later deploy) already
+          // upgraded the schema past what this loaded bundle's DB_VERSION constant knows about -
+          // connect at whatever version is already there instead of looping on the same error.
+          return openDb(undefined)
+        }
+        throw error
+      })
+      .then(db => {
+        let reconnected = false
+        const reconnect = () => {
+          if (reconnected) {
+            return
+          }
+          reconnected = true
+          this.dbp = this.connect()
+        }
+        db.onversionchange = () => {
+          db.close()
+          reconnect()
+        }
+        db.onclose = reconnect
+        return db
+      })
+  }
 
   /** Emits whenever `put()` resolves a genuine conflict (see below) - subscribed to by
    * OdmConflictToastService to notify the user. */
