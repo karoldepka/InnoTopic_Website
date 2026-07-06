@@ -167,6 +167,13 @@ TASKS:
   😊 Fun, ❗ Importance
 </ion-button>
 
+<ion-button (click)="setPreset('funCravingPanic')">
+  🎉 Fun Craving Panic Button
+  <ion-note *ngIf="g.feat.showUgly" class="preset-note">
+    😊 fun desc, 🧠 mental asc, recent
+  </ion-note>
+</ion-button>
+
 <ion-button *ngIf="g.feat.mockups" [disabled]="true">
   😊 Fun & 🤔 Challenging (bad roi / prio?)
 </ion-button>

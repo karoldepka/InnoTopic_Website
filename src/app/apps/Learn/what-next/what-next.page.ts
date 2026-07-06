@@ -9,6 +9,8 @@ import { SyncStatusIconComponent } from '../../../libs/AppFedShared/odm/sync-sta
 import { NgIf } from '@angular/common';
 import { QuizButtonComponent } from '../shared/quiz-button/quiz-button.component';
 import { EnergyGraphComponent } from '../energy-graph/energy-graph.component';
+import { LEARN_LIST_OPTIONS_LOCAL_STORAGE_KEY } from '../search-or-add-learnable-item/list-processing'
+import { ListOptionsData } from '../search-or-add-learnable-item/list-options'
 
 @Component({
     selector: 'app-what-next',
@@ -42,6 +44,13 @@ export class WhatNextPage extends BaseComponent implements OnInit {
   async cravingFun() {
     // TODO: popup with fancy image of doing smth fun. Piorun, spread wings.
     this.themeService.applyRandomTheme()
-    await this.router.navigateByUrl('/fun')
+    // GH issue #38: the fun-craving panic button - opens /learn's task/learn list pre-sorted by
+    // fun descending, mental effort ascending, then most-recently-touched. Writes the preset
+    // directly to the same localStorage key ListProcessing reads on construction (there's no
+    // live instance of it here to patch - this page's ListProcessing doesn't exist until /learn
+    // itself is navigated to).
+    const optionsPatch: Partial<ListOptionsData> = { preset: 'funCravingPanic' }
+    localStorage.setItem(LEARN_LIST_OPTIONS_LOCAL_STORAGE_KEY, JSON.stringify(optionsPatch))
+    await this.router.navigateByUrl('/learn')
   }
 }

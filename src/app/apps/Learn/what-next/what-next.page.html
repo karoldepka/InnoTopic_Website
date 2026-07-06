@@ -20,7 +20,7 @@
 
     <span *ngIf="g.feat.showTodosNotes">First stuff that has to be done quickly every day anyway (independent of time available or boredom) - will become a habit</span>
     <ion-button *ngIf="g.feat.showExperimental" [routerLink]="'/learn/item/LearnItem__2022-05-26__17.33.46.061Z_'">Affirmations</ion-button>
-    <ion-button *ngIf="g.feat.showExperimental" (click)="cravingFun()">Craving&nbsp;<span style="text-emphasis: 'x' orange"><!--Orange as warning (not negative)-->fun</span>&nbsp;Panic Button <span>&nbsp;</span> <ion-note> (Quiz/Tasks)</ion-note></ion-button>
+    <ion-button (click)="cravingFun()">Craving&nbsp;<span style="text-emphasis: 'x' orange"><!--Orange as warning (not negative)-->fun</span>&nbsp;Panic Button <span>&nbsp;</span> <ion-note> (Quiz/Tasks)</ion-note></ion-button>
     <div class="primary-learn-actions">
       <app-quiz-button />
       <ion-button routerLink="/ai/qa" size="big">

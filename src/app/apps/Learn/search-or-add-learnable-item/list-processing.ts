@@ -3,6 +3,11 @@ import {sortBy} from 'lodash-es'
 import {SelectionManager} from './SelectionManager'
 import {LocalOptionsPatchableObservable} from '../core/options.service'
 import {ListOptionsData} from './list-options'
+
+/** Not overridden per-instance, so it must match exactly across every place that reads or writes
+ * this preset - e.g. WhatNextPage's "craving fun" panic button sets this key directly (a fresh
+ * page's own ListProcessing instance doesn't exist yet to patch) before navigating to /learn. */
+export const LEARN_LIST_OPTIONS_LOCAL_STORAGE_KEY = 'LifeSuite_options'
 import {Injector} from '@angular/core'
 import {NavigationService} from '../../../shared/navigation.service'
 import {importanceDescriptors} from '../models/fields/importance.model'
@@ -20,7 +25,8 @@ export class ListProcessing {
 
   listOptions$P = new LocalOptionsPatchableObservable<ListOptionsData>({
       preset: `lastModified`
-    }
+    },
+    LEARN_LIST_OPTIONS_LOCAL_STORAGE_KEY
   )
 
   navigationService = this.injector.get(NavigationService)
@@ -145,6 +151,15 @@ export class ListProcessing {
         mentalGetterAscending /* kinda part of ROI */,
         importanceGetterDescending,
       ])
+    } else if ( preset === `funCravingPanic` ) {
+      /* GH issue #38: fun-craving panic button - fun descending, mental effort ascending, then
+         most-recently-touched first as a tie-breaker (arbitrary choice where the issue itself
+         was unsure of direction). */
+      this.item$s = sortBy(item$s, [
+        funGetterDescending,
+        mentalGetterAscending,
+        whenLastTouchedDescending,
+      ])
     } else if ( preset === `funImportant` /*  importance -> ignoring ROI*/ ) {
       this.item$s = sortBy(item$s, [
         maybeDoableGetterDescending,
@@ -234,6 +249,13 @@ export class ListProcessing {
           this.matchesSearch(item)
           && item.val?.isEffectivelyToLearn()
           && item.getEffectiveImportance()
+      )
+    } else if (preset === `funCravingPanic`) {
+      /* Both tasks and learn items ("task/learn list" per GH issue #38), unlike the other fun-*
+         presets above which fall through to the tasks-only default below. */
+      this.filteredItem$s = items.filter(
+        item =>
+          this.matchesSearch(item)
       )
     } else {
       this.filteredItem$s = items.filter(
