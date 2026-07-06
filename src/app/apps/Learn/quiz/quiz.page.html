@@ -10,6 +10,9 @@
       <app-app-logo />
       <ion-title>
         <span style="flex-grow: 1">&nbsp;QUIZ&nbsp;&nbsp;</span>
+        <span *ngIf="status$ | async as quizStatus" style="font-size: 12px; opacity: 70%">
+          ({{ quizStatus.itemsLeft }} left)
+        </span>
       </ion-title>
 
       <!--      <ion-button (click)="window.history.back()"><</ion-button>-->
