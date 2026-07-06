@@ -32,7 +32,15 @@ export class PlayButtonComponent implements OnInit {
   private itemId ? : LearnItemId
 
   isPlaying = false
-  private source ? : AudioBufferSourceNode
+  currentTimeSec = 0
+  durationSec = 0
+
+  /** A plain <audio> element rather than Web Audio API's AudioBufferSourceNode (the previous
+   * implementation) - AudioBufferSourceNode has no currentTime/duration/seek support at all, so
+   * there'd be no way to drive the timeline scrubber below without reimplementing all of that by
+   * hand. */
+  private audioEl ? : HTMLAudioElement
+  private objectUrl ? : string
 
   constructor(
     protected changeDetectorRef: ChangeDetectorRef,
@@ -62,42 +70,64 @@ export class PlayButtonComponent implements OnInit {
     this.isPlaying = true
     this.voiceAttachmentService.getRecording(target.collection, target.itemId).then(audioBytes => {
       if ( ! this.isPlaying || ! audioBytes ) {
+        this.isPlaying = false
+        this.changeDetectorRef.detectChanges()
         return
       }
-      // todo maybe reuse ctx / source
-      const audioCtx = new ((window as any).AudioContext || (window as any).webkitAudioContext)()
-      const source = audioCtx.createBufferSource()
-      this.source = source
+      const blob = new Blob([audioBytes], {type: 'audio/ogg; codecs=opus'})
+      this.objectUrl = URL.createObjectURL(blob)
+      const audio = new Audio(this.objectUrl)
+      this.audioEl = audio
 
-      audioCtx.decodeAudioData(audioBytes,
-        (buffer: AudioBuffer) => {
-          if ( ! this.isPlaying ) {
-            return
-          }
-          source.buffer = buffer;
-          console.log(`source.buffer`, source.buffer)
-
-          source.connect(audioCtx.destination);
-          // source.loop = true;
-          source.onended = () => this.onSoundEnded()
-          source.start(0)
-        },
-
-        (e: DOMException) => {
-          window.alert("Error with decoding audio data: " + (e as any).err + ' ' + e);
-        }
-      );
+      audio.addEventListener('loadedmetadata', () => {
+        this.durationSec = isFinite(audio.duration) ? audio.duration : 0
+        this.changeDetectorRef.detectChanges()
+      })
+      audio.addEventListener('timeupdate', () => {
+        this.currentTimeSec = audio.currentTime
+        this.changeDetectorRef.detectChanges()
+      })
+      audio.addEventListener('ended', () => this.onSoundEnded())
+      audio.play().catch((e: any) => {
+        window.alert('Error playing audio: ' + e)
+        this.stopPlaying()
+      })
     })
   }
 
+  /** Bound to the timeline ion-range's (ionChange) - seeks playback to wherever the user dropped
+   * the thumb. */
+  onSeek(event: any) {
+    const newTimeSec = Number(event?.detail?.value ?? 0)
+    if ( this.audioEl ) {
+      this.audioEl.currentTime = newTimeSec
+    }
+    this.currentTimeSec = newTimeSec
+  }
+
+  formatTime(totalSeconds: number): string {
+    if ( ! isFinite(totalSeconds) || totalSeconds < 0 ) {
+      return '0:00'
+    }
+    const minutes = Math.floor(totalSeconds / 60)
+    const seconds = Math.floor(totalSeconds % 60)
+    return `${minutes}:${seconds.toString().padStart(2, '0')}`
+  }
+
   private onSoundEnded() {
-    this.isPlaying = false
-    this.changeDetectorRef.detectChanges()
+    this.stopPlaying()
   }
 
   stopPlaying() {
     this.isPlaying = false
-    this.source ?. stop()
+    this.audioEl ?. pause()
+    this.audioEl = undefined
+    if ( this.objectUrl ) {
+      URL.revokeObjectURL(this.objectUrl)
+      this.objectUrl = undefined
+    }
+    this.currentTimeSec = 0
+    this.durationSec = 0
     this.changeDetectorRef.detectChanges()
   }
 }
