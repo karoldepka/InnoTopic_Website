@@ -101,6 +101,48 @@
       </div>
     </section>
 
+    <section class="mindfulness-stats" aria-label="Mindfulness time tracked">
+      <ion-button
+        size="small"
+        fill="clear"
+        (click)="toggleShowMore()"
+      >
+        {{ showMore ? 'Hide' : 'Show' }} time tracked
+        <ion-icon [name]="showMore ? 'chevron-up' : 'chevron-down'" slot="end" />
+      </ion-button>
+
+      <div *ngIf="showMore" class="mindfulness-stats__details">
+        <p>
+          Today: <strong>{{ formatDurationMs(todayMs) }}</strong>
+          <span *ngIf="goalMinutesPerDay"> / goal {{ goalMinutesPerDay }}m</span>
+        </p>
+        <p>
+          This week: <strong>{{ formatDurationMs(weekMs) }}</strong>
+          <span *ngIf="goalMinutesPerWeek"> / goal {{ goalMinutesPerWeek }}m</span>
+        </p>
+
+        <div class="mindfulness-goals" aria-label="Mindfulness goals">
+          <ion-input
+            type="number"
+            inputmode="numeric"
+            min="0"
+            placeholder="Goal min/day"
+            aria-label="Goal minutes per day"
+            [(ngModel)]="goalMinutesPerDay"
+          ></ion-input>
+          <ion-input
+            type="number"
+            inputmode="numeric"
+            min="0"
+            placeholder="Goal min/week"
+            aria-label="Goal minutes per week"
+            [(ngModel)]="goalMinutesPerWeek"
+          ></ion-input>
+          <ion-button size="small" fill="outline" (click)="saveGoals()">Save goals</ion-button>
+        </div>
+      </div>
+    </section>
+
     <div class="fancy">
 
       <p>Don't hesitate to spend some time on this. It will pay off!</p>

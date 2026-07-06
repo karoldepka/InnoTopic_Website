@@ -4,6 +4,8 @@ import { IonicModule } from '@ionic/angular';
 import { NgFor, NgIf } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { TimePassingComponent } from '../../../libs/AppFedShared/time/time-passing/time-passing.component';
+import { MindfulnessTrackingService } from './mindfulness-tracking.service'
+import { MindfulnessGoalsService } from './mindfulness-goals.service'
 
 @Component({
     selector: 'app-mindfulness',
@@ -48,8 +50,24 @@ export class MindfulnessPage extends BaseComponent implements OnInit, OnDestroy 
 
   private timerIntervalHandle?: ReturnType<typeof setInterval>
 
+  /** GH issue #27: expandable "show more" with today/this-week totals + goals. Collapsed by
+   * default so the page stays focused on the timer itself. */
+  showMore = false
+
+  todayMs = 0
+
+  weekMs = 0
+
+  goalMinutesPerDay: number | null = null
+
+  goalMinutesPerWeek: number | null = null
+
+  private isLoadingTotals = false
+
   constructor(
     private changeDetectorRef: ChangeDetectorRef,
+    private mindfulnessTrackingService: MindfulnessTrackingService,
+    private mindfulnessGoalsService: MindfulnessGoalsService,
     injector: Injector,
   ) {
     super(injector)
@@ -60,6 +78,53 @@ export class MindfulnessPage extends BaseComponent implements OnInit, OnDestroy 
 
   ngOnDestroy() {
     this.clearTimerInterval()
+    // Avoid leaving an open (never-ended) time-tracking period if the user navigates away while
+    // the timer is still running, rather than explicitly pausing/completing it first.
+    this.mindfulnessTrackingService.stopTrackingIfNeeded()
+  }
+
+  toggleShowMore() {
+    this.showMore = !this.showMore
+    if (this.showMore) {
+      this.refreshTotalsAndGoals()
+    }
+  }
+
+  private async refreshTotalsAndGoals() {
+    if (this.isLoadingTotals) {
+      return
+    }
+    this.isLoadingTotals = true
+    try {
+      const [totals, goals] = await Promise.all([
+        this.mindfulnessTrackingService.getTodayAndWeekTotals(),
+        this.mindfulnessGoalsService.getGoals(),
+      ])
+      this.todayMs = totals.todayMs
+      this.weekMs = totals.weekMs
+      this.goalMinutesPerDay = goals.goalMinutesPerDay
+      this.goalMinutesPerWeek = goals.goalMinutesPerWeek
+    } catch (error) {
+      console.error('MindfulnessPage.refreshTotalsAndGoals failed', error)
+    } finally {
+      this.isLoadingTotals = false
+      this.changeDetectorRef.detectChanges()
+    }
+  }
+
+  saveGoals() {
+    this.mindfulnessGoalsService.saveGoals({
+      goalMinutesPerDay: this.goalMinutesPerDay,
+      goalMinutesPerWeek: this.goalMinutesPerWeek,
+    })
+  }
+
+  /** e.g. 90 minutes -> "1h 30m", 45 minutes -> "45m". */
+  formatDurationMs(ms: number): string {
+    const totalMinutes = Math.round(ms / 60_000)
+    const hours = Math.floor(totalMinutes / 60)
+    const minutes = totalMinutes % 60
+    return hours > 0 ? `${hours}h ${minutes}m` : `${minutes}m`
   }
 
   get timerMinutesText() {
@@ -112,12 +177,16 @@ export class MindfulnessPage extends BaseComponent implements OnInit, OnDestroy 
     this.clearTimerInterval()
     this.timerIntervalHandle = setInterval(() => this.updateTimer(), 250)
     this.updateTimer()
+    // GH issue #27: time-track the session on the reserved `_mindfulness` item, in parallel with
+    // whatever else OrYoL might already be tracking.
+    this.mindfulnessTrackingService.startTracking()
   }
 
   pauseTimer() {
     this.updateTimer()
     this.isTimerRunning = false
     this.clearTimerInterval()
+    this.mindfulnessTrackingService.stopTrackingIfNeeded()
   }
 
   resetTimer() {
@@ -125,6 +194,7 @@ export class MindfulnessPage extends BaseComponent implements OnInit, OnDestroy 
     this.clearTimerInterval()
     this.timerEndsAtMs = undefined
     this.remainingSeconds = this.selectedDurationSeconds
+    this.mindfulnessTrackingService.stopTrackingIfNeeded()
   }
 
   private updateTimer() {
@@ -138,6 +208,10 @@ export class MindfulnessPage extends BaseComponent implements OnInit, OnDestroy 
       this.isTimerRunning = false
       this.clearTimerInterval()
       this.playCompletionChime()
+      this.mindfulnessTrackingService.stopTrackingIfNeeded()
+      if (this.showMore) {
+        this.refreshTotalsAndGoals()
+      }
     }
 
     this.changeDetectorRef.detectChanges()
