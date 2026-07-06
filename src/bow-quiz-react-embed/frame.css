@@ -261,6 +261,30 @@ button {
   line-height: 1.35;
 }
 
+.answer-controls {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  display: flex;
+  gap: 8px;
+}
+
+.answer-control-button {
+  min-height: 30px;
+  border: 1px solid rgba(163, 181, 200, 0.58);
+  border-radius: 7px;
+  padding: 0 10px;
+  color: #172033;
+  background: rgba(255, 255, 255, 0.86);
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.answer-control-button:disabled {
+  color: #9aa7b4;
+  cursor: not-allowed;
+}
+
 @media (max-width: 760px) {
   .game-header {
     grid-template-columns: minmax(0, 1fr) auto auto;

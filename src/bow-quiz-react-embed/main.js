@@ -41,6 +41,9 @@ const TRANSLATIONS = {
     hint: 'Drag backward from the bowstring, aim toward an answer target, then release. More pull gives more arrow speed and a flatter shot.',
     languageLabel: 'Language',
     aimHintLabel: 'Aim hint',
+    revealAnswersLabel: 'Reveal answers',
+    hideAnswersLabel: 'Hide answers',
+    hintButtonLabel: 'Hint',
   },
   pl: {
     title: 'Łukowy quiz',
@@ -182,6 +185,24 @@ function clamp(value, min, max) {
 
 function distance(a, b) {
   return Math.hypot(a.x - b.x, a.y - b.y);
+}
+
+function maskAnswerText(text) {
+  return text.replace(/\S/g, '•');
+}
+
+/** Answers start masked; `answersRevealed` unmasks all of them at once, while
+ * `hintLettersRevealed` progressively unmasks just the correct answer's leading letters
+ * without giving away the wrong ones. A target that was already hit always shows its real
+ * text, since the player just found out empirically which one it is. */
+function getDisplayedAnswerText(answer, { answersRevealed, hintLettersRevealed, wasHit }) {
+  if (answersRevealed || wasHit) {
+    return answer.text;
+  }
+  if (answer.correct && hintLettersRevealed > 0) {
+    return answer.text.slice(0, hintLettersRevealed) + maskAnswerText(answer.text.slice(hintLettersRevealed));
+  }
+  return maskAnswerText(answer.text);
 }
 
 function normalize(vector) {
@@ -329,9 +350,10 @@ function ArrowShape({ arrow }) {
   );
 }
 
-function Target({ answer, copy, index, hitAnswerId }) {
+function Target({ answer, copy, index, hitAnswerId, answersRevealed, hintLettersRevealed }) {
   const layout = getTargetLayout(index);
   const wasHit = hitAnswerId === answer.id;
+  const displayedText = getDisplayedAnswerText(answer, { answersRevealed, hintLettersRevealed, wasHit });
   const className = [
     'target-card',
     wasHit && answer.correct ? 'hit' : '',
@@ -371,7 +393,7 @@ function Target({ answer, copy, index, hitAnswerId }) {
       className: 'target-label',
       x: layout.x + 62,
       y: layout.y - 4,
-    }, answer.text),
+    }, displayedText),
     React.createElement('text', {
       className: 'target-sub-label',
       x: layout.x + 62,
@@ -464,6 +486,8 @@ function BowQuizGame() {
   const [showAimHint, setShowAimHint] = React.useState(
     () => window.localStorage.getItem('bowQuizShowAimHint') !== 'false',
   );
+  const [answersRevealed, setAnswersRevealed] = React.useState(false);
+  const [hintLettersRevealed, setHintLettersRevealed] = React.useState(0);
   const [arrows, setArrows] = React.useState([]);
   const [pullPoint, setPullPoint] = React.useState(null);
   const [hitAnswerId, setHitAnswerId] = React.useState('');
@@ -622,10 +646,24 @@ function BowQuizGame() {
     setScore(0);
     setStatus({ type: 'idle' });
     setPullPoint(null);
+    setAnswersRevealed(false);
+    setHintLettersRevealed(0);
   }
 
   function changeLocale(event) {
     setLocale(normalizeLocale(event.target.value));
+  }
+
+  function toggleAnswersRevealed() {
+    setAnswersRevealed((value) => !value);
+  }
+
+  function revealNextHintLetter() {
+    const correctAnswer = ANSWERS.find((answer) => answer.correct);
+    if (!correctAnswer) {
+      return;
+    }
+    setHintLettersRevealed((value) => Math.min(value + 1, correctAnswer.text.length));
   }
 
   function toggleAimHint(event) {
@@ -699,6 +737,8 @@ function BowQuizGame() {
           copy,
           index,
           hitAnswerId,
+          answersRevealed,
+          hintLettersRevealed,
         })),
         React.createElement(AimPreview, { pullPoint, showAimHint }),
         React.createElement(Bow, { pullPoint, pullDistance }),
@@ -727,6 +767,27 @@ function BowQuizGame() {
         'div',
         { className: 'hint-line' },
         copy.hint,
+      ),
+      React.createElement(
+        'div',
+        { className: 'answer-controls' },
+        React.createElement(
+          'button',
+          { type: 'button', className: 'answer-control-button', onClick: toggleAnswersRevealed },
+          answersRevealed
+            ? (copy.hideAnswersLabel || TRANSLATIONS.en.hideAnswersLabel)
+            : (copy.revealAnswersLabel || TRANSLATIONS.en.revealAnswersLabel),
+        ),
+        React.createElement(
+          'button',
+          {
+            type: 'button',
+            className: 'answer-control-button',
+            onClick: revealNextHintLetter,
+            disabled: answersRevealed || hintLettersRevealed >= (ANSWERS.find((answer) => answer.correct)?.text.length ?? 0),
+          },
+          copy.hintButtonLabel || TRANSLATIONS.en.hintButtonLabel,
+        ),
       ),
     ),
   );
