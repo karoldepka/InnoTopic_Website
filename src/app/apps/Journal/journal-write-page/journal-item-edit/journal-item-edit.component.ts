@@ -1,4 +1,4 @@
-import {Component, Injector, Input, OnInit, ChangeDetectionStrategy} from '@angular/core';
+import {Component, Injector, Input, OnInit, ViewChild, ChangeDetectionStrategy} from '@angular/core';
 import {CachedSubject} from '../../../../libs/AppFedShared/utils/cachedSubject2/CachedSubject2'
 import {JournalEntry} from '../../models/JournalEntry'
 import {JournalEntry$} from '../../models/JournalEntry$'
@@ -39,6 +39,11 @@ export class JournalItemEditComponent extends BaseComponent implements OnInit {
     return this.item$P.val$
   }
 
+  /** Optional (undefined until the *ngIf around <app-journal-text-fields> resolves, e.g. before
+   * the entry has loaded) - see flushAllTextFields() below. */
+  @ViewChild(JournalTextFieldsComponent)
+  private textFieldsComponent ? : JournalTextFieldsComponent
+
   constructor(
     injector: Injector,
   ) {
@@ -46,5 +51,11 @@ export class JournalItemEditComponent extends BaseComponent implements OnInit {
   }
 
   ngOnInit() {}
+
+  /** Flushes every text field's possibly-still-throttled pending edit immediately - see
+   * ViewSyncer.flush()'s doc comment for why this matters. */
+  flushAllTextFields() {
+    this.textFieldsComponent ?. flushAll()
+  }
 
 }

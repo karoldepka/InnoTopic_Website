@@ -40,6 +40,12 @@ export class JournalTextFieldComponent implements OnInit {
       this.fieldDescriptor.id as keyof JournalEntry) /* TODO might need to ignore other fields from db */
   }
 
+  /** Pushes this field's current (possibly still-throttled, not-yet-saved) value through
+   * immediately - see ViewSyncer.flush()'s doc comment for why this matters. */
+  flush() {
+    this.viewSyncer.flush()
+  }
+
   private createFormControlDict(): TextDescriptorsFormControlsDict {
     const ret = {} as TextDescriptorsFormControlsDict
     ret[this.fieldDescriptor. id ! as keyof TextDescriptorsFormControlsDict] = new UntypedFormControl()

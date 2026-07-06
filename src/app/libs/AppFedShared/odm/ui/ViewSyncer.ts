@@ -93,6 +93,24 @@ export class ViewSyncer<TKey = string, TValue = any /* TODO */, TItemInMem = any
     return this.lastLocalEditByUserMs
   }
 
+  /** Immediately pushes the form's current value through to the item, bypassing the 1500ms
+   * throttle above. Without this, navigating away (or the app backgrounding) within that window
+   * after the user's last keystroke can silently drop it - the throttle's trailing edge is still
+   * waiting to fire and never gets the chance to. Callers should invoke this right before any
+   * point that could end the current view (page navigation, ngOnDestroy, app going to
+   * background) - see JournalWritePage for where this is wired in. Safe to call even if there's
+   * nothing pending (same guards as the throttled subscription above), and safe to call more than
+   * once. */
+  flush() {
+    if ( this.requireExplicitInitialValueTrigger && ! this.initialDataArrivalWasSetExplicitly ) {
+      return
+    }
+    if ( ! this.isApplyingFromDb && this.initialDataArrived ) {
+      this.lastLocalEditByUserMs = Date.now()
+      this.item$.patchThrottled(this.formGroup.value)
+    }
+  }
+
   /* To prevent incoming changes overwriting user edit */
   private hasEnoughTimePassedFromLastUserEditToApplyFromDb() {
     const msFromLastLocalEdit = Date.now() - this.lastLocalEditByUserMs

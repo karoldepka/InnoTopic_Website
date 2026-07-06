@@ -1,4 +1,4 @@
-import {Component, Injector, OnInit, ChangeDetectionStrategy} from '@angular/core';
+import {Component, Injector, OnInit, OnDestroy, ViewChild, ChangeDetectionStrategy} from '@angular/core';
 import {JournalEntryItemsService} from "../core/journal-entries.service";
 import {JournalEntry, JournalEntryId} from "../models/JournalEntry";
 import {debugLog} from "../../../libs/AppFedShared/utils/log";
@@ -40,7 +40,7 @@ import { escapeHtml } from '../../../libs/AppFedShared/utils/html-utils'
         PlayButtonComponent,
     ],
 })
-export class JournalWritePage extends BaseComponent implements OnInit {
+export class JournalWritePage extends BaseComponent implements OnInit, OnDestroy {
 
   public item$ ? : JournalEntry$
 
@@ -50,6 +50,12 @@ export class JournalWritePage extends BaseComponent implements OnInit {
   public itemId: JournalEntryId = this.activatedRoute.snapshot.params['itemId']
 
   item$FakeArray ! : Array<JournalEntry$>
+
+  /** Optional (undefined before the first item$ has loaded) - see flushPendingEdits() below. */
+  @ViewChild(JournalItemEditComponent)
+  private itemEditComponent ? : JournalItemEditComponent
+
+  private readonly onWindowBeforeUnload = () => this.flushPendingEdits()
 
   constructor(
     public journalEntriesService: JournalEntryItemsService,
@@ -67,6 +73,30 @@ export class JournalWritePage extends BaseComponent implements OnInit {
       `itemId`, this.itemId,
       `this.activatedRoute.snapshot.params['itemId']`, this.activatedRoute.snapshot.params)
     this.initItem();
+    // Covers an actual tab/app close, not just in-app navigation - the throttled ViewSyncer
+    // subscriptions below wouldn't otherwise get a chance to flush their trailing edge at all.
+    window.addEventListener('beforeunload', this.onWindowBeforeUnload)
+  }
+
+  ngOnDestroy() {
+    // Covers in-app navigation away from this page (back button, tapping some other link) that
+    // doesn't go through newItem()/onBackClicked() below.
+    this.flushPendingEdits()
+    window.removeEventListener('beforeunload', this.onWindowBeforeUnload)
+  }
+
+  /** Pushes every text field's possibly-still-throttled pending edit through immediately, then
+   * saves it. Without this, typing something and immediately navigating away (or backgrounding
+   * the app) within the ~1.5s the fields' ViewSyncers throttle at can silently drop that last
+   * edit - the throttle's trailing edge is still waiting to fire and never gets the chance to.
+   * See ViewSyncer.flush()'s doc comment for the full story. */
+  private flushPendingEdits() {
+    this.itemEditComponent ?. flushAllTextFields()
+    this.item$ ?. saveNowToDbIfNeeded ?. ()
+  }
+
+  onBackClicked() {
+    this.flushPendingEdits()
   }
 
   public initItem() {
@@ -107,7 +137,7 @@ export class JournalWritePage extends BaseComponent implements OnInit {
       `itemId`, this.itemId,
       `this.activatedRoute.snapshot.params['itemId']`, this.activatedRoute.snapshot.params)
 
-    this.item$?.saveNowToDbIfNeeded()
+    this.flushPendingEdits()
     // this.item$Replacable
     this.router.navigateByUrl(`/journal/write/new`).then(() => {
       this.setItem$(new JournalEntry$(this.journalEntriesService, undefined, new JournalEntry()))
@@ -125,7 +155,7 @@ export class JournalWritePage extends BaseComponent implements OnInit {
   }
 
   private setItem$(item$: JournalEntry$) {
-    this.item$ ?. saveNowToDbIfNeeded ?. ()
+    this.flushPendingEdits()
     this.item$ = item$
     this.item$FakeArray = [ this.item$ ]
   }

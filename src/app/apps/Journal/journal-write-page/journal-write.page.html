@@ -4,7 +4,7 @@
 <!--      <ion-back-button [defaultHref]="'/'"></ion-back-button>-->
       <ion-icon
         [routerLink]="'/journal'"
-        (click)="item$ ?. saveNowToDbIfNeeded()"
+        (click)="onBackClicked()"
         name="arrow-back-outline"
         class="action-icon"
         slot="start"
