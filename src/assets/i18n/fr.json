@@ -62,6 +62,7 @@
     "NOT_LOGGED_IN": "Non connecté.",
     "LOG_OUT": "Se déconnecter",
     "OPTIONS": "Options",
+    "FORCE_RELOAD": "Forcer le rechargement",
     "BRANCH": "Branche",
     "LAST_COMMIT": "Dernier commit",
     "BUILT": "Compilé le"

@@ -84,6 +84,10 @@ export class SyncPopoverComponent extends BaseComponent implements OnInit {
     this.optionsService.openOptions()
   }
 
+  forceReload() {
+    window.location.reload()
+  }
+
   toArray(t: any) {
     return Array.from(t)
   }
