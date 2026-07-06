@@ -562,6 +562,7 @@ function BowQuizGame() {
   }
 
   function updatePull(event) {
+    event.preventDefault();
     if (!svgRef.current) {
       return;
     }
@@ -580,6 +581,7 @@ function BowQuizGame() {
   }
 
   function startPull(event) {
+    event.preventDefault();
     event.currentTarget.setPointerCapture?.(event.pointerId);
     setStatus({ type: 'aim' });
     updatePull(event);
