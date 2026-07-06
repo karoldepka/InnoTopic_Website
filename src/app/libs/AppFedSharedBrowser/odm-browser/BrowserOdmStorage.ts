@@ -140,12 +140,27 @@ export class BrowserOdmStorage {
    * below. */
   private hasConnectedBefore = false
 
+  /** Must also be declared before `dbPromise` below, for the same field-initializer-order reason
+   * as `hasConnectedBefore` above - `connect()` reads it synchronously. Never overridden outside
+   * `forTesting()` below - stays a plain field (not a constructor parameter) specifically so this
+   * class keeps a normal zero-arg constructor Angular's DI can resolve for its real
+   * `@Injectable(providedIn: 'root')` singleton; a constructor parameter with no injection token
+   * (a bare `string`) fails AOT compilation ("NG2003: No suitable injection token"). */
+  private dbName = DB_NAME
+
   private dbPromise: Promise<IDBDatabase> = this.connect()
 
-  /** Only ever overridden in tests, to exercise reconnect/version-upgrade behavior against a
-   * disposable database instead of the real shared one every other connection in the same test
-   * run (or the app itself) is relying on. */
-  constructor(private dbName: string = DB_NAME) {
+  /** Test-only: builds an instance pointed at a disposable database instead of the real shared
+   * one, so tests can exercise reconnect/version-upgrade/multi-connection behavior in isolation.
+   * The plain `new BrowserOdmStorage()` call below briefly connects to the real shared database
+   * name first (same as every other instance in the app or other tests) before this redirects it
+   * - harmless, since this file's existing tests already coexist with many simultaneous
+   * connections to that same shared name. */
+  static forTesting(dbName: string): BrowserOdmStorage {
+    const instance = new BrowserOdmStorage()
+    instance.dbName = dbName
+    instance.dbPromise = instance.connect()
+    return instance
   }
 
   /** Shared between `connect()`'s own onversionchange/onclose handlers and `withDb()`'s retry
@@ -230,6 +245,24 @@ export class BrowserOdmStorage {
   async closeConnectionForTesting(): Promise<void> {
     const db = await this.dbPromise
     db.close()
+  }
+
+  /** Wipes every local collection's cache, pending-edit journal, and blob cache - used on logout
+   * so a different user signing in on the same shared device never sees a previous user's cached
+   * rows (rows are keyed by collection+item_id only, not by owner, so nothing else here would
+   * segregate them). Deliberately does NOT try to surgically reconnect afterward and race the
+   * automatic onclose-triggered reconnect this close() below schedules - the caller is expected
+   * to reload the page right after this resolves, which sidesteps that entirely by starting a
+   * fresh JS context (and fresh, empty database) from scratch. */
+  async clearAllLocalData(): Promise<void> {
+    const db = await this.dbPromise
+    db.close()
+    await new Promise<void>((resolve, reject) => {
+      const req = indexedDB.deleteDatabase(this.dbName)
+      req.onsuccess = () => resolve()
+      req.onerror = () => reject(req.error)
+      req.onblocked = () => resolve() // best-effort; caller reloads the page regardless
+    })
   }
 
   /** Emits whenever the connection had to be silently reconnected (see `connect()`) - subscribed

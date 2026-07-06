@@ -402,8 +402,8 @@ describe('BrowserOdmStorage multi-tab and schema-update scenarios', () => {
   })
 
   it('a write from "tab A" is immediately visible to "tab B" - two independent connections to the same database', async () => {
-    const tabA = new BrowserOdmStorage(dbName)
-    const tabB = new BrowserOdmStorage(dbName)
+    const tabA = BrowserOdmStorage.forTesting(dbName)
+    const tabB = BrowserOdmStorage.forTesting(dbName)
     storagesToClose.push(tabA, tabB)
     const collection = 'JournalEntry'
 
@@ -417,8 +417,8 @@ describe('BrowserOdmStorage multi-tab and schema-update scenarios', () => {
     // Same conflict-resolution assertions as the single-storage test above, but the two writes
     // now come from genuinely separate BrowserOdmStorage instances - each tab has its own JS
     // state/instance in real usage, not just two sequential calls on one object.
-    const tabA = new BrowserOdmStorage(dbName)
-    const tabB = new BrowserOdmStorage(dbName)
+    const tabA = BrowserOdmStorage.forTesting(dbName)
+    const tabB = BrowserOdmStorage.forTesting(dbName)
     storagesToClose.push(tabA, tabB)
     const collection = 'JournalEntry'
     // conflictDetected$ is per-instance, not a cross-tab broadcast - only whichever connection's
@@ -447,7 +447,7 @@ describe('BrowserOdmStorage multi-tab and schema-update scenarios', () => {
   })
 
   it('a live connection recovers automatically when another tab reloads after a deploy and bumps the schema version', async () => {
-    const openTab = new BrowserOdmStorage(dbName)
+    const openTab = BrowserOdmStorage.forTesting(dbName)
     storagesToClose.push(openTab)
     const collection = 'JournalEntry'
     await openTab.put(createPostgresOdmRow<SutItem>(collection, 'entry1', 'owner1', {title: 'written before the deploy'}))

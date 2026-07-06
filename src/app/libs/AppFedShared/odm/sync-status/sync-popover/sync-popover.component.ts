@@ -12,9 +12,10 @@ import { ThemeConfigComponent } from '../../../theme-config/theme-config.compone
 import { LanguageSwitcherComponent } from '../../../i18n/language-switcher/language-switcher.component';
 import { NgIf, NgForOf, AsyncPipe, JsonPipe } from '@angular/common';
 import { TranslatePipe } from '@ngx-translate/core';
-import { IonicModule, PopoverController } from '@ionic/angular';
+import { AlertController, IonicModule, PopoverController } from '@ionic/angular';
 import { Router } from '@angular/router';
 import {stripHtml} from '../../../utils/html-utils'
+import {BrowserOdmStorage} from '../../../../AppFedSharedBrowser/odm-browser/BrowserOdmStorage'
 
 @Component({
     selector: 'app-sync-popover',
@@ -56,6 +57,8 @@ export class SyncPopoverComponent extends BaseComponent implements OnInit {
     public optionsService: OptionsService,
     private popoverController: PopoverController,
     private router: Router,
+    private alertController: AlertController,
+    private browserOdmStorage: BrowserOdmStorage,
     injector: Injector,
   ) {
     super(injector)
@@ -76,8 +79,36 @@ export class SyncPopoverComponent extends BaseComponent implements OnInit {
     await this.router.navigateByUrl('/auth')
   }
 
-  logOut() {
+  /** Clears the local IndexedDB cache on logout (see BrowserOdmStorage.clearAllLocalData's doc
+   * comment) so a different user signing in on the same shared device never sees a previous
+   * user's cached rows - but warns first if anything is still unsynced, since wiping the cache
+   * would otherwise silently lose exactly the kind of not-yet-saved edit this whole app is built
+   * to protect. */
+  async logOut() {
+    const pendingCount =
+      (this.syncStatusService.durablePendingSyncItems$.lastVal?.length ?? 0) +
+      (this.syncStatusService.durablePendingBlobUploads$.lastVal?.length ?? 0)
+
+    if (pendingCount > 0) {
+      const alert = await this.alertController.create({
+        header: 'Unsynced changes',
+        message: `You have ${pendingCount} change(s) that haven't finished syncing yet. Logging out now will lose them. Log out anyway?`,
+        buttons: [
+          {text: 'Cancel', role: 'cancel'},
+          {text: 'Log Out Anyway', role: 'destructive', handler: () => this.performLogout()},
+        ],
+      })
+      await alert.present()
+      return
+    }
+
+    await this.performLogout()
+  }
+
+  private async performLogout() {
     this.authService.logout()
+    await this.browserOdmStorage.clearAllLocalData()
+    window.location.reload()
   }
 
   openOptions() {
