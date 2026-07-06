@@ -31,7 +31,7 @@
       *ngIf="(showHint$ | async)"
     >
       <app-item-side-editor
-        *ngFor="let hintSide of (itemVal$ | async) ?. getSidesWithHints()"
+        *ngFor="let hintSide of getVisibleHintSides((itemVal$ | async), (showHint$ | async))"
         [item$]="item$ !"
         [side]="hintSide"
        />

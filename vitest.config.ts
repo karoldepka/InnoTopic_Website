@@ -13,6 +13,7 @@ export default defineConfig({
       'src/app/libs/AppFedSharedFanout/odm-fanout/**/*.spec.ts',
       'src/app/apps/OrYoL/db-supabase/**/*.spec.ts',
       'src/app/apps/Learn/search-or-add-learnable-item/mic/mic.component.spec.ts',
+      'src/app/apps/Learn/core/quiz/quiz-hint-reveal.spec.ts',
       'src/app/libs/AppFedSharedIonic/ratings/star-rating/**/*.spec.ts',
       // NOT a glob here deliberately: src/app/libs/AppFedShared/tree/ also has pre-existing
       // Jasmine-style specs (GenericItem$.spec.ts, min-mid-max-cell.component.spec.ts) that are

@@ -1,6 +1,7 @@
 import {AfterViewInit, Component, ElementRef, Input, OnDestroy, OnInit, ViewChild, ChangeDetectionStrategy} from '@angular/core';
 import {debugLog} from '../../../../libs/AppFedShared/utils/log'
 import {LearnItem} from '../../models/LearnItem'
+import {Side} from '../../core/sidesDefs'
 import {Observable} from 'rxjs'
 import {NumericPickerVal} from '../../../../libs/AppFedSharedIonic/ratings/numeric-picker/numeric-picker.component'
 import {LearnItem$} from '../../models/LearnItem$'
@@ -66,6 +67,10 @@ export class QuizItemDetailsComponent implements OnInit, OnDestroy, AfterViewIni
   get showAnswer$() { return this.quizService.showAnswer$ }
 
   get showHint$() { return this.quizService.showHint$ }
+
+  getVisibleHintSides(itemVal: LearnItem | undefined | null, hintLevel: number | undefined | null): Side[] {
+    return (itemVal?.getSidesWithHints() ?? []).slice(0, hintLevel ?? 0)
+  }
 
 
   private subscriptionToShowAnswer ? : Subscription

@@ -23,6 +23,7 @@ import {funLevels} from '../../models/fields/fun-level.model'
 import {QuizItemChooser} from './quiz-item-chooser'
 import {QuizStatus} from './QuizStatus'
 import {QuizOptions} from './QuizOptions'
+import {sidesDefsHintsArray} from '../sidesDefs'
 
 /* TODO units; rename to DurationMs or TimeDurationMs;
 *   !!! actually this is used as hours, confusingly! WARNING! */
@@ -51,7 +52,8 @@ export class QuizService {
 
   showAnswer$ = new CachedSubject<boolean>(false)
 
-  showHint$ = new CachedSubject<boolean>(false)
+  /** 0 = hidden; N = the first N hint sides (in sidesDefsHintsArray order) are revealed */
+  showHint$ = new CachedSubject<number>(0)
 
   constructor(
     private learnDoService: LearnItemItemsService,
@@ -239,17 +241,17 @@ export class QuizService {
   toggleShowAnswer() {
     const showAnswer = ! this.showAnswer$.lastVal
     this.showAnswer$.next(showAnswer)
-    this.showHint$.next(false)
+    this.showHint$.next(0)
   }
 
   toggleShowHint() {
-    // TODO: increase hint count (characters; stripHtml(), trim())
-    this.showHint$.next(! this.showHint$.lastVal)
+    const nextLevel = (this.showHint$.lastVal ?? 0) + 1
+    this.showHint$.next(nextLevel > sidesDefsHintsArray.length ? 0 : nextLevel)
   }
 
   onNewQuestion() {
     this.showAnswer$.next(false)
-    this.showHint$.next(false)
+    this.showHint$.next(0)
   }
 
   requestNextItem() {
