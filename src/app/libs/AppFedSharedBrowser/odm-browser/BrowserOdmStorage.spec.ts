@@ -370,6 +370,110 @@ describe('BrowserOdmStorage', () => {
   })
 })
 
+// Simulates the real multi-context scenarios Journal entries actually live through: a second
+// browser tab open on the same entry, and a tab left open across a deploy that bumps DB_VERSION.
+// Each BrowserOdmStorage here is pointed at its own disposable, uniquely-named database (via the
+// constructor's dbName override, test-only) rather than the shared production one those tests
+// above use - a version bump against the shared name would fire `versionchange` on every other
+// open connection in the same test run, including every earlier test's never-closed instance.
+describe('BrowserOdmStorage multi-tab and schema-update scenarios', () => {
+  let dbName: string
+  let storagesToClose: BrowserOdmStorage[]
+
+  function uniqueDbName(): string {
+    return `BrowserOdmStorage_multitab_test_${Date.now()}_${Math.random().toString(36).slice(2)}`
+  }
+
+  beforeEach(() => {
+    dbName = uniqueDbName()
+    storagesToClose = []
+  })
+
+  afterEach(async () => {
+    for (const s of storagesToClose) {
+      await s.closeConnectionForTesting().catch(() => {})
+    }
+    await new Promise<void>((resolve, reject) => {
+      const req = indexedDB.deleteDatabase(dbName)
+      req.onsuccess = () => resolve()
+      req.onerror = () => reject(req.error)
+      req.onblocked = () => resolve()
+    })
+  })
+
+  it('a write from "tab A" is immediately visible to "tab B" - two independent connections to the same database', async () => {
+    const tabA = new BrowserOdmStorage(dbName)
+    const tabB = new BrowserOdmStorage(dbName)
+    storagesToClose.push(tabA, tabB)
+    const collection = 'JournalEntry'
+
+    await tabA.put(createPostgresOdmRow<SutItem>(collection, 'entry1', 'owner1', {title: 'written in tab A'}))
+
+    const seenFromTabB = await tabB.get<SutItem>(collection, 'entry1')
+    expect(seenFromTabB?.data.title).toBe('written in tab A')
+  })
+
+  it('two tabs editing the same entry with different timestamps resolve exactly like a single-connection conflict would', async () => {
+    // Same conflict-resolution assertions as the single-storage test above, but the two writes
+    // now come from genuinely separate BrowserOdmStorage instances - each tab has its own JS
+    // state/instance in real usage, not just two sequential calls on one object.
+    const tabA = new BrowserOdmStorage(dbName)
+    const tabB = new BrowserOdmStorage(dbName)
+    storagesToClose.push(tabA, tabB)
+    const collection = 'JournalEntry'
+    // conflictDetected$ is per-instance, not a cross-tab broadcast - only whichever connection's
+    // own put() actually performs the losing write ever sees it (correct: that's the tab whose
+    // user needs to know their edit got archived, not the other tab that happened to win).
+    const conflictsSeenByTabA: any[] = []
+    tabA.conflictDetected$.subscribe(c => conflictsSeenByTabA.push(c))
+
+    const fromTabA = createPostgresOdmRow<SutItem>(collection, 'entry1', 'owner1', {title: 'tab A - typed first, saved later'})
+    fromTabA.when_last_modified = new Date('2024-01-01T00:00:00.000Z').toISOString()
+
+    const fromTabB = createPostgresOdmRow<SutItem>(collection, 'entry1', 'owner1', {title: 'tab B - typed second, saved first'})
+    fromTabB.when_last_modified = new Date('2024-01-02T00:00:00.000Z').toISOString()
+
+    // Tab B's edit reaches durable storage first (e.g. tab A was offline briefly), then tab A's
+    // older-timestamped edit arrives.
+    await tabB.put(fromTabB)
+    await tabA.put(fromTabA)
+
+    // Newer wins at the real key; older, different content is archived as a conflict - not
+    // silently dropped, so the user can recover it - and tab A (whose write lost) is notified.
+    const stored = await tabA.get<SutItem>(collection, 'entry1')
+    expect(stored?.data.title).toBe('tab B - typed second, saved first')
+    expect(conflictsSeenByTabA.length).toBe(1)
+    expect(conflictsSeenByTabA[0].winnerId).toBe('entry1')
+  })
+
+  it('a live connection recovers automatically when another tab reloads after a deploy and bumps the schema version', async () => {
+    const openTab = new BrowserOdmStorage(dbName)
+    storagesToClose.push(openTab)
+    const collection = 'JournalEntry'
+    await openTab.put(createPostgresOdmRow<SutItem>(collection, 'entry1', 'owner1', {title: 'written before the deploy'}))
+
+    const recoveries: void[] = []
+    openTab.connectionRecovered$.subscribe(() => recoveries.push(undefined))
+
+    // Simulates a second tab reloading after a deploy that bumped DB_VERSION: opening at a higher
+    // version fires `versionchange` on openTab's still-live connection, exactly like a real
+    // second tab would, without needing a second BrowserOdmStorage/second real tab at all.
+    const reloadedTab = await openDb(DB_VERSION + 1, dbName)
+
+    // openTab's onversionchange handler closes its stale connection and reconnects - give that
+    // microtask/event chain a moment to run, same as the existing dead-connection recovery tests.
+    await openTab.get(collection, 'missing')
+
+    expect(recoveries.length).toBe(1)
+    // The data written before the version bump must still be there after reconnecting - this is
+    // the "no data loss across a deploy" guarantee Journal entries actually depend on.
+    const stillThere = await openTab.get<SutItem>(collection, 'entry1')
+    expect(stillThere?.data.title).toBe('written before the deploy')
+
+    reloadedTab.close()
+  })
+})
+
 // These exercise the real cascading migration logic inside openDb() directly (rather than through
 // a whole BrowserOdmStorage instance, which always targets the shared production database name)
 // against disposable, uniquely-named databases, so schema-upgrade scenarios never disturb - or get

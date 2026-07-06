@@ -142,6 +142,12 @@ export class BrowserOdmStorage {
 
   private dbPromise: Promise<IDBDatabase> = this.connect()
 
+  /** Only ever overridden in tests, to exercise reconnect/version-upgrade behavior against a
+   * disposable database instead of the real shared one every other connection in the same test
+   * run (or the app itself) is relying on. */
+  constructor(private dbName: string = DB_NAME) {
+  }
+
   /** Shared between `connect()`'s own onversionchange/onclose handlers and `withDb()`'s retry
    * path below, so only one reconnect ever gets scheduled per failure no matter which of the two
    * notices first - `close()` firing the actual `onclose` event can lag a tick or two behind the
@@ -157,13 +163,13 @@ export class BrowserOdmStorage {
   private connect(): Promise<IDBDatabase> {
     const isReconnect = this.hasConnectedBefore
     this.hasConnectedBefore = true
-    return openDb(DB_VERSION)
+    return openDb(DB_VERSION, this.dbName)
       .catch(error => {
         if (error instanceof DOMException && error.name === 'VersionError') {
           // Another, newer connection (e.g. a tab that reloaded after a later deploy) already
           // upgraded the schema past what this loaded bundle's DB_VERSION constant knows about -
           // connect at whatever version is already there instead of looping on the same error.
-          return openDb(undefined)
+          return openDb(undefined, this.dbName)
         }
         throw error
       })
