@@ -1,4 +1,4 @@
-import {Component, Inject, Injector, Input, OnInit, Output, EventEmitter, ViewChild, ChangeDetectionStrategy} from '@angular/core';
+import {Component, Inject, Injector, Input, OnInit, Output, EventEmitter, ViewChild, ChangeDetectionStrategy, ChangeDetectorRef} from '@angular/core';
 import {ViewSyncer} from '../../odm/ui/ViewSyncer'
 import {EditorComponent} from '@tinymce/tinymce-angular'
 import { UntypedFormControl, ReactiveFormsModule } from '@angular/forms'
@@ -488,6 +488,15 @@ export class RichTextEditComponent extends AbstractCellComponent implements OnIn
                 event.preventDefault();
                 event.stopPropagation();
                 this.enterKeydownIntercepted.emit(event)
+                // TinyMCE's own keydown handling runs outside Angular's zone (the
+                // @tinymce/tinymce-angular wrapper calls into NgZone.runOutsideAngular for
+                // performance), so everything this triggers synchronously - including
+                // time-tracking pausing/resuming on other tree nodes entirely, per GH issue #33 -
+                // updates its underlying data correctly but never gets picked up on screen until
+                // some unrelated zone-tracked event happens to trigger a change-detection tick.
+                // Same fix as BaseComponent's FeatureService subscription and AskPage's debounced
+                // search for the same class of bug.
+                this.injector.get(ChangeDetectorRef).markForCheck()
                 return false;
               }
             }
