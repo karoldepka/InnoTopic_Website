@@ -47,7 +47,7 @@
 
     <div *ngIf="item$" style="display: flex; align-items: stretch;">
       <app-play-button [item$]="item$"></app-play-button>
-      <app-mic [item$]="item$"></app-mic>
+      <app-mic [item$]="item$" (transcriptReady)="onTranscriptReady($event)"></app-mic>
     </div>
 
   <ion-fab *ngIf=showFab vertical="bottom" horizontal="end" slot="fixed">

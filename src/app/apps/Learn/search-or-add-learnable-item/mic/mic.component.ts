@@ -1,4 +1,4 @@
-import { Component, Input, OnInit, ChangeDetectionStrategy } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import {LearnItemItemsService} from '../../core/learn-item-items.service'
 import {OdmBackend} from '../../../../libs/AppFedShared/odm/OdmBackend'
 import {VoiceAttachableItem, VoiceAttachmentService} from '../../../../libs/AppFedShared/audio/voice-attachment.service'
@@ -32,9 +32,17 @@ export class MicComponent implements OnInit {
    * (OrYoL's OryItem$ tree nodes) - see VoiceAttachableItem's doc comment. */
   @Input() collection?: string
 
+  /** Emits the live-transcribed text (via the browser's Web Speech API) once recognition ends,
+   * shortly after the recording stops. Only fires when the browser supports SpeechRecognition
+   * (Chrome/Edge; not Firefox/Safari) and speech was actually recognized - callers should treat
+   * this as a best-effort addition, not something every recording is guaranteed to produce. */
+  @Output() transcriptReady = new EventEmitter<string>()
+
   isRecording = false
   private mediaRecorder: any = null
   private audioChunks: any[] = []
+  private speechRecognition: any = null
+  private transcriptSoFar = ''
 
   /* TODO: move to service, to ensure reference is not lost on component being re-created (e.g. on mobile) */
   stream: MediaStream | undefined
@@ -62,6 +70,11 @@ export class MicComponent implements OnInit {
     if ( this.isRecording ) {
       this.mediaRecorder.stop()
       this.isRecording = false
+      try {
+        this.speechRecognition?.stop()
+      } catch (e) {
+        console.log('speechRecognition.stop() failed', e)
+      }
     }
   }
 
@@ -108,6 +121,46 @@ export class MicComponent implements OnInit {
     }
     this.mediaRecorder.onstop = (e: any) => {
       this.onRecordStopped()
+    }
+    this.startSpeechRecognitionIfSupported()
+  }
+
+  /** Live transcription running in parallel with the MediaRecorder blob capture - not derived
+   * from the recorded blob afterwards, so it only covers speech recognized while actively
+   * recording. Silently does nothing on browsers without SpeechRecognition support (Firefox,
+   * older Safari) - transcription is a bonus on top of the recording, never a requirement for it. */
+  private startSpeechRecognitionIfSupported() {
+    const SpeechRecognitionCtor = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition
+    if ( ! SpeechRecognitionCtor ) {
+      return
+    }
+    this.transcriptSoFar = ''
+    this.speechRecognition = new SpeechRecognitionCtor()
+    this.speechRecognition.continuous = true
+    this.speechRecognition.interimResults = false
+    this.speechRecognition.lang = document.documentElement.lang || undefined
+    this.speechRecognition.onresult = (event: any) => {
+      for (let i = event.resultIndex; i < event.results.length; i++) {
+        if (event.results[i].isFinal) {
+          this.transcriptSoFar += event.results[i][0].transcript + ' '
+        }
+      }
+    }
+    this.speechRecognition.onerror = (event: any) => {
+      console.log('speechRecognition error (non-fatal, recording is unaffected)', event.error)
+    }
+    this.speechRecognition.onend = () => {
+      const transcript = this.transcriptSoFar.trim()
+      if ( transcript ) {
+        this.transcriptReady.emit(transcript)
+      }
+      this.speechRecognition = null
+    }
+    try {
+      this.speechRecognition.start()
+    } catch (e) {
+      console.log('speechRecognition.start() failed (non-fatal, recording is unaffected)', e)
+      this.speechRecognition = null
     }
   }
 
