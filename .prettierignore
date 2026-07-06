@@ -1,0 +1,33 @@
+# Dependencies
+node_modules/
+
+# Build and generated output
+dist/
+tmp/
+temp/
+out-tsc/
+www/
+coverage/
+.angular/
+.firebase/
+android/
+platforms/
+plugins/
+electron/app
+CloudTimeDroid/
+
+# Legacy/disabled project kept for reference only
+OrYoL_OFF/
+
+# Lockfiles
+package-lock.json
+pnpm-lock.yaml
+yarn.lock
+
+# Misc generated/vendored content not worth formatting
+resources/
+docs/
+*.min.js
+
+# Claude Code worktrees (isolated agent working copies, not part of the tracked source tree)
+.claude/
