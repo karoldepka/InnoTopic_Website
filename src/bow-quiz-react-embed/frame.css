@@ -34,7 +34,7 @@ button {
 
 .game-header {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto auto auto auto;
+  grid-template-columns: minmax(0, 1fr) auto auto auto auto auto;
   gap: 10px;
   align-items: center;
   min-height: 72px;
@@ -112,6 +112,16 @@ button {
   color: #53677e;
   font-size: 12px;
   white-space: nowrap;
+}
+
+.aim-hint-toggle-wrap {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: #53677e;
+  font-size: 12px;
+  white-space: nowrap;
+  cursor: pointer;
 }
 
 .language-select {

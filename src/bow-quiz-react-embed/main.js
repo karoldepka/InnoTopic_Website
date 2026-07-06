@@ -40,6 +40,7 @@ const TRANSLATIONS = {
     answerLabel: (index) => `Answer ${index}`,
     hint: 'Drag backward from the bowstring, aim toward an answer target, then release. More pull gives more arrow speed and a flatter shot.',
     languageLabel: 'Language',
+    aimHintLabel: 'Aim hint',
   },
   pl: {
     title: 'Łukowy quiz',
@@ -409,7 +410,7 @@ function Bow({ pullPoint, pullDistance }) {
   );
 }
 
-function AimPreview({ pullPoint }) {
+function AimPreview({ pullPoint, showAimHint }) {
   if (!pullPoint) {
     return null;
   }
@@ -445,7 +446,7 @@ function AimPreview({ pullPoint }) {
       x2: arrowHead.x,
       y2: arrowHead.y,
     }),
-    dots.map((dot, index) => React.createElement('circle', {
+    showAimHint && dots.map((dot, index) => React.createElement('circle', {
       key: index,
       className: 'trajectory-dot',
       cx: dot.x,
@@ -460,6 +461,9 @@ function BowQuizGame() {
   const engineRef = React.useRef(null);
   const targetBodiesRef = React.useRef(new Map());
   const [locale, setLocale] = React.useState(getInitialLocale);
+  const [showAimHint, setShowAimHint] = React.useState(
+    () => window.localStorage.getItem('bowQuizShowAimHint') !== 'false',
+  );
   const [arrows, setArrows] = React.useState([]);
   const [pullPoint, setPullPoint] = React.useState(null);
   const [hitAnswerId, setHitAnswerId] = React.useState('');
@@ -624,6 +628,12 @@ function BowQuizGame() {
     setLocale(normalizeLocale(event.target.value));
   }
 
+  function toggleAimHint(event) {
+    const next = event.target.checked;
+    setShowAimHint(next);
+    window.localStorage.setItem('bowQuizShowAimHint', String(next));
+  }
+
   return React.createElement(
     'main',
     { className: 'game-shell' },
@@ -656,6 +666,16 @@ function BowQuizGame() {
           }, item.label)),
         ),
       ),
+      React.createElement(
+        'label',
+        { className: 'aim-hint-toggle-wrap' },
+        React.createElement('input', {
+          type: 'checkbox',
+          checked: showAimHint,
+          onChange: toggleAimHint,
+        }),
+        React.createElement('span', null, copy.aimHintLabel || TRANSLATIONS.en.aimHintLabel),
+      ),
       React.createElement('button', { type: 'button', className: 'reset-button', onClick: resetGame }, copy.reset),
     ),
     React.createElement(
@@ -680,7 +700,7 @@ function BowQuizGame() {
           index,
           hitAnswerId,
         })),
-        React.createElement(AimPreview, { pullPoint }),
+        React.createElement(AimPreview, { pullPoint, showAimHint }),
         React.createElement(Bow, { pullPoint, pullDistance }),
         React.createElement('rect', {
           className: 'pull-meter-track',
