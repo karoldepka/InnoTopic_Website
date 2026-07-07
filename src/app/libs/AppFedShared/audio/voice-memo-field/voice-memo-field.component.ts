@@ -101,6 +101,7 @@ export class VoiceMemoFieldComponent implements OnInit {
   }
 
   ngOnInit() {
+    this.eagerlyCacheMemosLocally()
     if (!this.includeLegacy) {
       return
     }
@@ -113,6 +114,24 @@ export class VoiceMemoFieldComponent implements OnInit {
       this.legacyMemoRef = ref
       this.changeDetectorRef.markForCheck()
     })
+  }
+
+  /** Pulls every existing memo's audio onto this device as soon as the field renders, rather than
+   * waiting for the user to tap play - `resolveMemoBlob()` is already cache-first (a no-op if
+   * it's already local), so this just makes "recorded on another device" or "loaded fresh after
+   * sign-in" memos playable offline immediately instead of on first tap. Fire-and-forget: a failed
+   * prefetch (offline, blob deleted server-side, etc.) just means the field falls back to fetching
+   * on-demand at play time like before, same as any other cache-miss. */
+  private eagerlyCacheMemosLocally() {
+    const collection = this.resolvedCollection
+    const itemId = this.item$?.id
+    if (!collection || !itemId) {
+      return
+    }
+    for (const memo of readVoiceMemosForField(this.item$, this.fieldId)) {
+      this.voiceMemoService.resolveMemoBlob(collection, itemId, memo)
+        .catch(error => console.error('VoiceMemoFieldComponent eager cache failed for memo', memo.blobId, error))
+    }
   }
 
   onMicClick(event?: any) {
