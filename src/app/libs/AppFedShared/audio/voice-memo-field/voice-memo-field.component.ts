@@ -121,6 +121,7 @@ export class VoiceMemoFieldComponent implements OnInit {
       } catch (e) {
         console.log('speechRecognition.stop() failed', e)
       }
+      this.changeDetectorRef.markForCheck()
     }
   }
 
@@ -142,9 +143,15 @@ export class VoiceMemoFieldComponent implements OnInit {
   }
 
   private recordUsingStream(stream: MediaStream) {
+    try {
+      this.mediaRecorder = new MediaRecorder(stream)
+      this.mediaRecorder.start()
+    } catch (e) {
+      window.alert('Could not start recording: ' + e)
+      this.changeDetectorRef.markForCheck()
+      return
+    }
     this.isRecording = true
-    this.mediaRecorder = new MediaRecorder(stream)
-    this.mediaRecorder.start()
     this.audioChunks = []
     this.mediaRecorder.ondataavailable = (e: any) => {
       this.audioChunks.push(e.data)
@@ -153,6 +160,7 @@ export class VoiceMemoFieldComponent implements OnInit {
       this.onRecordStopped()
     }
     this.startSpeechRecognitionIfSupported()
+    this.changeDetectorRef.markForCheck()
   }
 
   /** Live transcription running in parallel with the MediaRecorder blob capture - not derived

@@ -16,9 +16,9 @@
      />
   </ion-button>
   <ion-button
+    *ngIf="stream"
     size="small"
     fill="clear"
-    [hidden]="! stream"
     (click)="stopRecordingIfNeededAndReleaseMic()"
     title="Release the microphone"
   >
