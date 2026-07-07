@@ -1,5 +1,5 @@
 import {Component, Input, Output, EventEmitter, OnInit, ChangeDetectionStrategy, ChangeDetectorRef} from '@angular/core'
-import {IonicModule} from '@ionic/angular'
+import {AlertController, IonicModule, ToastController} from '@ionic/angular'
 import {NgIf, NgFor} from '@angular/common'
 import {AudioVisualizerComponent} from '../audio-visualizer/audio-visualizer.component'
 import {readVoiceMemos, readVoiceMemosForField, VoiceAttachableItem, VoiceMemoRecord, VoiceMemoRef, VoiceMemoService} from '../voice-memo.service'
@@ -78,6 +78,8 @@ export class VoiceMemoFieldComponent implements OnInit {
     private voiceMemoService: VoiceMemoService,
     private featureService: FeatureService,
     private changeDetectorRef: ChangeDetectorRef,
+    private alertController: AlertController,
+    private toastController: ToastController,
   ) {}
 
   get recordingEnabled(): boolean {
@@ -357,11 +359,27 @@ export class VoiceMemoFieldComponent implements OnInit {
     this.changeDetectorRef.markForCheck()
   }
 
-  deleteMemo(memoRef: VoiceMemoRef, event?: Event) {
+  async deleteMemo(memoRef: VoiceMemoRef, event?: Event) {
     event?.stopPropagation()
     if (memoRef.legacy) {
       return // predates per-memo storage; nothing on the item itself to remove
     }
+    const alert = await this.alertController.create({
+      header: 'Delete this recording?',
+      message: 'This cannot be undone once the "Undo" toast disappears.',
+      buttons: [
+        {text: 'Cancel', role: 'cancel'},
+        {text: 'Delete', role: 'destructive', handler: () => this.removeMemoWithUndo(memoRef)},
+      ],
+    })
+    await alert.present()
+  }
+
+  /** Removes the memo from the item immediately (so it disappears from the list right away), but
+   * only physically deletes its blob/row once the "Undo" toast dismisses without being tapped -
+   * once that storage delete happens there's no getting the audio back, so the undo window has to
+   * cover the real deletion, not just the list entry. */
+  private removeMemoWithUndo(memoRef: VoiceMemoRef) {
     if (this.playingBlobId === memoRef.blobId) {
       this.stopPlaying()
     }
@@ -372,6 +390,29 @@ export class VoiceMemoFieldComponent implements OnInit {
       return
     }
     item.patchThrottled({voiceMemos: readVoiceMemos(item).filter(m => m.blobId !== memoRef.blobId)})
-    this.voiceMemoService.deleteMemo(collection, itemId, memoRef)
+    this.changeDetectorRef.markForCheck()
+
+    let restored = false
+    this.toastController.create({
+      message: 'Recording deleted.',
+      duration: 6000,
+      color: 'medium',
+      position: 'bottom',
+      buttons: [{
+        text: 'Undo',
+        role: 'cancel',
+        handler: () => {
+          restored = true
+          item.patchThrottled({voiceMemos: [...readVoiceMemos(item), memoRef]})
+          this.changeDetectorRef.markForCheck()
+        },
+      }],
+    }).then(async toast => {
+      await toast.present()
+      await toast.onDidDismiss()
+      if (!restored) {
+        this.voiceMemoService.deleteMemo(collection, itemId, memoRef)
+      }
+    })
   }
 }
