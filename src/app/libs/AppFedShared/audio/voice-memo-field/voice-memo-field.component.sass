@@ -1,11 +1,15 @@
 // Host must itself be a flex participant with room to grow - otherwise the timeline row (flex-grow:
 // 1 inside .voice-memo-timeline) has nothing to actually grow against inside whatever flex row this
-// is placed in (mirrors the old PlayButtonComponent's host, which this supersedes).
+// is placed in (mirrors the old PlayButtonComponent's host, which this supersedes). Vertical
+// padding keeps this from sitting flush against whatever divider/border the surrounding field
+// layout draws directly above/below it (e.g. Journal's field-list rows).
 :host
   display: flex
   align-items: center
+  flex-wrap: wrap
   flex-grow: 1
   gap: 4px
+  padding: 4px 0
 
 .voice-memo-list
   display: flex
@@ -14,6 +18,15 @@
   align-items: center
   flex-grow: 1
   gap: 4px
+
+  // Visually separates the memo list from the record controls preceding it on the same row,
+  // rather than the two groups running straight into each other with only the flex gap between -
+  // only applies when those controls actually precede this (readOnly/allFields list-row contexts
+  // never show them at all, so there'd be nothing for a leading separator to separate from).
+  &.with-record-controls
+    padding-left: 6px
+    margin-left: 2px
+    border-left: 1px solid var(--ion-color-light, rgba(128, 128, 128, 0.4))
 
 .voice-memo-row
   display: flex

@@ -31,6 +31,7 @@
 <div
   *ngIf="playbackEnabled && memos.length"
   class="voice-memo-list"
+  [class.with-record-controls]="recordingEnabled"
 >
   <div
     *ngFor="let memo of memos"
