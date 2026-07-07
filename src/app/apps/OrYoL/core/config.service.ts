@@ -13,6 +13,13 @@ export class Config {
    * either can be switched back to instantly from the toolbar popover if the new editor
    * regresses something (e.g. its slightly different caret-position/focus behavior). */
   useTinyMceTitleEditor = true
+
+  /** Shows a compact play button directly on any tree row that has voice memos (title and/or the
+   * popover's "note" field), without needing to open the node's menu popover - mirrors the
+   * equivalent list-row playback added to Journal's /journal list. Off by default: this is a new,
+   * unreviewed row-layout change on an already-dense tree table, unlike useTinyMceTitleEditor
+   * above which defaults on because it's the already-adopted primary path. */
+  showVoiceMemoIndicator = false
 }
 
 const ORYOL_CONFIG_KEY = 'OrYoL_Config'

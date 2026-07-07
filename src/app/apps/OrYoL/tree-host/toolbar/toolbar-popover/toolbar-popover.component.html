@@ -54,6 +54,13 @@
       Rich Text Editor for Titles (TinyMCE)
     </label>
 
+    <label class="checkbox" >
+      <input type="checkbox"
+             [formControl]="controls.showVoiceMemoIndicator"
+      >
+      Voice Memo Playback in Tree Rows
+    </label>
+
     Items: {{treeHost.treeModel.mapItemIdToNodes.keyCount}}
 
     <div *ngIf="debugService.isDebug$ | async" class="backfill-section">

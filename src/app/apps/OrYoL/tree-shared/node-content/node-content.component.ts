@@ -53,6 +53,7 @@ import { NumericCellComponent } from '../cells/node-cell/numeric-cell.component'
 import { NodeContentTimeTrackingComponent } from '../node-content-time-tracking/node-content-time-tracking.component';
 import { OryRichTextCellComponent } from '../cells/rich-text-cell/ory-rich-text-cell.component';
 import { ContenteditableCellComponent } from '../cells/contenteditable-cell/contenteditable-cell.component';
+import { VoiceMemoFieldComponent } from '../../../../libs/AppFedShared/audio/voice-memo-field/voice-memo-field.component';
 
 /* ==== Note there are those sources of truth kind-of (for justified reasons) :
 * - UI state
@@ -79,6 +80,7 @@ import { ContenteditableCellComponent } from '../cells/contenteditable-cell/cont
         ContenteditableCellComponent,
         NodeDebugCellComponent,
         AsyncPipe,
+        VoiceMemoFieldComponent,
     ],
 })
 export class NodeContentComponent implements OnInit, AfterViewInit, OnDestroy, INodeContentComponent {

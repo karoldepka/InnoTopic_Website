@@ -127,6 +127,15 @@
     [cell]="cells.forColumn(columnDefs.title) !"
   />
 
+  <app-voice-memo-field
+    *ngIf="(config$ | async)?.showVoiceMemoIndicator && treeNode.content.itemData?.voiceMemos?.length"
+    [item$]="treeNode.content.dbItem"
+    [collection]="'OryItem'"
+    [allFields]="true"
+    [readOnly]="true"
+    (click)="$event.stopPropagation()"
+  />
+
   <app-node-debug-cell
     *ngIf="debugService.isDebug$ | async"
     [treeNode]="treeNode"
