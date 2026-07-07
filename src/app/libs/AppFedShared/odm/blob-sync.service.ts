@@ -88,39 +88,6 @@ export class BlobSyncService {
     await this.browserOdmStorage.clearPendingBlobUpload(collection, itemId, blobId)
   }
 
-  /** Every blob of `kind` recorded against one specific field on an item, oldest first - merges
-   * already-synced rows (from `odm_item_blobs`, best-effort: swallowed if offline/unreachable)
-   * with still-queued local uploads (from the durable pending-upload journal, always available)
-   * so a memo recorded moments ago while offline still shows up in the list immediately. Synced
-   * rows win on id collision (a pending upload that just finished between the two reads). */
-  async listBlobs(collection: string, itemId: string, kind: BlobKind, fieldId: string): Promise<Array<{blobId: string, whenCreated: string}>> {
-    const pending = await this.browserOdmStorage.getPendingBlobUploadsFor(collection, itemId)
-    const pendingMatching = pending.filter(upload => upload.kind === kind && upload.field_id === fieldId)
-
-    let synced: Array<{blobId: string, whenCreated: string}> = []
-    try {
-      const client = this.supabaseOdmClientService.getClient()
-      const {data, error} = await client.from('odm_item_blobs')
-        .select('blob_id, created_at')
-        .eq('collection', collection)
-        .eq('item_id', itemId)
-        .eq('kind', kind)
-        .eq('field_id', fieldId)
-        .order('created_at', {ascending: true})
-      if (error) {
-        throw error
-      }
-      synced = (data ?? []).map(row => ({blobId: row.blob_id as string, whenCreated: row.created_at as string}))
-    } catch (error) {
-      console.error('BlobSyncService listBlobs remote query failed (offline? falling back to pending-only)', error)
-    }
-
-    const syncedIds = new Set(synced.map(row => row.blobId))
-    const pendingOnly = pendingMatching
-      .filter(upload => !syncedIds.has(upload.blob_id))
-      .map(upload => ({blobId: upload.blob_id, whenCreated: upload.whenCreatedLocally}))
-    return [...synced, ...pendingOnly].sort((a, b) => a.whenCreated.localeCompare(b.whenCreated))
-  }
 
   /** Deletes a blob's Storage object and tracking row (both already RLS-scoped to the owner), and
    * cancels/clears any still-queued local upload for it - used when a user removes a bad voice

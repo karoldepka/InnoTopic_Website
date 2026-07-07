@@ -6,21 +6,59 @@ import {BlobSyncService} from '../odm/blob-sync.service'
 /** Duck-typed rather than `OdmItem$2` itself, so `VoiceMemoFieldComponent` also works against
  * OrYoL's still-legacy `OryItem$` (tree nodes haven't migrated onto OdmItem$2 yet, but already
  * have the same `id`/`patchThrottled` shape). Callers whose item has no `odmService.className` to
- * infer a collection name from (i.e. OryItem$) must pass one via the `collection` input instead. */
+ * infer a collection name from (i.e. OryItem$) must pass one via the `collection` input instead.
+ *
+ * `currentVal`/`itemData` are the same "read the item's current in-memory data" concept under two
+ * different names - `OdmItem$2`-based items (`JournalEntry$`/`LearnItem$`) expose `.currentVal`,
+ * while OrYoL's `OryItem$` exposes `.itemData` instead. Both are optional and read via
+ * `readVoiceMemos()` below (`item.currentVal ?? item.itemData`) so callers never need to branch on
+ * which kind of item they have. */
 export interface VoiceAttachableItem {
   id?: string | null
   patchThrottled(patch: any): void
   odmService?: {className: string}
+  currentVal?: any
+  itemData?: any
 }
 
 export interface VoiceMemoRef {
   blobId: string
   whenCreated: string
+  /** Wall-clock recording duration, measured from mic-start to mic-stop - absent for `legacy`
+   * entries (that old single-recording mechanism never tracked duration at all). */
+  durationMs?: number
   /** True only for the single synthesized entry read from the legacy pre-unification Firestore
    * `LearnDoAudio` doc (see `getLegacyRecordingBytes`) - lets a surface that already had exactly
    * one recording under the old single-recording-per-item mechanism keep it playable, without a
    * data migration script. Never true for anything recorded through this service. */
   legacy?: boolean
+}
+
+/** A recorded memo as actually stored on the item's own `voiceMemos` array - every field's memos
+ * live in one flat array on the item (not one array per field), so `fieldId` is what
+ * `readVoiceMemosForField()` filters on. This is the generalized replacement for the old
+ * `BlobSyncService.listBlobs()` Supabase query: the list now lives wherever the item itself
+ * already is (offline-safe for free, via the same pending-edit journal every other field patch
+ * already uses), rather than requiring a separate round-trip to list a field's memos. */
+export interface VoiceMemoRecord extends VoiceMemoRef {
+  fieldId: string
+}
+
+/** Reads every voice memo recorded on this item, across all of its fields - `undefined`/`null`
+ * itself (not yet loaded, or a brand new unsaved item) reads as no memos rather than throwing. */
+export function readVoiceMemos(item: VoiceAttachableItem | undefined | null): VoiceMemoRecord[] {
+  const data = item?.currentVal ?? item?.itemData
+  return data?.voiceMemos ?? []
+}
+
+export function readVoiceMemosForField(item: VoiceAttachableItem | undefined | null, fieldId: string): VoiceMemoRecord[] {
+  return readVoiceMemos(item).filter(memo => memo.fieldId === fieldId)
+}
+
+/** Total recorded duration across every memo on this item (every field) - `durationMs`-less
+ * entries (only ever the synthesized `legacy` one) don't contribute. */
+export function sumVoiceMemoDurationMs(voiceMemos: VoiceMemoRef[] | undefined | null): number {
+  return (voiceMemos ?? []).reduce((sum, memo) => sum + (memo.durationMs ?? 0), 0)
 }
 
 /** `collection`/`itemId` here are the same ODM collection name/item id used everywhere else
@@ -50,17 +88,14 @@ export class VoiceMemoService {
     return this.blobSyncService.upload(collection, itemId, blob, 'audio', 'audio/ogg; codecs=opus', undefined, fieldId)
   }
 
-  /** `includeLegacy` should only be set by the one field on each surface that the old
+  /** Only ever called once per field, at init, for the one field on each surface that the old
    * single-recording-per-item mic used to write to (Journal's 'general' field, OrYoL's per-node
    * popover note) - passing it for any other field would misattribute a pre-existing recording to
-   * a field it was never actually about. */
-  async listMemos(collection: string, itemId: string, fieldId: string, includeLegacy = false): Promise<VoiceMemoRef[]> {
-    const memos = await this.blobSyncService.listBlobs(collection, itemId, 'audio', fieldId)
-    if (!includeLegacy) {
-      return memos
-    }
+   * a field it was never actually about. Returns a synthesized ref (playable via
+   * `resolveMemoBlob`) or `undefined` if there's nothing to fall back to. */
+  async getLegacyMemoRef(collection: string, itemId: string): Promise<VoiceMemoRef | undefined> {
     const hasLegacy = await this.getLegacyRecordingBytes(collection, itemId)
-    return hasLegacy ? [{blobId: 'legacy', whenCreated: new Date(0).toISOString(), legacy: true}, ...memos] : memos
+    return hasLegacy ? {blobId: 'legacy', whenCreated: new Date(0).toISOString(), legacy: true} : undefined
   }
 
   async resolveMemoBlob(collection: string, itemId: string, memoRef: VoiceMemoRef): Promise<Blob | undefined> {

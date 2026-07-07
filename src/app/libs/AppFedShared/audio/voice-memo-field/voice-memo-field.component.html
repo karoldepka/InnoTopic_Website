@@ -46,6 +46,13 @@
        />
     </ion-button>
 
+    <span
+      *ngIf="playingBlobId !== memo.blobId"
+      class="voice-memo-meta"
+    >
+      <ng-container *ngIf="memo.durationMs">{{ formatTime(memo.durationMs / 1000) }} &middot; </ng-container>{{ formatRelativeTime(memo.whenCreated) }}
+    </span>
+
     <div
       *ngIf="playingBlobId === memo.blobId"
       class="voice-memo-timeline"

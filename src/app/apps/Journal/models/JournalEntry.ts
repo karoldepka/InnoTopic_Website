@@ -5,6 +5,7 @@ import {NumericPickerVal} from '../../../libs/AppFedSharedIonic/ratings/numeric-
 import {JournalTextDescriptor, JournalTextDescriptors} from './JournalTextDescriptors'
 import {nullish} from '../../../libs/AppFedShared/utils/type-utils'
 import {isNotNullish} from '../../../libs/AppFedShared/utils/utils'
+import {VoiceMemoRecord} from '../../../libs/AppFedShared/audio/voice-memo.service'
 
 export type JournalEntryId = OdmItemId<JournalEntry>
 
@@ -23,6 +24,10 @@ export class JournalEntry extends OdmInMemItem /*OdmItem<JournalEntry>*/ {
   general ?: JournalFieldVal
 
   importance ?: JournalCompositeFieldVal
+
+  /** Every voice memo recorded against any field on this entry - see VoiceMemoRecord's doc
+   * comment (one flat array, filtered per-field by `fieldId` at read time). */
+  voiceMemos ?: VoiceMemoRecord[]
 
   constructor(
     // odmService: OdmService<JournalEntry>,

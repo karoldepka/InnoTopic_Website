@@ -474,14 +474,6 @@ export class BrowserOdmStorage {
     })
   }
 
-  /** Pending uploads for one specific item - lets `BlobSyncService.listBlobs()` show
-   * not-yet-synced voice memos (recorded while offline) alongside already-synced ones, without a
-   * dedicated index (this store is small - a handful of in-flight uploads at most). */
-  async getPendingBlobUploadsFor(collection: string, itemId: string): Promise<PendingBlobUpload[]> {
-    const all = await this.getAllPendingBlobUploadsEverywhere()
-    return all.filter(upload => upload.collection === collection && upload.item_id === itemId)
-  }
-
   // ---- Local blob cache (populated on upload for instant local render, or on download to avoid
   // re-fetching the same blob from Storage repeatedly) ----
 

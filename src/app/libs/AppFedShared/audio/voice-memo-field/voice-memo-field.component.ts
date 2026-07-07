@@ -2,7 +2,7 @@ import {Component, Input, Output, EventEmitter, OnInit, ChangeDetectionStrategy,
 import {IonicModule} from '@ionic/angular'
 import {NgIf, NgFor} from '@angular/common'
 import {AudioVisualizerComponent} from '../audio-visualizer/audio-visualizer.component'
-import {VoiceAttachableItem, VoiceMemoRef, VoiceMemoService} from '../voice-memo.service'
+import {readVoiceMemos, readVoiceMemosForField, VoiceAttachableItem, VoiceMemoRecord, VoiceMemoRef, VoiceMemoService} from '../voice-memo.service'
 import {FeatureService} from '../../feature.service'
 
 declare const MediaRecorder: any
@@ -10,7 +10,10 @@ declare const MediaRecorder: any
 /** Unified recording + playback control for one field's voice memos - supersedes the old
  * `MicComponent`/`PlayButtonComponent` pair (one recording per whole item) with a per-field list,
  * backed by `VoiceMemoService`. Drop this next to any persisted text field (TinyMCE or a plain
- * textarea/input) that should support voice memos and live transcription. */
+ * textarea/input) that should support voice memos and live transcription. The memo list itself is
+ * read straight off `item$` (its `voiceMemos` array, see `VoiceMemoRecord`) rather than a separate
+ * query - already reactive and offline-safe for free, since it rides the same patch/sync mechanism
+ * every other field on the item already uses. */
 @Component({
     selector: 'app-voice-memo-field',
     templateUrl: './voice-memo-field.component.html',
@@ -35,7 +38,7 @@ export class VoiceMemoFieldComponent implements OnInit {
 
   /** Only for the one field on each surface the old single-recording-per-item mic used to write
    * to (Journal's 'general' field, OrYoL's per-node popover note) - see
-   * `VoiceMemoService.listMemos`'s doc comment for why this must not be set anywhere else. */
+   * `VoiceMemoService.getLegacyMemoRef`'s doc comment for why this must not be set anywhere else. */
   @Input() includeLegacy = false
 
   /** Quick-add's "no current item yet" case (generalizes MicComponent's original hardcoded
@@ -52,7 +55,6 @@ export class VoiceMemoFieldComponent implements OnInit {
   @Output() transcriptReady = new EventEmitter<string>()
 
   isRecording = false
-  memos: VoiceMemoRef[] = []
   playingBlobId?: string
   currentTimeSec = 0
   durationSec = 0
@@ -63,6 +65,11 @@ export class VoiceMemoFieldComponent implements OnInit {
   private transcriptSoFar = ''
   private audioEl?: HTMLAudioElement
   private objectUrl?: string
+  private recordingStartedAtMs?: number
+
+  /** Resolved once at init (see ngOnInit) when `includeLegacy` is set - `undefined` until that
+   * check resolves, and stays `undefined` forever if there's nothing to fall back to. */
+  private legacyMemoRef?: VoiceMemoRef
 
   /* TODO: move to service, to ensure reference is not lost on component being re-created (e.g. on mobile) */
   stream: MediaStream | undefined
@@ -81,22 +88,29 @@ export class VoiceMemoFieldComponent implements OnInit {
     return this.featureService.voiceMemoPlaybackEnabled
   }
 
+  /** Read live off `item$` on every check (cheap - a small array filter) rather than cached
+   * component state, so a memo just attached (or deleted) by this same component instance shows
+   * up immediately without a manual "optimistic update" step. */
+  get memos(): VoiceMemoRef[] {
+    const real = readVoiceMemosForField(this.item$, this.fieldId)
+    return (this.legacyMemoRef && real.length === 0) ? [this.legacyMemoRef, ...real] : real
+  }
+
   private get resolvedCollection(): string | undefined {
     return this.voiceMemoService.resolveCollection(this.item$, this.collection)
   }
 
   ngOnInit() {
-    this.refreshMemos()
-  }
-
-  private refreshMemos() {
+    if (!this.includeLegacy) {
+      return
+    }
     const collection = this.resolvedCollection
     const itemId = this.item$?.id
     if (!collection || !itemId) {
-      return // brand new, not-yet-saved item - nothing recorded against it yet, nothing to list
+      return
     }
-    this.voiceMemoService.listMemos(collection, itemId, this.fieldId, this.includeLegacy).then(memos => {
-      this.memos = memos
+    this.voiceMemoService.getLegacyMemoRef(collection, itemId).then(ref => {
+      this.legacyMemoRef = ref
       this.changeDetectorRef.markForCheck()
     })
   }
@@ -129,7 +143,7 @@ export class VoiceMemoFieldComponent implements OnInit {
     if (this.stream) {
       this.recordUsingStream(this.stream)
     } else if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-      navigator.mediaDevices.getUserMedia({audio: true})
+      navigator.mediaDevices.getUserMedia({audio: {echoCancellation: true, noiseSuppression: true, autoGainControl: true}})
         .then(stream => {
           this.stream = stream
           this.recordUsingStream(stream)
@@ -152,6 +166,7 @@ export class VoiceMemoFieldComponent implements OnInit {
       return
     }
     this.isRecording = true
+    this.recordingStartedAtMs = Date.now()
     this.audioChunks = []
     this.mediaRecorder.ondataavailable = (e: any) => {
       this.audioChunks.push(e.data)
@@ -205,18 +220,22 @@ export class VoiceMemoFieldComponent implements OnInit {
   private onRecordStopped() {
     const blob = new Blob(this.audioChunks, {type: 'audio/ogg; codecs=opus'})
     this.audioChunks = []
+    const durationMs = this.recordingStartedAtMs ? (Date.now() - this.recordingStartedAtMs) : 0
+    this.recordingStartedAtMs = undefined
 
     if (!this.item$ && this.createItemIfMissing) {
       this.item$ = this.createItemIfMissing()
     }
-    const collection = this.resolvedCollection
-    const itemId = this.item$?.id
-    if (!collection || !itemId) {
+    const item = this.item$
+    const collection = this.voiceMemoService.resolveCollection(item, this.collection)
+    const itemId = item?.id
+    if (!item || !collection || !itemId) {
       return
     }
-    this.item$?.patchThrottled({hasAudio: true})
+    item.patchThrottled({hasAudio: true})
     this.voiceMemoService.attachMemo(collection, itemId, this.fieldId, blob).then(blobId => {
-      this.memos = [...this.memos, {blobId, whenCreated: new Date().toISOString()}]
+      const newRecord: VoiceMemoRecord = {fieldId: this.fieldId, blobId, durationMs, whenCreated: new Date().toISOString()}
+      item.patchThrottled({voiceMemos: [...readVoiceMemos(item), newRecord]})
       this.changeDetectorRef.markForCheck()
     })
   }
@@ -287,6 +306,25 @@ export class VoiceMemoFieldComponent implements OnInit {
     return `${minutes}:${seconds.toString().padStart(2, '0')}`
   }
 
+  /** "1 min ago"-style label for a memo's `whenCreated` - deliberately coarse (rounds to the
+   * nearest unit, no seconds granularity) since precision doesn't matter here. */
+  formatRelativeTime(whenCreated: string): string {
+    const elapsedMs = Date.now() - new Date(whenCreated).getTime()
+    const minutes = Math.round(elapsedMs / 60_000)
+    if (minutes < 1) {
+      return 'just now'
+    }
+    if (minutes < 60) {
+      return `${minutes} min ago`
+    }
+    const hours = Math.round(minutes / 60)
+    if (hours < 24) {
+      return `${hours} hour${hours === 1 ? '' : 's'} ago`
+    }
+    const days = Math.round(hours / 24)
+    return `${days} day${days === 1 ? '' : 's'} ago`
+  }
+
   stopPlaying() {
     this.playingBlobId = undefined
     this.audioEl?.pause()
@@ -302,15 +340,19 @@ export class VoiceMemoFieldComponent implements OnInit {
 
   deleteMemo(memoRef: VoiceMemoRef, event?: Event) {
     event?.stopPropagation()
+    if (memoRef.legacy) {
+      return // predates per-memo storage; nothing on the item itself to remove
+    }
     if (this.playingBlobId === memoRef.blobId) {
       this.stopPlaying()
     }
+    const item = this.item$
     const collection = this.resolvedCollection
-    const itemId = this.item$?.id
-    if (!collection || !itemId) {
+    const itemId = item?.id
+    if (!item || !collection || !itemId) {
       return
     }
-    this.memos = this.memos.filter(m => m.blobId !== memoRef.blobId)
+    item.patchThrottled({voiceMemos: readVoiceMemos(item).filter(m => m.blobId !== memoRef.blobId)})
     this.voiceMemoService.deleteMemo(collection, itemId, memoRef)
   }
 }

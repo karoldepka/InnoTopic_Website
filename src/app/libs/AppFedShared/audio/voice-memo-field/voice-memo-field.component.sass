@@ -9,13 +9,27 @@
 
 .voice-memo-list
   display: flex
-  flex-direction: column
+  flex-direction: row
+  flex-wrap: wrap
+  align-items: center
   flex-grow: 1
+  gap: 4px
 
 .voice-memo-row
   display: flex
   align-items: center
-  gap: 4px
+  gap: 2px
+  padding: 0 4px 0 0
+  border-right: 1px solid var(--ion-color-medium, #808080)
+
+  &:last-child
+    border-right: none
+    padding-right: 0
+
+.voice-memo-meta
+  font-size: 0.7rem
+  white-space: nowrap
+  color: var(--ion-color-medium, #808080)
 
 .voice-memo-timeline
   display: flex

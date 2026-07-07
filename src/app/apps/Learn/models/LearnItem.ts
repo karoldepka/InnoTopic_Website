@@ -16,6 +16,7 @@ import {Deferrability, Urgency} from './planning-prioritizing.model'
 import {daysAsMs, hoursAsMs, isInFuture, isInThePastOrNullish} from '../../../libs/AppFedShared/utils/time/date-time-utils'
 import {StatusDef, StatusId, statuses} from './statuses.model'
 import {Dict} from '../../../libs/AppFedShared/utils/dictionary-utils'
+import {VoiceMemoRecord} from '../../../libs/AppFedShared/audio/voice-memo.service'
 
 export type LearnItemId = OdmItemId<LearnItem>
 
@@ -74,6 +75,9 @@ export class LearnItem extends OdmInMemItem implements QuizzableData {
   templateNodeClass?: string
 
   hasAudio?: true | null
+  /** Every voice memo recorded against any field (side) on this item - see VoiceMemoRecord's doc
+   * comment (one flat array, filtered per-field by `fieldId` at read time). */
+  voiceMemos?: VoiceMemoRecord[]
   whenDeleted?: Date
   lastSelfRating?: Rating
   whenLastSelfRated?: OdmTimestamp
