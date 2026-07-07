@@ -9,3 +9,9 @@
   [itemId]="treeNode.itemId"
   (enterKeydownIntercepted)="onEnterKeydownIntercepted($event)"
 ></app-rich-text-edit>
+<app-voice-memo-field
+  [item$]="treeNode.content.dbItem"
+  [collection]="'OryItem'"
+  [fieldId]="'title'"
+  (transcriptReady)="onTranscriptReady($event)"
+></app-voice-memo-field>

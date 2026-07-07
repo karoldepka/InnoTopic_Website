@@ -8,7 +8,6 @@ import { IonicModule } from '@ionic/angular';
 import { SearchOrAddLearnableItemPageComponent } from './search-or-add-learnable-item.page';
 import {OdmModule} from '../../../libs/AppFedShared/odm/odm.module'
 import {ActionableItemComponent} from './actionable-item/actionable-item.component'
-import {MicComponent} from './mic/mic.component'
 import {LearnSharedModule} from '../shared/learn-shared.module'
 import {TestItemComponent} from './test-item/test-item.component'
 import {LearnStatsComponent} from './learn-stats/learn-stats.component'
@@ -46,7 +45,6 @@ const routes: Routes = [
         SharedModule,
         SearchOrAddLearnableItemPageComponent,
         ActionableItemComponent,
-        MicComponent,
         TestItemComponent,
         LearnStatsComponent,
         SearchOrAddTextEditorComponent,

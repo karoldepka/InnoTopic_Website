@@ -2,6 +2,7 @@ import {Component, ViewChild, ChangeDetectionStrategy} from '@angular/core'
 import {UntypedFormControl, ReactiveFormsModule} from '@angular/forms'
 import {CellComponent} from '../CellComponent'
 import {RichTextEditComponent} from '../../../../../libs/AppFedShared/rich-text/rich-text-edit/rich-text-edit.component'
+import {VoiceMemoFieldComponent} from '../../../../../libs/AppFedShared/audio/voice-memo-field/voice-memo-field.component'
 import {NodeFocusOptions} from '../../../tree-model/TreeModel'
 import {nullish} from '../../../../../libs/AppFedShared/utils/type-utils'
 
@@ -14,7 +15,7 @@ import {nullish} from '../../../../../libs/AppFedShared/utils/type-utils'
     templateUrl: './ory-rich-text-cell.component.html',
     changeDetection: ChangeDetectionStrategy.Eager,
     styleUrls: ['./ory-rich-text-cell.component.sass'],
-    imports: [RichTextEditComponent, ReactiveFormsModule],
+    imports: [RichTextEditComponent, ReactiveFormsModule, VoiceMemoFieldComponent],
 })
 export class OryRichTextCellComponent extends CellComponent {
 
@@ -22,6 +23,10 @@ export class OryRichTextCellComponent extends CellComponent {
   richTextEditComponent!: RichTextEditComponent
 
   formControl = new UntypedFormControl('')
+
+  onTranscriptReady(transcript: string) {
+    this.richTextEditComponent.insertTranscript(transcript)
+  }
 
   override ngOnInit() {
     super.ngOnInit()

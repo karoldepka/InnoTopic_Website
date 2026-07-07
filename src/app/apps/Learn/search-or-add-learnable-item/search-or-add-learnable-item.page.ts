@@ -35,7 +35,9 @@ import { NgIf, AsyncPipe } from '@angular/common';
 import { SearchOrAddTextEditorComponent } from './search-or-add-text-editor/search-or-add-text-editor.component';
 import { SelectionInfoComponent } from './selection-info/selection-info.component';
 import { LearnStatsComponent } from './learn-stats/learn-stats.component';
-import { MicComponent } from './mic/mic.component';
+import { VoiceMemoFieldComponent } from '../../../libs/AppFedShared/audio/voice-memo-field/voice-memo-field.component';
+import { VoiceAttachableItem } from '../../../libs/AppFedShared/audio/voice-memo.service';
+import { OdmBackend } from '../../../libs/AppFedShared/odm/OdmBackend';
 import { ItemListComponent } from './item-list/item-list.component';
 import { addIcons } from 'ionicons';
 import { logoGoogle, logoFacebook, mailOutline } from 'ionicons/icons';
@@ -56,7 +58,7 @@ import { logoGoogle, logoFacebook, mailOutline } from 'ionicons/icons';
         SearchOrAddTextEditorComponent,
         SelectionInfoComponent,
         LearnStatsComponent,
-        MicComponent,
+        VoiceMemoFieldComponent,
         ItemListComponent,
         AsyncPipe,
     ],
@@ -586,6 +588,26 @@ export class SearchOrAddLearnableItemPageComponent extends BaseComponent impleme
 
   isTextEmpty() {
     return isNullishOrEmptyOrBlank(this.getUserString())
+  }
+
+  /** Quick-add's mic (see `app-voice-memo-field`'s `createItemIfMissing` input) has no "current
+   * item" to record onto - unlike every other surface, generalizes MicComponent's original
+   * hardcoded behavior of creating a brand new, otherwise-blank LearnItem right when the
+   * recording stops. */
+  createQuickAddItem = (): VoiceAttachableItem => {
+    const learnItemData = new LearnItem()
+    learnItemData.whenAdded = OdmBackend.nowTimestamp()
+    const learnItem$ = this.learnDoService.newItem(undefined, learnItemData)
+    learnItem$.saveNowToDb()
+    return learnItem$
+  }
+
+  /** Appends the transcribed voice memo to the quick-add draft text, rather than overwriting it -
+   * this is a plain TinyMCE quick-add field (not tied to any single saved item's field), so the
+   * transcript lands in the same draft the mic's newly-created item's recording is attached to. */
+  onQuickAddTranscriptReady(transcript: string) {
+    const existing = this.searchFormControl.value ?? ''
+    this.searchFormControl.setValue(existing ? `${existing} ${transcript}` : transcript)
   }
 
 }

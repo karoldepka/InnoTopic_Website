@@ -56,14 +56,12 @@
     Move Here From Clipboard
   </ion-button>
   <div style="display: flex; align-items: stretch; margin-top: .5em">
-    <app-play-button
+    <app-voice-memo-field
       [item$]="treeNode.content.dbItem"
       [collection]="'OryItem'"
-    ></app-play-button>
-    <app-mic
-      [item$]="treeNode.content.dbItem"
-      [collection]="'OryItem'"
-    ></app-mic>
+      [fieldId]="'note'"
+      [includeLegacy]="true"
+    ></app-voice-memo-field>
   </div>
 
   <p style="margin-top: .5em">

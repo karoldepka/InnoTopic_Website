@@ -110,11 +110,12 @@
    />
 
   &nbsp;
-  <app-play-button
+  <ion-icon
     *ngIf="item.val?.hasAudio"
-    [item]="item"
-    [itemId]="item.id"
-  ></app-play-button>
+    name="mic-outline"
+    style="margin-right: 4px"
+    title="Has voice memos"
+  ></ion-icon>
 
   <span style="color: var(--ion-color-primary)">
     {{ item.val?.lastSelfRating }}

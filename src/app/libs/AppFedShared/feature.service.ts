@@ -61,6 +61,22 @@ export class FeatureService {
     this.patchProps({niceLooking: enabled})
   }
 
+  get voiceMemoRecordingEnabled(): boolean {
+    return this.config$.lastVal?.props?.voiceMemoRecordingEnabled ?? true
+  }
+
+  setVoiceMemoRecordingEnabled(enabled: boolean) {
+    this.patchProps({voiceMemoRecordingEnabled: enabled})
+  }
+
+  get voiceMemoPlaybackEnabled(): boolean {
+    return this.config$.lastVal?.props?.voiceMemoPlaybackEnabled ?? true
+  }
+
+  setVoiceMemoPlaybackEnabled(enabled: boolean) {
+    this.patchProps({voiceMemoPlaybackEnabled: enabled})
+  }
+
   static readonly firestoreEnabledKey = 'firestoreEnabled'
 
   get firestoreEnabled(): boolean {

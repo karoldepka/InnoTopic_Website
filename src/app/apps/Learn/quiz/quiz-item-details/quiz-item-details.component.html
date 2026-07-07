@@ -5,13 +5,6 @@
    />
 
 
-  <app-play-button
-    [item]="(itemVal$ | async) !"
-    [item$]="item$ !"
-   />
-  <app-mic
-    [item$]="item$ !"
-   />
   <app-breadcrumbs
     *ngIf="! (itemVal$ | async)?.hideAncestorsInQuiz"
     [item$]="item$"

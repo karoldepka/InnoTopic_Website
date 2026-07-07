@@ -33,8 +33,10 @@ export class BlobSyncService {
    * pending-blob-uploads journal), never blocking the caller on the network round-trip.
    * `originalBlobId` links a thumbnail back to its full-size original (both already storable per
    * `odm_item_blobs.original_blob_id`) - omit it when uploading the original itself, or a blob
-   * with no such relationship (e.g. audio). */
-  async upload(collection: string, itemId: string, blob: Blob, kind: BlobKind, contentType: string, originalBlobId?: string): Promise<string> {
+   * with no such relationship (e.g. audio). `fieldId` tags which field on the item this blob
+   * belongs to (see `BrowserOdmStorage.PendingBlobUpload.field_id`'s doc comment) - only voice
+   * memos pass this today. */
+  async upload(collection: string, itemId: string, blob: Blob, kind: BlobKind, contentType: string, originalBlobId?: string, fieldId?: string): Promise<string> {
     const blobId = uuid4()
     await this.browserOdmStorage.cacheBlob(blobId, blob)
     await this.browserOdmStorage.savePendingBlobUpload({
@@ -45,14 +47,15 @@ export class BlobSyncService {
       content_type: contentType,
       kind,
       original_blob_id: originalBlobId,
+      field_id: fieldId,
       whenCreatedLocally: new Date().toISOString(),
     })
-    this.uploadLimiter.run(() => this.uploadNow(collection, itemId, blobId, blob, kind, contentType, originalBlobId))
+    this.uploadLimiter.run(() => this.uploadNow(collection, itemId, blobId, blob, kind, contentType, originalBlobId, fieldId))
       .catch(error => console.error('BlobSyncService upload failed (durably queued, will retry on reconnect)', error))
     return blobId
   }
 
-  private async uploadNow(collection: string, itemId: string, blobId: string, blob: Blob, kind: BlobKind, contentType: string, originalBlobId?: string): Promise<void> {
+  private async uploadNow(collection: string, itemId: string, blobId: string, blob: Blob, kind: BlobKind, contentType: string, originalBlobId?: string, fieldId?: string): Promise<void> {
     const owner = this.authService.userId
     if (!owner) {
       // No signed-in user yet (or anonymous/guest) - leave it queued; the authUser$ subscription
@@ -76,12 +79,62 @@ export class BlobSyncService {
       content_type: contentType,
       kind,
       original_blob_id: originalBlobId ?? null,
+      field_id: fieldId ?? null,
       byte_size: blob.size,
     })
     if (insertError) {
       throw insertError
     }
     await this.browserOdmStorage.clearPendingBlobUpload(collection, itemId, blobId)
+  }
+
+  /** Every blob of `kind` recorded against one specific field on an item, oldest first - merges
+   * already-synced rows (from `odm_item_blobs`, best-effort: swallowed if offline/unreachable)
+   * with still-queued local uploads (from the durable pending-upload journal, always available)
+   * so a memo recorded moments ago while offline still shows up in the list immediately. Synced
+   * rows win on id collision (a pending upload that just finished between the two reads). */
+  async listBlobs(collection: string, itemId: string, kind: BlobKind, fieldId: string): Promise<Array<{blobId: string, whenCreated: string}>> {
+    const pending = await this.browserOdmStorage.getPendingBlobUploadsFor(collection, itemId)
+    const pendingMatching = pending.filter(upload => upload.kind === kind && upload.field_id === fieldId)
+
+    let synced: Array<{blobId: string, whenCreated: string}> = []
+    try {
+      const client = this.supabaseOdmClientService.getClient()
+      const {data, error} = await client.from('odm_item_blobs')
+        .select('blob_id, created_at')
+        .eq('collection', collection)
+        .eq('item_id', itemId)
+        .eq('kind', kind)
+        .eq('field_id', fieldId)
+        .order('created_at', {ascending: true})
+      if (error) {
+        throw error
+      }
+      synced = (data ?? []).map(row => ({blobId: row.blob_id as string, whenCreated: row.created_at as string}))
+    } catch (error) {
+      console.error('BlobSyncService listBlobs remote query failed (offline? falling back to pending-only)', error)
+    }
+
+    const syncedIds = new Set(synced.map(row => row.blobId))
+    const pendingOnly = pendingMatching
+      .filter(upload => !syncedIds.has(upload.blob_id))
+      .map(upload => ({blobId: upload.blob_id, whenCreated: upload.whenCreatedLocally}))
+    return [...synced, ...pendingOnly].sort((a, b) => a.whenCreated.localeCompare(b.whenCreated))
+  }
+
+  /** Deletes a blob's Storage object and tracking row (both already RLS-scoped to the owner), and
+   * cancels/clears any still-queued local upload for it - used when a user removes a bad voice
+   * memo take. Best-effort on the Storage removal (swallowed): a dangling orphaned object with no
+   * tracking row left is harmless clutter, whereas surfacing that failure to the user for what's
+   * meant to be a quick "remove this recording" action is not worth it. */
+  async deleteBlob(collection: string, itemId: string, blobId: string): Promise<void> {
+    await this.browserOdmStorage.clearPendingBlobUpload(collection, itemId, blobId)
+    const client = this.supabaseOdmClientService.getClient()
+    const {data: row} = await client.from('odm_item_blobs').select('storage_path').eq('blob_id', blobId).maybeSingle()
+    if (row?.storage_path) {
+      await client.storage.from('media').remove([row.storage_path]).catch(error => console.error('BlobSyncService deleteBlob storage removal failed (row still deleted below)', error))
+    }
+    await client.from('odm_item_blobs').delete().eq('blob_id', blobId)
   }
 
   /** Local cache first, falling back to a signed URL + fetch (mirroring back into the cache) -

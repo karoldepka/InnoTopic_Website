@@ -13,7 +13,6 @@ import { AlertController, IonicModule, ToastController } from '@ionic/angular';
 import { RouterLink } from '@angular/router';
 import { NgIf } from '@angular/common';
 import { SelectionCheckboxComponent } from './selection-checkbox/selection-checkbox.component';
-import { PlayButtonComponent } from '../../shared/play-button/play-button.component';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { Subscription } from 'rxjs';
 import {stripHtml} from '../../../../libs/AppFedShared/utils/html-utils'
@@ -38,7 +37,6 @@ import {stripHtml} from '../../../../libs/AppFedShared/utils/html-utils'
         RouterLink,
         NgIf,
         SelectionCheckboxComponent,
-        PlayButtonComponent,
     ],
 })
 export class ActionableItemComponent extends BaseComponent implements OnInit, OnDestroy {

@@ -73,6 +73,8 @@
     "NICE_LOOKING": "Ładny wygląd",
     "FEATURES_I_USE": "Funkcje, których używam",
     "FIRESTORE_ENABLED": "Firestore włączony (odśwież, aby zastosować)",
+    "VOICE_MEMO_RECORDING_ENABLED": "Nagrywanie notatek głosowych włączone",
+    "VOICE_MEMO_PLAYBACK_ENABLED": "Odtwarzanie notatek głosowych włączone",
     "RANDOM_THEME": "Losowy motyw",
     "NEXT_THEME": "Następny motyw",
     "THEMES": "Motywy",

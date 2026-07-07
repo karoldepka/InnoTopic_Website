@@ -56,6 +56,11 @@ export interface PendingBlobUpload {
   /** Links a thumbnail back to its full-size original's blob_id - must survive a reconnect retry
    * just like every other field here, or a retried upload would lose the relationship. */
   original_blob_id?: string
+  /** Tags which field on the item this blob belongs to (e.g. a Journal text descriptor id, a
+   * Learn side id, OrYoL's 'title') - only meaningful for voice memos, which (unlike pasted
+   * images) aren't referenced inline from the field's own content, so this is the only way to
+   * later list "every memo recorded against this particular field". */
+  field_id?: string
   whenCreatedLocally: string
 }
 
@@ -467,6 +472,14 @@ export class BrowserOdmStorage {
       const all = await requestToPromise<PendingBlobUpload[]>(tx.objectStore(PENDING_BLOB_UPLOADS_STORE).getAll())
       return all ?? []
     })
+  }
+
+  /** Pending uploads for one specific item - lets `BlobSyncService.listBlobs()` show
+   * not-yet-synced voice memos (recorded while offline) alongside already-synced ones, without a
+   * dedicated index (this store is small - a handful of in-flight uploads at most). */
+  async getPendingBlobUploadsFor(collection: string, itemId: string): Promise<PendingBlobUpload[]> {
+    const all = await this.getAllPendingBlobUploadsEverywhere()
+    return all.filter(upload => upload.collection === collection && upload.item_id === itemId)
   }
 
   // ---- Local blob cache (populated on upload for instant local render, or on download to avoid

@@ -17,9 +17,6 @@ import { TimePassingComponent } from '../../../libs/AppFedShared/time/time-passi
 import { SyncStatusIconComponent } from '../../../libs/AppFedShared/odm/sync-status/sync-status-icon.component';
 import { JournalItemEditComponent } from './journal-item-edit/journal-item-edit.component';
 import { TranslatePipe } from '@ngx-translate/core';
-import { MicComponent } from '../../Learn/search-or-add-learnable-item/mic/mic.component';
-import { PlayButtonComponent } from '../../Learn/shared/play-button/play-button.component';
-import { escapeHtml } from '../../../libs/AppFedShared/utils/html-utils'
 
 @Component({
     selector: 'app-journal-write-page',
@@ -36,8 +33,6 @@ import { escapeHtml } from '../../../libs/AppFedShared/utils/html-utils'
         NgFor,
         JournalItemEditComponent,
         TranslatePipe,
-        MicComponent,
-        PlayButtonComponent,
     ],
 })
 export class JournalWritePage extends BaseComponent implements OnInit, OnDestroy {
@@ -141,16 +136,6 @@ export class JournalWritePage extends BaseComponent implements OnInit, OnDestroy
     // this.item$Replacable
     this.router.navigateByUrl(`/journal/write/new`).then(() => {
       this.setItem$(new JournalEntry$(this.journalEntriesService, undefined, new JournalEntry()))
-    })
-  }
-
-  /** MicComponent's transcriptReady (Web Speech API, live during recording) - append the
-   * transcribed text as its own paragraph in the "general" field, the entry's main free-form
-   * text, rather than overwriting whatever's already there. */
-  onTranscriptReady(transcript: string) {
-    const existingGeneral = this.item$?.currentVal?.general ?? ''
-    this.item$?.patchThrottled({
-      general: existingGeneral + `<p>${escapeHtml(transcript)}</p>`,
     })
   }
 

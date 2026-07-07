@@ -1,17 +1,18 @@
-import {Component, Input, OnInit, ChangeDetectionStrategy} from '@angular/core';
+import {Component, Input, OnInit, ViewChild, ChangeDetectionStrategy} from '@angular/core';
 import {JournalTextDescriptor, TextDescriptorsFormControlsDict} from '../../../models/JournalTextDescriptors'
 import {UntypedFormControl, UntypedFormGroup} from '@angular/forms'
 import {ViewSyncer} from '../../../../../libs/AppFedShared/odm/ui/ViewSyncer'
 import {JournalEntry} from '../../../models/JournalEntry'
 import {JournalEntry$} from '../../../models/JournalEntry$'
 import { RichTextEditComponent } from '../../../../../libs/AppFedShared/rich-text/rich-text-edit/rich-text-edit.component';
+import { VoiceMemoFieldComponent } from '../../../../../libs/AppFedShared/audio/voice-memo-field/voice-memo-field.component';
 
 @Component({
     selector: 'app-journal-text-field',
     templateUrl: './journal-text-field.component.html',
     changeDetection: ChangeDetectionStrategy.Eager,
     styleUrls: ['./journal-text-field.component.sass'],
-    imports: [RichTextEditComponent],
+    imports: [RichTextEditComponent, VoiceMemoFieldComponent],
 })
 export class JournalTextFieldComponent implements OnInit {
 
@@ -22,6 +23,9 @@ export class JournalTextFieldComponent implements OnInit {
   formControls ! : TextDescriptorsFormControlsDict
 
   formGroup ! : UntypedFormGroup
+
+  @ViewChild(RichTextEditComponent)
+  richTextEditComponent ! : RichTextEditComponent
 
   constructor() { }
 
@@ -38,6 +42,17 @@ export class JournalTextFieldComponent implements OnInit {
     this.formGroup = new UntypedFormGroup(this.formControls)
     this.viewSyncer = new ViewSyncer(this.formGroup, this.item$, true,
       this.fieldDescriptor.id as keyof JournalEntry) /* TODO might need to ignore other fields from db */
+  }
+
+  /** The old page-level mic used to append every transcript into the 'general' field specifically
+   * (see JournalWritePage's now-removed onTranscriptReady) - only that field inherits the
+   * pre-existing single legacy recording via `includeLegacy` below for the same reason. */
+  get includeLegacyRecording(): boolean {
+    return this.fieldDescriptor.id === 'general'
+  }
+
+  onTranscriptReady(transcript: string) {
+    this.richTextEditComponent.insertTranscript(transcript)
   }
 
   /** Pushes this field's current (possibly still-throttled, not-yet-saved) value through

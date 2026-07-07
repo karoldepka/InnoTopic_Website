@@ -657,6 +657,17 @@ export class RichTextEditComponent extends AbstractCellComponent implements OnIn
     // debugLog(`tinymce: `, msg)
   }
 
+  /** Appends a live-transcribed voice memo (see `VoiceMemoFieldComponent.transcriptReady`) as its
+   * own paragraph, rather than overwriting whatever's already in the field - mirrors the append
+   * behavior Journal's page-level mic already used before per-field mics existed. Appends (rather
+   * than inserting at the caret) since a transcript typically arrives well after the recording
+   * stops, by which point the field may no longer be focused or its caret position no longer
+   * meaningful to the user. */
+  insertTranscript(transcript: string) {
+    const existingHtml = this.formControl1.value ?? ''
+    this.formControl1.setValue(existingHtml + `<p>${escapeHtml(transcript)}</p>`)
+  }
+
   focusEditor() {
     if ( ! this.editorReady ) {
       // Editor isn't constructed yet - defer instead of calling into a half-built TinyMCE

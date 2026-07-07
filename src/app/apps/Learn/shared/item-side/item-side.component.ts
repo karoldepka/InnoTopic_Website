@@ -16,6 +16,7 @@ import { IonicModule } from '@ionic/angular';
 import { SideIconComponent } from '../side-icon/side-icon.component';
 import { SideLabelComponent } from '../side-label/side-label.component';
 import { QuizAnswerRevealerComponent } from '../../quiz/quiz-item-details/quiz-answer-revealer/quiz-answer-revealer.component';
+import { VoiceMemoFieldComponent } from '../../../../libs/AppFedShared/audio/voice-memo-field/voice-memo-field.component';
 
 export type SideFormControlsDict = {[key in keyof SidesDefs]: UntypedFormControl }
 
@@ -35,6 +36,7 @@ export type SideFormControlsDict = {[key in keyof SidesDefs]: UntypedFormControl
         RichTextEditComponent,
         QuizAnswerRevealerComponent,
         AsyncPipe,
+        VoiceMemoFieldComponent,
     ],
 })
 export class ItemSideComponent implements OnInit {
@@ -114,6 +116,17 @@ export class ItemSideComponent implements OnInit {
     setTimeout(() => {
       // debugLog(`focusEditor`, this.editorViewChild)
       this.editorViewChild ?. focusEditor()
+    }, 10)
+  }
+
+  /** Opens the editor (if it wasn't already, e.g. dictating straight into an empty side) before
+   * inserting - `editorViewChild` only exists once the *ngIf around `<app-rich-text-edit>` below
+   * is satisfied, so setting `editorOpened` has to take effect (next tick) before this can reach
+   * it, same as `focusEditor()` above. */
+  onTranscriptReady(transcript: string) {
+    this.editorOpened = true
+    setTimeout(() => {
+      this.editorViewChild ?. insertTranscript(transcript)
     }, 10)
   }
 

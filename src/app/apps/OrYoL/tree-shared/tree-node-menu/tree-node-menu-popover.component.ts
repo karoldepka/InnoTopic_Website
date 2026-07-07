@@ -23,8 +23,7 @@ import {ApfNonRootTreeNode} from '../../tree-model/TreeNode'
 import { NodeClassIconComponent } from '../node-content/node-class-icon/node-class-icon.component';
 import { NgIf } from '@angular/common';
 import { NodeClassPickerComponent } from './node-class-picker/node-class-picker.component';
-import { MicComponent } from '../../../Learn/search-or-add-learnable-item/mic/mic.component'
-import { PlayButtonComponent } from '../../../Learn/shared/play-button/play-button.component'
+import { VoiceMemoFieldComponent } from '../../../../libs/AppFedShared/audio/voice-memo-field/voice-memo-field.component'
 import { TimeTrackingMenuComponent } from './time-tracking-menu/time-tracking-menu.component'
 import { date } from '../../time-tracking/time-tracking.service'
 import {
@@ -42,7 +41,7 @@ import {generateNewInclusionId} from '../../tree-model/TreeModel'
     templateUrl: './tree-node-menu-popover.component.html',
     changeDetection: ChangeDetectionStrategy.Eager,
     styleUrls: ['./tree-node-menu-popover.component.sass'],
-    imports: [NodeClassIconComponent, IonicModule, NgIf, NodeClassPickerComponent, MicComponent, PlayButtonComponent, TimeTrackingMenuComponent]
+    imports: [NodeClassIconComponent, IonicModule, NgIf, NodeClassPickerComponent, VoiceMemoFieldComponent, TimeTrackingMenuComponent]
 })
 export class TreeNodeMenuPopoverComponent implements OnInit {
 

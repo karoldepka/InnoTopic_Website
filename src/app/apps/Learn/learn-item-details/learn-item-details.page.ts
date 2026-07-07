@@ -32,7 +32,6 @@ import { PhysicalHealthImpactLevelEditComponent } from './physical-health-impact
 import { MentalHealthImpactLevelEditComponent } from './mental-health-impact-level-edit/mental-health-impact-level-edit.component';
 import { StatusesEditComponent } from './statuses-edit/statuses-edit.component';
 import { SelfRatingComponent } from '../shared/self-rating/self-rating.component';
-import { PlayButtonComponent } from '../shared/play-button/play-button.component';
 import { ItemSubItemsComponent } from './item-sub-items/item-sub-items.component';
 import { ItemSideComponent } from '../shared/item-side/item-side.component';
 
@@ -60,7 +59,6 @@ import { ItemSideComponent } from '../shared/item-side/item-side.component';
         MentalHealthImpactLevelEditComponent,
         StatusesEditComponent,
         SelfRatingComponent,
-        PlayButtonComponent,
         ItemSubItemsComponent,
         NgFor,
         ItemSideComponent,

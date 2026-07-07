@@ -1,0 +1,31 @@
+// Host must itself be a flex participant with room to grow - otherwise the timeline row (flex-grow:
+// 1 inside .voice-memo-timeline) has nothing to actually grow against inside whatever flex row this
+// is placed in (mirrors the old PlayButtonComponent's host, which this supersedes).
+:host
+  display: flex
+  align-items: center
+  flex-grow: 1
+  gap: 4px
+
+.voice-memo-list
+  display: flex
+  flex-direction: column
+  flex-grow: 1
+
+.voice-memo-row
+  display: flex
+  align-items: center
+  gap: 4px
+
+.voice-memo-timeline
+  display: flex
+  align-items: center
+  gap: 4px
+  flex-grow: 1
+  min-width: 160px
+
+.voice-memo-time
+  font-size: 0.7rem
+  min-width: 2.2rem
+  position: relative
+  z-index: 1

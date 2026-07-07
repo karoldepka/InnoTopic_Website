@@ -32,6 +32,11 @@
           <span *ngIf="!isCommentOpen(descriptor)">{{ 'JOURNAL.NOTE' | translate }}</span>
           <span *ngIf="isCommentOpen(descriptor)">{{ 'JOURNAL.HIDE' | translate }}</span>
         </button>
+        <app-voice-memo-field
+          [item$]="journalEntry$"
+          [fieldId]="descriptor.id!"
+          (transcriptReady)="onTranscriptReady($event, descriptor)"
+        ></app-voice-memo-field>
       </div>
       <ion-textarea
         *ngIf="isCommentOpen(descriptor)"

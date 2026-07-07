@@ -13,6 +13,10 @@ export class FeatureLevelsConfig {
      * which all derive from the single shared enableAll. */
     beforeProductization = this.props.beforeProductization
 
+    voiceMemoRecordingEnabled = this.props.voiceMemoRecordingEnabled
+
+    voiceMemoPlaybackEnabled = this.props.voiceMemoPlaybackEnabled
+
     showDeprecated = this.props.enableAll
 
     potentiallyDangerous = this.props.enableAll

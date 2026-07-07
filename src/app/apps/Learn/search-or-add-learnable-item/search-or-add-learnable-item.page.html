@@ -164,8 +164,12 @@
         (click)="addToJournal()"
       ><ion-icon name="add-circle-outline" />&nbsp;JOURNAL</ion-button>
     </div>
-    <app-mic
-      style="display: flex; align-items: stretch; padding-bottom: 8px;"></app-mic>
+    <app-voice-memo-field
+      style="display: flex; align-items: stretch; padding-bottom: 8px;"
+      [fieldId]="'quick-add'"
+      [createItemIfMissing]="createQuickAddItem"
+      (transcriptReady)="onQuickAddTranscriptReady($event)"
+    ></app-voice-memo-field>
 
   </div>
 </ion-header>

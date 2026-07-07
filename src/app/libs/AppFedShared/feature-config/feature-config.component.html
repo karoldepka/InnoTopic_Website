@@ -23,4 +23,14 @@
   [checked]="firestoreEnabled"
   (ionChange)="onChangeFirestoreEnabled($event)"
 >{{ 'SETTINGS.FIRESTORE_ENABLED' | translate }}</ion-checkbox>
+<ion-checkbox
+  labelPlacement="end"
+  [checked]="voiceMemoRecordingEnabled"
+  (ionChange)="onChangeVoiceMemoRecordingEnabled($event)"
+>{{ 'SETTINGS.VOICE_MEMO_RECORDING_ENABLED' | translate }}</ion-checkbox>
+<ion-checkbox
+  labelPlacement="end"
+  [checked]="voiceMemoPlaybackEnabled"
+  (ionChange)="onChangeVoiceMemoPlaybackEnabled($event)"
+>{{ 'SETTINGS.VOICE_MEMO_PLAYBACK_ENABLED' | translate }}</ion-checkbox>
 <!--Version {{version}}-->

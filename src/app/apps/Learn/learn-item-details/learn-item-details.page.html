@@ -149,11 +149,6 @@
       [item$]="item$"
     />
 
-    <app-play-button
-      [item]="itemVal"
-      [itemId]="item$.id"
-    />
-
     <ion-button (click)="askDelete()">DELETE</ion-button>
 
     <ion-button *ngIf="!item$.isArchived()" (click)="askArchive()">

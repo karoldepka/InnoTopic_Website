@@ -1,0 +1,72 @@
+<ng-container *ngIf="recordingEnabled">
+  <ion-button
+    size="small"
+    style="height: 100%"
+    (touchstart)="onMicClick($event)"
+    (click)="onMicClick()"
+    [color]="isRecording ? 'danger' : 'medium'"
+  >
+    <ion-icon
+      slot="icon-only"
+      [name]="isRecording ? 'stop' : 'mic-outline'"
+     />
+    <app-audio-visualizer
+      [stream]="stream"
+      *ngIf="isRecording"
+     />
+  </ion-button>
+  <ion-button
+    size="small"
+    fill="clear"
+    [hidden]="! stream"
+    (click)="stopRecordingIfNeededAndReleaseMic()"
+  >
+    <ion-icon slot="icon-only" name="close-outline" />
+  </ion-button>
+</ng-container>
+
+<div
+  *ngIf="playbackEnabled && memos.length"
+  class="voice-memo-list"
+>
+  <div
+    *ngFor="let memo of memos"
+    class="voice-memo-row"
+  >
+    <ion-button
+      size="small"
+      fill="clear"
+      (click)="playOrStopMemo(memo)"
+    >
+      <ion-icon
+        slot="icon-only"
+        [name]="playingBlobId === memo.blobId ? 'stop' : 'play'"
+       />
+    </ion-button>
+
+    <div
+      *ngIf="playingBlobId === memo.blobId"
+      class="voice-memo-timeline"
+    >
+      <span class="voice-memo-time">{{ formatTime(currentTimeSec) }}</span>
+      <ion-range
+        style="flex-grow: 1"
+        [min]="0"
+        [max]="durationSec || 1"
+        [value]="currentTimeSec"
+        (ionChange)="onSeek($event)"
+       />
+      <span class="voice-memo-time">{{ formatTime(durationSec) }}</span>
+    </div>
+
+    <ion-button
+      *ngIf="playingBlobId !== memo.blobId && ! memo.legacy"
+      size="small"
+      fill="clear"
+      (click)="deleteMemo(memo, $event)"
+      title="Delete this recording"
+    >
+      <ion-icon slot="icon-only" name="trash-outline" />
+    </ion-button>
+  </div>
+</div>

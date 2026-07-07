@@ -11,6 +11,7 @@ import { IonicModule } from '@ionic/angular';
 import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { NgIf, NgFor } from '@angular/common';
 import { TranslatePipe } from '@ngx-translate/core';
+import { VoiceMemoFieldComponent } from '../../../../libs/AppFedShared/audio/voice-memo-field/voice-memo-field.component';
 
 @Component({
     selector: 'app-journal-numeric-fields',
@@ -25,6 +26,7 @@ import { TranslatePipe } from '@ngx-translate/core';
         NgFor,
         StarRatingComponent,
         TranslatePipe,
+        VoiceMemoFieldComponent,
     ],
 })
 export class JournalNumericFieldsComponent implements OnInit {
@@ -118,6 +120,16 @@ export class JournalNumericFieldsComponent implements OnInit {
     const existing: JournalCompositeFieldVal = (this.journalEntry$.currentVal as any)?.[descriptor.id!] ?? {}
     patch[descriptor.id!] = { ...existing, comment: comment ?? '' }
     this.journalEntry$.patchThrottled(patch)
+  }
+
+  /** Appends the transcribed voice memo to whatever's already in this comment (plain text, unlike
+   * the rich-text fields' paragraph-append - this is a plain ion-textarea), opening the comment
+   * field first if it wasn't already. */
+  onTranscriptReady(transcript: string, descriptor: JournalNumericDescriptor) {
+    this.openCommentFieldIds.add(descriptor.id!)
+    const existingComment = this.getComment(descriptor)
+    const joined = existingComment ? `${existingComment}\n${transcript}` : transcript
+    this.onChangeComment(joined, descriptor)
   }
 
 }

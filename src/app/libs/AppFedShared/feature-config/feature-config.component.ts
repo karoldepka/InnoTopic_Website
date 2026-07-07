@@ -66,4 +66,20 @@ export class FeatureConfigComponent extends BaseComponent implements OnInit {
     this.featureConfigService.setFirestoreEnabled($event.detail.checked)
   }
 
+  get voiceMemoRecordingEnabled(): boolean {
+    return this.featureConfigService.voiceMemoRecordingEnabled
+  }
+
+  onChangeVoiceMemoRecordingEnabled($event: any) {
+    this.featureConfigService.setVoiceMemoRecordingEnabled($event.detail.checked)
+  }
+
+  get voiceMemoPlaybackEnabled(): boolean {
+    return this.featureConfigService.voiceMemoPlaybackEnabled
+  }
+
+  onChangeVoiceMemoPlaybackEnabled($event: any) {
+    this.featureConfigService.setVoiceMemoPlaybackEnabled($event.detail.checked)
+  }
+
 }
