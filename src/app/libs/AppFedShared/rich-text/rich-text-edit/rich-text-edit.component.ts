@@ -179,13 +179,15 @@ export class RichTextEditComponent extends AbstractCellComponent implements OnIn
     }
   }
 
-  /** Resizes a pasted image down to a thumbnail (~400x300, aspect-preserving) and uploads just
-   * that as an external blob - not the full-size original as well (unlike the two-blob-variant
-   * design a "paste full-size vs. thumbnail" choice would need), so this is deliberately the
-   * simpler "always thumbnail-size" slice of that ask. Swaps the pasted image's `src` for the
-   * uploaded blob's local object URL immediately once the (still-local, cache-first) upload call
-   * resolves a blob_id - never a data: URI or TinyMCE's own transient blob-cache entry in the
-   * saved HTML from here on. */
+  /** Uploads a pasted image as two linked blobs - the full-size original (`kind:
+   * 'image-original'`) plus a resized ~400x300 thumbnail (`kind: 'image-thumbnail'`, `
+   * original_blob_id` pointing back at the original) - satisfying GH #32's "paste full-size or
+   * paste clickable thumbnail" ask by always doing both: the thumbnail is what's shown inline
+   * (fast, small), and it's marked `data-original-blob-id` so `onEditorClick` below can open the
+   * full-size original on click, rather than forcing an upfront choice the user has no time to
+   * notice at paste time. Swaps the pasted image's `src` for the thumbnail's local object URL
+   * once the (still-local, cache-first) upload call resolves - never a data: URI or TinyMCE's own
+   * transient blob-cache entry in the saved HTML from here on. */
   private async uploadPastedImage(editor: any, img: HTMLImageElement) {
     const itemId = this.resolveItemId()
     if ( ! this.collection || ! itemId ) {
@@ -204,13 +206,36 @@ export class RichTextEditComponent extends AbstractCellComponent implements OnIn
     } else {
       return
     }
+    const originalBlob = typeof imageSource === 'string' ? await (await fetch(imageSource)).blob() : imageSource
     const thumbnailBlob = await this.makeThumbnailBlob(imageSource)
     if ( ! thumbnailBlob ) {
       return // leave the pasted image as-is rather than losing it
     }
-    const blobId = await this.blobSyncService.upload(this.collection, itemId, thumbnailBlob, 'image-thumbnail', 'image/webp')
-    img.setAttribute('data-blob-id', blobId)
+    const originalBlobId = await this.blobSyncService.upload(this.collection, itemId, originalBlob, 'image-original', originalBlob.type || 'image/png')
+    const thumbnailBlobId = await this.blobSyncService.upload(this.collection, itemId, thumbnailBlob, 'image-thumbnail', 'image/webp', originalBlobId)
+    img.setAttribute('data-blob-id', thumbnailBlobId)
+    img.setAttribute('data-original-blob-id', originalBlobId)
+    img.setAttribute('title', 'Click to view full size')
     img.setAttribute('src', URL.createObjectURL(thumbnailBlob))
+  }
+
+  /** Opens the full-size original in a new tab when a thumbnail (`data-original-blob-id`, see
+   * `uploadPastedImage`) is clicked - the "clickable thumbnail" half of GH #32, available for
+   * both freshly-pasted images and ones hydrated back from a previous session. */
+  private onEditorImageClick(event: any) {
+    const target = event.target as HTMLElement
+    if ( target?.tagName !== 'IMG' ) {
+      return
+    }
+    const originalBlobId = target.getAttribute('data-original-blob-id')
+    if ( ! originalBlobId ) {
+      return
+    }
+    this.blobSyncService.resolve(originalBlobId).then(blob => {
+      if ( blob ) {
+        window.open(URL.createObjectURL(blob), '_blank')
+      }
+    })
   }
 
   private makeThumbnailBlob(source: Blob | string): Promise<Blob | undefined> {
@@ -403,7 +428,7 @@ export class RichTextEditComponent extends AbstractCellComponent implements OnIn
       entity_encoding: `raw`,
       /** https://www.tiny.cloud/docs/configure/content-filtering/#valid_classes */
       valid_classes: richTextEditCommon.valid_classes,
-      content_style: ''
+      content_style: 'img[data-original-blob-id] { cursor: zoom-in; } '
       // '[contenteditable] { padding-left: 5px; } ' +
       // // '[contenteditable] ul { padding-inline-start: 1rem; } ' +
       // // '[contenteditable] li { padding-top: 6px; } ' +
@@ -467,6 +492,9 @@ export class RichTextEditComponent extends AbstractCellComponent implements OnIn
           // `itemRef`'s doc comment above) - without a broader retry trigger, an image pasted
           // before that id exists would never get uploaded at all.
           this.retryPendingBlobWork(editor)
+        })
+        editor.on('click', (event: any) => {
+          this.onEditorImageClick(event)
         })
         editor.on('SetContent', () => {
           // Runs on every content change (including the user's own typing, harmlessly re-running

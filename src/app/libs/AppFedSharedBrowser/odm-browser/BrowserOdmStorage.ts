@@ -53,6 +53,9 @@ export interface PendingBlobUpload {
   blob: Blob
   content_type: string
   kind: BlobKind
+  /** Links a thumbnail back to its full-size original's blob_id - must survive a reconnect retry
+   * just like every other field here, or a retried upload would lose the relationship. */
+  original_blob_id?: string
   whenCreatedLocally: string
 }
 

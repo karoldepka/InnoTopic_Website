@@ -30,8 +30,11 @@ export class BlobSyncService {
   /** Caches the blob locally immediately (so a paste-time thumbnail renders instantly, offline or
    * not) and returns a `blob_id` reference right away - the actual upload to Storage happens in
    * the background (bounded by `uploadLimiter`, durably retried on failure/offline via the
-   * pending-blob-uploads journal), never blocking the caller on the network round-trip. */
-  async upload(collection: string, itemId: string, blob: Blob, kind: BlobKind, contentType: string): Promise<string> {
+   * pending-blob-uploads journal), never blocking the caller on the network round-trip.
+   * `originalBlobId` links a thumbnail back to its full-size original (both already storable per
+   * `odm_item_blobs.original_blob_id`) - omit it when uploading the original itself, or a blob
+   * with no such relationship (e.g. audio). */
+  async upload(collection: string, itemId: string, blob: Blob, kind: BlobKind, contentType: string, originalBlobId?: string): Promise<string> {
     const blobId = uuid4()
     await this.browserOdmStorage.cacheBlob(blobId, blob)
     await this.browserOdmStorage.savePendingBlobUpload({
@@ -41,14 +44,15 @@ export class BlobSyncService {
       blob,
       content_type: contentType,
       kind,
+      original_blob_id: originalBlobId,
       whenCreatedLocally: new Date().toISOString(),
     })
-    this.uploadLimiter.run(() => this.uploadNow(collection, itemId, blobId, blob, kind, contentType))
+    this.uploadLimiter.run(() => this.uploadNow(collection, itemId, blobId, blob, kind, contentType, originalBlobId))
       .catch(error => console.error('BlobSyncService upload failed (durably queued, will retry on reconnect)', error))
     return blobId
   }
 
-  private async uploadNow(collection: string, itemId: string, blobId: string, blob: Blob, kind: BlobKind, contentType: string): Promise<void> {
+  private async uploadNow(collection: string, itemId: string, blobId: string, blob: Blob, kind: BlobKind, contentType: string, originalBlobId?: string): Promise<void> {
     const owner = this.authService.userId
     if (!owner) {
       // No signed-in user yet (or anonymous/guest) - leave it queued; the authUser$ subscription
@@ -71,6 +75,7 @@ export class BlobSyncService {
       storage_path: storagePath,
       content_type: contentType,
       kind,
+      original_blob_id: originalBlobId ?? null,
       byte_size: blob.size,
     })
     if (insertError) {
@@ -108,7 +113,7 @@ export class BlobSyncService {
     this.browserOdmStorage.getAllPendingBlobUploadsEverywhere()
       .then(uploads => {
         for (const upload of uploads) {
-          this.uploadLimiter.run(() => this.uploadNow(upload.collection, upload.item_id, upload.blob_id, upload.blob, upload.kind, upload.content_type))
+          this.uploadLimiter.run(() => this.uploadNow(upload.collection, upload.item_id, upload.blob_id, upload.blob, upload.kind, upload.content_type, upload.original_blob_id))
             .catch(error => console.error('BlobSyncService resumed upload failed, still queued', error))
         }
       })
