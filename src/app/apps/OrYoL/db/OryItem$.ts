@@ -8,7 +8,7 @@ import {SyncStatusService} from '../../../libs/AppFedShared/odm/sync-status.serv
 import {throttleTime} from 'rxjs/operators'
 import {TreeTableNodeContent} from '../tree-model/TreeTableNodeContent'
 import {OryItemsService} from '../core/ory-items.service'
-import {FirestoreTreeService} from '../db-firestore/firestore-tree.service'
+import {DbTreeService} from '../tree-model/db-tree-service'
 import {HasItemData, HasPatchThrottled, ItemData} from '../tree-model/has-item-data'
 import {stripHtml} from '../../../libs/AppFedShared/utils/html-utils'
 
@@ -50,7 +50,7 @@ export class OryItem$<TData = any> implements HasPatchThrottled<TData> {
   itemsService = this.injector.get(OryItemsService)
 
   /** FIXME this is only needed for patchItemData; should be moved */
-  treeService = this.injector.get(FirestoreTreeService)
+  treeService = this.injector.get(DbTreeService)
 
   private mapCtorToDomainItem = new Map<DomainItemCtor, DomainItem$>()
 
