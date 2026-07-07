@@ -82,4 +82,20 @@ export class FeatureConfigComponent extends BaseComponent implements OnInit {
     this.featureConfigService.setVoiceMemoPlaybackEnabled($event.detail.checked)
   }
 
+  get voiceMemoTranscriptionMode() {
+    return this.featureConfigService.voiceMemoTranscriptionMode
+  }
+
+  onChangeVoiceMemoTranscriptionMode($event: any) {
+    this.featureConfigService.setVoiceMemoTranscriptionMode($event.detail.value)
+  }
+
+  get voiceMemoTranscriptionLanguage() {
+    return this.featureConfigService.voiceMemoTranscriptionLanguage
+  }
+
+  onChangeVoiceMemoTranscriptionLanguage($event: any) {
+    this.featureConfigService.setVoiceMemoTranscriptionLanguage($event.detail.value)
+  }
+
 }

@@ -3,6 +3,7 @@ import {AlertController, IonicModule, ToastController} from '@ionic/angular'
 import {NgIf, NgFor} from '@angular/common'
 import {AudioVisualizerComponent} from '../audio-visualizer/audio-visualizer.component'
 import {readVoiceMemos, readVoiceMemosForField, VoiceAttachableItem, VoiceMemoRecord, VoiceMemoRef, VoiceMemoService} from '../voice-memo.service'
+import {VoiceTranscriptionService} from '../voice-transcription.service'
 import {FeatureService} from '../../feature.service'
 
 declare const MediaRecorder: any
@@ -87,6 +88,7 @@ export class VoiceMemoFieldComponent implements OnInit {
 
   constructor(
     private voiceMemoService: VoiceMemoService,
+    private voiceTranscriptionService: VoiceTranscriptionService,
     private featureService: FeatureService,
     private changeDetectorRef: ChangeDetectorRef,
     private alertController: AlertController,
@@ -225,8 +227,13 @@ export class VoiceMemoFieldComponent implements OnInit {
   /** Live transcription running in parallel with the MediaRecorder blob capture - not derived
    * from the recorded blob afterwards, so it only covers speech recognized while actively
    * recording. Silently does nothing on browsers without SpeechRecognition support (Firefox,
-   * older Safari) - transcription is a bonus on top of the recording, never a requirement for it. */
+   * older Safari) - transcription is a bonus on top of the recording, never a requirement for it.
+   * Only runs at all in 'browser-native' mode - 'server'/'browser-whisper' transcribe the
+   * finished blob instead (see onRecordStopped()), and 'off' skips transcription entirely. */
   private startSpeechRecognitionIfSupported() {
+    if (this.featureService.voiceMemoTranscriptionMode !== 'browser-native') {
+      return
+    }
     const SpeechRecognitionCtor = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition
     if (!SpeechRecognitionCtor) {
       return
@@ -286,6 +293,8 @@ export class VoiceMemoFieldComponent implements OnInit {
     const durationMs = this.recordingStartedAtMs ? (Date.now() - this.recordingStartedAtMs) : 0
     this.recordingStartedAtMs = undefined
 
+    this.transcribeCompletedRecordingIfNeeded(blob)
+
     if (!this.item$ && this.createItemIfMissing) {
       this.item$ = this.createItemIfMissing()
     }
@@ -312,6 +321,29 @@ export class VoiceMemoFieldComponent implements OnInit {
       item.patchThrottled({voiceMemos: [...readVoiceMemos(item), newRecord]})
       this.changeDetectorRef.markForCheck()
     })
+  }
+
+  /** 'server' and 'browser-whisper' transcribe the *finished* recording, unlike 'browser-native'
+   * (which already ran live during recording, driven separately by
+   * startSpeechRecognitionIfSupported()/beginSpeechRecognitionSession() above) - dispatched here
+   * rather than blocking attachMemo() above on it, since transcription failing/being slow should
+   * never hold up the recording itself actually getting saved. */
+  private transcribeCompletedRecordingIfNeeded(blob: Blob) {
+    const mode = this.featureService.voiceMemoTranscriptionMode
+    const language = this.featureService.voiceMemoTranscriptionLanguage || undefined
+    const transcribePromise = mode === 'server' ? this.voiceTranscriptionService.transcribeViaServer(blob, language)
+      : mode === 'browser-whisper' ? this.voiceTranscriptionService.transcribeViaBrowserWhisper(blob, language)
+      : undefined
+    if (!transcribePromise) {
+      return
+    }
+    transcribePromise
+      .then(text => {
+        if (text) {
+          this.transcriptReady.emit(text)
+        }
+      })
+      .catch(error => console.error(`VoiceMemoFieldComponent transcription (mode: ${mode}) failed`, error))
   }
 
   /** True only while waiting out the flush-safety delay below (stopping a live recording) - the

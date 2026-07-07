@@ -3,6 +3,7 @@ import {g} from './g'
 import {CachedSubject} from './utils/cachedSubject2/CachedSubject2'
 import {FeaturesConfig} from './FeaturesConfig'
 import {FeaturesProps} from './FeaturesProps'
+import type {VoiceMemoTranscriptionMode} from './audio/voice-transcription.service'
 
 @Injectable({
   providedIn: 'root'
@@ -86,5 +87,32 @@ export class FeatureService {
 
   setFirestoreEnabled(enabled: boolean) {
     localStorage.setItem(FeatureService.firestoreEnabledKey, String(enabled))
+  }
+
+  // ---- Voice memo transcription mode/language - a user preference that should survive a
+  // reload, unlike the rest of this file's dev-facing toggles (patchProps() above never persists
+  // to localStorage at all) - stored directly, same pattern as firestoreEnabled above. ----
+
+  static readonly voiceMemoTranscriptionModeKey = 'voiceMemoTranscriptionMode'
+
+  get voiceMemoTranscriptionMode(): VoiceMemoTranscriptionMode {
+    const stored = localStorage.getItem(FeatureService.voiceMemoTranscriptionModeKey)
+    return (stored as VoiceMemoTranscriptionMode | null) ?? 'browser-native'
+  }
+
+  setVoiceMemoTranscriptionMode(mode: VoiceMemoTranscriptionMode) {
+    localStorage.setItem(FeatureService.voiceMemoTranscriptionModeKey, mode)
+  }
+
+  static readonly voiceMemoTranscriptionLanguageKey = 'voiceMemoTranscriptionLanguage'
+
+  /** ISO-639-1 code, or '' for auto-detect (browser-native's SpeechRecognition doesn't actually
+   * support auto-detect - it falls back to the page's own `lang` for that mode specifically). */
+  get voiceMemoTranscriptionLanguage(): string {
+    return localStorage.getItem(FeatureService.voiceMemoTranscriptionLanguageKey) ?? ''
+  }
+
+  setVoiceMemoTranscriptionLanguage(languageCode: string) {
+    localStorage.setItem(FeatureService.voiceMemoTranscriptionLanguageKey, languageCode)
   }
 }

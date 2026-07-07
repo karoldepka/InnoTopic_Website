@@ -33,4 +33,34 @@
   [checked]="voiceMemoPlaybackEnabled"
   (ionChange)="onChangeVoiceMemoPlaybackEnabled($event)"
 >{{ 'SETTINGS.VOICE_MEMO_PLAYBACK_ENABLED' | translate }}</ion-checkbox>
+<ion-item lines="none">
+  <ion-select
+    label="{{ 'SETTINGS.VOICE_MEMO_TRANSCRIPTION_MODE' | translate }}"
+    interface="popover"
+    [value]="voiceMemoTranscriptionMode"
+    (ionChange)="onChangeVoiceMemoTranscriptionMode($event)"
+  >
+    <ion-select-option value="browser-native">Browser (Web Speech API) - live, free, needs internet</ion-select-option>
+    <ion-select-option value="browser-whisper">Browser (Whisper, offline) - one-time ~40MB download</ion-select-option>
+    <ion-select-option value="server">Server (Whisper API) - most accurate, costs money</ion-select-option>
+    <ion-select-option value="off">Off</ion-select-option>
+  </ion-select>
+</ion-item>
+<ion-item lines="none">
+  <ion-select
+    label="{{ 'SETTINGS.VOICE_MEMO_TRANSCRIPTION_LANGUAGE' | translate }}"
+    interface="popover"
+    [value]="voiceMemoTranscriptionLanguage"
+    (ionChange)="onChangeVoiceMemoTranscriptionLanguage($event)"
+  >
+    <ion-select-option value="">Auto-detect</ion-select-option>
+    <ion-select-option value="pl">Polski</ion-select-option>
+    <ion-select-option value="en">English</ion-select-option>
+    <ion-select-option value="es">Español</ion-select-option>
+    <ion-select-option value="de">Deutsch</ion-select-option>
+    <ion-select-option value="pt">Português</ion-select-option>
+    <ion-select-option value="it">Italiano</ion-select-option>
+    <ion-select-option value="fr">Français</ion-select-option>
+  </ion-select>
+</ion-item>
 <!--Version {{version}}-->

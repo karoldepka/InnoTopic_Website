@@ -76,6 +76,8 @@
     "FIRESTORE_ENABLED": "Firestore enabled (reload to apply)",
     "VOICE_MEMO_RECORDING_ENABLED": "Voice memo recording enabled",
     "VOICE_MEMO_PLAYBACK_ENABLED": "Voice memo playback enabled",
+    "VOICE_MEMO_TRANSCRIPTION_MODE": "Voice memo transcription",
+    "VOICE_MEMO_TRANSCRIPTION_LANGUAGE": "Transcription language",
     "RANDOM_THEME": "Random Theme",
     "NEXT_THEME": "Next Theme",
     "THEMES": "Themes",
