@@ -19,6 +19,7 @@
     *ngIf="stream"
     size="small"
     fill="clear"
+    [disabled]="releasingMic"
     (click)="stopRecordingIfNeededAndReleaseMic()"
     title="Release the microphone"
   >

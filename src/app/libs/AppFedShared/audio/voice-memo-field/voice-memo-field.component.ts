@@ -261,12 +261,36 @@ export class VoiceMemoFieldComponent implements OnInit {
     })
   }
 
+  /** True only while waiting out the flush-safety delay below (stopping a live recording) - the
+   * button stays visible-but-disabled during that window instead of looking unresponsive. Never
+   * true when just releasing an already-idle, warm-kept stream (see below), since there's nothing
+   * to wait for in that case. */
+  releasingMic = false
+
   stopRecordingIfNeededAndReleaseMic() {
+    const wasRecording = this.isRecording
     this.stopRecordingIfNeeded()
+    if (!wasRecording) {
+      this.releaseMicTracksNow()
+      return
+    }
+    // `mediaRecorder.stop()` above is async - it still needs to fire a final `dataavailable` (the
+    // last audio chunk) before `onstop`, so stopping the underlying tracks immediately risks
+    // truncating that tail end on some browsers. This short delay just lets that flush finish
+    // first; it's not needed at all when releasing an idle stream (the `!wasRecording` branch
+    // above), only when actually stopping a live recording.
+    this.releasingMic = true
+    this.changeDetectorRef.markForCheck()
     setTimeout(() => {
-      this.stream?.getTracks().forEach(track => track.stop())
-      this.stream = undefined
-    }, 300 /* just some instinctual defensive voodoo programming ;) but harmless */)
+      this.releaseMicTracksNow()
+      this.releasingMic = false
+      this.changeDetectorRef.markForCheck()
+    }, 300)
+  }
+
+  private releaseMicTracksNow() {
+    this.stream?.getTracks().forEach(track => track.stop())
+    this.stream = undefined
   }
 
   // ---- Playback (only one memo at a time; starting another stops whatever was playing) ----
