@@ -1,31 +1,12 @@
 import './instrumentation.js';
 import 'dotenv/config';
 import { serve } from '@hono/node-server';
-import { Hono } from 'hono';
-import { cors } from 'hono/cors';
-import { logger } from 'hono/logger';
-import { categoriesRouter } from './routes/categories.js';
-import { qaRouter } from './routes/qa.js';
-import { quizRouter } from './routes/quiz.js';
-import { copilotRouter } from './routes/copilotkit.js';
-import { odmRouter } from './routes/odm.js';
+import { app } from './app.js';
 import { MODEL_NAME } from './llm.js';
 
-const app = new Hono();
-
-app.use('*', cors({ origin: '*' }));
-app.use('*', logger());
-
-app.route('/', categoriesRouter);
-app.route('/', qaRouter);
-app.route('/', quizRouter);
-app.route('/', copilotRouter);
-app.route('/', odmRouter);
-
-app.get('/health', c => c.json({ status: 'ok' }));
-app.get('/ai-api/health', c => c.json({ status: 'ok' }));
-app.get('/ai-api/model', c => c.json({ model: MODEL_NAME }));
-
+/** Local dev / traditional-Node entry point only - Vercel's serverless deployment goes through
+ * ../api/index.ts instead (Vercel's Functions runtime provides its own request listener, it never
+ * runs this file or calls serve() itself). */
 const port = parseInt(process.env['PORT'] ?? '8000', 10);
 
 serve({ fetch: app.fetch, port }, () => {
