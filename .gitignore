@@ -11,6 +11,11 @@ Thumbs.db
 UserInterfaceState.xcuserstate
 $RECYCLE.BIN/
 
+# Playwright e2e output
+test-results/
+playwright-report/
+blob-report/
+
 # Logs
 logs/
 *.log

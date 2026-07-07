@@ -265,11 +265,20 @@ export class VoiceMemoFieldComponent implements OnInit {
     }
     const item = this.item$
     const collection = this.voiceMemoService.resolveCollection(item, this.collection)
-    const itemId = item?.id
-    if (!item || !collection || !itemId) {
+    if (!item || !collection) {
       return
     }
+    // patchThrottled() is what actually assigns a brand-new item's id in the first place (see
+    // OdmItem$2.setIdAndWhenCreatedIfNecessary(), called synchronously at the top of it) - reading
+    // item.id *before* this call is what silently dropped a memo recorded on a never-typed-into
+    // new Journal entry (id was still undefined at that point). Call it first, then read the id
+    // fresh, exactly like RichTextEditComponent's own itemRef.id resolution does for the same
+    // "brand new item" case.
     item.patchThrottled({hasAudio: true})
+    const itemId = item.id
+    if (!itemId) {
+      return
+    }
     // Only reachable via the mic button, which recordingEnabled hides whenever allFields/readOnly
     // is set - fieldId is guaranteed real (non-null) here by that same gating.
     this.voiceMemoService.attachMemo(collection, itemId, this.fieldId!, blob).then(blobId => {
