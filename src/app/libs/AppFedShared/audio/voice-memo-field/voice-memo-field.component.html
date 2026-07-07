@@ -20,8 +20,10 @@
     fill="clear"
     [hidden]="! stream"
     (click)="stopRecordingIfNeededAndReleaseMic()"
+    title="Release the microphone"
   >
-    <ion-icon slot="icon-only" name="close-outline" />
+    <ion-icon slot="start" name="close-outline" />
+    release mic
   </ion-button>
 </ng-container>
 
