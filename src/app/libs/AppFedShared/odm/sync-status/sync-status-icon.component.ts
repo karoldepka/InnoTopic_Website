@@ -88,6 +88,7 @@ export class SyncStatusIconComponent implements OnInit {
       event: event,
       translucent: true,
       mode: 'ios',
+      cssClass: 'sync-status-popover',
     });
     return await popover.present();
   }

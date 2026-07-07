@@ -305,3 +305,14 @@ body {
 * {
   //transition: all 1s ease-in-out;
 }
+
+// GH #58: "App & Sync Status" popover was stuck at Ionic's content-based auto width (quite
+// narrow, given the sync popover's content - pending-item lists, theme/language pickers - wants
+// real room). Roughly double that on desktop, and let it use nearly the full viewport on mobile.
+.sync-status-popover {
+  --width: min(90vw, 560px);
+
+  @media (max-width: 480px) {
+    --width: 94vw;
+  }
+}

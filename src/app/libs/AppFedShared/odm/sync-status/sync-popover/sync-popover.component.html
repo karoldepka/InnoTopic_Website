@@ -15,8 +15,13 @@
 <app-theme-config></app-theme-config>
 <app-language-switcher></app-language-switcher>
 
-<p>
-  {{(authUser$ | async)?.email}}
+<p
+  *ngIf="(authUser$ | async)?.email as email"
+  class="email-reveal"
+  (click)="emailRevealed = ! emailRevealed"
+>
+  <ng-container *ngIf="emailRevealed; else emailHidden">{{email}}</ng-container>
+  <ng-template #emailHidden>&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull; <ion-note>{{ 'SYNC.TAP_TO_REVEAL_EMAIL' | translate }}</ion-note></ng-template>
 </p>
 
 <div

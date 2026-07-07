@@ -44,6 +44,10 @@ export class SyncPopoverComponent extends BaseComponent implements OnInit {
 
   aboutAppExpanded = false
 
+  /** GH #61: the user's email is PII shown in a popover reachable with a single tap from
+   * anywhere in the app (e.g. over someone's shoulder) - hidden by default, click to reveal. */
+  emailRevealed = false
+
   private static readonly clicksToRevealFeatureConfig = 5
 
   private aboutAppClickCount = 0
