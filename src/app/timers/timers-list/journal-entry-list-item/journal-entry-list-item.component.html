@@ -20,6 +20,14 @@
     [item$]="item$"
   ></app-journal-text-fields-view>
 
+  <app-voice-memo-field
+    *ngIf="itemVal?.voiceMemos?.length"
+    [item$]="item$"
+    [allFields]="true"
+    [readOnly]="true"
+    (click)="$event.stopPropagation()"
+  ></app-voice-memo-field>
+
   <div>
 <!--    <ion-note>-->
 <!--      TODO: this could/should be interwoven with time-tracking, moderation timers, ...-->

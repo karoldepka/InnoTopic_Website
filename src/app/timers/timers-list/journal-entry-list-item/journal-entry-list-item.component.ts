@@ -9,6 +9,7 @@ import { IonicModule } from '@ionic/angular';
 import { TimePointComponent } from '../../../libs/AppFedShared/time/time-point/time-point.component';
 import { JournalNumFieldsViewComponent } from './journal-num-fields-view/journal-num-fields-view.component';
 import { JournalTextFieldsViewComponent } from './journal-text-fields-view/journal-text-fields-view.component';
+import { VoiceMemoFieldComponent } from '../../../libs/AppFedShared/audio/voice-memo-field/voice-memo-field.component';
 
 @Component({
     selector: 'app-journal-entry-list-item',
@@ -23,6 +24,7 @@ import { JournalTextFieldsViewComponent } from './journal-text-fields-view/journ
         JournalNumFieldsViewComponent,
         JournalTextFieldsViewComponent,
         AsyncPipe,
+        VoiceMemoFieldComponent,
     ],
 })
 export class JournalEntryListItemComponent implements OnInit {

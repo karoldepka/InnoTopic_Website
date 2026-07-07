@@ -33,8 +33,19 @@ export class VoiceMemoFieldComponent implements OnInit {
 
   /** Identifies which field on the item these memos belong to (a Journal text/numeric descriptor
    * id, a Learn side id, OrYoL's 'title', etc.) - lets one item have independent memo lists per
-   * field instead of a single item-wide recording. */
-  @Input() fieldId!: string
+   * field instead of a single item-wide recording. Not required when `allFields` is set. */
+  @Input() fieldId?: string
+
+  /** Shows every memo on the item regardless of which field it's on, and forces recording off
+   * (there's no single field to attach a new one to) - for compact summary contexts like a list
+   * row, where showing/recording into one specific field doesn't make sense. Mutually exclusive
+   * with `fieldId`/`includeLegacy` in practice (the legacy single-recording fallback is already
+   * field-specific and wouldn't mean anything here). */
+  @Input() allFields = false
+
+  /** Hides the mic and each memo's delete button, leaving only playback - for read-only summary
+   * contexts (e.g. a list row) where recording/deleting isn't appropriate. */
+  @Input() readOnly = false
 
   /** Only for the one field on each surface the old single-recording-per-item mic used to write
    * to (Journal's 'general' field, OrYoL's per-node popover note) - see
@@ -83,18 +94,22 @@ export class VoiceMemoFieldComponent implements OnInit {
   ) {}
 
   get recordingEnabled(): boolean {
-    return this.featureService.voiceMemoRecordingEnabled
+    return !this.allFields && !this.readOnly && this.featureService.voiceMemoRecordingEnabled
   }
 
   get playbackEnabled(): boolean {
     return this.featureService.voiceMemoPlaybackEnabled
   }
 
+  get showDeleteButton(): boolean {
+    return !this.readOnly
+  }
+
   /** Read live off `item$` on every check (cheap - a small array filter) rather than cached
    * component state, so a memo just attached (or deleted) by this same component instance shows
    * up immediately without a manual "optimistic update" step. */
   get memos(): VoiceMemoRef[] {
-    const real = readVoiceMemosForField(this.item$, this.fieldId)
+    const real = this.allFields ? readVoiceMemos(this.item$) : readVoiceMemosForField(this.item$, this.fieldId!)
     return (this.legacyMemoRef && real.length === 0) ? [this.legacyMemoRef, ...real] : real
   }
 
@@ -130,7 +145,8 @@ export class VoiceMemoFieldComponent implements OnInit {
     if (!collection || !itemId) {
       return
     }
-    for (const memo of readVoiceMemosForField(this.item$, this.fieldId)) {
+    const memosToCache = this.allFields ? readVoiceMemos(this.item$) : readVoiceMemosForField(this.item$, this.fieldId!)
+    for (const memo of memosToCache) {
       this.voiceMemoService.resolveMemoBlob(collection, itemId, memo)
         .catch(error => console.error('VoiceMemoFieldComponent eager cache failed for memo', memo.blobId, error))
     }
@@ -254,8 +270,10 @@ export class VoiceMemoFieldComponent implements OnInit {
       return
     }
     item.patchThrottled({hasAudio: true})
-    this.voiceMemoService.attachMemo(collection, itemId, this.fieldId, blob).then(blobId => {
-      const newRecord: VoiceMemoRecord = {fieldId: this.fieldId, blobId, durationMs, whenCreated: new Date().toISOString()}
+    // Only reachable via the mic button, which recordingEnabled hides whenever allFields/readOnly
+    // is set - fieldId is guaranteed real (non-null) here by that same gating.
+    this.voiceMemoService.attachMemo(collection, itemId, this.fieldId!, blob).then(blobId => {
+      const newRecord: VoiceMemoRecord = {fieldId: this.fieldId!, blobId, durationMs, whenCreated: new Date().toISOString()}
       item.patchThrottled({voiceMemos: [...readVoiceMemos(item), newRecord]})
       this.changeDetectorRef.markForCheck()
     })

@@ -70,7 +70,7 @@
     </div>
 
     <ion-button
-      *ngIf="playingBlobId !== memo.blobId && ! memo.legacy"
+      *ngIf="showDeleteButton && playingBlobId !== memo.blobId && ! memo.legacy"
       size="small"
       fill="clear"
       (click)="deleteMemo(memo, $event)"
