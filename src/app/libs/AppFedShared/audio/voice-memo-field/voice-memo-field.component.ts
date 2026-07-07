@@ -215,6 +215,13 @@ export class VoiceMemoFieldComponent implements OnInit {
     this.changeDetectorRef.markForCheck()
   }
 
+  /** How many times startSpeechRecognitionIfSupported() will silently restart a `continuous: true`
+   * session after it drops with a `'network'` error (see below) before giving up on transcription
+   * for the rest of the current recording. */
+  private static readonly MAX_SPEECH_RECOGNITION_RETRIES = 3
+
+  private speechRecognitionRetriesLeft = 0
+
   /** Live transcription running in parallel with the MediaRecorder blob capture - not derived
    * from the recorded blob afterwards, so it only covers speech recognized while actively
    * recording. Silently does nothing on browsers without SpeechRecognition support (Firefox,
@@ -225,10 +232,23 @@ export class VoiceMemoFieldComponent implements OnInit {
       return
     }
     this.transcriptSoFar = ''
+    this.speechRecognitionRetriesLeft = VoiceMemoFieldComponent.MAX_SPEECH_RECOGNITION_RETRIES
+    this.beginSpeechRecognitionSession(SpeechRecognitionCtor)
+  }
+
+  /** Split out from startSpeechRecognitionIfSupported() so a dropped session can be restarted
+   * without resetting transcriptSoFar/the retry budget. Chrome's `continuous: true` recognition is
+   * known to be fragile in practice - it frequently drops with a `'network'` error after a short
+   * time even on a perfectly good connection (a well-documented, long-standing Chrome quirk, not
+   * something specific to this app or an actual connectivity problem most of the time) - silently
+   * reconnecting a few times covers that instead of losing the rest of the recording's transcript
+   * to one blip. */
+  private beginSpeechRecognitionSession(SpeechRecognitionCtor: any) {
     this.speechRecognition = new SpeechRecognitionCtor()
     this.speechRecognition.continuous = true
     this.speechRecognition.interimResults = false
     this.speechRecognition.lang = document.documentElement.lang || undefined
+    let hadNetworkError = false
     this.speechRecognition.onresult = (event: any) => {
       for (let i = event.resultIndex; i < event.results.length; i++) {
         if (event.results[i].isFinal) {
@@ -238,13 +258,19 @@ export class VoiceMemoFieldComponent implements OnInit {
     }
     this.speechRecognition.onerror = (event: any) => {
       console.log('speechRecognition error (non-fatal, recording is unaffected)', event.error)
+      hadNetworkError = event.error === 'network'
     }
     this.speechRecognition.onend = () => {
+      this.speechRecognition = null
+      if (hadNetworkError && this.isRecording && this.speechRecognitionRetriesLeft > 0) {
+        this.speechRecognitionRetriesLeft--
+        this.beginSpeechRecognitionSession(SpeechRecognitionCtor)
+        return
+      }
       const transcript = this.transcriptSoFar.trim()
       if (transcript) {
         this.transcriptReady.emit(transcript)
       }
-      this.speechRecognition = null
     }
     try {
       this.speechRecognition.start()
