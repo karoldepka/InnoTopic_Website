@@ -21,7 +21,7 @@ import {INodeContentComponent} from '../node-content/INodeContentComponent'
 import {OryBaseTreeNode, OryNonRootTreeNode} from '../../tree-model/TreeModel'
 import {ApfNonRootTreeNode} from '../../tree-model/TreeNode'
 import { NodeClassIconComponent } from '../node-content/node-class-icon/node-class-icon.component';
-import { NgIf } from '@angular/common';
+import { NgIf, NgFor } from '@angular/common';
 import { NodeClassPickerComponent } from './node-class-picker/node-class-picker.component';
 import { VoiceMemoFieldComponent } from '../../../../libs/AppFedShared/audio/voice-memo-field/voice-memo-field.component'
 import { TimeTrackingMenuComponent } from './time-tracking-menu/time-tracking-menu.component'
@@ -34,6 +34,9 @@ import {
 } from '../../plan-execution/templates/day-plan-templates'
 import {NodeInclusion} from '../../tree-model/TreeListener'
 import {generateNewInclusionId} from '../../tree-model/TreeModel'
+import {OrySubtreeShare, OrySubtreePermission, OrySubtreeSharesService} from '../../db-supabase/ory-subtree-shares.service'
+import {AuthService} from '../../../../auth/auth.service'
+import {environment} from '../../../../../environments/environment'
 
 
 @Component({
@@ -41,7 +44,7 @@ import {generateNewInclusionId} from '../../tree-model/TreeModel'
     templateUrl: './tree-node-menu-popover.component.html',
     changeDetection: ChangeDetectionStrategy.Eager,
     styleUrls: ['./tree-node-menu-popover.component.sass'],
-    imports: [NodeClassIconComponent, IonicModule, NgIf, NodeClassPickerComponent, VoiceMemoFieldComponent, TimeTrackingMenuComponent]
+    imports: [NodeClassIconComponent, IonicModule, NgIf, NgFor, NodeClassPickerComponent, VoiceMemoFieldComponent, TimeTrackingMenuComponent]
 })
 export class TreeNodeMenuPopoverComponent implements OnInit {
 
@@ -55,6 +58,15 @@ export class TreeNodeMenuPopoverComponent implements OnInit {
 
   // @Input() popOver!: NgbPopover
 
+  /** Only meaningful once the OrYoL tree is actually on the Supabase backend - under Firestore
+   * (the default today) items have no `owner` at all, so there's nothing yet for a share to grant
+   * access to. See OrySubtreeSharesService's doc comment. */
+  readonly sharingAvailable = (environment as any).oryolTreeBackend === 'supabase'
+
+  shares: OrySubtreeShare[] = []
+
+  sharesLoaded = false
+
   constructor(
     public dialogService: DialogService,
     // private modalService: NgbModal,
@@ -63,9 +75,72 @@ export class TreeNodeMenuPopoverComponent implements OnInit {
     public clipboardService: ClipboardService,
     public popoverController: PopoverController,
     public alertController: AlertController,
+    private sharesService: OrySubtreeSharesService,
+    private authService: AuthService,
   ) { }
 
   ngOnInit() {
+    if (this.sharingAvailable) {
+      this.loadShares()
+    }
+  }
+
+  /** Only the item's owner can grant a share - RLS enforces this server-side regardless, but
+   * checking here too avoids showing a "Share" action that would just fail. */
+  get canShareThisSubtree(): boolean {
+    const owner = (this.treeNode.content.itemData as any)?.owner
+    return this.sharingAvailable && !!owner && owner === this.authService.authUser$.lastVal?.uid
+  }
+
+  async loadShares() {
+    try {
+      this.shares = await this.sharesService.listSharesForSubtree(this.treeNode.itemId)
+    } catch (error) {
+      console.error('Failed to load subtree shares', error)
+    } finally {
+      this.sharesLoaded = true
+    }
+  }
+
+  async shareSubtree() {
+    const alert = await this.alertController.create({
+      header: 'Share this subtree',
+      message: 'The other person will be able to see and edit everything under this item.',
+      inputs: [
+        {name: 'uid', type: 'text', placeholder: 'Their user ID'},
+        {name: 'permission', type: 'text', placeholder: 'read or write', value: 'write'},
+      ],
+      buttons: [
+        {text: 'Cancel', role: 'cancel'},
+        {
+          text: 'Share',
+          handler: async (data: {uid?: string, permission?: string}) => {
+            const uid = data.uid?.trim()
+            const permission = data.permission?.trim().toLowerCase()
+            if (!uid || (permission !== 'read' && permission !== 'write')) {
+              console.error('Share subtree: uid is required and permission must be "read" or "write"', data)
+              return
+            }
+            try {
+              await this.sharesService.grantShare(this.treeNode.itemId, uid, permission as OrySubtreePermission)
+              await this.loadShares()
+            } catch (error) {
+              console.error('Failed to grant subtree share', error)
+            }
+          },
+        },
+      ],
+    })
+    await alert.present()
+  }
+
+  async revokeShare(share: OrySubtreeShare) {
+    try {
+      await this.sharesService.revokeShare(share.id)
+      await this.loadShares()
+    } catch (error) {
+      console.error('Failed to revoke subtree share', error)
+    }
   }
 
   openDeleteConfirmationDialog() {

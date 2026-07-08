@@ -78,4 +78,25 @@
 
   <app-node-class-picker
   ></app-node-class-picker>
+
+  <div *ngIf="sharingAvailable" class="sharing-section" style="margin-top: .5em">
+    <ion-button *ngIf="canShareThisSubtree" (click)="shareSubtree()">
+      Share this subtree...
+    </ion-button>
+
+    <div *ngIf="sharesLoaded && shares.length">
+      <p>Shared with:</p>
+      <div *ngFor="let share of shares" style="display: flex; align-items: center; gap: .5em">
+        <span>{{share.granted_to_uid}} ({{share.permission}})</span>
+        <ion-button
+          *ngIf="canShareThisSubtree"
+          size="small"
+          fill="clear"
+          (click)="revokeShare(share)"
+        >
+          Revoke
+        </ion-button>
+      </div>
+    </div>
+  </div>
 </div>
