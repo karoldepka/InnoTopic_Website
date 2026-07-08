@@ -52,6 +52,16 @@ export class JournalWritePage extends BaseComponent implements OnInit, OnDestroy
 
   private readonly onWindowBeforeUnload = () => this.flushPendingEdits()
 
+  /** Mobile Safari/WKWebView (the realistic runtime for this app backgrounded via home button,
+   * app-switch, or screen lock) doesn't reliably fire `beforeunload` - `visibilitychange` going
+   * `hidden` is the standard, reliable signal for "the app is about to be suspended/killed" on
+   * mobile, so it needs its own flush rather than relying on beforeunload alone. */
+  private readonly onVisibilityChange = () => {
+    if (document.visibilityState === 'hidden') {
+      this.flushPendingEdits()
+    }
+  }
+
   constructor(
     public journalEntriesService: JournalEntryItemsService,
     public geoLocationService: ApfGeoLocationService,
@@ -71,6 +81,7 @@ export class JournalWritePage extends BaseComponent implements OnInit, OnDestroy
     // Covers an actual tab/app close, not just in-app navigation - the throttled ViewSyncer
     // subscriptions below wouldn't otherwise get a chance to flush their trailing edge at all.
     window.addEventListener('beforeunload', this.onWindowBeforeUnload)
+    document.addEventListener('visibilitychange', this.onVisibilityChange)
   }
 
   ngOnDestroy() {
@@ -78,6 +89,7 @@ export class JournalWritePage extends BaseComponent implements OnInit, OnDestroy
     // doesn't go through newItem()/onBackClicked() below.
     this.flushPendingEdits()
     window.removeEventListener('beforeunload', this.onWindowBeforeUnload)
+    document.removeEventListener('visibilitychange', this.onVisibilityChange)
   }
 
   /** Pushes every text field's possibly-still-throttled pending edit through immediately, then

@@ -226,6 +226,31 @@ describe('BrowserOdmStorage', () => {
       expect(editsA.length).toBe(1)
       expect(editsA[0].item_id).toBe('a1')
     })
+
+    it('a second savePendingEdit for the same item merges onto the existing patch instead of replacing it (two tabs editing different fields)', async () => {
+      const collection = uniqueCollection()
+      // "Tab A" journals its own accumulated pendingDbPatch...
+      await storage.savePendingEdit(collection, 'item1', {general: 'from tab A'}, '2024-01-01T00:00:00.000Z')
+      // ...then "tab B", editing a different field on the same entry, journals its own -
+      // independently, with no knowledge of tab A's in-memory patch.
+      await storage.savePendingEdit(collection, 'item1', {importance: 3}, '2024-01-01T00:00:01.000Z')
+
+      const edit = await storage.getPendingEdit(collection, 'item1')
+
+      expect(edit?.patch).toEqual({general: 'from tab A', importance: 3})
+      expect(edit?.whenLastModified).toBe('2024-01-01T00:00:01.000Z')
+    })
+
+    it('merging keeps the later whenLastModified even if the later save races ahead and lands first', async () => {
+      const collection = uniqueCollection()
+      await storage.savePendingEdit(collection, 'item1', {importance: 3}, '2024-01-01T00:00:05.000Z')
+      await storage.savePendingEdit(collection, 'item1', {general: 'stale-ish but still applies'}, '2024-01-01T00:00:01.000Z')
+
+      const edit = await storage.getPendingEdit(collection, 'item1')
+
+      expect(edit?.patch).toEqual({importance: 3, general: 'stale-ish but still applies'})
+      expect(edit?.whenLastModified).toBe('2024-01-01T00:00:05.000Z')
+    })
   })
 
   describe('pending-blob-upload journal and blob cache', () => {

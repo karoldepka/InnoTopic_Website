@@ -402,11 +402,28 @@ export class BrowserOdmStorage {
 
   // ---- Durable pending-edit journal (survives reload/crash, not just this tab session) ----
 
+  /** Merges onto whatever's already journaled rather than overwriting it outright. Each tab
+   * keeps its own in-memory `pendingDbPatch` (only the fields *that tab* has changed since its
+   * own last confirmed write), so two tabs with the same item open concurrently each call this
+   * independently - a blind `put()` here would let whichever tab saves last silently erase the
+   * other tab's still-unsynced fields from the durable journal, with no way to recover them once
+   * that other tab closes. Merging (and keeping the later `whenLastModified`) means a genuine
+   * same-field conflict still resolves last-write-wins (unavoidable), but the much more common
+   * case - two tabs editing *different* fields on the same entry - keeps both. */
   async savePendingEdit(collection: string, itemId: string, patch: Record<string, any>, whenLastModified: string): Promise<void> {
     await this.withDb(async db => {
       const tx = db.transaction(PENDING_EDITS_STORE, 'readwrite')
-      const edit: OdmPendingEdit = {key: rowKey(collection, itemId), collection, item_id: itemId, patch, whenLastModified}
-      await requestToPromise(tx.objectStore(PENDING_EDITS_STORE).put(edit))
+      const store = tx.objectStore(PENDING_EDITS_STORE)
+      const key = rowKey(collection, itemId)
+      const existing = await requestToPromise<OdmPendingEdit | undefined>(store.get(key))
+      const edit: OdmPendingEdit = {
+        key,
+        collection,
+        item_id: itemId,
+        patch: {...existing?.patch, ...patch},
+        whenLastModified: (existing && existing.whenLastModified > whenLastModified) ? existing.whenLastModified : whenLastModified,
+      }
+      await requestToPromise(store.put(edit))
     })
     this.pendingEditsChanged$.next()
   }
