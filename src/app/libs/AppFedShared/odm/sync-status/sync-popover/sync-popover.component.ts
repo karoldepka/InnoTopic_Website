@@ -16,6 +16,7 @@ import { AlertController, IonicModule, PopoverController } from '@ionic/angular'
 import { Router } from '@angular/router';
 import {stripHtml} from '../../../utils/html-utils'
 import {BrowserOdmStorage} from '../../../../AppFedSharedBrowser/odm-browser/BrowserOdmStorage'
+import {VoiceMemoService} from '../../../audio/voice-memo.service'
 
 @Component({
     selector: 'app-sync-popover',
@@ -63,6 +64,7 @@ export class SyncPopoverComponent extends BaseComponent implements OnInit {
     private router: Router,
     private alertController: AlertController,
     private browserOdmStorage: BrowserOdmStorage,
+    public voiceMemoService: VoiceMemoService,
     injector: Injector,
   ) {
     super(injector)
@@ -121,6 +123,13 @@ export class SyncPopoverComponent extends BaseComponent implements OnInit {
 
   forceReload() {
     window.location.reload()
+  }
+
+  /** Escape hatch for a mic left open (recording or just warm-kept) on a field the user has
+   * since navigated away from - releases every currently-open microphone stream app-wide,
+   * regardless of which field(s) opened them, without needing to find that field again. */
+  releaseMic() {
+    this.voiceMemoService.releaseAllActiveMics()
   }
 
   toArray(t: any) {

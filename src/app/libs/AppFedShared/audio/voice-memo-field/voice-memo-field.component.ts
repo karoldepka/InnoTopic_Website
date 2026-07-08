@@ -2,7 +2,7 @@ import {Component, Input, Output, EventEmitter, OnInit, ChangeDetectionStrategy,
 import {AlertController, IonicModule, ToastController} from '@ionic/angular'
 import {NgIf, NgFor} from '@angular/common'
 import {AudioVisualizerComponent} from '../audio-visualizer/audio-visualizer.component'
-import {readVoiceMemos, readVoiceMemosForField, VoiceAttachableItem, VoiceMemoRecord, VoiceMemoRef, VoiceMemoService} from '../voice-memo.service'
+import {ActiveMicHolder, readVoiceMemos, readVoiceMemosForField, VoiceAttachableItem, VoiceMemoRecord, VoiceMemoRef, VoiceMemoService} from '../voice-memo.service'
 import {VoiceTranscriptionService} from '../voice-transcription.service'
 import {FeatureService} from '../../feature.service'
 
@@ -22,7 +22,7 @@ declare const MediaRecorder: any
     styleUrls: ['./voice-memo-field.component.sass'],
     imports: [IonicModule, NgIf, NgFor, AudioVisualizerComponent],
 })
-export class VoiceMemoFieldComponent implements OnInit {
+export class VoiceMemoFieldComponent implements OnInit, ActiveMicHolder {
 
   /** Item these memos are attached to. Left unset only on Learn's quick-add bar, which has no
    * "current item" yet - see `createItemIfMissing` below. */
@@ -185,6 +185,7 @@ export class VoiceMemoFieldComponent implements OnInit {
       navigator.mediaDevices.getUserMedia({audio: {echoCancellation: true, noiseSuppression: true, autoGainControl: true}})
         .then(stream => {
           this.stream = stream
+          this.voiceMemoService.registerActiveMic(this)
           this.recordUsingStream(stream)
         })
         .catch(err => {
@@ -352,6 +353,12 @@ export class VoiceMemoFieldComponent implements OnInit {
    * to wait for in that case. */
   releasingMic = false
 
+  /** `ActiveMicHolder` interface, for the sync popover's global "release mic" action - just
+   * delegates to the field's own release button logic below. */
+  releaseMicIfActive(): void {
+    this.stopRecordingIfNeededAndReleaseMic()
+  }
+
   stopRecordingIfNeededAndReleaseMic() {
     const wasRecording = this.isRecording
     this.stopRecordingIfNeeded()
@@ -376,6 +383,7 @@ export class VoiceMemoFieldComponent implements OnInit {
   private releaseMicTracksNow() {
     this.stream?.getTracks().forEach(track => track.stop())
     this.stream = undefined
+    this.voiceMemoService.unregisterActiveMic(this)
   }
 
   // ---- Playback (only one memo at a time; starting another stops whatever was playing) ----

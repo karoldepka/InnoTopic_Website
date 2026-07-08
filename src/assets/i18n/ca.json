@@ -63,6 +63,7 @@
     "LOG_OUT": "Tanca la sessió",
     "OPTIONS": "Opcions",
     "FORCE_RELOAD": "Força la recàrrega",
+    "RELEASE_MIC": "Allibera el micròfon",
     "BRANCH": "Branca",
     "LAST_COMMIT": "Darrer commit",
     "BUILT": "Compilat el"

@@ -63,6 +63,7 @@
     "LOG_OUT": "Cerrar sesión",
     "OPTIONS": "Opciones",
     "FORCE_RELOAD": "Forzar recarga",
+    "RELEASE_MIC": "Liberar micrófono",
     "BRANCH": "Rama",
     "LAST_COMMIT": "Último commit",
     "BUILT": "Compilado"

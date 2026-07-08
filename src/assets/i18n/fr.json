@@ -63,6 +63,7 @@
     "LOG_OUT": "Se déconnecter",
     "OPTIONS": "Options",
     "FORCE_RELOAD": "Forcer le rechargement",
+    "RELEASE_MIC": "Libérer le microphone",
     "BRANCH": "Branche",
     "LAST_COMMIT": "Dernier commit",
     "BUILT": "Compilé le"

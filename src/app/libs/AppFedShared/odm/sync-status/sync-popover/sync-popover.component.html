@@ -83,4 +83,14 @@
   <ion-button size="small" fill="outline" (click)="logOut()">{{ 'SYNC.LOG_OUT' | translate }}</ion-button>
   <ion-button size="small" fill="outline" (click)="openOptions()">{{ 'SYNC.OPTIONS' | translate }}</ion-button>
   <ion-button size="small" fill="outline" (click)="forceReload()">{{ 'SYNC.FORCE_RELOAD' | translate }}</ion-button>
+  <ion-button
+    *ngIf="voiceMemoService.hasActiveMic$ | async"
+    size="small"
+    fill="outline"
+    color="warning"
+    (click)="releaseMic()"
+  >
+    <ion-icon slot="start" name="mic-off-outline"></ion-icon>
+    {{ 'SYNC.RELEASE_MIC' | translate }}
+  </ion-button>
 </div>

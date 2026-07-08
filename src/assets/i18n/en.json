@@ -64,6 +64,7 @@
     "LOG_OUT": "Log Out",
     "OPTIONS": "Options",
     "FORCE_RELOAD": "Force Reload",
+    "RELEASE_MIC": "Release Microphone",
     "BRANCH": "Branch",
     "LAST_COMMIT": "Last commit",
     "BUILT": "Built"

@@ -2,6 +2,19 @@ import {Injectable} from '@angular/core'
 import {collection as firestoreCollection, doc, getDoc} from 'firebase/firestore'
 import {getAppFirestore} from '../../AppFedSharedFirebase/firebase-app'
 import {BlobSyncService} from '../odm/blob-sync.service'
+import {CachedSubject} from '../utils/cachedSubject2/CachedSubject2'
+
+/** Anything currently holding an open microphone `MediaStream` (recording or just warm-kept
+ * between recordings - see `VoiceMemoFieldComponent.stream`'s doc comment) that can be told to
+ * let go of it. Kept as a minimal interface (rather than importing `VoiceMemoFieldComponent`
+ * itself, which would make this service depend on its own consumer) purely so the global
+ * "release mic" action below has something to call - any field holding a stream registers itself
+ * here while it does. */
+export interface ActiveMicHolder {
+  /** Stops any in-progress recording (waiting for the final chunk if needed) and releases the
+   * held MediaStream's tracks. Safe to call on a holder that's already released. */
+  releaseMicIfActive(): void
+}
 
 /** Duck-typed rather than `OdmItem$2` itself, so `VoiceMemoFieldComponent` also works against
  * OrYoL's still-legacy `OryItem$` (tree nodes haven't migrated onto OdmItem$2 yet, but already
@@ -76,9 +89,35 @@ function legacyAudioDocId(collection: string, itemId: string): string {
 @Injectable({providedIn: 'root'})
 export class VoiceMemoService {
 
+  private activeMicHolders = new Set<ActiveMicHolder>()
+
+  /** True while at least one field anywhere in the app currently holds an open mic stream -
+   * drives the "Release Microphone" action in the sync popover, an escape hatch for a stream
+   * left warm-kept (or, in principle, still recording) on a field the user has since navigated
+   * away from and can no longer reach that field's own release button. */
+  readonly hasActiveMic$ = new CachedSubject<boolean>(false)
+
   constructor(
     private blobSyncService: BlobSyncService,
   ) {}
+
+  registerActiveMic(holder: ActiveMicHolder): void {
+    this.activeMicHolders.add(holder)
+    this.hasActiveMic$.next(this.activeMicHolders.size > 0)
+  }
+
+  unregisterActiveMic(holder: ActiveMicHolder): void {
+    this.activeMicHolders.delete(holder)
+    this.hasActiveMic$.next(this.activeMicHolders.size > 0)
+  }
+
+  /** Releases every currently-open microphone stream app-wide, regardless of which field(s)
+   * opened them. */
+  releaseAllActiveMics(): void {
+    for (const holder of [...this.activeMicHolders]) {
+      holder.releaseMicIfActive()
+    }
+  }
 
   resolveCollection(item$: VoiceAttachableItem | undefined, collectionOverride: string | undefined): string | undefined {
     return collectionOverride ?? item$?.odmService?.className

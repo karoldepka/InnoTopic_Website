@@ -64,6 +64,7 @@
     "LOG_OUT": "Wyloguj się",
     "OPTIONS": "Opcje",
     "FORCE_RELOAD": "Wymuś odświeżenie",
+    "RELEASE_MIC": "Zwolnij mikrofon",
     "BRANCH": "Gałąź",
     "LAST_COMMIT": "Ostatni commit",
     "BUILT": "Zbudowano"
