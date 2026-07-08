@@ -12,6 +12,8 @@ import {LinkPreviewService} from '../link-preview/link-preview.service'
 import {renderLinkPreviewCardHtml, renderLinkPreviewLoadingHtml} from '../link-preview/LinkPreviewCard'
 import {escapeHtml} from '../../utils/html-utils'
 import {BlobSyncService} from '../../odm/blob-sync.service'
+import {ModalController} from '@ionic/angular'
+import {ImageViewerModalComponent} from '../image-viewer-modal/image-viewer-modal.component'
 
 /**
  * http://ckeditor.github.io/editor-recommendations/about/
@@ -119,6 +121,7 @@ export class RichTextEditComponent extends AbstractCellComponent implements OnIn
     public editorService: EditorService,
     private linkPreviewService: LinkPreviewService,
     private blobSyncService: BlobSyncService,
+    private modalController: ModalController,
     injector: Injector
   ) {
     super(injector)
@@ -219,10 +222,15 @@ export class RichTextEditComponent extends AbstractCellComponent implements OnIn
     img.setAttribute('src', URL.createObjectURL(thumbnailBlob))
   }
 
-  /** Opens the full-size original in a new tab when a thumbnail (`data-original-blob-id`, see
-   * `uploadPastedImage`) is clicked - the "clickable thumbnail" half of GH #32, available for
-   * both freshly-pasted images and ones hydrated back from a previous session. */
-  private onEditorImageClick(event: any) {
+  /** Opens the full-size original in an in-app modal when a thumbnail (`data-original-blob-id`,
+   * see `uploadPastedImage`) is clicked - the "clickable thumbnail" half of GH #32, available for
+   * both freshly-pasted images and ones hydrated back from a previous session.
+   *
+   * Deliberately not `window.open(objectUrl, '_blank')` (GH #53): an object URL only resolves in
+   * the document that created it - opening it in a new tab is unreliable even in the same
+   * browser (Chrome's Blob URL Partitioning) and never works after a reload or in a different
+   * browser. A same-page modal has no such cross-context requirement. */
+  private async onEditorImageClick(event: any) {
     const target = event.target as HTMLElement
     if ( target?.tagName !== 'IMG' ) {
       return
@@ -231,11 +239,15 @@ export class RichTextEditComponent extends AbstractCellComponent implements OnIn
     if ( ! originalBlobId ) {
       return
     }
-    this.blobSyncService.resolve(originalBlobId).then(blob => {
-      if ( blob ) {
-        window.open(URL.createObjectURL(blob), '_blank')
-      }
+    const blob = await this.blobSyncService.resolve(originalBlobId)
+    if ( ! blob ) {
+      return
+    }
+    const modal = await this.modalController.create({
+      component: ImageViewerModalComponent,
+      componentProps: {imageUrl: URL.createObjectURL(blob)},
     })
+    await modal.present()
   }
 
   private makeThumbnailBlob(source: Blob | string): Promise<Blob | undefined> {
@@ -271,9 +283,30 @@ export class RichTextEditComponent extends AbstractCellComponent implements OnIn
     })
   }
 
+  /** A pasted image with no `data-blob-upload-pending` marker yet (i.e. genuinely new, not
+   * already mid-upload/uploaded) - used below to decide whether a missing item id is actually
+   * worth forcing, without unconditionally flushing on every keystroke of every field. */
+  private hasUnprocessedPastedImage(editor: any): boolean {
+    return !! editor.getBody()?.querySelector('img[src^="data:image"]:not([data-blob-upload-pending]), img[src^="blob:"]:not([data-blob-upload-pending])')
+  }
+
   private retryPendingBlobWork(editor: any) {
     this.hydrateBlobImages(editor)
-    if ( this.collection && this.resolveItemId() ) {
+    if ( ! this.collection ) {
+      return
+    }
+    if ( ! this.resolveItemId() && this.hasUnprocessedPastedImage(editor) ) {
+      // A brand-new, never-yet-saved item's id is only assigned the first time patchThrottled()
+      // actually runs - pasting an image as the very first action (no preceding keystroke)
+      // would otherwise leave resolveItemId() undefined forever, since nothing else triggers
+      // that first patch here. convertInlineImagesToBlobs() below is itself gated on having an
+      // id, so without this the image gets marked data-blob-upload-pending on the very next
+      // pass regardless and is then never retried, permanently un-uploaded (GH #53). Forcing a
+      // flush is a no-op if a save already went through, same as ViewSyncer.flush()'s other
+      // callers.
+      this.viewSyncer?.flush()
+    }
+    if ( this.resolveItemId() ) {
       this.convertInlineImagesToBlobs(editor, editor.getBody())
     }
   }
