@@ -104,6 +104,27 @@ create policy "Users can read shares involving them"
 
 -- Only the subtree's actual owner can grant/revoke access to it (not a re-share by someone
 -- who merely has write access) - simplest safe default for this pass.
+--
+-- This check can't be a direct `exists (select 1 from odm_items ...)` subquery: odm_items'
+-- own SELECT/INSERT/UPDATE/DELETE policies below query ory_subtree_shares right back (for the
+-- sharing carve-out), so a direct subquery here creates a circular RLS dependency between the
+-- two tables - confirmed live (Postgres error 42P17, "infinite recursion detected in policy for
+-- relation ory_subtree_shares") when this was first tried as a plain subquery. A SECURITY
+-- DEFINER function breaks the cycle: its internal query runs with the function owner's
+-- privileges, bypassing RLS re-evaluation on odm_items instead of re-triggering its policies.
+create or replace function public.user_owns_ory_item(item_id text, uid text)
+returns boolean
+language sql
+security definer
+set search_path = public
+stable
+as $$
+  select exists (
+    select 1 from odm_items i
+    where i.collection = 'OryItem' and i.id = item_id and i.owner = uid
+  );
+$$;
+
 drop policy if exists "Users can grant access to subtrees they own" on public.ory_subtree_shares;
 create policy "Users can grant access to subtrees they own"
   on public.ory_subtree_shares
@@ -111,12 +132,7 @@ create policy "Users can grant access to subtrees they own"
   to authenticated, anon
   with check (
     granted_by_uid = (select auth.jwt() ->> 'sub')
-    and exists (
-      select 1 from public.odm_items i
-      where i.collection = 'OryItem'
-        and i.id = subtree_root_item_id
-        and i.owner = (select auth.jwt() ->> 'sub')
-    )
+    and public.user_owns_ory_item(subtree_root_item_id, (select auth.jwt() ->> 'sub'))
   );
 
 drop policy if exists "Users can revoke shares they granted" on public.ory_subtree_shares;
