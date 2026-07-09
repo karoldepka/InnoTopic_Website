@@ -112,12 +112,12 @@
       </ion-button>
 
       <div *ngIf="showMore" class="mindfulness-stats__details">
-        <p>
-          Today: <strong>{{ formatDurationMs(todayMs) }}</strong>
+        <p *ngIf="formatDurationParts(todayMs) as todayParts">
+          Today: <strong>{{ todayParts.main }}</strong><small class="duration-seconds"> {{ todayParts.seconds }}</small>
           <span *ngIf="goalMinutesPerDay"> / goal {{ goalMinutesPerDay }}m</span>
         </p>
-        <p>
-          This week: <strong>{{ formatDurationMs(weekMs) }}</strong>
+        <p *ngIf="formatDurationParts(weekMs) as weekParts">
+          This week: <strong>{{ weekParts.main }}</strong><small class="duration-seconds"> {{ weekParts.seconds }}</small>
           <span *ngIf="goalMinutesPerWeek"> / goal {{ goalMinutesPerWeek }}m</span>
         </p>
 

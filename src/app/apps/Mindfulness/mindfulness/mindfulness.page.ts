@@ -120,11 +120,16 @@ export class MindfulnessPage extends BaseComponent implements OnInit, OnDestroy 
   }
 
   /** e.g. 90 minutes -> "1h 30m", 45 minutes -> "45m". */
-  formatDurationMs(ms: number): string {
-    const totalMinutes = Math.round(ms / 60_000)
-    const hours = Math.floor(totalMinutes / 60)
-    const minutes = totalMinutes % 60
-    return hours > 0 ? `${hours}h ${minutes}m` : `${minutes}m`
+  /** Split so the template can render the seconds in a smaller font (GH #54) - deriving both
+   * from the same floored totalSeconds keeps them consistent (independent rounding of minutes
+   * and seconds could otherwise disagree, e.g. 90s rounding to "2m" but seconds showing "30s"). */
+  formatDurationParts(ms: number): { main: string, seconds: string } {
+    const totalSeconds = Math.floor(ms / 1000)
+    const hours = Math.floor(totalSeconds / 3600)
+    const minutes = Math.floor((totalSeconds % 3600) / 60)
+    const seconds = totalSeconds % 60
+    const main = hours > 0 ? `${hours}h ${minutes}m` : `${minutes}m`
+    return { main, seconds: `${String(seconds).padStart(2, '0')}s` }
   }
 
   get timerMinutesText() {
