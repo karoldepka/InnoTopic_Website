@@ -66,12 +66,16 @@ export class JournalEntry extends OdmInMemItem /*OdmItem<JournalEntry>*/ {
     return this.getCompositeField(field)?.comment || undefined
   }
 
-  getPresentCompositeFieldEntries(): [JournalNumericDescriptor, number, string | undefined][] {
-    const retArray = [] as Array<[JournalNumericDescriptor, number, string | undefined]>
+  /** A descriptor with only a comment and no rating yet is still "present" (GH #57 - either a
+   * numeric-self-rating OR a note is enough) - previously dropped entirely since this only
+   * checked for a numeric value. */
+  getPresentCompositeFieldEntries(): [JournalNumericDescriptor, number | undefined, string | undefined][] {
+    const retArray = [] as Array<[JournalNumericDescriptor, number | undefined, string | undefined]>
     for ( let desc of JournalNumericDescriptors.instance.array ) {
       const fieldVal = this.getCompositeFieldNumVal(desc)
-      if ( fieldVal !== undefined ) {
-        retArray.push([desc, fieldVal, this.getCompositeFieldComment(desc)])
+      const comment = this.getCompositeFieldComment(desc)
+      if ( fieldVal !== undefined || comment ) {
+        retArray.push([desc, fieldVal, comment])
       }
     }
     return retArray

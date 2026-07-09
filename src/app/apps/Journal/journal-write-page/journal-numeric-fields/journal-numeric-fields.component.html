@@ -7,13 +7,13 @@
 ></ion-searchbar>
 
 <ng-container
-  *ngIf="showAny || ((search?.length || 0) > 2) || showAll"
+  *ngIf="showAny || hasAnyFieldWithData || ((search?.length || 0) > 2) || showAll"
 >
   <ng-container
     *ngFor="let descriptor of numDescriptors"
   >
     <div class="field-with-comment"
-      *ngIf="descriptor?.isShortListed || showAll || (isSearchEntered && descriptor.matchesSearch(search))"
+      *ngIf="descriptor?.isShortListed || showAll || (isSearchEntered && descriptor.matchesSearch(search)) || descriptorHasData(descriptor)"
       [hidden]="! descriptor.matchesSearch(search)"
     >
       <div class="journal-rating">

@@ -51,6 +51,22 @@ export class JournalNumericFieldsComponent implements OnInit {
     return this.search ?. trim() ?. length
   }
 
+  /** A field with a rating or a note already entered should show up on its own (GH #57) - not
+   * just when short-listed/showAll/matching a search - so opening an entry that already has data
+   * actually shows that data instead of hiding it behind "Show core ratings"/"Show all". Either
+   * one alone is enough, matching the issue's own "numeric-self-rating OR note" wording. */
+  descriptorHasData(descriptor: JournalNumericDescriptor): boolean {
+    const entry = this.journalEntry$?.currentVal
+    if ( ! entry ) {
+      return false
+    }
+    return entry.getCompositeFieldNumVal(descriptor) !== undefined || !! entry.getCompositeFieldComment(descriptor)?.trim()
+  }
+
+  get hasAnyFieldWithData(): boolean {
+    return this.numDescriptors.some(descriptor => this.descriptorHasData(descriptor))
+  }
+
   constructor(private elementRef: ElementRef<HTMLElement>) { }
 
   ngOnInit() {}
