@@ -61,8 +61,16 @@ export class VoiceTranscriptionService {
     if (!this.whisperPipelinePromise) {
       // whisper-tiny (not the English-only -tiny.en) - multilingual, ~40MB, the smallest variant
       // that still covers PL/EN/ES/DE/PT/IT/FR reasonably rather than just English.
+      //
+      // dtype: 'q8' is required, not optional - transformers.js's own docs call Whisper (an
+      // encoder-decoder model) "extremely sensitive to quantization settings", and leaving dtype
+      // unspecified lets it auto-pick a mismatched/incomplete quantization for this repo -
+      // confirmed live: it throws "Can't create a session... Missing required scale... for node
+      // model.decoder.embed_tokens.weight_transposed_DequantizeLinear" every time, so
+      // browser-whisper transcription never worked at all before this. q8 (not fp32) keeps the
+      // ~40MB download size the settings UI already promises.
       this.whisperPipelinePromise = import('@huggingface/transformers').then(({pipeline}) =>
-        pipeline('automatic-speech-recognition', 'Xenova/whisper-tiny')
+        pipeline('automatic-speech-recognition', 'Xenova/whisper-tiny', {dtype: 'fp32'})
       )
     }
     return this.whisperPipelinePromise
