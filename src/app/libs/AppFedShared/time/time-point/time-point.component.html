@@ -1,6 +1,6 @@
-<span *ngIf="time else noTimestamp">
-  {{ process(time) || '(no timestamp)' }}
-  {{ dayNames[time.getDay()] }}
+<span *ngIf="hasValidTime else noTimestamp">
+  {{ process(time) }}
+  {{ dayNames[time!.getDay()] }}
 </span>
 
 <ng-template #noTimestamp
