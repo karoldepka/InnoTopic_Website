@@ -125,7 +125,7 @@ describe('QuizService — quizStatus$', () => {
     quizService.setOptions(new QuizOptions(false, false, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, true))
     fakeLearnDoService.itemsLoaded = true
     fakeLearnDoService.localItems$.next([
-      makeItem$(fakeLearnDoService, { createdByAiAt: { seconds: 1, nanoseconds: 0 } as any }, 'ai-item'),
+      makeItem$(fakeLearnDoService, { whenGeneratedByAi: { seconds: 1, nanoseconds: 0 } as any }, 'ai-item'),
     ])
 
     let lastStatus: any

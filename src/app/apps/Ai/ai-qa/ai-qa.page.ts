@@ -232,7 +232,7 @@ export class AiQaPage implements OnInit {
     await toast.present();
   }
 
-  /** Persist Q&A into the Learn store as AI-created drafts (createdByAiAt + draftedAt),
+  /** Persist Q&A into the Learn store as AI-created drafts (whenGeneratedByAi + draftedAt),
    * using LearnItem$ and tagging each with its category path. */
   private persistQuestionsAsDrafts(questions: QuestionAnswer[]): void {
     const now = OdmBackend.nowTimestamp();
@@ -241,7 +241,7 @@ export class AiQaPage implements OnInit {
         title: qa.question,
         answer: qa.answer,
         categories: qa.categoryPath || qa.categoryId,
-        createdByAiAt: now,
+        whenGeneratedByAi: now,
         draftedAt: now,
       };
       this.learnItems.add(Object.assign(new LearnItem(), data));
@@ -265,7 +265,7 @@ export class AiQaPage implements OnInit {
       const data: Partial<LearnItem> = {
         title: node.title,
         isCategory: true,
-        createdByAiAt: now,
+        whenGeneratedByAi: now,
         draftedAt: now,
       };
       const item = parentItem
@@ -285,7 +285,7 @@ export class AiQaPage implements OnInit {
       const data: Partial<LearnItem> = {
         title: qa.question,
         answer: qa.answer,
-        createdByAiAt: now,
+        whenGeneratedByAi: now,
         draftedAt: now,
       };
       const categoryItem = categoryIdToItem.get(qa.categoryId);

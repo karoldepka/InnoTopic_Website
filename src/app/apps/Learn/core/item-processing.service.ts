@@ -9,6 +9,7 @@ import {LearnItem} from '../models/LearnItem'
 import {sidesDefsArray} from './sidesDefs'
 import {stripHtml} from '../../../libs/AppFedShared/utils/html-utils'
 import {AiBackendService} from './ai-backend.service'
+import {OdmBackend} from '../../../libs/AppFedShared/odm/OdmBackend'
 
 export interface FillQuestionsWithAiProgress {
   running: boolean
@@ -154,7 +155,7 @@ export class ItemProcessingService {
     ).toPromise()
     const modelName = response?.modelName || 'unknown-model'
     const answer = this.withFilledByAiMarker(response?.answer || '', modelName)
-    item$.patchThrottled({answer})
+    item$.patchThrottled({answer, whenGeneratedByAi: OdmBackend.nowTimestamp()})
     return true
   }
 

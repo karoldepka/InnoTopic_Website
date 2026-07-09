@@ -9,6 +9,7 @@ import {LearnItem} from '../../models/LearnItem'
 import {RichTextEditComponent} from '../../../../libs/AppFedShared/rich-text/rich-text-edit/rich-text-edit.component'
 import {OdmCell} from '../../../../libs/AppFedShared/tree/cells/OdmCell'
 import {AiBackendService} from '../../core/ai-backend.service'
+import {OdmBackend} from '../../../../libs/AppFedShared/odm/OdmBackend'
 import {stripHtml} from '../../../../libs/AppFedShared/utils/html-utils'
 import {finalize} from 'rxjs/operators'
 import { NgIf, NgClass, AsyncPipe } from '@angular/common';
@@ -186,7 +187,7 @@ export class ItemSideComponent implements OnInit {
         const marker = `#FilledByAI:(${modelName})`
         const answer = `${(response?.answer || '').trim()}\n\n${marker}`.trim()
         this.formControl.setValue(answer)
-        this.item$.patchThrottled({answer})
+        this.item$.patchThrottled({answer, whenGeneratedByAi: OdmBackend.nowTimestamp()})
       },
       e => console.error('Error filling with AI', e)
     )

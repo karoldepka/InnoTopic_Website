@@ -388,10 +388,13 @@ export class SearchOrAddLearnableItemPageComponent extends BaseComponent impleme
       const item$ = await this.learnDoService.add(item)
       this.clearInput()
       this.navigateIntoItem(item$.id!)
+      // Captured once (not re-read per streamed chunk below) - only when the answer was
+      // generated matters, not every intermediate token's arrival time.
+      const whenGeneratedByAi = OdmBackend.nowTimestamp()
       this.aiSubscription = this.aiBackend.generateAnswerStream(text).pipe(
         finalize(() => this.isAddingWithAI = false)
       ).subscribe(
-        answer => item$.patchThrottled({answer}),
+        answer => item$.patchThrottled({answer, whenGeneratedByAi}),
         e => {
           console.error('Error adding with AI', e)
           this.showAddError(this.formatAddError(e, 'The item was added, but AI could not fill the answer.'))

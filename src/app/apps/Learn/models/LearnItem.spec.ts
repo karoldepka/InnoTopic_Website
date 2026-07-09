@@ -5,10 +5,10 @@ import { OdmTimestamp } from '../../../libs/AppFedShared/odm/OdmBackend'
 const aTimestamp = { seconds: 1, nanoseconds: 0 } as unknown as OdmTimestamp
 
 describe('LearnItem — AI / draft markers', () => {
-  it('isAiGenerated reflects createdByAiAt', () => {
+  it('isAiGenerated reflects whenGeneratedByAi', () => {
     const item = new LearnItem()
     expect(item.isAiGenerated()).toBe(false)
-    item.createdByAiAt = aTimestamp
+    item.whenGeneratedByAi = aTimestamp
     expect(item.isAiGenerated()).toBe(true)
   })
 
@@ -21,7 +21,7 @@ describe('LearnItem — AI / draft markers', () => {
 
   it('AI-generated draft category is flagged on all three axes', () => {
     const item = new LearnItem()
-    item.createdByAiAt = aTimestamp
+    item.whenGeneratedByAi = aTimestamp
     item.draftedAt = aTimestamp
     item.isCategory = true
     expect(item.isAiGenerated()).toBe(true)
