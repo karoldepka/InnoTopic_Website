@@ -47,6 +47,22 @@ export abstract class OdmCollectionBackend<
   ) {
   }
 
+  /** Resolves once auth has settled and this backend is ready to accept queries. Read paths
+   * (setListener/loadChildrenOf/loadTreeDescendantsOf) already gate on collectionBackendReady$
+   * before querying - writes (saveNowToDb/deleteWithoutConfirmation) need the same guard, since
+   * calling requireUserId() synchronously throws immediately if a save is triggered before the
+   * first post-login auth signal arrives (e.g. a UI action fired right as a page renders, before
+   * authUser$'s first emission has landed) instead of just waiting the moment out. */
+  protected waitUntilReady(): Promise<void> {
+    // No unsubscribe here, matching every other collectionBackendReady$.subscribe(...) call in
+    // this file's subclasses (setListener/loadChildrenOf/loadTreeDescendantsOf) - CachedSubject
+    // replays its cached value synchronously to a new subscriber, so referencing a `const`
+    // subscription handle inside this same callback would hit it mid-initialization.
+    return new Promise<void>(resolve => {
+      this.collectionBackendReady$.subscribe(() => resolve())
+    })
+  }
+
   abstract saveNowToDb(
     item: TRaw,
     id: ItemId,

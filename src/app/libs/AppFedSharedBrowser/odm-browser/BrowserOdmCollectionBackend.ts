@@ -24,6 +24,7 @@ export class BrowserOdmCollectionBackend<TRaw> extends OdmCollectionBackend<TRaw
   }
 
   async saveNowToDb(item: TRaw, id: string, parentIds?: ItemId[], ancestorIds?: ItemId[]): Promise<any> {
+    await this.waitUntilReady()
     const owner = this.requireUserId()
     const row = createPostgresOdmRow(this.collectionName, id, owner, item, parentIds, ancestorIds)
     try {
@@ -34,6 +35,7 @@ export class BrowserOdmCollectionBackend<TRaw> extends OdmCollectionBackend<TRaw
   }
 
   async deleteWithoutConfirmation(itemId: OdmItemId): Promise<any> {
+    await this.waitUntilReady()
     const existing = await this.storage.get<TRaw>(this.collectionName, itemId as string)
     if (!existing) {
       return

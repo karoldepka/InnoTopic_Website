@@ -40,6 +40,7 @@ export class SupabaseOdmCollectionBackend<TRaw> extends OdmCollectionBackend<TRa
   }
 
   async deleteWithoutConfirmation(itemId: OdmItemId): Promise<any> {
+    await this.waitUntilReady()
     const owner = this.requireUserId()
     const {error} = await this.supabase
       .from(this.tableName)
@@ -53,6 +54,7 @@ export class SupabaseOdmCollectionBackend<TRaw> extends OdmCollectionBackend<TRa
   }
 
   async saveNowToDb(item: TRaw, id: string, parentIds?: ItemId[], ancestorIds?: ItemId[]): Promise<any> {
+    await this.waitUntilReady()
     const owner = this.requireUserId()
     const row = createPostgresOdmRow(this.collectionName, id, owner, item, parentIds, ancestorIds)
     console.log(`[Supabase ODM] -> ${this.collectionName}/${id}`)

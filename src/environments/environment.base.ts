@@ -12,11 +12,11 @@ export const environmentBase = {
   odmBackend: 'supabase', // 'firestore' reads, mirrored to Supabase+Neon via 'fanout'; or 'firestore'/'supabase'/'neon' alone
   authBackend: 'firebase',
 
-  // OrYoL (/tree) is being migrated off its standalone Firestore-only data layer onto the
+  // OrYoL (/tree) has been migrated off its standalone Firestore-only data layer onto the
   // shared ODM/Supabase sync engine (offline cache, durable pending-edits journal, subtree
-  // sharing). Stays 'firestore' until the one-time backfill + verification pass is done, so
-  // there's a clean rollback path during the migration - see the OrYoL tree migration plan.
-  oryolTreeBackend: 'firestore', // 'firestore' | 'supabase'
+  // sharing) - the one-time backfill + verification pass is done (2801 OryItem/OryNodeInclusion
+  // rows each, matching counts). Firestore data is left in place as a rollback path.
+  oryolTreeBackend: 'supabase', // 'firestore' | 'supabase'
 
   supabase: {
     url: 'https://xjqivegtpzstkzabqncb.supabase.co',
