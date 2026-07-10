@@ -9,6 +9,7 @@ import {OryItem$} from '../db/OryItem$'
 import {TimeTrackingPersistentData} from './TimeTrackingPersistentData'
 import {map} from 'rxjs/operators'
 import {maxBy, uniqBy} from 'lodash-es'
+import {odmTimestampToMillis} from '../../../libs/AppFedShared/odm/utils'
 
 
 export interface TimeTrackableItemData {
@@ -17,14 +18,14 @@ export interface TimeTrackableItemData {
 
 export type TimeTrackable = OryItem$ //= HasPatchThrottled<TimeTrackableItemData>
 
+/** Timestamps stored on OrYoL time-tracking data can arrive as a Firestore `Timestamp`
+ * (`.toDate()`), a real `Date`, or (since the Supabase cutover) a plain serialized
+ * `{seconds, nanoseconds}` object - the last of which used to fall through this function
+ * unconverted, since it has neither `.toDate` nor is a `Date` instance, later crashing callers
+ * like TimePassingComponent with "referenceTime.getTime is not a function". */
 export function date(obj: any): Date | null {
-  if ( ! obj ) {
-    return null
-  }
-  if ( obj.toDate ) {
-    return obj.toDate()
-  }
-  return obj
+  const millis = odmTimestampToMillis(obj)
+  return millis === undefined ? null : new Date(millis)
 }
 
 export type TTPatch = Partial<TimeTrackingPersistentData> & {
