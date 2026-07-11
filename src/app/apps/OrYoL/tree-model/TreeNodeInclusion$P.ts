@@ -65,7 +65,10 @@ export class TreeNodeInclusion$P<
         this.unsavedChangesPromiseResolveFunc = resolve
         // console.log('this.unsavedChangesPromiseResolveFunc = resolve', resolve)
       })
-      this.syncStatusService.handleUnsavedPromise(unsavedPromise, 'tree node move' /* TODO unify with saving in progress (code, message, handling of unsaved -> saving progression */) // using the crude placeholder func to piggy-back on the promise-based approach
+      // No title/name available on a bare inclusion patch (just parentItemId/nodeInclusionId) -
+      // referencing itemId at least says *which* item is being moved, instead of the fully
+      // generic "tree node move" that gave no indication of what changed or where.
+      this.syncStatusService.handleUnsavedPromise(unsavedPromise, `Moving item "${this.itemId}"` /* TODO unify with saving in progress (code, message, handling of unsaved -> saving progression */) // using the crude placeholder func to piggy-back on the promise-based approach
     }
   }
 

@@ -100,7 +100,7 @@ export class FirestoreTreeService extends DbTreeService {
       errorAlert('Firestore write failed in FirestoreTreeService.deleteWithoutConfirmation', error)
       throw error
     }) // TODO
-    this.syncStatusService.handleSavingPromise(promise)
+    this.syncStatusService.handleSavingPromise(promise, `Deleting item "${itemId}"`)
     console.log('deleteWithoutConfirmation deleted ' + itemId)
   }
 
@@ -325,7 +325,7 @@ export class FirestoreTreeService extends DbTreeService {
     // in order to work around the "no document to update" issue, we use the same function as for adding new inclusions:
     this.syncStatusService.handleSavingPromise(
       this.addNodeInclusionToParent(parentItemId, itemInclusionData, this.itemDocById(childItemId)),
-      'moving tree node',
+      `Moving item "${childItemId}" under "${parentItemId}"`,
     )
     // const inclusionRawObject = {} as any // Firestore wants object, does not accept instance of NodeInclusion
     // Object.assign(inclusionRawObject, itemInclusionData)

@@ -157,7 +157,7 @@ export class TimeTrackingService {
         timeTrackedEntry.updateFromTimeTrackData(ttData)
         this.emitTimeTrackedEntry(timeTrackedEntry)
       } else if (existingEntry) {
-        console.log(`onItemAddedOrModified$.subscribe item was on list of time tracked entries`, addedOrModifiedDataItem)
+        // console.log(`onItemAddedOrModified$.subscribe: item was on list of time tracked entries`, addedOrModifiedDataItem)
         if (ttData) {
           existingEntry.updateFromTimeTrackData(ttData)
         }

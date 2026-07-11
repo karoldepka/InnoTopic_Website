@@ -11,6 +11,7 @@ import {OryItemsService} from '../core/ory-items.service'
 import {DbTreeService} from '../tree-model/db-tree-service'
 import {HasItemData, HasPatchThrottled, ItemData} from '../tree-model/has-item-data'
 import {stripHtml} from '../../../libs/AppFedShared/utils/html-utils'
+import {summarizePatch} from '../../../libs/AppFedShared/odm/OdmItem$2'
 
 export type ItemId = string //& { type: 'ItemId' }
 
@@ -114,6 +115,15 @@ export class OryItem$<TData = any> implements HasPatchThrottled<TData> {
     return stripHtml(title)?.trim() || this.id
   }
 
+  /** Same "what changed and where" shape as OdmItem$2.describePendingChange() (see the sync
+   * popover's "Unsaved change" fallback) - this used to pass no titleOfChange at all here, so a
+   * pending OrYoL edit showed only the generic "Unsaved change" placeholder with no indication of
+   * which item or field. */
+  private describePendingChange(patch: any): string {
+    const patchSummary = summarizePatch(patch)
+    return `Modified "${this.getDisplayTitle()}"` + (patchSummary ? ` with ${patchSummary}` : '')
+  }
+
   private subscribeDebouncedOnChangePerColumns() {
     // for ( const column of this.columns.allColumns ) {
     const throttleTimeConfig = {
@@ -178,7 +188,7 @@ export class OryItem$<TData = any> implements HasPatchThrottled<TData> {
         // console.log('in promise executor func this.unsavedChangesPromiseResolveFunc = resolve', resolve)
       })
       // console.log('outside of promise this.unsavedChangesPromiseResolveFunc = resolve', this.unsavedChangesPromiseResolveFunc)
-      this.syncStatusService.handleUnsavedPromise(unsavedPromise) // using the crude placeholder func to piggy-back on the promise-based approach
+      this.syncStatusService.handleUnsavedPromise(unsavedPromise, this.describePendingChange(patch)) // using the crude placeholder func to piggy-back on the promise-based approach
     }
     this.data$.next(this.itemData !) // FIXME this should be replaced with OdmItemData
 
