@@ -174,7 +174,7 @@ export const themesMapById: { [key: string]: Theme } = setIdsFromKeys({
   //  primary secondary too similar
   // }),
   'Fire': theme({
-    primary: '#800000',
+    primary: '#e8303a',
     secondary: '#e1b74d',
   }),
   // TODO: brown and green like forest
