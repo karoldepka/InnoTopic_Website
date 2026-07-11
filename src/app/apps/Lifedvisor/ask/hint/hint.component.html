@@ -27,6 +27,11 @@
         <ion-icon slot="icon-only" name="heart" />
       </ion-button>
     </ion-buttons>
+
+    <apf-star-rating
+      (click)="$event.stopPropagation()"
+      (numericValue)="onRate($event)"
+    />
     <ion-card-subtitle *ngIf="! isCollapsed && wish.subTitle; let subTitle">
       {{subTitle}}
     </ion-card-subtitle>
