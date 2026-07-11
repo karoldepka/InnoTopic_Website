@@ -52,6 +52,12 @@ export class TreeHostComponent implements OnInit {
    * deep link back to '/tree'. */
   private pendingRootNodeIdFromRoute: string | undefined
 
+  /** Same idea as pendingRootNodeIdFromRoute, but for navigationService.navigation$ (search
+   * results, the time-tracking toolbar's "jump to tracked item") - navigation$ is a CachedSubject
+   * that replays its last-ever value to a brand new TreeHostComponent (e.g. a fresh page load),
+   * so the target node may genuinely not have streamed in yet. */
+  private pendingNavigationTargetItemId: string | undefined
+
   constructor(
     public treeService: TreeService,
     public treeDragDropService: TreeDragDropService,
@@ -68,10 +74,7 @@ export class TreeHostComponent implements OnInit {
     this.treeModel = this.treeService.getRootTreeModel()
 
     this.navigationService.navigation$.subscribe((nodeId: string) => {
-      const node = this.treeModel.getNodesByItemId(nodeId)[0]
-      const dayPlanAncestor = node?.findAncestorMatching((n: any) => (n.content as any)?.isDayPlan)
-      this.treeModel.navigation.navigateInto(dayPlanAncestor ?? nodeId)
-      this.focusNode(node)
+      this.tryNavigateToNodeId(nodeId)
     })
 
     commandsService.commands$.subscribe((command: Command) => {
@@ -121,6 +124,9 @@ export class TreeHostComponent implements OnInit {
       if (this.pendingRootNodeIdFromRoute) {
         this.applyRouteParamToVisualRoot(this.pendingRootNodeIdFromRoute)
       }
+      if (this.pendingNavigationTargetItemId) {
+        this.tryNavigateToNodeId(this.pendingNavigationTargetItemId)
+      }
     })
 
     // visualRoot -> router. Centralized here so every navigateInto() call site (menu, toolbar,
@@ -152,6 +158,18 @@ export class TreeHostComponent implements OnInit {
     setTimeout(() => {
       this.showTree = true
     }, 0 /*2000*/)
+  }
+
+  private tryNavigateToNodeId(nodeId: string) {
+    const node = this.treeModel.getNodesByItemId(nodeId)[0]
+    if (!node) {
+      this.pendingNavigationTargetItemId = nodeId
+      return
+    }
+    this.pendingNavigationTargetItemId = undefined
+    const dayPlanAncestor = node.findAncestorMatching((n: any) => (n.content as any)?.isDayPlan)
+    this.treeModel.navigation.navigateInto(dayPlanAncestor ?? node)
+    this.focusNode(node)
   }
 
   private applyRouteParamToVisualRoot(rootNodeId: string | undefined) {
