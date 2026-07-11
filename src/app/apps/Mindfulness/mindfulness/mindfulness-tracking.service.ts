@@ -5,9 +5,10 @@ import {TimeTrackingService, date} from '../../OrYoL/time-tracking/time-tracking
 import {TimeTrackedEntry} from '../../OrYoL/time-tracking/TimeTrackedEntry'
 import {TimeTrackingPeriodsService} from '../../OrYoL/time-tracking/time-tracking-periods.service'
 
-/** Reserved, non-tree item id (GH issue #27) that all mindfulness sessions time-track onto, in
- * parallel with whatever else is being tracked in OrYoL's tree - it never appears in any tree/
- * inclusion structure, just like `treeRootItemId`-style reserved ids elsewhere in this app. */
+/** Reserved anchor item id (GH issue #27) that all mindfulness sessions time-track onto, in
+ * parallel with whatever else is being tracked in OrYoL's tree. Per the issue's follow-up, it's
+ * also given a real inclusion under the tree root (upsertRootInclusionIfMissing below) so it
+ * shows up as a normal top-level node instead of being hidden. */
 export const MINDFULNESS_ITEM_ID = '_mindfulness'
 
 export interface MindfulnessTotals {
@@ -35,6 +36,9 @@ export class MindfulnessTrackingService {
         title: 'Mindfulness',
         isArchived: false,
       })
+      // GH #27 follow-up: show the anchor item in the OrYoL tree itself, not just as a hidden
+      // time-tracking target.
+      await this.dbTreeService.upsertRootInclusionIfMissing(MINDFULNESS_ITEM_ID)
       this.mindfulnessItem$ = new OryItem$(this.injector, MINDFULNESS_ITEM_ID, {})
       this.entry = this.timeTrackingService.obtainEntryForItem(this.mindfulnessItem$)
     }

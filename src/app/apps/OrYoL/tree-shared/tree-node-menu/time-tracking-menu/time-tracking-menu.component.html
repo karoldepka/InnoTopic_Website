@@ -24,3 +24,23 @@
 <!--  (click)="stopTimeTracking()">-->
 <!--  Stop TT-->
 <!--</button>-->
+
+<div style="margin-top: .5em">
+  <ion-button size="small" fill="clear" (click)="toggleShowSegments()">
+    {{ showSegments ? 'Hide' : 'Show' }} Time Segments
+  </ion-button>
+
+  <div *ngIf="showSegments">
+    <p *ngIf="loadingSegments">Loading...</p>
+    <p *ngIf="!loadingSegments && !segments.length">No tracked segments yet.</p>
+    <ul *ngIf="!loadingSegments && segments.length" style="list-style: none; padding: 0; margin: 0;">
+      <li *ngFor="let segment of segments" style="display: flex; align-items: center; gap: .5em; margin-bottom: .25em;">
+        <app-time-point [time]="startOf(segment)"></app-time-point>
+        <span>&rarr;</span>
+        <app-time-point *ngIf="endOf(segment) as end; else inProgress" [time]="end"></app-time-point>
+        <ng-template #inProgress><span>(in progress)</span></ng-template>
+        <app-time-view [timeMs]="durationMsOf(segment)"></app-time-view>
+      </li>
+    </ul>
+  </div>
+</div>

@@ -57,5 +57,15 @@ export abstract class DbTreeService {
   async upsertItemIfMissing(itemId: string, itemData: any): Promise<void> {
   }
 
+  /** Ensures a reserved/anchor item (see upsertItemIfMissing) is actually visible as a normal
+   * top-level tree node, by giving it a real inclusion under the tree root if it doesn't already
+   * have one under any parent - e.g. Mindfulness's `_mindfulness` anchor (GH #27), which started
+   * out deliberately invisible but was later asked to show up in the tree like any other item.
+   * Default no-op, matching upsertItemIfMissing's convention - Firestore doesn't implement this
+   * (it's the legacy/inactive OrYoL backend now that `environment.oryolTreeBackend` is
+   * 'supabase'). Safe to call repeatedly. */
+  async upsertRootInclusionIfMissing(itemId: string): Promise<void> {
+  }
+
 }
 

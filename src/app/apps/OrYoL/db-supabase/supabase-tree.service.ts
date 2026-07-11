@@ -134,6 +134,40 @@ export class SupabaseTreeService extends DbTreeService {
     item$.saveNowToDb()
   }
 
+  /** See DbTreeService.upsertRootInclusionIfMissing's doc comment. Waits for the inclusions
+   * collection's initial load (same reasoning as TimeTrackingPeriodsService.waitUntilLoaded) so a
+   * call made right after app boot doesn't race an empty in-memory list and create a duplicate
+   * inclusion every time. */
+  override async upsertRootInclusionIfMissing(itemId: string): Promise<void> {
+    await this.waitUntilInclusionsLoaded()
+    const alreadyIncluded = [...this.oryNodeInclusionsService.mapIdToItem$.values()]
+      .some(inclusion$ => inclusion$.val?.childItemId === itemId)
+    if (alreadyIncluded) {
+      return
+    }
+    const nodeInclusionId = ('inclusion_' + uuidv4()) as OryNodeInclusionId
+    const inclusion$ = this.oryNodeInclusionsService.createOdmItem$(nodeInclusionId, {
+      childItemId: itemId,
+      orderNum: 0,
+    } as any)
+    inclusion$.explicitParentItemId = this.HARDCODED_ROOT_NODE_ITEM_ID as OryNodeInclusionId
+    inclusion$.explicitAncestorItemIds = [this.HARDCODED_ROOT_NODE_ITEM_ID as OryNodeInclusionId]
+    inclusion$.saveNowToDb()
+  }
+
+  private waitUntilInclusionsLoaded(): Promise<void> {
+    if (this.oryNodeInclusionsService.itemsLoaded) {
+      return Promise.resolve()
+    }
+    return new Promise<void>(resolve => {
+      this.oryNodeInclusionsService.localItems$.subscribe(() => {
+        if (this.oryNodeInclusionsService.itemsLoaded) {
+          resolve()
+        }
+      })
+    })
+  }
+
   addChildNode(parentNode: OryBaseTreeNode, newNode: OryNonRootTreeNode): void {
     // OdmItem$2.saveNowToDb() already tracks its own sync-status promise internally
     // (OdmService2.saveNowToDb -> syncStatusService.handleSavingPromise) - nothing more to do
