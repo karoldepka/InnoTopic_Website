@@ -1,5 +1,6 @@
 import {Injectable} from '@angular/core'
 import {SupabaseOdmClientService} from '../../../AppFedSharedSupabase/odm-supabase/supabase-odm-client.service'
+import {AuthService} from '../../../../auth/auth.service'
 
 export interface LinkPreviewResult {
   url: string
@@ -22,13 +23,19 @@ export class LinkPreviewService {
 
   constructor(
     private supabaseOdmClientService: SupabaseOdmClientService,
+    private authService: AuthService,
   ) {}
 
   /** Never throws - a fetch/network failure resolves to a `fetchStatus: 'error'` result instead,
    * so a caller inserting a rich-text paste can always fall back to a plain link on failure
-   * without needing its own try/catch. */
+   * without needing its own try/catch. Waits for auth first: the Edge Function has
+   * `verify_jwt: true`, so invoking it before the first post-login auth signal arrives gets
+   * rejected at the gateway before the function body ever runs (no server-side log, indistinguishable
+   * from a generic network failure) - confirmed live: a URL paste right after a fresh page load
+   * silently fell into the plain-link fallback every time (GH #63). */
   async fetchPreview(url: string): Promise<LinkPreviewResult> {
     try {
+      await this.authService.waitUntilAuthReady()
       const {data, error} = await this.supabaseOdmClientService.getClient()
         .functions.invoke('link-preview', {body: {url}})
       if (error) {

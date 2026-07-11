@@ -82,13 +82,12 @@
       </div>
     </ng-container>
 
-    <div *ngIf="( status$ | async ) ?. isNextItemInFuture">
+    <div *ngIf="( status$ | async ) ?. itemsLeft === 0">
       <app-quiz-finished
        />
     </div>
 
-    <div>
-      <!-- *ngIf="! ( status$ | async ) ?. isNextItemInFuture" -->
+    <div *ngIf="( status$ | async ) ?. itemsLeft !== 0">
       <app-quiz-item-details
         *ngFor="let item$ of [ nextItem$WhenRequested | async ]"
         [item$]="item$"

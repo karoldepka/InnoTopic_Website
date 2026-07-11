@@ -15,6 +15,10 @@
       *ngIf="isRecording"
      />
   </ion-button>
+  <span
+    *ngIf="isRecording"
+    class="voice-memo-time"
+  >{{ formatTime(recordingElapsedSec) }}</span>
   <ion-button
     *ngIf="stream"
     size="small"

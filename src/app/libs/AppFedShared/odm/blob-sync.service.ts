@@ -7,6 +7,7 @@ import {
 import {SupabaseOdmClientService} from '../../AppFedSharedSupabase/odm-supabase/supabase-odm-client.service'
 import {AuthService} from '../../../auth/auth.service'
 import {ConcurrencyLimiter} from '../utils/promiseUtils'
+import {SyncStatusService} from './sync-status.service'
 
 /** Offline-safe upload/download of images/audio to the `media` Supabase Storage bucket, following
  * the exact same durable-journal + reconnect-drain shape `OdmService2`/`BrowserOdmStorage` already
@@ -22,6 +23,7 @@ export class BlobSyncService {
     private browserOdmStorage: BrowserOdmStorage,
     private supabaseOdmClientService: SupabaseOdmClientService,
     private authService: AuthService,
+    private syncStatusService: SyncStatusService,
   ) {
     this.authService.authUser$.subscribe(() => this.resumePendingUploadsNow())
     window.addEventListener('online', () => this.resumePendingUploadsNow())
@@ -50,9 +52,20 @@ export class BlobSyncService {
       field_id: fieldId,
       whenCreatedLocally: new Date().toISOString(),
     })
-    this.uploadLimiter.run(() => this.uploadNow(collection, itemId, blobId, blob, kind, contentType, originalBlobId, fieldId))
-      .catch(error => console.error('BlobSyncService upload failed (durably queued, will retry on reconnect)', error))
+    const uploadPromise = this.uploadLimiter.run(() => this.uploadNow(collection, itemId, blobId, blob, kind, contentType, originalBlobId, fieldId))
+    this.syncStatusService.handleSavingPromise(uploadPromise, this.describeUpload(kind))
+    uploadPromise.catch(error => console.error('BlobSyncService upload failed (durably queued, will retry on reconnect)', error))
     return blobId
+  }
+
+  /** GH request: uploads in progress (images/audio) weren't reflected in the top-right sync icon
+   * at all - only row patches (handleSavingPromise/handleUnsavedPromise elsewhere) were. */
+  private describeUpload(kind: BlobKind): string {
+    switch (kind) {
+      case 'image-original': return 'Uploading image'
+      case 'image-thumbnail': return 'Uploading image thumbnail'
+      case 'audio': return 'Uploading voice memo'
+    }
   }
 
   private async uploadNow(collection: string, itemId: string, blobId: string, blob: Blob, kind: BlobKind, contentType: string, originalBlobId?: string, fieldId?: string): Promise<void> {
@@ -105,12 +118,19 @@ export class BlobSyncService {
   }
 
   /** Local cache first, falling back to a signed URL + fetch (mirroring back into the cache) -
-   * same read-through shape `CachingOdmCollectionBackend` uses for row data. */
+   * same read-through shape `CachingOdmCollectionBackend` uses for row data. Waits for auth to be
+   * ready first (unlike SupabaseOdmCollectionBackend's queries, which already gate on this - see
+   * OdmCollectionBackend.waitUntilReady() - this is a separate, parallel implementation that never
+   * got the same guard): calling this before the first post-login auth signal arrives means
+   * auth.jwt() has no `sub` yet, so the owner-scoped RLS policy on odm_item_blobs/storage.objects
+   * matches zero rows and this returns undefined - a hydrated-once image would then be stuck
+   * broken forever (see hydrateBlobImages's retry-on-failure fix in rich-text-edit.component.ts). */
   async resolve(blobId: string): Promise<Blob | undefined> {
     const cached = await this.browserOdmStorage.getCachedBlob(blobId)
     if (cached) {
       return cached
     }
+    await this.authService.waitUntilAuthReady()
     const client = this.supabaseOdmClientService.getClient()
     const {data: row} = await client.from('odm_item_blobs').select('storage_path').eq('blob_id', blobId).maybeSingle()
     if (!row?.storage_path) {
@@ -133,8 +153,9 @@ export class BlobSyncService {
     this.browserOdmStorage.getAllPendingBlobUploadsEverywhere()
       .then(uploads => {
         for (const upload of uploads) {
-          this.uploadLimiter.run(() => this.uploadNow(upload.collection, upload.item_id, upload.blob_id, upload.blob, upload.kind, upload.content_type, upload.original_blob_id))
-            .catch(error => console.error('BlobSyncService resumed upload failed, still queued', error))
+          const resumedPromise = this.uploadLimiter.run(() => this.uploadNow(upload.collection, upload.item_id, upload.blob_id, upload.blob, upload.kind, upload.content_type, upload.original_blob_id))
+          this.syncStatusService.handleSavingPromise(resumedPromise, this.describeUpload(upload.kind))
+          resumedPromise.catch(error => console.error('BlobSyncService resumed upload failed, still queued', error))
         }
       })
       .catch(error => console.error('BlobSyncService resumePendingUploadsNow failed', error))

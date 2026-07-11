@@ -32,6 +32,75 @@ function makeFakeInjector() {
   return {get: () => navigationService}
 }
 
+describe('ListProcessing - roiFunEasyImportance preset', () => {
+  let listProcessing: ListProcessing
+
+  beforeEach(() => {
+    localStorage.removeItem('LifeSuite_options')
+    listProcessing = new ListProcessing(makeFakeInjector() as any)
+    listProcessing.listOptions$P.patchThrottled({preset: 'roiFunEasyImportance'})
+  })
+
+  it('sorts by ROI descending, then fun descending, then mental effort ("easy") ascending, then importance descending', () => {
+    const items = [
+      // Lowest ROI (importance 1 over 10 minutes) - should sort last regardless of its high fun.
+      makeItem$({
+        title: 'low roi, high fun',
+        importance: {numeric: 1} as any,
+        time_estimate: '10m',
+        funEstimate: {numeric: 10} as any,
+        mentalLevelEstimate: {numeric: 1} as any,
+      }, 'low-roi'),
+      // Highest ROI (importance 10 over 1 minute), but low fun and high mental effort - still
+      // sorts first, since ROI outranks everything else.
+      makeItem$({
+        title: 'high roi, low fun, hard',
+        importance: {numeric: 10} as any,
+        time_estimate: '1m',
+        funEstimate: {numeric: 1} as any,
+        mentalLevelEstimate: {numeric: 10} as any,
+      }, 'high-roi-low-fun'),
+      // Same ROI as the pair below (importance 2 / 2 minutes) but higher fun - should come first
+      // among the ROI-tied pair.
+      makeItem$({
+        title: 'roi tie, high fun, easy',
+        importance: {numeric: 2} as any,
+        time_estimate: '2m',
+        funEstimate: {numeric: 10} as any,
+        mentalLevelEstimate: {numeric: 1} as any,
+      }, 'roi-tie-high-fun-easy'),
+      // Same ROI and fun as the previous one, but harder (higher mental effort) - "easy" breaks
+      // the tie, so this comes after it.
+      makeItem$({
+        title: 'roi tie, high fun, hard',
+        importance: {numeric: 2} as any,
+        time_estimate: '2m',
+        funEstimate: {numeric: 10} as any,
+        mentalLevelEstimate: {numeric: 9} as any,
+      }, 'roi-tie-high-fun-hard'),
+      // Same ROI/fun/mental as the pair above but lower importance - importance breaks the final
+      // tie, so this comes last among the three ROI-tied items.
+      makeItem$({
+        title: 'roi tie, low fun',
+        importance: {numeric: 2} as any,
+        time_estimate: '2m',
+        funEstimate: {numeric: 1} as any,
+        mentalLevelEstimate: {numeric: 1} as any,
+      }, 'roi-tie-low-fun'),
+    ]
+
+    listProcessing.setItemsAndSort(items)
+
+    expect(listProcessing.item$s.map(item => item.id)).toEqual([
+      'high-roi-low-fun',
+      'roi-tie-high-fun-easy',
+      'roi-tie-high-fun-hard',
+      'roi-tie-low-fun',
+      'low-roi',
+    ])
+  })
+})
+
 describe('ListProcessing - funCravingPanic preset (GH issue #38)', () => {
   let listProcessing: ListProcessing
 

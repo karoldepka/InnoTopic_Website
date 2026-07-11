@@ -141,6 +141,14 @@ export class ListProcessing {
         mentalGetterAscending /* kinda part of ROI */,
         funGetterDescending /* kinda part of ROI */,
       ])
+    } else if ( preset === `roiFunEasyImportance` ) {
+      this.item$s = sortBy(item$s, [
+        maybeDoableGetterDescending,
+        roiGetterDescending,
+        funGetterDescending,
+        mentalGetterAscending /* "easy" - low mental effort first, distinct from duration/"quick" */,
+        importanceGetterDescending,
+      ])
     } else if ( preset === `funRoi` ) {
       this.item$s = sortBy(item$s, [
         maybeDoableGetterDescending,

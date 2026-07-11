@@ -68,6 +68,27 @@ export class AuthService {
     return this.authUser$.lastVal?.uid
   }
 
+  /** Resolves once a real (truthy) authUser$ has arrived - the same signal
+   * SupabaseOdmBackendService.initDb() already uses to flip backendReady$. Anything that calls
+   * straight into a Supabase client/Edge Function without going through the OdmCollectionBackend
+   * abstraction (which already gates on backendReady$) needs this same guard itself, or a call
+   * fired before the first post-login auth signal arrives fails - a JWT-verified Edge Function
+   * with no session yet rejects at the gateway, a `saveNowToDb()` throws "no userId", etc. - all
+   * variants of the same race, found repeatedly this session (BlobSyncService.resolve(),
+   * LinkPreviewService.fetchPreview(), the OrYoL backfill's "no userId" errors). */
+  waitUntilAuthReady(): Promise<void> {
+    if (this.authUser$.lastVal) {
+      return Promise.resolve()
+    }
+    return new Promise<void>(resolve => {
+      this.authUser$.subscribe(user => {
+        if (user) {
+          resolve()
+        }
+      })
+    })
+  }
+
   constructor(
     private authFacade: AuthFacadeService,
     private Router: Router,

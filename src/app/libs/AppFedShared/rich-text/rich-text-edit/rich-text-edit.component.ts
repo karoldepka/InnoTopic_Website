@@ -313,20 +313,27 @@ export class RichTextEditComponent extends AbstractCellComponent implements OnIn
 
   /** Resolves `data-blob-id` references (saved instead of inline base64 - see
    * `uploadPastedImage`) to a live object URL on every render, since object URLs don't survive a
-   * reload. Marks each image immediately upon starting so `SetContent` firing again mid-resolve
-   * (e.g. the user typing elsewhere) doesn't kick off a duplicate resolve for the same image. */
+   * reload. Marks each image `data-blob-hydrating` immediately upon starting (not yet
+   * `data-blob-hydrated`) so `SetContent` firing again mid-resolve (e.g. the user typing
+   * elsewhere) doesn't kick off a duplicate resolve for the same image - `data-blob-hydrated` is
+   * only set once resolve() actually succeeds. A failed resolve (e.g. BlobSyncService.resolve()
+   * racing auth-ready on first load, or a transient network blip) instead clears the in-flight
+   * marker so the image is retried on the next keyup/SetContent pass, rather than being silently
+   * abandoned as a permanently-broken thumbnail (GH #64). */
   private hydrateBlobImages(editor: any) {
-    const images: HTMLImageElement[] = Array.from(editor.getBody()?.querySelectorAll('img[data-blob-id]:not([data-blob-hydrated])') ?? [])
+    const images: HTMLImageElement[] = Array.from(editor.getBody()?.querySelectorAll('img[data-blob-id]:not([data-blob-hydrated]):not([data-blob-hydrating])') ?? [])
     for ( const img of images ) {
       const blobId = img.getAttribute('data-blob-id')
       if ( ! blobId ) {
         continue
       }
-      img.setAttribute('data-blob-hydrated', 'true')
+      img.setAttribute('data-blob-hydrating', 'true')
       this.blobSyncService.resolve(blobId).then(blob => {
+        img.removeAttribute('data-blob-hydrating')
         if ( ! blob ) {
-          return
+          return // leave un-hydrated - retried next time hydrateBlobImages() runs
         }
+        img.setAttribute('data-blob-hydrated', 'true')
         img.setAttribute('src', URL.createObjectURL(blob))
       })
     }
@@ -514,8 +521,13 @@ export class RichTextEditComponent extends AbstractCellComponent implements OnIn
         editor.on('keyup', (event: any) => {
           // Mirrors autolink's own trigger: it converts a just-typed/pasted bare URL into
           // <a href>url</a> only once a trailing space or Enter follows it, not at paste time.
+          // Deferred a tick (GH #63): confirmed live that TinyMCE's own autolink plugin hasn't
+          // necessarily created that <a href> yet by the time this same keyup handler runs - a
+          // querySelectorAll() here would find nothing, and (since nothing else re-triggers this
+          // check) the URL would sit as a plain unconverted link forever unless the user happened
+          // to type another space/Enter later. autolink has always finished by the next tick.
           if ( this.enableLinkPreview && (event.key === ' ' || event.key === 'Enter') ) {
-            this.convertBareUrlAnchorsToLinkPreviews(editor, editor.getBody())
+            setTimeout(() => this.convertBareUrlAnchorsToLinkPreviews(editor, editor.getBody()))
           }
           // Retries pending blob uploads/hydration on every keystroke - both are already no-ops
           // when there's nothing new to do (the `:not(...)` exclusions inside each), and this is

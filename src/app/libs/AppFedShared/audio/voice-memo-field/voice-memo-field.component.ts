@@ -1,4 +1,4 @@
-import {Component, Input, Output, EventEmitter, OnInit, ChangeDetectionStrategy, ChangeDetectorRef} from '@angular/core'
+import {Component, Input, Output, EventEmitter, OnInit, OnDestroy, ChangeDetectionStrategy, ChangeDetectorRef} from '@angular/core'
 import {AlertController, IonicModule, ToastController} from '@ionic/angular'
 import {NgIf, NgFor} from '@angular/common'
 import {AudioVisualizerComponent} from '../audio-visualizer/audio-visualizer.component'
@@ -22,7 +22,7 @@ declare const MediaRecorder: any
     styleUrls: ['./voice-memo-field.component.sass'],
     imports: [IonicModule, NgIf, NgFor, AudioVisualizerComponent],
 })
-export class VoiceMemoFieldComponent implements OnInit, ActiveMicHolder {
+export class VoiceMemoFieldComponent implements OnInit, OnDestroy, ActiveMicHolder {
 
   /** Item these memos are attached to. Left unset only on Learn's quick-add bar, which has no
    * "current item" yet - see `createItemIfMissing` below. */
@@ -70,6 +70,9 @@ export class VoiceMemoFieldComponent implements OnInit, ActiveMicHolder {
   playingBlobId?: string
   currentTimeSec = 0
   durationSec = 0
+  /** Live elapsed-time display while isRecording (GH #65) - separate from currentTimeSec, which
+   * is the played-back position of a finished memo, not the in-progress recording. */
+  recordingElapsedSec = 0
 
   private mediaRecorder: any = null
   private audioChunks: any[] = []
@@ -78,6 +81,7 @@ export class VoiceMemoFieldComponent implements OnInit, ActiveMicHolder {
   private audioEl?: HTMLAudioElement
   private objectUrl?: string
   private recordingStartedAtMs?: number
+  private recordingTimerHandle?: ReturnType<typeof setInterval>
 
   /** Resolved once at init (see ngOnInit) when `includeLegacy` is set - `undefined` until that
    * check resolves, and stays `undefined` forever if there's nothing to fall back to. */
@@ -169,6 +173,8 @@ export class VoiceMemoFieldComponent implements OnInit, ActiveMicHolder {
     if (this.isRecording) {
       this.mediaRecorder.stop()
       this.isRecording = false
+      clearInterval(this.recordingTimerHandle)
+      this.recordingTimerHandle = undefined
       try {
         this.speechRecognition?.stop()
       } catch (e) {
@@ -176,6 +182,10 @@ export class VoiceMemoFieldComponent implements OnInit, ActiveMicHolder {
       }
       this.changeDetectorRef.markForCheck()
     }
+  }
+
+  ngOnDestroy(): void {
+    clearInterval(this.recordingTimerHandle)
   }
 
   private startRecording() {
@@ -207,6 +217,11 @@ export class VoiceMemoFieldComponent implements OnInit, ActiveMicHolder {
     }
     this.isRecording = true
     this.recordingStartedAtMs = Date.now()
+    this.recordingElapsedSec = 0
+    this.recordingTimerHandle = setInterval(() => {
+      this.recordingElapsedSec = Math.floor((Date.now() - this.recordingStartedAtMs!) / 1000)
+      this.changeDetectorRef.markForCheck()
+    }, 1000)
     this.audioChunks = []
     this.mediaRecorder.ondataavailable = (e: any) => {
       this.audioChunks.push(e.data)
