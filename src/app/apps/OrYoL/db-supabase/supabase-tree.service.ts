@@ -124,6 +124,16 @@ export class SupabaseTreeService extends DbTreeService {
     }
   }
 
+  /** Unlike Firestore's updateDoc()-based patchItemData (which fails outright on a genuinely
+   * missing doc), Supabase's saveNowToDb() is an upsert on every write - so any *subsequent*
+   * patchItemData() call for this id would already create the row if needed. This still writes
+   * eagerly rather than relying on that, so the anchor item's initial fields (e.g. Mindfulness's
+   * title) are present from the start rather than only appearing after the first real patch. */
+  override async upsertItemIfMissing(itemId: string, itemData: any): Promise<void> {
+    const item$ = this.oryItemsService.createOdmItem$(itemId as OryOdmItemId, Object.assign(new OryOdmItem(), itemData))
+    item$.saveNowToDb()
+  }
+
   addChildNode(parentNode: OryBaseTreeNode, newNode: OryNonRootTreeNode): void {
     // OdmItem$2.saveNowToDb() already tracks its own sync-status promise internally
     // (OdmService2.saveNowToDb -> syncStatusService.handleSavingPromise) - nothing more to do

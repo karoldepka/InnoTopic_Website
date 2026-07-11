@@ -299,7 +299,7 @@ export class FirestoreTreeService extends DbTreeService {
    * above uses updateDoc(), which throws "no document to update" if the doc doesn't exist yet, so
    * anything that wants to patchThrottled() a special reserved-id item (e.g. Mindfulness's
    * `_mindfulness` time-tracking target) must call this once first. Safe to call repeatedly. */
-  async upsertItemIfMissing(itemId: string, itemData: any): Promise<void> {
+  override async upsertItemIfMissing(itemId: string, itemData: any): Promise<void> {
     await setDoc(this.itemDocById(itemId), itemData, {merge: true})
   }
 

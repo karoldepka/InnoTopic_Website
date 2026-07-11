@@ -1,37 +1,33 @@
-import {Injectable, Injector, runInInjectionContext} from '@angular/core';
-// import Timestamp = firebase.firestore.Timestamp
+import {Injectable, Injector} from '@angular/core';
 import { ItemId } from '../db/OryItem$'
-import { errorAlert } from '../utils/log'
 import {CachedSubject} from '../../../libs/AppFedShared/utils/cachedSubject2/CachedSubject2'
-import {uuidv4} from '../../../libs/AppFedShared/utils/utils-from-oryol'
 import {BaseService} from '../../../libs/AppFedShared/base.service'
-import {FeatureLevelsConfig} from '../../../libs/AppFedShared/FeatureLevelsConfig'
-import {Timestamp, collection, doc, setDoc, updateDoc} from 'firebase/firestore'
-import {getAppFirestore} from '../../../libs/AppFedSharedFirebase/firebase-app'
+import {OdmBackend, OdmTimestamp} from '../../../libs/AppFedShared/odm/OdmBackend'
 import {TimeTrackedEntry} from './TimeTrackedEntry'
+import {TimeTrackingPeriodsOdmService} from './time-tracking-periods-odm.service'
+import {TimeTrackingPeriodOdm} from './TimeTrackingPeriodOdm'
+import {TimeTrackingPeriod$} from './TimeTrackingPeriod$'
 
 // https://lifesuite.innotopic.com/learn/item/lmm0ETQ1dvl9x6mJnNs5
 
 export type TimeTrackingPeriodId = string
 
-/** Ranges, (time) intervals, time period */
+/** Ranges, (time) intervals, time period - public-facing shape held on
+ * TimeTrackedEntry.currentPeriod. Carries its own backing ODM item ($) so onPeriodEnd() can patch
+ * it directly, without needing a separate lookup by id. */
 export class TimeTrackingPeriod {
 
   constructor(
     public id: TimeTrackingPeriodId,
     public itemId: ItemId,
-    public start: Timestamp,
-    public end : Timestamp | null /* null instead of missing, to be able to query for non-finished periods ! */,
+    public start: OdmTimestamp,
+    public end : OdmTimestamp | null /* null instead of missing, to be able to query for non-finished periods ! */,
+    public odmItem$: TimeTrackingPeriod$,
     // TODO: approximate duration (in case manually entered
     // TODO: cancelled / is*Revoked* for when user forgets to stop tracking; but we still wanna show that tracking was started, in timeline
     // -- or `revoke` to save bytes
     // TODO: deleted / archived (undoable)
   ) {
-  }
-
-  static fromRaw(raw: TimeTrackingPeriod) {
-    return raw
-    // TimeTrackingPeriod.prototype.constructor.
   }
 }
 
@@ -42,40 +38,15 @@ export class TimeTrackingPeriod {
 })
 export class TimeTrackingPeriodsService extends BaseService {
 
-  coll = collection(getAppFirestore(), `TimeTrackingPeriodTest`)
-
   activePeriods$ = new CachedSubject<TimeTrackingPeriod[] | null | undefined>(undefined)
 
   constructor(
     injector: Injector,
+    private periodsOdmService: TimeTrackingPeriodsOdmService,
   ) {
     super(injector)
     this.featLocal = this.g.feat.timeTrackingPeriods
-    // this.queryNotFinishedPeriods().get().then(queryResult => {
-    //   console.log(`TimeTrackingPeriodTest query`, queryResult)
-    // })
-
-    // ==== BEGIN disabled 2023-01-31 when updating firestore
-    // this.queryNotFinishedPeriods().onSnapshot((x: any) => {
-    //   console.log(`queryNotFinishedPeriods().onSnapshot`, x)
-    //   for ( let doc of x.docs ) {
-    //     console.log(`tt data`, doc.data())
-    //     console.log(`tt itemId`, doc.data().itemId)
-    //   }
-    //   const array = x.docs.map((doc: any) => TimeTrackingPeriod.fromRaw(doc.data() as TimeTrackingPeriod))
-    //   this.activePeriods$.next(array)
-    // })
-    // ==== END disabled 2023-01-31 when updating firestore
-
-    // console.log( `firestore1.collection(\`TimeTrackingPeriodTest\`).add({testing: 'test'}) `)
-    // coll.add({testing: 'test'})
   }
-
-
-  // private queryNotFinishedPeriods(): Query {
-  // Disabled when updating angularfire
-  //   // return this.coll.where('end', '==', null)
-  // }
 
   onPeriodEnd(entry: TimeTrackedEntry) {
     let period: TimeTrackingPeriod | undefined = entry.currentPeriod
@@ -85,48 +56,47 @@ export class TimeTrackingPeriodsService extends BaseService {
       }
       return
     }
-    period.end = Timestamp.now()
-    runInInjectionContext(this.injector, () => {
-      updateDoc(doc(this.coll, period.id), { end: this.toFirestoreTimestampLike(period.end) })
+    const end = OdmBackend.nowTimestamp()
+    period.end = end
+    period.odmItem$.patchNow({end} as Partial<TimeTrackingPeriodOdm>)
+  }
+
+  onPeriodStart(entry: TimeTrackedEntry): TimeTrackingPeriod {
+    const itemId = entry.timeTrackable.getId()
+    const start = OdmBackend.nowTimestamp()
+    const item$ = this.periodsOdmService.add(Object.assign(new TimeTrackingPeriodOdm(), {
+      itemId,
+      start,
+      end: null,
+    }))
+    return new TimeTrackingPeriod(item$.id as string, itemId, start, null, item$)
+  }
+
+  /** All stored periods for a given itemId - client-side filtered from the already-loaded
+   * collection (same reasoning as before this was ODM-backed: a single-field equality lookup
+   * doesn't need a composite index/server-side query, fine at the volume a personal time-tracking
+   * log actually produces). Waits for the collection's initial load so a call made right after
+   * app boot doesn't race an empty in-memory list. */
+  async getPeriodsForItem(itemId: ItemId): Promise<TimeTrackingPeriodOdm[]> {
+    await this.waitUntilLoaded()
+    return (this.periodsOdmService.localItems$.lastVal ?? [])
+      .map(period$ => period$.val)
+      .filter((val): val is TimeTrackingPeriodOdm => !!val && val.itemId === itemId)
+  }
+
+  private waitUntilLoaded(): Promise<void> {
+    if (this.periodsOdmService.itemsLoaded) {
+      return Promise.resolve()
+    }
+    // No unsubscribe - matching OdmCollectionBackend.waitUntilReady()'s convention: CachedSubject
+    // replays synchronously to a new subscriber, so a `const sub` handle referenced inside this
+    // same callback would be read mid-initialization.
+    return new Promise<void>(resolve => {
+      this.periodsOdmService.localItems$.subscribe(() => {
+        if (this.periodsOdmService.itemsLoaded) {
+          resolve()
+        }
+      })
     })
-
-    // TODO: update in DB
-  }
-
-  onPeriodStart(entry: TimeTrackedEntry) {
-    const period = new TimeTrackingPeriod(
-      uuidv4(),
-      entry.timeTrackable.getId(),
-      Timestamp.now(),
-      null,
-    )
-    runInInjectionContext(this.injector, () => {
-      setDoc(doc(this.coll, period.id), this.toFirestorePeriodWrite(period))
-    })
-    return period
-//
-//     FIXME
-  }
-
-  private toFirestoreTimestampLike(value: any) {
-    if (!value) {
-      return value
-    }
-    if (value instanceof Date) {
-      return value
-    }
-    if (typeof value?.toDate === 'function') {
-      return value.toDate()
-    }
-    return value
-  }
-
-  private toFirestorePeriodWrite(period: TimeTrackingPeriod) {
-    return {
-      id: period.id,
-      itemId: period.itemId,
-      start: this.toFirestoreTimestampLike(period.start),
-      end: this.toFirestoreTimestampLike(period.end),
-    }
   }
 }

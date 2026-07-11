@@ -48,5 +48,14 @@ export abstract class DbTreeService {
   loadSubtreeFast(itemId: string): void {
   }
 
+  /** Ensures a reserved/anchor item exists with at least these fields, without requiring it to
+   * already be loaded/visible as a TreeNode - e.g. Mindfulness's `_mindfulness` tracking anchor,
+   * which deliberately never appears in any tree/inclusion structure. Firestore's updateDoc()
+   * (patchItemData) fails outright on a genuinely missing doc, unlike Supabase's upsert-on-every-
+   * save semantics, so backends that don't need an explicit "ensure exists" step default to a
+   * no-op here. */
+  async upsertItemIfMissing(itemId: string, itemData: any): Promise<void> {
+  }
+
 }
 
