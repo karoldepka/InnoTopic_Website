@@ -19,6 +19,12 @@ export class BlobSyncService {
 
   private uploadLimiter = new ConcurrencyLimiter(6)
 
+  /** Tracks each blob's real (network) upload promise by blob_id, purely so a thumbnail can wait
+   * for its original's row to actually exist server-side before attempting its own insert - see
+   * the ordering note on `upload()` below. Entries are never removed - negligible memory at the
+   * volume a single session pastes images. */
+  private uploadPromiseByBlobId = new Map<string, Promise<void>>()
+
   constructor(
     private browserOdmStorage: BrowserOdmStorage,
     private supabaseOdmClientService: SupabaseOdmClientService,
@@ -52,7 +58,25 @@ export class BlobSyncService {
       field_id: fieldId,
       whenCreatedLocally: new Date().toISOString(),
     })
-    const uploadPromise = this.uploadLimiter.run(() => this.uploadNow(collection, itemId, blobId, blob, kind, contentType, originalBlobId, fieldId))
+    // Confirmed live: `uploadPastedImage()` calls this for the original then immediately again
+    // for its thumbnail, `originalBlobId` in hand - but this method itself only awaits the local
+    // cache/queue step, not the real network upload, so both real uploads were free to run
+    // concurrently through `uploadLimiter` with no ordering guarantee. The thumbnail's row has an
+    // `original_blob_id` foreign key, so if its insert reached Postgres before the original's own
+    // insert had committed, it failed outright (`23503 ... odm_item_blobs_original_blob_id_fkey`)
+    // - not an auth/network fluke, a deterministic ordering bug. Waiting here for the original's
+    // real upload promise (if any) to settle - success or failure, via the `.catch()` no-op below
+    // - fixes the common case (original succeeds moments before the thumbnail's turn) without
+    // making a genuinely-failed original block the thumbnail forever: it still attempts anyway
+    // and falls back to the existing durable-retry path exactly as before.
+    const dependsOnPromise = originalBlobId ? this.uploadPromiseByBlobId.get(originalBlobId) : undefined
+    const uploadPromise = this.uploadLimiter.run(async () => {
+      if (dependsOnPromise) {
+        await dependsOnPromise.catch(() => {})
+      }
+      return this.uploadNow(collection, itemId, blobId, blob, kind, contentType, originalBlobId, fieldId)
+    })
+    this.uploadPromiseByBlobId.set(blobId, uploadPromise)
     this.syncStatusService.handleSavingPromise(uploadPromise, this.describeUpload(kind))
     uploadPromise.catch(error => console.error('BlobSyncService upload failed (durably queued, will retry on reconnect)', error))
     return blobId
@@ -153,7 +177,17 @@ export class BlobSyncService {
     this.browserOdmStorage.getAllPendingBlobUploadsEverywhere()
       .then(uploads => {
         for (const upload of uploads) {
-          const resumedPromise = this.uploadLimiter.run(() => this.uploadNow(upload.collection, upload.item_id, upload.blob_id, upload.blob, upload.kind, upload.content_type, upload.original_blob_id))
+          // Same original-before-thumbnail ordering as upload() above - if both are still
+          // pending (e.g. the whole pair failed together while offline), the thumbnail's retry
+          // must not race ahead of its original's retry here either.
+          const dependsOnPromise = upload.original_blob_id ? this.uploadPromiseByBlobId.get(upload.original_blob_id) : undefined
+          const resumedPromise = this.uploadLimiter.run(async () => {
+            if (dependsOnPromise) {
+              await dependsOnPromise.catch(() => {})
+            }
+            return this.uploadNow(upload.collection, upload.item_id, upload.blob_id, upload.blob, upload.kind, upload.content_type, upload.original_blob_id)
+          })
+          this.uploadPromiseByBlobId.set(upload.blob_id, resumedPromise)
           this.syncStatusService.handleSavingPromise(resumedPromise, this.describeUpload(upload.kind))
           resumedPromise.catch(error => console.error('BlobSyncService resumed upload failed, still queued', error))
         }

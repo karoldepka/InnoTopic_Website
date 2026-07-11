@@ -11,6 +11,7 @@ export default defineConfig({
       'src/app/libs/AppFedShared/odm/utils.spec.ts',
       'src/app/libs/AppFedSharedBrowser/odm-browser/**/*.spec.ts',
       'src/app/libs/AppFedSharedFanout/odm-fanout/**/*.spec.ts',
+      'src/app/libs/AppFedShared/odm/blob-sync.service.spec.ts',
       'src/app/apps/OrYoL/db-supabase/**/*.spec.ts',
       'src/app/apps/Learn/search-or-add-learnable-item/mic/mic.component.spec.ts',
       'src/app/apps/Learn/core/quiz/quiz-hint-reveal.spec.ts',
