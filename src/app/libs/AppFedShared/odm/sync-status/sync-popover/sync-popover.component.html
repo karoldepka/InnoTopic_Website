@@ -34,7 +34,7 @@
       {{ 'SYNC.QUEUED_TO_SYNC' | translate }} {{pendingSyncItems.length}}
       <ul>
         <li *ngFor="let item of pendingSyncItems">
-          {{describePendingSyncItem(item.patch, item.collection)}}
+          {{describePendingSyncItem(item.patch, item.collection, item.item_id)}}
         </li>
       </ul>
     </ng-container>

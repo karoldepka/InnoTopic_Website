@@ -17,6 +17,7 @@ import { Router } from '@angular/router';
 import {stripHtml} from '../../../utils/html-utils'
 import {BrowserOdmStorage} from '../../../../AppFedSharedBrowser/odm-browser/BrowserOdmStorage'
 import {VoiceMemoService} from '../../../audio/voice-memo.service'
+import {summarizePatch} from '../../OdmItem$2'
 
 @Component({
     selector: 'app-sync-popover',
@@ -151,9 +152,18 @@ export class SyncPopoverComponent extends BaseComponent implements OnInit {
    * is actively in flight this session. */
   get durablePendingSyncItems$() { return this.syncStatusService.durablePendingSyncItems$ }
 
-  describePendingSyncItem(patch: Record<string, any>, collection: string): string {
+  /** Falls back through title/name/question (works well for OryItem/LearnItem etc.) down to the
+   * item's own id plus a summarized field-level patch (e.g. JournalEntry, which has none of
+   * those fields) - previously fell all the way back to the bare collection name with no
+   * indication of which item or what changed. */
+  describePendingSyncItem(patch: Record<string, any>, collection: string, itemId?: string): string {
     const title = patch?.['title'] ?? patch?.['name'] ?? patch?.['question']
     const plainTitle = stripHtml(title)?.trim()
-    return plainTitle ? `${collection}: "${plainTitle}"` : collection
+    if (plainTitle) {
+      return `${collection}: "${plainTitle}"`
+    }
+    const patchSummary = summarizePatch(patch)
+    const idPart = itemId ? ` ${itemId}` : ''
+    return patchSummary ? `${collection}${idPart} (${patchSummary})` : `${collection}${idPart}`
   }
 }
