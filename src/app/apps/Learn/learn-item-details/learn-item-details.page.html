@@ -168,11 +168,13 @@
     <!--       *ngIf="feat.itemsTree.mockups"
     -->
 
-    <app-item-side-editor
-      *ngFor="let side of sidesDefsArray"
-      [item$]="item$"
-      [side]="side"
-    />
+    <div class="side-editors-flow">
+      <app-item-side-editor
+        *ngFor="let side of sidesDefsArray"
+        [item$]="item$"
+        [side]="side"
+      />
+    </div>
 
   </ng-container>
 

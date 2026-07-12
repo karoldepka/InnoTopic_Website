@@ -1,4 +1,15 @@
+// GH #67: `display: contents` erases this component's own box, so its top-level template
+// children (the collapsed button, the expanded editor div, the voice-memo mic button) become
+// direct flex items of the parent .side-editors-flow container (learn-item-details.page.html)
+// instead of being trapped inside one full-width block per field.
+:host
+  display: contents
 
 .answerBorder
   border: 2px var(--answerBorderColorDark) solid
   border-radius: 3px
+
+// The expanded rich-text editor needs the full row's width, not just its natural content
+// width - forces it (and whatever follows) onto a new line within the wrapping flex container.
+.expanded-editor
+  flex: 1 0 100%
