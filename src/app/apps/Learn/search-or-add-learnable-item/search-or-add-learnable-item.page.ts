@@ -41,6 +41,7 @@ import { OdmBackend } from '../../../libs/AppFedShared/odm/OdmBackend';
 import { ItemListComponent } from './item-list/item-list.component';
 import { addIcons } from 'ionicons';
 import { logoGoogle, logoFacebook, mailOutline } from 'ionicons/icons';
+import { TranslatePipe } from '@ngx-translate/core';
 
 /** TODO: rename to smth simpler more standard like LearnDoItemsPage (search-or-add is kinda implied, especially search) */
 @Component({
@@ -61,6 +62,7 @@ import { logoGoogle, logoFacebook, mailOutline } from 'ionicons/icons';
         VoiceMemoFieldComponent,
         ItemListComponent,
         AsyncPipe,
+        TranslatePipe,
     ],
 })
 export class SearchOrAddLearnableItemPageComponent extends BaseComponent implements OnInit {

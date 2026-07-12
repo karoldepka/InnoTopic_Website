@@ -32,6 +32,7 @@
     "PASSWORD": "Contrasenya",
     "SHOW_PASSWORD": "Mostra la contrasenya",
     "LOGGING_IN": "Iniciant sessió...",
+    "AUTHENTICATING": "Autenticant, si us plau espera...",
     "CONNECTING_GOOGLE": "Connectant amb Google...",
     "CONTINUE_WITH_GOOGLE": "Continua amb Google",
     "REPEAT_PASSWORD": "Repeteix la contrasenya",
