@@ -125,6 +125,11 @@ const routes: Routes = [
     loadChildren: () => import('./apps/Lifedvisor/life-overviews/life-overviews.module').then(m => m.LifeOverviewsPageModule)
   },
 
+  {
+    path: 'experiments',
+    loadComponent: () => import('./experiments/experiments.page').then(m => m.ExperimentsPage),
+  },
+
   { path: '**', redirectTo: '' },
   {
     path: 'audio',

@@ -1,0 +1,28 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button mode="md" [defaultHref]="'/'"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Experiment: Record + Transcribe</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <p *ngIf="!supported" style="color: red">
+    SpeechRecognition not supported in this browser — try Chrome or Edge.
+  </p>
+
+  <ion-button (click)="isRecording() ? stop() : start()" [color]="isRecording() ? 'danger' : 'primary'">
+    {{ isRecording() ? 'Stop' : 'Start Recording' }}
+  </ion-button>
+
+  <p *ngIf="error()" style="color: red">{{ error() }}</p>
+
+  <h3>Live transcript</h3>
+  <p>{{ finalTranscript() }}<span style="opacity: 0.5">{{ interimTranscript() }}</span></p>
+
+  <div *ngIf="audioUrl() as url">
+    <h3>Recorded audio</h3>
+    <audio [src]="url" controls></audio>
+  </div>
+</ion-content>
