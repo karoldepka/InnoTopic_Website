@@ -77,7 +77,13 @@ export class VoiceMemoFieldComponent implements OnInit, OnDestroy, ActiveMicHold
   private mediaRecorder: any = null
   private audioChunks: any[] = []
   private speechRecognition: any = null
-  private transcriptSoFar = ''
+  /** Bound directly in the template (alongside interimTranscript) to show transcription live
+   * while recording - see interimTranscript's doc comment. */
+  transcriptSoFar = ''
+  /** Not-yet-finalized tail of the current utterance (bound in the template alongside
+   * transcriptSoFar) - only set when interimResults is on, so live transcription can show text
+   * as it's spoken instead of only once the whole recording stops (see beginSpeechRecognitionSession). */
+  interimTranscript = ''
   private audioEl?: HTMLAudioElement
   private objectUrl?: string
   private recordingStartedAtMs?: number
@@ -255,6 +261,7 @@ export class VoiceMemoFieldComponent implements OnInit, OnDestroy, ActiveMicHold
       return
     }
     this.transcriptSoFar = ''
+    this.interimTranscript = ''
     this.speechRecognitionRetriesLeft = VoiceMemoFieldComponent.MAX_SPEECH_RECOGNITION_RETRIES
     this.beginSpeechRecognitionSession(SpeechRecognitionCtor)
   }
@@ -269,15 +276,20 @@ export class VoiceMemoFieldComponent implements OnInit, OnDestroy, ActiveMicHold
   private beginSpeechRecognitionSession(SpeechRecognitionCtor: any) {
     this.speechRecognition = new SpeechRecognitionCtor()
     this.speechRecognition.continuous = true
-    this.speechRecognition.interimResults = false
+    this.speechRecognition.interimResults = true
     this.speechRecognition.lang = document.documentElement.lang || undefined
     let hadNetworkError = false
     this.speechRecognition.onresult = (event: any) => {
+      let interim = ''
       for (let i = event.resultIndex; i < event.results.length; i++) {
         if (event.results[i].isFinal) {
           this.transcriptSoFar += event.results[i][0].transcript + ' '
+        } else {
+          interim += event.results[i][0].transcript
         }
       }
+      this.interimTranscript = interim
+      this.changeDetectorRef.markForCheck()
     }
     this.speechRecognition.onerror = (event: any) => {
       console.log('speechRecognition error (non-fatal, recording is unaffected)', event.error)
@@ -285,6 +297,7 @@ export class VoiceMemoFieldComponent implements OnInit, OnDestroy, ActiveMicHold
     }
     this.speechRecognition.onend = () => {
       this.speechRecognition = null
+      this.interimTranscript = ''
       if (hadNetworkError && this.isRecording && this.speechRecognitionRetriesLeft > 0) {
         this.speechRecognitionRetriesLeft--
         this.beginSpeechRecognitionSession(SpeechRecognitionCtor)
@@ -294,6 +307,7 @@ export class VoiceMemoFieldComponent implements OnInit, OnDestroy, ActiveMicHold
       if (transcript) {
         this.transcriptReady.emit(transcript)
       }
+      this.changeDetectorRef.markForCheck()
     }
     try {
       this.speechRecognition.start()

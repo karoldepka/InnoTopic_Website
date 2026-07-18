@@ -19,6 +19,10 @@
     *ngIf="isRecording"
     class="voice-memo-time"
   >{{ formatTime(recordingElapsedSec) }}</span>
+  <div
+    *ngIf="isRecording && (transcriptSoFar || interimTranscript)"
+    class="voice-memo-live-transcript"
+  >{{ transcriptSoFar }}<span class="interim">{{ interimTranscript }}</span></div>
   <ion-button
     *ngIf="stream"
     size="small"
