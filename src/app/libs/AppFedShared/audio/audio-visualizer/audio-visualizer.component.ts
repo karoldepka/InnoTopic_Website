@@ -1,4 +1,4 @@
-import {Component, Input, OnDestroy, OnInit, ChangeDetectionStrategy} from '@angular/core';
+import {Component, Input, OnDestroy, OnInit, ChangeDetectionStrategy, ChangeDetectorRef} from '@angular/core';
 import {Required} from '../../utils/angular/Required.decorator'
 import { NgIf, NgStyle, NgFor } from '@angular/common';
 
@@ -44,12 +44,17 @@ export class AudioVisualizerComponent implements OnInit, OnDestroy {
   public array ! : Array<number>
 
   constructor(
+    private changeDetectorRef: ChangeDetectorRef,
   ) { }
 
 
   private intervalHandle ?: number
 
   scale: number = 16
+
+  // 15fps: within the 10-20fps range that's smooth enough for a bar visualizer without redoing
+  // change detection more often than needed.
+  private static readonly UPDATE_INTERVAL_MS = 1000 / 15
 
   ngOnInit() {
     this.analyser.minDecibels = -90;
@@ -65,7 +70,11 @@ export class AudioVisualizerComponent implements OnInit, OnDestroy {
       // also, don't have to deal with the 127 values
       // console.log(`vis`, this.dataArray)
       this.array = Array.from(this.dataArray)
-    }, 50) as unknown as number
+      // this component's own setInterval doesn't get picked up by change detection on its own -
+      // without this it only visually refreshed whenever some unrelated timer elsewhere in the
+      // app happened to trigger a CD tick (e.g. the once-a-second recording-elapsed-time timer)
+      this.changeDetectorRef.markForCheck()
+    }, AudioVisualizerComponent.UPDATE_INTERVAL_MS) as unknown as number
 
   }
 
