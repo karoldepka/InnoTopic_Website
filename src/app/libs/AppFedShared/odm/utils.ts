@@ -30,3 +30,15 @@ export function odmTimestampToMillis(value: any): number | undefined {
   }
   return undefined
 }
+
+/** Same shape-tolerance as `odmTimestampToMillis()`, returning a `Date` instead - for templates
+ * that used to call `.toDate()` directly on a `whenCreated`/`whenLastModified`-style field. That
+ * throws ("X.toDate is not a function") whenever the value isn't a live Firestore `Timestamp`
+ * instance - e.g. a plain `{seconds, nanoseconds}` object that a round-trip through IndexedDB's
+ * structured clone (which drops the prototype/methods of any non-built-in class instance) or an
+ * older/differently-migrated row can produce. Never throws; returns `null` for anything it can't
+ * make sense of, same as a genuinely missing timestamp. */
+export function odmTimestampToDate(value: any): Date | null {
+  const millis = odmTimestampToMillis(value)
+  return millis === undefined ? null : new Date(millis)
+}

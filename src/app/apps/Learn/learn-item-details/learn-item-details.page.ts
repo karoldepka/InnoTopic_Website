@@ -36,6 +36,7 @@ import { SelfRatingComponent } from '../shared/self-rating/self-rating.component
 import { ItemSubItemsComponent } from './item-sub-items/item-sub-items.component';
 import { ItemSideComponent } from '../shared/item-side/item-side.component';
 import { TimeTrackedItemCellComponent } from '../../OrYoL/time-tracking/time-tracked-item-cell/time-tracked-item-cell.component';
+import { OdmTimestampToDatePipe } from '../../../libs/AppFedShared/odm/odm-timestamp-to-date.pipe';
 
 @Component({
     selector: 'app-learn-item-details',
@@ -66,6 +67,7 @@ import { TimeTrackedItemCellComponent } from '../../OrYoL/time-tracking/time-tra
         ItemSideComponent,
         TimeTrackedItemCellComponent,
         AsyncPipe,
+        OdmTimestampToDatePipe,
     ],
 })
 export class LearnItemDetailsPage extends BaseComponent implements OnInit {

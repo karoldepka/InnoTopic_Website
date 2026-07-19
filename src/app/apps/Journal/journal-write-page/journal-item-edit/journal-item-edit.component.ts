@@ -13,6 +13,7 @@ import { JournalNumericFieldsComponent } from '../journal-numeric-fields/journal
 import { JournalTextFieldsComponent } from '../journal-text-fields/journal-text-fields.component';
 import { TimeTrackedItemCellComponent } from '../../../OrYoL/time-tracking/time-tracked-item-cell/time-tracked-item-cell.component';
 import { TranslatePipe } from '@ngx-translate/core';
+import { OdmTimestampToDatePipe } from '../../../../libs/AppFedShared/odm/odm-timestamp-to-date.pipe';
 
 @Component({
     selector: 'app-journal-item-edit',
@@ -29,6 +30,7 @@ import { TranslatePipe } from '@ngx-translate/core';
         TimeTrackedItemCellComponent,
         AsyncPipe,
         TranslatePipe,
+        OdmTimestampToDatePipe,
     ],
 })
 export class JournalItemEditComponent extends BaseComponent implements OnInit {

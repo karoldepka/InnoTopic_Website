@@ -61,10 +61,10 @@
       />
 
       CREATED <app-time-point
-      [time]="$safeNavigationMigration(itemVal?.whenCreated?.toDate())"
+      [time]="$safeNavigationMigration(itemVal?.whenCreated | odmDate)"
     />
       MODIFIED <app-time-point
-      [time]="$safeNavigationMigration(itemVal?.whenLastModified?.toDate())"
+      [time]="$safeNavigationMigration(itemVal?.whenLastModified | odmDate)"
     />
 
       <app-geo-loc [geoLoc]="$safeNavigationMigration(itemVal?.whereCreated)" />

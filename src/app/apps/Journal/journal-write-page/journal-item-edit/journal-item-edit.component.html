@@ -9,7 +9,7 @@
 
     </ng-container>
     <p>
-      <app-time-point [time]="$safeNavigationMigration(itemVal?.whenCreated?.toDate())"></app-time-point>
+      <app-time-point [time]="$safeNavigationMigration(itemVal?.whenCreated | odmDate)"></app-time-point>
       <app-geo-loc [geoLoc]="$safeNavigationMigration(itemVal?.whereCreated)"></app-geo-loc>
     </p>
     <app-time-tracked-item-cell

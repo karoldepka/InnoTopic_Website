@@ -7,7 +7,7 @@
 >
 
   <app-time-point
-    [time]="$safeNavigationMigration(itemVal?.whenCreated?.toDate())"
+    [time]="$safeNavigationMigration(itemVal?.whenCreated | odmDate)"
   ></app-time-point>
 
 <!--  {{item$.val$ | async | json}}-->
