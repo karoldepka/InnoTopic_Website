@@ -16,6 +16,11 @@ export interface BrowserOdmRow<TRaw> extends PostgresOdmRow<TRaw> {
   key: string
   whenFirstStoredLocally: string
   whenLastStoredLocally: string
+  /** True only for a synthesized conflict-archival row (see `put()` below) - recovery-only
+   * bookkeeping under its own synthetic id, never meant to be read back as a normal item. Readers
+   * that surface rows as real app items (e.g. `BrowserOdmCollectionBackend.fetchRows`) must
+   * exclude these, the same way they already exclude soft-deleted rows. */
+  isConflictArchive?: boolean
 }
 
 const DB_NAME = 'lifesuite-odm-cache'
@@ -328,6 +333,7 @@ export class BrowserOdmStorage {
             key: rowKey(row.collection, loserId),
             whenFirstStoredLocally: now,
             whenLastStoredLocally: now,
+            isConflictArchive: true,
           }
           await requestToPromise(store.put(loserRow))
           this.conflictDetected$.next({

@@ -32,7 +32,7 @@ export class JournalEntryListItemComponent implements OnInit {
   @Input() item$ ! : JournalEntry$
 
   get val$(): Observable<JournalEntry | undefined | null> | undefined {
-    return this.item$ ?. val$WithWhenCreated
+    return this.item$ ?. val$
   }
 
 

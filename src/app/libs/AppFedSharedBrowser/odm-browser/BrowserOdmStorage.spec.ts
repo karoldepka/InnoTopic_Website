@@ -140,6 +140,10 @@ describe('BrowserOdmStorage', () => {
       const expectedLoserId = `item1_conflict_${loser.when_last_modified!.replace(/[:.]/g, '-')}`
       const archived = await storage.get<SutItem>(collection, expectedLoserId)
       expect(archived?.data.title).toBe('loser (older, different)')
+      // Flagged so readers that surface rows as real app items (e.g.
+      // BrowserOdmCollectionBackend.fetchRows) know to exclude it (GH #73 - this row was
+      // previously indistinguishable from a real item and rendered as a duplicate entry).
+      expect(archived?.isConflictArchive).toBe(true)
 
       // Notified exactly once.
       expect(conflicts.length).toBe(1)

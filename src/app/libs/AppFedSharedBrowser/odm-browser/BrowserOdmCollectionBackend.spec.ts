@@ -137,4 +137,24 @@ describe('BrowserOdmCollectionBackend (mock storage adapter)', () => {
     const stored = await storage.get<SutItem>('SutItem', 'item1')
     expect(stored?.when_deleted).toBeTruthy()
   })
+
+  it('excludes conflict-archival rows from setListener (GH #73 - these are recovery-only ' +
+    'bookkeeping under a synthetic id, and were previously surfacing as duplicate items)', async () => {
+    await backend.saveNowToDb({title: 'the real entry'} as SutItem, 'item1')
+    // Simulates what BrowserOdmStorage.put() writes for a losing/conflicting edit: its own row,
+    // under its own synthetic id, flagged isConflictArchive.
+    await storage.put({
+      collection: 'SutItem',
+      item_id: 'item1_conflict_2024-01-01T00-00-00-000Z',
+      owner: 'owner1',
+      data: {title: 'the real entry'},
+      isConflictArchive: true,
+    })
+
+    const {listener, added} = collectAdded<SutItem>()
+    backend.setListener(listener, {comments: 'test', oneTimeGet: true} as any, () => undefined)
+    await flushMicrotasks()
+
+    expect(added.map(a => a.id)).toEqual(['item1'])
+  })
 })

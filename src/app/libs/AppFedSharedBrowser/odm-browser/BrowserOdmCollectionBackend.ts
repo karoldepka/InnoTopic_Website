@@ -87,7 +87,10 @@ export class BrowserOdmCollectionBackend<TRaw> extends OdmCollectionBackend<TRaw
     console.log(`[ODM query started] dbType=indexeddb collection=${this.collectionName}`)
     const owner = this.requireUserId()
     const rows = await this.storage.getAllForCollection<TRaw>(this.collectionName)
-    const filtered = rows.filter(row => row.owner === owner && !row.when_deleted)
+    // Conflict-archival rows (see BrowserOdmStorage.put()) are recovery-only bookkeeping under a
+    // synthetic id, not real items - surfacing them here duplicated the winning item as a second,
+    // near-identical entry with garbage metadata (GH #73).
+    const filtered = rows.filter(row => row.owner === owner && !row.when_deleted && !row.isConflictArchive)
     console.log(`[ODM query ended] dbType=indexeddb collection=${this.collectionName}`, 'yielded', filtered.length, 'rows')
     return filtered
   }
