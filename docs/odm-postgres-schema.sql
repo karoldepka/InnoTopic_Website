@@ -1,3 +1,5 @@
+create extension if not exists vector with schema extensions;
+
 create table if not exists public.odm_items (
   collection text not null,
   id text not null,
@@ -14,6 +16,15 @@ create table if not exists public.odm_items (
   server_modified_at timestamptz not null default now(),
   primary key (collection, id)
 );
+
+alter table public.odm_items
+  add column if not exists embedding extensions.vector(1536),
+  add column if not exists embedding_text text,
+  add column if not exists embedding_model text;
+
+create index if not exists odm_items_embedding_hnsw_idx
+  on public.odm_items using hnsw (embedding extensions.vector_cosine_ops)
+  where embedding is not null and when_deleted is null;
 
 create index if not exists odm_items_owner_collection_modified_idx
   on public.odm_items (owner, collection, when_last_modified desc);

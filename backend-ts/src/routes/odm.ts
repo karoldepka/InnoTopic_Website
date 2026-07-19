@@ -1,8 +1,17 @@
 import { Hono } from 'hono';
 import postgres from 'postgres';
-import type { OdmSaveRequest, OdmDeleteRequest } from '../types.js';
+import type { OdmSaveRequest, OdmDeleteRequest, OdmSearchRequest, EmbeddingRequest } from '../types.js';
+import { createEmbedding, EMBEDDING_DIMENSIONS, EMBEDDING_MODEL, toPgVector } from '../embeddings.js';
 
 export const odmRouter = new Hono();
+
+odmRouter.post('/api/embeddings', async c => {
+  const body = await c.req.json<EmbeddingRequest>();
+  if (!body.text?.trim()) return c.json({ error: 'text required' }, 400);
+
+  const embedding = await createEmbedding(body.text);
+  return c.json({ embedding, model: EMBEDDING_MODEL, dimensions: EMBEDDING_DIMENSIONS });
+});
 
 let _sql: ReturnType<typeof postgres> | null = null;
 
@@ -34,6 +43,15 @@ async function ensureTables() {
   await sql`
     create index if not exists odm_items_owner_idx
       on public.odm_items (owner, collection, when_last_modified desc)
+  `;
+  await sql`create extension if not exists vector`;
+  await sql`alter table public.odm_items add column if not exists embedding vector(1536)`;
+  await sql`alter table public.odm_items add column if not exists embedding_text text`;
+  await sql`alter table public.odm_items add column if not exists embedding_model text`;
+  await sql`
+    create index if not exists odm_items_embedding_hnsw_idx
+      on public.odm_items using hnsw (embedding vector_cosine_ops)
+      where embedding is not null and when_deleted is null
   `;
   await sql`
     create table if not exists public.odm_item_history (
@@ -96,6 +114,7 @@ odmRouter.put('/api/odm/items/:collection/:item_id', async c => {
 
   await ensureTables();
   const sql = getSql();
+  const embedding = body.embeddingText ? await createEmbedding(body.embeddingText) : null;
 
   if (body.storeVersionHistory) {
     const historyId = `${item_id}_${crypto.randomUUID()}`;
@@ -109,23 +128,79 @@ odmRouter.put('/api/odm/items/:collection/:item_id', async c => {
     `;
   }
 
-  await sql`
-    insert into public.odm_items
-      (collection, id, owner, data, parent_ids, ancestor_ids, when_last_modified, when_deleted)
-    values (
-      ${collection}, ${item_id}, ${body.owner},
-      ${sql.json(body.data as Parameters<typeof sql.json>[0])}, ${body.parentIds}, ${body.ancestorIds}, now(), null
-    )
-    on conflict (collection, id) do update set
-      owner = excluded.owner,
-      data = excluded.data,
-      parent_ids = excluded.parent_ids,
-      ancestor_ids = excluded.ancestor_ids,
-      when_last_modified = now(),
-      when_deleted = null
-  `;
+  if (embedding) {
+    await sql`
+      insert into public.odm_items
+        (collection, id, owner, data, parent_ids, ancestor_ids, when_last_modified, when_deleted,
+         embedding, embedding_text, embedding_model)
+      values (
+        ${collection}, ${item_id}, ${body.owner},
+        ${sql.json(body.data as Parameters<typeof sql.json>[0])}, ${body.parentIds}, ${body.ancestorIds}, now(), null,
+        ${toPgVector(embedding)}::vector, ${body.embeddingText!.trim()}, ${EMBEDDING_MODEL}
+      )
+      on conflict (collection, id) do update set
+        owner = excluded.owner,
+        data = excluded.data,
+        parent_ids = excluded.parent_ids,
+        ancestor_ids = excluded.ancestor_ids,
+        when_last_modified = now(),
+        when_deleted = null,
+        embedding = excluded.embedding,
+        embedding_text = excluded.embedding_text,
+        embedding_model = excluded.embedding_model
+    `;
+  } else {
+    await sql`
+      insert into public.odm_items
+        (collection, id, owner, data, parent_ids, ancestor_ids, when_last_modified, when_deleted)
+      values (
+        ${collection}, ${item_id}, ${body.owner},
+        ${sql.json(body.data as Parameters<typeof sql.json>[0])}, ${body.parentIds}, ${body.ancestorIds}, now(), null
+      )
+      on conflict (collection, id) do update set
+        owner = excluded.owner,
+        data = excluded.data,
+        parent_ids = excluded.parent_ids,
+        ancestor_ids = excluded.ancestor_ids,
+        when_last_modified = now(),
+        when_deleted = null
+    `;
+  }
 
   return c.json({ ok: true });
+});
+
+odmRouter.post('/api/odm/search', async c => {
+  const body = await c.req.json<OdmSearchRequest>();
+  if (!body.owner || !body.query?.trim()) return c.json({ error: 'owner and query required' }, 400);
+
+  const limit = Math.max(1, Math.min(Math.trunc(body.limit ?? 10), 100));
+  const minSimilarity = Math.max(-1, Math.min(body.minSimilarity ?? 0, 1));
+  await ensureTables();
+
+  const sql = getSql();
+  const queryVector = toPgVector(await createEmbedding(body.query));
+  const rows = await sql`
+    select collection, id as item_id, owner, data, parent_ids, ancestor_ids,
+      embedding_text, embedding_model, when_last_modified,
+      1 - (embedding <=> ${queryVector}::vector) as similarity
+    from public.odm_items
+    where owner = ${body.owner}
+      and when_deleted is null
+      and embedding is not null
+      ${body.collection ? sql`and collection = ${body.collection}` : sql``}
+      and 1 - (embedding <=> ${queryVector}::vector) >= ${minSimilarity}
+    order by embedding <=> ${queryVector}::vector
+    limit ${limit}
+  `;
+
+  return c.json({
+    items: rows.map(row => ({
+      ...row,
+      similarity: Number(row['similarity']),
+      when_last_modified: row['when_last_modified']?.toISOString() ?? null,
+    })),
+  });
 });
 
 odmRouter.post('/api/odm/items/:collection/:item_id/delete', async c => {

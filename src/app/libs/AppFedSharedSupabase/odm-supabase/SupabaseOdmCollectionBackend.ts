@@ -1,4 +1,5 @@
 import {Injector} from '@angular/core'
+import {HttpClient} from '@angular/common/http'
 import {OdmBackend} from '../../AppFedShared/odm/OdmBackend'
 import {ItemId, OdmCollectionBackend, OdmCollectionBackendListener, QueryOpts} from '../../AppFedShared/odm/OdmCollectionBackend'
 import {OdmItemId} from '../../AppFedShared/odm/OdmItemId'
@@ -12,6 +13,13 @@ import {
 import {SupabaseOdmClientService} from './supabase-odm-client.service'
 import {environment} from '../../../../environments/environment'
 import {BrowserOdmStorage} from '../../AppFedSharedBrowser/odm-browser/BrowserOdmStorage'
+import {stripHtml} from '../../AppFedShared/utils/html-utils'
+
+interface EmbeddingResponse {
+  embedding: number[]
+  model: string
+  dimensions: number
+}
 
 // Postgres's own now() reflects transaction *start*, not commit, so under concurrent writes
 // commit order isn't guaranteed to match server_modified_at order - a strict .gte(cursor)
@@ -22,6 +30,7 @@ const SYNC_CURSOR_BUFFER_MS = 10 * 60 * 1000
 
 export class SupabaseOdmCollectionBackend<TRaw> extends OdmCollectionBackend<TRaw> {
   private supabase = this.injector.get(SupabaseOdmClientService).getClient()
+  private http = this.injector.get(HttpClient)
   private browserOdmStorage = this.injector.get(BrowserOdmStorage)
   private tableName = (environment as any).supabase?.odmItemsTable ?? 'lifesuite_odm_items'
   private historyTableName = (environment as any).supabase?.odmHistoryTable ?? 'lifesuite_odm_item_history'
@@ -69,9 +78,71 @@ export class SupabaseOdmCollectionBackend<TRaw> extends OdmCollectionBackend<TRa
       throw this.errorAlertAndThrow('saveNowToDb upsert error', error, item, id)
     }
 
+    // Embeddings are derived data. Save the user's item first, then update pgvector in the
+    // background so an unavailable AI provider never blocks the offline-first persistence path.
+    if (this.collectionName === 'LearnItem') {
+      void this.syncLearnItemQuestionEmbedding(item, id, owner)
+    }
+
     // History is best-effort - a failure here (e.g. RLS) shouldn't stop the item itself from saving.
     if (!this.opts.dontStoreVersionHistory) {
       await this.saveToHistory(row).catch(error => this.errorAlert('saveToHistory insert error', error))
+    }
+  }
+
+  private async syncLearnItemQuestionEmbedding(item: TRaw, id: string, owner: string): Promise<void> {
+    const raw = item as any
+    const rawQuestion = typeof raw?.title === 'string' ? raw.title : ''
+    const rawAnswer = typeof raw?.answer === 'string' ? raw.answer : ''
+    const question = stripHtml(rawQuestion)?.replace(/\s+/g, ' ').trim() ?? ''
+    const isQuestionAndAnswer = !!question && !!stripHtml(rawAnswer)?.trim()
+
+    try {
+      const {data: current, error: readError} = await this.supabase
+        .from(this.tableName)
+        .select('embedding_text,embedding_model')
+        .eq('collection', this.collectionName)
+        .eq('id', id)
+        .eq('owner', owner)
+        .maybeSingle()
+      if (readError) throw readError
+
+      if (!isQuestionAndAnswer) {
+        if (current?.embedding_text) {
+          const {error} = await this.supabase
+            .from(this.tableName)
+            .update({embedding: null, embedding_text: null, embedding_model: null} as any)
+            .eq('collection', this.collectionName)
+            .eq('id', id)
+            .eq('owner', owner)
+          if (error) throw error
+        }
+        return
+      }
+
+      const embeddingModel = 'text-embedding-3-small'
+      if (current?.embedding_text === question && current?.embedding_model === embeddingModel) return
+
+      const response = await this.http
+        .post<EmbeddingResponse>(`${environment.aiBackendUrl}/api/embeddings`, {text: question})
+        .toPromise()
+      if (!response?.embedding?.length) throw new Error('Embedding API returned no vector')
+
+      const {error} = await this.supabase
+        .from(this.tableName)
+        .update({
+          embedding: `[${response.embedding.join(',')}]`,
+          embedding_text: question,
+          embedding_model: response.model,
+        } as any)
+        .eq('collection', this.collectionName)
+        .eq('id', id)
+        .eq('owner', owner)
+        // Prevent an older embedding request from winning if this item changed while in flight.
+        .contains('data', {title: rawQuestion, answer: rawAnswer})
+      if (error) throw error
+    } catch (error) {
+      this.errorAlert('syncLearnItemQuestionEmbedding error', error)
     }
   }
 

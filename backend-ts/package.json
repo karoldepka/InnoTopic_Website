@@ -9,7 +9,7 @@
   },
   "dependencies": {
     "@ai-sdk/anthropic": "^4.0.0",
-    "@ai-sdk/openai": "^2.0.0",
+    "@ai-sdk/openai": "^3.0.86",
     "@hono/node-server": "^1.13.7",
     "@opentelemetry/api-logs": "^0.219.0",
     "@tavily/core": "^0.4.0",

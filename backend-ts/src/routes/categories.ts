@@ -16,15 +16,15 @@ categoriesRouter.post('/category-tree/debug-prompt', async (c) => {
   const body = await c.req.json<CategoryTreeRequest>();
   const searchResults = body.web_search ? await webSearch(body.message) : [];
   const existingCategories = loadExistingCategories();
-  const messages = buildCategoryTreeMessages(body, existingCategories, searchResults);
-  return c.json({ model: MODEL_NAME, messages });
+  const prompt = buildCategoryTreeMessages(body, existingCategories, searchResults);
+  return c.json({ model: MODEL_NAME, ...prompt });
 });
 categoriesRouter.post('/ai-api/category-tree/debug-prompt', async (c) => {
   const body = await c.req.json<CategoryTreeRequest>();
   const searchResults = body.web_search ? await webSearch(body.message) : [];
   const existingCategories = loadExistingCategories();
-  const messages = buildCategoryTreeMessages(body, existingCategories, searchResults);
-  return c.json({ model: MODEL_NAME, messages });
+  const prompt = buildCategoryTreeMessages(body, existingCategories, searchResults);
+  return c.json({ model: MODEL_NAME, ...prompt });
 });
 
 // ─── Zod schemas ──────────────────────────────────────────────────────────────
@@ -60,10 +60,11 @@ async function handleCategoryTreeStream(c: import('hono').Context) {
   const body = await c.req.json<CategoryTreeRequest>();
   const searchResults = body.web_search ? await webSearch(body.message) : [];
   const existingCategories = loadExistingCategories();
-  const messages = buildCategoryTreeMessages(body, existingCategories, searchResults);
+  const { system, messages } = buildCategoryTreeMessages(body, existingCategories, searchResults);
 
   const { textStream } = streamText({
     model: llm,
+    system,
     messages,
     maxRetries: 0,
     experimental_telemetry: { isEnabled: true, functionId: 'category-tree-stream' },
@@ -82,10 +83,11 @@ async function handleCategoryTreeStreamSSE(c: import('hono').Context) {
   const body = await c.req.json<CategoryTreeRequest>();
   const searchResults = body.web_search ? await webSearch(body.message) : [];
   const existingCategories = loadExistingCategories();
-  const messages = buildCategoryTreeMessages(body, existingCategories, searchResults);
+  const { system, messages } = buildCategoryTreeMessages(body, existingCategories, searchResults);
 
   const { textStream } = streamText({
     model: llm,
+    system,
     messages,
     maxRetries: 0,
     experimental_telemetry: { isEnabled: true, functionId: 'category-tree-stream' },
@@ -109,11 +111,12 @@ async function handleCategoryTree(c: import('hono').Context) {
   const body = await c.req.json<CategoryTreeRequest>();
   const searchResults = body.web_search ? await webSearch(body.message) : [];
   const existingCategories = loadExistingCategories();
-  const messages = buildCategoryTreeMessages(body, existingCategories, searchResults);
+  const { system, messages } = buildCategoryTreeMessages(body, existingCategories, searchResults);
 
   const { object } = await generateObject({
     model: llm,
     schema: categoryTreeResponseSchema,
+    system,
     messages,
     experimental_telemetry: { isEnabled: true, functionId: 'category-tree' },
   });
@@ -129,10 +132,11 @@ categoriesRouter.post('/ai-api/category-tree', handleCategoryTree);
 async function handleMoreSubcategories(c: import('hono').Context) {
   const body = await c.req.json<MoreSubcategoriesRequest>();
   const searchResults = body.web_search ? await webSearch(body.topic) : [];
-  const messages = buildMoreSubcategoriesMessages(body, searchResults);
+  const { system, messages } = buildMoreSubcategoriesMessages(body, searchResults);
 
   const { textStream } = streamText({
     model: llm,
+    system,
     messages,
     maxRetries: 0,
     experimental_telemetry: { isEnabled: true, functionId: 'more-subcategories' },

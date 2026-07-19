@@ -29,15 +29,16 @@ async function handleQAStream(c: import('hono').Context) {
   const body = await c.req.json<QuestionAnswerRequest>();
   const query = (body.tree ?? []).map(n => n.title).join(' ');
   const searchResults = body.web_search ? await webSearch(query) : [];
-  const messages = buildQAMessages(body, searchResults);
+  const { system, messages } = buildQAMessages(body, searchResults);
 
-  const { textStream, text } = streamText({
+  const { textStream } = streamText({
     model: llm,
+    system,
     messages,
     maxRetries: 0,
     experimental_telemetry: { isEnabled: true, functionId: 'qa-stream' },
+    onFinish: ({ text }) => console.log('[qa] raw model output (first 500):', text.slice(0, 500)),
   });
-  text.then(t => console.log('[qa] raw model output (first 500):', t.slice(0, 500)));
   return textStreamResponse(stripJsonFences(textStream), c);
 }
 
@@ -50,11 +51,12 @@ async function handleQA(c: import('hono').Context) {
   const body = await c.req.json<QuestionAnswerRequest>();
   const query = (body.tree ?? []).map(n => n.title).join(' ');
   const searchResults = body.web_search ? await webSearch(query) : [];
-  const messages = buildQAMessages(body, searchResults);
+  const { system, messages } = buildQAMessages(body, searchResults);
 
   const { object } = await generateObject({
     model: llm,
     schema: questionAnswerResponseSchema,
+    system,
     messages,
     experimental_telemetry: { isEnabled: true, functionId: 'qa' },
   });
