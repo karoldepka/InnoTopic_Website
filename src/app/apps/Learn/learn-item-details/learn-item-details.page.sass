@@ -1,0 +1,10 @@
+// GH #67: the collapsed per-side "TITLE"/"BENEFITS"/... buttons (app-item-side-editor,
+// display:contents - see its own .sass) used to each force a full-width block, one per line,
+// with its voice-memo mic button below it on a line of its own - very tall for how little
+// content each row held. Flowing them as wrapping flex items lets several collapsed fields sit
+// side by side per row instead.
+.side-editors-flow
+  display: flex
+  flex-wrap: wrap
+  align-items: flex-start
+  gap: 4px

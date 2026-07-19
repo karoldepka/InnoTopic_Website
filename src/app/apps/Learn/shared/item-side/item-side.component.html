@@ -15,6 +15,7 @@
 </ion-button>
 
 <div
+  class="expanded-editor"
   style="margin: 3px"
   *ngIf="side && isVisible(item$.val$ | async) && (editorOpened || formControl.value)"
   (click)="focusEditor()"
