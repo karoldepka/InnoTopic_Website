@@ -1,3 +1,30 @@
-<p>
-  min-mid-max-cell works!
-</p>
+<div class="journal-rating">
+  <apf-star-rating
+    class="journal-rating__stars"
+    [allowZero]="true"
+    [maxStars]="maxStars"
+    [ngModel]="starValue"
+    (numericValue)="onStarValueChanged($event)"
+  />
+  <app-voice-memo-field
+    [item$]="cell.treeNode.item$"
+    [fieldId]="cell.column.id"
+    (transcriptReady)="onTranscriptReady($event)"
+  ></app-voice-memo-field>
+  <app-expand-toggle
+    [isOpen]="isCommentOpen"
+    (isOpenChange)="onCommentOpenChange($event)"
+    [hasContent]="!!comment"
+    openLabel="Hide"
+    closedLabel="Note"
+  >
+    <ion-textarea
+      class="field-comment"
+      [value]="comment"
+      (ionInput)="onChangeComment($any($event).detail.value)"
+      placeholder="Add a note..."
+      [autoGrow]="true"
+      rows="2"
+    ></ion-textarea>
+  </app-expand-toggle>
+</div>

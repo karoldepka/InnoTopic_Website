@@ -1,45 +1,54 @@
-import {Component, ElementRef, Input, OnInit, ViewChild, ChangeDetectionStrategy} from '@angular/core';
-import {OdmCell} from '../OdmCell'
-import {CellNavigationService} from '../../../cell-navigation.service'
+import {Component, Injector, Input, Output, EventEmitter, ViewChild, ChangeDetectionStrategy} from '@angular/core';
 import {FormControl, UntypedFormControl} from '@angular/forms'
 import {RichTextEditComponent} from '../../../rich-text/rich-text-edit/rich-text-edit.component'
-import {CellComponent} from '../../../../../apps/OrYoL/tree-shared/cells/CellComponent'
-import {errorAlert} from '../../../utils/log'
+import {VoiceMemoFieldComponent} from '../../../audio/voice-memo-field/voice-memo-field.component'
+import {AbstractCellComponent} from '../../../AbstractCellComponent'
+import {fieldVirtualNodeId} from '../SlotDescriptor'
+import {createChildUnderSlot} from '../../BareSlotChildren'
 
+/** The one rich-text cell for all of LifeSuite (GH #89) - Journal/Learn's unified slots render
+ * this for any `kind: 'text'` `SlotDescriptor`. OrYoL's tree still has its own parallel
+ * `OryRichTextCellComponent` wrapping the exact same underlying `RichTextEditComponent`/TinyMCE,
+ * because OrYoL's node rendering sits on the legacy `OryItem$`/`ColumnCell` adapter rather than
+ * `OdmCell`/`OdmTreeNode` this cell is built on - genuinely collapsing the two requires migrating
+ * OrYoL's node-content rendering onto `OdmCell` first (tracked as follow-up work alongside
+ * replacing OrYoL's template-node mechanism with bare slots), not a safe change to make as a
+ * side-effect here. This component is kept at parity with `OryRichTextCellComponent`'s feature
+ * set (TinyMCE, voice-memo transcript insertion, Enter-key interception) so that migration is a
+ * delete-and-rewire later, not a redesign. */
 @Component({
     selector: 'app-rich-text-edit-cell',
     templateUrl: './rich-text-edit-cell.component.html',
     changeDetection: ChangeDetectionStrategy.Eager,
     styleUrls: ['./rich-text-edit-cell.component.sass'],
-    imports: [RichTextEditComponent],
+    imports: [RichTextEditComponent, VoiceMemoFieldComponent],
 })
-export class RichTextEditCellComponent /*extends CellComponent*/ implements OnInit {
-
-  /** TODO use RichTextEditComponent.
-   * Later the fancy component could be activated on-demand by some 3-dots menu button or edit icon
-   * Pass FormControl
-   * */
-  @ViewChild('contentEditableEl', {static: true})
-  contentEditableEl !: ElementRef
+export class RichTextEditCellComponent extends AbstractCellComponent {
 
   @ViewChild(RichTextEditComponent, {static: true})
   richTextEditComponent !: RichTextEditComponent
 
-  @Input()
-  cell !: OdmCell
+  /** Matches the hardcoded behavior this cell always had before this became configurable - a
+   * plain Enter is suppressed and forwarded via `enterKeydownIntercepted` instead of inserting a
+   * newline, since a slot cell usually sits inside a list where Enter means "next row"/"add
+   * sibling", not "new paragraph". */
+  @Input() enterKeyOnlyWithShift = true
+
+  /** Forwards `RichTextEditComponent`'s own output of the same name unchanged - the caller (e.g.
+   * OrYoL's tree, once migrated onto this shared cell - see class doc comment) decides what a
+   * plain Enter should actually do; this cell stays app-agnostic. */
+  @Output() enterKeydownIntercepted = new EventEmitter<KeyboardEvent>()
 
   formControl!: FormControl
 
   constructor(
-    public cellNavigationService: CellNavigationService
+    injector: Injector,
   ) {
-    // super()
+    super(injector)
   }
 
-  /*override */ngOnInit() {
-    // super.onInit()
-    // this.contentEditableEl
-    //   .nativeElement.addEventListener('input', (event: any) => this.onInputChanged(event, this.getInputValue()))
+  override ngOnInit() {
+    super.ngOnInit() // registers this cell with CellNavigationService
 
     this.formControl = new UntypedFormControl()
     this.formControl.setValue(this.cell.patchableObservable.locallyVisibleChanges$.lastVal)
@@ -65,21 +74,39 @@ export class RichTextEditCellComponent /*extends CellComponent*/ implements OnIn
     })
   }
 
-  /*override */ onInputChanged(event: any, newValue: any) {
+  onInputChanged(event: any, newValue: any) {
     console.log('onInputChanged', newValue)
     this.cell.patchThrottled(newValue, event)
   }
 
-  /*override */getInputValue(): string {
-    return this.contentEditableEl.nativeElement.innerHTML
+  getInputValue(): string {
+    return this.formControl.value ?? ''
   }
 
-  /*override */ focus() {
+  override focus() {
     this.richTextEditComponent.focusEditor()
   }
 
-  /*override */ setInputValue(newValue: string): void {
-    errorAlert('setInputValue not implemented; do i still need it?')
+  setInputValue(newValue: string): void {
+    this.formControl.setValue(newValue, {emitEvent: false})
+  }
+
+  /** "Recording a voice note on 'mood' should create a new sub-node. Its text should be the
+   * transcript." (GH #89) - a real child of this cell's item, anchored under this field's
+   * fabricated virtual-node id via `manualAncestorIds` (see `BareSlotChildren.ts`), not spliced
+   * into this field's own rich-text value (unlike OrYoL's `OryRichTextCellComponent`, which still
+   * inserts inline - not yet migrated onto this shared cell, see class doc comment). */
+  onTranscriptReady(transcript: string) {
+    const targetNodeId = fieldVirtualNodeId(this.cell.treeNode.item$.id as string, this.cell.column.id)
+    createChildUnderSlot(this.cell.treeNode.item$, targetNodeId, {title: transcript} as any)
+  }
+
+  /** Only Journal's 'general' field inherits the one pre-existing legacy single-recording (from
+   * before per-field voice memos existed) - matches the old `JournalTextFieldComponent`'s
+   * identical `fieldDescriptor.id === 'general'` check (see `VoiceMemoService.getLegacyMemoRef`'s
+   * doc comment for why this must stay scoped to exactly one field). */
+  get includeLegacyRecording(): boolean {
+    return this.cell.column.id === 'general'
   }
 
 }

@@ -1,4 +1,3 @@
-
 <!-- Have cells-list component be nestable for sub-cells -->
 
 <!-- individual cell components MUST NOT assume they are in a tree node
@@ -6,28 +5,41 @@
   So they must be in separate module(s)
 
   Cell MUST NOT assume that it has anything to do with columns.
-
-  SOME cells/cell-components must be able to handle display of aggregate values (e.g. minMidMax or at the numeric cell level, time-tracking)
-    and missing child values
 -->
 
+@for (entry of cells; track entry.descriptor.id) {
+  <div class="slot-cell">
+    <div class="slot-cell__label">
+      <app-slot-icon [descriptor]="entry.descriptor"></app-slot-icon>
+      {{ entry.descriptor.label }}
+    </div>
 
+    @switch (entry.descriptor.kind) {
+      @case ('numeric') {
+        <app-min-mid-max-cell [cell]="entry.cell!"></app-min-mid-max-cell>
+      }
+      @case ('text') {
+        <app-rich-text-edit-cell [cell]="entry.cell!"></app-rich-text-edit-cell>
+      }
+      @case ('slot') {
+        <app-bare-slot-cell
+          [parentItem$]="treeNode.item$"
+          [targetNodeId]="entry.targetNodeId"
+          [descriptorId]="entry.descriptor.id"
+        ></app-bare-slot-cell>
+      }
+    }
 
-<!--<ng-container-->
-<!--  *ngFor="let cell of cells"-->
-<!--&gt;-->
-<!--  &lt;!&ndash; TODO: maybe separate cell type resolver component, to be reusable also in property sheets, options popups, etc &ndash;&gt;-->
-<!--  <ng-container *ngIf="cell.type === 'richText'">-->
+    <app-time-tracked-item-cell [item$]="entry.timeTrackItem$"></app-time-tracked-item-cell>
 
-<!--    <app-rich-text-edit-cell-->
-<!--      [cell]="cell"-->
-<!--    ></app-rich-text-edit-cell>-->
-<!--  </ng-container>-->
+    <app-expand-toggle
+      icon="chatbubble-outline"
+      [isOpen]="openCommentsForDescriptorId === entry.descriptor.id"
+      (isOpenChange)="onCommentsIsOpenChange(entry.descriptor.id, $event)"
+    >
+      <app-comment-thread [targetNodeId]="entry.targetNodeId"></app-comment-thread>
+    </app-expand-toggle>
+  </div>
+}
 
-<!--  <ng-container *ngIf="cell.type === 'minMidMax'">-->
-<!--    <app-min-mid-max-cell-->
-<!--      [cell]="cell"-->
-<!--    ></app-min-mid-max-cell>-->
-<!--  </ng-container>-->
-
-<!--</ng-container>-->
+<app-slot-picker [treeNode]="treeNode" [descriptors]="descriptors"></app-slot-picker>

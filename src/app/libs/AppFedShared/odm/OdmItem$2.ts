@@ -33,6 +33,12 @@ export class OdmInMemItemWriteOnce {
   public whenArchived?: OdmTimestamp | null
   public owner?: UserId
   public parentIds?: string[]
+  /** Extra `ancestorIds` entries beyond the real parent chain `getAncestorIds()` already walks -
+   * currently just the bare-slot mechanism (GH #89): a child "created under" a fabricated/virtual
+   * slot id (e.g. `abcdefgh_field_plan`) stays a completely normal child of its real parent
+   * (`parentIds` unchanged) with the slot id appended here, so it's reachable via the exact same
+   * `ancestorIds`-containment query as any other descendant - see `BareSlotChildren.ts`. */
+  public manualAncestorIds?: string[]
 }
 
 /** FIXME: rename OdmInMemItemData */
@@ -42,6 +48,11 @@ export class OdmInMemItem extends OdmInMemItemWriteOnce {
   /** Fractional sibling-ordering key (OrYoL-style), spaced by ODM_ORDER_STEP so nodes
    * can be reordered/inserted between neighbours without renumbering siblings. */
   public orderNum?: number
+  /** GH #89's unified slot picker: ids of `SlotDescriptor`s the user explicitly added via
+   * `SlotPickerComponent` even though they have no filled value (or no `dataFieldKey`) yet - an
+   * otherwise-empty/bare slot only renders once it's either filled in or listed here, so a
+   * 236-descriptor registry (Journal's numeric fields) doesn't render 236 empty cells. */
+  public manuallyAddedSlotIds?: string[]
 }
 
 export type OdmRawItemData = OdmInMemItem // workaround
@@ -655,6 +666,7 @@ export class OdmItem$2<
       const ancestorsOfParent: TItemId[] = parentItem$.getAncestorIds() as TItemId[]
       ancestorIds.push(... ancestorsOfParent)
     }
+    ancestorIds.push(... (this.currentVal?.manualAncestorIds ?? []) as TItemId[])
 
     return ancestorIds
   }

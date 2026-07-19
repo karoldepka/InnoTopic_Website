@@ -18,6 +18,13 @@
   [formControl1]="formControl"
   [showToolbar]="true"
   [showMenuBar]="true"
-  [enterKeyOnlyWithShift]="true"
+  [enterKeyOnlyWithShift]="enterKeyOnlyWithShift"
+  (enterKeydownIntercepted)="enterKeydownIntercepted.emit($event)"
 ></app-rich-text-edit>
+<app-voice-memo-field
+  [item$]="cell.treeNode.item$"
+  [fieldId]="cell.column.id"
+  [includeLegacy]="includeLegacyRecording"
+  (transcriptReady)="onTranscriptReady($event)"
+></app-voice-memo-field>
 
