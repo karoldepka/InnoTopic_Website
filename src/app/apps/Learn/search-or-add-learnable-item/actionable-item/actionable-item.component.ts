@@ -11,7 +11,7 @@ import {FeatureService} from '../../../../libs/AppFedShared/feature.service'
 import {BaseComponent} from '../../../../libs/AppFedShared/base/base.component'
 import { AlertController, IonicModule, ToastController } from '@ionic/angular';
 import { RouterLink } from '@angular/router';
-import { NgIf } from '@angular/common';
+import { NgIf, AsyncPipe } from '@angular/common';
 import { SelectionCheckboxComponent } from './selection-checkbox/selection-checkbox.component';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { Subscription } from 'rxjs';
@@ -37,6 +37,7 @@ import {stripHtml} from '../../../../libs/AppFedShared/utils/html-utils'
         RouterLink,
         NgIf,
         SelectionCheckboxComponent,
+        AsyncPipe,
     ],
 })
 export class ActionableItemComponent extends BaseComponent implements OnInit, OnDestroy {

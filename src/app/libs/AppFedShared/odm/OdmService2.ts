@@ -118,6 +118,18 @@ export abstract class OdmService2<
 
   readonly treeRootItem = this.obtainItem$ById(this.treeRootItemId)
 
+  /** Ids of this collection's items that have at least one archived conflict row - lets a list UI
+   * mark them (GH #84) rather than the one-off toast (`OdmConflictToastService`) being the only
+   * trace a conflict ever happened. Refreshed on construction and whenever a new conflict for
+   * this collection is archived. */
+  conflictedItemIds$ = new CachedSubject<Set<TItemId>>(new Set())
+
+  private refreshConflictedItemIds() {
+    this.browserOdmStorage.getConflictedItemIds(this.className).then(ids => {
+      this.conflictedItemIds$.nextWithCache(ids as Set<TItemId>)
+    })
+  }
+
   protected constructor(
     public injector: Injector,
     public className: string,
@@ -127,6 +139,12 @@ export abstract class OdmService2<
     // this.className += '_DEBUG'
     this.setBackendListenerIfNecessary()
     this.resumePendingEdits()
+    this.refreshConflictedItemIds()
+    this.browserOdmStorage.conflictDetected$.subscribe(conflict => {
+      if (conflict.collection === this.className) {
+        this.refreshConflictedItemIds()
+      }
+    })
     // this.subscribeToBackendCollection();
   }
 

@@ -21,6 +21,10 @@ export interface BrowserOdmRow<TRaw> extends PostgresOdmRow<TRaw> {
    * that surface rows as real app items (e.g. `BrowserOdmCollectionBackend.fetchRows`) must
    * exclude these, the same way they already exclude soft-deleted rows. */
   isConflictArchive?: boolean
+  /** Only set on a conflict-archival row - the id of the real (winning) item this archived write
+   * lost a race against, so a UI can mark that item as having an unresolved conflict (GH #84)
+   * without parsing it back out of the archival row's own synthetic id. */
+  conflictWinnerItemId?: string
 }
 
 const DB_NAME = 'lifesuite-odm-cache'
@@ -337,6 +341,7 @@ export class BrowserOdmStorage {
             whenFirstStoredLocally: now,
             whenLastStoredLocally: now,
             isConflictArchive: true,
+            conflictWinnerItemId: row.item_id,
           }
           await requestToPromise(store.put(loserRow))
           this.conflictDetected$.next({
@@ -375,6 +380,21 @@ export class BrowserOdmStorage {
       const rows = await requestToPromise<BrowserOdmRow<TRaw>[]>(tx.objectStore(STORE).index(COLLECTION_INDEX).getAll(collection))
       return rows ?? []
     })
+  }
+
+  /** Ids of every item in this collection that has at least one archived conflict row (GH #84 -
+   * so a UI can mark those items rather than the conflict staying a one-off toast nobody can
+   * revisit). Recomputed on demand rather than cached - conflicts are rare, so a full collection
+   * scan is cheap relative to how often this actually changes. */
+  async getConflictedItemIds(collection: string): Promise<Set<string>> {
+    const rows = await this.getAllForCollection<unknown>(collection)
+    const ids = new Set<string>()
+    for (const row of rows) {
+      if (row.isConflictArchive && row.conflictWinnerItemId) {
+        ids.add(row.conflictWinnerItemId)
+      }
+    }
+    return ids
   }
 
   async delete(collection: string, itemId: string): Promise<void> {
