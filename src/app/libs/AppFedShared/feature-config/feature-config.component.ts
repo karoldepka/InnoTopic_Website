@@ -82,6 +82,14 @@ export class FeatureConfigComponent extends BaseComponent implements OnInit {
     this.featureConfigService.setVoiceMemoPlaybackEnabled($event.detail.checked)
   }
 
+  get timeTrackingEnabled(): boolean {
+    return this.featureConfigService.timeTrackingEnabled
+  }
+
+  onChangeTimeTrackingEnabled($event: any) {
+    this.featureConfigService.setTimeTrackingEnabled($event.detail.checked)
+  }
+
   get voiceMemoTranscriptionMode() {
     return this.featureConfigService.voiceMemoTranscriptionMode
   }

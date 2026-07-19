@@ -316,3 +316,43 @@ describe('GenericItemsService/GenericItem$ - sync (realtime) reactivity', () => 
     expect(item$.val?.title).toBe('My unsynced edit')
   })
 })
+
+// Covers the members OdmItem$2 grew to structurally satisfy OrYoL's `TimeTrackable`
+// (apps/OrYoL/time-tracking/time-tracking.service.ts) - so domain items like `TimeTrackedEntry`
+// work identically whether hosted on an OryItem$ tree node or a plain OdmItem$2 (Journal, Learn).
+describe('OdmItem$2 - domain-item mixin (getId/getItemData/data$/obtainDomainItem/getCollectionName)', () => {
+  it('getId/getItemData/getCollectionName expose the id, current value, and owning collection name', async () => {
+    const {service} = setup()
+    const item$ = service.add(Object.assign(new GenericItem(), {title: 'Hello'}))
+    await flushMicrotasks()
+
+    expect(item$.getId()).toBe(item$.id)
+    expect(item$.getItemData()).toBe(item$.val)
+    expect(item$.getCollectionName()).toBe('GenericItem')
+  })
+
+  it('data$ is the same stream as val$', () => {
+    const {service} = setup()
+    const item$ = service.add(Object.assign(new GenericItem(), {title: 'Hello'}))
+
+    expect(item$.data$).toBe(item$.val$)
+  })
+
+  it('obtainDomainItem caches one instance per constructor, reused across repeated calls', () => {
+    const {service} = setup()
+    const item$ = service.add(Object.assign(new GenericItem(), {title: 'Hello'}))
+
+    class DomainA { constructor(public injector: any, public hostItem$: any) {} }
+    class DomainB { constructor(public injector: any, public hostItem$: any) {} }
+
+    const a1 = item$.obtainDomainItem(DomainA as any)
+    const a2 = item$.obtainDomainItem(DomainA as any)
+    const b1 = item$.obtainDomainItem(DomainB as any)
+
+    expect(a1).toBeInstanceOf(DomainA)
+    expect(a2).toBe(a1) // same constructor -> cached instance reused
+    expect(b1).toBeInstanceOf(DomainB)
+    expect(b1).not.toBe(a1) // different constructor -> its own instance
+    expect((a1 as any).hostItem$).toBe(item$)
+  })
+})

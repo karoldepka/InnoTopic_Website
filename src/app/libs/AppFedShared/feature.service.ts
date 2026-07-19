@@ -115,4 +115,20 @@ export class FeatureService {
   setVoiceMemoTranscriptionLanguage(languageCode: string) {
     localStorage.setItem(FeatureService.voiceMemoTranscriptionLanguageKey, languageCode)
   }
+
+  // ---- Global on/off for the time-tracking widget on Journal entries and Learn's Task items
+  // (OrYoL's own time-tracking stays on regardless - this only gates the newer surfaces) - a real
+  // user preference that should survive a reload, so localStorage-persisted like
+  // firestoreEnabled above rather than the in-memory-only patchProps() toggles. ----
+
+  static readonly timeTrackingEnabledKey = 'timeTrackingEnabled'
+
+  get timeTrackingEnabled(): boolean {
+    const stored = localStorage.getItem(FeatureService.timeTrackingEnabledKey)
+    return stored === null ? true : stored === 'true'
+  }
+
+  setTimeTrackingEnabled(enabled: boolean) {
+    localStorage.setItem(FeatureService.timeTrackingEnabledKey, String(enabled))
+  }
 }

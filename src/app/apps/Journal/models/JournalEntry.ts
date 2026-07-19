@@ -6,6 +6,7 @@ import {JournalTextDescriptor, JournalTextDescriptors} from './JournalTextDescri
 import {nullish} from '../../../libs/AppFedShared/utils/type-utils'
 import {isNotNullish} from '../../../libs/AppFedShared/utils/utils'
 import {VoiceMemoRecord} from '../../../libs/AppFedShared/audio/voice-memo.service'
+import {TimeTrackingPersistentData} from '../../OrYoL/time-tracking/TimeTrackingPersistentData'
 
 export type JournalEntryId = OdmItemId<JournalEntry>
 
@@ -28,6 +29,10 @@ export class JournalEntry extends OdmInMemItem /*OdmItem<JournalEntry>*/ {
   /** Every voice memo recorded against any field on this entry - see VoiceMemoRecord's doc
    * comment (one flat array, filtered per-field by `fieldId` at read time). */
   voiceMemos ?: VoiceMemoRecord[]
+
+  /** Live time-tracking state (start/pause) shared with OrYoL's time-tracking engine - see
+   * `TimeTrackable` in `apps/OrYoL/time-tracking/time-tracking.service.ts`. */
+  timeTrack ?: TimeTrackingPersistentData
 
   constructor(
     // odmService: OdmService<JournalEntry>,

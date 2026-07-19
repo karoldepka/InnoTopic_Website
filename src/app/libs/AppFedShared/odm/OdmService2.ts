@@ -119,7 +119,7 @@ export abstract class OdmService2<
   readonly treeRootItem = this.obtainItem$ById(this.treeRootItemId)
 
   protected constructor(
-    protected injector: Injector,
+    public injector: Injector,
     public className: string,
     public opts : OdmServiceOpts = new OdmServiceOpts(),
   ) {

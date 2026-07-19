@@ -7,7 +7,7 @@
 
 <app-time-tracking-cell
   *ngFor="let entry of (timeTrackedEntries$ | async)"
-  [ngStyle]="{'display': 'inline-flex', 'opacity': entry.timeTrackable.itemData.isDone ? '50%' : '100%' }"
+  [ngStyle]="{'display': 'inline-flex', 'opacity': entry.timeTrackable.getItemData()?.isDone ? '50%' : '100%' }"
   (click)="navigateTo(entry)"
   [timeTrackedEntry]="entry"
   [toolBarMode]="true"

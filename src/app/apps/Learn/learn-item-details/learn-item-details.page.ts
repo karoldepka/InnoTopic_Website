@@ -15,6 +15,7 @@ import {LearnItem$} from '../models/LearnItem$'
 import {NavigationService} from '../../../shared/navigation.service'
 import {filter} from 'rxjs/operators'
 import {BaseComponent} from '../../../libs/AppFedShared/base/base.component'
+import {FeatureService} from '../../../libs/AppFedShared/feature.service'
 import { AppLogoComponent } from '../../Common/app-logo/app-logo.component';
 import { NgIf, NgFor, AsyncPipe } from '@angular/common';
 import { TimePassingComponent } from '../../../libs/AppFedShared/time/time-passing/time-passing.component';
@@ -34,6 +35,7 @@ import { StatusesEditComponent } from './statuses-edit/statuses-edit.component';
 import { SelfRatingComponent } from '../shared/self-rating/self-rating.component';
 import { ItemSubItemsComponent } from './item-sub-items/item-sub-items.component';
 import { ItemSideComponent } from '../shared/item-side/item-side.component';
+import { TimeTrackedItemCellComponent } from '../../OrYoL/time-tracking/time-tracked-item-cell/time-tracked-item-cell.component';
 
 @Component({
     selector: 'app-learn-item-details',
@@ -62,10 +64,13 @@ import { ItemSideComponent } from '../shared/item-side/item-side.component';
         ItemSubItemsComponent,
         NgFor,
         ItemSideComponent,
+        TimeTrackedItemCellComponent,
         AsyncPipe,
     ],
 })
 export class LearnItemDetailsPage extends BaseComponent implements OnInit {
+
+  featureService = this.injector.get(FeatureService)
 
   get val$(): Observable<LearnItem | nullish> {
     return this.item$.locallyVisibleChanges$

@@ -132,6 +132,11 @@
       [item$]="item$"
     />
 
+    <app-time-tracked-item-cell
+      *ngIf="featureService.timeTrackingEnabled && itemVal?.isTask"
+      [item$]="item$"
+    ></app-time-tracked-item-cell>
+
     <ion-checkbox
       labelPlacement="end"
       [checked]="!!itemVal?.whenDone"
