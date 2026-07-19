@@ -10,6 +10,7 @@ import { TimePointComponent } from '../../../libs/AppFedShared/time/time-point/t
 import { JournalNumFieldsViewComponent } from './journal-num-fields-view/journal-num-fields-view.component';
 import { JournalTextFieldsViewComponent } from './journal-text-fields-view/journal-text-fields-view.component';
 import { VoiceMemoFieldComponent } from '../../../libs/AppFedShared/audio/voice-memo-field/voice-memo-field.component';
+import { OdmTimestampToDatePipe } from '../../../libs/AppFedShared/odm/odm-timestamp-to-date.pipe';
 
 @Component({
     selector: 'app-journal-entry-list-item',
@@ -25,6 +26,7 @@ import { VoiceMemoFieldComponent } from '../../../libs/AppFedShared/audio/voice-
         JournalTextFieldsViewComponent,
         AsyncPipe,
         VoiceMemoFieldComponent,
+        OdmTimestampToDatePipe,
     ],
 })
 export class JournalEntryListItemComponent implements OnInit {

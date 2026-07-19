@@ -1,5 +1,5 @@
 import {describe, it, expect} from 'vitest'
-import {odmTimestampToMillis} from './utils'
+import {odmTimestampToMillis, odmTimestampToDate} from './utils'
 
 describe('odmTimestampToMillis', () => {
   it('converts a Firestore-Timestamp-like object (has toMillis())', () => {
@@ -38,5 +38,25 @@ describe('odmTimestampToMillis', () => {
     const earlier = odmTimestampToMillis('2024-01-01T00:00:00.000Z')!
     const later = odmTimestampToMillis({seconds: Math.floor(new Date('2024-06-01T00:00:00.000Z').getTime() / 1000), nanoseconds: 0})!
     expect(later).toBeGreaterThan(earlier)
+  })
+})
+
+describe('odmTimestampToDate', () => {
+  it('converts a live Firestore-Timestamp-like object (has toMillis())', () => {
+    const fakeTimestamp = {toMillis: () => 1700000000000}
+    expect(odmTimestampToDate(fakeTimestamp)).toEqual(new Date(1700000000000))
+  })
+
+  it('converts a plain {seconds, nanoseconds} object - e.g. one that lost its Timestamp ' +
+    'prototype/toDate() in an IndexedDB structured-clone round-trip (the live crash this guards ' +
+    'against: "X.toDate is not a function")', () => {
+    expect(odmTimestampToDate({seconds: 1700000000, nanoseconds: 0})).toEqual(new Date(1700000000000))
+  })
+
+  it('returns null (never throws) for null/undefined/an unrecognized shape', () => {
+    expect(odmTimestampToDate(null)).toBeNull()
+    expect(odmTimestampToDate(undefined)).toBeNull()
+    expect(odmTimestampToDate({})).toBeNull()
+    expect(odmTimestampToDate('not a date')).toBeNull()
   })
 })
