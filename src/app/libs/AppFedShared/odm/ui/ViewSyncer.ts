@@ -30,6 +30,11 @@ export class ViewSyncer<TKey = string, TValue = any /* TODO */, TItemInMem = any
   /** High number as hack for learnItem fields being overridden */
   MIN_INTERVAL_MS: DurationMs = 10_000
 
+  /** Handle for a retry of a DB update that arrived while the post-edit lockout above was still
+   * active - see handleIncomingDbValue()'s doc comment. Cleared/replaced whenever a newer
+   * candidate value supersedes an already-scheduled retry. */
+  private pendingRetryTimeoutHandle ? : ReturnType<typeof setTimeout>
+
   constructor(
     /** TODO make it FormControl in maybe ViewSyncer2 coz needs individual updates */
     public formGroup: AbstractControl,
@@ -46,28 +51,7 @@ export class ViewSyncer<TKey = string, TValue = any /* TODO */, TItemInMem = any
   {
     // console.log('ViewSyncer ctor', item$, item$.id)
     this.item$.locallyVisibleChanges$.subscribe((dataFromDb: TItemInMem | undefined | null) => {
-
-      // console.log(`ViewSyncer locallyVisibleChanges$`, this.item$.id, dataFromDb)
-      // this.formGroup.setValue(data) // FIXME: use setValue in case some field externally deleted, but need to fill missing fields using new util func ensureFieldsExistBasedOn
-      // if ( ! this.initialDataArrived /* prevent self-overwrite; later could do smth like in OrYoL - minimum time delay from last edit, some seconds or even minutes*/ ) {
-      if ( this.shouldApplyFromDb(dataFromDb) ) {
-        if ( dataFromDb ) {
-          // debugLog('ViewSyncer - item$.locallyVisibleChanges$.subscribe -- initialDataArrived = true', dataFromDb)
-          this.initialDataArrived = true
-        }
-        try {
-          this.isApplyingFromDb = true
-          // debugLog(`ViewSyncer this.formGroup.patchValue(dataFromDb)`, this.fieldNameHack)
-          // convert plain to HTML:
-          if ( this.fieldNameHack ) {
-            (dataFromDb as any)[this.fieldNameHack] = convertToHtmlIfNeeded((dataFromDb as any)[this.fieldNameHack])
-          }
-          this.formGroup.patchValue(dataFromDb) // TODO: handle nullish
-          this.lastValFromDb = dataFromDb
-        } finally {
-          this.isApplyingFromDb = false
-        }
-      }
+      this.handleIncomingDbValue(dataFromDb)
     })
     this.formGroup.valueChanges.pipe(
       throttleTimeWithLeadingTrailing_ReallyThrottle(1500 as (number & {unit: 'ms'}))
@@ -123,19 +107,63 @@ export class ViewSyncer<TKey = string, TValue = any /* TODO */, TItemInMem = any
     this.initialDataArrivalWasSetExplicitly = true
   }
 
-  private shouldApplyFromDb(newDataFromDb: TItemInMem | undefined | null): boolean {
+  /** A DB update that arrives while the post-edit lockout (MIN_INTERVAL_MS) is still active isn't
+   * just a redundant echo - that case is already filtered out below by the "same value" check -
+   * it's genuinely newer data. Previously this was just dropped: `lastValFromDb` only advanced
+   * when an update was actually *applied*, so a value skipped for arriving too soon was never
+   * retried once the lockout lifted - nothing else re-delivers that same DB event later. The
+   * field stayed stuck on this device's own last local edit indefinitely, surviving even a reload
+   * if that reload's own first-arriving value (e.g. a stale earlier cache/db read) was applied
+   * before the still-in-flight newer value returned (GH #83 - "field text value gets stuck on
+   * local version, even after page reload"). Now: schedule a retry for exactly when the lockout
+   * will lift, re-evaluating from scratch (in case an even newer value or edit has arrived by
+   * then) rather than silently forgetting about it. */
+  private handleIncomingDbValue(dataFromDb: TItemInMem | undefined | null) {
     /* NOTE: interestingly, setting empty string in tinymce only syncs to app in firefox when editor losing focus
       not really, coz editing adding chars also does not sync the last chars until losing editor focus / could be related to throttleTime vs debounce?
      */
     if ( this.fieldNameHack && this.initialDataArrived ) {
       const lastValFromDbElement = (this.lastValFromDb as any)?.[this.fieldNameHack]
-      const newDataFromDbElement = (newDataFromDb as any)?.[this.fieldNameHack]
+      const newDataFromDbElement = (dataFromDb as any)?.[this.fieldNameHack]
       if ( lastValFromDbElement === newDataFromDbElement ) {
-        // console.log(`shouldApplyFromDb: lastValFromDbElement equal`, this.fieldNameHack, lastValFromDbElement, newDataFromDbElement)
-        return false
+        // console.log(`handleIncomingDbValue: lastValFromDbElement equal`, this.fieldNameHack, lastValFromDbElement, newDataFromDbElement)
+        return // genuinely unchanged - nothing to apply or retry
       }
     }
 
-    return this.hasEnoughTimePassedFromLastUserEditToApplyFromDb()
+    if ( this.pendingRetryTimeoutHandle ) {
+      clearTimeout(this.pendingRetryTimeoutHandle)
+      this.pendingRetryTimeoutHandle = undefined
+    }
+
+    if ( this.hasEnoughTimePassedFromLastUserEditToApplyFromDb() ) {
+      this.applyFromDb(dataFromDb)
+      return
+    }
+
+    const msUntilLockoutLifts = this.MIN_INTERVAL_MS - (Date.now() - this.lastLocalEditByUserMs)
+    this.pendingRetryTimeoutHandle = setTimeout(() => {
+      this.pendingRetryTimeoutHandle = undefined
+      this.handleIncomingDbValue(dataFromDb)
+    }, Math.max(msUntilLockoutLifts, 0) + 50 /* small buffer past the exact boundary */)
+  }
+
+  private applyFromDb(dataFromDb: TItemInMem | undefined | null) {
+    if ( dataFromDb ) {
+      // debugLog('ViewSyncer - applyFromDb -- initialDataArrived = true', dataFromDb)
+      this.initialDataArrived = true
+    }
+    try {
+      this.isApplyingFromDb = true
+      // debugLog(`ViewSyncer this.formGroup.patchValue(dataFromDb)`, this.fieldNameHack)
+      // convert plain to HTML:
+      if ( this.fieldNameHack ) {
+        (dataFromDb as any)[this.fieldNameHack] = convertToHtmlIfNeeded((dataFromDb as any)[this.fieldNameHack])
+      }
+      this.formGroup.patchValue(dataFromDb) // TODO: handle nullish
+      this.lastValFromDb = dataFromDb
+    } finally {
+      this.isApplyingFromDb = false
+    }
   }
 }
