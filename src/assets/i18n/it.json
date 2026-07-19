@@ -32,6 +32,7 @@
     "PASSWORD": "Password",
     "SHOW_PASSWORD": "Mostra password",
     "LOGGING_IN": "Accesso in corso...",
+    "AUTHENTICATING": "Autenticazione in corso, attendere...",
     "CONNECTING_GOOGLE": "Connessione a Google...",
     "CONTINUE_WITH_GOOGLE": "Continua con Google",
     "REPEAT_PASSWORD": "Ripeti password",

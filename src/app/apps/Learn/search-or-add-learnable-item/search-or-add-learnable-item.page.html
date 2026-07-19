@@ -192,25 +192,32 @@
     <section class="search-add-results">
       <ng-container *ngIf="(! (authService.authUser$ | async)) else loggedIn">
 
-        <div class="login-prompt">
-          <span>Please</span>
-          <ion-button (click)="toggleLoginOptions()">LOG IN</ion-button>
-        </div>
+        <!-- GH #66: authUser$ starts unemitted (neither a user nor confirmed-logged-out) until
+          the first real auth signal arrives - showing the login prompt during that gap wrongly
+          implied the user was logged out before auth was even checked. -->
+        <p *ngIf="! authService.authUser$.hasEmitted">{{ 'AUTH.AUTHENTICATING' | translate }}</p>
 
-        <div *ngIf="showLoginOptions" class="login-options">
-          <ion-button (click)="continueWithGoogle()">
-            <ion-icon slot="start" name="logo-google"></ion-icon>
-            Continue with Google
-          </ion-button>
-          <ion-button fill="outline" (click)="continueWithFacebook()">
-            <ion-icon slot="start" name="logo-facebook"></ion-icon>
-            Continue with Facebook
-          </ion-button>
-          <ion-button fill="outline" (click)="openPasswordLogin()">
-            <ion-icon slot="start" name="mail-outline"></ion-icon>
-            Login + password
-          </ion-button>
-        </div>
+        <ng-container *ngIf="authService.authUser$.hasEmitted">
+          <div class="login-prompt">
+            <span>Please</span>
+            <ion-button (click)="toggleLoginOptions()">LOG IN</ion-button>
+          </div>
+
+          <div *ngIf="showLoginOptions" class="login-options">
+            <ion-button (click)="continueWithGoogle()">
+              <ion-icon slot="start" name="logo-google"></ion-icon>
+              Continue with Google
+            </ion-button>
+            <ion-button fill="outline" (click)="continueWithFacebook()">
+              <ion-icon slot="start" name="logo-facebook"></ion-icon>
+              Continue with Facebook
+            </ion-button>
+            <ion-button fill="outline" (click)="openPasswordLogin()">
+              <ion-icon slot="start" name="mail-outline"></ion-icon>
+              Login + password
+            </ion-button>
+          </div>
+        </ng-container>
 
       </ng-container>
 

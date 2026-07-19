@@ -32,6 +32,7 @@
     "PASSWORD": "Hasło",
     "SHOW_PASSWORD": "Pokaż hasło",
     "LOGGING_IN": "Logowanie...",
+    "AUTHENTICATING": "Uwierzytelnianie, proszę czekać...",
     "CONNECTING_GOOGLE": "Łączenie z Google...",
     "CONTINUE_WITH_GOOGLE": "Kontynuuj z Google",
     "REPEAT_PASSWORD": "Powtórz hasło",

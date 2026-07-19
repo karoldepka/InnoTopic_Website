@@ -61,7 +61,14 @@
 
 <ion-content>
 
-  <p *ngIf="!(authService.authUser$ | async)" class="ion-text-center" style="margin: 12px">
+  <!-- GH #66: authUser$ starts unemitted (neither a user nor confirmed-logged-out) until the
+    first real auth signal arrives - showing this prompt during that gap wrongly implied the user
+    was logged out before auth was even checked. hasEmitted distinguishes "not yet known" from
+    "known: no user" (see CachedSubject's own doc comment for the same distinction elsewhere). -->
+  <p *ngIf="!(authService.authUser$ | async) && !authService.authUser$.hasEmitted" class="ion-text-center" style="margin: 12px">
+    {{ 'AUTH.AUTHENTICATING' | translate }}
+  </p>
+  <p *ngIf="!(authService.authUser$ | async) && authService.authUser$.hasEmitted" class="ion-text-center" style="margin: 12px">
     {{ 'JOURNAL.LOGIN_PROMPT_PREFIX' | translate }} <a [routerLink]="'/auth'">&lt; {{ 'JOURNAL.LOGIN_PROMPT_LINK' | translate }} &gt;</a> {{ 'JOURNAL.LOGIN_PROMPT_SUFFIX' | translate }}
   </p>
 
