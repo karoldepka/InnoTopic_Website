@@ -1,0 +1,32 @@
+.slot-picker
+  display: flex
+  flex-direction: column
+  gap: 4px
+  padding: 4px 0
+
+.slot-picker__search
+  padding: 0
+
+.slot-picker__chips
+  display: flex
+  flex-wrap: wrap
+  gap: 6px
+  padding: 2px 8px
+
+.slot-picker__chip
+  display: flex
+  align-items: center
+  gap: 4px
+  background: none
+  border: 1px solid var(--ion-color-medium)
+  color: var(--ion-color-medium)
+  border-radius: 999px
+  padding: 2px 10px
+  font-size: 0.85em
+  cursor: pointer
+  opacity: 0.75
+
+  &:hover
+    opacity: 1
+    color: var(--ion-color-primary)
+    border-color: var(--ion-color-primary)

@@ -1,0 +1,27 @@
+<div class="bare-slot">
+  @if (children$ | async; as children) {
+    @if (children.length > 0) {
+      <ul class="bare-slot__children">
+        @for (child of children; track child.id) {
+          <li class="bare-slot__child">{{ getChildTitle(child) }}</li>
+        }
+      </ul>
+    }
+  }
+
+  <div class="bare-slot__add">
+    <ion-input
+      [(ngModel)]="newChildTitle"
+      placeholder="Add…"
+      (keydown.enter)="addChild()"
+    ></ion-input>
+    <ion-button fill="clear" size="small" (click)="addChild()" [disabled]="!newChildTitle.trim()">
+      <ion-icon name="add-outline" slot="icon-only"></ion-icon>
+    </ion-button>
+    <app-voice-memo-field
+      [item$]="parentItem$"
+      [fieldId]="descriptorId"
+      (transcriptReady)="onTranscriptReady($event)"
+    ></app-voice-memo-field>
+  </div>
+</div>

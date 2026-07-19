@@ -1,24 +1,116 @@
-import {Component, Input, OnInit, ChangeDetectionStrategy} from '@angular/core';
+import {Component, Input, OnChanges, OnInit, OnDestroy, ChangeDetectionStrategy, ChangeDetectorRef} from '@angular/core';
+import {Subscription} from 'rxjs'
 import {OdmTreeNode} from '../../OdmTreeNode'
-import {dictToArrayWithIds, getDictionaryValuesAsArray, setIdsFromKeys} from '../../../../utils/dictionary-utils'
 import {OdmCell} from '../../../cells/OdmCell'
+import {fieldVirtualNodeId, isSlotVisible, SlotDescriptor} from '../../../cells/SlotDescriptor'
+import {IonicModule} from '@ionic/angular'
+import {MinMidMaxCellComponent} from '../../../cells/min-mid-max-cell/min-mid-max-cell.component'
+import {RichTextEditCellComponent} from '../../../cells/rich-text-edit-cell/rich-text-edit-cell.component'
+import {CommentThreadComponent} from '../../../../comments/comment-thread/comment-thread.component'
+import {ExpandToggleComponent} from '../../../../expand-toggle/expand-toggle.component'
+import {SlotIconComponent} from '../../../cells/slot-icon/slot-icon.component'
+import {BareSlotCellComponent} from '../../../cells/bare-slot-cell/bare-slot-cell.component'
+import {SlotPickerComponent} from '../../../cells/slot-picker/slot-picker.component'
+import {VirtualSlotStatesOdmService} from '../../../../virtual-slot-state/virtual-slot-states-odm.service'
+import {VirtualSlotState$} from '../../../../virtual-slot-state/VirtualSlotState$'
+import {TimeTrackedItemCellComponent} from '../../../../../../apps/OrYoL/time-tracking/time-tracked-item-cell/time-tracked-item-cell.component'
 
-
-/** TODO: consider naming as COLUMNS cells */
+/** Renders one cell per *visible* `SlotDescriptor` for a real item's own fields (GH #89's unified
+ * Journal/Learn field rendering) - the generic dispatcher `node-content.component.html`'s own
+ * hardcoded per-column cell wiring was heading towards, now driven by data (a `SlotDescriptor[]`)
+ * instead of one hardcoded template element per field. `@Input() descriptors` is the item class's
+ * *full* registry (e.g. Journal's 236 numeric descriptors) - `isSlotVisible()` (shared with
+ * `SlotPickerComponent`, so the two can't drift out of sync) narrows that down to slots that are
+ * either filled in, manually added via the picker, or a bare slot (always shown).
+ *
+ * Every visible slot is commentable AND time-trackable (GH #89) via the same fabricated
+ * `fieldVirtualNodeId()` id: `FieldComment` client-filters by it as a `targetNodeId`, while
+ * `VirtualSlotState` uses it as the item's own id (one time-track state per slot, not many like
+ * comments) - `obtainItem$ById()` lazily creates that row on first patch, same as
+ * `OdmService2`'s own well-known `treeRootItem`, so nothing needs pre-creating per slot. */
 @Component({
     selector: 'app-tree-node-cells',
     templateUrl: './tree-node-cells.component.html',
     changeDetection: ChangeDetectionStrategy.Eager,
     styleUrls: ['./tree-node-cells.component.sass'],
+    imports: [IonicModule, MinMidMaxCellComponent, RichTextEditCellComponent, BareSlotCellComponent, CommentThreadComponent, ExpandToggleComponent, SlotIconComponent, TimeTrackedItemCellComponent, SlotPickerComponent],
 })
-export class TreeNodeCellsComponent implements OnInit {
+export class TreeNodeCellsComponent implements OnChanges, OnInit, OnDestroy {
 
   @Input()
   treeNode !: OdmTreeNode
 
-  ngOnInit(): void {
+  @Input()
+  descriptors !: SlotDescriptor[]
+
+  cells: Array<{descriptor: SlotDescriptor, cell?: OdmCell, targetNodeId: string, timeTrackItem$: VirtualSlotState$}> = []
+
+  /** Which cell's comment thread is expanded - at most one at a time, mirroring the numeric
+   * cell's own single `commentOpen` toggle. Keyed by descriptor id, not index, so it survives
+   * `cells` being rebuilt on an unrelated descriptor-list change. */
+  openCommentsForDescriptorId: string | null = null
+
+  private valSubscription?: Subscription
+
+  constructor(
+    private virtualSlotStatesOdmService: VirtualSlotStatesOdmService,
+    private changeDetectorRef: ChangeDetectorRef,
+  ) {
   }
 
+  ngOnInit(): void {
+    // Re-filter whenever the item's own value changes, not just on an @Input() change - e.g.
+    // right after SlotPickerComponent patches `manuallyAddedSlotIds`, a previously-hidden slot
+    // must appear without treeNode/descriptors themselves having changed.
+    this.valSubscription = this.treeNode.item$.val$.subscribe(() => {
+      this.rebuildCells()
+      this.changeDetectorRef.markForCheck()
+    })
+  }
 
+  ngOnChanges(): void {
+    this.rebuildCells()
+  }
+
+  ngOnDestroy(): void {
+    this.valSubscription?.unsubscribe()
+  }
+
+  private rebuildCells(): void {
+    // Rebuilt whenever the node/descriptors/item-value changes (not per-render) - an OdmCell is a
+    // thin, cheap wrapper, but there's no reason to reconstruct it every change-detection pass.
+    const itemVal = this.treeNode.item$.val
+    this.cells = this.descriptors
+      .filter(descriptor => isSlotVisible(descriptor, itemVal))
+      .map(descriptor => {
+        const targetNodeId = fieldVirtualNodeId(this.treeNode.item$.id as string, descriptor.id)
+        return {
+          descriptor,
+          cell: descriptor.dataFieldKey
+            ? new OdmCell(this.treeNode, {id: descriptor.dataFieldKey, type: descriptor.kind})
+            : undefined,
+          targetNodeId,
+          timeTrackItem$: this.virtualSlotStatesOdmService.obtainItem$ById(targetNodeId),
+        }
+      })
+
+    // A bare slot (`kind: 'slot'`) groups the item's real children by ancestorIds-containment
+    // (see BareSlotChildren.ts) - that only finds anything once the parent's full descendant
+    // tree has actually been bulk-loaded. Whatever embeds this component (currently only
+    // OdmTreeNodeComponent, via requestLoadChildren()) may already trigger this, but calling it
+    // again here is a cheap no-op guard (OdmItem$2.requestLoadChildren() bails if already
+    // listening) - cheaper than requiring every future embedder to remember to.
+    if (this.cells.some(entry => entry.descriptor.kind === 'slot')) {
+      this.treeNode.requestLoadChildren()
+    }
+  }
+
+  trackByDescriptorId(index: number, entry: {descriptor: SlotDescriptor}): string {
+    return entry.descriptor.id
+  }
+
+  onCommentsIsOpenChange(descriptorId: string, isOpen: boolean): void {
+    this.openCommentsForDescriptorId = isOpen ? descriptorId : null
+  }
 
 }

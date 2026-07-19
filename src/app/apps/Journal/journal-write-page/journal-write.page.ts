@@ -1,11 +1,8 @@
-import {Component, Injector, OnInit, OnDestroy, ViewChild, ChangeDetectionStrategy} from '@angular/core';
+import {Component, Injector, OnInit, OnDestroy, ChangeDetectionStrategy} from '@angular/core';
 import {JournalEntryItemsService} from "../core/journal-entries.service";
 import {JournalEntry, JournalEntryId} from "../models/JournalEntry";
 import {debugLog} from "../../../libs/AppFedShared/utils/log";
 import {ApfGeoLocationService} from "../../../libs/AppFedShared/geo-location/apf-geo-location.service";
-import {JournalTextDescriptor, JournalTextDescriptors} from "../models/JournalTextDescriptors";
-import {NumericPickerVal} from "../../../libs/AppFedSharedIonic/ratings/numeric-picker/numeric-picker.component";
-import {JournalNumericDescriptors} from '../models/JournalNumericDescriptors'
 import {JournalEntry$} from '../models/JournalEntry$'
 import { ActivatedRoute, Router, RouterLink } from '@angular/router'
 import {CachedSubject} from '../../../libs/AppFedShared/utils/cachedSubject2/CachedSubject2'
@@ -45,10 +42,6 @@ export class JournalWritePage extends BaseComponent implements OnInit, OnDestroy
   public itemId: JournalEntryId = this.activatedRoute.snapshot.params['itemId']
 
   item$FakeArray ! : Array<JournalEntry$>
-
-  /** Optional (undefined before the first item$ has loaded) - see flushPendingEdits() below. */
-  @ViewChild(JournalItemEditComponent)
-  private itemEditComponent ? : JournalItemEditComponent
 
   private readonly onWindowBeforeUnload = () => this.flushPendingEdits()
 
@@ -92,13 +85,15 @@ export class JournalWritePage extends BaseComponent implements OnInit, OnDestroy
     document.removeEventListener('visibilitychange', this.onVisibilityChange)
   }
 
-  /** Pushes every text field's possibly-still-throttled pending edit through immediately, then
-   * saves it. Without this, typing something and immediately navigating away (or backgrounding
-   * the app) within the ~1.5s the fields' ViewSyncers throttle at can silently drop that last
-   * edit - the throttle's trailing edge is still waiting to fire and never gets the chance to.
-   * See ViewSyncer.flush()'s doc comment for the full story. */
+  /** Forces the item's own pending-patch throttle to save immediately. Without this, typing
+   * something and immediately navigating away (or backgrounding the app) within the DB-save
+   * throttle window could silently drop that last edit - the throttle's trailing edge is still
+   * waiting to fire and never gets the chance to. Used to need a separate per-field flush too
+   * (the old `ViewSyncer`-based text fields had their own throttle layer above this one) - GH
+   * #89's unified `RichTextEditCellComponent`/`MinMidMaxCellComponent` cells call
+   * `OdmItem$2.patchThrottled()` directly on every change with no additional debounce of their
+   * own, so this one call already covers everything. */
   private flushPendingEdits() {
-    this.itemEditComponent ?. flushAllTextFields()
     this.item$ ?. saveNowToDbIfNeeded ?. ()
   }
 

@@ -23,6 +23,9 @@ export default defineConfig({
       // Jasmine-style specs (GenericItem$.spec.ts, min-mid-max-cell.component.spec.ts) that are
       // part of the broken legacy Karma suite - a glob would sweep those in too.
       'src/app/libs/AppFedShared/tree/generic-items.service.spec.ts',
+      'src/app/libs/AppFedShared/tree/cells/SlotDescriptor.spec.ts',
+      'src/app/libs/AppFedShared/tree/BareSlotChildren.spec.ts',
+      'src/app/libs/AppFedShared/comments/field-comments.service.spec.ts',
     ],
     browser: {
       enabled: true,

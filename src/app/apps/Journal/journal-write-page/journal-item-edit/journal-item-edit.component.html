@@ -5,7 +5,7 @@
       *ngIf="feat.showExperimental"
     >
       {{ 'JOURNAL.SELF_IMPROVEMENT_GAME_PROMPT' | translate }}
-      <ion-note>{{ fieldDescriptors.length }} {{ 'JOURNAL.FIELDS' | translate }}</ion-note>
+      <ion-note>{{ descriptors.length }} {{ 'JOURNAL.FIELDS' | translate }}</ion-note>
 
     </ng-container>
     <p>
@@ -18,13 +18,11 @@
     ></app-time-tracked-item-cell>
   </div>
 
-  <app-journal-numeric-fields
-    [journalEntry$]="item$P"
-  ></app-journal-numeric-fields>
-
-  <app-journal-text-fields
-    [journalEntry$]="item$P"
-  ></app-journal-text-fields>
+  <app-tree-node-cells
+    *ngIf="treeNode"
+    [treeNode]="treeNode"
+    [descriptors]="descriptors"
+  ></app-tree-node-cells>
 
 </ng-container>
 
