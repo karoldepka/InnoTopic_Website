@@ -55,6 +55,18 @@ export class HintFinder {
   //   }
   // }
 
+  /** Looks up a hint by its stable `id` (see SelfRatingHistoryItem.subjectId) - used to resolve
+   * a logged rating back to a human-readable title on the /ask/log page. */
+  findHintById(id: string): LiHintImpl | undefined {
+    let found: LiHintImpl | undefined
+    this.recursively1(this.rootHint, hint => {
+      if (!found && hint.id === id) {
+        found = hint
+      }
+    })
+    return found
+  }
+
   private recursively(func: (hint: LiHintImpl) => void) {
     this.recursively1(this.rootHint, func)
   }

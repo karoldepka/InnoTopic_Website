@@ -17,6 +17,7 @@ import { AppLogoComponent } from '../../Common/app-logo/app-logo.component';
 import { SyncStatusIconComponent } from '../../../libs/AppFedShared/odm/sync-status/sync-status-icon.component';
 import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { NgFor, NgIf, NgClass } from '@angular/common';
+import { RouterLink } from '@angular/router';
 import { HintComponent } from './hint/hint.component';
 
 @Component({
@@ -24,7 +25,7 @@ import { HintComponent } from './hint/hint.component';
     templateUrl: './ask.page.html',
     changeDetection: ChangeDetectionStrategy.Eager,
     styleUrls: ['./ask.page.scss'],
-    imports: [IonicModule, AppLogoComponent, SyncStatusIconComponent, ReactiveFormsModule, FormsModule, NgFor, NgIf, HintComponent, NgClass]
+    imports: [IonicModule, AppLogoComponent, SyncStatusIconComponent, ReactiveFormsModule, FormsModule, NgFor, NgIf, HintComponent, NgClass, RouterLink]
 })
 export class AskPage implements OnInit {
 

@@ -7,6 +7,7 @@ import { IonicModule } from '@ionic/angular';
 import { AskPageRoutingModule } from './ask-routing.module';
 
 import { AskPage } from './ask.page';
+import { AskLogPage } from './ask-log/ask-log.page';
 import {HintComponent} from './hint/hint.component';
 import {SharedModule} from '../../../shared/shared.module'
 import {OdmModule} from '../../../libs/AppFedShared/odm/odm.module'
@@ -25,6 +26,7 @@ import {RationalePageModule} from '../rationale/rationale.module'
         LifeOverviewsPageModule,
         RationalePageModule,
         AskPage,
+        AskLogPage,
         HintComponent,
         HintEmbedMediaComponent,
     ],

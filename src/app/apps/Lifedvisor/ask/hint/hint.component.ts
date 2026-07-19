@@ -13,6 +13,8 @@ import { IonicModule } from '@ionic/angular';
 import { NgClass, NgIf, NgFor } from '@angular/common';
 import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { HintEmbedMediaComponent } from './hint-embed-media/hint-embed-media.component';
+import { StarRatingComponent } from '../../../../libs/AppFedSharedIonic/ratings/star-rating/star-rating.component';
+import { SelfRatingHistoryService } from '../../self-rating-history/self-rating-history.service';
 
 /** Hint, Wish, Problem / Question */
 @Component({
@@ -20,9 +22,28 @@ import { HintEmbedMediaComponent } from './hint-embed-media/hint-embed-media.com
     templateUrl: './hint.component.html',
     changeDetection: ChangeDetectionStrategy.Eager,
     styleUrls: ['./hint.component.css'],
-    imports: [IonicModule, NgClass, NgIf, NgFor, ReactiveFormsModule, FormsModule, HintEmbedMediaComponent]
+    imports: [IonicModule, NgClass, NgIf, NgFor, ReactiveFormsModule, FormsModule, HintEmbedMediaComponent, StarRatingComponent]
 })
 export class HintComponent implements OnInit {
+
+  constructor(
+    private selfRatingHistoryService: SelfRatingHistoryService,
+  ) {
+    HintComponent.hintsCount ++
+    if ( HintComponent.hintsCount % 1 === 0 ) {
+      // console.log('HintComponent.hintsCount', HintComponent.hintsCount)
+    }
+  }
+
+  /** GH issue #31: logs a 5-star self-rating against this hint's stable id - a new append-only
+   * history entry per rating given (not overwriting a single "current rating" field), since a
+   * static /ask hint has no backing DB item of its own to store one on directly. */
+  onRate(rating: number) {
+    if ( ! this.wish?.id ) {
+      return
+    }
+    this.selfRatingHistoryService.addRating(this.wish.id, rating)
+  }
 
   /** otherwise just qualities/problems */
   @Input() includeHintsInSearch: boolean = false
@@ -72,13 +93,6 @@ export class HintComponent implements OnInit {
 
   get isThisLevelExpandedFullyEffectively() {
     return this.isExpandedManually || this.isExpandedRecursively
-  }
-
-  constructor() {
-    HintComponent.hintsCount ++
-    if ( HintComponent.hintsCount % 1 === 0 ) {
-      // console.log('HintComponent.hintsCount', HintComponent.hintsCount)
-    }
   }
 
   ngOnInit() {

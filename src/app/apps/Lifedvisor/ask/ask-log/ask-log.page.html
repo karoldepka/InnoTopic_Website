@@ -1,0 +1,25 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button mode="md" [defaultHref]="'/ask'"></ion-back-button>
+      <app-app-logo></app-app-logo>
+    </ion-buttons>
+    <ion-title>Rating Log</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true" class="ion-padding">
+  <p *ngIf="loading">Loading...</p>
+  <p *ngIf="! loading && ! ratings.length">No ratings logged yet.</p>
+
+  <ion-list *ngIf="! loading && ratings.length">
+    <ion-item *ngFor="let rating of ratings">
+      <ion-label>
+        <h2>{{ titleFor(rating) }}</h2>
+        <p>{{ rating.rating }} / 5 &nbsp;
+          <app-time-point [time]="dateOf(rating)"></app-time-point>
+        </p>
+      </ion-label>
+    </ion-item>
+  </ion-list>
+</ion-content>
