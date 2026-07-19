@@ -4,12 +4,14 @@ import {JournalEntry} from '../../models/JournalEntry'
 import {JournalEntry$} from '../../models/JournalEntry$'
 import {JournalNumericDescriptors} from '../../models/JournalNumericDescriptors'
 import {BaseComponent} from '../../../../libs/AppFedShared/base/base.component'
+import {FeatureService} from '../../../../libs/AppFedShared/feature.service'
 import { NgIf, AsyncPipe } from '@angular/common';
 import { IonicModule } from '@ionic/angular';
 import { TimePointComponent } from '../../../../libs/AppFedShared/time/time-point/time-point.component';
 import { GeoLocComponent } from '../../../../libs/AppFedShared/geo-location/geo-loc/geo-loc.component';
 import { JournalNumericFieldsComponent } from '../journal-numeric-fields/journal-numeric-fields.component';
 import { JournalTextFieldsComponent } from '../journal-text-fields/journal-text-fields.component';
+import { TimeTrackedItemCellComponent } from '../../../OrYoL/time-tracking/time-tracked-item-cell/time-tracked-item-cell.component';
 import { TranslatePipe } from '@ngx-translate/core';
 
 @Component({
@@ -24,6 +26,7 @@ import { TranslatePipe } from '@ngx-translate/core';
         GeoLocComponent,
         JournalNumericFieldsComponent,
         JournalTextFieldsComponent,
+        TimeTrackedItemCellComponent,
         AsyncPipe,
         TranslatePipe,
     ],
@@ -31,6 +34,8 @@ import { TranslatePipe } from '@ngx-translate/core';
 export class JournalItemEditComponent extends BaseComponent implements OnInit {
 
   fieldDescriptors = JournalNumericDescriptors.instance.array
+
+  featureService = this.injector.get(FeatureService)
 
   @Input()
   public item$P ! : JournalEntry$

@@ -11,8 +11,18 @@ import {tap} from 'rxjs/operators'
 import {getNowTimePointSuitableForId, odmTimestampToMillis} from './utils'
 import {BehaviorSubject} from 'rxjs'
 import {debugLog} from '../utils/log'
+import {Injector} from '@angular/core'
 
 export type UserId = string
+
+/** Constructor shape for a "domain item" - a companion object overlaying an `OdmItem$2` with
+ * type-specific behaviour (e.g. OrYoL's `TimeTrackedEntry`) without the base item itself needing
+ * to know about it. Mirrors `OryItem$.DomainItemCtor` (`apps/OrYoL/db/OryItem$.ts`) so the same
+ * domain items can be obtained from either kind of item - see `obtainDomainItem()` below. */
+export type OdmDomainItemCtor<TDomainItem = any> = new (
+  injector: Injector,
+  item$: OdmItem$2<any, any, any, any>,
+) => TDomainItem
 
 export class OdmInMemItemWriteOnce {
   public whenCreated?: OdmTimestamp
@@ -136,6 +146,40 @@ export class OdmItem$2<
   get val() { return this.currentVal }
 
   get val$() { return this.locallyVisibleChanges$ }
+
+  /** Alias for `val$` under the name OrYoL's `OryItem$.data$` uses, so code written against
+   * either kind of item (e.g. `TimeTrackedEntry` - see `TimeTrackable` in
+   * `apps/OrYoL/time-tracking/time-tracking.service.ts`) doesn't need to care which one it has. */
+  get data$() { return this.locallyVisibleChanges$ }
+
+  /** Non-optional to match `HasItemData.getId()` (`apps/OrYoL/tree-model/has-item-data.ts`) -
+   * only meaningful once the item actually has an id (true by the time anything treats it as a
+   * domain-item host, same assumption `OryItem$.getId()` makes over its own non-optional `id`). */
+  getId(): TItemId { return this.id as TItemId }
+
+  getItemData(): TInMemData | nullish { return this.currentVal }
+
+  /** The ODM collection/class name this item belongs to (e.g. `"JournalEntry"`, `"LearnItem"`) -
+   * the same string already used as the `collection` key in patterns like
+   * `OdmConflictToastService.COLLECTION_ROUTES`, so callers that need to route to/identify an
+   * item's app (without hard-importing that app's model class) can key off this instead. */
+  getCollectionName(): string { return this.odmService.className }
+
+  private mapCtorToDomainItem = new Map<OdmDomainItemCtor, any>()
+
+  /** Get-or-create a cached "domain item" companion object for this item (one instance per
+   * constructor, reused across calls) - mirrors `OryItem$.obtainDomainItem()`
+   * (`apps/OrYoL/db/OryItem$.ts`) so the same domain items (e.g. `TimeTrackedEntry`) work
+   * identically whether the underlying item is an OrYoL tree item or a plain `OdmItem$2` (Journal,
+   * Learn, ...). */
+  obtainDomainItem<TCtor extends OdmDomainItemCtor>(ctor: TCtor): InstanceType<TCtor> {
+    let ret = this.mapCtorToDomainItem.get(ctor)
+    if ( ! ret ) {
+      ret = new ctor(this.odmService.injector, this)
+      this.mapCtorToDomainItem.set(ctor, ret)
+    }
+    return ret
+  }
 
   private resolveFuncPendingThrottled?: (value?: (PromiseLike<any> | any)) => void
 

@@ -33,6 +33,11 @@
   [checked]="voiceMemoPlaybackEnabled"
   (ionChange)="onChangeVoiceMemoPlaybackEnabled($event)"
 >{{ 'SETTINGS.VOICE_MEMO_PLAYBACK_ENABLED' | translate }}</ion-checkbox>
+<ion-checkbox
+  labelPlacement="end"
+  [checked]="timeTrackingEnabled"
+  (ionChange)="onChangeTimeTrackingEnabled($event)"
+>{{ 'SETTINGS.TIME_TRACKING_ENABLED' | translate }}</ion-checkbox>
 <ion-item lines="none">
   <ion-select
     label="{{ 'SETTINGS.VOICE_MEMO_TRANSCRIPTION_MODE' | translate }}"

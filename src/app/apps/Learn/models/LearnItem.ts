@@ -17,6 +17,7 @@ import {daysAsMs, hoursAsMs, isInFuture, isInThePastOrNullish} from '../../../li
 import {StatusDef, StatusId, statuses} from './statuses.model'
 import {Dict} from '../../../libs/AppFedShared/utils/dictionary-utils'
 import {VoiceMemoRecord} from '../../../libs/AppFedShared/audio/voice-memo.service'
+import {TimeTrackingPersistentData} from '../../OrYoL/time-tracking/TimeTrackingPersistentData'
 
 export type LearnItemId = OdmItemId<LearnItem>
 
@@ -80,6 +81,9 @@ export class LearnItem extends OdmInMemItem implements QuizzableData {
   /** Every voice memo recorded against any field (side) on this item - see VoiceMemoRecord's doc
    * comment (one flat array, filtered per-field by `fieldId` at read time). */
   voiceMemos?: VoiceMemoRecord[]
+  /** Live time-tracking state (start/pause) shared with OrYoL's time-tracking engine - see
+   * `TimeTrackable` in `apps/OrYoL/time-tracking/time-tracking.service.ts`. */
+  timeTrack?: TimeTrackingPersistentData
   whenDeleted?: Date
   lastSelfRating?: Rating
   whenLastSelfRated?: OdmTimestamp

@@ -1,11 +1,10 @@
-import {Injectable} from '@angular/core';
+import {Injectable, Injector} from '@angular/core';
 import {TimeService} from '../core/time.service'
-import {HasItemData} from '../tree-model/has-item-data'
+import {HasItemData, HasPatchThrottled} from '../tree-model/has-item-data'
 import {OryItemsService} from '../core/ory-items.service'
 import {TimeTrackingPeriod, TimeTrackingPeriodsService} from './time-tracking-periods.service'
 import {CachedSubject} from '../../../libs/AppFedShared/utils/cachedSubject2/CachedSubject2'
 import {TimeTrackedEntry} from './TimeTrackedEntry'
-import {OryItem$} from '../db/OryItem$'
 import {TimeTrackingPersistentData} from './TimeTrackingPersistentData'
 import {map} from 'rxjs/operators'
 import {maxBy, uniqBy} from 'lodash-es'
@@ -16,7 +15,26 @@ export interface TimeTrackableItemData {
   timeTrack?: TimeTrackingPersistentData
 }
 
-export type TimeTrackable = OryItem$ //= HasPatchThrottled<TimeTrackableItemData>
+/** A time-trackable item - either OrYoL's own tree-item wrapper (`OryItem$`) or a generic
+ * `OdmItem$2`-based item (Journal entries, Learn's Task items, ...). Both already satisfy this
+ * shape structurally: `OdmItem$2` grew matching `getId()`/`getItemData()`/`data$`/
+ * `obtainDomainItem()` members (see `libs/AppFedShared/odm/OdmItem$2.ts`) specifically so
+ * `TimeTrackedEntry` - the domain item this type exists for - works identically over either kind
+ * of item, without needing to know which one it has. Broadened from the OrYoL-only `OryItem$`
+ * this used to be pinned to. */
+export interface TimeTrackable extends HasPatchThrottled<TimeTrackableItemData> {
+  /** Loosely typed deliberately - real usages need both `.subscribe(fn)` (`TimeTrackedEntry.ts`)
+   * and `.lastVal` (`emitTimeTrackedEntry()` below), and `OryItem$.data$`/`OdmItem$2.data$` are
+   * each a slightly different concrete `CachedSubject<T>` instantiation that don't need to unify
+   * exactly here - matches how loosely the rest of this mixin is already typed
+   * (`ItemData = any` in `has-item-data.ts`). */
+  data$: any
+  obtainDomainItem<TCtor extends new (injector: Injector, item$: any) => any>(ctor: TCtor): InstanceType<TCtor>
+  /** Present on `OdmItem$2`-based items (Journal/Learn/...), absent on OrYoL's own `OryItem$` -
+   * lets callers like the time-tracking toolbar's navigation pick a route without needing to
+   * import each app's model class (see `TimeTrackingToolbarComponent.navigateTo()`). */
+  getCollectionName?(): string
+}
 
 /** Timestamps stored on OrYoL time-tracking data can arrive as a Firestore `Timestamp`
  * (`.toDate()`), a real `Date`, or (since the Supabase cutover) a plain serialized

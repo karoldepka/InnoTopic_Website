@@ -77,6 +77,7 @@
     "FIRESTORE_ENABLED": "Firestore włączony (odśwież, aby zastosować)",
     "VOICE_MEMO_RECORDING_ENABLED": "Nagrywanie notatek głosowych włączone",
     "VOICE_MEMO_PLAYBACK_ENABLED": "Odtwarzanie notatek głosowych włączone",
+    "TIME_TRACKING_ENABLED": "Mierzenie czasu w Dzienniku/Zadaniach włączone",
     "VOICE_MEMO_TRANSCRIPTION_MODE": "Transkrypcja notatek głosowych",
     "VOICE_MEMO_TRANSCRIPTION_LANGUAGE": "Język transkrypcji",
     "RANDOM_THEME": "Losowy motyw",

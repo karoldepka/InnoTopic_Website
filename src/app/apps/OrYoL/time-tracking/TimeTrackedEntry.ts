@@ -1,9 +1,8 @@
 import {TimeTrackingPeriod, TimeTrackingPeriodsService} from './time-tracking-periods.service'
 import {TimeoutHandle} from '../../../libs/AppFedShared/scheduler/scheduler.service'
-import {date, TimeTrackable, TimeTrackingService, TTPatch, TTPausePatch} from './time-tracking.service'
+import {date, TimeTrackable, TimeTrackableItemData, TimeTrackingService, TTPatch, TTPausePatch} from './time-tracking.service'
 import {CachedSubject} from '../../../libs/AppFedShared/utils/cachedSubject2/CachedSubject2'
 import {TimeMsDuration} from '../../../libs/AppFedShared/time/TimeMsDuration'
-import {OryItem$} from '../db/OryItem$'
 import {Injector} from '@angular/core'
 import {TimeTrackingPersistentData} from './TimeTrackingPersistentData'
 
@@ -126,7 +125,7 @@ export class TimeTrackedEntry /* extends OverlayOdmItem$ */ {
     // const ttData = itemData?.timeTrack
     // console.log('ttData', ttData)
     // this.updateFromTimeTrackData(ttData)
-    this.timeTrackable.data$.subscribe(val => {
+    this.timeTrackable.data$.subscribe((val: TimeTrackableItemData) => {
       this.updateFromTimeTrackData(val.timeTrack)
     })
 
@@ -135,7 +134,7 @@ export class TimeTrackedEntry /* extends OverlayOdmItem$ */ {
     // AND/BUT maybe the TimeTracked (Items) service wants to have a list of all the post-processed items too
   }
 
-  public updateFromTimeTrackData(ttData: TimeTrackingPersistentData) {
+  public updateFromTimeTrackData(ttData: TimeTrackingPersistentData | undefined) {
     // FIXME: this should probably be this.timeTrackable.val$.pipe(map(.... to TimeTrackingJsObjVal)); though then we don't get .lastVal - but could make util func like that map
     // mappedCachedSubject(this.timeTrackable.val$, val => ...)
     const newVal = new TimeTrackingJsObjVal()
