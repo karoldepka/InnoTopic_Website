@@ -8,24 +8,21 @@ import {AuthService} from '../../../auth/auth.service'
 import {SyncStatusService} from '../odm/sync-status.service'
 import {ApfGeoLocationService} from '../geo-location/apf-geo-location.service'
 import {BrowserOdmStorage} from '../../AppFedSharedBrowser/odm-browser/BrowserOdmStorage'
-import {FeatureService} from '../feature.service'
-import {ConfigService} from '../../../apps/OrYoL/core/config.service'
+import {GenericItemsService} from './generic-items.service'
+import {GenericItem} from './GenericItem'
 import {g} from '../g'
-import {FieldCommentsOdmService} from './field-comments-odm.service'
-import {FieldCommentsService} from './field-comments.service'
 
 // Same stub as generic-items.service.spec.ts/BareSlotChildren.spec.ts - OdmItem$2.getParentIds()
 // reads appGlobals.feat for a dev-only diagnostic warning outside of real Angular bootstrap.
 g.feat = {categoriesTree: {showFixmes: false}} as any
 
-/** Same self-contained fake-backend shape as generic-items.service.spec.ts/BareSlotChildren.spec.ts
- * (see vitest.config.ts's comment on why these specs each keep their own copy rather than a
- * shared glob-swept helper). */
+/** Same self-contained fake-backend shape as the other specs in this directory (see
+ * vitest.config.ts's comment on why each spec keeps its own copy rather than a shared helper). */
 class FakeOdmCollectionBackend<TRaw> extends OdmCollectionBackend<TRaw> {
   storedItems = new Map<string, any>()
 
-  async saveNowToDb(item: TRaw, id: ItemId): Promise<any> {
-    this.storedItems.set(id as string, {...(item as any)})
+  async saveNowToDb(item: TRaw, id: ItemId, parentIds?: ItemId[], ancestorIds?: ItemId[]): Promise<any> {
+    this.storedItems.set(id as string, {...(item as any), parentIds: parentIds ?? [], ancestorIds: ancestorIds ?? []})
     return {ok: true}
   }
 
@@ -79,8 +76,6 @@ function setup() {
     removePendingDownload: () => undefined,
   }
   const geoLocationService = {geoLocation$: new CachedSubject<any>(undefined)}
-  const featureService = {config$: new CachedSubject<any>(g.feat)}
-  const configService = {config$: new CachedSubject<any>({})}
   const odmBackend: OdmBackend = {
     backendReady$: new CachedSubject<boolean>(true),
     createCollectionBackend: (injector: Injector, className: string) =>
@@ -92,8 +87,6 @@ function setup() {
     [SyncStatusService, syncStatusService],
     [ApfGeoLocationService, geoLocationService],
     [BrowserOdmStorage, new FakeBrowserOdmStorage()],
-    [FeatureService, featureService],
-    [ConfigService, configService],
   ])
   const injector = {
     get: (token: any) => {
@@ -104,61 +97,68 @@ function setup() {
     },
   } as Injector
 
-  const odmService = new FieldCommentsOdmService(injector)
-  const service = new FieldCommentsService(injector, odmService)
-  return {service}
+  return {service: new GenericItemsService(injector)}
 }
 
 async function flushMicrotasks(): Promise<void> {
   await new Promise(resolve => setTimeout(resolve, 0))
 }
 
-describe('FieldCommentsService', () => {
-  it('getCommentsForNode$ only returns comments targeting that node, oldest first', async () => {
+describe('OdmItem$2 - descendant rollups (getDescendantsCount/getWhenDescendantLastModified)', () => {
+  it('counts a simple, single-parent subtree correctly', async () => {
     const {service} = setup()
-
-    // Subscribed before any comment exists (matches the other two tests below) - localItems$
-    // only reliably reflects a just-added item to a subscriber that was already listening when
-    // it landed, not to one that subscribes afterward and expects the accumulated backlog.
-    let latest: any[] = []
-    service.getCommentsForNode$('item1_field_mood').subscribe(comments => latest = comments)
-
-    service.addComment('item1_field_mood', 'second comment')
+    const root$ = service.add(Object.assign(new GenericItem(), {title: 'Root'}))
     await flushMicrotasks()
-    service.addComment('item1_field_mood', 'first comment') // stored after, but whenCreated will still sort by creation order
+    const child1$ = root$.createChild({title: 'Child 1'} as any)
+    const child2$ = root$.createChild({title: 'Child 2'} as any)
     await flushMicrotasks()
-    service.addComment('item2_field_mood', 'comment on a different node')
+    child1$.createChild({title: 'Grandchild'} as any)
     await flushMicrotasks()
 
-    expect(latest.map(c => c.text)).toEqual(['second comment', 'first comment'])
-    expect(latest.every(c => c.targetNodeId === 'item1_field_mood')).toBe(true)
+    expect(root$.getDescendantsCount()).toBe(3)
   })
 
-  it('addComment trims whitespace and ignores an empty/whitespace-only comment', async () => {
+  it('does NOT double-count a descendant reachable via two different parent paths (many-to-many tree)', async () => {
     const {service} = setup()
-
-    service.addComment('item1_field_mood', '   ')
+    const root$ = service.add(Object.assign(new GenericItem(), {title: 'Root'}))
+    await flushMicrotasks()
+    const branchA$ = root$.createChild({title: 'Branch A'} as any)
+    const branchB$ = root$.createChild({title: 'Branch B'} as any)
     await flushMicrotasks()
 
-    let latest: any[] = []
-    service.getCommentsForNode$('item1_field_mood').subscribe(comments => latest = comments)
-    expect(latest).toEqual([])
-
-    service.addComment('item1_field_mood', '  padded text  ')
+    // A single item shared under both branches - createChild() only sets one parent, so wire the
+    // second parent relationship directly the same way OdmItem$2 itself tracks multi-parent (via
+    // `parents`), then re-emit both branches' childrenList$ so getChildren() picks it up.
+    const shared$ = branchA$.createChild({title: 'Shared'} as any)
     await flushMicrotasks()
-    expect(latest.map(c => c.text)).toEqual(['padded text'])
+    ;(shared$ as any).parents = [...((shared$ as any).parents ?? []), branchB$]
+    branchB$.childrenList$.nextWithCache([...(branchB$.getChildren()), shared$])
+
+    // Root's total descendants: branchA, branchB, shared - NOT branchA, branchB, shared, shared.
+    expect(root$.getDescendantsCount()).toBe(3)
   })
 
-  it('reflects a newly-added comment reactively, without needing to re-subscribe', async () => {
+  it('getWhenDescendantLastModified returns the latest whenLastModified among descendants, not the item itself', async () => {
     const {service} = setup()
-
-    let latest: any[] = []
-    service.getCommentsForNode$('item1_field_mood').subscribe(comments => latest = comments)
-    expect(latest).toEqual([])
-
-    service.addComment('item1_field_mood', 'arrived later')
+    const root$ = service.add(Object.assign(new GenericItem(), {title: 'Root'}))
+    await flushMicrotasks()
+    const older$ = root$.createChild({title: 'Older child'} as any)
+    await flushMicrotasks()
+    const newer$ = root$.createChild({title: 'Newer child'} as any)
     await flushMicrotasks()
 
-    expect(latest.map(c => c.text)).toEqual(['arrived later'])
+    // createChild() already stamps whenLastModified via setLastModifiedIfNecessary() at save
+    // time, in creation order - newer$ was created after older$, so it should win.
+    const latest = root$.getWhenDescendantLastModified()
+    expect(latest).toEqual((newer$.val as any)?.whenLastModified)
+  })
+
+  it('an item with no children has zero descendants and no whenDescendantLastModified', async () => {
+    const {service} = setup()
+    const leaf$ = service.add(Object.assign(new GenericItem(), {title: 'Leaf'}))
+    await flushMicrotasks()
+
+    expect(leaf$.getDescendantsCount()).toBe(0)
+    expect(leaf$.getWhenDescendantLastModified()).toBeUndefined()
   })
 })

@@ -79,10 +79,10 @@ ${JSON.stringify(existingCategories)}`
     ? CATEGORY_TREE_SYSTEM_BASE + CATEGORY_TREE_MATCHING_RULES
     : CATEGORY_TREE_SYSTEM_BASE;
 
-  return [
-    { role: 'system' as const, content: system },
-    { role: 'user' as const, content: userContent },
-  ];
+  return {
+    system,
+    messages: [{ role: 'user' as const, content: userContent }],
+  };
 }
 
 // ─── Q&A ─────────────────────────────────────────────────────────────────────
@@ -128,10 +128,10 @@ export function buildQAMessages(
     .filter(Boolean)
     .join('\n\n');
 
-  return [
-    { role: 'system' as const, content: QA_SYSTEM },
-    { role: 'user' as const, content: userContent },
-  ];
+  return {
+    system: QA_SYSTEM,
+    messages: [{ role: 'user' as const, content: userContent }],
+  };
 }
 
 // ─── Quiz answer ─────────────────────────────────────────────────────────────
@@ -145,10 +145,10 @@ export function buildAnswerMessages(question: string, context: string, searchRes
     ? `\n\nWeb search results:\n${searchResults.join('\n')}`
     : '';
   const ctx = context ? `\n\nContext:\n${context}` : '';
-  return [
-    { role: 'system' as const, content: ANSWER_SYSTEM },
-    { role: 'user' as const, content: `Question: ${question}${ctx}${search}` },
-  ];
+  return {
+    system: ANSWER_SYSTEM,
+    messages: [{ role: 'user' as const, content: `Question: ${question}${ctx}${search}` }],
+  };
 }
 
 // ─── More subcategories ──────────────────────────────────────────────────────
@@ -190,10 +190,10 @@ export function buildMoreSubcategoriesMessages(
     search,
   ].filter(Boolean).join('\n\n');
 
-  return [
-    { role: 'system' as const, content: MORE_SUBCATEGORIES_SYSTEM },
-    { role: 'user' as const, content: userContent },
-  ];
+  return {
+    system: MORE_SUBCATEGORIES_SYSTEM,
+    messages: [{ role: 'user' as const, content: userContent }],
+  };
 }
 
 // ─── Copilot chat ─────────────────────────────────────────────────────────────
@@ -220,8 +220,5 @@ export function buildCopilotMessages(agUiMessages: AgUiMessage[]) {
     })
     .filter((m): m is { role: 'user' | 'assistant'; content: string } => m !== null);
 
-  return [
-    { role: 'system' as const, content: COPILOT_SYSTEM },
-    ...conversation,
-  ];
+  return { system: COPILOT_SYSTEM, messages: conversation };
 }

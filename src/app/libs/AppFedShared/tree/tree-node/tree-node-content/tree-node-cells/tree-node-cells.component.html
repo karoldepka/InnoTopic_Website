@@ -19,7 +19,15 @@
         <app-min-mid-max-cell [cell]="entry.cell!"></app-min-mid-max-cell>
       }
       @case ('text') {
-        <app-rich-text-edit-cell [cell]="entry.cell!"></app-rich-text-edit-cell>
+        <app-rich-text-edit-cell
+          [cell]="entry.cell!"
+          [showAiFillButton]="!!entry.descriptor.aiFillable"
+          [aiFillLoading]="aiFillLoadingDescriptorId === entry.descriptor.id"
+          (aiFillRequested)="aiFillRequested.emit(entry.descriptor)"
+        ></app-rich-text-edit-cell>
+      }
+      @case ('intensity') {
+        <app-intensity-cell [cell]="entry.cell!"></app-intensity-cell>
       }
       @case ('slot') {
         <app-bare-slot-cell

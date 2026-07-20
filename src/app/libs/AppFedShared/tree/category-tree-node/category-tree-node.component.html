@@ -1,0 +1,34 @@
+<div class="category-node">
+  <div class="category-node__row">
+    <ion-icon
+      class="category-node__toggle"
+      [name]="treeNode.isExpanded ? 'chevron-down-outline' : 'chevron-forward-outline'"
+      (click)="toggleExpanded()"
+    ></ion-icon>
+    <ion-icon class="category-node__folder-icon" name="folder-outline"></ion-icon>
+    <app-rich-text-edit-cell
+      class="category-node__title"
+      [cell]="titleCell"
+      [enterKeyOnlyWithShift]="false"
+    ></app-rich-text-edit-cell>
+  </div>
+
+  @if (treeNode.isExpanded) {
+    <div class="category-node__children">
+      @for (childNode of (treeNode.childNodesList$ | async) ?? []; track childNode.item$.id) {
+        <app-category-tree-node [treeNode]="childNode"></app-category-tree-node>
+      }
+
+      <div class="category-node__add">
+        <ion-input
+          [(ngModel)]="newChildTitle"
+          placeholder="Add sub-category…"
+          (keydown.enter)="addChild()"
+        ></ion-input>
+        <ion-button fill="clear" size="small" (click)="addChild()" [disabled]="!newChildTitle.trim()">
+          <ion-icon name="add-outline" slot="icon-only"></ion-icon>
+        </ion-button>
+      </div>
+    </div>
+  }
+</div>

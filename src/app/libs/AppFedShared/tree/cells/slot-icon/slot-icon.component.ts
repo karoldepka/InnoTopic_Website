@@ -13,6 +13,7 @@ const DEFAULT_ICON_BY_KIND: Record<SlotKind, string> = {
   numeric: 'star-outline',
   text: 'document-text-outline',
   slot: 'folder-outline',
+  intensity: 'speedometer-outline',
 }
 
 @Component({

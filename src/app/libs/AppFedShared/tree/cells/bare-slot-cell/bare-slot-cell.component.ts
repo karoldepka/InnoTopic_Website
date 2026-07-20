@@ -3,9 +3,12 @@ import {AsyncPipe} from '@angular/common'
 import {FormsModule} from '@angular/forms'
 import {IonicModule} from '@ionic/angular'
 import {Observable} from 'rxjs'
+import {map} from 'rxjs/operators'
 import {OdmItem$2} from '../../../odm/OdmItem$2'
+import {odmTimestampToMillis} from '../../../odm/utils'
 import {createChildUnderSlot, getBareSlotChildren$} from '../../BareSlotChildren'
 import {VoiceMemoFieldComponent} from '../../../audio/voice-memo-field/voice-memo-field.component'
+import {DatePipe} from '@angular/common'
 
 /** A bare slot (GH #89's `kind: 'slot'` descriptor, e.g. a former OrYoL/Learn template node like
  * "Plan") - no scalar value of its own, just a live-filtered list of the parent's real children
@@ -19,7 +22,7 @@ import {VoiceMemoFieldComponent} from '../../../audio/voice-memo-field/voice-mem
   templateUrl: './bare-slot-cell.component.html',
   changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./bare-slot-cell.component.sass'],
-  imports: [AsyncPipe, FormsModule, IonicModule, VoiceMemoFieldComponent],
+  imports: [AsyncPipe, DatePipe, FormsModule, IonicModule, VoiceMemoFieldComponent],
 })
 export class BareSlotCellComponent implements OnChanges {
 
@@ -29,10 +32,28 @@ export class BareSlotCellComponent implements OnChanges {
 
   children$?: Observable<OdmItem$2<any, any, any, any>[]>
 
+  /** GH #89's "descendantsCount"/"whenDescendantLastModified" rollup, scoped to just this bare
+   * slot's own children (not the whole parent item's full descendant tree - see
+   * `OdmItem$2.getDescendantsCount()`'s doc comment for why these are computed on demand, not
+   * persisted fields). Deduplication isn't needed here the way it is for the whole-item rollup -
+   * `getBareSlotChildren$()` already yields each item at most once. */
+  summary$?: Observable<{count: number, whenLastModified: Date | null}>
+
   newChildTitle = ''
 
   ngOnChanges(): void {
     this.children$ = getBareSlotChildren$(this.parentItem$, this.targetNodeId)
+    this.summary$ = this.children$.pipe(
+      map(children => {
+        const timestamps = children
+          .map(child => odmTimestampToMillis((child.val as any)?.whenLastModified))
+          .filter((ms): ms is number => ms !== undefined)
+        return {
+          count: children.length,
+          whenLastModified: timestamps.length > 0 ? new Date(Math.max(...timestamps)) : null,
+        }
+      }),
+    )
   }
 
   getChildTitle(child: OdmItem$2<any, any, any, any>): string {

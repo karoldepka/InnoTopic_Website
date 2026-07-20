@@ -1,5 +1,6 @@
 import {Component, Injector, Input, Output, EventEmitter, ViewChild, ChangeDetectionStrategy} from '@angular/core';
 import {FormControl, UntypedFormControl} from '@angular/forms'
+import {IonicModule} from '@ionic/angular'
 import {RichTextEditComponent} from '../../../rich-text/rich-text-edit/rich-text-edit.component'
 import {VoiceMemoFieldComponent} from '../../../audio/voice-memo-field/voice-memo-field.component'
 import {AbstractCellComponent} from '../../../AbstractCellComponent'
@@ -21,7 +22,7 @@ import {createChildUnderSlot} from '../../BareSlotChildren'
     templateUrl: './rich-text-edit-cell.component.html',
     changeDetection: ChangeDetectionStrategy.Eager,
     styleUrls: ['./rich-text-edit-cell.component.sass'],
-    imports: [RichTextEditComponent, VoiceMemoFieldComponent],
+    imports: [RichTextEditComponent, VoiceMemoFieldComponent, IonicModule],
 })
 export class RichTextEditCellComponent extends AbstractCellComponent {
 
@@ -38,6 +39,15 @@ export class RichTextEditCellComponent extends AbstractCellComponent {
    * OrYoL's tree, once migrated onto this shared cell - see class doc comment) decides what a
    * plain Enter should actually do; this cell stays app-agnostic. */
   @Output() enterKeydownIntercepted = new EventEmitter<KeyboardEvent>()
+
+  /** Opt-in "✨ Fill with AI" affordance (`SlotDescriptor.aiFillable`) - Learn's `answer` side is
+   * the first user. This cell only renders the button and emits `aiFillRequested`; the actual
+   * generation call, loading state, and where the result gets written all stay with whoever set
+   * `aiFillable` (e.g. `LearnItemDetailsPage`), same as `VoiceMemoFieldComponent.transcriptReady`
+   * is handled by the caller rather than baked into a specific cell. */
+  @Input() showAiFillButton = false
+  @Input() aiFillLoading = false
+  @Output() aiFillRequested = new EventEmitter<void>()
 
   formControl!: FormControl
 

@@ -11,10 +11,11 @@ async function handleCopilotAgui(c: import('hono').Context) {
   const body = await c.req.json<AgUiRunInput>();
   const { threadId, runId, messages } = body;
 
-  const aiMessages = buildCopilotMessages(messages);
+  const prompt = buildCopilotMessages(messages);
   const { textStream } = streamText({
     model: llm,
-    messages: aiMessages,
+    system: prompt.system,
+    messages: prompt.messages,
     experimental_telemetry: { isEnabled: true, functionId: 'copilotkit-agui' },
   });
 

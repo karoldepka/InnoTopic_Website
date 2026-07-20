@@ -1,30 +1,33 @@
-<!--Rich text:-->
-<!--<div-->
-<!--  style="background-color: var(&#45;&#45;apf-rich-text-edit-background)"-->
-<!--  #contentEditableEl-->
-<!--  contenteditable-->
-<!--&gt;-->
+<div class="rich-text-edit-cell">
+  <app-rich-text-edit
+    style="flex-grow: 1"
+    [formControl1]="formControl"
+    [showToolbar]="true"
+    [showMenuBar]="true"
+    [enterKeyOnlyWithShift]="enterKeyOnlyWithShift"
+    (enterKeydownIntercepted)="enterKeydownIntercepted.emit($event)"
+  ></app-rich-text-edit>
 
-<!--  &lt;!&ndash;-->
-<!--     [ngClass]="{'done-title': isDone}"-->
-<!--  (keydown.backspace)="onKeyDownBackspaceOnTitle()"-->
-<!--   &ndash;&gt;-->
+  @if (showAiFillButton) {
+    <ion-button
+      size="small"
+      fill="clear"
+      [disabled]="aiFillLoading"
+      (click)="aiFillRequested.emit()"
+      title="Fill with AI"
+    >
+      @if (aiFillLoading) {
+        <ion-spinner name="dots"></ion-spinner>
+      } @else {
+        <span style="font-size: 1.2rem">✨</span>
+      }
+    </ion-button>
+  }
+</div>
 
-<!--</div>-->
-
-<!--RichTextComp:-->
-<app-rich-text-edit
-  style="flex-grow: 1"
-  [formControl1]="formControl"
-  [showToolbar]="true"
-  [showMenuBar]="true"
-  [enterKeyOnlyWithShift]="enterKeyOnlyWithShift"
-  (enterKeydownIntercepted)="enterKeydownIntercepted.emit($event)"
-></app-rich-text-edit>
 <app-voice-memo-field
   [item$]="cell.treeNode.item$"
   [fieldId]="cell.column.id"
   [includeLegacy]="includeLegacyRecording"
   (transcriptReady)="onTranscriptReady($event)"
 ></app-voice-memo-field>
-

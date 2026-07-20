@@ -168,4 +168,28 @@ describe('BareSlotChildren - getBareSlotChildren$', () => {
 
     expect(latest.map(c => (c.val as any)?.title)).toEqual(['Added after subscribing'])
   })
+
+  it('does NOT include a grandchild nested under a direct bare-slot child (regression: getCategoriesTree double-listing)', async () => {
+    // Reproduces a real bug found while building the categories feature: a normal (non-slot)
+    // grandchild nested under a direct bare-slot child inherits the slot id transitively via
+    // getAncestorIds() (which walks through its real parent's own manualAncestorIds too), so it
+    // used to leak into this "direct children of the slot" list as a spurious extra entry -
+    // on top of correctly rendering nested under its real parent via the normal tree walk.
+    const {service} = setup()
+    const root$ = service.add(Object.assign(new GenericItem(), {title: 'Root'}))
+    await flushMicrotasks()
+    const categoriesSlotId = fieldVirtualNodeId(root$.id as string, 'categories')
+
+    const topCategory$ = createChildUnderSlot(root$, categoriesSlotId, {title: 'Top category'})
+    await flushMicrotasks()
+    // A normal nested child, NOT created via createChildUnderSlot - matches
+    // CategoryTreeNodeComponent.addChild()'s plain odmService.newItem([parent$]) call.
+    topCategory$.createChild({title: 'Sub-category'} as any)
+    await flushMicrotasks()
+
+    let latest: any[] = []
+    getBareSlotChildren$(root$, categoriesSlotId).subscribe(children => latest = children)
+
+    expect(latest.map(c => (c.val as any)?.title)).toEqual(['Top category'])
+  })
 })

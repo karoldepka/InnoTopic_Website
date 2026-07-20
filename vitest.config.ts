@@ -25,6 +25,7 @@ export default defineConfig({
       'src/app/libs/AppFedShared/tree/generic-items.service.spec.ts',
       'src/app/libs/AppFedShared/tree/cells/SlotDescriptor.spec.ts',
       'src/app/libs/AppFedShared/tree/BareSlotChildren.spec.ts',
+      'src/app/libs/AppFedShared/tree/descendant-rollups.spec.ts',
       'src/app/libs/AppFedShared/comments/field-comments.service.spec.ts',
     ],
     browser: {

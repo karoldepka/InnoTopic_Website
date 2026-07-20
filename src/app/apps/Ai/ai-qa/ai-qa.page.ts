@@ -33,13 +33,14 @@ import { LearnItemItemsService } from '../../Learn/core/learn-item-items.service
 import { LearnItem } from '../../Learn/models/LearnItem';
 import { LearnItem$ } from '../../Learn/models/LearnItem$';
 import { OdmBackend } from '../../../libs/AppFedShared/odm/OdmBackend';
+import { AppLogoComponent } from '../../Common/app-logo/app-logo.component';
 
 @Component({
   selector: 'app-ai-qa',
   templateUrl: './ai-qa.page.html',
   styleUrls: ['./ai-qa.page.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, FormsModule, IonicModule],
+  imports: [CommonModule, FormsModule, IonicModule, AppLogoComponent],
   providers: [AiQaGeneratorService],
 })
 export class AiQaPage implements OnInit {

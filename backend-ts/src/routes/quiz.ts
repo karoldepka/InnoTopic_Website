@@ -16,10 +16,11 @@ interface AnswerRequest {
 async function handleGenerateAnswer(c: import('hono').Context) {
   const body = await c.req.json<AnswerRequest>();
   const searchResults = body.web_search ? await webSearch(body.question) : [];
-  const messages = buildAnswerMessages(body.question, body.context ?? '', searchResults);
+  const { system, messages } = buildAnswerMessages(body.question, body.context ?? '', searchResults);
 
   const { text } = await generateText({
     model: llm,
+    system,
     messages,
     experimental_telemetry: { isEnabled: true, functionId: 'generate-answer' },
   });
@@ -29,10 +30,11 @@ async function handleGenerateAnswer(c: import('hono').Context) {
 async function handleGenerateAnswerStream(c: import('hono').Context) {
   const body = await c.req.json<AnswerRequest>();
   const searchResults = body.web_search ? await webSearch(body.question) : [];
-  const messages = buildAnswerMessages(body.question, body.context ?? '', searchResults);
+  const { system, messages } = buildAnswerMessages(body.question, body.context ?? '', searchResults);
 
   const { textStream } = streamText({
     model: llm,
+    system,
     messages,
     experimental_telemetry: { isEnabled: true, functionId: 'generate-answer-stream' },
   });

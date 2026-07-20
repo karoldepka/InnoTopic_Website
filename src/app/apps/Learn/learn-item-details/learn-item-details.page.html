@@ -97,36 +97,6 @@
 
     </div>
 
-    <app-importance-edit
-      [item$]="item$"
-    />
-
-
-    <ion-grid>
-      <ion-row>
-        <ion-col size="12" size-md="6" size-xl=3>
-          <app-fun-level-edit
-            [item$]="item$"
-          />
-        </ion-col>
-        <ion-col size="12" size-md="6" size-xl=3>
-          <app-mental-effort-level-edit
-            [item$]="item$"
-          />
-        </ion-col>
-        <ion-col size="12" size-md="6" size-xl=3>
-          <app-physical-health-impact-level-edit
-            [item$]="item$"
-          />
-        </ion-col>
-        <ion-col size="12" size-md="6" size-xl=3>
-          <app-mental-health-impact-level-edit
-            [item$]="item$"
-          />
-        </ion-col>
-      </ion-row>
-    </ion-grid>
-
     <app-statuses-edit
       *ngIf="feat.workflowStatuses"
       [item$]="item$"
@@ -173,13 +143,12 @@
     <!--       *ngIf="feat.itemsTree.mockups"
     -->
 
-    <div class="side-editors-flow">
-      <app-item-side-editor
-        *ngFor="let side of sidesDefsArray"
-        [item$]="item$"
-        [side]="side"
-      />
-    </div>
+    <app-tree-node-cells
+      [treeNode]="treeNode"
+      [descriptors]="visibleDescriptors"
+      [aiFillLoadingDescriptorId]="aiFillLoadingDescriptorId"
+      (aiFillRequested)="onAiFillRequested($event)"
+    ></app-tree-node-cells>
 
   </ng-container>
 

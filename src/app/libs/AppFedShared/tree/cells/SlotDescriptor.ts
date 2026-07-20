@@ -1,13 +1,21 @@
+import {ButtonsDescriptor} from '../../../AppFedSharedIonic/ratings/numeric-picker/numeric-picker.component'
+
 /** Unified per-field/side/template-node descriptor (GH #89) - one shape replacing Journal's
  * numeric/text descriptors, Learn's "sides", and OrYoL/Learn's hardcoded template-node lists.
  * Rendered by `TreeNodeCellsComponent` via `OdmCell`/`OdmTreeNode` (see that file's doc comment
  * for why no new node/cell wrapper class was needed for the common, scalar-field case). */
-export type SlotKind = 'numeric' | 'text' | 'slot'
+export type SlotKind = 'numeric' | 'text' | 'slot' | 'intensity'
 
 export interface SlotDescriptor {
   id: string
   label: string
   icon?: string
+  /** A flag/country-style icon rendered as `<img [src]>` instead of `<ion-icon [name]>` - Learn's
+   * language sides (e.g. `pl`/`de`) use real flag SVGs, not Ionicons. Takes precedence over `icon`
+   * when set. */
+  imageSrc?: string
+  /** Matches `Side.flagTransparent` - some flag SVGs render better dimmed. */
+  imageOpacity?: number
   kind: SlotKind
   /** The key on the parent item this slot's value reads/writes through to (e.g. `mood`,
    * `funEstimate`, `general`) - omitted for a bare slot with no scalar value of its own (e.g. a
@@ -18,6 +26,14 @@ export interface SlotDescriptor {
    * numeric-descriptor "shortlist" (~50 of 236 fields shown by default) and its old text-
    * descriptor "not `hide`" default (all but one of 18 text fields always shown). */
   isShortListed?: boolean
+  /** Opt-in "✨ Fill with AI" button on a `kind: 'text'` cell (`RichTextEditCellComponent`) - the
+   * cell only emits `aiFillRequested`; the actual generation call/business logic stays with
+   * whoever passes this descriptor down (e.g. Learn's `answer` side), not the shared cell. */
+  aiFillable?: boolean
+  /** Required for `kind: 'intensity'` - the named-bucket set `IntensityCellComponent` renders
+   * (e.g. Learn's fun/mental-effort/importance levels). Data-driven rather than hardcoded per
+   * cell component, so each intensity field can bring its own bucket set. */
+  buttonsDescriptor?: ButtonsDescriptor<any, any>
 }
 
 /** The fabricated virtual-node id for a slot on a given parent item, e.g.
@@ -30,9 +46,11 @@ export function fieldVirtualNodeId(parentItemId: string, slotId: string): string
 }
 
 /** A field value counts as "filled in" if it's a non-empty string (plain or rich-text scalar
- * fields) or a composite `{numVal, comment}` (Journal-style numeric fields, see
- * `JournalCompositeFieldVal`) with either half actually set - an empty `{}` left behind by a
- * since-cleared rating must NOT count as data, or the field would stay stuck visible forever. */
+ * fields), a composite `{numVal, comment}` (Journal-style numeric fields, see
+ * `JournalCompositeFieldVal`) with either half actually set, or a `{id, numeric}` intensity
+ * bucket (Learn's `IntensityVal` - `funEstimate`/`importance`/etc.) - an empty `{}` left behind
+ * by a since-cleared rating must NOT count as data, or the field would stay stuck visible
+ * forever. */
 function hasFieldValue(value: any): boolean {
   if (value == null) {
     return false
@@ -41,23 +59,29 @@ function hasFieldValue(value: any): boolean {
     return value.trim().length > 0
   }
   if (typeof value === 'object') {
-    return (value.numVal !== undefined && value.numVal !== null) || !!value.comment?.trim?.()
+    return (value.numVal !== undefined && value.numVal !== null)
+      || !!value.comment?.trim?.()
+      || value.id !== undefined
+      || value.numeric !== undefined
   }
   return true
 }
 
 /** Whether a slot should actually render for a given item - `TreeNodeCellsComponent` and
  * `SlotPickerComponent` (which only offers *hidden* slots) share this so they can't drift out of
- * sync. A bare slot (`kind: 'slot'`) always shows (it's a stable structural grouping, like a
- * former OrYoL template node); a scalar field shows once it's filled in, once it's
- * `isShortListed`, or once the user's explicitly added it via the picker
- * (`manuallyAddedSlotIds`) - a 236-descriptor registry (Journal's numeric fields) would otherwise
- * render 236 mostly-empty cells. */
+ * sync. `isShortListed` always shows (a small, stable set an app chooses to always surface); a
+ * scalar field additionally shows once it's filled in; a bare slot (`kind: 'slot'`) has no value
+ * to check, so it shows once explicitly added instead (`manuallyAddedSlotIds` - e.g. OrYoL's
+ * "Apply Template" marking a chosen template's slots). **Not** unconditionally visible just for
+ * being `kind: 'slot'` - confirmed live while wiring OrYoL's day-plan templates (21 slot
+ * descriptors spanning 4 templates): if bare slots were always shown, "Apply Template" would be
+ * a no-op and every item's popover would list all 21 regardless of which (if any) template was
+ * ever applied to it. */
 export function isSlotVisible(descriptor: SlotDescriptor, itemVal: {manuallyAddedSlotIds?: string[]} & Record<string, any> | undefined): boolean {
-  if (descriptor.kind === 'slot' || descriptor.isShortListed) {
+  if (descriptor.isShortListed) {
     return true
   }
-  if (descriptor.dataFieldKey && hasFieldValue(itemVal?.[descriptor.dataFieldKey])) {
+  if (descriptor.kind !== 'slot' && descriptor.dataFieldKey && hasFieldValue(itemVal?.[descriptor.dataFieldKey])) {
     return true
   }
   return !!itemVal?.manuallyAddedSlotIds?.includes(descriptor.id)

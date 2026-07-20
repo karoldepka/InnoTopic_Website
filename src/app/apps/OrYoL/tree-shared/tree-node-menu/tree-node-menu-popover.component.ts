@@ -26,17 +26,15 @@ import { NodeClassPickerComponent } from './node-class-picker/node-class-picker.
 import { VoiceMemoFieldComponent } from '../../../../libs/AppFedShared/audio/voice-memo-field/voice-memo-field.component'
 import { TimeTrackingMenuComponent } from './time-tracking-menu/time-tracking-menu.component'
 import { date } from '../../time-tracking/time-tracking.service'
-import {
-  buildTemplateItemId,
-  DAY_PLAN_TEMPLATES,
-  DayPlanTemplate,
-  DayPlanTemplateNode,
-} from '../../plan-execution/templates/day-plan-templates'
-import {NodeInclusion} from '../../tree-model/TreeListener'
-import {generateNewInclusionId} from '../../tree-model/TreeModel'
+import {DAY_PLAN_TEMPLATES, DayPlanTemplate} from '../../plan-execution/templates/day-plan-templates'
 import {OrySubtreeShare, OrySubtreePermission, OrySubtreeSharesService} from '../../db-supabase/ory-subtree-shares.service'
 import {AuthService} from '../../../../auth/auth.service'
 import {environment} from '../../../../../environments/environment'
+import {ORYOL_SLOT_DESCRIPTORS, getSlotIdsForTemplate} from '../../models/OrYoLSlotDescriptors'
+import {OryOdmItemsService} from '../../db-supabase/ory-odm-items.service'
+import {OryOdmItem$} from '../../db-supabase/OryOdmItem$'
+import {OdmTreeNode} from '../../../../libs/AppFedShared/tree/tree-node/OdmTreeNode'
+import {TreeNodeCellsComponent} from '../../../../libs/AppFedShared/tree/tree-node/tree-node-content/tree-node-cells/tree-node-cells.component'
 
 
 @Component({
@@ -44,7 +42,7 @@ import {environment} from '../../../../../environments/environment'
     templateUrl: './tree-node-menu-popover.component.html',
     changeDetection: ChangeDetectionStrategy.Eager,
     styleUrls: ['./tree-node-menu-popover.component.sass'],
-    imports: [NodeClassIconComponent, IonicModule, NgIf, NgFor, NodeClassPickerComponent, VoiceMemoFieldComponent, TimeTrackingMenuComponent]
+    imports: [NodeClassIconComponent, IonicModule, NgIf, NgFor, NodeClassPickerComponent, VoiceMemoFieldComponent, TimeTrackingMenuComponent, TreeNodeCellsComponent]
 })
 export class TreeNodeMenuPopoverComponent implements OnInit {
 
@@ -67,6 +65,17 @@ export class TreeNodeMenuPopoverComponent implements OnInit {
 
   sharesLoaded = false
 
+  /** GH #89's unified bare-slot rendering for this node's day-plan-template slots ("Plan",
+   * "General", etc. - see OrYoLSlotDescriptors.ts). `OryOdmItem$` (the ODM-backed view of the
+   * exact same `OryItem` row `this.treeNode` itself reads/writes through `OryItem$`, the legacy
+   * TreeModel-facing view - both are just different lenses onto the same Supabase row, kept in
+   * sync by nothing more than both reading the same table) is what makes reusing the already-
+   * proven `OdmTreeNode`/`OdmCell`/`TreeNodeCellsComponent`/`BareSlotChildren.ts` machinery here
+   * possible without touching TreeModel/NodeInclusion at all. */
+  slotTreeNode!: OdmTreeNode<OryOdmItem$>
+
+  slotDescriptors = ORYOL_SLOT_DESCRIPTORS
+
   constructor(
     public dialogService: DialogService,
     // private modalService: NgbModal,
@@ -77,12 +86,14 @@ export class TreeNodeMenuPopoverComponent implements OnInit {
     public alertController: AlertController,
     private sharesService: OrySubtreeSharesService,
     private authService: AuthService,
+    private oryOdmItemsService: OryOdmItemsService,
   ) { }
 
   ngOnInit() {
     if (this.sharingAvailable) {
       this.loadShares()
     }
+    this.slotTreeNode = new OdmTreeNode(undefined, this.oryOdmItemsService.obtainItem$ById(this.treeNode.itemId as any))
   }
 
   /** Only the item's owner can grant a share - RLS enforces this server-side regardless, but
@@ -192,78 +203,27 @@ export class TreeNodeMenuPopoverComponent implements OnInit {
     this.treeNode.content.toggleDone()
   }
 
-  async applyTemplate() {
+  /** GH #89: "Replace OrYoL's template nodes with the new virtual nodes." Used to create a real,
+   * separately-persisted child item + `NodeInclusion` per template node (a real second tree row
+   * for "Plan", "General", etc. - see `OrYoLSlotDescriptors.ts`'s doc comment for the full
+   * reasoning and what changed). Now just marks each of the chosen template's slot ids as
+   * `manuallyAddedSlotIds` on this node's `OryOdmItem$` view, so they render as bare slots in the
+   * `<app-tree-node-cells>` block below - real children addressable/commentable/time-trackable
+   * without a second tree row, `NodeInclusion`, or any change to OrYoL's own tree engine. */
+  applyTemplate() {
     const template = this.getTemplateToApply()
     if (!template) {
       console.warn('No day-plan template found to apply.')
       return
     }
-    this.addTemplateNodesToParent(this.treeNode, template.nodes)
-    await this.popoverController.dismiss()
+    const slotIds = getSlotIdsForTemplate(template)
+    const existing = this.slotTreeNode.item$.val?.manuallyAddedSlotIds ?? []
+    const merged = [...new Set([...existing, ...slotIds])]
+    this.slotTreeNode.item$.patchNow({manuallyAddedSlotIds: merged} as any)
   }
 
   private getTemplateToApply(): DayPlanTemplate | undefined {
     return DAY_PLAN_TEMPLATES.find(t => t.id === this.defaultTemplateId) ?? DAY_PLAN_TEMPLATES[0]
-  }
-
-  /** Inserts template nodes at the top of parentNode.children, preserving template order. */
-  private addTemplateNodesToParent(
-    parentNode: OryBaseTreeNode,
-    templateNodes: DayPlanTemplateNode[],
-  ) {
-    // Capture the first existing child before any insertions so template nodes are prepended.
-    const firstExistingChild = parentNode.children[0] as OryNonRootTreeNode | undefined
-    let lastInserted: OryNonRootTreeNode | undefined
-    for (const templateNode of templateNodes) {
-      const node = this.createOrGetTemplateNode(parentNode, templateNode, lastInserted, firstExistingChild)
-      if (node) {
-        lastInserted = node
-        if (templateNode.children?.length) {
-          this.addTemplateNodesToParent(node as any, templateNode.children)
-        }
-      }
-    }
-  }
-
-  /**
-   * Returns existing node if the template ID already exists under parentNode,
-   * otherwise creates and inserts it before firstExistingChild (after afterNode).
-   */
-  private createOrGetTemplateNode(
-    parentNode: OryBaseTreeNode,
-    templateNode: DayPlanTemplateNode,
-    afterNode: OryNonRootTreeNode | undefined,
-    beforeNode: OryNonRootTreeNode | undefined,
-  ): OryNonRootTreeNode | undefined {
-    const templateItemId = buildTemplateItemId(parentNode.itemId, templateNode.id)
-    const existing = parentNode.children.find(child => child.itemId === templateItemId) as OryNonRootTreeNode | undefined
-    if (existing) return existing
-
-    const nodeInclusion = new NodeInclusion(generateNewInclusionId(), parentNode.itemId)
-    const treeModel = (parentNode as any).treeModel
-    treeModel.nodeOrderer.addOrderMetadataToInclusion(
-      {
-        inclusionBefore: afterNode?.nodeInclusion,
-        inclusionAfter: beforeNode?.nodeInclusion,
-      },
-      nodeInclusion,
-    )
-
-    const itemData: any = {
-      title: templateNode.title,
-      isTask: !!templateNode.isTask,
-      templateNodeClass: templateNode.templateNodeClass,
-    }
-    const nodeContent = parentNode.createNodeContent(templateItemId, itemData)
-    const newNode = parentNode.createChildNode(nodeInclusion as any, nodeContent as any)
-
-    treeModel.permissionsManager.onAfterCreated(newNode as any)
-    treeModel.treeService.addChildNode(parentNode as any, newNode as any)
-
-    const insertIndex = afterNode ? (afterNode.getIndexInParent() + 1) : 0
-    parentNode._appendChildAndSetThisAsParent(newNode as any, insertIndex)
-
-    return newNode as any as OryNonRootTreeNode
   }
 
   async askArchiveItems() {

@@ -67,8 +67,22 @@ export interface OdmSaveRequest {
   parentIds: string[];
   ancestorIds: string[];
   storeVersionHistory?: boolean;
+  /** Plain text to index for semantic search. Omit to leave an existing embedding unchanged. */
+  embeddingText?: string;
 }
 
 export interface OdmDeleteRequest {
   owner: string;
+}
+
+export interface OdmSearchRequest {
+  owner: string;
+  query: string;
+  collection?: string;
+  limit?: number;
+  minSimilarity?: number;
+}
+
+export interface EmbeddingRequest {
+  text: string;
 }
