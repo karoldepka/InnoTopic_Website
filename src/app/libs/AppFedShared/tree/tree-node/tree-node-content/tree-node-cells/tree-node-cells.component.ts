@@ -1,4 +1,4 @@
-import {Component, Input, OnChanges, OnInit, OnDestroy, ChangeDetectionStrategy, ChangeDetectorRef} from '@angular/core';
+import {Component, Input, Output, EventEmitter, OnChanges, OnInit, OnDestroy, ChangeDetectionStrategy, ChangeDetectorRef} from '@angular/core';
 import {Subscription} from 'rxjs'
 import {OdmTreeNode} from '../../OdmTreeNode'
 import {OdmCell} from '../../../cells/OdmCell'
@@ -6,6 +6,7 @@ import {fieldVirtualNodeId, isSlotVisible, SlotDescriptor} from '../../../cells/
 import {IonicModule} from '@ionic/angular'
 import {MinMidMaxCellComponent} from '../../../cells/min-mid-max-cell/min-mid-max-cell.component'
 import {RichTextEditCellComponent} from '../../../cells/rich-text-edit-cell/rich-text-edit-cell.component'
+import {IntensityCellComponent} from '../../../cells/intensity-cell/intensity-cell.component'
 import {CommentThreadComponent} from '../../../../comments/comment-thread/comment-thread.component'
 import {ExpandToggleComponent} from '../../../../expand-toggle/expand-toggle.component'
 import {SlotIconComponent} from '../../../cells/slot-icon/slot-icon.component'
@@ -33,7 +34,7 @@ import {TimeTrackedItemCellComponent} from '../../../../../../apps/OrYoL/time-tr
     templateUrl: './tree-node-cells.component.html',
     changeDetection: ChangeDetectionStrategy.Eager,
     styleUrls: ['./tree-node-cells.component.sass'],
-    imports: [IonicModule, MinMidMaxCellComponent, RichTextEditCellComponent, BareSlotCellComponent, CommentThreadComponent, ExpandToggleComponent, SlotIconComponent, TimeTrackedItemCellComponent, SlotPickerComponent],
+    imports: [IonicModule, MinMidMaxCellComponent, RichTextEditCellComponent, IntensityCellComponent, BareSlotCellComponent, CommentThreadComponent, ExpandToggleComponent, SlotIconComponent, TimeTrackedItemCellComponent, SlotPickerComponent],
 })
 export class TreeNodeCellsComponent implements OnChanges, OnInit, OnDestroy {
 
@@ -42,6 +43,18 @@ export class TreeNodeCellsComponent implements OnChanges, OnInit, OnDestroy {
 
   @Input()
   descriptors !: SlotDescriptor[]
+
+  /** Set by the caller to the descriptor id currently loading (e.g. Learn's `answer` side while
+   * an AI generation call is in flight) - purely a spinner/disabled-state signal, forwarded to
+   * whichever cell has `aiFillable` and matches. */
+  @Input()
+  aiFillLoadingDescriptorId: string | null = null
+
+  /** Pass-through of a `RichTextEditCellComponent`'s `aiFillRequested` for whichever
+   * `aiFillable` descriptor triggered it - the actual AI call/business logic is the caller's
+   * responsibility (see `SlotDescriptor.aiFillable`'s doc comment), not this generic dispatcher's. */
+  @Output()
+  aiFillRequested = new EventEmitter<SlotDescriptor>()
 
   cells: Array<{descriptor: SlotDescriptor, cell?: OdmCell, targetNodeId: string, timeTrackItem$: VirtualSlotState$}> = []
 
@@ -87,7 +100,11 @@ export class TreeNodeCellsComponent implements OnChanges, OnInit, OnDestroy {
         return {
           descriptor,
           cell: descriptor.dataFieldKey
-            ? new OdmCell(this.treeNode, {id: descriptor.dataFieldKey, type: descriptor.kind})
+            ? new OdmCell(this.treeNode, {
+              id: descriptor.dataFieldKey,
+              type: descriptor.kind,
+              buttonsDescriptor: descriptor.buttonsDescriptor,
+            })
             : undefined,
           targetNodeId,
           timeTrackItem$: this.virtualSlotStatesOdmService.obtainItem$ById(targetNodeId),

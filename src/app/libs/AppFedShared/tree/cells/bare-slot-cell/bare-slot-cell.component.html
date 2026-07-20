@@ -9,6 +9,17 @@
     }
   }
 
+  @if (summary$ | async; as summary) {
+    @if (summary.count > 0) {
+      <div class="bare-slot__summary">
+        {{ summary.count }} item{{ summary.count === 1 ? '' : 's' }}
+        @if (summary.whenLastModified) {
+          · last touched {{ summary.whenLastModified | date:'short' }}
+        }
+      </div>
+    }
+  }
+
   <div class="bare-slot__add">
     <ion-input
       [(ngModel)]="newChildTitle"

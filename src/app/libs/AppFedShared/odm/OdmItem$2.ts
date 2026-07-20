@@ -803,6 +803,60 @@ export class OdmItem$2<
     )
   }
 
+  /** Deduplicated (by id) in-memory descendants - unlike `getDescendants()`/`forEachDescendant()`
+   * above, safe for a many-to-many tree (`parentIds`/`ancestorIds` are plain, unvalidated string
+   * arrays - an item reachable via more than one parent path would otherwise be visited, and
+   * counted, once per path) and guarded against a cycle (shouldn't occur in a well-formed tree,
+   * but nothing at the DB level actually prevents one). Backing method for
+   * `getDescendantsCount()`/`getWhenDescendantLastModified()` (GH #89's rollup fields) - only
+   * covers what's currently loaded in memory, same caveat `getDescendants()` already has; call
+   * `requestLoadTreeDescendants()` first for a complete answer over a whole subtree. */
+  private getDeduplicatedDescendants(): OdmItem$2<any, any, any, any>[] {
+    const visitedIds = new Set<string>()
+    const result: OdmItem$2<any, any, any, any>[] = []
+    const stack: OdmItem$2<any, any, any, any>[] = [...this.getChildren() as unknown as OdmItem$2<any, any, any, any>[]]
+    while (stack.length > 0) {
+      const item = stack.pop()!
+      const id = item.id as string | undefined
+      if (!id || visitedIds.has(id)) {
+        continue
+      }
+      visitedIds.add(id)
+      result.push(item)
+      stack.push(...(item.getChildren() as unknown as OdmItem$2<any, any, any, any>[]))
+    }
+    return result
+  }
+
+  /** Total count of unique in-memory descendants (GH #89: "New field ... descendantsCount").
+   * Deliberately a computed method, not a persisted field - a live incrementally-maintained
+   * counter would need every write to any descendant to fan out and bump every ancestor's
+   * counter, which doesn't fit this ODM's single-document-patch model and would be genuinely
+   * wrong for a many-to-many tree (the same write incrementing a shared descendant's counter via
+   * more than one parent path). Computing on demand from whatever's already loaded sidesteps
+   * both problems entirely, at the cost of only covering the in-memory subtree - see
+   * `getDeduplicatedDescendants()`'s doc comment. */
+  getDescendantsCount(): number {
+    return this.getDeduplicatedDescendants().length
+  }
+
+  /** Latest `whenLastModified` among all unique in-memory descendants (GH #89: "New field
+   * whenDescendantLastModified") - undefined if there are none, or none have a timestamp yet.
+   * Same computed-not-persisted reasoning as `getDescendantsCount()`. */
+  getWhenDescendantLastModified(): OdmTimestamp | undefined {
+    let latestMs: number | undefined
+    let latest: OdmTimestamp | undefined
+    for (const descendant of this.getDeduplicatedDescendants()) {
+      const whenLastModified = (descendant.val as any)?.whenLastModified
+      const ms = odmTimestampToMillis(whenLastModified)
+      if (ms !== undefined && (latestMs === undefined || ms > latestMs)) {
+        latestMs = ms
+        latest = whenLastModified
+      }
+    }
+    return latest
+  }
+
   // ============================================================================
   // Sibling ordering & child creation (unified from the OrYoL tree node-orderer).
   // Children carry a fractional `orderNum` so they keep a stable, editable order

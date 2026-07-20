@@ -1,48 +1,16 @@
-<p>
-  categories works!
-</p>
+<div class="categories">
+  @for (node of (topLevelCategoryNodes$ | async) ?? []; track node.item$.id) {
+    <app-category-tree-node [treeNode]="node"></app-category-tree-node>
+  }
 
-my tree:
-<app-tree
-
-></app-tree>
-
-<br>
-
-=====
-
-
-https://stackblitz.com/edit/primeng-treedragdrop-demo
-
-<p-tree [value]="files1" [draggableNodes]="true" draggableScope="self" [droppableNodes]="true"  droppableScope="self">
-  <ng-template let-node pTemplate="default">
-    XYZ
-<!--    {{node.data}}-->
-<!--    <input [(ngModel)]="node.label" type="text" style="width:100%">-->
-  </ng-template>
-</p-tree>
-
-<!--   -->
-
-tree
-
-
-<div class="p-grid p-fluid">
-  <div class="p-col-12 p-md-4">
-    <h4>Files</h4>
-    <p>Can transfer to Server 2.</p>
-
-  </div>
-
-  <div class="p-col-12 p-md-4">
-    <h4>Server 1</h4>
-    <p>Can transfer to Files.</p>
-    <p-tree [value]="files3" [draggableNodes]="true" [droppableNodes]="true" droppableScope="server1" draggableScope="files"></p-tree>
-  </div>
-
-  <div class="p-col-12 p-md-4">
-    <h4>Server 2</h4>
-    <p>Can transfer to Server 1.</p>
-    <p-tree [value]="files4" [draggableNodes]="true" [droppableNodes]="true" droppableScope="server2" draggableScope="server1"></p-tree>
+  <div class="categories__add">
+    <ion-input
+      [(ngModel)]="newCategoryTitle"
+      placeholder="Add a category…"
+      (keydown.enter)="addTopLevelCategory()"
+    ></ion-input>
+    <ion-button fill="clear" size="small" (click)="addTopLevelCategory()" [disabled]="!newCategoryTitle.trim()">
+      <ion-icon name="add-outline" slot="icon-only"></ion-icon>
+    </ion-button>
   </div>
 </div>

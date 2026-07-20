@@ -10,7 +10,9 @@ import { ReactiveFormsModule } from '@angular/forms';
 
 const levels = mentalEffortLevels
 
-const buttonsDesc = createBalancedIntensityButtonsDescriptor(
+/** Exported for `LearnSlotDescriptors.ts` (GH #89's unified cell registry), which reuses this
+ * same button set for `mentalHealthImpact`'s `app-intensity-cell` rather than duplicating it. */
+export const buttonsDesc = createBalancedIntensityButtonsDescriptor(
   levels,
   [`🤒`, `🤒🤒`, `🤒🤒🤒`, `🤒🤒🤒🤒`],
   [`🧠`, `🧠🧠`, `🧠🧠🧠`, `🧠🧠🧠🧠`],

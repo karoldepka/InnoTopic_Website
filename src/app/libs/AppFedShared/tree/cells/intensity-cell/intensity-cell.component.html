@@ -1,0 +1,13 @@
+<div class="intensity-cell">
+  <apf-numeric-picker
+    class="intensity-cell__picker"
+    [buttonDescriptors]="buttonsDescriptor"
+    [ngModel]="val"
+    (numericValue)="onValueChanged($event)"
+  />
+  <app-voice-memo-field
+    [item$]="cell.treeNode.item$"
+    [fieldId]="cell.column.id"
+    (transcriptReady)="onTranscriptReady($event)"
+  ></app-voice-memo-field>
+</div>

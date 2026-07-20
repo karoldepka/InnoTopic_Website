@@ -17,8 +17,16 @@ export function getBareSlotChildren$<TOdmItem$ extends OdmItem$2<any, any, any, 
   slotTargetNodeId: string,
 ): Observable<TOdmItem$[]> {
   return parentItem$.odmService.localItems$.pipe(
+    // Checks this item's own `manualAncestorIds` directly, NOT the full recursive
+    // `getAncestorIds()` - the latter also matches a *grandchild* nested under a direct bare-slot
+    // child (e.g. the categories feature's sub-categories), since `getAncestorIds()` walks up
+    // through real parents and each of THEIR `manualAncestorIds` too. That would surface a
+    // deeply-nested descendant as a spurious extra top-level entry here, on top of it correctly
+    // rendering nested under its real parent - confirmed live while building categories. Only an
+    // item *directly* tagged under this exact slot belongs in this list; anything nested deeper
+    // is reached by the normal parent-child tree walk instead, not this bare-slot query again.
     map((items: TOdmItem$[]) => (items ?? []).filter(item$ =>
-      item$.id !== parentItem$.id && item$.getAncestorIds().includes(slotTargetNodeId)
+      item$.id !== parentItem$.id && !!(item$.val as any)?.manualAncestorIds?.includes(slotTargetNodeId)
     )),
   )
 }
