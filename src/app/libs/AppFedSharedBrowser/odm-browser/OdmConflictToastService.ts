@@ -8,6 +8,8 @@ import {BrowserOdmStorage} from './BrowserOdmStorage'
  * toast, just without an "Open" button. */
 const COLLECTION_ROUTES: Record<string, (id: string) => string> = {
   LearnItem: id => `/learn/item/${id}`,
+  JournalEntry: id => `/journal/write/${id}`,
+  OryItem: id => `/tree/${id}`,
 }
 
 /** Subscribes to BrowserOdmStorage.conflictDetected$ and surfaces each conflict as a toast, so
