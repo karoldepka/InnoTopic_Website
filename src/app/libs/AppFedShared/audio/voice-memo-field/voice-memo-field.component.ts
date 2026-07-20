@@ -5,6 +5,7 @@ import {AudioVisualizerComponent} from '../audio-visualizer/audio-visualizer.com
 import {ActiveMicHolder, readVoiceMemos, readVoiceMemosForField, VoiceAttachableItem, VoiceMemoRecord, VoiceMemoRef, VoiceMemoService} from '../voice-memo.service'
 import {VoiceTranscriptionService} from '../voice-transcription.service'
 import {FeatureService} from '../../feature.service'
+import {formatDurationMmSs} from '../../utils/stringUtils'
 
 declare const MediaRecorder: any
 
@@ -375,7 +376,7 @@ export class VoiceMemoFieldComponent implements OnInit, OnDestroy, ActiveMicHold
     }
     // Only reachable via the mic button, which recordingEnabled hides whenever allFields/readOnly
     // is set - fieldId is guaranteed real (non-null) here by that same gating.
-    this.voiceMemoService.attachMemo(collection, itemId, this.fieldId!, blob).then(blobId => {
+    this.voiceMemoService.attachMemo(collection, itemId, this.fieldId!, blob, durationMs).then(blobId => {
       const newRecord: VoiceMemoRecord = {fieldId: this.fieldId!, blobId, durationMs, whenCreated: new Date().toISOString()}
       item.patchThrottled({voiceMemos: [...readVoiceMemos(item), newRecord]})
       this.changeDetectorRef.markForCheck()
@@ -494,12 +495,7 @@ export class VoiceMemoFieldComponent implements OnInit, OnDestroy, ActiveMicHold
   }
 
   formatTime(totalSeconds: number): string {
-    if (!isFinite(totalSeconds) || totalSeconds < 0) {
-      return '0:00'
-    }
-    const minutes = Math.floor(totalSeconds / 60)
-    const seconds = Math.floor(totalSeconds % 60)
-    return `${minutes}:${seconds.toString().padStart(2, '0')}`
+    return formatDurationMmSs(totalSeconds)
   }
 
   /** "1 min ago"-style label for a memo's `whenCreated` - deliberately coarse (rounds to the

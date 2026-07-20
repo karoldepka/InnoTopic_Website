@@ -66,6 +66,9 @@ export interface PendingBlobUpload {
    * images) aren't referenced inline from the field's own content, so this is the only way to
    * later list "every memo recorded against this particular field". */
   field_id?: string
+  /** Recording length, for voice memos only - lets the "Uploading voice memo" sync-status text
+   * show how long the take was, including after a reload/reconnect resumes it from this journal. */
+  duration_ms?: number
   whenCreatedLocally: string
 }
 
