@@ -30,3 +30,10 @@
     opacity: 1
     color: var(--ion-color-primary)
     border-color: var(--ion-color-primary)
+
+// Already on screen (possibly still compact) - picking it jumps to it rather than adding
+// anything, so it's styled as a solid/filled chip instead of the addable ones' outline style.
+.slot-picker__chip--visible
+  background: var(--ion-color-light, rgba(255, 255, 255, 0.08))
+  border-style: dashed
+  opacity: 0.9

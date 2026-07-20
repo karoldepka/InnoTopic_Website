@@ -10,7 +10,12 @@
 
   <div class="slot-picker__chips">
     @for (descriptor of visibleChips; track descriptor.id) {
-      <button type="button" class="slot-picker__chip" (click)="pickSlot(descriptor)">
+      <button
+        type="button"
+        class="slot-picker__chip"
+        [class.slot-picker__chip--visible]="isAlreadyVisible(descriptor)"
+        (click)="pickSlot(descriptor)"
+      >
         <app-slot-icon [descriptor]="descriptor"></app-slot-icon>
         {{ descriptor.label }}
       </button>

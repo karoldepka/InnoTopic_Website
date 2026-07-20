@@ -7,18 +7,25 @@
   Cell MUST NOT assume that it has anything to do with columns.
 -->
 
+<app-slot-picker
+  [treeNode]="treeNode"
+  [descriptors]="descriptors"
+  (fieldPicked)="onFieldPicked($event)"
+></app-slot-picker>
+
 @for (entry of cells; track entry.descriptor.id) {
   @if (isCompact(entry.descriptor)) {
     <button
       type="button"
       class="slot-cell slot-cell--compact"
+      [attr.data-descriptor-id]="entry.descriptor.id"
       (click)="expandCompactCell(entry.descriptor.id)"
     >
       <app-slot-icon [descriptor]="entry.descriptor"></app-slot-icon>
       {{ entry.descriptor.label }}
     </button>
   } @else {
-  <div class="slot-cell">
+  <div class="slot-cell" [attr.data-descriptor-id]="entry.descriptor.id">
     <div class="slot-cell__label">
       <app-slot-icon [descriptor]="entry.descriptor"></app-slot-icon>
       {{ entry.descriptor.label }}
@@ -59,5 +66,3 @@
   </div>
   }
 }
-
-<app-slot-picker [treeNode]="treeNode" [descriptors]="descriptors"></app-slot-picker>

@@ -1,4 +1,4 @@
-import {Component, Input, Output, EventEmitter, OnChanges, OnInit, OnDestroy, ChangeDetectionStrategy, ChangeDetectorRef} from '@angular/core';
+import {Component, Input, Output, EventEmitter, OnChanges, OnInit, OnDestroy, ChangeDetectionStrategy, ChangeDetectorRef, ElementRef} from '@angular/core';
 import {Subscription} from 'rxjs'
 import {OdmTreeNode} from '../../OdmTreeNode'
 import {OdmCell} from '../../../cells/OdmCell'
@@ -91,6 +91,7 @@ export class TreeNodeCellsComponent implements OnChanges, OnInit, OnDestroy {
   constructor(
     private virtualSlotStatesOdmService: VirtualSlotStatesOdmService,
     private changeDetectorRef: ChangeDetectorRef,
+    private elementRef: ElementRef<HTMLElement>,
   ) {
   }
 
@@ -202,6 +203,21 @@ export class TreeNodeCellsComponent implements OnChanges, OnInit, OnDestroy {
   expandCompactCell(descriptorId: string): void {
     this.manuallyExpandedSlotIds.add(descriptorId)
     this.changeDetectorRef.markForCheck()
+  }
+
+  /** `SlotPickerComponent.fieldPicked` - now that the search box scans every field, not just
+   * addable ones (see that component's doc comment), this is the "jump to it" half: expand it if
+   * it's currently compact, then scroll it into view. `[attr.data-descriptor-id]` (set on both the
+   * compact button and the expanded `.slot-cell` in the template) is what makes it findable either
+   * way - `setTimeout` lets Angular re-render the compact->expanded switch first, so the element
+   * being scrolled to is the final, full-size one, not the about-to-disappear compact button. */
+  onFieldPicked(descriptor: SlotDescriptor): void {
+    this.expandCompactCell(descriptor.id)
+    setTimeout(() => {
+      this.elementRef.nativeElement
+        .querySelector(`[data-descriptor-id="${descriptor.id}"]`)
+        ?.scrollIntoView({behavior: 'smooth', block: 'center'})
+    })
   }
 
   trackByDescriptorId(index: number, entry: {descriptor: SlotDescriptor}): string {
