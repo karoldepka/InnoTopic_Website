@@ -89,6 +89,10 @@ export class AiBackendService {
     return this.http.get<ExistingCategoriesResponse>(this.apiUrl('/categories/existing'));
   }
 
+  post<T>(path: string, body: unknown): Observable<T> {
+    return this.http.post<T>(this.apiUrl(path), body);
+  }
+
   generateCategoryTree(request: CategoryTreeRequest): Observable<CategoryTreeResponse> {
     return this.http.post<CategoryTreeResponse>(this.apiUrl('/category-tree'), request);
   }

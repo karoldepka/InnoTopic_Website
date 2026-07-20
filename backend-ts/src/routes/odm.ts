@@ -1,7 +1,7 @@
 import { Hono } from 'hono';
 import postgres from 'postgres';
-import type { OdmSaveRequest, OdmDeleteRequest, OdmSearchRequest, EmbeddingRequest } from '../types.js';
-import { createEmbedding, EMBEDDING_DIMENSIONS, EMBEDDING_MODEL, toPgVector } from '../embeddings.js';
+import type { OdmSaveRequest, OdmDeleteRequest, OdmSearchRequest, EmbeddingRequest, EmbeddingBatchRequest } from '../types.js';
+import { createEmbedding, createEmbeddings, EMBEDDING_DIMENSIONS, EMBEDDING_MODEL, toPgVector } from '../embeddings.js';
 
 export const odmRouter = new Hono();
 
@@ -12,6 +12,18 @@ odmRouter.post('/api/embeddings', async c => {
   const embedding = await createEmbedding(body.text);
   return c.json({ embedding, model: EMBEDDING_MODEL, dimensions: EMBEDDING_DIMENSIONS });
 });
+
+async function handleEmbeddingBatch(c: import('hono').Context) {
+  const body = await c.req.json<EmbeddingBatchRequest>();
+  if (!Array.isArray(body.texts) || !body.texts.length) return c.json({ error: 'texts required' }, 400);
+  if (body.texts.length > 100) return c.json({ error: 'at most 100 texts per request' }, 400);
+
+  const embeddings = await createEmbeddings(body.texts);
+  return c.json({ embeddings, model: EMBEDDING_MODEL, dimensions: EMBEDDING_DIMENSIONS });
+}
+
+odmRouter.post('/api/embeddings/batch', handleEmbeddingBatch);
+odmRouter.post('/ai-api/embeddings/batch', handleEmbeddingBatch);
 
 let _sql: ReturnType<typeof postgres> | null = null;
 
@@ -45,7 +57,7 @@ async function ensureTables() {
       on public.odm_items (owner, collection, when_last_modified desc)
   `;
   await sql`create extension if not exists vector`;
-  await sql`alter table public.odm_items add column if not exists embedding vector(1536)`;
+  await sql`alter table public.odm_items add column if not exists embedding vector(768)`;
   await sql`alter table public.odm_items add column if not exists embedding_text text`;
   await sql`alter table public.odm_items add column if not exists embedding_model text`;
   await sql`

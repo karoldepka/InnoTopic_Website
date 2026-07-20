@@ -18,13 +18,48 @@ create table if not exists public.odm_items (
 );
 
 alter table public.odm_items
-  add column if not exists embedding extensions.vector(1536),
+  add column if not exists embedding extensions.vector(768),
   add column if not exists embedding_text text,
   add column if not exists embedding_model text;
 
 create index if not exists odm_items_embedding_hnsw_idx
   on public.odm_items using hnsw (embedding extensions.vector_cosine_ops)
   where embedding is not null and when_deleted is null;
+
+-- Semantic duplicate lookup for generated Learn Q&A. SECURITY INVOKER keeps normal RLS in
+-- force; the explicit Firebase-sub predicate is defense in depth and helps the vector planner
+-- filter before ranking. No caller-supplied owner is accepted.
+create or replace function public.match_learn_item_questions(
+  query_embedding extensions.vector(768),
+  match_threshold double precision default 0.92,
+  match_count integer default 3
+)
+returns table (
+  item_id text,
+  question text,
+  similarity double precision
+)
+language sql
+stable
+security invoker
+set search_path = ''
+as $$
+  select
+    item.id,
+    item.embedding_text,
+    1 - (item.embedding <=> query_embedding) as similarity
+  from public.odm_items as item
+  where item.collection = 'LearnItem'
+    and item.owner = (select auth.jwt() ->> 'sub')
+    and item.when_deleted is null
+    and item.embedding is not null
+    and 1 - (item.embedding <=> query_embedding) >= match_threshold
+  order by item.embedding <=> query_embedding
+  limit least(greatest(match_count, 1), 20);
+$$;
+
+revoke all on function public.match_learn_item_questions(extensions.vector, double precision, integer) from public, anon;
+grant execute on function public.match_learn_item_questions(extensions.vector, double precision, integer) to authenticated;
 
 create index if not exists odm_items_owner_collection_modified_idx
   on public.odm_items (owner, collection, when_last_modified desc);
