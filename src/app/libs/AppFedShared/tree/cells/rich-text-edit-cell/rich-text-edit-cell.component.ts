@@ -5,7 +5,7 @@ import {RichTextEditComponent} from '../../../rich-text/rich-text-edit/rich-text
 import {VoiceMemoFieldComponent} from '../../../audio/voice-memo-field/voice-memo-field.component'
 import {AbstractCellComponent} from '../../../AbstractCellComponent'
 import {fieldVirtualNodeId} from '../SlotDescriptor'
-import {createChildUnderSlot} from '../../BareSlotChildren'
+import {FieldVoiceMemoChildController} from '../../BareSlotChildren'
 
 /** The one rich-text cell for all of LifeSuite (GH #89) - Journal/Learn's unified slots render
  * this for any `kind: 'text'` `SlotDescriptor`. OrYoL's tree still has its own parallel
@@ -105,10 +105,16 @@ export class RichTextEditCellComponent extends AbstractCellComponent {
    * transcript." (GH #89) - a real child of this cell's item, anchored under this field's
    * fabricated virtual-node id via `manualAncestorIds` (see `BareSlotChildren.ts`), not spliced
    * into this field's own rich-text value (unlike OrYoL's `OryRichTextCellComponent`, which still
-   * inserts inline - not yet migrated onto this shared cell, see class doc comment). */
-  onTranscriptReady(transcript: string) {
-    const targetNodeId = fieldVirtualNodeId(this.cell.treeNode.item$.id as string, this.cell.column.id)
-    createChildUnderSlot(this.cell.treeNode.item$, targetNodeId, {title: transcript} as any)
+   * inserts inline - not yet migrated onto this shared cell, see class doc comment). See
+   * `FieldVoiceMemoChildController`'s doc comment for why the child also ends up owning the
+   * recording itself, live-title-updating included. */
+  private _voiceMemoChildController?: FieldVoiceMemoChildController<any>
+  get voiceMemoChildController(): FieldVoiceMemoChildController<any> {
+    if (!this._voiceMemoChildController) {
+      const targetNodeId = fieldVirtualNodeId(this.cell.treeNode.item$.id as string, this.cell.column.id)
+      this._voiceMemoChildController = new FieldVoiceMemoChildController(this.cell.treeNode.item$, targetNodeId)
+    }
+    return this._voiceMemoChildController
   }
 
   /** Only Journal's 'general' field inherits the one pre-existing legacy single-recording (from

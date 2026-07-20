@@ -12,6 +12,7 @@ import {getNowTimePointSuitableForId, odmTimestampToMillis} from './utils'
 import {BehaviorSubject} from 'rxjs'
 import {debugLog} from '../utils/log'
 import {Injector} from '@angular/core'
+import {NodeOrderer, ORDER_STEP} from './NodeOrderer'
 
 export type UserId = string
 
@@ -96,9 +97,14 @@ export function summarizePatch(patch: any): string {
   }).join(', ')
 }
 
-/** Spacing between sibling `orderNum`s (OrYoL-style). Large gap lets us insert
- * between two neighbours by averaging, without renumbering siblings. */
-export const ODM_ORDER_STEP = 1000 * 1000
+/** Spacing between sibling `orderNum`s. Large gap lets us insert between two neighbours by
+ * averaging, without renumbering siblings. Re-exported from the shared `NodeOrderer` (GH #89's
+ * unify-the-tree-worlds effort - this used to be a separate, duplicate constant) so there's one
+ * canonical value, not two that could drift apart. */
+export const ODM_ORDER_STEP = ORDER_STEP
+
+/** One stateless instance, shared by every `OdmItem$2` - `NodeOrderer` holds no per-call state. */
+const nodeOrderer = new NodeOrderer()
 
 export type OdmItem$2CtorOpts = { createdLocally?: boolean }
 
@@ -930,19 +936,11 @@ export class OdmItem$2<
     })
   }
 
-  /** OrYoL-style fractional ordering: midpoint between neighbours, or one step
-   * beyond a single neighbour, or 0 when there are none. */
+  /** Fractional ordering: midpoint between neighbours, or one step beyond a single neighbour, or
+   * 0 when there are none. Delegates to the shared `NodeOrderer` (GH #89's unify-the-tree-worlds
+   * effort - this used to be a separate reimplementation of OrYoL's identical algorithm). */
   calculateOrderNumBetween(previous: number | nullish, next: number | nullish): number {
-    if ( (previous ?? null) === null && next != null ) {
-      return next - ODM_ORDER_STEP
-    }
-    if ( previous != null && (next ?? null) === null ) {
-      return previous + ODM_ORDER_STEP
-    }
-    if ( (previous ?? null) === null && (next ?? null) === null ) {
-      return 0
-    }
-    return (previous! + next!) / 2
+    return nodeOrderer.calculateNewOrderNumber(previous, next)
   }
 
   /** Create, register and persist a new child item under this one (appended last by
@@ -966,5 +964,112 @@ export class OdmItem$2<
     ) as unknown as TChild
     ;(child as unknown as OdmItem$2<any, any, any, any>).saveNowToDb()
     return child
+  }
+
+  /** Move this item one position earlier among its (first) parent's ordered children - OrYoL's
+   * `ApfNonRootTreeNode.reorderUp()`, generalized to a plain `OdmItem$2` child instead of a
+   * `NodeInclusion`-wrapped tree node. Wraps around to become the last child when already first;
+   * no-op with no parent or as an only child. */
+  reorderUp(): void {
+    const parent = this.parents?.[0] as unknown as OdmItem$2<any, any, any, any> | undefined
+    if (!parent) {
+      return
+    }
+    const ordered = parent.getChildrenOrdered() as unknown as OdmItem$2<any, any, any, any>[]
+    const index = ordered.indexOf(this as unknown as OdmItem$2<any, any, any, any>)
+    if (index < 0 || ordered.length < 2) {
+      return
+    }
+    if (index === 0) {
+      this.reorderBetween(parent, ordered[ordered.length - 1], undefined) // wrap to last
+    } else {
+      this.reorderBetween(parent, ordered[index - 2], ordered[index - 1])
+    }
+  }
+
+  /** Move this item one position later among its (first) parent's ordered children - OrYoL's
+   * `ApfNonRootTreeNode.reorderDown()`, generalized the same way `reorderUp()` is. Wraps around to
+   * become the first child when already last; no-op with no parent or as an only child. */
+  reorderDown(): void {
+    const parent = this.parents?.[0] as unknown as OdmItem$2<any, any, any, any> | undefined
+    if (!parent) {
+      return
+    }
+    const ordered = parent.getChildrenOrdered() as unknown as OdmItem$2<any, any, any, any>[]
+    const index = ordered.indexOf(this as unknown as OdmItem$2<any, any, any, any>)
+    if (index < 0 || ordered.length < 2) {
+      return
+    }
+    if (index === ordered.length - 1) {
+      this.reorderBetween(parent, undefined, ordered[0]) // wrap to first
+    } else {
+      this.reorderBetween(parent, ordered[index + 1], ordered[index + 2])
+    }
+  }
+
+  private reorderBetween(
+    parent: OdmItem$2<any, any, any, any>,
+    previous: OdmItem$2<any, any, any, any> | undefined,
+    next: OdmItem$2<any, any, any, any> | undefined,
+  ): void {
+    const orderNum = parent.calculateOrderNumBetween(previous?.getOrderNum(), next?.getOrderNum())
+    this.patchThrottled({orderNum} as TMemPatch)
+    // Patching this child's own orderNum doesn't itself notify the parent's childrenList$ (a
+    // separate CachedSubject) - force a re-emit so anything deriving a display order from it
+    // (OdmTreeNode.childNodesList$) re-sorts immediately instead of only on the next unrelated
+    // children-list change.
+    parent.childrenList$.reEmit()
+  }
+
+  /** Nest this item one level deeper - becomes the last child of its previous sibling. OrYoL's
+   * `ApfNonRootTreeNode.indentIncrease()`, generalized. No-op if this is already the first child
+   * (no sibling above to become a child of). */
+  indentIncrease(): void {
+    const parent = this.parents?.[0] as unknown as OdmItem$2<any, any, any, any> | undefined
+    if (!parent) {
+      return
+    }
+    const ordered = parent.getChildrenOrdered() as unknown as OdmItem$2<any, any, any, any>[]
+    const index = ordered.indexOf(this as unknown as OdmItem$2<any, any, any, any>)
+    if (index <= 0) {
+      return
+    }
+    this.reparentTo(ordered[index - 1], undefined)
+  }
+
+  /** Un-nest this item one level - becomes a sibling of its current parent, positioned right
+   * after it. OrYoL's `ApfNonRootTreeNode.indentDecrease()`, generalized. No-op if the parent has
+   * no parent of its own (this item is already top-level). */
+  indentDecrease(): void {
+    const parent = this.parents?.[0] as unknown as OdmItem$2<any, any, any, any> | undefined
+    const grandparent = parent?.parents?.[0] as unknown as OdmItem$2<any, any, any, any> | undefined
+    if (!parent || !grandparent) {
+      return
+    }
+    this.reparentTo(grandparent, parent)
+  }
+
+  /** Re-parents this item onto `newParent`, positioned right after `afterSibling` (or last, if
+   * omitted). Sets `.parents` directly so the very next `patchThrottled()`/save picks up the new
+   * `parentIds` via the existing `setIdAndWhenCreatedIfNecessary()` logic - no separate field
+   * needed. Updates both parents' locally-cached `childrenList$` immediately (removed from the
+   * old one, added to the new one via `onChildrenAddedLocally()` - the same "wired in immediately
+   * for snappy UX" pattern `createChild()` already uses) rather than waiting on a full reload. */
+  private reparentTo(newParent: OdmItem$2<any, any, any, any>, afterSibling: OdmItem$2<any, any, any, any> | undefined): void {
+    const orderedNewSiblings = newParent.getChildrenOrdered() as unknown as OdmItem$2<any, any, any, any>[]
+    const afterIndex = afterSibling ? orderedNewSiblings.indexOf(afterSibling) : -1
+    const previous = afterIndex >= 0 ? orderedNewSiblings[afterIndex] : orderedNewSiblings[orderedNewSiblings.length - 1]
+    const next = afterIndex >= 0 ? orderedNewSiblings[afterIndex + 1] : undefined
+    const orderNum = newParent.calculateOrderNumBetween(previous?.getOrderNum(), next?.getOrderNum())
+
+    const oldParent = this.parents?.[0] as unknown as OdmItem$2<any, any, any, any> | undefined
+    if (oldParent && oldParent !== newParent) {
+      oldParent.childrenList$.nextWithCache(
+        (oldParent.childrenList$.lastVal ?? []).filter(child => child !== (this as unknown as OdmItem$2<any, any, any, any>)),
+      )
+    }
+    this.parents = [newParent as unknown as TParent]
+    this.patchThrottled({orderNum} as TMemPatch)
+    newParent.onChildrenAddedLocally([this as unknown as TSelf])
   }
 }

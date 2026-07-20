@@ -25,9 +25,22 @@
   }
 </div>
 
-<app-voice-memo-field
-  [item$]="cell.treeNode.item$"
-  [fieldId]="cell.column.id"
-  [includeLegacy]="includeLegacyRecording"
-  (transcriptReady)="onTranscriptReady($event)"
-></app-voice-memo-field>
+@if (includeLegacyRecording) {
+  <!-- Journal's 'general' field only - keeps recording on the parent item itself (not a child)
+    so the pre-unification legacy single-recording lookup (keyed to the parent) still works;
+    still creates a title-only child from the transcript via the same shared controller. -->
+  <app-voice-memo-field
+    [item$]="cell.treeNode.item$"
+    [fieldId]="cell.column.id"
+    [includeLegacy]="true"
+    (transcriptReady)="voiceMemoChildController.onTranscriptReady($event)"
+  ></app-voice-memo-field>
+} @else {
+  <app-voice-memo-field
+    [fieldId]="'note'"
+    [createItemIfMissing]="voiceMemoChildController.createChild"
+    [createItemEagerlyOnRecordStart]="true"
+    (interimTranscriptChanged)="voiceMemoChildController.onInterimTranscriptChanged($event)"
+    (transcriptReady)="voiceMemoChildController.onTranscriptReady($event)"
+  ></app-voice-memo-field>
+}

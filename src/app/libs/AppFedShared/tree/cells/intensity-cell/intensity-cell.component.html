@@ -6,8 +6,10 @@
     (numericValue)="onValueChanged($event)"
   />
   <app-voice-memo-field
-    [item$]="cell.treeNode.item$"
-    [fieldId]="cell.column.id"
-    (transcriptReady)="onTranscriptReady($event)"
+    [fieldId]="'note'"
+    [createItemIfMissing]="voiceMemoChildController.createChild"
+    [createItemEagerlyOnRecordStart]="true"
+    (interimTranscriptChanged)="voiceMemoChildController.onInterimTranscriptChanged($event)"
+    (transcriptReady)="voiceMemoChildController.onTranscriptReady($event)"
   ></app-voice-memo-field>
 </div>

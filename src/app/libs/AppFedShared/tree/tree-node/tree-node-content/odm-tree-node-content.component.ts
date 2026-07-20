@@ -7,6 +7,7 @@ import {getDictionaryValuesAsArray, setIdsFromKeys} from '../../../utils/diction
 import { PopoverController, IonicModule } from '@ionic/angular'
 import {OdmTreeNodePopupComponent} from '../odm-tree-node-popup/odm-tree-node-popup.component'
 import {RichTextEditCellComponent} from '../../cells/rich-text-edit-cell/rich-text-edit-cell.component'
+import {VoiceMemoFieldComponent} from '../../../audio/voice-memo-field/voice-memo-field.component'
 import { AsyncPipe, NgIf } from '@angular/common';
 
 
@@ -25,7 +26,12 @@ export function column(colDesc: any) {
  * (template application, task/category type-switching, `getRouterLinkUrl()`) and would either
  * misbehave or create a wrong-typed child if opened for a non-Learn node. Genericizing that popup
  * too is a separate, larger piece of work, deliberately not attempted here - hiding it is the
- * safe default until it is. */
+ * safe default until it is.
+ *
+ * Also renders its own `<app-voice-memo-field>` (`fieldId: 'note'`, matching
+ * `FieldVoiceMemoChildController`'s convention) - a voice-memo-created child (the main new
+ * reason any `OdmItem$2` besides a `LearnItem` ends up here at all) needs somewhere to actually
+ * show/play the recording that created it, not just its transcript-derived title. */
 @Component({
     selector: 'app-tree-node-content',
     templateUrl: './odm-tree-node-content.component.html',
@@ -34,6 +40,7 @@ export function column(colDesc: any) {
     imports: [
         IonicModule,
         RichTextEditCellComponent,
+        VoiceMemoFieldComponent,
         AsyncPipe,
         NgIf,
     ],
@@ -116,5 +123,30 @@ export class OdmTreeNodeContentComponent implements OnInit {
 
   focusTitle() {
     this.titleCell.focus()
+  }
+
+  /** Ctrl+ArrowUp/Down and Tab/Shift+Tab, matching OrYoL's own `NodeContentComponent` bindings
+   * for muscle-memory parity (GH #89 unify-the-tree-worlds effort) - both now call the exact same
+   * `OdmItem$2.reorderUp()`/`indentIncrease()` etc. built on the shared `NodeOrderer`. `Tab`'s
+   * default (move focus to the next form control) has to be suppressed, or indenting would also
+   * shift focus away from this row. */
+  reorderUp(event: Event) {
+    event.preventDefault()
+    this.treeNode.item$.reorderUp()
+  }
+
+  reorderDown(event: Event) {
+    event.preventDefault()
+    this.treeNode.item$.reorderDown()
+  }
+
+  indentIncrease(event: Event) {
+    event.preventDefault()
+    this.treeNode.item$.indentIncrease()
+  }
+
+  indentDecrease(event: Event) {
+    event.preventDefault()
+    this.treeNode.item$.indentDecrease()
   }
 }

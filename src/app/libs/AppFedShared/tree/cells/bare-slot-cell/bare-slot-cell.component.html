@@ -31,9 +31,11 @@
         <ion-icon name="add-outline" slot="icon-only"></ion-icon>
       </ion-button>
       <app-voice-memo-field
-        [item$]="parentItem$"
-        [fieldId]="descriptorId"
-        (transcriptReady)="onTranscriptReady($event)"
+        [fieldId]="'note'"
+        [createItemIfMissing]="voiceMemoChildController.createChild"
+        [createItemEagerlyOnRecordStart]="true"
+        (interimTranscriptChanged)="voiceMemoChildController.onInterimTranscriptChanged($event)"
+        (transcriptReady)="voiceMemoChildController.onTranscriptReady($event)"
       ></app-voice-memo-field>
     </div>
   }

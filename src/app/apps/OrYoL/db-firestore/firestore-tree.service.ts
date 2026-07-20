@@ -13,7 +13,7 @@ import { FirestoreAllItemsLoader } from './firestore-all-items-loader'
 import { FIXME } from '../utils/log'
 import {FirestoreAllInclusionsSyncer, loadArchivedItems} from './FirestoreAllInclusionsSyncer'
 import { ChildrenChangesEvent } from '../tree-model/children-changes-event'
-import { NodeOrderer } from '../tree-model/node-orderer'
+import { NodeOrderer } from '../../../libs/AppFedShared/odm/NodeOrderer'
 import { TimeStamper } from '../tree-model/TimeStamper'
 import {nullish} from '../../../libs/AppFedShared/utils/type-utils'
 import {

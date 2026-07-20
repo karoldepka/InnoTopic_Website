@@ -6,7 +6,7 @@ import {Observable} from 'rxjs'
 import {map} from 'rxjs/operators'
 import {OdmItem$2} from '../../../odm/OdmItem$2'
 import {odmTimestampToMillis} from '../../../odm/utils'
-import {createChildUnderSlot, getBareSlotChildren$} from '../../BareSlotChildren'
+import {createChildUnderSlot, FieldVoiceMemoChildController, getBareSlotChildren$} from '../../BareSlotChildren'
 import {VoiceMemoFieldComponent} from '../../../audio/voice-memo-field/voice-memo-field.component'
 import {DatePipe} from '@angular/common'
 import {OdmTreeNode} from '../../tree-node/OdmTreeNode'
@@ -64,7 +64,14 @@ export class BareSlotCellComponent implements OnChanges {
    * and remount `app-tree-node` on every unrelated reactive update (e.g. a sibling child's edit). */
   private treeNodeCache = new Map<string, OdmTreeNode<OdmItem$2<any, any, any, any>>>()
 
+  /** GH #89's voice-memo-becomes-a-child wiring, shared with every other cell kind - see
+   * `FieldVoiceMemoChildController`'s doc comment. A bare slot's own "add" row already targets
+   * this exact slot (`targetNodeId`), so unlike the other cells' controllers (which derive their
+   * own target from a `dataFieldKey`), this one is just handed straight through. */
+  voiceMemoChildController!: FieldVoiceMemoChildController<any>
+
   ngOnChanges(): void {
+    this.voiceMemoChildController = new FieldVoiceMemoChildController(this.parentItem$, this.targetNodeId)
     this.children$ = getBareSlotChildren$(this.parentItem$, this.targetNodeId)
     this.summary$ = this.children$.pipe(
       map(children => {
@@ -96,13 +103,6 @@ export class BareSlotCellComponent implements OnChanges {
     }
     createChildUnderSlot(this.parentItem$, this.targetNodeId, {title} as any)
     this.newChildTitle = ''
-  }
-
-  /** Same "voice note -> new sub-node" behavior as `MinMidMaxCellComponent`/
-   * `RichTextEditCellComponent` (GH #89) - a bare slot already groups real children by this
-   * exact mechanism, so recording directly onto it is just `createChildUnderSlot()` again. */
-  onTranscriptReady(transcript: string): void {
-    createChildUnderSlot(this.parentItem$, this.targetNodeId, {title: transcript} as any)
   }
 
 }

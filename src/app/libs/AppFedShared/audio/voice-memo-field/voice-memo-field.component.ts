@@ -54,10 +54,22 @@ export class VoiceMemoFieldComponent implements OnInit, OnDestroy, ActiveMicHold
   @Input() includeLegacy = false
 
   /** Quick-add's "no current item yet" case (generalizes MicComponent's original hardcoded
-   * "create a new LearnItem" behavior). Called lazily right when recording stops, so a blank item
-   * isn't created just because the user tapped the mic and then changed their mind. Left unset
-   * everywhere else, which already has a real item$ to record onto. */
+   * "create a new LearnItem" behavior). Called lazily right when recording stops (unless
+   * `createItemEagerlyOnRecordStart` is set - see below), so a blank item isn't created just
+   * because the user tapped the mic and then changed their mind. Left unset everywhere else,
+   * which already has a real item$ to record onto. */
   @Input() createItemIfMissing?: () => VoiceAttachableItem
+
+  /** Opt-in: calls `createItemIfMissing` as soon as recording *starts* instead of waiting for it
+   * to stop, so the very same item ends up owning both the live-updating title
+   * (`interimTranscriptChanged`, only meaningful once something exists to patch) and the actual
+   * recording, rather than the recording attaching to a different (or no) item than whatever a
+   * caller does with the transcript. `FieldVoiceMemoChildController` (`BareSlotChildren.ts`) is
+   * the intended pairing - GH #89's unify-the-tree-worlds "voice memo becomes a real child node"
+   * flow. Ignored (has no effect) when `createItemIfMissing` isn't also set. Defaults to `false`
+   * so existing lazy-at-stop callers (Learn's quick-add bar) are unaffected - creating an item
+   * just because the mic was tapped, before any audio exists, would be wrong there. */
+  @Input() createItemEagerlyOnRecordStart = false
 
   /** Emits the live-transcribed text (via the browser's Web Speech API) once recognition ends,
    * shortly after the recording stops. Only fires when the browser supports SpeechRecognition
@@ -65,6 +77,13 @@ export class VoiceMemoFieldComponent implements OnInit, OnDestroy, ActiveMicHold
    * this as a best-effort addition, not something every recording is guaranteed to produce. The
    * caller decides how to splice the text into its own field (rich text vs. a plain textarea). */
   @Output() transcriptReady = new EventEmitter<string>()
+
+  /** Live, not-yet-final transcript text as it's recognized - the same value bound to
+   * `interimTranscript` in this component's own template (for showing transcription live while
+   * recording), just also surfaced to callers who want to reflect it somewhere of their own (e.g.
+   * a real tree node's title, live). Only fires in `browser-native` transcription mode - the only
+   * mode with interim results at all (see `interimTranscript`'s doc comment). */
+  @Output() interimTranscriptChanged = new EventEmitter<string>()
 
   isRecording = false
   playingBlobId?: string
@@ -221,6 +240,9 @@ export class VoiceMemoFieldComponent implements OnInit, OnDestroy, ActiveMicHold
       this.changeDetectorRef.markForCheck()
       return
     }
+    if (this.createItemEagerlyOnRecordStart && !this.item$ && this.createItemIfMissing) {
+      this.item$ = this.createItemIfMissing()
+    }
     this.isRecording = true
     this.recordingStartedAtMs = Date.now()
     this.recordingElapsedSec = 0
@@ -289,6 +311,13 @@ export class VoiceMemoFieldComponent implements OnInit, OnDestroy, ActiveMicHold
         }
       }
       this.interimTranscript = interim
+      // Same concatenation this component's own template shows live (transcriptSoFar + the
+      // not-yet-final interim tail) - a caller patching a title from just the interim part alone
+      // would see it visually reset/shrink each time a word gets finalized.
+      const combined = (this.transcriptSoFar + interim).trim()
+      if (combined) {
+        this.interimTranscriptChanged.emit(combined)
+      }
       this.changeDetectorRef.markForCheck()
     }
     this.speechRecognition.onerror = (event: any) => {
