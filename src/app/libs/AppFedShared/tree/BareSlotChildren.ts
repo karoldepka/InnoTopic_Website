@@ -67,7 +67,16 @@ export function createChildUnderSlot<TOdmItem$ extends OdmItem$2<any, any, any, 
  *     results at all).
  * One controller instance per field (a cell keeps one for its lifetime) - a second recording on
  * the same field continues patching the same child rather than creating another one, matching
- * `VoiceMemoFieldComponent`'s own `item$`-persists-for-the-component's-lifetime semantics. */
+ * `VoiceMemoFieldComponent`'s own `item$`-persists-for-the-component's-lifetime semantics.
+ *
+ * `onChildCreated` is an optional escape hatch for a caller that needs to do something extra
+ * once the child exists - deliberately just a callback rather than this class knowing about any
+ * specific app. OrYoL is the one current user (GH #89 unify-the-tree-worlds Tier 2): a bare-slot
+ * child under an OrYoL field should *also* become a real row in OrYoL's own primary tree, which
+ * needs `SupabaseTreeService.createInclusionForExistingItem()` - an `apps/OrYoL/`-layer service
+ * this `libs/AppFedShared/`-layer class must not import directly. `TreeNodeMenuPopoverComponent`
+ * (which already knows it's OrYoL) supplies the hook instead, threaded down through
+ * `TreeNodeCellsComponent`/`BareSlotCellComponent`'s own optional `@Input()`s. */
 export class FieldVoiceMemoChildController<TOdmItem$ extends OdmItem$2<any, any, any, any>> {
 
   private child?: TOdmItem$
@@ -75,11 +84,13 @@ export class FieldVoiceMemoChildController<TOdmItem$ extends OdmItem$2<any, any,
   constructor(
     private parentItem$: TOdmItem$,
     private targetNodeId: string,
+    private onChildCreated?: (child: TOdmItem$) => void,
   ) {
   }
 
   createChild = (): TOdmItem$ => {
     this.child = createChildUnderSlot(this.parentItem$, this.targetNodeId, {})
+    this.onChildCreated?.(this.child)
     return this.child
   }
 

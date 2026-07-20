@@ -34,12 +34,27 @@ export class OdmInMemItemWriteOnce {
   public whenArchived?: OdmTimestamp | null
   public owner?: UserId
   public parentIds?: string[]
+  /** Full ancestor-id path (root..self, exclusive of self) - persisted explicitly (not purely
+   * derived at read time) so the `ancestor_ids`-containment query (`.contains([nodeId])`) can
+   * fetch a whole displayable subtree in one request without needing every ancestor loaded
+   * client-side first. Kept in sync with `inclusionsByParentId`/`parentIds` by
+   * `setIdAndWhenCreatedIfNecessary()` via `getAncestorIds()`. */
+  public ancestorIds?: string[]
   /** Extra `ancestorIds` entries beyond the real parent chain `getAncestorIds()` already walks -
    * currently just the bare-slot mechanism (GH #89): a child "created under" a fabricated/virtual
    * slot id (e.g. `abcdefgh_field_plan`) stays a completely normal child of its real parent
    * (`parentIds` unchanged) with the slot id appended here, so it's reachable via the exact same
    * `ancestorIds`-containment query as any other descendant - see `BareSlotChildren.ts`. */
   public manualAncestorIds?: string[]
+  /** GH #89 unify-the-tree-worlds: a parent-child relationship (and its sibling order under that
+   * specific parent), embedded directly on the child instead of living in a separate "inclusion"
+   * row/collection (OrYoL's old `NodeInclusion` model). Keyed by parent item id - most items have
+   * exactly one key; an item included under several different parents at once (OrYoL's multi-
+   * parent support) has one entry per parent, each with its own independent order. This is the
+   * source of truth `getParentIds()`/`getAncestorIds()` derive from when present (see below) -
+   * `parentIds`/`ancestorIds` stay as real persisted columns for containment queries, but are
+   * always recomputed from this map, never edited independently. */
+  public inclusionsByParentId?: Record<string, {orderNum: number}>
 }
 
 /** FIXME: rename OdmInMemItemData */
@@ -276,14 +291,50 @@ export class OdmItem$2<
     this.currentVal ! . owner = this.odmService.authService.authUser$?.lastVal?.uid
     this.currentVal ! . whenCreated = this.currentVal ! . whenCreated || OdmBackend.nowTimestamp()
     /* FIXME move to smth like setMetadata(): */
-    this.currentVal ! . parentIds = this.parents?.filter(
-      p => p.id /* FIXME this is a hack if parent was not saved yet (didn't get id yet) */
-    )?.map(p => p.id as string) ?? [] /* FIXME: on the loading/receiving side, the this.parents are not set in-mem? */
+    // Always derived from getParentIds()/getAncestorIds() (not reimplemented here) so a
+    // subclass override (e.g. explicit-parent-id items) and the persisted `parentIds`/
+    // `ancestorIds` fields can never silently diverge - see inclusionsByParentId's doc comment.
+    this.currentVal ! . parentIds = this.getParentIds() as string[]
+    this.currentVal ! . ancestorIds = this.getAncestorIds() as string[]
 
     if ( ! this.id ) {
       this.id = this.generateItemId()
       // this.currentVal.id = this.id
     }
+  }
+
+  /** GH #89 unify-the-tree-worlds: records (or updates the order of) a parent-child relationship
+   * directly on this item, replacing OrYoL's old separate-row `NodeInclusion` model. `parentItem$`
+   * must already be loaded (true by construction - you can't attach a child under a parent you
+   * don't have in memory), so `getAncestorIds()` can walk it immediately without a network round
+   * trip. Caller is responsible for persisting afterward (`saveNowToDb()`/`patchNow()`). */
+  setParentInclusion(parentItem$: TParent, orderNum: number): void {
+    this.currentVal ??= {} as TInMemData
+    const parentId = parentItem$.id as string
+    const inclusions = {...(this.currentVal.inclusionsByParentId ?? {})}
+    inclusions[parentId] = {orderNum}
+    this.currentVal.inclusionsByParentId = inclusions
+    if (!this.parents?.some(p => p.id === parentId)) {
+      this.parents = [...(this.parents ?? []), parentItem$]
+    }
+  }
+
+  /** Removes this item from one specific parent (the multi-parent-aware counterpart of
+   * `setParentInclusion()`) - e.g. a move/reparent removes the old parent then adds the new one. */
+  removeParentInclusion(parentId: string): void {
+    if (!this.currentVal?.inclusionsByParentId) {
+      return
+    }
+    const inclusions = {...this.currentVal.inclusionsByParentId}
+    delete inclusions[parentId]
+    this.currentVal.inclusionsByParentId = inclusions
+    this.parents = this.parents?.filter(p => p.id !== parentId)
+  }
+
+  /** Sibling order under one specific parent - falls back to the legacy flat `orderNum` scalar
+   * for items not using `inclusionsByParentId` (single-parent generic items, unchanged). */
+  getOrderNumUnderParent(parentId: string): number | undefined {
+    return this.currentVal?.inclusionsByParentId?.[parentId]?.orderNum ?? this.currentVal?.orderNum
   }
 
   private generateItemId(): TItemId {
@@ -692,6 +743,10 @@ export class OdmItem$2<
 
 
   public getParentIds(): TItemId[] {
+    if ( this.currentVal?.inclusionsByParentId ) {
+      return Object.keys(this.currentVal.inclusionsByParentId) as TItemId[]
+    }
+
     if ( this.parents ) {
       return this.parents.map(parent => parent.id! as TItemId)
     }
@@ -707,7 +762,7 @@ export class OdmItem$2<
       return [] as TItemId[]
     }
 
-    if ( appGlobals.feat.categoriesTree.showFixmes ) {
+    if ( appGlobals?.feat?.categoriesTree?.showFixmes ) {
       console.error('Item$ has no parent metadata; treating as top-level item.', this)
     }
     return [] as TItemId[]

@@ -33,6 +33,7 @@ import {environment} from '../../../../../environments/environment'
 import {ORYOL_SLOT_DESCRIPTORS, getSlotIdsForTemplate} from '../../models/OrYoLSlotDescriptors'
 import {OryOdmItemsService} from '../../db-supabase/ory-odm-items.service'
 import {OryOdmItem$} from '../../db-supabase/OryOdmItem$'
+import {SupabaseTreeService} from '../../db-supabase/supabase-tree.service'
 import {OdmTreeNode} from '../../../../libs/AppFedShared/tree/tree-node/OdmTreeNode'
 import {TreeNodeCellsComponent} from '../../../../libs/AppFedShared/tree/tree-node/tree-node-content/tree-node-cells/tree-node-cells.component'
 
@@ -87,6 +88,7 @@ export class TreeNodeMenuPopoverComponent implements OnInit {
     private sharesService: OrySubtreeSharesService,
     private authService: AuthService,
     private oryOdmItemsService: OryOdmItemsService,
+    private supabaseTreeService: SupabaseTreeService,
   ) { }
 
   ngOnInit() {
@@ -94,6 +96,19 @@ export class TreeNodeMenuPopoverComponent implements OnInit {
       this.loadShares()
     }
     this.slotTreeNode = new OdmTreeNode(undefined, this.oryOdmItemsService.obtainItem$ById(this.treeNode.itemId as any))
+  }
+
+  /** GH #89 unify-the-tree-worlds Tier 2 - passed to `<app-tree-node-cells>` as
+   * `[onSlotChildCreated]`, so a voice-memo-created (or typed) bare-slot child under one of this
+   * node's day-plan-template fields also becomes a real row in OrYoL's own primary tree, not just
+   * grouped under its field here in the popover (via the existing `manualAncestorIds` query,
+   * unaffected either way). Reuses `sharingAvailable` (really just "is the Supabase backend
+   * active") - under Firestore there's no ODM-backed `NodeInclusion` concept to create at all. */
+  createRealNodeInclusionForSlotChild = (child: {id?: string | null}): void => {
+    if (!this.sharingAvailable || !child?.id) {
+      return
+    }
+    this.supabaseTreeService.createInclusionForExistingItem(this.treeNode, child.id)
   }
 
   /** Only the item's owner can grant a share - RLS enforces this server-side regardless, but

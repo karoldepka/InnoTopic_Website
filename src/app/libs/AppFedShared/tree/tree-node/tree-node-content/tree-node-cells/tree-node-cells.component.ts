@@ -57,6 +57,12 @@ export class TreeNodeCellsComponent implements OnChanges, OnInit, OnDestroy {
   @Output()
   aiFillRequested = new EventEmitter<SlotDescriptor>()
 
+  /** Pass-through to every `kind: 'slot'` cell's own `BareSlotCellComponent.onChildCreated` -
+   * see `FieldVoiceMemoChildController`'s doc comment. Only OrYoL's `TreeNodeMenuPopoverComponent`
+   * currently supplies this. */
+  @Input()
+  onSlotChildCreated?: (child: any) => void
+
   cells: Array<{descriptor: SlotDescriptor, cell?: OdmCell, targetNodeId: string, timeTrackItem$: VirtualSlotState$}> = []
 
   /** Which cell's comment thread is expanded - at most one at a time, mirroring the numeric

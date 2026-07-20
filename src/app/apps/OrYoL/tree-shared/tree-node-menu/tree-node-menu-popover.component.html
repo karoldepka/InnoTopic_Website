@@ -27,6 +27,7 @@
     *ngIf="slotTreeNode"
     [treeNode]="slotTreeNode"
     [descriptors]="slotDescriptors"
+    [onSlotChildCreated]="createRealNodeInclusionForSlotChild"
   ></app-tree-node-cells>
 
   <!--<ion-button-->

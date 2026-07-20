@@ -51,6 +51,7 @@
           [parentItem$]="treeNode.item$"
           [targetNodeId]="entry.targetNodeId"
           [descriptorId]="entry.descriptor.id"
+          [onChildCreated]="onSlotChildCreated"
         ></app-bare-slot-cell>
       }
     }
@@ -58,8 +59,12 @@
     @if (entry.descriptor.kind !== 'slot') {
       <!-- Recording a voice memo on this field creates a real child here (see
         MinMidMaxCellComponent/RichTextEditCellComponent/IntensityCellComponent's own
-        onTranscriptReady()) - list it read-only (no second add-input/voice-memo button, this
-        field's own widget above already has one). -->
+        voiceMemoChildController) - list it read-only (no second add-input/voice-memo button,
+        this field's own widget above already has one). This is a SEPARATE
+        FieldVoiceMemoChildController instance from the cell's own, so onSlotChildCreated isn't
+        wired here - it wouldn't fire anyway (nothing creates children through this embed's own
+        controller). OrYoL only uses kind: 'slot' today, so this gap doesn't matter yet; wire it
+        the same way the 'slot' case below does if that ever changes. -->
       <app-bare-slot-cell
         [parentItem$]="treeNode.item$"
         [targetNodeId]="entry.targetNodeId"

@@ -48,6 +48,12 @@ export class BareSlotCellComponent implements OnChanges {
    * would just be a confusing duplicate. */
   @Input() showAddInput = true
 
+  /** Optional escape hatch for a caller that needs to do something extra once a real child of
+   * this slot exists (voice-created or typed via `addChild()` below) - see
+   * `FieldVoiceMemoChildController`'s doc comment. Only OrYoL's `TreeNodeMenuPopoverComponent`
+   * currently supplies this. */
+  @Input() onChildCreated?: (child: OdmItem$2<any, any, any, any>) => void
+
   children$?: Observable<OdmItem$2<any, any, any, any>[]>
 
   /** GH #89's "descendantsCount"/"whenDescendantLastModified" rollup, scoped to just this bare
@@ -71,7 +77,7 @@ export class BareSlotCellComponent implements OnChanges {
   voiceMemoChildController!: FieldVoiceMemoChildController<any>
 
   ngOnChanges(): void {
-    this.voiceMemoChildController = new FieldVoiceMemoChildController(this.parentItem$, this.targetNodeId)
+    this.voiceMemoChildController = new FieldVoiceMemoChildController(this.parentItem$, this.targetNodeId, this.onChildCreated)
     this.children$ = getBareSlotChildren$(this.parentItem$, this.targetNodeId)
     this.summary$ = this.children$.pipe(
       map(children => {
@@ -101,7 +107,8 @@ export class BareSlotCellComponent implements OnChanges {
     if (!title) {
       return
     }
-    createChildUnderSlot(this.parentItem$, this.targetNodeId, {title} as any)
+    const child = createChildUnderSlot(this.parentItem$, this.targetNodeId, {title} as any)
+    this.onChildCreated?.(child)
     this.newChildTitle = ''
   }
 
