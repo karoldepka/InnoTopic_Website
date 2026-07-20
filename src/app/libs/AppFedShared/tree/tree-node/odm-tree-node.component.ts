@@ -1,9 +1,7 @@
 import {Component, Input, OnInit, ChangeDetectionStrategy, forwardRef, ViewChild, ViewChildren, QueryList} from '@angular/core';
 import {OdmTreeNode} from './OdmTreeNode'
 import {OdmItem$2} from '../../odm/OdmItem$2'
-import {OdmService2} from '../../odm/OdmService2'
 import {AuthService} from '../../../../auth/auth.service'
-import {LearnItem} from '../../../../apps/Learn/models/LearnItem'
 import { ToastController, IonicModule } from '@ionic/angular'
 import { OdmTreeNodeContentComponent } from './tree-node-content/odm-tree-node-content.component';
 import { NgIf, NgFor, AsyncPipe } from '@angular/common';
@@ -65,20 +63,19 @@ export class OdmTreeNodeComponent implements OnInit {
     })
   }
 
+  /** Generic across whatever collection `treeNode.item$` belongs to (GH #89's unify-the-tree-
+   * rendering effort - this component is no longer Learn-only, see `OdmTreeNodeContentComponent`'s
+   * doc comment) - `OdmItem$2.createChild()` already handles item construction/parenting/saving
+   * the same way every other "add a child" flow in the app does, so this doesn't need to know or
+   * guess the concrete item class the way the old hardcoded `new LearnItem()` did. */
   async addChild() {
     const item$ = this.treeNode.item$
-    const odmService = item$.odmService as OdmService2<any, any, any, any>
-    const newItemData = new LearnItem()
-    newItemData.title = 'New learn item'
-    newItemData.isToLearn = true
-    const newItem = odmService.newItem(undefined, newItemData, [item$], {createdLocally: true})
+    const newItem = item$.createChild({title: 'New item'} as any)
     try {
-      newItem.saveNowToDb()
       this.treeNode.isExpanded = true
       this.focusNewChildTitleWhenRendered(newItem.id)
-      console.log('newItem', newItem)
       const toast = await this.toastController.create({
-        message: 'Draft learn item added.',
+        message: 'Draft item added.',
         duration: 5000,
         color: 'success',
         position: 'bottom',

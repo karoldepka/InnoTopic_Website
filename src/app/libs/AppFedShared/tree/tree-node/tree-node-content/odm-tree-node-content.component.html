@@ -20,6 +20,7 @@
   </ion-button>
 
   <ion-button
+    *ngIf="isLearnItem"
     fill="clear"
     size="small"
     class="node-icon-button"
@@ -34,6 +35,7 @@
   </ion-button>
 
   <ion-button
+    *ngIf="isLearnItem"
     fill="clear"
     size="small"
     class="node-icon-button"
@@ -70,6 +72,7 @@
 </div>
 
 <app-rich-text-edit-cell
+  *ngIf="isLearnItem"
   #answerCell
   [hidden]="((! showAnswer) && !((val$ | async)?.answer)) || (!treeNode.isExpanded)"
   class="tree-answer-cell"

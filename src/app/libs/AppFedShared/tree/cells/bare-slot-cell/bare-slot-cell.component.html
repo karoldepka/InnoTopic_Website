@@ -1,11 +1,11 @@
 <div class="bare-slot">
   @if (children$ | async; as children) {
     @if (children.length > 0) {
-      <ul class="bare-slot__children">
+      <div class="bare-slot__children">
         @for (child of children; track child.id) {
-          <li class="bare-slot__child">{{ getChildTitle(child) }}</li>
+          <app-tree-node [treeNode]="getChildTreeNode(child)"></app-tree-node>
         }
-      </ul>
+      </div>
     }
   }
 

@@ -9,6 +9,8 @@ import {odmTimestampToMillis} from '../../../odm/utils'
 import {createChildUnderSlot, getBareSlotChildren$} from '../../BareSlotChildren'
 import {VoiceMemoFieldComponent} from '../../../audio/voice-memo-field/voice-memo-field.component'
 import {DatePipe} from '@angular/common'
+import {OdmTreeNode} from '../../tree-node/OdmTreeNode'
+import {OdmTreeNodeComponent} from '../../tree-node/odm-tree-node.component'
 
 /** A bare slot (GH #89's `kind: 'slot'` descriptor, e.g. a former OrYoL/Learn template node like
  * "Plan") - no scalar value of its own, just a live-filtered list of the parent's real children
@@ -16,13 +18,21 @@ import {DatePipe} from '@angular/common'
  * to add another. Rendered by `TreeNodeCellsComponent` alongside `MinMidMaxCellComponent`/
  * `RichTextEditCellComponent` for the other two `SlotKind`s - it isn't an `AbstractCellComponent`
  * itself (no single editable value/`OdmCell` to bind), but the comment-thread and time-tracking
- * toggles around it work identically since both key off the same fabricated `targetNodeId`. */
+ * toggles around it work identically since both key off the same fabricated `targetNodeId`.
+ *
+ * Children render via the generic `app-tree-node` (`OdmTreeNodeComponent`) - the same recursive,
+ * expand/collapse tree rendering used elsewhere in the app, unified here instead of a bespoke
+ * flat text list, so a voice-memo-created child (or one added directly here) is a first-class,
+ * navigable/nestable node, not a dead-end label. Deliberately NOT OrYoL's own tree component
+ * (`NestedTreeNodeComponent`) - that one is fused to OrYoL's multi-parent `TreeModel`/
+ * `NodeInclusion` engine and only ever renders `OryBaseTreeNode`s, whereas this cell's children
+ * can be a `GenericItem`/`JournalEntry`/`LearnItem`/`OryItem` alike, all plain `OdmItem$2`s. */
 @Component({
   selector: 'app-bare-slot-cell',
   templateUrl: './bare-slot-cell.component.html',
   changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./bare-slot-cell.component.sass'],
-  imports: [AsyncPipe, DatePipe, FormsModule, IonicModule, VoiceMemoFieldComponent],
+  imports: [AsyncPipe, DatePipe, FormsModule, IonicModule, VoiceMemoFieldComponent, OdmTreeNodeComponent],
 })
 export class BareSlotCellComponent implements OnChanges {
 
@@ -49,6 +59,11 @@ export class BareSlotCellComponent implements OnChanges {
 
   newChildTitle = ''
 
+  /** One `OdmTreeNode` wrapper per child, reused across `children$` re-emissions (keyed by item
+   * id) rather than rebuilt every time - a fresh wrapper each emission would reset `isExpanded`
+   * and remount `app-tree-node` on every unrelated reactive update (e.g. a sibling child's edit). */
+  private treeNodeCache = new Map<string, OdmTreeNode<OdmItem$2<any, any, any, any>>>()
+
   ngOnChanges(): void {
     this.children$ = getBareSlotChildren$(this.parentItem$, this.targetNodeId)
     this.summary$ = this.children$.pipe(
@@ -64,8 +79,14 @@ export class BareSlotCellComponent implements OnChanges {
     )
   }
 
-  getChildTitle(child: OdmItem$2<any, any, any, any>): string {
-    return (child.val as any)?.title ?? (child.val as any)?.name ?? child.id as string
+  getChildTreeNode(child: OdmItem$2<any, any, any, any>): OdmTreeNode<OdmItem$2<any, any, any, any>> {
+    const id = child.id as string
+    let treeNode = this.treeNodeCache.get(id)
+    if (!treeNode) {
+      treeNode = new OdmTreeNode(undefined, child)
+      this.treeNodeCache.set(id, treeNode)
+    }
+    return treeNode
   }
 
   addChild(): void {
