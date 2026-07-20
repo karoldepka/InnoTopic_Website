@@ -29,12 +29,13 @@
   opacity: 0.75
   padding: 4px 8px 0
 
-// An empty cell - a bare slot (kind: 'slot') with no children yet, or an intensity field with no
-// value picked yet - renders as a compact pill instead of a full label+cell row, so several
-// never-filled ones (e.g. right after OrYoL's "Apply Template", or Learn's six always-shortlisted
-// intensity fields before any are rated) flow together instead of stacking into a wall of empty
-// rows/full bucket-picker grids. `flex: 0 0 auto` (not the 100% every other cell gets) is what
-// lets it share a line with its neighbours in the :host flex-wrap container above.
+// Any empty cell - a bare slot (kind: 'slot') with no children yet, or any other kind with no
+// value set yet (a star rating, a bucket picker, or plain text) - renders as a compact pill
+// instead of a full label+cell row, so several never-filled ones (e.g. right after OrYoL's "Apply
+// Template", or Journal/Learn's many always-shortlisted fields before they're filled in) flow
+// together instead of stacking into a wall of empty rows/widgets. `flex: 0 0 auto` (not the 100%
+// every other cell gets) is what lets it share a line with its neighbours in the :host flex-wrap
+// container above.
 .slot-cell--compact
   flex: 0 0 auto
   align-items: center

@@ -64,22 +64,21 @@ export class TreeNodeCellsComponent implements OnChanges, OnInit, OnDestroy {
    * `cells` being rebuilt on an unrelated descriptor-list change. */
   openCommentsForDescriptorId: string | null = null
 
-  /** An empty cell (a bare slot with no children, or an `intensity` field with no value set - e.g.
-   * Learn's "Mental health impact") renders as a small compact button instead of its full row, so
-   * an item with several never-filled slots (right after OrYoL's "Apply Template", or Learn's six
-   * always-shortlisted intensity fields before any are picked) doesn't turn into a wall of empty
-   * rows/full bucket-picker grids - see this component's .sass for the flex-wrap layout that lets
-   * compact buttons flow together and share lines. Only bare slots need tracking here: "has a
-   * value" for an `intensity` field is synchronous (`hasFieldValue()` on the item's own current
-   * val, checked directly in `isCompact()`), but "has children" for a bare slot needs the same
-   * live `getBareSlotChildren$()` query `BareSlotCellComponent` itself uses - see
-   * `syncBareSlotContentSubscriptions()`. */
+  /** An empty cell (a bare slot with no children, or any other kind - numeric/text/intensity - with
+   * no value set, e.g. Journal's `mental_health` or Learn's "Mental health impact") renders as a
+   * small compact button instead of its full row, so an item with several never-filled fields
+   * (right after OrYoL's "Apply Template", or Journal/Learn's many always-shortlisted fields
+   * before they're filled in) doesn't turn into a wall of empty rows/rating widgets - see this
+   * component's .sass for the flex-wrap layout that lets compact buttons flow together and share
+   * lines. Only bare slots need tracking here: "has a value" for every other kind is synchronous
+   * (`hasFieldValue()` on the item's own current val, checked directly in `isCompact()`), but "has
+   * children" for a bare slot needs the same live `getBareSlotChildren$()` query
+   * `BareSlotCellComponent` itself uses - see `syncBareSlotContentSubscriptions()`. */
   bareSlotHasContentIds = new Set<string>()
 
-  /** Once a compact cell (bare slot or intensity field) is clicked open, it stays expanded for the
-   * rest of this component's lifetime even if its content is later removed - collapsing it back
-   * out from under the user mid-edit would be jarring. Reset naturally next time the popover/page
-   * reopens. */
+  /** Once a compact cell is clicked open, it stays expanded for the rest of this component's
+   * lifetime even if its content is later removed - collapsing it back out from under the user
+   * mid-edit would be jarring. Reset naturally next time the popover/page reopens. */
   manuallyExpandedSlotIds = new Set<string>()
 
   private valSubscription?: Subscription
@@ -185,10 +184,11 @@ export class TreeNodeCellsComponent implements OnChanges, OnInit, OnDestroy {
     }
   }
 
-  /** A bare slot with no children, or an `intensity` field with no value, stays a compact button
-   * until either it gains content, or the user explicitly clicks it open. `numeric`/`text` cells
-   * are never compact - they're only ever visible once already filled in (or shortlisted with a
-   * value expected soon), unlike `intensity`'s "always shown so the user can rate it" shortlist. */
+  /** Every cell with no content stays a compact button until either it gains content, or the user
+   * explicitly clicks it open - `isShortListed` (Journal's `mental_health`, Learn's "Mental health
+   * impact", etc.) means "always shown", not "always shown at full size": an unset field is just
+   * as compact-able as an unset bare slot, whether it's a star rating, a bucket picker, or a plain
+   * text box. */
   isCompact(descriptor: SlotDescriptor): boolean {
     if (this.manuallyExpandedSlotIds.has(descriptor.id)) {
       return false
@@ -196,10 +196,7 @@ export class TreeNodeCellsComponent implements OnChanges, OnInit, OnDestroy {
     if (descriptor.kind === 'slot') {
       return !this.bareSlotHasContentIds.has(descriptor.id)
     }
-    if (descriptor.kind === 'intensity') {
-      return !hasFieldValue(this.treeNode.item$.val?.[descriptor.dataFieldKey as string])
-    }
-    return false
+    return !hasFieldValue(this.treeNode.item$.val?.[descriptor.dataFieldKey as string])
   }
 
   expandCompactCell(descriptorId: string): void {
