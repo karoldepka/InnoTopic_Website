@@ -94,8 +94,18 @@ export class VoiceMemoService {
   /** True while at least one field anywhere in the app currently holds an open mic stream -
    * drives the "Release Microphone" action in the sync popover, an escape hatch for a stream
    * left warm-kept (or, in principle, still recording) on a field the user has since navigated
-   * away from and can no longer reach that field's own release button. */
+   * away from and can no longer reach that field's own release button. Deliberately broader than
+   * `isRecordingAnywhere$` below (a held-open-but-idle stream between recordings still counts
+   * here) - use that one instead for "is a recording actually in progress right now". */
   readonly hasActiveMic$ = new CachedSubject<boolean>(false)
+
+  private recordingHolders = new Set<ActiveMicHolder>()
+
+  /** True while at least one field anywhere in the app is actively recording right now (narrower
+   * than `hasActiveMic$` - a warm-kept idle stream between recordings doesn't count). Drives the
+   * main-toolbar "recording" indicator (GH #92 follow-up) so it's visible regardless of which
+   * field's own mic button started it, e.g. Journal's `general` field. */
+  readonly isRecordingAnywhere$ = new CachedSubject<boolean>(false)
 
   constructor(
     private blobSyncService: BlobSyncService,
@@ -108,7 +118,34 @@ export class VoiceMemoService {
 
   unregisterActiveMic(holder: ActiveMicHolder): void {
     this.activeMicHolders.delete(holder)
+    this.recordingHolders.delete(holder)
     this.hasActiveMic$.next(this.activeMicHolders.size > 0)
+    this.isRecordingAnywhere$.next(this.recordingHolders.size > 0)
+  }
+
+  setRecording(holder: ActiveMicHolder, isRecording: boolean): void {
+    if (isRecording) {
+      this.recordingHolders.add(holder)
+    } else {
+      this.recordingHolders.delete(holder)
+    }
+    this.isRecordingAnywhere$.next(this.recordingHolders.size > 0)
+  }
+
+  private playingHolders = new Set<object>()
+
+  /** True while at least one memo anywhere in the app is actively playing back right now - same
+   * "toolbar-wide indicator regardless of which field's own button triggered it" reasoning as
+   * `isRecordingAnywhere$` above. */
+  readonly isPlayingAnywhere$ = new CachedSubject<boolean>(false)
+
+  setPlaying(holder: object, isPlaying: boolean): void {
+    if (isPlaying) {
+      this.playingHolders.add(holder)
+    } else {
+      this.playingHolders.delete(holder)
+    }
+    this.isPlayingAnywhere$.next(this.playingHolders.size > 0)
   }
 
   /** Releases every currently-open microphone stream app-wide, regardless of which field(s)

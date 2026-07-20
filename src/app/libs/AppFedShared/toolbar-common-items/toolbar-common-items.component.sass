@@ -11,3 +11,32 @@
   gap: 4px
   font-size: 13px
   height: 100%
+
+.recording-indicator
+  display: inline-flex
+  align-items: center
+  gap: 4px
+  flex-shrink: 0
+  color: var(--ion-color-danger, #eb445a)
+  font-weight: 600
+  font-size: 11px
+
+.recording-dot
+  width: 8px
+  height: 8px
+  border-radius: 50%
+  background: var(--ion-color-danger, #eb445a)
+  animation: toolbar-recording-pulse 1.2s ease-in-out infinite
+
+@keyframes toolbar-recording-pulse
+  0%, 100%
+    opacity: 1
+  50%
+    opacity: 0.3
+
+.playing-indicator
+  display: inline-flex
+  align-items: center
+  flex-shrink: 0
+  color: var(--ion-color-success, #2dd36f)
+  font-size: 16px

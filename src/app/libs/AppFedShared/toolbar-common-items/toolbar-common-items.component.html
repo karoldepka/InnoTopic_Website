@@ -2,6 +2,25 @@
   style="font-size: 13px"
 ></app-time-tracking-toolbar>
 
+@if (voiceMemoService.isRecordingAnywhere$ | async) {
+  <span
+    class="recording-indicator"
+    title="Recording in progress somewhere in the app"
+  >
+    <span class="recording-dot"></span>
+    REC
+  </span>
+}
+
+@if (voiceMemoService.isPlayingAnywhere$ | async) {
+  <span
+    class="playing-indicator"
+    title="A voice memo is playing somewhere in the app"
+  >
+    <ion-icon name="play"></ion-icon>
+  </span>
+}
+
 <app-voice-memo-field
   [fieldId]="'note'"
   [createItemIfMissing]="createQuickRecordItem"

@@ -1,4 +1,5 @@
 import {ChangeDetectionStrategy, Component, ViewChild} from '@angular/core'
+import {AsyncPipe} from '@angular/common'
 import {IonicModule} from '@ionic/angular'
 import {AuthService} from '../../../auth/auth.service'
 import {GenericItemsService} from '../tree/generic-items.service'
@@ -8,7 +9,7 @@ import {getUserTreeRootId} from '../tree/UserTreeRoot'
 import {fieldVirtualNodeId} from '../tree/cells/SlotDescriptor'
 import {createChildUnderSlot} from '../tree/BareSlotChildren'
 import {VoiceMemoFieldComponent} from '../audio/voice-memo-field/voice-memo-field.component'
-import {VoiceAttachableItem} from '../audio/voice-memo.service'
+import {VoiceAttachableItem, VoiceMemoService} from '../audio/voice-memo.service'
 import {OdmBackend} from '../odm/OdmBackend'
 import {TimeTrackingToolbarComponent} from '../../../apps/OrYoL/time-tracking/time-tracking-toolbar/time-tracking-toolbar.component'
 
@@ -34,7 +35,7 @@ import {TimeTrackingToolbarComponent} from '../../../apps/OrYoL/time-tracking/ti
   templateUrl: './toolbar-common-items.component.html',
   changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./toolbar-common-items.component.sass'],
-  imports: [IonicModule, TimeTrackingToolbarComponent, VoiceMemoFieldComponent],
+  imports: [IonicModule, AsyncPipe, TimeTrackingToolbarComponent, VoiceMemoFieldComponent],
 })
 export class ToolbarCommonItemsComponent {
 
@@ -43,6 +44,10 @@ export class ToolbarCommonItemsComponent {
   constructor(
     private authService: AuthService,
     private genericItemsService: GenericItemsService,
+    // Public: template shows isRecordingAnywhere$ as a toolbar-wide indicator, regardless of
+    // which field's own mic button (this toolbar's quick-record one, or any other field anywhere
+    // in the app, e.g. Journal's `general`) is the one actually recording.
+    public voiceMemoService: VoiceMemoService,
   ) {
   }
 
