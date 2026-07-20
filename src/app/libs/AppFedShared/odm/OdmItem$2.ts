@@ -667,7 +667,14 @@ export class OdmItem$2<
 
   public requestLoadTreeDescendants() {
     console.log('requestLoadTreeDescendants', this.id)
-    if ( this.treeDescendantsListener ) {
+    // A brand-new, not-yet-saved item has no id yet (only assigned on its first save/patch -
+    // see setIdAndWhenCreatedIfNecessary()) - matches the same guard requestLoadChildren() above
+    // already has. Without it, OdmTreeNode.requestLoadChildren() (called unconditionally by
+    // TreeNodeCellsComponent for every visible cell, not just bare slots, so a voice-memo-created
+    // child is findable under any field kind) crashed on every fresh item: "'ancestorId': must be
+    // truthy, is: undefined" - ancestorId here is just loadTreeDescendantsOf()'s own parameter
+    // name (a query filter on the real ancestor_ids column), not a persisted field.
+    if ( this.treeDescendantsListener || ! this.id ) {
       return
     }
     // Descendants (any depth) just join the service's general item pool, same as a normal

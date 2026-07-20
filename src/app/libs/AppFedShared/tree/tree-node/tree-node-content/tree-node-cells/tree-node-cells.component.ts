@@ -64,16 +64,19 @@ export class TreeNodeCellsComponent implements OnChanges, OnInit, OnDestroy {
    * `cells` being rebuilt on an unrelated descriptor-list change. */
   openCommentsForDescriptorId: string | null = null
 
-  /** An empty cell (a bare slot with no children, or any other kind - numeric/text/intensity - with
-   * no value set, e.g. Journal's `mental_health` or Learn's "Mental health impact") renders as a
-   * small compact button instead of its full row, so an item with several never-filled fields
-   * (right after OrYoL's "Apply Template", or Journal/Learn's many always-shortlisted fields
-   * before they're filled in) doesn't turn into a wall of empty rows/rating widgets - see this
-   * component's .sass for the flex-wrap layout that lets compact buttons flow together and share
-   * lines. Only bare slots need tracking here: "has a value" for every other kind is synchronous
-   * (`hasFieldValue()` on the item's own current val, checked directly in `isCompact()`), but "has
-   * children" for a bare slot needs the same live `getBareSlotChildren$()` query
-   * `BareSlotCellComponent` itself uses - see `syncBareSlotContentSubscriptions()`. */
+  /** An empty cell (no value, and no children recorded under its virtual-node id - see below)
+   * renders as a small compact button instead of its full row, so an item with several never-
+   * filled fields (right after OrYoL's "Apply Template", or Journal/Learn's many always-
+   * shortlisted fields before they're filled in) doesn't turn into a wall of empty rows/rating
+   * widgets - see this component's .sass for the flex-wrap layout that lets compact buttons flow
+   * together and share lines. "Has a value" for numeric/text/intensity is synchronous
+   * (`hasFieldValue()` on the item's own current val, checked directly in `isCompact()`), but
+   * every kind ALSO needs this live `getBareSlotChildren$()`-backed set: recording a voice memo on
+   * *any* field kind creates a real child anchored under that field's virtual-node id (e.g.
+   * `MinMidMaxCellComponent.onTranscriptReady()`), rendered read-only via a second, add-input-less
+   * `<app-bare-slot-cell>` under the field's own widget - a field with such a child must count as
+   * "has content" even if its own scalar value was never actually set. See
+   * `syncBareSlotContentSubscriptions()`. */
   bareSlotHasContentIds = new Set<string>()
 
   /** Once a compact cell is clicked open, it stays expanded for the rest of this component's
@@ -138,13 +141,15 @@ export class TreeNodeCellsComponent implements OnChanges, OnInit, OnDestroy {
         }
       })
 
-    // A bare slot (`kind: 'slot'`) groups the item's real children by ancestorIds-containment
-    // (see BareSlotChildren.ts) - that only finds anything once the parent's full descendant
-    // tree has actually been bulk-loaded. Whatever embeds this component (currently only
-    // OdmTreeNodeComponent, via requestLoadChildren()) may already trigger this, but calling it
-    // again here is a cheap no-op guard (OdmItem$2.requestLoadChildren() bails if already
-    // listening) - cheaper than requiring every future embedder to remember to.
-    if (this.cells.some(entry => entry.descriptor.kind === 'slot')) {
+    // Every field kind can now have real children anchored under its virtual-node id (a bare
+    // slot's own children, or a voice-memo-created child on any other kind - see
+    // bareSlotHasContentIds' doc comment), found by ancestorIds-containment (BareSlotChildren.ts) -
+    // that only finds anything once the parent's full descendant tree has actually been bulk-
+    // loaded. Whatever embeds this component (currently only OdmTreeNodeComponent, via
+    // requestLoadChildren()) may already trigger this, but calling it again here is a cheap no-op
+    // guard (OdmItem$2.requestLoadChildren() bails if already listening) - cheaper than requiring
+    // every future embedder to remember to.
+    if (this.cells.length > 0) {
       this.treeNode.requestLoadChildren()
     }
 
@@ -152,16 +157,15 @@ export class TreeNodeCellsComponent implements OnChanges, OnInit, OnDestroy {
   }
 
   /** Reconciles `bareSlotSubscriptions`/`bareSlotHasContentIds` against the current `cells` list -
-   * subscribes newly-visible bare slots, tears down ones no longer visible, and leaves already-
+   * every kind now needs this (not just `kind: 'slot'`, see `bareSlotHasContentIds`' doc comment) -
+   * subscribes newly-visible cells, tears down ones no longer visible, and leaves already-
    * subscribed ones alone (their subscription already reflects live content, no need to churn it
    * on every unrelated `rebuildCells()` call, e.g. a sibling field being edited). */
   private syncBareSlotContentSubscriptions(): void {
-    const visibleSlotIds = new Set(
-      this.cells.filter(entry => entry.descriptor.kind === 'slot').map(entry => entry.descriptor.id),
-    )
+    const visibleIds = new Set(this.cells.map(entry => entry.descriptor.id))
 
     for (const [descriptorId, subscription] of this.bareSlotSubscriptions) {
-      if (!visibleSlotIds.has(descriptorId)) {
+      if (!visibleIds.has(descriptorId)) {
         subscription.unsubscribe()
         this.bareSlotSubscriptions.delete(descriptorId)
         this.bareSlotHasContentIds.delete(descriptorId)
@@ -169,7 +173,7 @@ export class TreeNodeCellsComponent implements OnChanges, OnInit, OnDestroy {
     }
 
     for (const entry of this.cells) {
-      if (entry.descriptor.kind !== 'slot' || this.bareSlotSubscriptions.has(entry.descriptor.id)) {
+      if (this.bareSlotSubscriptions.has(entry.descriptor.id)) {
         continue
       }
       const descriptorId = entry.descriptor.id
@@ -189,13 +193,17 @@ export class TreeNodeCellsComponent implements OnChanges, OnInit, OnDestroy {
    * explicitly clicks it open - `isShortListed` (Journal's `mental_health`, Learn's "Mental health
    * impact", etc.) means "always shown", not "always shown at full size": an unset field is just
    * as compact-able as an unset bare slot, whether it's a star rating, a bucket picker, or a plain
-   * text box. */
+   * text box. A field with a voice-memo-created child (`bareSlotHasContentIds`) counts as "has
+   * content" too, even with no scalar value of its own. */
   isCompact(descriptor: SlotDescriptor): boolean {
     if (this.manuallyExpandedSlotIds.has(descriptor.id)) {
       return false
     }
+    if (this.bareSlotHasContentIds.has(descriptor.id)) {
+      return false
+    }
     if (descriptor.kind === 'slot') {
-      return !this.bareSlotHasContentIds.has(descriptor.id)
+      return true
     }
     return !hasFieldValue(this.treeNode.item$.val?.[descriptor.dataFieldKey as string])
   }

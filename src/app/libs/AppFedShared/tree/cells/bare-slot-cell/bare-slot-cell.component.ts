@@ -30,6 +30,14 @@ export class BareSlotCellComponent implements OnChanges {
   @Input() targetNodeId!: string
   @Input() descriptorId!: string
 
+  /** A bare slot (`kind: 'slot'`) has no widget of its own, so it needs this add-input/voice-memo
+   * row to create its first child at all. A `numeric`/`text`/`intensity` cell already has its own
+   * voice-memo button (recording there already `createChildUnderSlot()`s the exact same way - see
+   * e.g. `MinMidMaxCellComponent.onTranscriptReady()`) - when this component is embedded under one
+   * of those (read-only children list only, see `TreeNodeCellsComponent`), a second add-input here
+   * would just be a confusing duplicate. */
+  @Input() showAddInput = true
+
   children$?: Observable<OdmItem$2<any, any, any, any>[]>
 
   /** GH #89's "descendantsCount"/"whenDescendantLastModified" rollup, scoped to just this bare
