@@ -16,6 +16,7 @@ import {SlotPickerComponent} from '../../../cells/slot-picker/slot-picker.compon
 import {VirtualSlotStatesOdmService} from '../../../../virtual-slot-state/virtual-slot-states-odm.service'
 import {VirtualSlotState$} from '../../../../virtual-slot-state/VirtualSlotState$'
 import {TimeTrackedItemCellComponent} from '../../../../../../apps/OrYoL/time-tracking/time-tracked-item-cell/time-tracked-item-cell.component'
+import {CellNavigationService} from '../../../../cell-navigation.service'
 
 /** Renders one cell per *visible* `SlotDescriptor` for a real item's own fields (GH #89's unified
  * Journal/Learn field rendering) - the generic dispatcher `node-content.component.html`'s own
@@ -101,6 +102,7 @@ export class TreeNodeCellsComponent implements OnChanges, OnInit, OnDestroy {
     private virtualSlotStatesOdmService: VirtualSlotStatesOdmService,
     private changeDetectorRef: ChangeDetectorRef,
     private elementRef: ElementRef<HTMLElement>,
+    private cellNavigationService: CellNavigationService,
   ) {
   }
 
@@ -217,6 +219,35 @@ export class TreeNodeCellsComponent implements OnChanges, OnInit, OnDestroy {
   expandCompactCell(descriptorId: string): void {
     this.manuallyExpandedSlotIds.add(descriptorId)
     this.changeDetectorRef.markForCheck()
+    // Angular hasn't swapped the compact button for the real cell yet at this point in the same
+    // tick - defer to let that render first, same reasoning as onFieldPicked()'s scrollIntoView.
+    setTimeout(() => this.focusExpandedCell(descriptorId))
+  }
+
+  /** Focuses whatever the just-expanded cell's own natural input is - `numeric`/`text`/
+   * `intensity` cells are `AbstractCellComponent`s with a real `focus()` (TinyMCE's own focus API
+   * for text, not a raw DOM call, so it works even inside its iframe), found via
+   * `CellNavigationService`'s registry rather than `OdmCell` reference equality (robust against
+   * `rebuildCells()` having re-run a fresh `OdmCell` in between). `kind: 'slot'`
+   * (`BareSlotCellComponent`) isn't one of those (no single editable value of its own) - falls
+   * back to its "Add…" input directly. */
+  private focusExpandedCell(descriptorId: string): void {
+    const container = this.elementRef.nativeElement.querySelector<HTMLElement>(`[data-descriptor-id="${descriptorId}"]`)
+    if (!container) {
+      return
+    }
+    const cellComponent = [...this.cellNavigationService.cellComponents]
+      .find(component => container.contains(component.elementRef.nativeElement))
+    if (cellComponent) {
+      cellComponent.focus()
+      return
+    }
+    const ionInput = container.querySelector('ion-input, ion-textarea') as (HTMLElement & {setFocus?: () => void}) | null
+    if (ionInput?.setFocus) {
+      ionInput.setFocus()
+      return
+    }
+    container.querySelector<HTMLElement>('input, textarea, [contenteditable="true"]')?.focus()
   }
 
   /** `SlotPickerComponent.fieldPicked` - now that the search box scans every field, not just
