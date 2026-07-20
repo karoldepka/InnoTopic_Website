@@ -13,7 +13,6 @@ import {BaseComponent} from '../../../../libs/AppFedShared/base/base.component'
 import { FaIconComponent } from '@fortawesome/angular-fontawesome';
 import { SearchComponent } from '../../search/search/search.component';
 import { NgIf, AsyncPipe } from '@angular/common';
-import { TimeTrackingToolbarComponent } from '../../time-tracking/time-tracking-toolbar/time-tracking-toolbar.component';
 import { IonicModule } from '@ionic/angular';
 
 @Component({
@@ -21,7 +20,7 @@ import { IonicModule } from '@ionic/angular';
     templateUrl: './toolbar.component.html',
     changeDetection: ChangeDetectionStrategy.Eager,
     styleUrls: ['./toolbar.component.sass'],
-    imports: [FaIconComponent, SearchComponent, NgIf, TimeTrackingToolbarComponent, AsyncPipe, IonicModule]
+    imports: [FaIconComponent, SearchComponent, NgIf, AsyncPipe, IonicModule]
 })
 export class ToolbarComponent extends BaseComponent implements OnInit {
 

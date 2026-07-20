@@ -72,6 +72,14 @@ export class VoiceMemoFieldComponent implements OnInit, OnDestroy, ActiveMicHold
    * just because the mic was tapped, before any audio exists, would be wrong there. */
   @Input() createItemEagerlyOnRecordStart = false
 
+  /** Opt-in: every recording gets its *own* fresh item via `createItemIfMissing()`, even if
+   * `item$` is already set from a previous recording - for an always-mounted, session-spanning
+   * quick-record surface (GH #92's main-toolbar mic) where "one recording = one new item" is the
+   * whole point, unlike Learn's quick-add (which intentionally keeps accumulating multiple takes
+   * onto the same draft item until the page is left). Ignored when `createItemIfMissing` isn't
+   * also set, same as `createItemEagerlyOnRecordStart` above. */
+  @Input() alwaysCreateNewItemOnRecord = false
+
   /** Emits the live-transcribed text (via the browser's Web Speech API) once recognition ends,
    * shortly after the recording stops. Only fires when the browser supports SpeechRecognition
    * (Chrome/Edge; not Firefox/Safari) and speech was actually recognized - callers should treat
@@ -361,7 +369,7 @@ export class VoiceMemoFieldComponent implements OnInit, OnDestroy, ActiveMicHold
 
     this.transcribeCompletedRecordingIfNeeded(blob)
 
-    if (!this.item$ && this.createItemIfMissing) {
+    if ((!this.item$ || this.alwaysCreateNewItemOnRecord) && this.createItemIfMissing) {
       this.item$ = this.createItemIfMissing()
     }
     const item = this.item$

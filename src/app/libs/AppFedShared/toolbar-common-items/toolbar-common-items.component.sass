@@ -1,0 +1,13 @@
+// A single, fixed-height row (no wrap) - this sits inside AppComponent's persistent ion-header,
+// whose height global.scss uses as a hardcoded offset for ion-router-outlet (Ionic's own
+// ion-router-outlet is `position: absolute; inset: 0`, so routed pages would otherwise overlap
+// this header instead of starting below it - see that rule's comment). Wrapping to a second line
+// here would silently desync from that offset, so overflow horizontally instead.
+\:host
+  display: flex
+  align-items: center
+  flex-wrap: nowrap
+  overflow-x: auto
+  gap: 4px
+  font-size: 13px
+  height: 100%

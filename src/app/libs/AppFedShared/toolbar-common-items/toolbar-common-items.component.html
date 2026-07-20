@@ -1,0 +1,11 @@
+<app-time-tracking-toolbar
+  style="font-size: 13px"
+></app-time-tracking-toolbar>
+
+<app-voice-memo-field
+  [fieldId]="'note'"
+  [createItemIfMissing]="createQuickRecordItem"
+  [alwaysCreateNewItemOnRecord]="true"
+  (transcriptReady)="onQuickRecordTranscriptReady($event)"
+  title="Quick voice note - saved as a new item, not attached to whatever page you're on"
+></app-voice-memo-field>
