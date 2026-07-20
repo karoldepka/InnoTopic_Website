@@ -12,9 +12,20 @@ describe('fieldVirtualNodeId', () => {
 })
 
 describe('isSlotVisible', () => {
-  it('a bare slot (kind: slot) is always visible regardless of item value', () => {
-    expect(isSlotVisible(descriptor({kind: 'slot', dataFieldKey: undefined}), undefined)).toBe(true)
-    expect(isSlotVisible(descriptor({kind: 'slot', dataFieldKey: undefined}), {})).toBe(true)
+  it('a bare slot (kind: slot) has no value to check, so it stays hidden until explicitly added', () => {
+    // NOT unconditionally visible - a registry the size of OrYoL's day-plan slots (21 across 4
+    // templates) would otherwise always list all of them regardless of which (if any) template
+    // was ever applied to a given item, making "Apply Template" a no-op.
+    expect(isSlotVisible(descriptor({kind: 'slot', dataFieldKey: undefined}), undefined)).toBe(false)
+    expect(isSlotVisible(descriptor({kind: 'slot', dataFieldKey: undefined}), {})).toBe(false)
+  })
+
+  it('a bare slot becomes visible once explicitly added via manuallyAddedSlotIds', () => {
+    expect(isSlotVisible(descriptor({kind: 'slot', dataFieldKey: undefined}), {manuallyAddedSlotIds: ['mood']})).toBe(true)
+  })
+
+  it('a bare slot with isShortListed is still always visible (e.g. a stable, always-shown grouping)', () => {
+    expect(isSlotVisible(descriptor({kind: 'slot', dataFieldKey: undefined, isShortListed: true}), undefined)).toBe(true)
   })
 
   it('an isShortListed descriptor is always visible even with no value', () => {

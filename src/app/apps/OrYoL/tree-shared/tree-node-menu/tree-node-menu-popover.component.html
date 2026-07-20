@@ -23,6 +23,12 @@
     Apply Template
   </ion-button>
 
+  <app-tree-node-cells
+    *ngIf="slotTreeNode"
+    [treeNode]="slotTreeNode"
+    [descriptors]="slotDescriptors"
+  ></app-tree-node-cells>
+
   <!--<ion-button-->
   <!--  (click)="openDeleteConfirmationDialog()">-->
   <!--  Delete-->

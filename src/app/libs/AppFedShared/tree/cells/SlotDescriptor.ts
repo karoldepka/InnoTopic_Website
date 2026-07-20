@@ -69,16 +69,19 @@ function hasFieldValue(value: any): boolean {
 
 /** Whether a slot should actually render for a given item - `TreeNodeCellsComponent` and
  * `SlotPickerComponent` (which only offers *hidden* slots) share this so they can't drift out of
- * sync. A bare slot (`kind: 'slot'`) always shows (it's a stable structural grouping, like a
- * former OrYoL template node); a scalar field shows once it's filled in, once it's
- * `isShortListed`, or once the user's explicitly added it via the picker
- * (`manuallyAddedSlotIds`) - a 236-descriptor registry (Journal's numeric fields) would otherwise
- * render 236 mostly-empty cells. */
+ * sync. `isShortListed` always shows (a small, stable set an app chooses to always surface); a
+ * scalar field additionally shows once it's filled in; a bare slot (`kind: 'slot'`) has no value
+ * to check, so it shows once explicitly added instead (`manuallyAddedSlotIds` - e.g. OrYoL's
+ * "Apply Template" marking a chosen template's slots). **Not** unconditionally visible just for
+ * being `kind: 'slot'` - confirmed live while wiring OrYoL's day-plan templates (21 slot
+ * descriptors spanning 4 templates): if bare slots were always shown, "Apply Template" would be
+ * a no-op and every item's popover would list all 21 regardless of which (if any) template was
+ * ever applied to it. */
 export function isSlotVisible(descriptor: SlotDescriptor, itemVal: {manuallyAddedSlotIds?: string[]} & Record<string, any> | undefined): boolean {
-  if (descriptor.kind === 'slot' || descriptor.isShortListed) {
+  if (descriptor.isShortListed) {
     return true
   }
-  if (descriptor.dataFieldKey && hasFieldValue(itemVal?.[descriptor.dataFieldKey])) {
+  if (descriptor.kind !== 'slot' && descriptor.dataFieldKey && hasFieldValue(itemVal?.[descriptor.dataFieldKey])) {
     return true
   }
   return !!itemVal?.manuallyAddedSlotIds?.includes(descriptor.id)
