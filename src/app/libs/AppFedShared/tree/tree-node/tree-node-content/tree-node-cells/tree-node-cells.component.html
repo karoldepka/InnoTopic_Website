@@ -8,6 +8,16 @@
 -->
 
 @for (entry of cells; track entry.descriptor.id) {
+  @if (isBareSlotCompact(entry.descriptor)) {
+    <button
+      type="button"
+      class="slot-cell slot-cell--compact"
+      (click)="expandBareSlot(entry.descriptor.id)"
+    >
+      <app-slot-icon [descriptor]="entry.descriptor"></app-slot-icon>
+      {{ entry.descriptor.label }}
+    </button>
+  } @else {
   <div class="slot-cell">
     <div class="slot-cell__label">
       <app-slot-icon [descriptor]="entry.descriptor"></app-slot-icon>
@@ -41,13 +51,13 @@
     <app-time-tracked-item-cell [item$]="entry.timeTrackItem$"></app-time-tracked-item-cell>
 
     <app-expand-toggle
-      icon="chatbubble-outline"
       [isOpen]="openCommentsForDescriptorId === entry.descriptor.id"
       (isOpenChange)="onCommentsIsOpenChange(entry.descriptor.id, $event)"
     >
       <app-comment-thread [targetNodeId]="entry.targetNodeId"></app-comment-thread>
     </app-expand-toggle>
   </div>
+  }
 }
 
 <app-slot-picker [treeNode]="treeNode" [descriptors]="descriptors"></app-slot-picker>

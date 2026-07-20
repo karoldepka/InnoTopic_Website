@@ -3,6 +3,7 @@ import {Subscription} from 'rxjs'
 import {OdmTreeNode} from '../../OdmTreeNode'
 import {OdmCell} from '../../../cells/OdmCell'
 import {fieldVirtualNodeId, isSlotVisible, SlotDescriptor} from '../../../cells/SlotDescriptor'
+import {getBareSlotChildren$} from '../../../BareSlotChildren'
 import {IonicModule} from '@ionic/angular'
 import {MinMidMaxCellComponent} from '../../../cells/min-mid-max-cell/min-mid-max-cell.component'
 import {RichTextEditCellComponent} from '../../../cells/rich-text-edit-cell/rich-text-edit-cell.component'
@@ -63,7 +64,25 @@ export class TreeNodeCellsComponent implements OnChanges, OnInit, OnDestroy {
    * `cells` being rebuilt on an unrelated descriptor-list change. */
   openCommentsForDescriptorId: string | null = null
 
+  /** A bare slot (`kind: 'slot'`) with no children yet renders as a small compact button instead
+   * of a full label+add-input row, so an item with several never-filled slots (e.g. right after
+   * OrYoL's "Apply Template") doesn't turn into a wall of empty rows - see this component's .sass
+   * for the flex-wrap layout that lets compact buttons flow together and share lines. Populated
+   * reactively (see `syncBareSlotContentSubscriptions()`) since "has children" requires the same
+   * live `getBareSlotChildren$()` query `BareSlotCellComponent` itself uses. */
+  bareSlotHasContentIds = new Set<string>()
+
+  /** Once a compact bare slot is clicked open, it stays expanded for the rest of this component's
+   * lifetime even if its last child is later removed - collapsing it back out from under the user
+   * mid-edit would be jarring. Reset naturally next time the popover/page reopens. */
+  manuallyExpandedSlotIds = new Set<string>()
+
   private valSubscription?: Subscription
+
+  /** One `getBareSlotChildren$()` subscription per currently-visible bare slot, keyed by
+   * descriptor id - reconciled (not just accumulated) on every `rebuildCells()` since the visible
+   * slot set can shrink (e.g. `SlotPickerComponent`/template changes) as well as grow. */
+  private bareSlotSubscriptions = new Map<string, Subscription>()
 
   constructor(
     private virtualSlotStatesOdmService: VirtualSlotStatesOdmService,
@@ -87,6 +106,9 @@ export class TreeNodeCellsComponent implements OnChanges, OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.valSubscription?.unsubscribe()
+    for (const subscription of this.bareSlotSubscriptions.values()) {
+      subscription.unsubscribe()
+    }
   }
 
   private rebuildCells(): void {
@@ -120,6 +142,55 @@ export class TreeNodeCellsComponent implements OnChanges, OnInit, OnDestroy {
     if (this.cells.some(entry => entry.descriptor.kind === 'slot')) {
       this.treeNode.requestLoadChildren()
     }
+
+    this.syncBareSlotContentSubscriptions()
+  }
+
+  /** Reconciles `bareSlotSubscriptions`/`bareSlotHasContentIds` against the current `cells` list -
+   * subscribes newly-visible bare slots, tears down ones no longer visible, and leaves already-
+   * subscribed ones alone (their subscription already reflects live content, no need to churn it
+   * on every unrelated `rebuildCells()` call, e.g. a sibling field being edited). */
+  private syncBareSlotContentSubscriptions(): void {
+    const visibleSlotIds = new Set(
+      this.cells.filter(entry => entry.descriptor.kind === 'slot').map(entry => entry.descriptor.id),
+    )
+
+    for (const [descriptorId, subscription] of this.bareSlotSubscriptions) {
+      if (!visibleSlotIds.has(descriptorId)) {
+        subscription.unsubscribe()
+        this.bareSlotSubscriptions.delete(descriptorId)
+        this.bareSlotHasContentIds.delete(descriptorId)
+      }
+    }
+
+    for (const entry of this.cells) {
+      if (entry.descriptor.kind !== 'slot' || this.bareSlotSubscriptions.has(entry.descriptor.id)) {
+        continue
+      }
+      const descriptorId = entry.descriptor.id
+      const subscription = getBareSlotChildren$(this.treeNode.item$, entry.targetNodeId).subscribe(children => {
+        if (children.length > 0) {
+          this.bareSlotHasContentIds.add(descriptorId)
+        } else {
+          this.bareSlotHasContentIds.delete(descriptorId)
+        }
+        this.changeDetectorRef.markForCheck()
+      })
+      this.bareSlotSubscriptions.set(descriptorId, subscription)
+    }
+  }
+
+  /** A bare slot with no children stays a compact button until either it gains a real child, or
+   * the user explicitly clicks it open to add the first one. */
+  isBareSlotCompact(descriptor: SlotDescriptor): boolean {
+    return descriptor.kind === 'slot'
+      && !this.bareSlotHasContentIds.has(descriptor.id)
+      && !this.manuallyExpandedSlotIds.has(descriptor.id)
+  }
+
+  expandBareSlot(descriptorId: string): void {
+    this.manuallyExpandedSlotIds.add(descriptorId)
+    this.changeDetectorRef.markForCheck()
   }
 
   trackByDescriptorId(index: number, entry: {descriptor: SlotDescriptor}): string {

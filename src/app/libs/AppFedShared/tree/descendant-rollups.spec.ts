@@ -104,7 +104,7 @@ async function flushMicrotasks(): Promise<void> {
   await new Promise(resolve => setTimeout(resolve, 0))
 }
 
-describe('OdmItem$2 - descendant rollups (getDescendantsCount/getWhenDescendantLastModified)', () => {
+describe('OdmItem$2 - getDescendantsCount (computed, not persisted)', () => {
   it('counts a simple, single-parent subtree correctly', async () => {
     const {service} = setup()
     const root$ = service.add(Object.assign(new GenericItem(), {title: 'Root'}))
@@ -138,7 +138,24 @@ describe('OdmItem$2 - descendant rollups (getDescendantsCount/getWhenDescendantL
     expect(root$.getDescendantsCount()).toBe(3)
   })
 
-  it('getWhenDescendantLastModified returns the latest whenLastModified among descendants, not the item itself', async () => {
+  it('an item with no children has zero descendants', async () => {
+    const {service} = setup()
+    const leaf$ = service.add(Object.assign(new GenericItem(), {title: 'Leaf'}))
+    await flushMicrotasks()
+
+    expect(leaf$.getDescendantsCount()).toBe(0)
+  })
+})
+
+/** Unlike `getDescendantsCount()`, `whenDescendantLastModified` is a **persisted** field (see the
+ * `trg_bump_when_descendant_last_modified` DB trigger) - a MAX rollup, unlike a count, is safe to
+ * propagate incrementally even in a many-to-many tree (idempotent/commutative regardless of how
+ * many paths or how many times it's reapplied). These tests only exercise the client-side half:
+ * `bumpAncestorsWhenDescendantLastModifiedLocally()` (called from `setWhenLastModified()`), the
+ * optimistic, offline-safe local patch that makes the UI reflect a just-made edit immediately,
+ * ahead of (and independently of) the DB trigger's own server-side propagation. */
+describe('OdmItem$2 - getWhenDescendantLastModified (persisted, with an optimistic local bump)', () => {
+  it('returns the latest whenLastModified among descendants, not the item itself', async () => {
     const {service} = setup()
     const root$ = service.add(Object.assign(new GenericItem(), {title: 'Root'}))
     await flushMicrotasks()
@@ -153,12 +170,38 @@ describe('OdmItem$2 - descendant rollups (getDescendantsCount/getWhenDescendantL
     expect(latest).toEqual((newer$.val as any)?.whenLastModified)
   })
 
-  it('an item with no children has zero descendants and no whenDescendantLastModified', async () => {
+  it('propagates through more than one level (grandparent, not just the direct parent)', async () => {
+    const {service} = setup()
+    const root$ = service.add(Object.assign(new GenericItem(), {title: 'Root'}))
+    await flushMicrotasks()
+    const child$ = root$.createChild({title: 'Child'} as any)
+    await flushMicrotasks()
+    const grandchild$ = child$.createChild({title: 'Grandchild'} as any)
+    await flushMicrotasks()
+
+    expect(root$.getWhenDescendantLastModified()).toEqual((grandchild$.val as any)?.whenLastModified)
+    expect(child$.getWhenDescendantLastModified()).toEqual((grandchild$.val as any)?.whenLastModified)
+  })
+
+  it('does not patch an ancestor that has not finished loading/persisting yet (would wipe its other fields)', async () => {
+    const {service} = setup()
+    // A stub obtained but never loaded/saved - hasBeenPersistedToDb stays false, currentVal stays
+    // undefined, exactly like an ancestor whose real data hasn't arrived from the server yet.
+    const unloadedParent$ = service.obtainItem$ById('unloaded-parent' as any)
+    const child$ = service.createOdmItem$(undefined, Object.assign(new GenericItem(), {title: 'Child'}), [unloadedParent$])
+    child$.saveNowToDb()
+    await flushMicrotasks()
+
+    child$.patchNow({title: 'edited'} as any)
+
+    expect((unloadedParent$ as any).currentVal).toBeUndefined()
+  })
+
+  it('an item with no children has no whenDescendantLastModified', async () => {
     const {service} = setup()
     const leaf$ = service.add(Object.assign(new GenericItem(), {title: 'Leaf'}))
     await flushMicrotasks()
 
-    expect(leaf$.getDescendantsCount()).toBe(0)
     expect(leaf$.getWhenDescendantLastModified()).toBeUndefined()
   })
 })

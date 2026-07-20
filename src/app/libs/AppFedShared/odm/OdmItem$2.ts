@@ -44,6 +44,14 @@ export class OdmInMemItemWriteOnce {
 /** FIXME: rename OdmInMemItemData */
 export class OdmInMemItem extends OdmInMemItemWriteOnce {
   public whenLastModified?: OdmTimestamp
+  /** GH #89's "whenDescendantLastModified" rollup - server-maintained (see the
+   * `trg_bump_when_descendant_last_modified` DB trigger, migration
+   * `add_when_descendant_last_modified_rollup`), never written directly by the client except for
+   * the local-only optimistic bump in `bumpAncestorsWhenDescendantLastModifiedLocally()` below
+   * (so the UI reflects a just-made edit immediately, including fully offline, before the write
+   * even reaches the server). See `getWhenDescendantLastModified()`'s doc comment for why a MAX
+   * rollup like this one is safe to persist/propagate incrementally, unlike a count would be. */
+  public whenDescendantLastModified?: OdmTimestamp
   public whereCreated?: any
   /** Fractional sibling-ordering key (OrYoL-style), spaced by ODM_ORDER_STEP so nodes
    * can be reordered/inserted between neighbours without renumbering siblings. */
@@ -413,7 +421,44 @@ export class OdmItem$2<
   setWhenLastModified() {
     // debugLog(`setWhenLastModified`, this)
     // console.trace(`setWhenLastModified`, this)
-    this.currentVal ! . whenLastModified = OdmBackend.nowTimestamp()
+    const ts = OdmBackend.nowTimestamp()
+    this.currentVal ! . whenLastModified = ts
+    this.bumpAncestorsWhenDescendantLastModifiedLocally(ts)
+  }
+
+  /** Optimistic, offline-safe half of GH #89's "whenDescendantLastModified" rollup - the DB
+   * trigger (`trg_bump_when_descendant_last_modified`) is the authoritative propagation path, but
+   * that only takes effect once this edit actually reaches the server. Walking `this.parents`
+   * (whatever's already resident in memory - same caveat as `getAncestorIds()`) and patching each
+   * loaded ancestor directly means the UI updates immediately, including with no network at all,
+   * via the exact same durable patch/journal/retry path (`patchThrottled`) any other field edit
+   * already uses - no bespoke offline handling needed.
+   *
+   * Deliberately gated on `hasBeenPersistedToDb`: patching an ancestor whose full data hasn't
+   * loaded yet would `patchThrottled()` a near-empty `currentVal`, and this backend's upsert
+   * writes `data` as a whole JSONB column (not a merge) - see `createPostgresOdmRow()` - so that
+   * would wipe out every other real field on that row. Skipping unloaded ancestors here is safe:
+   * the DB trigger still reaches them once the edit syncs, this is purely a same-session nicety. */
+  private bumpAncestorsWhenDescendantLastModifiedLocally(timestamp: OdmTimestamp, visitedIds: Set<string> = new Set()): void {
+    const newMs = odmTimestampToMillis(timestamp)
+    if (newMs === undefined) {
+      return
+    }
+    for (const parent of this.parents ?? []) {
+      const parentId = parent?.id as string | undefined
+      if (!parentId || visitedIds.has(parentId)) {
+        continue
+      }
+      visitedIds.add(parentId)
+      if (!(parent as any).hasBeenPersistedToDb) {
+        continue
+      }
+      const existingMs = odmTimestampToMillis((parent.currentVal as any)?.whenDescendantLastModified)
+      if (existingMs === undefined || existingMs < newMs) {
+        (parent as any).patchThrottled({whenDescendantLastModified: timestamp}, {dontSetWhenLastModified: true})
+      }
+      ;(parent as any).bumpAncestorsWhenDescendantLastModifiedLocally(timestamp, visitedIds)
+    }
   }
 
   applyDataFromDbAndEmit(incomingConverted: TInMemData) {
@@ -807,10 +852,11 @@ export class OdmItem$2<
    * above, safe for a many-to-many tree (`parentIds`/`ancestorIds` are plain, unvalidated string
    * arrays - an item reachable via more than one parent path would otherwise be visited, and
    * counted, once per path) and guarded against a cycle (shouldn't occur in a well-formed tree,
-   * but nothing at the DB level actually prevents one). Backing method for
-   * `getDescendantsCount()`/`getWhenDescendantLastModified()` (GH #89's rollup fields) - only
-   * covers what's currently loaded in memory, same caveat `getDescendants()` already has; call
-   * `requestLoadTreeDescendants()` first for a complete answer over a whole subtree. */
+   * but nothing at the DB level actually prevents one). Backing method for `getDescendantsCount()`
+   * (GH #89's rollup fields) - only covers what's currently loaded in memory, same caveat
+   * `getDescendants()` already has; call `requestLoadTreeDescendants()` first for a complete
+   * answer over a whole subtree. (`getWhenDescendantLastModified()` no longer uses this - see its
+   * own doc comment for why a MAX rollup didn't have to share this in-memory-only limitation.) */
   private getDeduplicatedDescendants(): OdmItem$2<any, any, any, any>[] {
     const visitedIds = new Set<string>()
     const result: OdmItem$2<any, any, any, any>[] = []
@@ -840,21 +886,20 @@ export class OdmItem$2<
     return this.getDeduplicatedDescendants().length
   }
 
-  /** Latest `whenLastModified` among all unique in-memory descendants (GH #89: "New field
-   * whenDescendantLastModified") - undefined if there are none, or none have a timestamp yet.
-   * Same computed-not-persisted reasoning as `getDescendantsCount()`. */
+  /** Latest `whenLastModified` anywhere in this item's subtree (GH #89: "New field
+   * whenDescendantLastModified") - a **persisted** field, unlike `getDescendantsCount()`. A count
+   * can't be incrementally maintained correctly in a many-to-many tree (the same write would
+   * increment a shared descendant's counter via more than one parent path), but a MAX doesn't have
+   * that problem - it's idempotent and commutative regardless of how many paths or how many times
+   * it's reapplied, so it's safe to propagate. The DB trigger `trg_bump_when_descendant_last_modified`
+   * (migration `add_when_descendant_last_modified_rollup`) does that propagation server-side in
+   * one bulk statement per write (via the already-fully-expanded `ancestor_ids` column), so this
+   * is always accurate regardless of what's currently loaded client-side - unlike the old
+   * in-memory-only computed version. `bumpAncestorsWhenDescendantLastModifiedLocally()` (called
+   * from `setWhenLastModified()`) additionally patches whatever ancestors are already loaded in
+   * this session for immediate, fully-offline-safe UI feedback ahead of that server round-trip. */
   getWhenDescendantLastModified(): OdmTimestamp | undefined {
-    let latestMs: number | undefined
-    let latest: OdmTimestamp | undefined
-    for (const descendant of this.getDeduplicatedDescendants()) {
-      const whenLastModified = (descendant.val as any)?.whenLastModified
-      const ms = odmTimestampToMillis(whenLastModified)
-      if (ms !== undefined && (latestMs === undefined || ms > latestMs)) {
-        latestMs = ms
-        latest = whenLastModified
-      }
-    }
-    return latest
+    return (this.currentVal as any)?.whenDescendantLastModified
   }
 
   // ============================================================================
