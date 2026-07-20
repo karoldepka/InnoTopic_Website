@@ -9,7 +9,7 @@ import {IonicModule} from '@ionic/angular'
 import {ExpandToggleComponent} from '../../../expand-toggle/expand-toggle.component'
 import {VoiceMemoFieldComponent} from '../../../audio/voice-memo-field/voice-memo-field.component'
 import {fieldVirtualNodeId} from '../SlotDescriptor'
-import {createChildUnderSlot} from '../../BareSlotChildren'
+import {FieldVoiceMemoChildController} from '../../BareSlotChildren'
 
 /** A single composite numeric self-rating: `{numVal, comment}` - same shape Journal's fields
  * already use (`JournalCompositeFieldVal`), generalized so any app's numeric slot can share one
@@ -103,10 +103,15 @@ export class MinMidMaxCellComponent extends AbstractCellComponent {
   /** "Recording a voice note on 'mood' should create a new sub-node. Its text should be the
    * transcript." (GH #89) - a real child of this cell's item, anchored under this field's
    * fabricated virtual-node id via `manualAncestorIds` (see `BareSlotChildren.ts`), not appended
-   * into this field's own value/comment. */
-  onTranscriptReady(transcript: string) {
-    const targetNodeId = fieldVirtualNodeId(this.cell.treeNode.item$.id as string, this.cell.column.id)
-    createChildUnderSlot(this.cell.treeNode.item$, targetNodeId, {title: transcript} as any)
+   * into this field's own value/comment. See `FieldVoiceMemoChildController`'s doc comment for
+   * why the child also ends up owning the recording itself, live-title-updating included. */
+  private _voiceMemoChildController?: FieldVoiceMemoChildController<any>
+  get voiceMemoChildController(): FieldVoiceMemoChildController<any> {
+    if (!this._voiceMemoChildController) {
+      const targetNodeId = fieldVirtualNodeId(this.cell.treeNode.item$.id as string, this.cell.column.id)
+      this._voiceMemoChildController = new FieldVoiceMemoChildController(this.cell.treeNode.item$, targetNodeId)
+    }
+    return this._voiceMemoChildController
   }
 
   override focus() {

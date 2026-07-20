@@ -86,3 +86,7 @@ export interface OdmSearchRequest {
 export interface EmbeddingRequest {
   text: string;
 }
+
+export interface EmbeddingBatchRequest {
+  texts: string[];
+}

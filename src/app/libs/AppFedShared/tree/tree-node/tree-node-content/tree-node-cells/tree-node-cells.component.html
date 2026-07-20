@@ -7,8 +7,25 @@
   Cell MUST NOT assume that it has anything to do with columns.
 -->
 
+<app-slot-picker
+  [treeNode]="treeNode"
+  [descriptors]="descriptors"
+  (fieldPicked)="onFieldPicked($event)"
+></app-slot-picker>
+
 @for (entry of cells; track entry.descriptor.id) {
-  <div class="slot-cell">
+  @if (isCompact(entry.descriptor)) {
+    <button
+      type="button"
+      class="slot-cell slot-cell--compact"
+      [attr.data-descriptor-id]="entry.descriptor.id"
+      (click)="expandCompactCell(entry.descriptor.id)"
+    >
+      <app-slot-icon [descriptor]="entry.descriptor"></app-slot-icon>
+      {{ entry.descriptor.label }}
+    </button>
+  } @else {
+  <div class="slot-cell" [attr.data-descriptor-id]="entry.descriptor.id">
     <div class="slot-cell__label">
       <app-slot-icon [descriptor]="entry.descriptor"></app-slot-icon>
       {{ entry.descriptor.label }}
@@ -34,20 +51,36 @@
           [parentItem$]="treeNode.item$"
           [targetNodeId]="entry.targetNodeId"
           [descriptorId]="entry.descriptor.id"
+          [onChildCreated]="onSlotChildCreated"
         ></app-bare-slot-cell>
       }
+    }
+
+    @if (entry.descriptor.kind !== 'slot') {
+      <!-- Recording a voice memo on this field creates a real child here (see
+        MinMidMaxCellComponent/RichTextEditCellComponent/IntensityCellComponent's own
+        voiceMemoChildController) - list it read-only (no second add-input/voice-memo button,
+        this field's own widget above already has one). This is a SEPARATE
+        FieldVoiceMemoChildController instance from the cell's own, so onSlotChildCreated isn't
+        wired here - it wouldn't fire anyway (nothing creates children through this embed's own
+        controller). OrYoL only uses kind: 'slot' today, so this gap doesn't matter yet; wire it
+        the same way the 'slot' case below does if that ever changes. -->
+      <app-bare-slot-cell
+        [parentItem$]="treeNode.item$"
+        [targetNodeId]="entry.targetNodeId"
+        [descriptorId]="entry.descriptor.id"
+        [showAddInput]="false"
+      ></app-bare-slot-cell>
     }
 
     <app-time-tracked-item-cell [item$]="entry.timeTrackItem$"></app-time-tracked-item-cell>
 
     <app-expand-toggle
-      icon="chatbubble-outline"
       [isOpen]="openCommentsForDescriptorId === entry.descriptor.id"
       (isOpenChange)="onCommentsIsOpenChange(entry.descriptor.id, $event)"
     >
       <app-comment-thread [targetNodeId]="entry.targetNodeId"></app-comment-thread>
     </app-expand-toggle>
   </div>
+  }
 }
-
-<app-slot-picker [treeNode]="treeNode" [descriptors]="descriptors"></app-slot-picker>

@@ -1,4 +1,4 @@
-import {describe, it, expect, beforeEach} from 'vitest'
+import {describe, it, expect} from 'vitest'
 import {Injector} from '@angular/core'
 import {OdmBackend} from '../../../libs/AppFedShared/odm/OdmBackend'
 import {ItemId, OdmCollectionBackend, OdmCollectionBackendListener, QueryOpts} from '../../../libs/AppFedShared/odm/OdmCollectionBackend'
@@ -10,7 +10,6 @@ import {ApfGeoLocationService} from '../../../libs/AppFedShared/geo-location/apf
 import {BrowserOdmStorage} from '../../../libs/AppFedSharedBrowser/odm-browser/BrowserOdmStorage'
 import {DbTreeListener, NodeAddEvent, NodeInclusion} from '../tree-model/TreeListener'
 import {OryOdmItemsService} from './ory-odm-items.service'
-import {OryNodeInclusionsOdmService} from './ory-node-inclusions-odm.service'
 import {SupabaseTreeService} from './supabase-tree.service'
 import {OryolFirestoreBackfillService} from './oryol-firestore-backfill.service'
 
@@ -179,44 +178,45 @@ function setup() {
   const browserOdmStorage = new FakeBrowserOdmStorage()
   const injector = createFakeInjector(backends, browserOdmStorage)
   const oryItemsService = new OryOdmItemsService(injector)
-  const oryNodeInclusionsService = new OryNodeInclusionsOdmService(injector)
-  const treeService = new SupabaseTreeService(oryItemsService, oryNodeInclusionsService)
+  const treeService = new SupabaseTreeService(oryItemsService)
   const itemsBackend = backends.get('OryItem') as FakeOdmCollectionBackend<any>
-  const inclusionsBackend = backends.get('OryNodeInclusion') as FakeOdmCollectionBackend<any>
   const listener = new RecordingDbTreeListener()
-  return {treeService, oryItemsService, oryNodeInclusionsService, itemsBackend, inclusionsBackend, listener, browserOdmStorage}
+  return {treeService, oryItemsService, itemsBackend, listener, browserOdmStorage}
 }
 
 async function flushMicrotasks(): Promise<void> {
   await new Promise(resolve => setTimeout(resolve, 0))
 }
 
+/** Seeds an item that already carries an embedded relationship - the GH #89 unify-the-tree-
+ * worlds replacement for a separate `OryNodeInclusion` row. */
+function seedItemWithInclusion(itemsBackend: FakeOdmCollectionBackend<any>, itemId: string, itemData: any, parentId: string, orderNum: number, ancestorIds: string[]) {
+  itemsBackend.seed(itemId, {
+    ...itemData,
+    inclusionsByParentId: {[parentId]: {orderNum}},
+  }, [parentId], ancestorIds)
+}
+
 describe('SupabaseTreeService.loadNodesTree - delivery ordering', () => {
   it('delivers a direct child of the root immediately', async () => {
-    const {treeService, itemsBackend, inclusionsBackend, listener} = setup()
-    itemsBackend.seed('child1', {title: 'Child'})
-    inclusionsBackend.seed('inclusion1', {childItemId: 'child1', orderNum: 1}, [treeService.HARDCODED_ROOT_NODE_ITEM_ID], [treeService.HARDCODED_ROOT_NODE_ITEM_ID])
+    const {treeService, itemsBackend, listener} = setup()
+    const root = treeService.HARDCODED_ROOT_NODE_ITEM_ID
+    seedItemWithInclusion(itemsBackend, 'child1', {title: 'Child'}, root, 1, [root])
 
     treeService.loadNodesTree(listener)
     await flushMicrotasks()
 
-    // A node may legitimately be redelivered more than once (e.g. once per collection's
-    // CachedSubject replaying on subscribe) - TreeModel.onNodeAddedOrModified's existing-node
-    // branch is idempotent-safe for that, same as Firestore's onSnapshot repeatedly redelivering
-    // current state. What matters: it was delivered, with the right parent, and never dropped.
     const childEvents = listener.addedOrModified.filter(e => e.itemId === 'child1')
     expect(childEvents.length).toBeGreaterThan(0)
-    expect(childEvents.every(e => e.directParentItemId === treeService.HARDCODED_ROOT_NODE_ITEM_ID)).toBe(true)
+    expect(childEvents.every(e => e.directParentItemId === root)).toBe(true)
   })
 
-  it('delivers a grandchild whose parent inclusion arrives after it, in parent-before-child order once both are known', async () => {
-    const {treeService, itemsBackend, inclusionsBackend, listener} = setup()
+  it('delivers a grandchild whose parent arrives after it, in parent-before-child order once both are known', async () => {
+    const {treeService, itemsBackend, listener} = setup()
     const root = treeService.HARDCODED_ROOT_NODE_ITEM_ID
-    // Seed out of order: grandchild's own item + inclusion arrive fully before the parent's.
-    itemsBackend.seed('grandchild1', {title: 'Grandchild'})
-    inclusionsBackend.seed('inclusionGrandchild', {childItemId: 'grandchild1', orderNum: 1}, ['child1'], ['child1'])
-    itemsBackend.seed('child1', {title: 'Child'})
-    inclusionsBackend.seed('inclusionChild', {childItemId: 'child1', orderNum: 1}, [root], [root])
+    // Seed out of order: grandchild arrives fully before its parent.
+    seedItemWithInclusion(itemsBackend, 'grandchild1', {title: 'Grandchild'}, 'child1', 1, ['child1'])
+    seedItemWithInclusion(itemsBackend, 'child1', {title: 'Child'}, root, 1, [root])
 
     treeService.loadNodesTree(listener)
     await flushMicrotasks()
@@ -227,10 +227,9 @@ describe('SupabaseTreeService.loadNodesTree - delivery ordering', () => {
     expect(deliveredIds.indexOf('child1')).toBeLessThan(deliveredIds.indexOf('grandchild1'))
   })
 
-  it('does not deliver an inclusion whose parent has not arrived yet', async () => {
-    const {treeService, itemsBackend, inclusionsBackend, listener} = setup()
-    itemsBackend.seed('orphan1', {title: 'Orphan'})
-    inclusionsBackend.seed('inclusionOrphan', {childItemId: 'orphan1', orderNum: 1}, ['missingParent'], ['missingParent'])
+  it('does not deliver an item whose parent has not arrived yet', async () => {
+    const {treeService, itemsBackend, listener} = setup()
+    seedItemWithInclusion(itemsBackend, 'orphan1', {title: 'Orphan'}, 'missingParent', 1, ['missingParent'])
 
     treeService.loadNodesTree(listener)
     await flushMicrotasks()
@@ -239,43 +238,37 @@ describe('SupabaseTreeService.loadNodesTree - delivery ordering', () => {
   })
 
   it('a later-arriving parent flushes its previously-buffered children', async () => {
-    const {treeService, itemsBackend, inclusionsBackend, listener} = setup()
+    const {treeService, itemsBackend, listener} = setup()
     const root = treeService.HARDCODED_ROOT_NODE_ITEM_ID
-    itemsBackend.seed('grandchild1', {title: 'Grandchild'})
-    inclusionsBackend.seed('inclusionGrandchild', {childItemId: 'grandchild1', orderNum: 1}, ['child1'], ['child1'])
+    seedItemWithInclusion(itemsBackend, 'grandchild1', {title: 'Grandchild'}, 'child1', 1, ['child1'])
 
     treeService.loadNodesTree(listener)
     await flushMicrotasks()
     expect(listener.addedOrModified.map(e => e.itemId)).not.toContain('grandchild1')
 
     // Parent arrives afterwards (e.g. a slower incremental-sync page).
-    itemsBackend.seed('child1', {title: 'Child'})
-    inclusionsBackend.seed('inclusionChild', {childItemId: 'child1', orderNum: 1}, [root], [root])
+    seedItemWithInclusion(itemsBackend, 'child1', {title: 'Child'}, root, 1, [root])
     treeService.loadNodesTree(listener) // re-entrant call, as ngOnInit-driven re-subscription would be
     await flushMicrotasks()
 
     expect(listener.addedOrModified.map(e => e.itemId)).toEqual(expect.arrayContaining(['child1', 'grandchild1']))
   })
 
-  it('the same item included under two different parents is delivered as two separate inclusions, each with its own orderNum', async () => {
-    const {treeService, itemsBackend, inclusionsBackend, listener} = setup()
+  it('the same item included under two different parents is delivered as two separate occurrences, each with its own orderNum', async () => {
+    const {treeService, itemsBackend, listener} = setup()
     const root = treeService.HARDCODED_ROOT_NODE_ITEM_ID
-    itemsBackend.seed('parentA', {title: 'Parent A'})
-    itemsBackend.seed('parentB', {title: 'Parent B'})
-    inclusionsBackend.seed('inclusionA', {childItemId: 'parentA', orderNum: 1}, [root], [root])
-    inclusionsBackend.seed('inclusionB', {childItemId: 'parentB', orderNum: 2}, [root], [root])
+    seedItemWithInclusion(itemsBackend, 'parentA', {title: 'Parent A'}, root, 1, [root])
+    seedItemWithInclusion(itemsBackend, 'parentB', {title: 'Parent B'}, root, 2, [root])
 
-    itemsBackend.seed('shared1', {title: 'Shared item'})
-    inclusionsBackend.seed('inclusionSharedUnderA', {childItemId: 'shared1', orderNum: 5}, ['parentA'], ['parentA'])
-    inclusionsBackend.seed('inclusionSharedUnderB', {childItemId: 'shared1', orderNum: 9}, ['parentB'], ['parentB'])
+    itemsBackend.seed('shared1', {
+      title: 'Shared item',
+      inclusionsByParentId: {parentA: {orderNum: 5}, parentB: {orderNum: 9}},
+    }, ['parentA', 'parentB'], ['parentA'])
 
     treeService.loadNodesTree(listener)
     await flushMicrotasks()
 
     const sharedEvents = listener.addedOrModified.filter(e => e.itemId === 'shared1')
-    // Redundant redelivery of the *same* (itemId, parent) pair is fine (see the comment in the
-    // previous test) - what must hold is that both distinct parent occurrences are represented,
-    // each with its own independent orderNum.
     const distinctParents = new Set(sharedEvents.map(e => e.directParentItemId))
     expect(distinctParents).toEqual(new Set(['parentA', 'parentB']))
     const orderNumsByParent = Object.fromEntries(sharedEvents.map(e => [e.directParentItemId, e.nodeInclusion.orderNum]))
@@ -283,30 +276,28 @@ describe('SupabaseTreeService.loadNodesTree - delivery ordering', () => {
     expect(orderNumsByParent['parentB']).toBe(9)
   })
 
-  it('a re-parented inclusion is delivered via onNodeInclusionModified, not a duplicate onNodeAddedOrModified', async () => {
-    const {treeService, itemsBackend, inclusionsBackend, listener} = setup()
+  it('a re-parented item is delivered via onNodeInclusionModified, not a duplicate onNodeAddedOrModified', async () => {
+    const {treeService, itemsBackend, listener} = setup()
     const root = treeService.HARDCODED_ROOT_NODE_ITEM_ID
-    itemsBackend.seed('parentA', {title: 'Parent A'})
-    itemsBackend.seed('parentB', {title: 'Parent B'})
-    inclusionsBackend.seed('inclusionA', {childItemId: 'parentA', orderNum: 1}, [root], [root])
-    inclusionsBackend.seed('inclusionB', {childItemId: 'parentB', orderNum: 2}, [root], [root])
-    itemsBackend.seed('movable1', {title: 'Movable'})
-    inclusionsBackend.seed('inclusionMovable', {childItemId: 'movable1', orderNum: 1}, ['parentA'], ['parentA'])
+    seedItemWithInclusion(itemsBackend, 'parentA', {title: 'Parent A'}, root, 1, [root])
+    seedItemWithInclusion(itemsBackend, 'parentB', {title: 'Parent B'}, root, 2, [root])
+    seedItemWithInclusion(itemsBackend, 'movable1', {title: 'Movable'}, 'parentA', 1, ['parentA'])
 
     treeService.loadNodesTree(listener)
     await flushMicrotasks()
     expect(listener.addedOrModified.some(e => e.itemId === 'movable1' && e.directParentItemId === 'parentA')).toBe(true)
     const addedOrModifiedCountBeforeMove = listener.addedOrModified.length
 
-    // Re-parent movable1's inclusion from parentA to parentB.
-    inclusionsBackend.seed('inclusionMovable', {childItemId: 'movable1', orderNum: 1}, ['parentB'], ['parentB'])
+    // Re-parent movable1 from parentA to parentB - same shape a real setParentInclusion()/
+    // removeParentInclusion() pair produces.
+    seedItemWithInclusion(itemsBackend, 'movable1', {title: 'Movable'}, 'parentB', 1, ['parentB'])
     treeService.loadNodesTree(listener)
     await flushMicrotasks()
 
     // The move must actually go through onNodeInclusionModified (the only path TreeModel uses
     // to relocate an existing node) with the correct new parent.
     expect(listener.inclusionModified.length).toBeGreaterThan(0)
-    expect(listener.inclusionModified[0]).toMatchObject({nodeInclusionId: 'inclusionMovable', newParentItemId: 'parentB'})
+    expect(listener.inclusionModified[0]).toMatchObject({nodeInclusionId: 'movable1', newParentItemId: 'parentB'})
     // Once moved, any *new* onNodeAddedOrModified redelivery (routine/idempotent, see the
     // earlier test) must reflect the new parent, not the stale one - only look at events added
     // after the move, since the pre-move parentA event legitimately stays in history.
@@ -335,6 +326,7 @@ function fakeTreeNode(itemId: string, ancestors: string[], itemData: any = {}, n
     nodeInclusion,
     parent2: previous, // last ancestor, or undefined if this node has none (i.e. it IS the root)
     getAncestorsPathArray: () => ancestorNodes,
+    children: [],
   } as any
 }
 
@@ -350,78 +342,74 @@ describe('SupabaseTreeService - writes', () => {
     expect(itemsBackend.storedItems.get('item1')?.title).toBe('Patched')
   })
 
-  it('deleteWithoutConfirmation removes the item and every inclusion referencing it as a child', async () => {
-    const {treeService, itemsBackend, inclusionsBackend} = setup()
+  it('deleteWithoutConfirmation removes the item (relationships live on it, nothing else to clean up)', async () => {
+    const {treeService, itemsBackend} = setup()
     const root = treeService.HARDCODED_ROOT_NODE_ITEM_ID
-    itemsBackend.seed('parentA', {title: 'Parent A'})
-    itemsBackend.seed('parentB', {title: 'Parent B'})
-    inclusionsBackend.seed('inclusionA', {childItemId: 'parentA', orderNum: 1}, [root], [root])
-    inclusionsBackend.seed('inclusionB', {childItemId: 'parentB', orderNum: 2}, [root], [root])
-    itemsBackend.seed('shared1', {title: 'Shared'})
-    inclusionsBackend.seed('inclusionSharedA', {childItemId: 'shared1'}, ['parentA'], ['parentA'])
-    inclusionsBackend.seed('inclusionSharedB', {childItemId: 'shared1'}, ['parentB'], ['parentB'])
+    seedItemWithInclusion(itemsBackend, 'parentA', {title: 'Parent A'}, root, 1, [root])
+    seedItemWithInclusion(itemsBackend, 'shared1', {title: 'Shared'}, 'parentA', 1, ['parentA'])
 
     treeService.deleteWithoutConfirmation('shared1')
     await flushMicrotasks()
 
     expect(itemsBackend.storedItems.has('shared1')).toBe(false)
-    expect(inclusionsBackend.storedItems.has('inclusionSharedA')).toBe(false)
-    expect(inclusionsBackend.storedItems.has('inclusionSharedB')).toBe(false)
-    // Unrelated inclusions untouched.
-    expect(inclusionsBackend.storedItems.has('inclusionA')).toBe(true)
+    expect(itemsBackend.storedItems.has('parentA')).toBe(true) // unrelated item untouched
   })
 
-  it('addChildNode persists both the item and an inclusion carrying the full ancestor chain', async () => {
-    const {treeService, itemsBackend, inclusionsBackend} = setup()
-    const parentNode = fakeTreeNode('grandparent1', [treeService.HARDCODED_ROOT_NODE_ITEM_ID])
-    const newNode = fakeTreeNode('newChild1', [], {title: 'New child'}, new NodeInclusion('newInclusion1', 'grandparent1', 3))
+  it('addChildNode persists the item with its relationship embedded, carrying the full ancestor chain', async () => {
+    const {treeService, itemsBackend, oryItemsService} = setup()
+    const root = treeService.HARDCODED_ROOT_NODE_ITEM_ID
+    const grandparentItem$ = oryItemsService.obtainItem$ById('grandparent1' as any)
+    grandparentItem$.applyDataFromDbAndEmit({title: 'Grandparent', inclusionsByParentId: {[root]: {orderNum: 0}}} as any)
+    const parentNode = fakeTreeNode('grandparent1', [root])
+    const newNode = fakeTreeNode('newChild1', [], {title: 'New child'}, new NodeInclusion('newChild1', 'grandparent1', 3))
 
     treeService.addChildNode(parentNode, newNode)
     await flushMicrotasks()
 
-    expect(itemsBackend.storedItems.get('newChild1')?.title).toBe('New child')
-    const inclusion = inclusionsBackend.storedItems.get('newInclusion1')
-    expect(inclusion?.childItemId).toBe('newChild1')
-    expect(inclusion?.orderNum).toBe(3)
-    expect(inclusion?.parentIds).toEqual(['grandparent1'])
-    expect(inclusion?.ancestorIds).toEqual([treeService.HARDCODED_ROOT_NODE_ITEM_ID, 'grandparent1'])
+    const stored = itemsBackend.storedItems.get('newChild1')
+    expect(stored?.title).toBe('New child')
+    expect(stored?.inclusionsByParentId).toEqual({grandparent1: {orderNum: 3}})
+    expect(stored?.parentIds).toEqual(['grandparent1'])
+    // getAncestorIds() walks nearest-parent-first (order doesn't matter for the ancestor_ids
+    // containment query itself) - just needs to contain both.
+    expect(stored?.ancestorIds).toEqual(expect.arrayContaining([root, 'grandparent1']))
   })
 
   it('addAssociateSiblingAfterNode links an existing item under a second parent without duplicating the item', async () => {
-    const {treeService, itemsBackend, inclusionsBackend} = setup()
+    const {treeService, itemsBackend, oryItemsService} = setup()
+    const root = treeService.HARDCODED_ROOT_NODE_ITEM_ID
     itemsBackend.seed('existingItem1', {title: 'Existing'})
-    const parentB = fakeTreeNode('parentB', [treeService.HARDCODED_ROOT_NODE_ITEM_ID])
-    const nodeToAssociate = fakeTreeNode('existingItem1', [], {title: 'Existing'}, new NodeInclusion('newInclusionUnderB', 'parentB', 7))
+    oryItemsService.obtainItem$ById('existingItem1' as any).applyDataFromDbAndEmit({title: 'Existing'} as any)
+    seedItemWithInclusion(itemsBackend, 'parentB', {title: 'Parent B'}, root, 0, [root])
+    const parentB = fakeTreeNode('parentB', [root])
+    const nodeToAssociate = fakeTreeNode('existingItem1', [], {title: 'Existing'}, new NodeInclusion('existingItem1', 'parentB', 7))
 
     treeService.addAssociateSiblingAfterNode(parentB, nodeToAssociate, undefined)
     await flushMicrotasks()
 
-    expect(itemsBackend.storedItems.size).toBe(1) // no duplicate item row created
-    const inclusion = inclusionsBackend.storedItems.get('newInclusionUnderB')
-    expect(inclusion?.childItemId).toBe('existingItem1')
-    expect(inclusion?.parentIds).toEqual(['parentB'])
+    expect(itemsBackend.storedItems.size).toBe(2) // existingItem1 + parentB - no duplicate item row created
+    const stored = itemsBackend.storedItems.get('existingItem1')
+    expect(stored?.inclusionsByParentId).toEqual({parentB: {orderNum: 7}})
+    expect(stored?.parentIds).toEqual(['parentB'])
   })
 
   it('patchChildInclusionData moving a node to a new parent updates parentIds/ancestorIds to the new parent chain', async () => {
-    const {treeService, itemsBackend, inclusionsBackend, listener} = setup()
+    const {treeService, itemsBackend, listener} = setup()
     const root = treeService.HARDCODED_ROOT_NODE_ITEM_ID
-    itemsBackend.seed('parentA', {title: 'Parent A'})
-    itemsBackend.seed('parentB', {title: 'Parent B'})
-    inclusionsBackend.seed('inclusionA', {childItemId: 'parentA', orderNum: 1}, [root], [root])
-    inclusionsBackend.seed('inclusionB', {childItemId: 'parentB', orderNum: 2}, [root], [root])
-    itemsBackend.seed('movable1', {title: 'Movable'})
-    inclusionsBackend.seed('inclusionMovable', {childItemId: 'movable1', orderNum: 1}, ['parentA'], ['parentA'])
+    seedItemWithInclusion(itemsBackend, 'parentA', {title: 'Parent A'}, root, 1, [root])
+    seedItemWithInclusion(itemsBackend, 'parentB', {title: 'Parent B'}, root, 2, [root])
+    seedItemWithInclusion(itemsBackend, 'movable1', {title: 'Movable'}, 'parentA', 1, ['parentA'])
     // Make parentA/parentB "reachable" (as if already rendered) via a normal load pass first.
     treeService.loadNodesTree(listener)
     await flushMicrotasks()
 
-    treeService.patchChildInclusionData('parentA', 'inclusionMovable', new NodeInclusion('inclusionMovable', 'parentB', 4), 'movable1')
+    treeService.patchChildInclusionData('parentA', 'movable1', new NodeInclusion('movable1', 'parentB', 4), 'movable1')
     await flushMicrotasks()
 
-    const inclusion = inclusionsBackend.storedItems.get('inclusionMovable')
-    expect(inclusion?.parentIds).toEqual(['parentB'])
-    expect(inclusion?.ancestorIds).toEqual([root, 'parentB'])
-    expect(inclusion?.orderNum).toBe(4)
+    const stored = itemsBackend.storedItems.get('movable1')
+    expect(stored?.inclusionsByParentId).toEqual({parentB: {orderNum: 4}})
+    expect(stored?.parentIds).toEqual(['parentB'])
+    expect(stored?.ancestorIds).toEqual(expect.arrayContaining([root, 'parentB']))
   })
 })
 
@@ -429,49 +417,37 @@ describe('SupabaseTreeService.backfillNode - source (Firestore) tree root id rem
   // Regression coverage for a real bug: the tree being walked during a backfill is the
   // *Firestore*-backed TreeModel, whose root has Firestore's own hardcoded root item id - not
   // this service's 'ory_root'. Every real item keeps the same id across both backends, but the
-  // synthetic root id itself differs, so it has to be remapped wherever it appears in
-  // parent_ids/ancestor_ids. Getting this wrong means every top-level node (and everything
+  // synthetic root id itself differs, so it has to be remapped wherever it appears in the
+  // relationship/ancestor chain. Getting this wrong means every top-level node (and everything
   // under it) is written with a parent id that never matches 'ory_root' once the Supabase
   // backend goes live - the entire migrated tree silently unreachable.
   const firestoreRootId = 'item_firestore_hardcoded_root'
 
   it('remaps a top-level node\'s parent to this service\'s own root id, not the source tree\'s', async () => {
-    const {treeService, inclusionsBackend} = setup()
-    const firestoreRoot = fakeTreeNode(firestoreRootId, [])
-    const topLevelNode = fakeTreeNode('topLevel1', [], {title: 'Top level'}, new NodeInclusion('topLevelInclusion', firestoreRootId, 1))
-
-    await treeService.backfillNode(firestoreRoot, topLevelNode)
-
-    const inclusion = inclusionsBackend.storedItems.get('topLevelInclusion')
-    expect(inclusion?.parentIds).toEqual([treeService.HARDCODED_ROOT_NODE_ITEM_ID])
-    expect(inclusion?.ancestorIds).toEqual([treeService.HARDCODED_ROOT_NODE_ITEM_ID])
-  })
-
-  it('leaves a real (non-root) ancestor id unchanged while still remapping the root at the base of the chain', async () => {
-    const {treeService, inclusionsBackend} = setup()
-    const realParent = fakeTreeNode('realParent1', [firestoreRootId], {title: 'Parent'})
-    const deepNode = fakeTreeNode('deepChild1', [], {title: 'Deep child'}, new NodeInclusion('deepInclusion', 'realParent1', 1))
-
-    await treeService.backfillNode(realParent, deepNode)
-
-    const inclusion = inclusionsBackend.storedItems.get('deepInclusion')
-    // parent id is the real item id, unchanged
-    expect(inclusion?.parentIds).toEqual(['realParent1'])
-    // ancestor chain: [remapped root, real parent] - the root remapped, the real ancestor kept as-is
-    expect(inclusion?.ancestorIds).toEqual([treeService.HARDCODED_ROOT_NODE_ITEM_ID, 'realParent1'])
-  })
-
-  it('writes the item itself unchanged regardless of the source root id mismatch', async () => {
     const {treeService, itemsBackend} = setup()
     const firestoreRoot = fakeTreeNode(firestoreRootId, [])
     const topLevelNode = fakeTreeNode('topLevel1', [], {title: 'Top level'}, new NodeInclusion('topLevelInclusion', firestoreRootId, 1))
 
     await treeService.backfillNode(firestoreRoot, topLevelNode)
 
-    expect(itemsBackend.storedItems.get('topLevel1')?.title).toBe('Top level')
-    // items never carry parent/ancestor ids themselves (see OryOdmItem$'s doc comment) - only
-    // the inclusion does, so there's nothing root-id-shaped to get wrong here.
-    expect(itemsBackend.storedItems.get('topLevel1')?.parentIds).toEqual([])
+    const stored = itemsBackend.storedItems.get('topLevel1')
+    expect(stored?.parentIds).toEqual([treeService.HARDCODED_ROOT_NODE_ITEM_ID])
+    expect(stored?.ancestorIds).toEqual([treeService.HARDCODED_ROOT_NODE_ITEM_ID])
+    expect(stored?.inclusionsByParentId).toEqual({[treeService.HARDCODED_ROOT_NODE_ITEM_ID]: {orderNum: 1}})
+  })
+
+  it('leaves a real (non-root) ancestor id unchanged while still remapping the root at the base of the chain', async () => {
+    const {treeService, itemsBackend} = setup()
+    const realParent = fakeTreeNode('realParent1', [firestoreRootId], {title: 'Parent'})
+    const deepNode = fakeTreeNode('deepChild1', [], {title: 'Deep child'}, new NodeInclusion('deepInclusion', 'realParent1', 1))
+
+    await treeService.backfillNode(realParent, deepNode)
+
+    const stored = itemsBackend.storedItems.get('deepChild1')
+    // parent id is the real item id, unchanged
+    expect(stored?.parentIds).toEqual(['realParent1'])
+    // ancestor chain: [remapped root, real parent] - the root remapped, the real ancestor kept as-is
+    expect(stored?.ancestorIds).toEqual([treeService.HARDCODED_ROOT_NODE_ITEM_ID, 'realParent1'])
   })
 })
 
@@ -483,7 +459,7 @@ describe('OryolFirestoreBackfillService', () => {
   }
 
   it('walks the whole source tree and writes every non-root node, remapping top-level parents to this service\'s root id', async () => {
-    const {treeService, itemsBackend, inclusionsBackend, backfillService} = backfillSetup()
+    const {treeService, itemsBackend, backfillService} = backfillSetup()
     const firestoreRootId = 'item_firestore_hardcoded_root'
     const root = fakeTreeNode(firestoreRootId, [])
     const child = fakeTreeNode('child1', [firestoreRootId], {title: 'Child'}, new NodeInclusion('inclusionChild', firestoreRootId, 1))
@@ -496,8 +472,8 @@ describe('OryolFirestoreBackfillService', () => {
 
     expect(itemsBackend.storedItems.has('child1')).toBe(true)
     expect(itemsBackend.storedItems.has('grandchild1')).toBe(true)
-    expect(inclusionsBackend.storedItems.get('inclusionChild')?.parentIds).toEqual([treeService.HARDCODED_ROOT_NODE_ITEM_ID])
-    expect(inclusionsBackend.storedItems.get('inclusionGrandchild')?.parentIds).toEqual(['child1'])
+    expect(itemsBackend.storedItems.get('child1')?.parentIds).toEqual([treeService.HARDCODED_ROOT_NODE_ITEM_ID])
+    expect(itemsBackend.storedItems.get('grandchild1')?.parentIds).toEqual(['child1'])
     expect(backfillService.progress$.lastVal).toMatchObject({written: 2, failed: 0, total: 2, done: true})
   })
 
@@ -529,7 +505,7 @@ describe('OryolFirestoreBackfillService', () => {
   })
 
   it('is safe to re-run - a retried node upserts instead of duplicating', async () => {
-    const {itemsBackend, inclusionsBackend, backfillService} = backfillSetup()
+    const {itemsBackend, backfillService} = backfillSetup()
     const firestoreRootId = 'item_firestore_hardcoded_root'
     const root = fakeTreeNode(firestoreRootId, [])
     const node = fakeTreeNode('item1', [], {title: 'Original'}, new NodeInclusion('inclusion1', firestoreRootId, 1))
@@ -541,17 +517,18 @@ describe('OryolFirestoreBackfillService', () => {
     await backfillService.run(root)
 
     expect(itemsBackend.storedItems.size).toBe(1)
-    expect(inclusionsBackend.storedItems.size).toBe(1)
     expect(itemsBackend.storedItems.get('item1')?.title).toBe('Updated on second pass')
   })
 })
 
 describe('SupabaseTreeService - offline/network-failure resilience', () => {
   it('a failed addChildNode item save is durably journaled for retry (survives reload/crash)', async () => {
-    const {treeService, itemsBackend, browserOdmStorage} = setup()
+    const {treeService, itemsBackend, browserOdmStorage, oryItemsService} = setup()
+    const root = treeService.HARDCODED_ROOT_NODE_ITEM_ID
+    oryItemsService.obtainItem$ById(root as any).applyDataFromDbAndEmit({title: 'Root', inclusionsByParentId: {}} as any)
     itemsBackend.shouldFailSave = true
-    const parentNode = fakeTreeNode(treeService.HARDCODED_ROOT_NODE_ITEM_ID, [])
-    const newNode = fakeTreeNode('offlineChild1', [], {title: 'Created offline'}, new NodeInclusion('offlineInclusion1', treeService.HARDCODED_ROOT_NODE_ITEM_ID, 1))
+    const parentNode = fakeTreeNode(root, [])
+    const newNode = fakeTreeNode('offlineChild1', [], {title: 'Created offline'}, new NodeInclusion('offlineChild1', root, 1))
 
     treeService.addChildNode(parentNode, newNode)
     await flushMicrotasks()
@@ -563,9 +540,11 @@ describe('SupabaseTreeService - offline/network-failure resilience', () => {
 
   it('reconnecting and resuming the journaled edit succeeds once the network is back', async () => {
     const {treeService, itemsBackend, oryItemsService, browserOdmStorage} = setup()
+    const root = treeService.HARDCODED_ROOT_NODE_ITEM_ID
+    oryItemsService.obtainItem$ById(root as any).applyDataFromDbAndEmit({title: 'Root', inclusionsByParentId: {}} as any)
     itemsBackend.shouldFailSave = true
-    const parentNode = fakeTreeNode(treeService.HARDCODED_ROOT_NODE_ITEM_ID, [])
-    const newNode = fakeTreeNode('offlineChild2', [], {title: 'Created offline'}, new NodeInclusion('offlineInclusion2', treeService.HARDCODED_ROOT_NODE_ITEM_ID, 1))
+    const parentNode = fakeTreeNode(root, [])
+    const newNode = fakeTreeNode('offlineChild2', [], {title: 'Created offline'}, new NodeInclusion('offlineChild2', root, 1))
     treeService.addChildNode(parentNode, newNode)
     await flushMicrotasks()
     expect(itemsBackend.storedItems.has('offlineChild2')).toBe(false)

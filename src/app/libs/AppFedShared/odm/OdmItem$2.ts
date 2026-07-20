@@ -12,6 +12,7 @@ import {getNowTimePointSuitableForId, odmTimestampToMillis} from './utils'
 import {BehaviorSubject} from 'rxjs'
 import {debugLog} from '../utils/log'
 import {Injector} from '@angular/core'
+import {NodeOrderer, ORDER_STEP} from './NodeOrderer'
 
 export type UserId = string
 
@@ -33,17 +34,40 @@ export class OdmInMemItemWriteOnce {
   public whenArchived?: OdmTimestamp | null
   public owner?: UserId
   public parentIds?: string[]
+  /** Full ancestor-id path (root..self, exclusive of self) - persisted explicitly (not purely
+   * derived at read time) so the `ancestor_ids`-containment query (`.contains([nodeId])`) can
+   * fetch a whole displayable subtree in one request without needing every ancestor loaded
+   * client-side first. Kept in sync with `inclusionsByParentId`/`parentIds` by
+   * `setIdAndWhenCreatedIfNecessary()` via `getAncestorIds()`. */
+  public ancestorIds?: string[]
   /** Extra `ancestorIds` entries beyond the real parent chain `getAncestorIds()` already walks -
    * currently just the bare-slot mechanism (GH #89): a child "created under" a fabricated/virtual
    * slot id (e.g. `abcdefgh_field_plan`) stays a completely normal child of its real parent
    * (`parentIds` unchanged) with the slot id appended here, so it's reachable via the exact same
    * `ancestorIds`-containment query as any other descendant - see `BareSlotChildren.ts`. */
   public manualAncestorIds?: string[]
+  /** GH #89 unify-the-tree-worlds: a parent-child relationship (and its sibling order under that
+   * specific parent), embedded directly on the child instead of living in a separate "inclusion"
+   * row/collection (OrYoL's old `NodeInclusion` model). Keyed by parent item id - most items have
+   * exactly one key; an item included under several different parents at once (OrYoL's multi-
+   * parent support) has one entry per parent, each with its own independent order. This is the
+   * source of truth `getParentIds()`/`getAncestorIds()` derive from when present (see below) -
+   * `parentIds`/`ancestorIds` stay as real persisted columns for containment queries, but are
+   * always recomputed from this map, never edited independently. */
+  public inclusionsByParentId?: Record<string, {orderNum: number}>
 }
 
 /** FIXME: rename OdmInMemItemData */
 export class OdmInMemItem extends OdmInMemItemWriteOnce {
   public whenLastModified?: OdmTimestamp
+  /** GH #89's "whenDescendantLastModified" rollup - server-maintained (see the
+   * `trg_bump_when_descendant_last_modified` DB trigger, migration
+   * `add_when_descendant_last_modified_rollup`), never written directly by the client except for
+   * the local-only optimistic bump in `bumpAncestorsWhenDescendantLastModifiedLocally()` below
+   * (so the UI reflects a just-made edit immediately, including fully offline, before the write
+   * even reaches the server). See `getWhenDescendantLastModified()`'s doc comment for why a MAX
+   * rollup like this one is safe to persist/propagate incrementally, unlike a count would be. */
+  public whenDescendantLastModified?: OdmTimestamp
   public whereCreated?: any
   /** Fractional sibling-ordering key (OrYoL-style), spaced by ODM_ORDER_STEP so nodes
    * can be reordered/inserted between neighbours without renumbering siblings. */
@@ -88,9 +112,14 @@ export function summarizePatch(patch: any): string {
   }).join(', ')
 }
 
-/** Spacing between sibling `orderNum`s (OrYoL-style). Large gap lets us insert
- * between two neighbours by averaging, without renumbering siblings. */
-export const ODM_ORDER_STEP = 1000 * 1000
+/** Spacing between sibling `orderNum`s. Large gap lets us insert between two neighbours by
+ * averaging, without renumbering siblings. Re-exported from the shared `NodeOrderer` (GH #89's
+ * unify-the-tree-worlds effort - this used to be a separate, duplicate constant) so there's one
+ * canonical value, not two that could drift apart. */
+export const ODM_ORDER_STEP = ORDER_STEP
+
+/** One stateless instance, shared by every `OdmItem$2` - `NodeOrderer` holds no per-call state. */
+const nodeOrderer = new NodeOrderer()
 
 export type OdmItem$2CtorOpts = { createdLocally?: boolean }
 
@@ -262,14 +291,50 @@ export class OdmItem$2<
     this.currentVal ! . owner = this.odmService.authService.authUser$?.lastVal?.uid
     this.currentVal ! . whenCreated = this.currentVal ! . whenCreated || OdmBackend.nowTimestamp()
     /* FIXME move to smth like setMetadata(): */
-    this.currentVal ! . parentIds = this.parents?.filter(
-      p => p.id /* FIXME this is a hack if parent was not saved yet (didn't get id yet) */
-    )?.map(p => p.id as string) ?? [] /* FIXME: on the loading/receiving side, the this.parents are not set in-mem? */
+    // Always derived from getParentIds()/getAncestorIds() (not reimplemented here) so a
+    // subclass override (e.g. explicit-parent-id items) and the persisted `parentIds`/
+    // `ancestorIds` fields can never silently diverge - see inclusionsByParentId's doc comment.
+    this.currentVal ! . parentIds = this.getParentIds() as string[]
+    this.currentVal ! . ancestorIds = this.getAncestorIds() as string[]
 
     if ( ! this.id ) {
       this.id = this.generateItemId()
       // this.currentVal.id = this.id
     }
+  }
+
+  /** GH #89 unify-the-tree-worlds: records (or updates the order of) a parent-child relationship
+   * directly on this item, replacing OrYoL's old separate-row `NodeInclusion` model. `parentItem$`
+   * must already be loaded (true by construction - you can't attach a child under a parent you
+   * don't have in memory), so `getAncestorIds()` can walk it immediately without a network round
+   * trip. Caller is responsible for persisting afterward (`saveNowToDb()`/`patchNow()`). */
+  setParentInclusion(parentItem$: TParent, orderNum: number): void {
+    this.currentVal ??= {} as TInMemData
+    const parentId = parentItem$.id as string
+    const inclusions = {...(this.currentVal.inclusionsByParentId ?? {})}
+    inclusions[parentId] = {orderNum}
+    this.currentVal.inclusionsByParentId = inclusions
+    if (!this.parents?.some(p => p.id === parentId)) {
+      this.parents = [...(this.parents ?? []), parentItem$]
+    }
+  }
+
+  /** Removes this item from one specific parent (the multi-parent-aware counterpart of
+   * `setParentInclusion()`) - e.g. a move/reparent removes the old parent then adds the new one. */
+  removeParentInclusion(parentId: string): void {
+    if (!this.currentVal?.inclusionsByParentId) {
+      return
+    }
+    const inclusions = {...this.currentVal.inclusionsByParentId}
+    delete inclusions[parentId]
+    this.currentVal.inclusionsByParentId = inclusions
+    this.parents = this.parents?.filter(p => p.id !== parentId)
+  }
+
+  /** Sibling order under one specific parent - falls back to the legacy flat `orderNum` scalar
+   * for items not using `inclusionsByParentId` (single-parent generic items, unchanged). */
+  getOrderNumUnderParent(parentId: string): number | undefined {
+    return this.currentVal?.inclusionsByParentId?.[parentId]?.orderNum ?? this.currentVal?.orderNum
   }
 
   private generateItemId(): TItemId {
@@ -413,7 +478,44 @@ export class OdmItem$2<
   setWhenLastModified() {
     // debugLog(`setWhenLastModified`, this)
     // console.trace(`setWhenLastModified`, this)
-    this.currentVal ! . whenLastModified = OdmBackend.nowTimestamp()
+    const ts = OdmBackend.nowTimestamp()
+    this.currentVal ! . whenLastModified = ts
+    this.bumpAncestorsWhenDescendantLastModifiedLocally(ts)
+  }
+
+  /** Optimistic, offline-safe half of GH #89's "whenDescendantLastModified" rollup - the DB
+   * trigger (`trg_bump_when_descendant_last_modified`) is the authoritative propagation path, but
+   * that only takes effect once this edit actually reaches the server. Walking `this.parents`
+   * (whatever's already resident in memory - same caveat as `getAncestorIds()`) and patching each
+   * loaded ancestor directly means the UI updates immediately, including with no network at all,
+   * via the exact same durable patch/journal/retry path (`patchThrottled`) any other field edit
+   * already uses - no bespoke offline handling needed.
+   *
+   * Deliberately gated on `hasBeenPersistedToDb`: patching an ancestor whose full data hasn't
+   * loaded yet would `patchThrottled()` a near-empty `currentVal`, and this backend's upsert
+   * writes `data` as a whole JSONB column (not a merge) - see `createPostgresOdmRow()` - so that
+   * would wipe out every other real field on that row. Skipping unloaded ancestors here is safe:
+   * the DB trigger still reaches them once the edit syncs, this is purely a same-session nicety. */
+  private bumpAncestorsWhenDescendantLastModifiedLocally(timestamp: OdmTimestamp, visitedIds: Set<string> = new Set()): void {
+    const newMs = odmTimestampToMillis(timestamp)
+    if (newMs === undefined) {
+      return
+    }
+    for (const parent of this.parents ?? []) {
+      const parentId = parent?.id as string | undefined
+      if (!parentId || visitedIds.has(parentId)) {
+        continue
+      }
+      visitedIds.add(parentId)
+      if (!(parent as any).hasBeenPersistedToDb) {
+        continue
+      }
+      const existingMs = odmTimestampToMillis((parent.currentVal as any)?.whenDescendantLastModified)
+      if (existingMs === undefined || existingMs < newMs) {
+        (parent as any).patchThrottled({whenDescendantLastModified: timestamp}, {dontSetWhenLastModified: true})
+      }
+      ;(parent as any).bumpAncestorsWhenDescendantLastModifiedLocally(timestamp, visitedIds)
+    }
   }
 
   applyDataFromDbAndEmit(incomingConverted: TInMemData) {
@@ -622,7 +724,14 @@ export class OdmItem$2<
 
   public requestLoadTreeDescendants() {
     console.log('requestLoadTreeDescendants', this.id)
-    if ( this.treeDescendantsListener ) {
+    // A brand-new, not-yet-saved item has no id yet (only assigned on its first save/patch -
+    // see setIdAndWhenCreatedIfNecessary()) - matches the same guard requestLoadChildren() above
+    // already has. Without it, OdmTreeNode.requestLoadChildren() (called unconditionally by
+    // TreeNodeCellsComponent for every visible cell, not just bare slots, so a voice-memo-created
+    // child is findable under any field kind) crashed on every fresh item: "'ancestorId': must be
+    // truthy, is: undefined" - ancestorId here is just loadTreeDescendantsOf()'s own parameter
+    // name (a query filter on the real ancestor_ids column), not a persisted field.
+    if ( this.treeDescendantsListener || ! this.id ) {
       return
     }
     // Descendants (any depth) just join the service's general item pool, same as a normal
@@ -634,6 +743,10 @@ export class OdmItem$2<
 
 
   public getParentIds(): TItemId[] {
+    if ( this.currentVal?.inclusionsByParentId ) {
+      return Object.keys(this.currentVal.inclusionsByParentId) as TItemId[]
+    }
+
     if ( this.parents ) {
       return this.parents.map(parent => parent.id! as TItemId)
     }
@@ -649,7 +762,7 @@ export class OdmItem$2<
       return [] as TItemId[]
     }
 
-    if ( appGlobals.feat.categoriesTree.showFixmes ) {
+    if ( appGlobals?.feat?.categoriesTree?.showFixmes ) {
       console.error('Item$ has no parent metadata; treating as top-level item.', this)
     }
     return [] as TItemId[]
@@ -807,10 +920,11 @@ export class OdmItem$2<
    * above, safe for a many-to-many tree (`parentIds`/`ancestorIds` are plain, unvalidated string
    * arrays - an item reachable via more than one parent path would otherwise be visited, and
    * counted, once per path) and guarded against a cycle (shouldn't occur in a well-formed tree,
-   * but nothing at the DB level actually prevents one). Backing method for
-   * `getDescendantsCount()`/`getWhenDescendantLastModified()` (GH #89's rollup fields) - only
-   * covers what's currently loaded in memory, same caveat `getDescendants()` already has; call
-   * `requestLoadTreeDescendants()` first for a complete answer over a whole subtree. */
+   * but nothing at the DB level actually prevents one). Backing method for `getDescendantsCount()`
+   * (GH #89's rollup fields) - only covers what's currently loaded in memory, same caveat
+   * `getDescendants()` already has; call `requestLoadTreeDescendants()` first for a complete
+   * answer over a whole subtree. (`getWhenDescendantLastModified()` no longer uses this - see its
+   * own doc comment for why a MAX rollup didn't have to share this in-memory-only limitation.) */
   private getDeduplicatedDescendants(): OdmItem$2<any, any, any, any>[] {
     const visitedIds = new Set<string>()
     const result: OdmItem$2<any, any, any, any>[] = []
@@ -840,21 +954,20 @@ export class OdmItem$2<
     return this.getDeduplicatedDescendants().length
   }
 
-  /** Latest `whenLastModified` among all unique in-memory descendants (GH #89: "New field
-   * whenDescendantLastModified") - undefined if there are none, or none have a timestamp yet.
-   * Same computed-not-persisted reasoning as `getDescendantsCount()`. */
+  /** Latest `whenLastModified` anywhere in this item's subtree (GH #89: "New field
+   * whenDescendantLastModified") - a **persisted** field, unlike `getDescendantsCount()`. A count
+   * can't be incrementally maintained correctly in a many-to-many tree (the same write would
+   * increment a shared descendant's counter via more than one parent path), but a MAX doesn't have
+   * that problem - it's idempotent and commutative regardless of how many paths or how many times
+   * it's reapplied, so it's safe to propagate. The DB trigger `trg_bump_when_descendant_last_modified`
+   * (migration `add_when_descendant_last_modified_rollup`) does that propagation server-side in
+   * one bulk statement per write (via the already-fully-expanded `ancestor_ids` column), so this
+   * is always accurate regardless of what's currently loaded client-side - unlike the old
+   * in-memory-only computed version. `bumpAncestorsWhenDescendantLastModifiedLocally()` (called
+   * from `setWhenLastModified()`) additionally patches whatever ancestors are already loaded in
+   * this session for immediate, fully-offline-safe UI feedback ahead of that server round-trip. */
   getWhenDescendantLastModified(): OdmTimestamp | undefined {
-    let latestMs: number | undefined
-    let latest: OdmTimestamp | undefined
-    for (const descendant of this.getDeduplicatedDescendants()) {
-      const whenLastModified = (descendant.val as any)?.whenLastModified
-      const ms = odmTimestampToMillis(whenLastModified)
-      if (ms !== undefined && (latestMs === undefined || ms > latestMs)) {
-        latestMs = ms
-        latest = whenLastModified
-      }
-    }
-    return latest
+    return (this.currentVal as any)?.whenDescendantLastModified
   }
 
   // ============================================================================
@@ -878,19 +991,11 @@ export class OdmItem$2<
     })
   }
 
-  /** OrYoL-style fractional ordering: midpoint between neighbours, or one step
-   * beyond a single neighbour, or 0 when there are none. */
+  /** Fractional ordering: midpoint between neighbours, or one step beyond a single neighbour, or
+   * 0 when there are none. Delegates to the shared `NodeOrderer` (GH #89's unify-the-tree-worlds
+   * effort - this used to be a separate reimplementation of OrYoL's identical algorithm). */
   calculateOrderNumBetween(previous: number | nullish, next: number | nullish): number {
-    if ( (previous ?? null) === null && next != null ) {
-      return next - ODM_ORDER_STEP
-    }
-    if ( previous != null && (next ?? null) === null ) {
-      return previous + ODM_ORDER_STEP
-    }
-    if ( (previous ?? null) === null && (next ?? null) === null ) {
-      return 0
-    }
-    return (previous! + next!) / 2
+    return nodeOrderer.calculateNewOrderNumber(previous, next)
   }
 
   /** Create, register and persist a new child item under this one (appended last by
@@ -914,5 +1019,112 @@ export class OdmItem$2<
     ) as unknown as TChild
     ;(child as unknown as OdmItem$2<any, any, any, any>).saveNowToDb()
     return child
+  }
+
+  /** Move this item one position earlier among its (first) parent's ordered children - OrYoL's
+   * `ApfNonRootTreeNode.reorderUp()`, generalized to a plain `OdmItem$2` child instead of a
+   * `NodeInclusion`-wrapped tree node. Wraps around to become the last child when already first;
+   * no-op with no parent or as an only child. */
+  reorderUp(): void {
+    const parent = this.parents?.[0] as unknown as OdmItem$2<any, any, any, any> | undefined
+    if (!parent) {
+      return
+    }
+    const ordered = parent.getChildrenOrdered() as unknown as OdmItem$2<any, any, any, any>[]
+    const index = ordered.indexOf(this as unknown as OdmItem$2<any, any, any, any>)
+    if (index < 0 || ordered.length < 2) {
+      return
+    }
+    if (index === 0) {
+      this.reorderBetween(parent, ordered[ordered.length - 1], undefined) // wrap to last
+    } else {
+      this.reorderBetween(parent, ordered[index - 2], ordered[index - 1])
+    }
+  }
+
+  /** Move this item one position later among its (first) parent's ordered children - OrYoL's
+   * `ApfNonRootTreeNode.reorderDown()`, generalized the same way `reorderUp()` is. Wraps around to
+   * become the first child when already last; no-op with no parent or as an only child. */
+  reorderDown(): void {
+    const parent = this.parents?.[0] as unknown as OdmItem$2<any, any, any, any> | undefined
+    if (!parent) {
+      return
+    }
+    const ordered = parent.getChildrenOrdered() as unknown as OdmItem$2<any, any, any, any>[]
+    const index = ordered.indexOf(this as unknown as OdmItem$2<any, any, any, any>)
+    if (index < 0 || ordered.length < 2) {
+      return
+    }
+    if (index === ordered.length - 1) {
+      this.reorderBetween(parent, undefined, ordered[0]) // wrap to first
+    } else {
+      this.reorderBetween(parent, ordered[index + 1], ordered[index + 2])
+    }
+  }
+
+  private reorderBetween(
+    parent: OdmItem$2<any, any, any, any>,
+    previous: OdmItem$2<any, any, any, any> | undefined,
+    next: OdmItem$2<any, any, any, any> | undefined,
+  ): void {
+    const orderNum = parent.calculateOrderNumBetween(previous?.getOrderNum(), next?.getOrderNum())
+    this.patchThrottled({orderNum} as TMemPatch)
+    // Patching this child's own orderNum doesn't itself notify the parent's childrenList$ (a
+    // separate CachedSubject) - force a re-emit so anything deriving a display order from it
+    // (OdmTreeNode.childNodesList$) re-sorts immediately instead of only on the next unrelated
+    // children-list change.
+    parent.childrenList$.reEmit()
+  }
+
+  /** Nest this item one level deeper - becomes the last child of its previous sibling. OrYoL's
+   * `ApfNonRootTreeNode.indentIncrease()`, generalized. No-op if this is already the first child
+   * (no sibling above to become a child of). */
+  indentIncrease(): void {
+    const parent = this.parents?.[0] as unknown as OdmItem$2<any, any, any, any> | undefined
+    if (!parent) {
+      return
+    }
+    const ordered = parent.getChildrenOrdered() as unknown as OdmItem$2<any, any, any, any>[]
+    const index = ordered.indexOf(this as unknown as OdmItem$2<any, any, any, any>)
+    if (index <= 0) {
+      return
+    }
+    this.reparentTo(ordered[index - 1], undefined)
+  }
+
+  /** Un-nest this item one level - becomes a sibling of its current parent, positioned right
+   * after it. OrYoL's `ApfNonRootTreeNode.indentDecrease()`, generalized. No-op if the parent has
+   * no parent of its own (this item is already top-level). */
+  indentDecrease(): void {
+    const parent = this.parents?.[0] as unknown as OdmItem$2<any, any, any, any> | undefined
+    const grandparent = parent?.parents?.[0] as unknown as OdmItem$2<any, any, any, any> | undefined
+    if (!parent || !grandparent) {
+      return
+    }
+    this.reparentTo(grandparent, parent)
+  }
+
+  /** Re-parents this item onto `newParent`, positioned right after `afterSibling` (or last, if
+   * omitted). Sets `.parents` directly so the very next `patchThrottled()`/save picks up the new
+   * `parentIds` via the existing `setIdAndWhenCreatedIfNecessary()` logic - no separate field
+   * needed. Updates both parents' locally-cached `childrenList$` immediately (removed from the
+   * old one, added to the new one via `onChildrenAddedLocally()` - the same "wired in immediately
+   * for snappy UX" pattern `createChild()` already uses) rather than waiting on a full reload. */
+  private reparentTo(newParent: OdmItem$2<any, any, any, any>, afterSibling: OdmItem$2<any, any, any, any> | undefined): void {
+    const orderedNewSiblings = newParent.getChildrenOrdered() as unknown as OdmItem$2<any, any, any, any>[]
+    const afterIndex = afterSibling ? orderedNewSiblings.indexOf(afterSibling) : -1
+    const previous = afterIndex >= 0 ? orderedNewSiblings[afterIndex] : orderedNewSiblings[orderedNewSiblings.length - 1]
+    const next = afterIndex >= 0 ? orderedNewSiblings[afterIndex + 1] : undefined
+    const orderNum = newParent.calculateOrderNumBetween(previous?.getOrderNum(), next?.getOrderNum())
+
+    const oldParent = this.parents?.[0] as unknown as OdmItem$2<any, any, any, any> | undefined
+    if (oldParent && oldParent !== newParent) {
+      oldParent.childrenList$.nextWithCache(
+        (oldParent.childrenList$.lastVal ?? []).filter(child => child !== (this as unknown as OdmItem$2<any, any, any, any>)),
+      )
+    }
+    this.parents = [newParent as unknown as TParent]
+    this.patchThrottled({orderNum} as TMemPatch)
+    newParent.onChildrenAddedLocally([this as unknown as TSelf])
   }
 }

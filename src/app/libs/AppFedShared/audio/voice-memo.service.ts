@@ -123,8 +123,8 @@ export class VoiceMemoService {
     return collectionOverride ?? item$?.odmService?.className
   }
 
-  async attachMemo(collection: string, itemId: string, fieldId: string, blob: Blob): Promise<string> {
-    return this.blobSyncService.upload(collection, itemId, blob, 'audio', 'audio/ogg; codecs=opus', undefined, fieldId)
+  async attachMemo(collection: string, itemId: string, fieldId: string, blob: Blob, durationMs?: number): Promise<string> {
+    return this.blobSyncService.upload(collection, itemId, blob, 'audio', 'audio/ogg; codecs=opus', undefined, fieldId, durationMs)
   }
 
   /** Only ever called once per field, at init, for the one field on each surface that the old

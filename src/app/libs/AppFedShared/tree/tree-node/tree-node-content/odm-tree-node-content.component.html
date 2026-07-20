@@ -4,6 +4,10 @@
   (keydown.alt.arrowleft)="onArrowLeft()"
   (keydown.meta.arrowleft)="onArrowLeft()"
   (keydown.control.a)="this.toggleShowAnswer()"
+  (keydown.control.arrowup)="reorderUp($event)"
+  (keydown.control.arrowdown)="reorderDown($event)"
+  (keydown.tab)="indentIncrease($event)"
+  (keydown.shift.tab)="indentDecrease($event)"
 >
   <ion-button
     fill="clear"
@@ -23,6 +27,51 @@
     fill="clear"
     size="small"
     class="node-icon-button"
+    title="Move up (Ctrl+↑)"
+    aria-label="Move up"
+    (click)="reorderUp($event)"
+  >
+    <ion-icon slot="icon-only" name="arrow-up-outline" />
+  </ion-button>
+
+  <ion-button
+    fill="clear"
+    size="small"
+    class="node-icon-button"
+    title="Move down (Ctrl+↓)"
+    aria-label="Move down"
+    (click)="reorderDown($event)"
+  >
+    <ion-icon slot="icon-only" name="arrow-down-outline" />
+  </ion-button>
+
+  <ion-button
+    fill="clear"
+    size="small"
+    class="node-icon-button"
+    title="Indent - nest under previous sibling (Tab)"
+    aria-label="Indent"
+    (click)="indentIncrease($event)"
+  >
+    <ion-icon slot="icon-only" name="arrow-forward-outline" />
+  </ion-button>
+
+  <ion-button
+    fill="clear"
+    size="small"
+    class="node-icon-button"
+    title="Outdent - become a sibling of the parent (Shift+Tab)"
+    aria-label="Outdent"
+    (click)="indentDecrease($event)"
+  >
+    <ion-icon slot="icon-only" name="arrow-back-outline" />
+  </ion-button>
+
+  <ion-button
+    *ngIf="isLearnItem"
+    fill="clear"
+    size="small"
+    class="node-icon-button"
     title="Node actions"
     aria-label="Node actions"
     (click)="onClickClassIcon($event)"
@@ -34,6 +83,7 @@
   </ion-button>
 
   <ion-button
+    *ngIf="isLearnItem"
     fill="clear"
     size="small"
     class="node-icon-button"
@@ -55,6 +105,11 @@
     [cell]="mapColumnIdToCell.get('title')!"
   ></app-rich-text-edit-cell>
 
+  <app-voice-memo-field
+    [item$]="treeNode.item$"
+    [fieldId]="'note'"
+  ></app-voice-memo-field>
+
   <!--  <ion-button size="small">Add to my categories-->
 <!--    &lt;!&ndash; bookmark icon like in LinkedIn Learning &ndash;&gt;-->
 <!--  </ion-button>-->
@@ -70,6 +125,7 @@
 </div>
 
 <app-rich-text-edit-cell
+  *ngIf="isLearnItem"
   #answerCell
   [hidden]="((! showAnswer) && !((val$ | async)?.answer)) || (!treeNode.isExpanded)"
   class="tree-answer-cell"

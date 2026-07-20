@@ -48,3 +48,64 @@ export function createChildUnderSlot<TOdmItem$ extends OdmItem$2<any, any, any, 
   child.saveNowToDb()
   return child
 }
+
+/** Shared wiring for "recording a voice memo on this field creates a real child, whose title is
+ * the transcript" - every cell kind's own `<app-voice-memo-field>` needs the exact same three
+ * behaviors (GH #89 unify-the-tree-worlds effort - this used to be copy-pasted per cell instead
+ * of one implementation):
+ *  1. `createChild` - passed as `VoiceMemoFieldComponent`'s `[createItemIfMissing]`, with
+ *     `[createItemEagerlyOnRecordStart]="true"` so the child (and thus somewhere for the
+ *     recording itself to attach to) exists from the moment recording starts, not just once it
+ *     stops - that's what lets the *same* child end up owning both the live-updating title and
+ *     the actual playable recording, instead of the audio staying on the parent field while only
+ *     a text-only child gets created from the transcript afterwards.
+ *  2. `onInterimTranscriptChanged` - bind to `(interimTranscriptChanged)` for a live-updating
+ *     title while still speaking (browser-native transcription mode only - see
+ *     `VoiceMemoFieldComponent.interimTranscript`'s doc comment).
+ *  3. `onTranscriptReady` - bind to `(transcriptReady)` to set the final title once recognition
+ *     ends (also the only path for `server`/`browser-whisper` modes, which have no interim
+ *     results at all).
+ * One controller instance per field (a cell keeps one for its lifetime) - a second recording on
+ * the same field continues patching the same child rather than creating another one, matching
+ * `VoiceMemoFieldComponent`'s own `item$`-persists-for-the-component's-lifetime semantics.
+ *
+ * `onChildCreated` is an optional escape hatch for a caller that needs to do something extra
+ * once the child exists - deliberately just a callback rather than this class knowing about any
+ * specific app. OrYoL is the one current user (GH #89 unify-the-tree-worlds Tier 2): a bare-slot
+ * child under an OrYoL field should *also* become a real row in OrYoL's own primary tree, which
+ * needs `SupabaseTreeService.createInclusionForExistingItem()` - an `apps/OrYoL/`-layer service
+ * this `libs/AppFedShared/`-layer class must not import directly. `TreeNodeMenuPopoverComponent`
+ * (which already knows it's OrYoL) supplies the hook instead, threaded down through
+ * `TreeNodeCellsComponent`/`BareSlotCellComponent`'s own optional `@Input()`s. */
+export class FieldVoiceMemoChildController<TOdmItem$ extends OdmItem$2<any, any, any, any>> {
+
+  private child?: TOdmItem$
+
+  constructor(
+    private parentItem$: TOdmItem$,
+    private targetNodeId: string,
+    private onChildCreated?: (child: TOdmItem$) => void,
+  ) {
+  }
+
+  createChild = (): TOdmItem$ => {
+    this.child = createChildUnderSlot(this.parentItem$, this.targetNodeId, {})
+    this.onChildCreated?.(this.child)
+    return this.child
+  }
+
+  onInterimTranscriptChanged = (text: string): void => {
+    this.child?.patchThrottled({title: text} as any)
+  }
+
+  /** Lazily creates the child if `createChild`/eager mode was never used (e.g. a caller that
+   * needs `[item$]` bound to the parent directly instead - see Journal's `general` field, which
+   * keeps its own legacy-recording lookup pointed at the parent and so can't use eager creation,
+   * but still gets a title-only child from the transcript exactly like it always has). */
+  onTranscriptReady = (transcript: string): void => {
+    if (!this.child) {
+      this.createChild()
+    }
+    this.child?.patchThrottled({title: transcript} as any)
+  }
+}

@@ -1,3 +1,4 @@
+import {describe, it, expect, vi, beforeEach} from 'vitest'
 import {
   OdmItem$2,
   ODM_ORDER_STEP,
@@ -12,15 +13,15 @@ function makeFakeService(): any {
     throttleSaveToDbMs: 3000,
     throttleIntervalMs: 500,
     treeRootItemId: 'ROOT',
-    saveNowToDb: jasmine.createSpy('saveNowToDb'),
-    emitLocalItems: jasmine.createSpy('emitLocalItems'),
-    itemHistoryService: { onPatch: jasmine.createSpy('onPatch') },
-    syncStatusService: { handleSavingPromise: jasmine.createSpy('handleSavingPromise') },
+    saveNowToDb: vi.fn(),
+    emitLocalItems: vi.fn(),
+    itemHistoryService: { onPatch: vi.fn() },
+    syncStatusService: { handleSavingPromise: vi.fn() },
     authService: { authUser$: { lastVal: { uid: 'user-1' } } },
     browserOdmStorage: {
-      savePendingEdit: jasmine.createSpy('savePendingEdit').and.resolveTo(undefined),
-      clearPendingEdit: jasmine.createSpy('clearPendingEdit').and.resolveTo(undefined),
-      get: jasmine.createSpy('get').and.resolveTo(undefined),
+      savePendingEdit: vi.fn().mockResolvedValue(undefined),
+      clearPendingEdit: vi.fn().mockResolvedValue(undefined),
+      get: vi.fn().mockResolvedValue(undefined),
     },
   }
   svc.createOdmItem$ = (id: any, data: any, parents: any, opts: any) =>
@@ -131,6 +132,94 @@ describe('OdmItem$2 — sibling ordering', () => {
     expect(second.getOrderNum()).toBe(ODM_ORDER_STEP)
     expect(parent.getChildren().length).toBe(2)
     expect(svc.saveNowToDb).toHaveBeenCalled()
+  })
+})
+
+describe('OdmItem$2 — reorder/indent (shared NodeOrderer, GH #89 unify-the-tree-worlds)', () => {
+  let svc: any
+  beforeEach(() => { svc = makeFakeService() })
+
+  it('reorderUp swaps this item earlier among its siblings', () => {
+    const parent = makeItem(svc, {}, undefined, 'p')
+    const a = parent.createChild({ title: 'a' })
+    const b = parent.createChild({ title: 'b' })
+    const c = parent.createChild({ title: 'c' })
+    expect(parent.getChildrenOrdered().map((x: any) => x.id)).toEqual([a.id, b.id, c.id])
+    c.reorderUp()
+    expect(parent.getChildrenOrdered().map((x: any) => x.id)).toEqual([a.id, c.id, b.id])
+  })
+
+  it('reorderUp on the first child wraps around to become last', () => {
+    const parent = makeItem(svc, {}, undefined, 'p')
+    const a = parent.createChild({ title: 'a' })
+    const b = parent.createChild({ title: 'b' })
+    a.reorderUp()
+    expect(parent.getChildrenOrdered().map((x: any) => x.id)).toEqual([b.id, a.id])
+  })
+
+  it('reorderDown swaps this item later among its siblings', () => {
+    const parent = makeItem(svc, {}, undefined, 'p')
+    const a = parent.createChild({ title: 'a' })
+    const b = parent.createChild({ title: 'b' })
+    const c = parent.createChild({ title: 'c' })
+    a.reorderDown()
+    expect(parent.getChildrenOrdered().map((x: any) => x.id)).toEqual([b.id, a.id, c.id])
+  })
+
+  it('reorderDown on the last child wraps around to become first', () => {
+    const parent = makeItem(svc, {}, undefined, 'p')
+    const a = parent.createChild({ title: 'a' })
+    const b = parent.createChild({ title: 'b' })
+    b.reorderDown()
+    expect(parent.getChildrenOrdered().map((x: any) => x.id)).toEqual([b.id, a.id])
+  })
+
+  it('reorderUp/reorderDown are no-ops for an only child or an item with no parent', () => {
+    const parent = makeItem(svc, {}, undefined, 'p')
+    const onlyChild = parent.createChild({ title: 'only' })
+    onlyChild.reorderUp()
+    onlyChild.reorderDown()
+    expect(parent.getChildrenOrdered().map((x: any) => x.id)).toEqual([onlyChild.id])
+
+    const orphan = makeItem(svc, { title: 'orphan' }, undefined, 'orphan')
+    expect(() => orphan.reorderUp()).not.toThrow()
+    expect(() => orphan.reorderDown()).not.toThrow()
+  })
+
+  it('indentIncrease nests this item as the last child of its previous sibling', () => {
+    const parent = makeItem(svc, {}, undefined, 'p')
+    const a = parent.createChild({ title: 'a' })
+    const b = parent.createChild({ title: 'b' })
+    b.indentIncrease()
+    expect(parent.getChildrenOrdered().map((x: any) => x.id)).toEqual([a.id])
+    expect(a.getChildrenOrdered().map((x: any) => x.id)).toEqual([b.id])
+    expect(b.getParentIds()).toEqual([a.id])
+  })
+
+  it('indentIncrease on the first child is a no-op (no sibling above to nest under)', () => {
+    const parent = makeItem(svc, {}, undefined, 'p')
+    const a = parent.createChild({ title: 'a' })
+    const b = parent.createChild({ title: 'b' })
+    a.indentIncrease()
+    expect(parent.getChildrenOrdered().map((x: any) => x.id)).toEqual([a.id, b.id])
+    expect(a.getParentIds()).toEqual([parent.id])
+  })
+
+  it('indentDecrease un-nests this item to become a sibling of its parent, right after it', () => {
+    const grandparent = makeItem(svc, {}, undefined, 'gp')
+    const parent = grandparent.createChild({ title: 'parent' })
+    const afterParent = grandparent.createChild({ title: 'after-parent' })
+    const child = parent.createChild({ title: 'child' })
+    child.indentDecrease()
+    expect(child.getParentIds()).toEqual([grandparent.id])
+    expect(grandparent.getChildrenOrdered().map((x: any) => x.id)).toEqual([parent.id, child.id, afterParent.id])
+  })
+
+  it('indentDecrease on an already-top-level item is a no-op', () => {
+    const parent = makeItem(svc, {}, undefined, 'p')
+    const child = parent.createChild({ title: 'child' })
+    child.indentDecrease()
+    expect(child.getParentIds()).toEqual([parent.id])
   })
 })
 

@@ -21,8 +21,10 @@ import {
   countLeafNodes,
   flattenCategoryTree,
   setLeafQuestionCounts,
+  sumQuestionCounts,
   updateCategoryNode,
 } from './ai-qa-tree.utils';
+import {QaDuplicateDetectorService} from './qa-duplicate-detector.service';
 
 export type QaIntegrationMode = 'vercel-ai-sdk' | 'copilotkit';
 
@@ -67,6 +69,7 @@ export class AiQaGeneratorService {
   private readonly aiBackend = inject(AiBackendService);
   private readonly copilotKit = inject(CopilotKit);
   private readonly copilotStore = injectAgentStore(COPILOT_AGENT_ID);
+  private readonly duplicateDetector = inject(QaDuplicateDetectorService);
 
   private readonly categoryObject = new StructuredObject<
     typeof categoryTreeResponseSchema,
@@ -217,12 +220,14 @@ export class AiQaGeneratorService {
         existingQuestions: this.preAppendQuestions.map(q => q.question),
       }),
     };
+    const targetCount = this.preAppendQuestions.length + sumQuestionCounts(request.tree);
+    const baseline = [...this.preAppendQuestions];
 
     try {
       const response = integration === 'vercel-ai-sdk'
         ? await this.generateQuestionsWithVercel(request)
         : await this.generateQuestionsWithCopilot(request);
-      this.applyQuestionResponse(response);
+      await this.reconcileQuestions(response, baseline, targetCount, integration, webSearch);
     } catch (error) {
       if (this.questionAbortController?.signal.aborted) return;
       this.questionError.set(this.formatError(error));
@@ -284,12 +289,14 @@ export class AiQaGeneratorService {
       web_search: webSearch,
       existingQuestions: this.preAppendQuestions.map(q => q.question),
     };
+    const targetCount = this.preAppendQuestions.length + additionalCount;
+    const baseline = [...this.preAppendQuestions];
 
     try {
       const response = integration === 'vercel-ai-sdk'
         ? await this.generateQuestionsWithVercel(request)
         : await this.generateQuestionsWithCopilot(request);
-      this.applyQuestionResponse(response);
+      await this.reconcileQuestions(response, baseline, targetCount, integration, webSearch);
     } catch (error) {
       if (this.questionAbortController?.signal.aborted) return;
       this.appendMode = false;
@@ -487,9 +494,9 @@ export class AiQaGeneratorService {
     this.categoryStatus.set(response?.assistantMessage || `Generated ${count} categories`);
   }
 
-  private applyQuestionResponse(response: QuestionAnswerResponse | undefined): void {
+  private stampQuestions(response: QuestionAnswerResponse | undefined): QuestionAnswer[] {
     const now = Date.now();
-    const newItems = (response?.items || []).map(q => ({
+    return (response?.items || []).map(q => ({
       ...q,
       createdAt: q.createdAt ?? now,
       draftedAt: q.draftedAt ?? now,
@@ -497,14 +504,78 @@ export class AiQaGeneratorService {
       lastModifiedAt: q.lastModifiedAt ?? now,
       contentModifiedAt: q.contentModifiedAt ?? now,
     }));
-    const finalItems = this.appendMode
-      ? [...this.preAppendQuestions, ...newItems]
-      : newItems;
-    this.appendMode = false;
-    this.preAppendQuestions = [];
-    this.questions.set(finalItems);
-    this.modelName.set(response?.modelName || this.modelName());
-    this.questionStatus.set(`Generated ${finalItems.length} Q&A`);
+  }
+
+  private async reconcileQuestions(
+    initialResponse: QuestionAnswerResponse | undefined,
+    baseline: QuestionAnswer[],
+    targetCount: number,
+    integration: QaIntegrationMode,
+    webSearch: boolean,
+  ): Promise<void> {
+    const maxReplacementRounds = 3;
+    let response = initialResponse;
+    let accepted = [...baseline];
+    let excludedQuestions = baseline.map(item => item.question);
+    let duplicateCount = 0;
+
+    try {
+      for (let round = 0; round <= maxReplacementRounds; round++) {
+        if (this.questionAbortController?.signal.aborted) return;
+        const candidates = this.stampQuestions(response);
+        excludedQuestions.push(...candidates.map(item => item.question));
+
+        const filtered = await this.duplicateDetector.removeDuplicates(candidates, accepted);
+        duplicateCount += filtered.duplicateCount;
+        accepted.push(...filtered.unique.slice(0, Math.max(0, targetCount - accepted.length)));
+        this.questions.set(accepted);
+        this.modelName.set(response?.modelName || this.modelName());
+
+        const missing = targetCount - accepted.length;
+        if (missing <= 0) {
+          this.questionStatus.set(
+            duplicateCount
+              ? `Generated ${accepted.length} Q&A · replaced ${duplicateCount} duplicates`
+              : `Generated ${accepted.length} Q&A`,
+          );
+          return;
+        }
+        if (round === maxReplacementRounds) {
+          this.questionStatus.set(
+            `Generated ${accepted.length}/${targetCount} Q&A · ${duplicateCount} duplicates removed after ${maxReplacementRounds} replacement rounds`,
+          );
+          return;
+        }
+
+        this.appendMode = true;
+        this.preAppendQuestions = [...accepted];
+        this.questionStatus.set(
+          `Replacing ${missing} duplicate${missing === 1 ? '' : 's'}… round ${round + 1}/${maxReplacementRounds}`,
+        );
+        const leafCount = countLeafNodes(this.tree());
+        const perLeaf = Math.max(1, Math.ceil(missing / Math.max(1, leafCount)));
+        const replacementRequest: QuestionAnswerRequest = {
+          tree: setLeafQuestionCounts(cloneCategoryTree(this.tree()), perLeaf),
+          web_search: webSearch,
+          existingQuestions: [...new Set(excludedQuestions)],
+        };
+        response = integration === 'vercel-ai-sdk'
+          ? await this.generateQuestionsWithVercel(replacementRequest)
+          : await this.generateQuestionsWithCopilot(replacementRequest);
+      }
+    } catch (error) {
+      // Duplicate detection is derived-data enrichment. Keep generated questions if pgvector or
+      // the embedding provider is unavailable; never turn that outage into lost generation work.
+      const fallback = this.stampQuestions(response)
+        .slice(0, Math.max(0, targetCount - accepted.length));
+      accepted.push(...fallback);
+      this.questions.set(accepted);
+      this.questionStatus.set(`Generated ${accepted.length} Q&A · duplicate check unavailable`);
+      console.error('[qa duplicate detection]', error);
+    } finally {
+      this.appendMode = false;
+      this.preAppendQuestions = [];
+    }
   }
 
   private stampTreeDraftedAt(nodes: CategoryNode[], now: number): CategoryNode[] {

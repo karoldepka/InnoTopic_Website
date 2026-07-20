@@ -51,7 +51,7 @@ export function fieldVirtualNodeId(parentItemId: string, slotId: string): string
  * bucket (Learn's `IntensityVal` - `funEstimate`/`importance`/etc.) - an empty `{}` left behind
  * by a since-cleared rating must NOT count as data, or the field would stay stuck visible
  * forever. */
-function hasFieldValue(value: any): boolean {
+export function hasFieldValue(value: any): boolean {
   if (value == null) {
     return false
   }

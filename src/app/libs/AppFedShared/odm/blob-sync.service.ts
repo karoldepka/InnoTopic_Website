@@ -8,6 +8,7 @@ import {SupabaseOdmClientService} from '../../AppFedSharedSupabase/odm-supabase/
 import {AuthService} from '../../../auth/auth.service'
 import {ConcurrencyLimiter} from '../utils/promiseUtils'
 import {SyncStatusService} from './sync-status.service'
+import {formatDurationMmSs} from '../utils/stringUtils'
 
 /** Offline-safe upload/download of images/audio to the `media` Supabase Storage bucket, following
  * the exact same durable-journal + reconnect-drain shape `OdmService2`/`BrowserOdmStorage` already
@@ -44,7 +45,7 @@ export class BlobSyncService {
    * with no such relationship (e.g. audio). `fieldId` tags which field on the item this blob
    * belongs to (see `BrowserOdmStorage.PendingBlobUpload.field_id`'s doc comment) - only voice
    * memos pass this today. */
-  async upload(collection: string, itemId: string, blob: Blob, kind: BlobKind, contentType: string, originalBlobId?: string, fieldId?: string): Promise<string> {
+  async upload(collection: string, itemId: string, blob: Blob, kind: BlobKind, contentType: string, originalBlobId?: string, fieldId?: string, durationMs?: number): Promise<string> {
     const blobId = uuid4()
     await this.browserOdmStorage.cacheBlob(blobId, blob)
     await this.browserOdmStorage.savePendingBlobUpload({
@@ -56,6 +57,7 @@ export class BlobSyncService {
       kind,
       original_blob_id: originalBlobId,
       field_id: fieldId,
+      duration_ms: durationMs,
       whenCreatedLocally: new Date().toISOString(),
     })
     // Confirmed live: `uploadPastedImage()` calls this for the original then immediately again
@@ -77,18 +79,20 @@ export class BlobSyncService {
       return this.uploadNow(collection, itemId, blobId, blob, kind, contentType, originalBlobId, fieldId)
     })
     this.uploadPromiseByBlobId.set(blobId, uploadPromise)
-    this.syncStatusService.handleSavingPromise(uploadPromise, this.describeUpload(kind))
+    this.syncStatusService.handleSavingPromise(uploadPromise, this.describeUpload(kind, durationMs))
     uploadPromise.catch(error => console.error('BlobSyncService upload failed (durably queued, will retry on reconnect)', error))
     return blobId
   }
 
   /** GH request: uploads in progress (images/audio) weren't reflected in the top-right sync icon
-   * at all - only row patches (handleSavingPromise/handleUnsavedPromise elsewhere) were. */
-  private describeUpload(kind: BlobKind): string {
+   * at all - only row patches (handleSavingPromise/handleUnsavedPromise elsewhere) were.
+   * `durationMs` (voice memos only) is appended so a stuck/slow upload can be told apart from a
+   * genuinely long recording. */
+  private describeUpload(kind: BlobKind, durationMs?: number): string {
     switch (kind) {
       case 'image-original': return 'Uploading image'
       case 'image-thumbnail': return 'Uploading image thumbnail'
-      case 'audio': return 'Uploading voice memo'
+      case 'audio': return durationMs ? `Uploading voice memo (${formatDurationMmSs(durationMs / 1000)})` : 'Uploading voice memo'
     }
   }
 
@@ -188,7 +192,7 @@ export class BlobSyncService {
             return this.uploadNow(upload.collection, upload.item_id, upload.blob_id, upload.blob, upload.kind, upload.content_type, upload.original_blob_id)
           })
           this.uploadPromiseByBlobId.set(upload.blob_id, resumedPromise)
-          this.syncStatusService.handleSavingPromise(resumedPromise, this.describeUpload(upload.kind))
+          this.syncStatusService.handleSavingPromise(resumedPromise, this.describeUpload(upload.kind, upload.duration_ms))
           resumedPromise.catch(error => console.error('BlobSyncService resumed upload failed, still queued', error))
         }
       })

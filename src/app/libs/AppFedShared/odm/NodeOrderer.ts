@@ -1,30 +1,38 @@
-import {
-  debugLog,
-} from '../utils/log'
-import { NodeInclusion } from './TreeListener'
-import {nullOrUndef} from '../../../libs/AppFedShared/utils/utils-from-oryol'
-import {nullish} from '../../../libs/AppFedShared/utils/type-utils'
-
+import {debugLog} from '../utils/log'
+import {nullOrUndef} from '../utils/utils-from-oryol'
+import {nullish} from '../utils/type-utils'
 
 export const ORDER_STEP = 1000 * 1000
 
-interface NodeInclusionWithOrderNum extends NodeInclusion {
-  orderNum: number
+/** Anything with a fractional sibling-order key - OrYoL's `NodeInclusion` and every `OdmInMemItem`
+ * (`OdmItem$2.orderNum`) both already satisfy this structurally. */
+export interface Ordered {
+  orderNum?: number
 }
 
 export interface NodeOrderRepair<TNode> {
   node: TNode
-  inclusion: NodeInclusion
+  inclusion: Ordered
   previousOrderNum: number | undefined
   orderNum: number
 }
 
 export interface NodeOrderInfo {
   /* Note: naming: before&after is better than above&below because it is decoupled from spatial projection (imagine e.g. a graph in the future; or left-right flow of order) */
-  inclusionBefore?: NodeInclusion | nullish,
-  inclusionAfter?: NodeInclusion | nullish,
+  inclusionBefore?: Ordered | nullish,
+  inclusionAfter?: Ordered | nullish,
 }
 
+/** Fractional-midpoint sibling ordering (`ORDER_STEP`-spaced, so a new node can always be
+ * inserted between two neighbours by averaging) - originally OrYoL's `TreeModel.nodeOrderer`,
+ * generalized (GH #89's unify-the-tree-worlds effort) so `OdmItem$2`'s own sibling ordering
+ * (`orderNum`, `calculateOrderNumBetween()`) is the exact same algorithm instead of a parallel
+ * reimplementation. Deliberately structural (`Ordered = {orderNum?: number}`) rather than typed
+ * against OrYoL's `NodeInclusion` specifically - a `NodeInclusion` and a plain `OdmItem$2` child
+ * are both just "a thing with an orderNum" as far as this class is concerned. Identity for
+ * `findIndexByInclusion()` is reference equality (`===`) rather than an id field - both
+ * `NodeInclusion` and `OdmItem$2` instances are stable, cached object references for as long as
+ * they're in use, so this doesn't need a per-caller id accessor. */
 export class NodeOrderer {
 
   calculateNewOrderNumber(
@@ -48,26 +56,20 @@ export class NodeOrderer {
 
   addOrderMetadataToInclusion(
     order: NodeOrderInfo,
-    inclusionToEnrich: NodeInclusion
+    inclusionToEnrich: Ordered
   ) {
-    const inclusionBefore = order.inclusionBefore as NodeInclusionWithOrderNum
-    const inclusionAfter = order.inclusionAfter as NodeInclusionWithOrderNum
-    const previousOrderNumber = inclusionBefore && inclusionBefore.orderNum
-
-    // console.log('addChild: previousOrderNumber', previousOrderNumber)
-    const nextOrderNumber = inclusionAfter && inclusionAfter.orderNum
-    // console.log('addChild: nextOrderNumber', nextOrderNumber)
+    const previousOrderNumber = order.inclusionBefore?.orderNum
+    const nextOrderNumber = order.inclusionAfter?.orderNum
     const newOrderNumber = this.calculateNewOrderNumber(previousOrderNumber, nextOrderNumber);
-    // console.log('addChild: newOrderNumber', newOrderNumber)
-    (<NodeInclusionWithOrderNum> inclusionToEnrich).orderNum = newOrderNumber
+    inclusionToEnrich.orderNum = newOrderNumber
   }
 
   canCalculateOrderNumberBetween(
-    previousInclusion: NodeInclusion | nullish,
-    nextInclusion: NodeInclusion | nullish,
+    previousInclusion: Ordered | nullish,
+    nextInclusion: Ordered | nullish,
   ): boolean {
-    const previousOrderNumber = this.orderNum(previousInclusion)
-    const nextOrderNumber = this.orderNum(nextInclusion)
+    const previousOrderNumber = previousInclusion?.orderNum
+    const nextOrderNumber = nextInclusion?.orderNum
     const newOrderNumber = this.calculateNewOrderNumber(previousOrderNumber, nextOrderNumber)
     if (previousOrderNumber != null && newOrderNumber <= previousOrderNumber) {
       return false
@@ -80,13 +82,13 @@ export class NodeOrderer {
 
   hasUnsafeOrderNumbers<TNode>(
     nodes: TNode[],
-    accessInclusionFn: ((node: TNode) => NodeInclusion)
+    accessInclusionFn: ((node: TNode) => Ordered)
   ): boolean {
     let previousOrderNum: number | undefined
     const seenOrderNums = new Set<number>()
 
     for (const node of nodes) {
-      const orderNum = this.orderNum(accessInclusionFn(node))
+      const orderNum = accessInclusionFn(node)?.orderNum
       if (orderNum == null) {
         return true
       }
@@ -106,7 +108,7 @@ export class NodeOrderer {
   findInsertionIndexForOrder<TNode>(
     nodes: TNode[],
     order: NodeOrderInfo,
-    accessInclusionFn: ((node: TNode) => NodeInclusion)
+    accessInclusionFn: ((node: TNode) => Ordered)
   ): number {
     const inclusionAfter = order.inclusionAfter
     if (inclusionAfter) {
@@ -129,16 +131,16 @@ export class NodeOrderer {
 
   normalizeOrderNumbers<TNode>(
     nodes: TNode[],
-    accessInclusionFn: ((node: TNode) => NodeInclusion)
+    accessInclusionFn: ((node: TNode) => Ordered)
   ): NodeOrderRepair<TNode>[] {
     const repairs: NodeOrderRepair<TNode>[] = []
 
     nodes.forEach((node, index) => {
       const inclusion = accessInclusionFn(node)
-      const previousOrderNum = this.orderNum(inclusion)
+      const previousOrderNum = inclusion?.orderNum
       const orderNum = index * ORDER_STEP
       if (previousOrderNum !== orderNum) {
-        ;(inclusion as NodeInclusionWithOrderNum).orderNum = orderNum
+        inclusion.orderNum = orderNum
         repairs.push({node, inclusion, previousOrderNum, orderNum})
       }
     })
@@ -148,14 +150,14 @@ export class NodeOrderer {
 
   findInsertionIndexForNewInclusion<TNode>(
     nodes: TNode[],
-    newInclusion: NodeInclusion,
-    accessInclusionFn: ((node: TNode) => NodeInclusion)
+    newInclusion: Ordered,
+    accessInclusionFn: ((node: TNode) => Ordered)
   ): number {
-    const newOrderNum = (newInclusion as NodeInclusionWithOrderNum).orderNum
+    const newOrderNum = newInclusion.orderNum
 
     let foundIndex = nodes.findIndex((node) => {
-      const existingOrderNum = (accessInclusionFn(node) as NodeInclusionWithOrderNum).orderNum
-      return existingOrderNum > newOrderNum
+      const existingOrderNum = accessInclusionFn(node)?.orderNum
+      return existingOrderNum! > newOrderNum!
     })
     if ( foundIndex < 0 ) {
       // newIndex is higher than any existing
@@ -166,16 +168,10 @@ export class NodeOrderer {
 
   private findIndexByInclusion<TNode>(
     nodes: TNode[],
-    inclusion: NodeInclusion,
-    accessInclusionFn: ((node: TNode) => NodeInclusion)
+    inclusion: Ordered,
+    accessInclusionFn: ((node: TNode) => Ordered)
   ): number {
-    return nodes.findIndex(node =>
-      accessInclusionFn(node)?.nodeInclusionId === inclusion.nodeInclusionId
-    )
-  }
-
-  private orderNum(inclusion: NodeInclusion | nullish): number | undefined {
-    return (inclusion as NodeInclusionWithOrderNum | nullish)?.orderNum
+    return nodes.findIndex(node => accessInclusionFn(node) === inclusion)
   }
 
 }

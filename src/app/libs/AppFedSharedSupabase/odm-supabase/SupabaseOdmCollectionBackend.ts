@@ -120,7 +120,7 @@ export class SupabaseOdmCollectionBackend<TRaw> extends OdmCollectionBackend<TRa
         return
       }
 
-      const embeddingModel = 'text-embedding-3-small'
+      const embeddingModel = 'nomic-embed-text'
       if (current?.embedding_text === question && current?.embedding_model === embeddingModel) return
 
       const response = await this.http

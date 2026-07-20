@@ -1,6 +1,17 @@
+// The cells themselves are the flex-wrap items (not just each one's own internal content) so a
+// compact, empty cell (.slot-cell--compact below) can sit at its own natural width and flow onto
+// a shared line with its neighbours, while every other (already-filled/expanded) cell (always
+// `flex: 1 1 100%`) still forces its own full-width line - see .slot-cell--compact's comment.
+:host
+  display: flex
+  flex-wrap: wrap
+  align-items: flex-start
+  gap: 4px
+
 .slot-cell
   display: flex
   align-items: center
+  flex: 1 1 100%
   flex-wrap: wrap
   border-bottom: 1px solid var(--ion-border-color, rgba(0, 0, 0, 0.1))
   padding-bottom: 2px
@@ -12,8 +23,44 @@
   app-comment-thread
     flex: 1 1 100%
 
+  // Without an explicit flex-grow, a text cell's host sizes to its content (TinyMCE's own
+  // default width) instead of filling the row's remaining space alongside the label/mic/play/
+  // comment-toggle siblings - min-width: 0 is required alongside flex-grow for a flex child
+  // whose content (a whole editor, not just a short label) would otherwise refuse to shrink
+  // below its natural width and force the row to overflow instead of actually filling it.
+  app-rich-text-edit-cell
+    flex: 1 1 300px
+    min-width: 0
+
 .slot-cell__label
-  flex: 1 1 9rem
+  // flex-grow: 0 - the label only needs its own natural width; letting it grow (the original
+  // `1 1 9rem`) made it compete for space with the actual cell/widget next to it, which is what
+  // should get the row's remaining room (see app-rich-text-edit-cell below).
+  flex: 0 1 9rem
   min-width: 8rem
   opacity: 0.75
   padding: 4px 8px 0
+
+// Any empty cell - a bare slot (kind: 'slot') with no children yet, or any other kind with no
+// value set yet (a star rating, a bucket picker, or plain text) - renders as a compact pill
+// instead of a full label+cell row, so several never-filled ones (e.g. right after OrYoL's "Apply
+// Template", or Journal/Learn's many always-shortlisted fields before they're filled in) flow
+// together instead of stacking into a wall of empty rows/widgets. `flex: 0 0 auto` (not the 100%
+// every other cell gets) is what lets it share a line with its neighbours in the :host flex-wrap
+// container above.
+.slot-cell--compact
+  flex: 0 0 auto
+  align-items: center
+  gap: 4px
+  border: 1px solid var(--ion-border-color, rgba(0, 0, 0, 0.15))
+  border-radius: 999px
+  padding: 4px 10px
+  margin-bottom: 0
+  background: transparent
+  color: inherit
+  font: inherit
+  opacity: 0.75
+
+  &:hover
+    opacity: 1
+    background: var(--ion-color-light, rgba(0, 0, 0, 0.05))

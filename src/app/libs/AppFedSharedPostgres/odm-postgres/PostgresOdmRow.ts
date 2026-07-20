@@ -16,8 +16,18 @@ export interface PostgresOdmRow<TRaw> {
    * authoritative sync-cursor watermark, never written by the client. See
    * docs/odm-incremental-sync-plan.md. */
   server_modified_at?: string | null
+  /** Postgres-set only (GH #89's `whenDescendantLastModified` rollup - see the
+   * `trg_bump_when_descendant_last_modified` trigger) - deliberately never written by the client,
+   * see `createPostgresOdmRow()`'s doc comment. */
+  when_descendant_last_modified?: string | null
 }
 
+/** Note: `item`'s own `whenDescendantLastModified` (if the in-memory object happens to carry a
+ * locally-optimistic value - see `OdmItem$2.bumpAncestorsWhenDescendantLastModifiedLocally()`) is
+ * deliberately NOT promoted into the dedicated `when_descendant_last_modified` column here - that
+ * column is exclusively written by the `trg_bump_when_descendant_last_modified` DB trigger. If a
+ * client ever sent it directly, a stale locally-cached value could regress the authoritative
+ * server-computed one (e.g. another device already pushed it further ahead via its own edit). */
 export function createPostgresOdmRow<TRaw>(
   collectionName: string,
   id: OdmItemId | string,
@@ -44,6 +54,10 @@ export function rawFromPostgresOdmRow<TRaw>(row: PostgresOdmRow<TRaw>): TRaw {
     ...(row.data as any),
     parentIds: row.parent_ids ?? (row.data as any)?.parentIds ?? [],
     ancestorIds: row.ancestor_ids ?? (row.data as any)?.ancestorIds ?? [],
+    // The real column (server-authoritative) always wins over whatever's nested in `data` (e.g. a
+    // stale locally-optimistic value echoed back from a prior client write - see the doc comment
+    // on createPostgresOdmRow() above).
+    whenDescendantLastModified: row.when_descendant_last_modified ?? (row.data as any)?.whenDescendantLastModified,
   })
   return data as TRaw
 }

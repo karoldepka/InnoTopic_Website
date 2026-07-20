@@ -12,18 +12,41 @@ export class FeatureService {
 
   config$: CachedSubject<FeaturesConfig> = new CachedSubject<FeaturesConfig>()
 
+  private static readonly featuresPropsKey = 'featuresProps'
+
   constructor() {
     console.log('FeatureService ctor')
     // g.feat = this // DX FTW!
-    const featuresConfig = new FeaturesConfig(new FeaturesProps())
+    const featuresConfig = new FeaturesConfig(this.loadPersistedProps())
     g.feat = featuresConfig
     this.config$.nextWithCache(featuresConfig)
+  }
+
+  /** Toggles under "App & Sync Status" (enableAll, beforeProductization, showWhatIUse,
+   * niceLooking, voiceMemoRecordingEnabled, voiceMemoPlaybackEnabled) used to reset to their
+   * class defaults on every reload - only firestoreEnabled/timeTrackingEnabled/voice-memo-
+   * transcription-mode below were ever actually persisted. Stored as one JSON blob (all of
+   * `FeaturesProps`, not a key per flag) so any flag added to that class in the future persists
+   * for free. `Object.assign(new FeaturesProps(), ...)` covers a stored blob missing a
+   * newer field - it falls back to that field's class default rather than `undefined`. */
+  private loadPersistedProps(): FeaturesProps {
+    const stored = localStorage.getItem(FeatureService.featuresPropsKey)
+    if (!stored) {
+      return new FeaturesProps()
+    }
+    try {
+      return Object.assign(new FeaturesProps(), JSON.parse(stored))
+    } catch (error) {
+      console.error('FeatureService: failed to parse persisted featuresProps, using defaults', error)
+      return new FeaturesProps()
+    }
   }
 
   /** Applies a patch on top of the current props, so toggling one flag doesn't reset the
    * others back to their defaults. */
   private patchProps(patch: Partial<FeaturesProps>) {
     const props = Object.assign(new FeaturesProps(), this.config$.lastVal?.props, patch)
+    localStorage.setItem(FeatureService.featuresPropsKey, JSON.stringify(props))
     const featuresConfig = new FeaturesConfig(props)
     g.feat = featuresConfig
     this.config$.nextWithCache(featuresConfig)

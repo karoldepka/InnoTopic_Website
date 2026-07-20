@@ -4,7 +4,7 @@ import {AbstractCellComponent} from '../../../AbstractCellComponent'
 import {ButtonsDescriptor, NumericPickerComponent} from '../../../../AppFedSharedIonic/ratings/numeric-picker/numeric-picker.component'
 import {VoiceMemoFieldComponent} from '../../../audio/voice-memo-field/voice-memo-field.component'
 import {fieldVirtualNodeId} from '../SlotDescriptor'
-import {createChildUnderSlot} from '../../BareSlotChildren'
+import {FieldVoiceMemoChildController} from '../../BareSlotChildren'
 
 /** A discrete named-bucket rating (Learn's `IntensityVal = {id, numeric}` - `funEstimate`,
  * `mentalLevelEstimate`, `physicalHealthImpact`, `mentalHealthImpact`, `importance`,
@@ -35,11 +35,17 @@ export class IntensityCellComponent extends AbstractCellComponent {
     this.cell.patchThrottled(newValue)
   }
 
-  /** Same "voice note -> new sub-node" behavior as the other cells (GH #89) - there's no note
-   * field on an intensity value to append into (unlike `MinMidMaxCellComponent`'s comment). */
-  onTranscriptReady(transcript: string): void {
-    const targetNodeId = fieldVirtualNodeId(this.cell.treeNode.item$.id as string, this.cell.column.id)
-    createChildUnderSlot(this.cell.treeNode.item$, targetNodeId, {title: transcript} as any)
+  /** Same voice-memo-becomes-a-real-child wiring as every other cell kind (GH #89 unify-the-
+   * tree-worlds effort - see `FieldVoiceMemoChildController`'s doc comment) - there's no note
+   * field on an intensity value to append into (unlike `MinMidMaxCellComponent`'s comment), so
+   * this has always created a child rather than splicing into its own value. */
+  private _voiceMemoChildController?: FieldVoiceMemoChildController<any>
+  get voiceMemoChildController(): FieldVoiceMemoChildController<any> {
+    if (!this._voiceMemoChildController) {
+      const targetNodeId = fieldVirtualNodeId(this.cell.treeNode.item$.id as string, this.cell.column.id)
+      this._voiceMemoChildController = new FieldVoiceMemoChildController(this.cell.treeNode.item$, targetNodeId)
+    }
+    return this._voiceMemoChildController
   }
 
   override focus() {

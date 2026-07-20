@@ -1,39 +1,52 @@
-import { createOpenAI } from '@ai-sdk/openai';
-import { embed } from 'ai';
+export const EMBEDDING_MODEL = process.env['EMBEDDING_MODEL'] ?? 'nomic-embed-text';
+export const EMBEDDING_DIMENSIONS = 768;
 
-export const EMBEDDING_MODEL = process.env['EMBEDDING_MODEL'] ?? 'text-embedding-3-small';
-export const EMBEDDING_DIMENSIONS = 1536;
+interface OllamaEmbedResponse {
+  embeddings?: number[][];
+}
 
-let embeddingProvider: ReturnType<typeof createOpenAI> | undefined;
+function getOllamaBaseUrl(): string {
+  return (process.env['OLLAMA_BASE_URL'] ?? 'http://localhost:11434').replace(/\/$/, '');
+}
 
-function getEmbeddingProvider() {
-  if (!embeddingProvider) {
-    const apiKey = process.env['EMBEDDING_API_KEY'] ?? process.env['OPENAI_API_KEY'];
-    if (!apiKey) throw new Error('EMBEDDING_API_KEY or OPENAI_API_KEY is required for embeddings');
-
-    embeddingProvider = createOpenAI({
-      apiKey,
-      baseURL: process.env['EMBEDDING_API_BASE_URL'] ?? 'https://api.openai.com/v1',
-    });
+async function embedWithOllama(texts: string[]): Promise<number[][]> {
+  const response = await fetch(`${getOllamaBaseUrl()}/api/embed`, {
+    method: 'POST',
+    headers: {'content-type': 'application/json'},
+    body: JSON.stringify({model: EMBEDDING_MODEL, input: texts}),
+  });
+  if (!response.ok) {
+    throw new Error(`Ollama embedding request failed (${response.status}): ${await response.text()}`);
   }
-  return embeddingProvider;
+
+  const result = await response.json() as OllamaEmbedResponse;
+  if (!result.embeddings || result.embeddings.length !== texts.length) {
+    throw new Error(`Ollama returned ${result.embeddings?.length ?? 0} embeddings for ${texts.length} texts`);
+  }
+  for (const embedding of result.embeddings) {
+    if (embedding.length !== EMBEDDING_DIMENSIONS) {
+      throw new Error(
+        `Embedding model ${EMBEDDING_MODEL} returned ${embedding.length} dimensions; expected ${EMBEDDING_DIMENSIONS}`,
+      );
+    }
+  }
+  return result.embeddings;
 }
 
 export async function createEmbedding(value: string): Promise<number[]> {
   const text = value.trim();
   if (!text) throw new Error('Embedding text must not be empty');
 
-  const result = await embed({
-    model: getEmbeddingProvider().embedding(EMBEDDING_MODEL),
-    value: text,
-  });
+  return (await embedWithOllama([text]))[0]!;
+}
 
-  if (result.embedding.length !== EMBEDDING_DIMENSIONS) {
-    throw new Error(
-      `Embedding model ${EMBEDDING_MODEL} returned ${result.embedding.length} dimensions; expected ${EMBEDDING_DIMENSIONS}`,
-    );
+export async function createEmbeddings(values: string[]): Promise<number[][]> {
+  const texts = values.map(value => value.trim());
+  if (!texts.length || texts.some(text => !text)) {
+    throw new Error('Embedding texts must not be empty');
   }
-  return result.embedding;
+
+  return embedWithOllama(texts);
 }
 
 export function toPgVector(value: number[]): string {

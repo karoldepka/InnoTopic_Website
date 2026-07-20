@@ -11,7 +11,7 @@ import {OryTreeTableNodeContent} from './OryTreeTableNodeContent'
 import {sumRecursivelyIncludingRoot, sumRecursivelyJustChildren} from '../utils/collection-utils'
 import {generateNewInclusionId, OryBaseTreeNode, TreeModel} from './TreeModel'
 import {TreeNodeInclusion$P} from './TreeNodeInclusion$P'
-import {NodeOrderInfo} from './node-orderer'
+import {NodeOrderInfo} from '../../../libs/AppFedShared/odm/NodeOrderer'
 
 export class RootTreeNode<
   TNodeContent extends TreeTableNodeContent = TreeTableNodeContent,
