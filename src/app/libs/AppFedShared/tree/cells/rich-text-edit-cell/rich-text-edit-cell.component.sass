@@ -8,6 +8,13 @@
   flex: 1 1 auto
   gap: 2px
 
+// app-voice-memo-field's own :host sets flex-grow: 1 unconditionally (needed where it's the only
+// flex participant in its row) - here it's a sibling of .rich-text-edit-cell (the actual editor),
+// which also grows, so without this override the two would split the row roughly evenly instead
+// of the editor getting the space and the mic/playback controls just their natural width.
+app-voice-memo-field
+  flex: 0 1 auto
+
 [contenteditable]
   width: 100%
   vertical-align: middle
