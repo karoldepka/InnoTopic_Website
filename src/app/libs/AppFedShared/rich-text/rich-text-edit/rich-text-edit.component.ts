@@ -702,15 +702,36 @@ export class RichTextEditComponent extends AbstractCellComponent implements OnIn
     // debugLog(`tinymce: `, msg)
   }
 
-  /** Appends a live-transcribed voice memo (see `VoiceMemoFieldComponent.transcriptReady`) as its
-   * own paragraph, rather than overwriting whatever's already in the field - mirrors the append
-   * behavior Journal's page-level mic already used before per-field mics existed. Appends (rather
-   * than inserting at the caret) since a transcript typically arrives well after the recording
-   * stops, by which point the field may no longer be focused or its caret position no longer
-   * meaningful to the user. */
+  /** Content already in the field *before* the recording currently in progress started - the
+   * fixed prefix `updateLiveTranscript()` keeps re-appending the (still-changing) interim
+   * paragraph onto, so each update *replaces* that trailing paragraph instead of stacking a new
+   * one per word. `undefined` between recordings (no live transcript in progress). */
+  private liveTranscriptBaselineHtml?: string
+
+  /** Live-updates the in-progress recording's transcript as its own trailing paragraph, replacing
+   * it on every call (interim results arrive repeatedly as speech is recognized) rather than
+   * overwriting whatever else was already in the field. Appends rather than inserting at the
+   * caret, matching `insertTranscript()`'s reasoning - the field may not even be focused while
+   * recording. Multiple recordings on the same field each get their own baseline (see
+   * `finalizeLiveTranscript()`), so they accumulate as separate paragraphs rather than each
+   * replacing the last. */
+  updateLiveTranscript(text: string) {
+    this.liveTranscriptBaselineHtml ??= this.formControl1.value ?? ''
+    this.formControl1.setValue(this.liveTranscriptBaselineHtml + `<p>${escapeHtml(text)}</p>`)
+  }
+
+  /** Locks in the current content as the new baseline, so the *next* recording's live updates
+   * append a fresh paragraph after this one instead of continuing to replace it. */
+  finalizeLiveTranscript() {
+    this.liveTranscriptBaselineHtml = undefined
+  }
+
+  /** One-shot version of `updateLiveTranscript()`/`finalizeLiveTranscript()` for callers that
+   * only ever get a single final transcript (no interim updates) - Learn's answer side, OrYoL's
+   * node-title field. */
   insertTranscript(transcript: string) {
-    const existingHtml = this.formControl1.value ?? ''
-    this.formControl1.setValue(existingHtml + `<p>${escapeHtml(transcript)}</p>`)
+    this.updateLiveTranscript(transcript)
+    this.finalizeLiveTranscript()
   }
 
   focusEditor() {

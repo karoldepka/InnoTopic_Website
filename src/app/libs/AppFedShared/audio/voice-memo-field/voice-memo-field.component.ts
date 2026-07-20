@@ -145,6 +145,12 @@ export class VoiceMemoFieldComponent implements OnInit, OnDestroy, ActiveMicHold
     return (this.legacyMemoRef && real.length === 0) ? [this.legacyMemoRef, ...real] : real
   }
 
+  /** Sum of every recording's own duration - only meaningful (and only shown, see the template)
+   * once there's more than one, since a single recording's length is already in its own row. */
+  get totalDurationSec(): number {
+    return this.memos.reduce((sum, memo) => sum + (memo.durationMs ?? 0), 0) / 1000
+  }
+
   private get resolvedCollection(): string | undefined {
     return this.voiceMemoService.resolveCollection(this.item$, this.collection)
   }

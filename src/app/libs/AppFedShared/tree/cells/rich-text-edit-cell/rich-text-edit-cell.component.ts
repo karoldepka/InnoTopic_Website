@@ -117,12 +117,29 @@ export class RichTextEditCellComponent extends AbstractCellComponent {
     return this._voiceMemoChildController
   }
 
-  /** Only Journal's 'general' field inherits the one pre-existing legacy single-recording (from
-   * before per-field voice memos existed) - matches the old `JournalTextFieldComponent`'s
-   * identical `fieldDescriptor.id === 'general'` check (see `VoiceMemoService.getLegacyMemoRef`'s
-   * doc comment for why this must stay scoped to exactly one field). */
+  /** Only Journal's 'general' field: inherits the one pre-existing legacy single-recording (from
+   * before per-field voice memos existed - matches the old `JournalTextFieldComponent`'s
+   * identical `fieldDescriptor.id === 'general'` check, see `VoiceMemoService.getLegacyMemoRef`'s
+   * doc comment for why this must stay scoped to exactly one field), and transcribes straight
+   * into the field's own text (like OrYoL's node-title field already does via
+   * `OryRichTextCellComponent.onTranscriptReady()`) rather than into a child node - every other
+   * field still gets a real child (see `voiceMemoChildController` above). Each separate recording
+   * still ends up as its own `VoiceMemoRecord` (the mic writes onto `cell.treeNode.item$`
+   * directly), but its transcript is appended into the field live as its own paragraph. */
   get includeLegacyRecording(): boolean {
     return this.cell.column.id === 'general'
+  }
+
+  onFieldInterimTranscriptChanged(text: string) {
+    if (text) {
+      this.richTextEditComponent.updateLiveTranscript(text)
+    }
+  }
+
+  onFieldTranscriptReady(text: string) {
+    if (text) {
+      this.richTextEditComponent.insertTranscript(text)
+    }
   }
 
 }
