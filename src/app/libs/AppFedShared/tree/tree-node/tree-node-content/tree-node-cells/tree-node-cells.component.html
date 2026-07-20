@@ -8,11 +8,11 @@
 -->
 
 @for (entry of cells; track entry.descriptor.id) {
-  @if (isBareSlotCompact(entry.descriptor)) {
+  @if (isCompact(entry.descriptor)) {
     <button
       type="button"
       class="slot-cell slot-cell--compact"
-      (click)="expandBareSlot(entry.descriptor.id)"
+      (click)="expandCompactCell(entry.descriptor.id)"
     >
       <app-slot-icon [descriptor]="entry.descriptor"></app-slot-icon>
       {{ entry.descriptor.label }}

@@ -1,7 +1,7 @@
 // The cells themselves are the flex-wrap items (not just each one's own internal content) so a
-// compact, empty bare slot (.slot-cell--compact below) can sit at its own natural width and flow
-// onto a shared line with its neighbours, while every other cell (always `flex: 1 1 100%`) still
-// forces its own full-width line - see .slot-cell--compact's comment.
+// compact, empty cell (.slot-cell--compact below) can sit at its own natural width and flow onto
+// a shared line with its neighbours, while every other (already-filled/expanded) cell (always
+// `flex: 1 1 100%`) still forces its own full-width line - see .slot-cell--compact's comment.
 :host
   display: flex
   flex-wrap: wrap
@@ -29,10 +29,12 @@
   opacity: 0.75
   padding: 4px 8px 0
 
-// A bare slot (kind: 'slot') with no children yet - a compact pill instead of a full label+cell
-// row, so several never-filled slots (e.g. right after OrYoL's "Apply Template") flow together
-// instead of stacking into a wall of empty rows. `flex: 0 0 auto` (not the 100% every other cell
-// gets) is what lets it share a line with its neighbours in the :host flex-wrap container above.
+// An empty cell - a bare slot (kind: 'slot') with no children yet, or an intensity field with no
+// value picked yet - renders as a compact pill instead of a full label+cell row, so several
+// never-filled ones (e.g. right after OrYoL's "Apply Template", or Learn's six always-shortlisted
+// intensity fields before any are rated) flow together instead of stacking into a wall of empty
+// rows/full bucket-picker grids. `flex: 0 0 auto` (not the 100% every other cell gets) is what
+// lets it share a line with its neighbours in the :host flex-wrap container above.
 .slot-cell--compact
   flex: 0 0 auto
   align-items: center

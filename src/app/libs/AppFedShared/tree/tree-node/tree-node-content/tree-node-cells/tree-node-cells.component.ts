@@ -2,7 +2,7 @@ import {Component, Input, Output, EventEmitter, OnChanges, OnInit, OnDestroy, Ch
 import {Subscription} from 'rxjs'
 import {OdmTreeNode} from '../../OdmTreeNode'
 import {OdmCell} from '../../../cells/OdmCell'
-import {fieldVirtualNodeId, isSlotVisible, SlotDescriptor} from '../../../cells/SlotDescriptor'
+import {fieldVirtualNodeId, hasFieldValue, isSlotVisible, SlotDescriptor} from '../../../cells/SlotDescriptor'
 import {getBareSlotChildren$} from '../../../BareSlotChildren'
 import {IonicModule} from '@ionic/angular'
 import {MinMidMaxCellComponent} from '../../../cells/min-mid-max-cell/min-mid-max-cell.component'
@@ -64,17 +64,22 @@ export class TreeNodeCellsComponent implements OnChanges, OnInit, OnDestroy {
    * `cells` being rebuilt on an unrelated descriptor-list change. */
   openCommentsForDescriptorId: string | null = null
 
-  /** A bare slot (`kind: 'slot'`) with no children yet renders as a small compact button instead
-   * of a full label+add-input row, so an item with several never-filled slots (e.g. right after
-   * OrYoL's "Apply Template") doesn't turn into a wall of empty rows - see this component's .sass
-   * for the flex-wrap layout that lets compact buttons flow together and share lines. Populated
-   * reactively (see `syncBareSlotContentSubscriptions()`) since "has children" requires the same
-   * live `getBareSlotChildren$()` query `BareSlotCellComponent` itself uses. */
+  /** An empty cell (a bare slot with no children, or an `intensity` field with no value set - e.g.
+   * Learn's "Mental health impact") renders as a small compact button instead of its full row, so
+   * an item with several never-filled slots (right after OrYoL's "Apply Template", or Learn's six
+   * always-shortlisted intensity fields before any are picked) doesn't turn into a wall of empty
+   * rows/full bucket-picker grids - see this component's .sass for the flex-wrap layout that lets
+   * compact buttons flow together and share lines. Only bare slots need tracking here: "has a
+   * value" for an `intensity` field is synchronous (`hasFieldValue()` on the item's own current
+   * val, checked directly in `isCompact()`), but "has children" for a bare slot needs the same
+   * live `getBareSlotChildren$()` query `BareSlotCellComponent` itself uses - see
+   * `syncBareSlotContentSubscriptions()`. */
   bareSlotHasContentIds = new Set<string>()
 
-  /** Once a compact bare slot is clicked open, it stays expanded for the rest of this component's
-   * lifetime even if its last child is later removed - collapsing it back out from under the user
-   * mid-edit would be jarring. Reset naturally next time the popover/page reopens. */
+  /** Once a compact cell (bare slot or intensity field) is clicked open, it stays expanded for the
+   * rest of this component's lifetime even if its content is later removed - collapsing it back
+   * out from under the user mid-edit would be jarring. Reset naturally next time the popover/page
+   * reopens. */
   manuallyExpandedSlotIds = new Set<string>()
 
   private valSubscription?: Subscription
@@ -180,15 +185,24 @@ export class TreeNodeCellsComponent implements OnChanges, OnInit, OnDestroy {
     }
   }
 
-  /** A bare slot with no children stays a compact button until either it gains a real child, or
-   * the user explicitly clicks it open to add the first one. */
-  isBareSlotCompact(descriptor: SlotDescriptor): boolean {
-    return descriptor.kind === 'slot'
-      && !this.bareSlotHasContentIds.has(descriptor.id)
-      && !this.manuallyExpandedSlotIds.has(descriptor.id)
+  /** A bare slot with no children, or an `intensity` field with no value, stays a compact button
+   * until either it gains content, or the user explicitly clicks it open. `numeric`/`text` cells
+   * are never compact - they're only ever visible once already filled in (or shortlisted with a
+   * value expected soon), unlike `intensity`'s "always shown so the user can rate it" shortlist. */
+  isCompact(descriptor: SlotDescriptor): boolean {
+    if (this.manuallyExpandedSlotIds.has(descriptor.id)) {
+      return false
+    }
+    if (descriptor.kind === 'slot') {
+      return !this.bareSlotHasContentIds.has(descriptor.id)
+    }
+    if (descriptor.kind === 'intensity') {
+      return !hasFieldValue(this.treeNode.item$.val?.[descriptor.dataFieldKey as string])
+    }
+    return false
   }
 
-  expandBareSlot(descriptorId: string): void {
+  expandCompactCell(descriptorId: string): void {
     this.manuallyExpandedSlotIds.add(descriptorId)
     this.changeDetectorRef.markForCheck()
   }
