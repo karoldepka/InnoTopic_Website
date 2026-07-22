@@ -328,7 +328,17 @@ export class RootTreeNode<
 
     const nodeBelow = afterExistingNode?.getSiblingNodeBelowThis()
     // console.log('addChild: nodeBelow', nodeBelow)
-    const nodeInclusion: NodeInclusion = newNode?.nodeInclusion || new NodeInclusion(generateNewInclusionId(), /*parentItemId: */ this.itemId
+    const itemData = this.newItemData()
+    const newItemId = this.generateItemId()
+    // GH #111: for a brand-new single-parent child, the inclusion id must be the new item's own
+    // id, not an unrelated freshly-generated one - SupabaseTreeService.flushDeliverable() derives
+    // the id it redelivers this same node under deterministically from childItemId for the
+    // single-parent case (see its "keeps the plain child id as its inclusion id" doc comment), so
+    // a random id here would never match on redelivery. TreeModel.onNodeAddedOrModified() dedupes
+    // by nodeInclusionId (mapNodeInclusionIdToNodes) - a mismatch meant the optimistic local
+    // insert below and the server-confirmed redelivery were never recognized as the same node,
+    // silently creating two tree nodes for one logical "add" (e.g. one Enter keypress).
+    const nodeInclusion: NodeInclusion = newNode?.nodeInclusion || new NodeInclusion(newItemId, /*parentItemId: */ this.itemId
       /* FIXME order is added in addOrderMetadataToInclusion */)
 
     this.treeModel.nodeOrderer.addOrderMetadataToInclusion(
@@ -338,8 +348,6 @@ export class RootTreeNode<
       },
       nodeInclusion,
     )
-    const itemData = this.newItemData()
-    const newItemId = this.generateItemId()
     const nodeContent = this.createNodeContent(newItemId, itemData)
     newNode = newNode ?? this.createChildNode(nodeInclusion, nodeContent)
 
@@ -347,10 +355,17 @@ export class RootTreeNode<
 
     this.treeModel.permissionsManager.onAfterCreated(newNode as any as OryBaseTreeNode)
 
-    this.treeModel.treeService.addChildNode(this as any as OryBaseTreeNode, newNode as any as OryBaseTreeNode)
-
+    // GH #111: register the optimistic local node (below) BEFORE persisting it - unlike Firestore's
+    // always-async writes, SupabaseTreeService.addChildNode()'s save can synchronously re-enter
+    // TreeModel.onNodeAddedOrModified() within this very call (via localItems$'s synchronous
+    // subscriber -> flushDeliverable()), and that only recognizes an already-registered node
+    // (mapNodeInclusionIdToNodes, keyed by nodeInclusionId) as a dedup instead of creating a
+    // second one. Registering first means that reentrant call always finds this node already
+    // there, regardless of which backend is wired up.
     const newNodeIndex = afterExistingNode ? (afterExistingNode.getIndexInParent() + 1) : 0
     this._appendChildAndSetThisAsParent(newNode, newNodeIndex) // this is to avoid delay caused by Firestore; for UX
+
+    this.treeModel.treeService.addChildNode(this as any as OryBaseTreeNode, newNode as any as OryBaseTreeNode)
     // TODO: handle adding child in multiple parents; and this addChild method should actually accept DbItem instead of node, coz it really might create multiple nodes
     return newNode
   }
