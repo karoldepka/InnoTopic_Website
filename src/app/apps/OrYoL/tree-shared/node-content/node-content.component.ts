@@ -206,10 +206,13 @@ export class NodeContentComponent implements OnInit, AfterViewInit, OnDestroy, I
   }
 
   private focusNewlyCreatedNode(newTreeNode: ApfBaseTreeNode) {
-    setTimeout(() => {
-      console.log(`focusNewlyCreatedNode`)
-      this.treeHost.focusNode(newTreeNode)
-    })
+    // GH #82: this used to wrap the call below in its own setTimeout() - `TreeHostComponent.
+    // focusNode()` already defers internally (waiting for the new node's DOM element to render),
+    // so that outer setTimeout was a second, fully redundant event-loop hop adding real,
+    // user-visible delay on every Enter press. Every other focusNode() caller
+    // (newNodeAtVisualRoot(), createChildNavigateAndFocus(), planToday(), etc.) already calls it
+    // directly with no wrapper, confirming the inner deferral alone is sufficient.
+    this.treeHost.focusNode(newTreeNode)
   }
 
   keyPressAltEnter(event: Event) {

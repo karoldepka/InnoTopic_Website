@@ -189,9 +189,9 @@ export class TreeHostComponent implements OnInit {
 
   appendNode() {
     const newNode = this.treeModel.navigation.visualRoot!.addChild()
-    setTimeout(() => {
-      this.focusNode(newNode)
-    })
+    // GH #82: focusNode() already defers internally - this outer setTimeout was a second,
+    // redundant event-loop hop (same fix as NodeContentComponent.focusNewlyCreatedNode()).
+    this.focusNode(newNode)
   }
 
   expandAll() {
