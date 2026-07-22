@@ -1,0 +1,6 @@
+// GH #107: this sits directly in the app-wide toolbar (ToolbarCommonItemsComponent) with no
+// breathing room of its own - the toolbar's :host gap only separates it from neighbouring items,
+// not from the toolbar's own edges.
+\:host
+  display: inline-flex
+  padding: 0 4px
