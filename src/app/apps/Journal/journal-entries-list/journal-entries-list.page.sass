@@ -1,0 +1,5 @@
+// GH #76: no space between the header toolbar and the first entry - ion-content's own
+// --padding-top custom property (not a plain CSS rule) is how Ionic expects this to be set,
+// since the scrollable area lives inside its shadow DOM.
+ion-content
+  --padding-top: 10px
