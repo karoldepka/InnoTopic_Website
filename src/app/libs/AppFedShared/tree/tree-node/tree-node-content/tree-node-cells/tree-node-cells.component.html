@@ -40,6 +40,7 @@
           [cell]="entry.cell!"
           [showAiFillButton]="!!entry.descriptor.aiFillable"
           [aiFillLoading]="aiFillLoadingDescriptorId === entry.descriptor.id"
+          [enterKeyOnlyWithShift]="false"
           (aiFillRequested)="aiFillRequested.emit(entry.descriptor)"
         ></app-rich-text-edit-cell>
       }

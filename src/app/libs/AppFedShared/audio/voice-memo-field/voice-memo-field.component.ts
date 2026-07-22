@@ -72,6 +72,14 @@ export class VoiceMemoFieldComponent implements OnInit, OnDestroy, ActiveMicHold
    * just because the mic was tapped, before any audio exists, would be wrong there. */
   @Input() createItemEagerlyOnRecordStart = false
 
+  /** Opt-in: every recording gets its *own* fresh item via `createItemIfMissing()`, even if
+   * `item$` is already set from a previous recording - for an always-mounted, session-spanning
+   * quick-record surface (GH #92's main-toolbar mic) where "one recording = one new item" is the
+   * whole point, unlike Learn's quick-add (which intentionally keeps accumulating multiple takes
+   * onto the same draft item until the page is left). Ignored when `createItemIfMissing` isn't
+   * also set, same as `createItemEagerlyOnRecordStart` above. */
+  @Input() alwaysCreateNewItemOnRecord = false
+
   /** Emits the live-transcribed text (via the browser's Web Speech API) once recognition ends,
    * shortly after the recording stops. Only fires when the browser supports SpeechRecognition
    * (Chrome/Edge; not Firefox/Safari) and speech was actually recognized - callers should treat
@@ -205,6 +213,7 @@ export class VoiceMemoFieldComponent implements OnInit, OnDestroy, ActiveMicHold
     if (this.isRecording) {
       this.mediaRecorder.stop()
       this.isRecording = false
+      this.voiceMemoService.setRecording(this, false)
       clearInterval(this.recordingTimerHandle)
       this.recordingTimerHandle = undefined
       try {
@@ -251,6 +260,7 @@ export class VoiceMemoFieldComponent implements OnInit, OnDestroy, ActiveMicHold
       this.item$ = this.createItemIfMissing()
     }
     this.isRecording = true
+    this.voiceMemoService.setRecording(this, true)
     this.recordingStartedAtMs = Date.now()
     this.recordingElapsedSec = 0
     this.recordingTimerHandle = setInterval(() => {
@@ -361,7 +371,7 @@ export class VoiceMemoFieldComponent implements OnInit, OnDestroy, ActiveMicHold
 
     this.transcribeCompletedRecordingIfNeeded(blob)
 
-    if (!this.item$ && this.createItemIfMissing) {
+    if ((!this.item$ || this.alwaysCreateNewItemOnRecord) && this.createItemIfMissing) {
       this.item$ = this.createItemIfMissing()
     }
     const item = this.item$
@@ -465,9 +475,17 @@ export class VoiceMemoFieldComponent implements OnInit, OnDestroy, ActiveMicHold
       return
     }
     this.playingBlobId = memoRef.blobId
+    this.voiceMemoService.setPlaying(this, true)
     this.voiceMemoService.resolveMemoBlob(collection, itemId, memoRef).then(blob => {
       if (this.playingBlobId !== memoRef.blobId || !blob) {
+        // Note: don't call the full stopPlaying() here - if playingBlobId no longer matches, a
+        // *different* play attempt may already be in progress on this same component instance,
+        // and stopPlaying() would wrongly tear down its audioEl/objectUrl too. Only report
+        // "nothing playing here anymore" to the service if that's actually still true.
         this.playingBlobId = undefined
+        if (!this.audioEl) {
+          this.voiceMemoService.setPlaying(this, false)
+        }
         this.changeDetectorRef.markForCheck()
         return
       }
@@ -525,6 +543,7 @@ export class VoiceMemoFieldComponent implements OnInit, OnDestroy, ActiveMicHold
 
   stopPlaying() {
     this.playingBlobId = undefined
+    this.voiceMemoService.setPlaying(this, false)
     this.audioEl?.pause()
     this.audioEl = undefined
     if (this.objectUrl) {

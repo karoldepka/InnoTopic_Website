@@ -104,9 +104,8 @@
     (press)="treeHost.planToday(true)"
   ></ion-icon>
 
-  <app-time-tracking-toolbar
-    style="font-size: 13px"
-  ></app-time-tracking-toolbar>
+  <!-- GH #92: now shown app-wide (AppComponent's persistent header, ToolbarCommonItemsComponent) -
+    keeping a second copy here would just duplicate it on this one page. -->
 
   <ng-container *ngIf="showExtraNavIcons">
     <fa-icon icon="trophy" class="actionable"

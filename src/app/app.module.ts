@@ -27,6 +27,7 @@ import { PRESS_EVENT_PLUGIN_PROVIDER } from './shared/gestures/press-event.plugi
 import { provideTranslateService } from '@ngx-translate/core'
 import { provideTranslateHttpLoader } from '@ngx-translate/http-loader'
 import { DEFAULT_LANGUAGE, resolveInitialLanguage } from './libs/AppFedShared/i18n/supported-languages'
+import { ToolbarCommonItemsComponent } from './libs/AppFedShared/toolbar-common-items/toolbar-common-items.component'
 
 const copilotQaAgentId = 'lifesuite-qa'
 
@@ -46,6 +47,7 @@ function copilotAgUiUrl(): string {
         AppRoutingModule,
         SharedModule,
         CoreModule,
+        ToolbarCommonItemsComponent,
         BrowserAnimationsModule,
         DbFirestoreModule,
         HttpClientModule /* Only for primeng tree demo */,

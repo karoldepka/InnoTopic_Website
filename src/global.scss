@@ -306,6 +306,20 @@ body {
   //transition: all 1s ease-in-out;
 }
 
+// GH #92: AppComponent's persistent ion-header (ToolbarCommonItemsComponent - time-tracking +
+// quick-record mic, always visible regardless of which page is open) sits as a sibling of
+// ion-router-outlet, but Ionic's own ion-router-outlet CSS is `position: absolute; inset: 0`, so
+// every routed page fills the full viewport and overlaps this header instead of starting below
+// it. This is Ionic's own documented fix for a persistent header above the router outlet.
+// `> ion-router-outlet` (not a blanket rule) so tabs.page.html's own *nested* router-outlet,
+// which has nothing to do with this app-root header, is unaffected. The 56px offset matches
+// `md`-mode ion-toolbar's fixed height - ToolbarCommonItemsComponent is deliberately constrained
+// to a single non-wrapping row (see its own .sass) so this stays accurate regardless of how many
+// time-tracked entries are showing.
+ion-app > ion-router-outlet {
+  top: 56px;
+}
+
 // GH #58: "App & Sync Status" popover was stuck at Ionic's content-based auto width (quite
 // narrow, given the sync popover's content - pending-item lists, theme/language pickers - wants
 // real room). Roughly double that on desktop, and let it use nearly the full viewport on mobile.
