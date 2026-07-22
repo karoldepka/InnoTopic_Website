@@ -18,6 +18,10 @@ export class TimeTrackedItemCellComponent implements OnInit {
 
   @Input() item$!: OdmItem$2<any, any, any, any>
 
+  /** Passed straight through to TimeTrackingCellComponent - see its own @Input for what this
+   * actually changes (compact icon+timer, no title, no full-width look). */
+  @Input() toolBarMode = false
+
   timeTrackedEntry!: TimeTrackedEntry
 
   ngOnInit() {

@@ -8,14 +8,15 @@
       <ion-note>{{ descriptors.length }} {{ 'JOURNAL.FIELDS' | translate }}</ion-note>
 
     </ng-container>
-    <p>
+    <p style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap">
       <app-time-point [time]="$safeNavigationMigration(itemVal?.whenCreated | odmDate)"></app-time-point>
       <app-geo-loc [geoLoc]="$safeNavigationMigration(itemVal?.whereCreated)"></app-geo-loc>
+      <app-time-tracked-item-cell
+        *ngIf="featureService.timeTrackingEnabled"
+        [item$]="item$P"
+        [toolBarMode]="true"
+      ></app-time-tracked-item-cell>
     </p>
-    <app-time-tracked-item-cell
-      *ngIf="featureService.timeTrackingEnabled"
-      [item$]="item$P"
-    ></app-time-tracked-item-cell>
   </div>
 
   <app-tree-node-cells
