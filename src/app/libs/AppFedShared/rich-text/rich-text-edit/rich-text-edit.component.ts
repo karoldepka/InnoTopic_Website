@@ -41,6 +41,17 @@ export class RichTextEditComponent extends AbstractCellComponent implements OnIn
 
   @Input() showMenuBar = true
 
+  /** Off for a field embedded in a dense multi-field list (e.g. Journal/Learn's
+   * `TreeNodeCellsComponent` rows via `RichTextEditCellComponent`) - TinyMCE's sticky-toolbar
+   * positioning is calculated against the viewport once and doesn't reliably recompute when a
+   * *different* field elsewhere on the same page expands/collapses (compact-pill <-> full-row,
+   * see `TreeNodeCellsComponent.isCompact()`) or this field is focused programmatically right as
+   * that layout shift happens (`focusExpandedCell()`) - the toolbar can end up visually stuck
+   * mid-page, overlapping unrelated content instead of docked above its own editor. Left on by
+   * default for every other context (a single long-form editor - Learn's answer field, OrYoL's
+   * node title - where keeping the toolbar in view while scrolling a long document is the point). */
+  @Input() toolbarSticky = true
+
   /** workaround for searchOrAdd not updating when deleting all text at once */
   @Input() enableModelEventNodeChange = false
 
@@ -383,7 +394,7 @@ export class RichTextEditComponent extends AbstractCellComponent implements OnIn
         }
       },
       toolbar_location: 'auto', // 'bottom', /* https://www.tiny.cloud/docs/configure/editor-appearance/ */
-      toolbar_sticky: true,
+      toolbar_sticky: this.toolbarSticky,
       // menubar: false,
       statusbar: false,
       plugins: [
