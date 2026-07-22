@@ -17,6 +17,7 @@ import {VirtualSlotStatesOdmService} from '../../../../virtual-slot-state/virtua
 import {VirtualSlotState$} from '../../../../virtual-slot-state/VirtualSlotState$'
 import {TimeTrackedItemCellComponent} from '../../../../../../apps/OrYoL/time-tracking/time-tracked-item-cell/time-tracked-item-cell.component'
 import {CellNavigationService} from '../../../../cell-navigation.service'
+import {SlotUsageTrackerService} from '../../../cells/slot-usage-tracker.service'
 
 /** Renders one cell per *visible* `SlotDescriptor` for a real item's own fields (GH #89's unified
  * Journal/Learn field rendering) - the generic dispatcher `node-content.component.html`'s own
@@ -91,6 +92,21 @@ export class TreeNodeCellsComponent implements OnChanges, OnInit, OnDestroy {
    * mid-edit would be jarring. Reset naturally next time the popover/page reopens. */
   manuallyExpandedSlotIds = new Set<string>()
 
+  /** GH #85/#101: once an item has at least one real filled-in field, its *other*, never-filled
+   * shortlisted fields (e.g. Journal's ~46 "always shown" metrics) stop rendering as compact pills
+   * at all - on a real entry these are pure clutter (confirmed live: 45 pills on one item), not the
+   * quick-access convenience they're meant to be on a genuinely blank one. This id set is the
+   * escape hatch that keeps a few of them around anyway: the most-recently-used ones (so a field
+   * you always fill in stays one tap away), recomputed each `rebuildCells()` from
+   * `SlotUsageTrackerService` (cheap - a handful of localStorage entries per item class). */
+  mruDescriptorIds = new Set<string>()
+
+  /** GH #101's "show all" checkbox - the manual override for the same hiding rule, for the rarer
+   * case of wanting to browse/open a field that's neither filled nor recently used. */
+  showAllFields = false
+
+  private static readonly MRU_LIMIT = 8
+
   private valSubscription?: Subscription
 
   /** One `getBareSlotChildren$()` subscription per currently-visible bare slot, keyed by
@@ -103,6 +119,7 @@ export class TreeNodeCellsComponent implements OnChanges, OnInit, OnDestroy {
     private changeDetectorRef: ChangeDetectorRef,
     private elementRef: ElementRef<HTMLElement>,
     private cellNavigationService: CellNavigationService,
+    private slotUsageTrackerService: SlotUsageTrackerService,
   ) {
   }
 
@@ -131,8 +148,15 @@ export class TreeNodeCellsComponent implements OnChanges, OnInit, OnDestroy {
     // Rebuilt whenever the node/descriptors/item-value changes (not per-render) - an OdmCell is a
     // thin, cheap wrapper, but there's no reason to reconstruct it every change-detection pass.
     const itemVal = this.treeNode.item$.val
+    this.mruDescriptorIds = new Set(
+      this.slotUsageTrackerService.getMostRecentlyUsedIds(this.treeNode.item$.getCollectionName(), TreeNodeCellsComponent.MRU_LIMIT)
+    )
+    const anyFieldHasValue = this.descriptors.some(descriptor =>
+      descriptor.kind !== 'slot' && hasFieldValue(itemVal?.[descriptor.dataFieldKey as string])
+    )
     this.cells = this.descriptors
       .filter(descriptor => isSlotVisible(descriptor, itemVal))
+      .filter(descriptor => !this.isClutteringUnfilledPill(descriptor, itemVal, anyFieldHasValue))
       .map(descriptor => {
         const targetNodeId = fieldVirtualNodeId(this.treeNode.item$.id as string, descriptor.id)
         return {
@@ -203,6 +227,23 @@ export class TreeNodeCellsComponent implements OnChanges, OnInit, OnDestroy {
    * as compact-able as an unset bare slot, whether it's a star rating, a bucket picker, or a plain
    * text box. A field with a voice-memo-created child (`bareSlotHasContentIds`) counts as "has
    * content" too, even with no scalar value of its own. */
+  /** See `mruDescriptorIds`' doc comment (GH #85/#101). Scoped to `isShortListed` + non-`'slot'`
+   * descriptors specifically - those are the always-shown-regardless-of-value set that causes the
+   * clutter; bare slots and explicitly-searched-and-added fields are left exactly as
+   * `isSlotVisible()` already decides (unchanged, out of scope here). */
+  private isClutteringUnfilledPill(descriptor: SlotDescriptor, itemVal: any, anyFieldHasValue: boolean): boolean {
+    if (!descriptor.isShortListed || descriptor.kind === 'slot') {
+      return false
+    }
+    if (!anyFieldHasValue) {
+      return false // blank item - every shortlisted field stays available for quick entry, as today
+    }
+    if (this.showAllFields || this.manuallyExpandedSlotIds.has(descriptor.id) || this.mruDescriptorIds.has(descriptor.id)) {
+      return false
+    }
+    return !hasFieldValue(itemVal?.[descriptor.dataFieldKey as string])
+  }
+
   isCompact(descriptor: SlotDescriptor): boolean {
     if (this.manuallyExpandedSlotIds.has(descriptor.id)) {
       return false
@@ -218,10 +259,25 @@ export class TreeNodeCellsComponent implements OnChanges, OnInit, OnDestroy {
 
   expandCompactCell(descriptorId: string): void {
     this.manuallyExpandedSlotIds.add(descriptorId)
+    this.slotUsageTrackerService.recordUsage(this.treeNode.item$.getCollectionName(), descriptorId)
+    // GH #85/#101: this descriptor may have been filtered out of `cells` entirely (never-filled,
+    // not-yet-MRU shortlisted field on an otherwise-filled-in item) - re-run the filter now that
+    // it's manually expanded, same as onFieldPicked()'s caller (a search hit isn't necessarily
+    // already in `cells` either).
+    this.rebuildCells()
     this.changeDetectorRef.markForCheck()
     // Angular hasn't swapped the compact button for the real cell yet at this point in the same
     // tick - defer to let that render first, same reasoning as onFieldPicked()'s scrollIntoView.
     setTimeout(() => this.focusExpandedCell(descriptorId))
+  }
+
+  /** GH #101's "show all" checkbox - `cells` itself depends on `showAllFields` now
+   * (`isClutteringUnfilledPill()`), so toggling it needs a rebuild, unlike a plain template-only
+   * flag. */
+  onShowAllFieldsChange(value: boolean): void {
+    this.showAllFields = value
+    this.rebuildCells()
+    this.changeDetectorRef.markForCheck()
   }
 
   /** Focuses whatever the just-expanded cell's own natural input is - `numeric`/`text`/
