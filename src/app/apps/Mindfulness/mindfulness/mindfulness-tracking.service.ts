@@ -4,12 +4,21 @@ import {DbTreeService} from '../../OrYoL/tree-model/db-tree-service'
 import {TimeTrackingService, date} from '../../OrYoL/time-tracking/time-tracking.service'
 import {TimeTrackedEntry} from '../../OrYoL/time-tracking/TimeTrackedEntry'
 import {TimeTrackingPeriodsService} from '../../OrYoL/time-tracking/time-tracking-periods.service'
+import {AuthService} from '../../../auth/auth.service'
 
 /** Reserved anchor item id (GH issue #27) that all mindfulness sessions time-track onto, in
  * parallel with whatever else is being tracked in OrYoL's tree. Per the issue's follow-up, it's
  * also given a real inclusion under the tree root (upsertRootInclusionIfMissing below) so it
- * shows up as a normal top-level node instead of being hidden. */
-export const MINDFULNESS_ITEM_ID = '_mindfulness'
+ * shows up as a normal top-level node instead of being hidden.
+ *
+ * Suffixed per-user (GH #108) - odm_items' primary key is `(collection, id)` globally, not scoped
+ * by `owner`, so a bare `'_mindfulness'` collided across accounts as soon as a second real user
+ * existed: Postgres' upsert took the UPDATE path against the row's existing (different) owner,
+ * and RLS's UPDATE policy (`USING (owner = auth.jwt()->>'sub')`) rejected it - 42501, "new row
+ * violates row-level security policy". Same fix as `UserTreeRoot.ts`'s `getUserTreeRootId()`. */
+function mindfulnessItemId(userId: string): string {
+  return `_mindfulness_${userId}`
+}
 
 export interface MindfulnessTotals {
   todayMs: number
@@ -27,19 +36,24 @@ export class MindfulnessTrackingService {
     private dbTreeService: DbTreeService,
     private timeTrackingService: TimeTrackingService,
     private timeTrackingPeriodsService: TimeTrackingPeriodsService,
+    private authService: AuthService,
   ) {
   }
 
   private async getEntry(): Promise<TimeTrackedEntry> {
     if (!this.entry) {
-      await this.dbTreeService.upsertItemIfMissing(MINDFULNESS_ITEM_ID, {
+      // Every caller of startTracking()/stopTrackingIfNeeded() is already behind an auth-required
+      // route (matches CategoriesComponent/ToolbarCommonItemsComponent's identical assumption for
+      // the same well-known-id pattern).
+      const itemId = mindfulnessItemId(this.authService.userId as string)
+      await this.dbTreeService.upsertItemIfMissing(itemId, {
         title: 'Mindfulness',
         isArchived: false,
       })
       // GH #27 follow-up: show the anchor item in the OrYoL tree itself, not just as a hidden
       // time-tracking target.
-      await this.dbTreeService.upsertRootInclusionIfMissing(MINDFULNESS_ITEM_ID)
-      this.mindfulnessItem$ = new OryItem$(this.injector, MINDFULNESS_ITEM_ID, {})
+      await this.dbTreeService.upsertRootInclusionIfMissing(itemId)
+      this.mindfulnessItem$ = new OryItem$(this.injector, itemId, {})
       this.entry = this.timeTrackingService.obtainEntryForItem(this.mindfulnessItem$)
     }
     return this.entry
@@ -60,8 +74,9 @@ export class MindfulnessTrackingService {
     this.entry.pauseOrNoop()
   }
 
-  /** Sums every stored TimeTrackingPeriod for `_mindfulness` into "today" and "this week" (Monday
-   * start) totals. An open period (`end == null`, still running) counts up to "now". */
+  /** Sums every stored TimeTrackingPeriod for the current user's mindfulness anchor item into
+   * "today" and "this week" (Monday start) totals. An open period (`end == null`, still running)
+   * counts up to "now". */
   async getTodayAndWeekTotals(): Promise<MindfulnessTotals> {
     const now = new Date()
     const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate())
@@ -69,7 +84,7 @@ export class MindfulnessTrackingService {
     const startOfWeek = new Date(startOfToday)
     startOfWeek.setDate(startOfToday.getDate() - dayOfWeekMondayFirst)
 
-    const periods = await this.timeTrackingPeriodsService.getPeriodsForItem(MINDFULNESS_ITEM_ID)
+    const periods = await this.timeTrackingPeriodsService.getPeriodsForItem(mindfulnessItemId(this.authService.userId as string))
 
     let todayMs = 0
     let weekMs = 0
