@@ -101,9 +101,10 @@ export class JournalEntriesListPage extends BaseComponent implements OnInit {
         return items
       }
       const searchableItems = items.map(item$ => ({item$, text: this.searchableTextFor(item$)}))
-      // Fuzzy/typo-tolerant: threshold 0.4 (0 = exact match only, 1 = matches anything) is
-      // Fuse's own suggested starting point for forgiving free-text search.
-      const fuse = new Fuse(searchableItems, {keys: ['text'], threshold: 0.4, ignoreLocation: true})
+      // Fuzzy/typo-tolerant: threshold 0.3 (0 = exact match only, 1 = matches anything). Started
+      // at Fuse's own suggested 0.4, but that let through results too dissimilar from the query
+      // (GH #96) - 0.3 still tolerates small typos without matching on loose coincidence alone.
+      const fuse = new Fuse(searchableItems, {keys: ['text'], threshold: 0.3, ignoreLocation: true})
       return fuse.search(trimmedTerm).map(result => result.item.item$)
     })
   )
