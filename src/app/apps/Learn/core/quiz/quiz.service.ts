@@ -164,6 +164,10 @@ export class QuizService {
     if (quizOptions.skipAiGenerated) {
       item$s = item$s.filter(item => ! item.val?.isAiGenerated())
     }
+    // ...or, inversely, the quiz can be restricted to *only* AI-generated items (GH #100).
+    if (quizOptions.onlyAiGenerated) {
+      item$s = item$s.filter(item => !! item.val?.isAiGenerated())
+    }
 
     // FIXME: perf: one .filter() call, with multiple predicates
     if (quizOptions.onlyWithQA) {
