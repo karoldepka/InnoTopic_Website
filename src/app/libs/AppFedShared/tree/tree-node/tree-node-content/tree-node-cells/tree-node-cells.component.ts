@@ -64,6 +64,16 @@ export class TreeNodeCellsComponent implements OnChanges, OnInit, OnDestroy {
   @Input()
   onSlotChildCreated?: (child: any) => void
 
+  /** When set, this descriptor's cell is force-expanded and focused once, right after the first
+   * `rebuildCells()` - e.g. Journal's write-new page (GH #104) wants `general` ready to type into
+   * immediately, instead of behind an extra "tap the pill" step. Only applied once at startup;
+   * later @Input() changes have no effect (matches `manuallyExpandedSlotIds`' own "sticky once
+   * expanded" semantics - there's no scenario yet where this needs to re-fire). */
+  @Input()
+  autoExpandDescriptorId?: string
+
+  private didAutoExpand = false
+
   cells: Array<{descriptor: SlotDescriptor, cell?: OdmCell, targetNodeId: string, timeTrackItem$: VirtualSlotState$}> = []
 
   /** Which cell's comment thread is expanded - at most one at a time, mirroring the numeric
@@ -114,6 +124,9 @@ export class TreeNodeCellsComponent implements OnChanges, OnInit, OnDestroy {
       this.rebuildCells()
       this.changeDetectorRef.markForCheck()
     })
+    // ngOnChanges (treeNode/descriptors are both bound @Input()s) always runs before ngOnInit,
+    // including on this very first change - so `cells` is already populated here.
+    this.maybeAutoExpand()
   }
 
   ngOnChanges(): void {
@@ -216,6 +229,17 @@ export class TreeNodeCellsComponent implements OnChanges, OnInit, OnDestroy {
     return !hasFieldValue(this.treeNode.item$.val?.[descriptor.dataFieldKey as string])
   }
 
+  private maybeAutoExpand(): void {
+    if (this.didAutoExpand || !this.autoExpandDescriptorId) {
+      return
+    }
+    if (!this.cells.some(entry => entry.descriptor.id === this.autoExpandDescriptorId)) {
+      return
+    }
+    this.didAutoExpand = true
+    this.expandCompactCell(this.autoExpandDescriptorId)
+  }
+
   expandCompactCell(descriptorId: string): void {
     this.manuallyExpandedSlotIds.add(descriptorId)
     this.changeDetectorRef.markForCheck()
@@ -231,23 +255,32 @@ export class TreeNodeCellsComponent implements OnChanges, OnInit, OnDestroy {
    * `rebuildCells()` having re-run a fresh `OdmCell` in between). `kind: 'slot'`
    * (`BareSlotCellComponent`) isn't one of those (no single editable value of its own) - falls
    * back to its "Add…" input directly. */
-  private focusExpandedCell(descriptorId: string): void {
+  private focusExpandedCell(descriptorId: string, attemptsLeft = 20): void {
     const container = this.elementRef.nativeElement.querySelector<HTMLElement>(`[data-descriptor-id="${descriptorId}"]`)
-    if (!container) {
-      return
-    }
-    const cellComponent = [...this.cellNavigationService.cellComponents]
+    const cellComponent = container && [...this.cellNavigationService.cellComponents]
       .find(component => container.contains(component.elementRef.nativeElement))
     if (cellComponent) {
       cellComponent.focus()
       return
     }
-    const ionInput = container.querySelector('ion-input, ion-textarea') as (HTMLElement & {setFocus?: () => void}) | null
+    const ionInput = container?.querySelector('ion-input, ion-textarea') as (HTMLElement & {setFocus?: () => void}) | null
     if (ionInput?.setFocus) {
       ionInput.setFocus()
       return
     }
-    container.querySelector<HTMLElement>('input, textarea, [contenteditable="true"]')?.focus()
+    const plainInput = container?.querySelector<HTMLElement>('input, textarea, [contenteditable="true"]')
+    if (plainInput) {
+      plainInput.focus()
+      return
+    }
+    // Nothing focusable found yet. A user-triggered click (expandCompactCell()'s other caller)
+    // always finds it on the very first attempt, since the app has already fully settled by then -
+    // this branch only matters for GH #104's auto-expand-at-startup case, which races Angular
+    // still mounting the expanded cell's child component (on top of TinyMCE's own async init on
+    // top of THAT) during cold app bootstrap. Retry for up to ~2s rather than silently giving up.
+    if (attemptsLeft > 0) {
+      setTimeout(() => this.focusExpandedCell(descriptorId, attemptsLeft - 1), 100)
+    }
   }
 
   /** `SlotPickerComponent.fieldPicked` - now that the search box scans every field, not just
