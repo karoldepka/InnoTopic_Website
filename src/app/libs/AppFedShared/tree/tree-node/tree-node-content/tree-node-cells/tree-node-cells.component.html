@@ -13,6 +13,13 @@
   (fieldPicked)="onFieldPicked($event)"
 ></app-slot-picker>
 
+<ion-checkbox
+  class="show-all-fields-toggle"
+  labelPlacement="end"
+  [checked]="showAllFields"
+  (ionChange)="onShowAllFieldsChange($event.detail.checked)"
+>Show all fields</ion-checkbox>
+
 @for (entry of cells; track entry.descriptor.id) {
   @if (isCompact(entry.descriptor)) {
     <button
