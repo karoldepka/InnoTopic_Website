@@ -23,6 +23,7 @@ import { MindfulnessGoalsService } from './mindfulness-goals.service'
 export class MindfulnessPage extends BaseComponent implements OnInit, OnDestroy {
 
   readonly timerPresets: { label: string; durationSeconds: number }[] = [
+    { label: '5s',  durationSeconds: 5 },
     { label: '10s', durationSeconds: 10 },
     { label: '20s', durationSeconds: 20 },
     { label: '30s', durationSeconds: 30 },
