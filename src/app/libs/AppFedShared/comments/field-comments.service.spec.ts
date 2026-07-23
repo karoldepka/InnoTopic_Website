@@ -118,6 +118,18 @@ async function flushMicrotasks(): Promise<void> {
   await new Promise(resolve => setTimeout(resolve, 0))
 }
 
+/** Item ids are generated from a millisecond-resolution timestamp (`getNowTimePointSuitableForId()`
+ * - `new Date()`) with no sub-millisecond disambiguation - two `addComment()` calls close enough
+ * together can land in the same millisecond and collide, silently overwriting one comment with the
+ * other in the fake backend's `Map` (keyed by id). `flushMicrotasks()`'s plain `setTimeout(…, 0)`
+ * doesn't reliably guarantee the clock has actually ticked over by the time it resolves - this is
+ * what made "oldest first" intermittently fail with only one comment present instead of two.
+ * Real usage can't hit this (a user can't submit two comments within the same millisecond via the
+ * UI); this is a test-timing-only workaround, not a production concern. */
+async function ensureDistinctIdTimestamp(): Promise<void> {
+  await new Promise(resolve => setTimeout(resolve, 2))
+}
+
 describe('FieldCommentsService', () => {
   it('getCommentsForNode$ only returns comments targeting that node, oldest first', async () => {
     const {service} = setup()
@@ -129,7 +141,7 @@ describe('FieldCommentsService', () => {
     service.getCommentsForNode$('item1_field_mood').subscribe(comments => latest = comments)
 
     service.addComment('item1_field_mood', 'second comment')
-    await flushMicrotasks()
+    await ensureDistinctIdTimestamp() // see this helper's doc comment - avoids an id collision with the next comment
     service.addComment('item1_field_mood', 'first comment') // stored after, but whenCreated will still sort by creation order
     await flushMicrotasks()
     service.addComment('item2_field_mood', 'comment on a different node')
