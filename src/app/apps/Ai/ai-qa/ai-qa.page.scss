@@ -1,9 +1,15 @@
 // ── Host ──────────────────────────────────────────────────────────────────────
 // No height: 100% here. Setting height:100% on a child of ion-content's
 // .inner-scroll resolves to 100vh (the full inner-scroll height, which starts at
-// y=0 above the header), placing our element's bottom 56px below the viewport.
+// y=0 above the header), placing our element's bottom 112px below the viewport.
 // We avoid that by NOT setting any height on :host, and instead using
-// calc(100dvh - 56px) on the layout container at tablet/desktop below.
+// calc(100dvh - 112px) on the layout container at tablet/desktop below.
+//
+// Why 112px and not 56px: there are *two* stacked ion-header bars above
+// ion-content, not one - the app-root header (app.component.html's own
+// ion-header/app-toolbar-common-items) plus this page's own ion-header - each
+// 56px tall (GH #121: the footer action buttons were sticking out below the
+// viewport because this used to subtract only one of them).
 
 :host {
   display: block;
@@ -338,21 +344,24 @@
 
 // ── Tablet (768–1099px): 2-column grid ───────────────────────────────────────
 //
-// KEY: height: calc(100dvh - 56px) on .qa-layout is a direct, absolute value —
+// KEY: height: calc(100dvh - 112px) on .qa-layout is a direct, absolute value —
 // no height:100% percentage chains into ion-content's shadow DOM.
 //
-// Why this matters: ion-content's .inner-scroll has top:-56px (extends above
-// the header to y=0), so its total height = 100vh. A child with height:100%
-// gets 100vh, but starts at y=56, ending at y=56+100vh = 56px below viewport.
-// Using calc(100dvh - 56px) directly avoids that resolution entirely.
+// Why this matters: ion-content's .inner-scroll has top:-112px (extends above
+// both stacked headers - the app-root one and this page's own, 56px each - to
+// y=0), so its total height = 100vh. A child with height:100% gets 100vh, but
+// starts at y=112, ending at y=112+100vh = 112px below viewport. Using
+// calc(100dvh - 112px) directly avoids that resolution entirely (GH #121: this
+// used to subtract only 56px, one header's worth, pushing the footer action
+// buttons off the bottom of the viewport).
 
 @media (min-width: 720px) and (max-width: 1099px) {
   .qa-layout {
     // box-sizing: border-box ensures padding is INCLUDED in the height value.
-    // Without it: total box = calc(100dvh - 56px) + 28px padding = 100dvh - 28px,
-    // which overflows ion-content's area (100dvh - 56px) by 28px → second scrollbar.
+    // Without it: total box = calc(100dvh - 112px) + 28px padding = 100dvh - 84px,
+    // which overflows ion-content's area (100dvh - 112px) by 28px → second scrollbar.
     box-sizing: border-box;
-    height: calc(100dvh - 56px);
+    height: calc(100dvh - 112px);
     display: grid;
     grid-template-columns: minmax(260px, 0.9fr) minmax(300px, 1.2fr);
     grid-template-rows: minmax(0, 45%) 1fr;
@@ -397,7 +406,7 @@
 @media (min-width: 1100px) {
   .qa-layout {
     box-sizing: border-box;
-    height: calc(100dvh - 56px);
+    height: calc(100dvh - 112px);
     display: grid;
     grid-template-columns: minmax(260px, 0.9fr) minmax(280px, 1fr) minmax(320px, 1.3fr);
     grid-template-rows: 1fr;
