@@ -22,6 +22,11 @@
   <ion-badge *ngIf="item.val?.isAiGenerated()" color="tertiary" style="margin-right: 5px">AI</ion-badge>
   <ion-badge *ngIf="item.val?.isDraft()" color="warning" style="margin-right: 5px">DRAFT</ion-badge>
   <ion-badge *ngIf="item.isArchived()" color="medium" style="margin-right: 5px">ARCHIVED</ion-badge>
+  <ion-badge
+    *ngIf="(item$.odmService.conflictedItemIds$ | async)?.has(item.id!)"
+    color="danger"
+    style="margin-right: 5px"
+  >CONFLICT</ion-badge>
 
   <ion-button
     *ngIf="! item.isArchived()"

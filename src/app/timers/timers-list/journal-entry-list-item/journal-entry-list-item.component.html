@@ -10,6 +10,11 @@
     [time]="$safeNavigationMigration(itemVal?.whenCreated | odmDate)"
   ></app-time-point>
 
+  <ion-note
+    *ngIf="(item$.odmService.conflictedItemIds$ | async)?.has(item$.id!)"
+    color="danger"
+  >⚠ Conflict detected - an older edit was archived</ion-note>
+
 <!--  {{item$.val$ | async | json}}-->
 
   <app-journal-num-fields-view

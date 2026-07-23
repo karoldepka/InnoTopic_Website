@@ -47,6 +47,11 @@ class FakeOdmCollectionBackend<TRaw> extends OdmCollectionBackend<TRaw> {
 
 class FakeBrowserOdmStorage {
   pendingEditsChanged$ = new CachedSubject<void>(undefined as any)
+  conflictDetected$ = new CachedSubject<{collection: string, winnerId: string}>(undefined as any)
+
+  async getConflictedItemIds(): Promise<Set<string>> {
+    return new Set()
+  }
 
   async getAllPendingEdits() {
     return []

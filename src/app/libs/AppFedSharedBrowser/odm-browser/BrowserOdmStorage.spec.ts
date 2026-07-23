@@ -144,6 +144,9 @@ describe('BrowserOdmStorage', () => {
       // BrowserOdmCollectionBackend.fetchRows) know to exclude it (GH #73 - this row was
       // previously indistinguishable from a real item and rendered as a duplicate entry).
       expect(archived?.isConflictArchive).toBe(true)
+      // Points back at the real (winning) item so a UI can mark it (GH #84), without parsing it
+      // back out of the archival row's own synthetic id.
+      expect(archived?.conflictWinnerItemId).toBe('item1')
 
       // Notified exactly once.
       expect(conflicts.length).toBe(1)
@@ -152,6 +155,10 @@ describe('BrowserOdmStorage', () => {
         winnerId: 'item1',
         loserConflictId: expectedLoserId,
       })
+
+      const conflictedIds = await storage.getConflictedItemIds(collection)
+      expect(conflictedIds.has('item1')).toBe(true)
+      expect(conflictedIds.size).toBe(1)
     })
 
     it('a strictly-older write with IDENTICAL data is treated as a benign duplicate, not a conflict', async () => {
@@ -170,6 +177,7 @@ describe('BrowserOdmStorage', () => {
       expect(conflicts.length).toBe(0)
       const allRows = await storage.getAllForCollection<SutItem>(collection)
       expect(allRows.length).toBe(1)
+      expect((await storage.getConflictedItemIds(collection)).size).toBe(0)
     })
   })
 
