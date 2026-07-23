@@ -14,19 +14,28 @@
   (searchTermChange)="onSearchTermChange($event)"
 ></app-slot-picker>
 
-<ion-checkbox
-  class="show-all-fields-toggle"
-  labelPlacement="end"
-  [checked]="showMostRecentlyUsed"
-  (ionChange)="onShowMostRecentlyUsedChange($event.detail.checked)"
->Show most recently used</ion-checkbox>
+<div class="field-visibility-toggles">
+  <ion-checkbox
+    class="field-visibility-toggle"
+    labelPlacement="end"
+    [checked]="showCoreFields"
+    (ionChange)="onShowCoreFieldsChange($event.detail.checked)"
+  >Show core fields</ion-checkbox>
 
-<ion-checkbox
-  class="show-all-fields-toggle"
-  labelPlacement="end"
-  [checked]="showAllFields"
-  (ionChange)="onShowAllFieldsChange($event.detail.checked)"
->Show all fields</ion-checkbox>
+  <ion-checkbox
+    class="field-visibility-toggle"
+    labelPlacement="end"
+    [checked]="showMostRecentlyUsed"
+    (ionChange)="onShowMostRecentlyUsedChange($event.detail.checked)"
+  >Show most recently used</ion-checkbox>
+
+  <ion-checkbox
+    class="field-visibility-toggle"
+    labelPlacement="end"
+    [checked]="showAllFields"
+    (ionChange)="onShowAllFieldsChange($event.detail.checked)"
+  >Show all fields</ion-checkbox>
+</div>
 
 @for (entry of cells; track entry.descriptor.id) {
   @if (isCompact(entry.descriptor)) {

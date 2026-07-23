@@ -135,6 +135,14 @@ export class TreeNodeCellsComponent implements OnChanges, OnInit, OnDestroy {
    * MRU is available as an explicit, temporary "show me my usual fields" toggle instead. */
   showMostRecentlyUsed = false
 
+  /** Opt-in gate for every `isShortListed` ("core") field, filled or not - originally these all
+   * stayed visible unconditionally on a genuinely blank item ("for quick entry"), but that meant a
+   * brand-new entry showed the same ~46-pill wall this whole hiding rule exists to avoid, just on
+   * a delay (the moment `general` gets any text, everything else vanishes anyway). A blank item is
+   * no longer special-cased - `general` alone (via `alwaysVisibleDescriptorIds`) is enough to start
+   * from; this checkbox is the explicit way back to browsing the full core-field set. */
+  showCoreFields = false
+
   private static readonly MRU_LIMIT = 8
 
   private valSubscription?: Subscription
@@ -184,9 +192,6 @@ export class TreeNodeCellsComponent implements OnChanges, OnInit, OnDestroy {
     this.mruDescriptorIds = new Set(
       this.slotUsageTrackerService.getMostRecentlyUsedIds(this.treeNode.item$.getCollectionName(), TreeNodeCellsComponent.MRU_LIMIT)
     )
-    const anyFieldHasValue = this.descriptors.some(descriptor =>
-      descriptor.kind !== 'slot' && hasFieldValue(itemVal?.[descriptor.dataFieldKey as string])
-    )
     const trimmedSearch = this.searchTerm.trim()
     this.cells = this.descriptors
       // A search match reveals ANY matching descriptor here directly, not just already-visible/
@@ -195,7 +200,7 @@ export class TreeNodeCellsComponent implements OnChanges, OnInit, OnDestroy {
       // field's name jumps straight to it wherever it conceptually belongs either way.
       .filter(descriptor => isSlotVisible(descriptor, itemVal)
         || (trimmedSearch && slotDescriptorMatchesSearch(descriptor, trimmedSearch)))
-      .filter(descriptor => !this.isClutteringUnfilledPill(descriptor, itemVal, anyFieldHasValue))
+      .filter(descriptor => !this.isClutteringUnfilledPill(descriptor, itemVal))
       .map(descriptor => {
         const targetNodeId = fieldVirtualNodeId(this.treeNode.item$.id as string, descriptor.id)
         return {
@@ -269,13 +274,13 @@ export class TreeNodeCellsComponent implements OnChanges, OnInit, OnDestroy {
   /** See `mruDescriptorIds`' doc comment (GH #85/#101). Scoped to `isShortListed` + non-`'slot'`
    * descriptors specifically - those are the always-shown-regardless-of-value set that causes the
    * clutter; bare slots and explicitly-searched-and-added fields are left exactly as
-   * `isSlotVisible()` already decides (unchanged, out of scope here). */
-  private isClutteringUnfilledPill(descriptor: SlotDescriptor, itemVal: any, anyFieldHasValue: boolean): boolean {
+   * `isSlotVisible()` already decides (unchanged, out of scope here). Deliberately no "blank item"
+   * exemption - a brand-new entry showing every shortlisted field (confirmed live: ~46 of them)
+   * defeats the purpose just as much as an already-filled-in one would; `general` staying visible
+   * via `alwaysVisibleDescriptorIds` is what keeps a fresh entry usable instead. */
+  private isClutteringUnfilledPill(descriptor: SlotDescriptor, itemVal: any): boolean {
     if (!descriptor.isShortListed || descriptor.kind === 'slot') {
       return false
-    }
-    if (!anyFieldHasValue) {
-      return false // blank item - every shortlisted field stays available for quick entry, as today
     }
     if (this.alwaysVisibleDescriptorIds.includes(descriptor.id)) {
       return false
@@ -283,7 +288,7 @@ export class TreeNodeCellsComponent implements OnChanges, OnInit, OnDestroy {
     if (this.searchTerm.trim() && slotDescriptorMatchesSearch(descriptor, this.searchTerm)) {
       return false // actively searching - reveal a match here too, not just as a separate add-chip
     }
-    if (this.showAllFields || this.manuallyExpandedSlotIds.has(descriptor.id)) {
+    if (this.showAllFields || this.showCoreFields || this.manuallyExpandedSlotIds.has(descriptor.id)) {
       return false
     }
     if (this.showMostRecentlyUsed && this.mruDescriptorIds.has(descriptor.id)) {
@@ -343,6 +348,14 @@ export class TreeNodeCellsComponent implements OnChanges, OnInit, OnDestroy {
    * `onShowAllFieldsChange()` above. */
   onShowMostRecentlyUsedChange(value: boolean): void {
     this.showMostRecentlyUsed = value
+    this.rebuildCells()
+    this.changeDetectorRef.markForCheck()
+  }
+
+  /** `showCoreFields`'s own checkbox handler - same rebuild-on-toggle reasoning as
+   * `onShowAllFieldsChange()` above. */
+  onShowCoreFieldsChange(value: boolean): void {
+    this.showCoreFields = value
     this.rebuildCells()
     this.changeDetectorRef.markForCheck()
   }
