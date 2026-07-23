@@ -2,7 +2,7 @@ import {Component, Input, Output, EventEmitter, OnChanges, OnInit, OnDestroy, Ch
 import {Subscription} from 'rxjs'
 import {OdmTreeNode} from '../../OdmTreeNode'
 import {OdmCell} from '../../../cells/OdmCell'
-import {fieldVirtualNodeId, hasFieldValue, isSlotVisible, SlotDescriptor} from '../../../cells/SlotDescriptor'
+import {fieldVirtualNodeId, hasFieldValue, isSlotVisible, slotDescriptorMatchesSearch, SlotDescriptor} from '../../../cells/SlotDescriptor'
 import {getBareSlotChildren$} from '../../../BareSlotChildren'
 import {IonicModule} from '@ionic/angular'
 import {MinMidMaxCellComponent} from '../../../cells/min-mid-max-cell/min-mid-max-cell.component'
@@ -73,7 +73,20 @@ export class TreeNodeCellsComponent implements OnChanges, OnInit, OnDestroy {
   @Input()
   autoExpandDescriptorId?: string
 
+  /** Descriptor ids the caller considers "primary" for this item class (e.g. Journal's `general`) -
+   * exempt from the GH #85/#101 clutter-hiding rule regardless of value/MRU/manual-expand state, so
+   * the anchor field a user is expected to always be able to find/fill stays present even on an
+   * otherwise-filled-in item where it would otherwise itself still be empty. Kept as a caller-
+   * supplied list (not a hardcoded id here) so this component stays usable by any item class, not
+   * just Journal's. */
+  @Input()
+  alwaysVisibleDescriptorIds: string[] = []
+
   private didAutoExpand = false
+
+  /** Mirrors `SlotPickerComponent`'s own search box - typing a field's name also reveals it here
+   * if it's currently clutter-hidden, instead of only surfacing as a separate "add" chip above. */
+  private searchTerm = ''
 
   cells: Array<{descriptor: SlotDescriptor, cell?: OdmCell, targetNodeId: string, timeTrackItem$: VirtualSlotState$}> = []
 
@@ -106,14 +119,21 @@ export class TreeNodeCellsComponent implements OnChanges, OnInit, OnDestroy {
    * shortlisted fields (e.g. Journal's ~46 "always shown" metrics) stop rendering as compact pills
    * at all - on a real entry these are pure clutter (confirmed live: 45 pills on one item), not the
    * quick-access convenience they're meant to be on a genuinely blank one. This id set is the
-   * escape hatch that keeps a few of them around anyway: the most-recently-used ones (so a field
-   * you always fill in stays one tap away), recomputed each `rebuildCells()` from
-   * `SlotUsageTrackerService` (cheap - a handful of localStorage entries per item class). */
+   * candidate escape hatch (the most-recently-used ones, server-synced via
+   * `SlotUsageTrackerService`) - only actually applied while `showMostRecentlyUsed` is on, see
+   * that flag's own doc comment for why this moved behind a checkbox instead of being automatic. */
   mruDescriptorIds = new Set<string>()
 
   /** GH #101's "show all" checkbox - the manual override for the same hiding rule, for the rarer
    * case of wanting to browse/open a field that's neither filled nor recently used. */
   showAllFields = false
+
+  /** Opt-in gate for `mruDescriptorIds` - originally MRU fields stayed visible unconditionally,
+   * but that made "which fields show by default" depend on personal usage history instead of just
+   * the item's own data, surprising on someone else's item (or your own after a while). Default
+   * visibility is now just the caller's `alwaysVisibleDescriptorIds` + fields with an actual value;
+   * MRU is available as an explicit, temporary "show me my usual fields" toggle instead. */
+  showMostRecentlyUsed = false
 
   private static readonly MRU_LIMIT = 8
 
@@ -167,8 +187,14 @@ export class TreeNodeCellsComponent implements OnChanges, OnInit, OnDestroy {
     const anyFieldHasValue = this.descriptors.some(descriptor =>
       descriptor.kind !== 'slot' && hasFieldValue(itemVal?.[descriptor.dataFieldKey as string])
     )
+    const trimmedSearch = this.searchTerm.trim()
     this.cells = this.descriptors
-      .filter(descriptor => isSlotVisible(descriptor, itemVal))
+      // A search match reveals ANY matching descriptor here directly, not just already-visible/
+      // shortlisted ones - matches SlotPickerComponent's own "once actively searching, the search
+      // scope widens to every descriptor" behavior for its separate add-chip row, so typing a
+      // field's name jumps straight to it wherever it conceptually belongs either way.
+      .filter(descriptor => isSlotVisible(descriptor, itemVal)
+        || (trimmedSearch && slotDescriptorMatchesSearch(descriptor, trimmedSearch)))
       .filter(descriptor => !this.isClutteringUnfilledPill(descriptor, itemVal, anyFieldHasValue))
       .map(descriptor => {
         const targetNodeId = fieldVirtualNodeId(this.treeNode.item$.id as string, descriptor.id)
@@ -251,7 +277,16 @@ export class TreeNodeCellsComponent implements OnChanges, OnInit, OnDestroy {
     if (!anyFieldHasValue) {
       return false // blank item - every shortlisted field stays available for quick entry, as today
     }
-    if (this.showAllFields || this.manuallyExpandedSlotIds.has(descriptor.id) || this.mruDescriptorIds.has(descriptor.id)) {
+    if (this.alwaysVisibleDescriptorIds.includes(descriptor.id)) {
+      return false
+    }
+    if (this.searchTerm.trim() && slotDescriptorMatchesSearch(descriptor, this.searchTerm)) {
+      return false // actively searching - reveal a match here too, not just as a separate add-chip
+    }
+    if (this.showAllFields || this.manuallyExpandedSlotIds.has(descriptor.id)) {
+      return false
+    }
+    if (this.showMostRecentlyUsed && this.mruDescriptorIds.has(descriptor.id)) {
       return false
     }
     return !hasFieldValue(itemVal?.[descriptor.dataFieldKey as string])
@@ -300,6 +335,22 @@ export class TreeNodeCellsComponent implements OnChanges, OnInit, OnDestroy {
    * flag. */
   onShowAllFieldsChange(value: boolean): void {
     this.showAllFields = value
+    this.rebuildCells()
+    this.changeDetectorRef.markForCheck()
+  }
+
+  /** `showMostRecentlyUsed`'s own checkbox handler - same rebuild-on-toggle reasoning as
+   * `onShowAllFieldsChange()` above. */
+  onShowMostRecentlyUsedChange(value: boolean): void {
+    this.showMostRecentlyUsed = value
+    this.rebuildCells()
+    this.changeDetectorRef.markForCheck()
+  }
+
+  /** `SlotPickerComponent.searchTermChange` - a match also un-hides a clutter-hidden field here,
+   * see `isClutteringUnfilledPill()`. */
+  onSearchTermChange(term: string): void {
+    this.searchTerm = term
     this.rebuildCells()
     this.changeDetectorRef.markForCheck()
   }

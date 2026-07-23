@@ -38,6 +38,12 @@ export class SlotPickerComponent implements OnChanges, OnDestroy {
    * uses this to expand a compact cell and scroll it into view. */
   @Output() fieldPicked = new EventEmitter<SlotDescriptor>()
 
+  /** Lets the parent (`TreeNodeCellsComponent`) also reveal an already-shortlisted-but-currently-
+   * clutter-hidden field as the user types, not just this component's own "add a still-hidden
+   * field" chip row below - typing a field's name should surface it wherever it already
+   * conceptually belongs, the same way clicking a chip does for a not-yet-added one. */
+  @Output() searchTermChange = new EventEmitter<string>()
+
   searchTerm = ''
   visibleChips: SlotDescriptor[] = []
 
@@ -64,6 +70,7 @@ export class SlotPickerComponent implements OnChanges, OnDestroy {
   onSearchChange(term: string): void {
     this.searchTerm = term
     this.recomputeChips()
+    this.searchTermChange.emit(term)
   }
 
   private recomputeChips(): void {

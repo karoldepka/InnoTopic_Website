@@ -11,7 +11,15 @@
   [treeNode]="treeNode"
   [descriptors]="descriptors"
   (fieldPicked)="onFieldPicked($event)"
+  (searchTermChange)="onSearchTermChange($event)"
 ></app-slot-picker>
+
+<ion-checkbox
+  class="show-all-fields-toggle"
+  labelPlacement="end"
+  [checked]="showMostRecentlyUsed"
+  (ionChange)="onShowMostRecentlyUsedChange($event.detail.checked)"
+>Show most recently used</ion-checkbox>
 
 <ion-checkbox
   class="show-all-fields-toggle"

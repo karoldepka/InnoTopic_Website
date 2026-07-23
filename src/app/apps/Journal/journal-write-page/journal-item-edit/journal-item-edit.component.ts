@@ -41,6 +41,11 @@ export class JournalItemEditComponent extends BaseComponent implements OnChanges
 
   descriptors = JOURNAL_SLOT_DESCRIPTORS
 
+  /** `general` is Journal's primary/anchor field (GH #104: auto-expanded+focused on a brand-new
+   * entry) - it should stay visible even on an existing, otherwise-filled-in entry where it
+   * itself has no value yet, not get clutter-hidden like any other shortlisted field would. */
+  alwaysVisibleDescriptorIds = ['general']
+
   featureService = this.injector.get(FeatureService)
 
   @Input()
