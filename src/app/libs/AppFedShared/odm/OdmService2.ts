@@ -195,7 +195,7 @@ export abstract class OdmService2<
       // an id-generation collision - see getNowTimePointSuitableForId()'s doc comment, GH #122) -
       // this branch used to silently drop the second one entirely, which is exactly what made
       // that bug so hard to trace (121 accepted items quietly became 7-8, no error anywhere).
-      console.error(`_ensureItemAdded: id collision - a different ${this.className} item already exists for id`, item$.id, 'dropping the new one to avoid clobbering the existing entry silently in the UI, though the DB write may already have overwritten it')
+      errorAlert(`_ensureItemAdded: id collision - a different ${this.className} item already exists for id`, item$.id, 'dropping the new one to avoid clobbering the existing entry silently in the UI, though the DB write may already have overwritten it')
     }
   }
 
