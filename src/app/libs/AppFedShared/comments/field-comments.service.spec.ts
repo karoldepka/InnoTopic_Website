@@ -118,14 +118,21 @@ async function flushMicrotasks(): Promise<void> {
   await new Promise(resolve => setTimeout(resolve, 0))
 }
 
-/** Item ids are generated from a millisecond-resolution timestamp (`getNowTimePointSuitableForId()`
- * - `new Date()`) with no sub-millisecond disambiguation - two `addComment()` calls close enough
- * together can land in the same millisecond and collide, silently overwriting one comment with the
- * other in the fake backend's `Map` (keyed by id). `flushMicrotasks()`'s plain `setTimeout(…, 0)`
- * doesn't reliably guarantee the clock has actually ticked over by the time it resolves - this is
- * what made "oldest first" intermittently fail with only one comment present instead of two.
- * Real usage can't hit this (a user can't submit two comments within the same millisecond via the
- * UI); this is a test-timing-only workaround, not a production concern. */
+/** Item ids used to be generated from a millisecond-resolution timestamp alone
+ * (`getNowTimePointSuitableForId()` - `new Date()`) with no sub-millisecond disambiguation - two
+ * `addComment()` calls close enough together could land in the same millisecond and collide,
+ * silently overwriting one comment with the other in the fake backend's `Map` (keyed by id).
+ * `flushMicrotasks()`'s plain `setTimeout(…, 0)` doesn't reliably guarantee the clock has actually
+ * ticked over by the time it resolves - this is what made "oldest first" intermittently fail with
+ * only one comment present instead of two.
+ *
+ * This turned out NOT to be test-only: the same collision, in a real tight synchronous loop
+ * (bulk-accepting 100+ AI-generated Q&A items into Learn), caused GH #122 - a genuine production
+ * data-loss bug where 121 accepted items collapsed to 7-8 survivors. `getNowTimePointSuitableForId()`
+ * now appends a monotonic per-process counter, so this collision can no longer happen at all -
+ * this helper (and the extra delay below) is only still here to keep this test's own two calls
+ * unambiguously ordered in time for the "oldest first" assertion, not to route around a real bug
+ * anymore. */
 async function ensureDistinctIdTimestamp(): Promise<void> {
   await new Promise(resolve => setTimeout(resolve, 2))
 }

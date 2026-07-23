@@ -184,11 +184,18 @@ export abstract class OdmService2<
   }
 
   _ensureItemAdded(item$: TOdmItem$) {
-    if ( ! this.mapIdToItem$.get(item$.id as TItemId) ) {
+    const existing = this.mapIdToItem$.get(item$.id as TItemId)
+    if ( ! existing ) {
       this.mapIdToItem$.set(item$.id as TItemId, item$)
       let items = this.localItems$.lastVal
       items!.push(item$) /* FIXME: this out-of-band modification might confuse RxJS */
       this.emitLocalItems()
+    } else if ( existing !== item$ ) {
+      // Two genuinely different item objects sharing an id is always a bug upstream (most likely
+      // an id-generation collision - see getNowTimePointSuitableForId()'s doc comment, GH #122) -
+      // this branch used to silently drop the second one entirely, which is exactly what made
+      // that bug so hard to trace (121 accepted items quietly became 7-8, no error anywhere).
+      console.error(`_ensureItemAdded: id collision - a different ${this.className} item already exists for id`, item$.id, 'dropping the new one to avoid clobbering the existing entry silently in the UI, though the DB write may already have overwritten it')
     }
   }
 
