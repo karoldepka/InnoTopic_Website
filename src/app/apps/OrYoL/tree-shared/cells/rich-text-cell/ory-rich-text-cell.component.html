@@ -4,10 +4,12 @@
   [showToolbar]="true"
   [showMenuBar]="false"
   [enterKeyOnlyWithShift]="true"
+  [interceptBackspaceOnEmpty]="true"
   [enableLinkPreview]="true"
   [collection]="'OryItem'"
   [itemId]="treeNode.itemId"
   (enterKeydownIntercepted)="onEnterKeydownIntercepted($event)"
+  (backspaceOnEmptyIntercepted)="onBackspaceOnEmptyIntercepted()"
 ></app-rich-text-edit>
 <app-voice-memo-field
   [item$]="treeNode.content.dbItem"

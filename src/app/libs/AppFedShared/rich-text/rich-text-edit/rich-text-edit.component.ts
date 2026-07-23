@@ -68,6 +68,17 @@ export class RichTextEditComponent extends AbstractCellComponent implements OnIn
    * new sibling node) can dispatch on its modifiers itself. */
   @Output() enterKeydownIntercepted = new EventEmitter<KeyboardEvent>()
 
+  /** GH #75: when set, a Backspace pressed while the editor is already empty is intercepted
+   * (instead of doing nothing, which is the browser's default for an empty contenteditable) so a
+   * caller can delete the whole node it belongs to - matching common outliner-app behavior
+   * (Workflowy/Notion/Roam: backspace on an empty line removes it and moves to the previous one). */
+  @Input() interceptBackspaceOnEmpty: boolean = false
+
+  /** Fires whenever `interceptBackspaceOnEmpty` suppresses a Backspace on an already-empty editor -
+   * same rationale as `enterKeydownIntercepted` above for why this needs to be an output rather
+   * than relying on a plain ancestor `(keydown.backspace)` binding. */
+  @Output() backspaceOnEmptyIntercepted = new EventEmitter<KeyboardEvent>()
+
   /** Off by default so a bare pasted URL still just becomes a plain autolink anywhere this
    * component is used for something link previews don't make sense for (kept opt-in rather than
    * risk surprising behavior in an untested context) - Learn/Quiz/Journal/OrYoL explicitly
@@ -583,6 +594,19 @@ export class RichTextEditComponent extends AbstractCellComponent implements OnIn
                 this.injector.get(ChangeDetectorRef).markForCheck()
                 return false;
               }
+            }
+          }
+          if ( this.interceptBackspaceOnEmpty && event.keyCode === 8 && ! event.shiftKey && ! event.altKey && ! event.metaKey && ! event.ctrlKey ) {
+            // Checked against the editor's live content (not the `formControl`/@Input value,
+            // which can lag behind same-keystroke edits) - only intercept when there's genuinely
+            // nothing left to delete, so a normal backspace-deletes-a-character keystroke is
+            // never swallowed.
+            if ( editor.getContent({format: 'text'}).trim() === '' ) {
+              event.preventDefault()
+              event.stopPropagation()
+              this.backspaceOnEmptyIntercepted.emit(event)
+              this.injector.get(ChangeDetectorRef).markForCheck() // see enterKeydownIntercepted's comment above for why
+              return false
             }
           }
           /// ==== new:

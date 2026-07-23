@@ -66,4 +66,10 @@ export class OryRichTextCellComponent extends CellComponent {
       this.nodeContentComponent.createSiblingOrChildOnEnter()
     }
   }
+
+  /** GH #75: same forwarding rationale as onEnterKeydownIntercepted() above - TinyMCE's own
+   * keydown handling suppresses this Backspace itself. */
+  onBackspaceOnEmptyIntercepted(): void {
+    this.nodeContentComponent.deleteOnBackspaceIfEmpty()
+  }
 }

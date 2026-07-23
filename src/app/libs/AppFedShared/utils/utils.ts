@@ -56,6 +56,13 @@ export function isNullishOrEmptyOrBlank(x: any): boolean {
   return ( x === null ) || ( x === undefined ) || ! ( x ?. trim() ?. length )
 }
 
+/** Trims a string, collapsing a nullish or whitespace-only result to `undefined` - so callers can
+ * use a single falsy check instead of separately handling `null`/`undefined`/`''`/`'   '`. */
+export function trimToUndefined(x: string | null | undefined): string | undefined {
+  const trimmed = x ?. trim()
+  return trimmed ? trimmed : undefined
+}
+
 export function isNotNullishOrEmptyOrBlank<T>(x: T)
     : x is NonNullable<T>
 {

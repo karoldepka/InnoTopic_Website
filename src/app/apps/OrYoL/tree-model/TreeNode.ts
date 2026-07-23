@@ -101,6 +101,14 @@ export class RootTreeNode<
     return this.children?.length ?? 0
   }
 
+  /** GH #75: whether this node's title is blank - delegates to `OryItem$.isEmptyOrWhitespace()`
+   * (HTML-aware, so a TinyMCE-empty `<p></p>` counts as blank). Deliberately doesn't consider
+   * `hasChildren`/other fields - "is this node's own content empty" vs "is it safe to delete
+   * without confirmation" are different questions, the latter decided by the caller. */
+  isEmptyOrWhitespace(): boolean {
+    return this.content.dbItem.isEmptyOrWhitespace()
+  }
+
   allDescendantsMatch(predicate: (node: RootTreeNode<any, any, any, any>) => boolean): boolean {
     return this.children.every(child =>
       predicate(child as any) && (child as any).allDescendantsMatch(predicate)

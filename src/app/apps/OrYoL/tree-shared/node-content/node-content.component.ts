@@ -22,7 +22,6 @@ import { debugLog } from '../../utils/log'
 // import {
 //   NgbModal,
 // } from '@ng-bootstrap/ng-bootstrap'
-import { ConfirmDeleteTreeNodeComponent } from '../confirm-delete-tree-node/confirm-delete-tree-node.component'
 import {
   Cells,
   ColumnCell,
@@ -37,9 +36,9 @@ import {
 import {Config, ConfigService} from '../../core/config.service'
 import { TimeTrackingService } from '../../time-tracking/time-tracking.service'
 import {getActiveElementCaretPos, getSelectionCursorState} from '../../../../libs/AppFedShared/utils/caret-utils'
-import {isNullish} from '../../../../libs/AppFedShared/utils/utils'
+import {isNullish, trimToUndefined} from '../../../../libs/AppFedShared/utils/utils'
 import {nullish} from '../../../../libs/AppFedShared/utils/type-utils'
-import {PopoverController} from '@ionic/angular'
+import {AlertController, PopoverController, ToastController} from '@ionic/angular'
 import {TreeNodeMenuPopoverComponent} from '../tree-node-menu/tree-node-menu-popover.component'
 import {INodeContentComponent} from './INodeContentComponent'
 import {CachedSubject} from '../../../../libs/AppFedShared/utils/cachedSubject2/CachedSubject2'
@@ -397,23 +396,81 @@ export class NodeContentComponent implements OnInit, AfterViewInit, OnDestroy, I
     if ( getActiveElementCaretPos() === 0
       && this.treeNode.content.itemData.estimatedTime === ''
     ) {
-      this.openDeleteDialog()
+      this.deleteOnBackspaceIfEmpty()
     }
   }
 
   onKeyDownBackspaceOnTitle() {
-    // if (getCaretPosition(this.elInputTitle.nativeElement) === 0
-    //   && this.treeNode.itemData.title === ''
-    // ) {
-    //   this.openDeleteDialog()
-    // }
+    // Legacy ContenteditableCellComponent path (behind the `useTinyMceTitleEditor` feature flag,
+    // off by default now) - OryRichTextCellComponent's own TinyMCE-level interception
+    // (RichTextEditComponent's interceptBackspaceOnEmpty) covers the live rich-text path instead.
+    if ( getActiveElementCaretPos() === 0 && this.treeNode.isEmptyOrWhitespace() ) {
+      this.deleteOnBackspaceIfEmpty()
+    }
   }
 
-  private openDeleteDialog() {
-    // TODO: move to our own modal service - single line with passing treeNode
-    // const modalRef = this.modalService.open(ConfirmDeleteTreeNodeComponent);
-    // const component = modalRef.componentInstance as ConfirmDeleteTreeNodeComponent
-    // component.treeNode = this.treeNode;
+  /** GH #75: backspace-to-delete, triggered once the title is already confirmed blank (either via
+   * OryRichTextCellComponent's TinyMCE-level interception, or the legacy contenteditable path's
+   * own check above). A node with children is left alone entirely - deleting it wouldn't cascade
+   * to its children (TreeNode.deleteWithoutConfirmation() only ever touches the one item),
+   * silently orphaning them; Archive (the tree-node menu's existing "remove a whole subtree"
+   * action, which does recurse) is the right tool for that case, not backspace. Otherwise: a
+   * genuinely empty node (title blank, no other data) deletes immediately - nothing to lose. One
+   * with other data still set (e.g. an estimated time) confirms first - deleting removes that too. */
+  deleteOnBackspaceIfEmpty(): void {
+    if ( this.treeNode.isVisualRoot || this.treeNode.hasChildren || ! this.treeNode.isEmptyOrWhitespace() ) {
+      return
+    }
+    if ( trimToUndefined(this.treeNode.content.itemData?.estimatedTime) === undefined ) {
+      this.deleteNodeWithUndoToast()
+    } else {
+      this.confirmThenDeleteWithUndoToast()
+    }
+  }
+
+  private async confirmThenDeleteWithUndoToast() {
+    const alert = await this.injector.get(AlertController).create({
+      header: 'Delete this item?',
+      message: 'It still has other data (e.g. a time estimate) that will be removed too.',
+      buttons: [
+        {text: 'Cancel', role: 'cancel'},
+        {text: 'Delete', role: 'destructive', handler: () => this.deleteNodeWithUndoToast()},
+      ],
+    })
+    await alert.present()
+  }
+
+  /** Deletes and offers a 6s "Undo" toast that re-creates the node - reuses TreeNode.addChild()'s
+   * existing support for re-inserting an already-constructed node (same code path other node-reuse
+   * callers like onNodeInclusionModified rely on), so undo goes through the exact same tested
+   * create+persist logic as a normal add, rather than a bespoke restore path. Works because
+   * deleteWithoutConfirmation() is a soft delete (sets when_deleted) and every save
+   * (createPostgresOdmRow()) unconditionally writes when_deleted: null - a fresh save after delete
+   * un-deletes it as a side effect. */
+  private deleteNodeWithUndoToast() {
+    const parent2 = this.treeNode.parent2
+    const siblingAbove = this.treeNode.getSiblingNodeAboveThis()
+    const deletedNode = this.treeNode
+    this.treeNode.deleteWithoutConfirmation()
+    const nodeToFocus = (siblingAbove && ! siblingAbove.isVisualRoot) ? siblingAbove
+      : (parent2 && ! parent2.isVisualRoot) ? parent2
+      : undefined
+    if ( nodeToFocus ) {
+      this.treeHost.focusNode(nodeToFocus as any, this.columns.lastColumn, {cursorPosition: -1})
+    }
+    this.injector.get(ToastController).create({
+      message: 'Item deleted.',
+      duration: 6000,
+      color: 'medium',
+      position: 'bottom',
+      buttons: [{
+        text: 'Undo',
+        role: 'cancel',
+        handler: () => {
+          parent2?.addChild(siblingAbove as any, deletedNode as any)
+        },
+      }],
+    }).then(toast => toast.present())
   }
 
   onArrowLeft() {

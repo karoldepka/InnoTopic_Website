@@ -12,6 +12,7 @@ import {DbTreeService} from '../tree-model/db-tree-service'
 import {HasItemData, HasPatchThrottled, ItemData} from '../tree-model/has-item-data'
 import {stripHtml} from '../../../libs/AppFedShared/utils/html-utils'
 import {summarizePatch} from '../../../libs/AppFedShared/odm/OdmItem$2'
+import {trimToUndefined} from '../../../libs/AppFedShared/utils/utils'
 
 export type ItemId = string //& { type: 'ItemId' }
 
@@ -113,6 +114,14 @@ export class OryItem$<TData = any> implements HasPatchThrottled<TData> {
     const data = this.itemData as any
     const title = data?.title ?? data?.name ?? data?.question
     return stripHtml(title)?.trim() || this.id
+  }
+
+  /** GH #75: whether this item's title is blank - HTML-aware (a TinyMCE-empty `<p></p>` strips
+   * down to no text), so backspace-to-delete on an "empty-looking" rich-text title is recognized
+   * even though its raw HTML string isn't itself an empty string. */
+  isEmptyOrWhitespace(): boolean {
+    const title = (this.itemData as any)?.title
+    return trimToUndefined(stripHtml(title) ?? undefined) === undefined
   }
 
   /** Same "what changed and where" shape as OdmItem$2.describePendingChange() (see the sync
