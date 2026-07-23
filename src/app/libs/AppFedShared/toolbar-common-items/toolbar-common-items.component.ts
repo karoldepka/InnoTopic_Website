@@ -1,6 +1,9 @@
 import {ChangeDetectionStrategy, Component, ViewChild} from '@angular/core'
 import {AsyncPipe} from '@angular/common'
 import {IonicModule} from '@ionic/angular'
+import {NavigationEnd, Router} from '@angular/router'
+import {Observable} from 'rxjs'
+import {filter, map, startWith} from 'rxjs/operators'
 import {AuthService} from '../../../auth/auth.service'
 import {GenericItemsService} from '../tree/generic-items.service'
 import {GenericItem} from '../tree/GenericItem'
@@ -41,6 +44,16 @@ export class ToolbarCommonItemsComponent {
 
   @ViewChild(VoiceMemoFieldComponent) voiceMemoField!: VoiceMemoFieldComponent
 
+  /** No mic buttons should show while quizzing (this toolbar's quick-record one, same as the
+   * per-field ones in ItemSideComponent.showMic) - mounted once outside the router-outlet, so it
+   * has to check the current route itself rather than being told via an @Input. Exposed as an
+   * observable (consumed via `| async` in the template, like voiceMemoService's isRecordingAnywhere$/
+   * isPlayingAnywhere$ right above it), not a plain field written from the router.events
+   * subscription - a plain field caused ExpressionChangedAfterItHasBeenCheckedError, since the
+   * subscription's callback can run in between Angular's own check/checkNoChanges passes for the
+   * same cycle; the async pipe is built to handle exactly that. */
+  inQuiz$: Observable<boolean>
+
   constructor(
     private authService: AuthService,
     private genericItemsService: GenericItemsService,
@@ -48,7 +61,13 @@ export class ToolbarCommonItemsComponent {
     // which field's own mic button (this toolbar's quick-record one, or any other field anywhere
     // in the app, e.g. Journal's `general`) is the one actually recording.
     public voiceMemoService: VoiceMemoService,
+    router: Router,
   ) {
+    this.inQuiz$ = router.events.pipe(
+      filter((e): e is NavigationEnd => e instanceof NavigationEnd),
+      map(e => e.urlAfterRedirects.startsWith('/learn/quiz') || e.urlAfterRedirects.startsWith('/learn/bow-quiz')),
+      startWith(router.url.startsWith('/learn/quiz') || router.url.startsWith('/learn/bow-quiz')),
+    )
   }
 
   // Every route this component is reachable from already requires auth (matches

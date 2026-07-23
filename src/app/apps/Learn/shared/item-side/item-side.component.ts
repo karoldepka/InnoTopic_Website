@@ -66,6 +66,10 @@ export class ItemSideComponent implements OnInit {
   @Input()
   showRevealButton = false
 
+  /** Quiz sets this to false - no mic buttons should show while quizzing. */
+  @Input()
+  showMic = true
+
 
   formControls ! : SideFormControlsDict
 

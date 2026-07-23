@@ -75,7 +75,7 @@
 </div>
 
 <app-voice-memo-field
-  *ngIf="side && isVisible(item$.val$ | async)"
+  *ngIf="showMic && side && isVisible(item$.val$ | async)"
   [item$]="item$"
   [fieldId]="side.id"
   (transcriptReady)="onTranscriptReady($event)"

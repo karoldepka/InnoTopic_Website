@@ -13,6 +13,7 @@
   <app-item-side-editor
     [item$]="item$ !"
     [side]="$safeNavigationMigration((itemVal$ ! | async) ?. getSideWithQuestionOrFirstNonEmpty())"
+    [showMic]="false"
    />
 
   <div
@@ -27,6 +28,7 @@
         *ngFor="let hintSide of getVisibleHintSides((itemVal$ | async), (showHint$ | async))"
         [item$]="item$ !"
         [side]="hintSide"
+        [showMic]="false"
        />
     </ng-container>
 
@@ -41,6 +43,7 @@
         [item$]="item$ !"
         [side]="answerSide"
         [showRevealButton]="! (showAnswer$ | async)"
+        [showMic]="false"
        />
 
     </ng-container>
