@@ -46,6 +46,11 @@ export class JournalItemEditComponent extends BaseComponent implements OnChanges
   @Input()
   public item$P ! : JournalEntry$
 
+  /** See `TreeNodeCellsComponent.autoExpandDescriptorId`'s doc comment - passed through from
+   * `JournalWritePage` (GH #104), only set for a brand-new entry. */
+  @Input()
+  public autoExpandDescriptorId?: string
+
   treeNode ! : OdmTreeNode<JournalEntry$>
 
   get itemVal$(): CachedSubject<JournalEntry | undefined | null> {
