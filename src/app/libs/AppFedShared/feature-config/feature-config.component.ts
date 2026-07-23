@@ -90,6 +90,14 @@ export class FeatureConfigComponent extends BaseComponent implements OnInit {
     this.featureConfigService.setTimeTrackingEnabled($event.detail.checked)
   }
 
+  get journalCompactStarRatings(): boolean {
+    return this.featureConfigService.journalCompactStarRatings
+  }
+
+  onChangeJournalCompactStarRatings($event: any) {
+    this.featureConfigService.setJournalCompactStarRatings($event.detail.checked)
+  }
+
   get voiceMemoTranscriptionMode() {
     return this.featureConfigService.voiceMemoTranscriptionMode
   }

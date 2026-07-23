@@ -21,4 +21,10 @@ export class FeaturesProps {
     /** Gates playback (and the memo list itself) on `app-voice-memo-field` - independent of
      * `voiceMemoRecordingEnabled` above. */
     voiceMemoPlaybackEnabled = true
+
+    /** GH #106: Journal's list-view metric summary (e.g. "motivation: 3.75/5") shows each
+     * numeric field's raw 0-10 stored value converted to a 0-5 scale instead of the raw value
+     * itself - defaults on since this was the explicit ask, not an experiment; off falls back to
+     * the previous raw "motivation: 7" display for comparison/rollback. */
+    journalCompactStarRatings = true
 }

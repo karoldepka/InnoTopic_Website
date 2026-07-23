@@ -101,6 +101,14 @@ export class FeatureService {
     this.patchProps({voiceMemoPlaybackEnabled: enabled})
   }
 
+  get journalCompactStarRatings(): boolean {
+    return this.config$.lastVal?.props?.journalCompactStarRatings ?? true
+  }
+
+  setJournalCompactStarRatings(enabled: boolean) {
+    this.patchProps({journalCompactStarRatings: enabled})
+  }
+
   static readonly firestoreEnabledKey = 'firestoreEnabled'
 
   get firestoreEnabled(): boolean {

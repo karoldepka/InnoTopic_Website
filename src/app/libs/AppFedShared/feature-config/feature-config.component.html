@@ -38,6 +38,11 @@
   [checked]="timeTrackingEnabled"
   (ionChange)="onChangeTimeTrackingEnabled($event)"
 >{{ 'SETTINGS.TIME_TRACKING_ENABLED' | translate }}</ion-checkbox>
+<ion-checkbox
+  labelPlacement="end"
+  [checked]="journalCompactStarRatings"
+  (ionChange)="onChangeJournalCompactStarRatings($event)"
+>Journal metrics as x/5 (GH #106)</ion-checkbox>
 <ion-item lines="none">
   <ion-select
     label="{{ 'SETTINGS.VOICE_MEMO_TRANSCRIPTION_MODE' | translate }}"

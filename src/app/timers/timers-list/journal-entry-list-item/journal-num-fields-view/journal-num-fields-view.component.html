@@ -9,7 +9,11 @@
   > <!-- TODO color -->
     <!--     *ngIf="(val$ | async)?.getCompositeField(field) let fieldVal" -->
     {{fieldEntry[0].title}}:
-    <b>{{fieldEntry[1]}}</b>
+    <ng-container *ngIf="fieldEntry[1] !== undefined; else noRating">
+      <b *ngIf="compactStarRatings">{{formatAsFiveScale(fieldEntry[1])}}/5</b>
+      <b *ngIf="!compactStarRatings">{{fieldEntry[1]}}</b>
+    </ng-container>
+    <ng-template #noRating></ng-template>
     <span *ngIf="fieldEntry[2]" class="field-note">&nbsp;&mdash; {{fieldEntry[2]}}</span>
   </span>
 
