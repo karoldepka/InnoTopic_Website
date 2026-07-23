@@ -9,7 +9,10 @@
 
 <ion-button
   size="small"
-  (click)="onClickReveal()"
+  (pointerdown)="onPressStart()"
+  (pointerup)="onPressEnd()"
+  (pointerleave)="onPressEnd()"
+  (pointercancel)="onPressEnd()"
 >
   REVEAL
 </ion-button>
