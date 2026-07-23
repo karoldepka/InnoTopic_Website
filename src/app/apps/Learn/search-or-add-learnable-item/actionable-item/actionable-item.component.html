@@ -29,28 +29,31 @@
   >CONFLICT</ion-badge>
 
   <ion-button
-    *ngIf="! item.isArchived()"
+    [id]="menuTriggerId"
     class="row-icon-button"
     fill="clear"
     size="small"
-    title="Archive"
-    aria-label="Archive"
-    (click)="archive($event)"
+    title="Item menu"
+    aria-label="Item menu"
+    (click)="stopRowNavigationOnly($event)"
   >
-    <ion-icon slot="icon-only" name="archive-outline"></ion-icon>
+    <ion-icon slot="icon-only" name="ellipsis-vertical"></ion-icon>
   </ion-button>
 
-  <ion-button
-    *ngIf="item.isArchived()"
-    class="row-icon-button"
-    fill="clear"
-    size="small"
-    title="Restore"
-    aria-label="Restore"
-    (click)="restore($event)"
-  >
-    <ion-icon slot="icon-only" name="arrow-undo-outline"></ion-icon>
-  </ion-button>
+  <ion-popover [trigger]="menuTriggerId" triggerAction="click" [dismissOnSelect]="true">
+    <ng-template>
+      <ion-list lines="none">
+        <ion-item *ngIf="!item.isArchived()" button="true" (click)="archive($event)">
+          <ion-icon slot="start" name="archive-outline"></ion-icon>
+          <ion-label>Archive</ion-label>
+        </ion-item>
+        <ion-item *ngIf="item.isArchived()" button="true" (click)="restore($event)">
+          <ion-icon slot="start" name="arrow-undo-outline"></ion-icon>
+          <ion-label>Restore</ion-label>
+        </ion-item>
+      </ion-list>
+    </ng-template>
+  </ion-popover>
 
   <!-- FIXME icon task / learnable / journal-entry / note -->
   <ion-note *ngIf="g.feat.roiPoints.showUgly && item.val?.isTask">
@@ -67,7 +70,7 @@
   </ion-button>
   <!--  <ion-note *ngIf="item.val?.isEffectivelyToLearn()">LEARN</ion-note>-->
   <!--  <ion-note *ngIf="item.val?.isEffectivelyToLearn()">-->
-  <ion-icon style="margin-right: 7px; font-size: 25px" color="secondary" name="book-outline" />
+  <ion-icon style="margin-right: 7px; font-size: 25px; vertical-align: middle" color="secondary" name="book-outline" />
 
   <ion-note *ngIf="item.val?.isTask">
     <span *ngIf="item.val?.isTask && item.val?.isEffectivelyToLearn()">, &nbsp;</span>

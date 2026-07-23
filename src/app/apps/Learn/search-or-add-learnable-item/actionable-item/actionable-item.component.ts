@@ -62,6 +62,12 @@ export class ActionableItemComponent extends BaseComponent implements OnInit, On
 
   get item$() { return this._item }
 
+  /** GH #102: unique per row (`ion-popover`'s `trigger` matches a DOM id, which must be unique
+   * across the whole page) - the row's own item id is already guaranteed unique. */
+  get menuTriggerId(): string {
+    return 'item-menu-trigger-' + this.item.id
+  }
+
   // @Required()
   @Input() index ! : number
 
@@ -204,6 +210,13 @@ export class ActionableItemComponent extends BaseComponent implements OnInit, On
   private stopRowNavigation(event: Event) {
     event.stopPropagation()
     event.preventDefault()
+  }
+
+  /** The "..." menu trigger button's own click handler - just opens the popover (ion-popover's
+   * `trigger` attribute handles that declaratively), this only needs to stop it from also
+   * bubbling into the row's routerLink navigation. */
+  stopRowNavigationOnly(event: Event) {
+    this.stopRowNavigation(event)
   }
 
   private getShortTitle(): string {
