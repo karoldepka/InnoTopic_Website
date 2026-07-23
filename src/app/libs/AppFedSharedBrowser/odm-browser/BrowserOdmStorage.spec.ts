@@ -179,6 +179,44 @@ describe('BrowserOdmStorage', () => {
       expect(allRows.length).toBe(1)
       expect((await storage.getConflictedItemIds(collection)).size).toBe(0)
     })
+
+    it('a strictly-older write with different data is NOT a conflict if it is a known echo of this item\'s own write history (GH #73/#125/#126)', async () => {
+      // Reproduces the same-device realtime-echo race: two rapid local edits (A then B) both
+      // land, but B's realtime echo arrives back before A's delayed echo does - by the time A's
+      // echo shows up, the cache is already at B (newer, different data). Without checking own
+      // write history, this looked identical to a real conflict from another device/session.
+      const collection = uniqueCollection()
+      const conflicts: any[] = []
+      storage.conflictDetected$.subscribe(c => conflicts.push(c))
+
+      const editATimestamp = new Date('2024-01-01T00:00:00.000Z').toISOString()
+      const editBTimestamp = new Date('2024-01-02T00:00:00.000Z').toISOString()
+
+      // Edit B (the current winner) knows about edit A in its own whenLastModifiedHistory -
+      // exactly what OdmItem$2.setWhenLastModified() accumulates on every local edit.
+      const editB = createPostgresOdmRow<SutItem>(collection, 'item1', 'owner1', {
+        title: 'edit B (newer)',
+        whenLastModifiedHistory: [editATimestamp, editBTimestamp],
+      } as any)
+      editB.when_last_modified = editBTimestamp
+      await storage.put(editB)
+
+      // Edit A's delayed echo arrives after B is already cached.
+      const editAEcho = createPostgresOdmRow<SutItem>(collection, 'item1', 'owner1', {title: 'edit A (older)'})
+      editAEcho.when_last_modified = editATimestamp
+      const result = await storage.put(editAEcho)
+
+      // B is unchanged - no regression.
+      expect(result.data.title).toBe('edit B (newer)')
+      const stored = await storage.get<SutItem>(collection, 'item1')
+      expect(stored?.data.title).toBe('edit B (newer)')
+
+      // No conflict archived, no toast - this was recognized as a known self-echo.
+      expect(conflicts.length).toBe(0)
+      const allRows = await storage.getAllForCollection<SutItem>(collection)
+      expect(allRows.length).toBe(1)
+      expect((await storage.getConflictedItemIds(collection)).size).toBe(0)
+    })
   })
 
   describe('sync cursor', () => {

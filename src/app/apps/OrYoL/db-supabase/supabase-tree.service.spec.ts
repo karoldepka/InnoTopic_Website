@@ -418,6 +418,33 @@ describe('SupabaseTreeService - writes', () => {
   })
 })
 
+describe('SupabaseTreeService.upsertItemIfMissing', () => {
+  it('creates the item, with the given data, when it does not exist yet', async () => {
+    const {treeService, itemsBackend} = setup()
+
+    await treeService.upsertItemIfMissing('newAnchor1', {title: 'Mindfulness', isArchived: false})
+    await flushMicrotasks()
+
+    expect(itemsBackend.storedItems.get('newAnchor1')).toMatchObject({title: 'Mindfulness', isArchived: false})
+  })
+
+  it('does not overwrite or duplicate an item that is already loaded (GH #125/#126 - used to createOdmItem$() a second, disconnected object for the same id, which collided in OdmService2._ensureItemAdded() and silently clobbered the existing row with only this call\'s minimal itemData)', async () => {
+    const {treeService, itemsBackend, oryItemsService} = setup()
+    itemsBackend.seed('existingAnchor1', {title: 'Mindfulness', accumulatedField: 'keep-me'})
+    oryItemsService.obtainItem$ById('existingAnchor1' as any).applyDataFromDbAndEmit({title: 'Mindfulness', accumulatedField: 'keep-me'} as any)
+    const itemCountBefore = oryItemsService.itemsCount()
+
+    await treeService.upsertItemIfMissing('existingAnchor1', {title: 'Mindfulness', isArchived: false})
+    await flushMicrotasks()
+
+    // Already exists - left untouched, not overwritten with just this call's minimal itemData.
+    expect(itemsBackend.saveNowToDbCalls.some(c => c.id === 'existingAnchor1')).toBe(false)
+    expect(itemsBackend.storedItems.get('existingAnchor1')).toMatchObject({accumulatedField: 'keep-me'})
+    // No duplicate object was registered for the same id.
+    expect(oryItemsService.itemsCount()).toBe(itemCountBefore)
+  })
+})
+
 describe('SupabaseTreeService.backfillNode - source (Firestore) tree root id remapping', () => {
   // Regression coverage for a real bug: the tree being walked during a backfill is the
   // *Firestore*-backed TreeModel, whose root has Firestore's own hardcoded root item id - not

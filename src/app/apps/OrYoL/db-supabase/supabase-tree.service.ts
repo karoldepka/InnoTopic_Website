@@ -137,10 +137,24 @@ export class SupabaseTreeService extends DbTreeService {
    * missing doc), Supabase's saveNowToDb() is an upsert on every write - so any *subsequent*
    * patchItemData() call for this id would already create the row if needed. This still writes
    * eagerly rather than relying on that, so the anchor item's initial fields (e.g. Mindfulness's
-   * title) are present from the start rather than only appearing after the first real patch. */
+   * title) are present from the start rather than only appearing after the first real patch.
+   *
+   * Must reuse the shared obtainItem$ById() instance (like every other method in this file) rather
+   * than createOdmItem$()'ing a fresh, disconnected object: for a well-known fixed id (e.g.
+   * Mindfulness's per-user anchor, see mindfulnessItemId()), the item is typically *already* loaded
+   * via the tree's normal sync by the time this runs, so a second freestanding object for the same
+   * id collides with the cached one in OdmService2._ensureItemAdded() (GH #125/#126 - surfaced live
+   * via its errorAlert) and, worse, silently wins the write with only this call's minimal itemData,
+   * clobbering whatever real fields (e.g. whenLastModifiedHistory) the existing row had already
+   * accumulated. */
   override async upsertItemIfMissing(itemId: string, itemData: any): Promise<void> {
-    const item$ = this.oryItemsService.createOdmItem$(itemId as OryOdmItemId, Object.assign(new OryOdmItem(), itemData))
-    item$.saveNowToDb()
+    await this.waitUntilItemsLoaded()
+    const item$ = this.oryItemsService.obtainItem$ById(itemId as OryOdmItemId)
+    if (item$.val) {
+      return // already exists - don't clobber it with just this call's minimal itemData
+    }
+    item$.currentVal ??= {} as OryOdmItem
+    item$.patchNow(itemData)
   }
 
   /** See DbTreeService.upsertRootInclusionIfMissing's doc comment. Waits for the items

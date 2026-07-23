@@ -16,6 +16,11 @@ import {NodeOrderer, ORDER_STEP} from './NodeOrderer'
 
 export type UserId = string
 
+/** How many of an item's own past `whenLastModified` values to remember (see
+ * `OdmInMemItem.whenLastModifiedHistory`) - just enough to cover a realistically delayed realtime
+ * echo, not a full history. */
+const OWN_WHEN_LAST_MODIFIED_HISTORY_LIMIT = 8
+
 /** Constructor shape for a "domain item" - a companion object overlaying an `OdmItem$2` with
  * type-specific behaviour (e.g. OrYoL's `TimeTrackedEntry`) without the base item itself needing
  * to know about it. Mirrors `OryItem$.DomainItemCtor` (`apps/OrYoL/db/OryItem$.ts`) so the same
@@ -60,6 +65,15 @@ export class OdmInMemItemWriteOnce {
 /** FIXME: rename OdmInMemItemData */
 export class OdmInMemItem extends OdmInMemItemWriteOnce {
   public whenLastModified?: OdmTimestamp
+  /** GH #73/#125/#126: this item's own last few self-written `whenLastModified` values (ISO
+   * strings, oldest first, capped at `OWN_WHEN_LAST_MODIFIED_HISTORY_LIMIT`) - lets a delayed
+   * realtime echo of one of *our own* past writes (Supabase's realtime channel echoes back this
+   * device's own writes, with no ordering guarantee against a newer local edit that already
+   * landed) be recognized by exact match against this list and never mistaken for a genuinely
+   * conflicting edit from elsewhere - see `BrowserOdmStorage.put()`'s use of this. A frequently-
+   * rewritten item (e.g. OrYoL's `_mindfulness` anchor, patched on every time-track pause/resume)
+   * is exactly where this race was most reproducible ("happens all the time" per #125/#126). */
+  public whenLastModifiedHistory?: string[]
   /** GH #89's "whenDescendantLastModified" rollup - server-maintained (see the
    * `trg_bump_when_descendant_last_modified` DB trigger, migration
    * `add_when_descendant_last_modified_rollup`), never written directly by the client except for
@@ -480,6 +494,9 @@ export class OdmItem$2<
     // console.trace(`setWhenLastModified`, this)
     const ts = OdmBackend.nowTimestamp()
     this.currentVal ! . whenLastModified = ts
+    const history = this.currentVal ! . whenLastModifiedHistory ?? []
+    history.push(ts.toDate().toISOString())
+    this.currentVal ! . whenLastModifiedHistory = history.slice(-OWN_WHEN_LAST_MODIFIED_HISTORY_LIMIT)
     this.bumpAncestorsWhenDescendantLastModifiedLocally(ts)
   }
 

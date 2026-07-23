@@ -318,7 +318,18 @@ export class BrowserOdmStorage {
    * If the older, losing row's `data` actually *differs* from what's cached (a genuine
    * conflicting edit, not just a benign duplicate/replay of data we already have), it isn't
    * silently discarded - it's archived as its own row (id suffixed `_conflict_<timestamp>`)
-   * and `conflictDetected$` fires, so resolution is best-effort but never lossy. */
+   * and `conflictDetected$` fires, so resolution is best-effort but never lossy.
+   *
+   * GH #73/#125/#126: a data-mismatch alone isn't actually enough to call something a genuine
+   * conflict - Supabase's realtime channel echoes back this device's own writes, with no
+   * ordering guarantee against a newer local edit that already landed. A delayed echo of an
+   * older self-edit looks identical (by timestamp and content) to a real conflicting edit from
+   * another device/session, and was firing constantly on frequently-rewritten items (OrYoL's
+   * `_mindfulness` anchor, patched on every time-track pause/resume). The winning (currently
+   * cached) row's own `whenLastModifiedHistory` (`OdmItem$2.setWhenLastModified()`) is checked
+   * first - if it already contains this exact stale write's timestamp, it's unambiguously an
+   * echo of a write this same logical item already knows about, not a conflict, and is skipped
+   * entirely (no archive row, no toast). */
   async put<TRaw>(row: PostgresOdmRow<TRaw> & Partial<Pick<BrowserOdmRow<TRaw>, 'key' | 'whenFirstStoredLocally' | 'whenLastStoredLocally'>>): Promise<BrowserOdmRow<TRaw>> {
     return this.withDb(async db => {
       const key = rowKey(row.collection, row.item_id)
@@ -332,7 +343,10 @@ export class BrowserOdmStorage {
         const refreshed: BrowserOdmRow<TRaw> = {...existing, whenLastStoredLocally: now}
         await requestToPromise(store.put(refreshed))
 
-        if (JSON.stringify(row.data) !== JSON.stringify(existing.data)) {
+        const ownHistory: string[] | undefined = (existing.data as any)?.whenLastModifiedHistory
+        const isKnownOwnEcho = !!row.when_last_modified && !!ownHistory?.includes(row.when_last_modified)
+
+        if (!isKnownOwnEcho && JSON.stringify(row.data) !== JSON.stringify(existing.data)) {
           const loserId = `${row.item_id}_conflict_${(row.when_last_modified ?? now).replace(/[:.]/g, '-')}`
           const loserRow: BrowserOdmRow<TRaw> = {
             ...row,
