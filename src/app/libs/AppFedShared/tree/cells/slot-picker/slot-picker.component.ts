@@ -76,7 +76,12 @@ export class SlotPickerComponent implements OnChanges, OnDestroy {
     // this class's doc comment.
     const fuse = new Fuse(this.descriptors, {
       keys: ['id', 'label', 'searchTerms'],
-      threshold: 0.4,
+      // 0.2, not the 0.4 originally copied from journal-entries-list.page.ts's own choice - too
+      // permissive in practice on short field labels/ids specifically (GH #96): confirmed live,
+      // even 0.3 still matched "mood" against "diet"/"overeating"/"self-restraint" - Fuse's fuzzy
+      // slack is proportionally larger on short strings, so short queries need a tighter bound
+      // than the free-text case in journal-entries-list.page.ts does.
+      threshold: 0.2,
       ignoreLocation: true,
     })
     this.visibleChips = fuse.search(trimmed).map(result => result.item)
