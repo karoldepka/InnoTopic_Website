@@ -1,6 +1,10 @@
+// align-items: center, not the default stretch - app-voice-memo-field (the mic/playback button,
+// a sibling of the actual editor div below) used to stretch to match the editor's full height on
+// a multi-line field, pinning its own icon near the top instead of vertically centering next to
+// the editor - confirmed live on a tall "general" field.
 \:host
   display: flex
-  align-items: stretch
+  align-items: center
 
 .rich-text-edit-cell
   display: flex

@@ -5,18 +5,20 @@ import Fuse from 'fuse.js'
 import {OdmTreeNode} from '../../tree-node/OdmTreeNode'
 import {isSlotVisible, SlotDescriptor} from '../SlotDescriptor'
 import {SlotIconComponent} from '../slot-icon/slot-icon.component'
+import {SlotUsageTrackerService} from '../slot-usage-tracker.service'
 
 /** "Below the visual row with given items text, there should be a searchable horizontally-
  * flowing list of available fields" (GH #89) - a wrapping chip row, fuzzy-searchable the same way
  * `journal-entries-list.page.ts` already searches entries (same `Fuse` threshold/config).
  *
- * At rest (no search typed) only shows the item class's *hidden* slots as a browsable "add a
- * field" list - already-visible ones are dropped (via the same `isSlotVisible()`
- * `TreeNodeCellsComponent` uses), so this doesn't turn into an overwhelming wall of all 236 of
- * Journal's descriptors. Once actively searching, though, the search scope widens to *every*
- * descriptor, hidden or already-visible - with everything now defaulting to a compact pill until
- * set (see `TreeNodeCellsComponent.isCompact()`), typing a field's name is the fast way to jump
- * straight to it wherever it already is, not just to add ones that aren't there yet.
+ * At rest (no search typed), only recently-used-but-not-yet-visible slots show as quick-add
+ * chips - showing every one of Journal's 236 descriptors here (confirmed live: a wall of 200+
+ * chips for fields like "left chest pain" nobody's ever touched) was exactly the same clutter
+ * `TreeNodeCellsComponent`'s own default-visibility rule exists to avoid, just relocated to this
+ * component instead of solved. Once actively searching, the scope widens to *every* descriptor,
+ * hidden or already-visible - with everything now defaulting to a compact pill until set (see
+ * `TreeNodeCellsComponent.isCompact()`), typing a field's name is the fast way to jump straight to
+ * it wherever it already is, not just to add ones that aren't there yet.
  *
  * Picking a still-hidden chip appends its id to `manuallyAddedSlotIds` - the one new persisted
  * field this whole design needs - which `TreeNodeCellsComponent` is already subscribed to react
@@ -30,6 +32,8 @@ import {SlotIconComponent} from '../slot-icon/slot-icon.component'
   imports: [IonicModule, SlotIconComponent],
 })
 export class SlotPickerComponent implements OnChanges, OnDestroy {
+
+  private static readonly AT_REST_CHIP_LIMIT = 8
 
   @Input() treeNode!: OdmTreeNode
   @Input() descriptors!: SlotDescriptor[]
@@ -49,6 +53,11 @@ export class SlotPickerComponent implements OnChanges, OnDestroy {
 
   private addableDescriptors: SlotDescriptor[] = []
   private valSubscription?: Subscription
+
+  constructor(
+    private slotUsageTrackerService: SlotUsageTrackerService,
+  ) {
+  }
 
   ngOnChanges(): void {
     this.valSubscription?.unsubscribe()
@@ -76,7 +85,11 @@ export class SlotPickerComponent implements OnChanges, OnDestroy {
   private recomputeChips(): void {
     const trimmed = this.searchTerm.trim()
     if (!trimmed) {
-      this.visibleChips = this.addableDescriptors
+      // Recently-used-but-still-hidden fields only, not the full addable set - see this class's
+      // doc comment for why.
+      const mruIds = new Set(this.slotUsageTrackerService.getMostRecentlyUsedIds(
+        this.treeNode.item$.getCollectionName(), SlotPickerComponent.AT_REST_CHIP_LIMIT))
+      this.visibleChips = this.addableDescriptors.filter(descriptor => mruIds.has(descriptor.id))
       return
     }
     // Search everything once the user is actively typing - not just what's still addable, see
