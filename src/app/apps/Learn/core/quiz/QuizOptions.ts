@@ -17,6 +17,12 @@ export class QuizOptions {
     public minImportanceLevel: ImportanceVal = importanceDescriptors.undefined,
     /** Skip AI-generated items in the quiz (categories are always skipped regardless). */
     public skipAiGenerated: boolean = false,
+    /** GH #100: the inverse of skipAiGenerated - quiz *only* AI-generated items, e.g. to review
+     * freshly-generated questions specifically. Not mutually exclusive with skipAiGenerated at
+     * the type level (both are just independent predicates in QuizService.filterByOptions()),
+     * but enabling both together would always yield zero items - the UI doesn't currently guard
+     * against that combination. */
+    public onlyAiGenerated: boolean = false,
     // TODO: priorityByImportances: 0 .. 1 -- 0 - ignore importances, 1 - items of highest importance go first
     // in-between - probabilities
   ) {

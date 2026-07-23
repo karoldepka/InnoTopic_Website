@@ -18,6 +18,9 @@ export default defineConfig({
       'src/app/apps/OrYoL/db-supabase/**/*.spec.ts',
       'src/app/apps/Learn/search-or-add-learnable-item/mic/mic.component.spec.ts',
       'src/app/apps/Learn/core/quiz/quiz-hint-reveal.spec.ts',
+      // Was never actually wired in before (orphaned, silently not running, same class of gap as
+      // OdmItem$2.spec.ts above) - found while adding the onlyAiGenerated test (GH #100).
+      'src/app/apps/Learn/core/quiz/quiz.service.spec.ts',
       'src/app/apps/Learn/search-or-add-learnable-item/list-processing.spec.ts',
       'src/app/libs/AppFedSharedIonic/ratings/star-rating/**/*.spec.ts',
       'src/app/libs/AppFedShared/time/time-point/time-point.component.spec.ts',
