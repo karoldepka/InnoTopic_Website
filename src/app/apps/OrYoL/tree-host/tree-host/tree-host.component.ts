@@ -194,6 +194,15 @@ export class TreeHostComponent implements OnInit {
     this.focusNode(newNode)
   }
 
+  /** GH #123: a "Plan" template node - same placement as appendNode(), just stamped with
+   * templateId so it's identifiable as a template instance. Always creates a fresh node (like
+   * appendNode()), so adding multiple is just clicking this again. */
+  appendPlanTemplateNode() {
+    const newNode = this.treeModel.navigation.visualRoot!.addChild()
+    newNode.content.dbItem.patchThrottled({templateId: 'plan', title: 'Plan'})
+    this.focusNode(newNode)
+  }
+
   expandAll() {
     this.treeModel.navigation.visualRoot?.expansion?.setExpanded(true, true)
   }
