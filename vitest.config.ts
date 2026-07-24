@@ -26,6 +26,7 @@ export default defineConfig({
       'src/app/libs/AppFedSharedIonic/ratings/star-rating/**/*.spec.ts',
       'src/app/libs/AppFedShared/time/time-point/time-point.component.spec.ts',
       'src/app/libs/AppFedShared/odm/ui/ViewSyncer.spec.ts',
+      'src/app/libs/AppFedShared/utils/html-utils.spec.ts',
       // NOT a glob here deliberately: src/app/libs/AppFedShared/tree/ also has pre-existing
       // Jasmine-style specs (GenericItem$.spec.ts, min-mid-max-cell.component.spec.ts) that are
       // part of the broken legacy Karma suite - a glob would sweep those in too.

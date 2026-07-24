@@ -10,7 +10,7 @@ import {AbstractCellComponent} from '../../AbstractCellComponent'
 import {getSelectionCursorState} from '../../utils/caret-utils'
 import {LinkPreviewService} from '../link-preview/link-preview.service'
 import {renderLinkPreviewCardHtml, renderLinkPreviewLoadingHtml} from '../link-preview/LinkPreviewCard'
-import {escapeHtml} from '../../utils/html-utils'
+import {convertToHtmlIfNeeded, escapeHtml} from '../../utils/html-utils'
 import {BlobSyncService} from '../../odm/blob-sync.service'
 import {ModalController} from '@ionic/angular'
 import {ImageViewerModalComponent} from '../image-viewer-modal/image-viewer-modal.component'
@@ -782,9 +782,22 @@ export class RichTextEditComponent extends AbstractCellComponent implements OnIn
     }, 10)
   }
 
-  /** Bound to `<editor>`'s `(onInit)` output - see `editorReady`'s doc comment above. */
+  /** Bound to `<editor>`'s `(onInit)` output - see `editorReady`'s doc comment above.
+   *
+   * Also self-heals a leading/trailing blank line here (HTML-aware, not a plain string .trim()) -
+   * a defensive backstop on top of ViewSyncer.applyFromDb() already doing this for the common
+   * (DB-synced) case, covering any other caller that sets formControl1's value directly, and any
+   * already-corrupted value saved before convertToHtmlIfNeeded()'s fix. {emitEvent: false} because
+   * this is purely a display correction, not a user edit - it shouldn't trigger a save on its own. */
   onEditorInit() {
     this.editorReady = true
+    const current = this.formControl1?.value
+    if ( typeof current === 'string' ) {
+      const trimmed = convertToHtmlIfNeeded(current)
+      if ( trimmed !== current ) {
+        this.formControl1.setValue(trimmed, {emitEvent: false})
+      }
+    }
     if ( this.focusPending ) {
       this.focusPending = false
       this.focusEditor()

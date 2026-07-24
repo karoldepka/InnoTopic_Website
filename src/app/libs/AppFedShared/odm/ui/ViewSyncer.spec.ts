@@ -36,14 +36,14 @@ describe('ViewSyncer', () => {
 
     // fieldNameHack is set, so plain text gets marked as HTML on the way in (convertToHtmlIfNeeded) -
     // unrelated to this test's point, just how the real Journal usage (rich text fields) works.
-    expect(formControl.value).toBe('<p></p>A')
+    expect(formControl.value).toBe('<p>A</p>')
   })
 
   it('GH #83: a genuinely newer DB value arriving during the post-edit lockout is retried ' +
     'and applied once the lockout lifts, instead of being silently dropped forever', () => {
     const {formControl, locallyVisibleChanges$, viewSyncer} = setup()
     locallyVisibleChanges$.nextWithCache({general: 'A'})
-    expect(formControl.value).toBe('<p></p>A')
+    expect(formControl.value).toBe('<p>A</p>')
 
     // A local edit just happened - arms the post-edit lockout (MIN_INTERVAL_MS).
     viewSyncer.lastLocalEditByUserMs = Date.now()
@@ -52,13 +52,13 @@ describe('ViewSyncer', () => {
     locallyVisibleChanges$.nextWithCache({general: 'B - edited on another browser'})
 
     // Must not clobber the just-made local edit immediately...
-    expect(formControl.value).toBe('<p></p>A')
+    expect(formControl.value).toBe('<p>A</p>')
 
     // ...but must not be lost either - once the lockout lifts, it applies automatically. Before
     // the fix, this update was simply forgotten forever once skipped here (GH #83 - "field text
     // value gets stuck on local version, even after page reload").
     vi.advanceTimersByTime(viewSyncer.MIN_INTERVAL_MS + 100)
-    expect(formControl.value).toBe('<p></p>B - edited on another browser')
+    expect(formControl.value).toBe('<p>B - edited on another browser</p>')
   })
 
   it('a further local edit while a retry is pending pushes the retry out, rather than applying stale data underneath it', () => {
@@ -72,10 +72,10 @@ describe('ViewSyncer', () => {
     viewSyncer.lastLocalEditByUserMs = Date.now()
 
     vi.advanceTimersByTime(5_100) // enough time for the ORIGINAL retry, not the rescheduled one
-    expect(formControl.value).toBe('<p></p>A')
+    expect(formControl.value).toBe('<p>A</p>')
 
     vi.advanceTimersByTime(5_000) // now past the rescheduled retry too
-    expect(formControl.value).toBe('<p></p>B')
+    expect(formControl.value).toBe('<p>B</p>')
   })
 
   it('does not retry an update that never differed from what\'s already shown', () => {
@@ -84,9 +84,9 @@ describe('ViewSyncer', () => {
     viewSyncer.lastLocalEditByUserMs = Date.now()
 
     // Re-delivery of the exact already-applied (converted) value - not a new edit from anywhere.
-    locallyVisibleChanges$.nextWithCache({general: '<p></p>A'})
+    locallyVisibleChanges$.nextWithCache({general: '<p>A</p>'})
     vi.advanceTimersByTime(20_000)
 
-    expect(formControl.value).toBe('<p></p>A')
+    expect(formControl.value).toBe('<p>A</p>')
   })
 })
