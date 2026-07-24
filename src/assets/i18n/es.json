@@ -65,6 +65,7 @@
     "OPTIONS": "Opciones",
     "FORCE_RELOAD": "Forzar recarga",
     "RELEASE_MIC": "Liberar micrófono",
+    "CURRENTLY_TRACKING": "Rastreando actualmente:",
     "BRANCH": "Rama",
     "LAST_COMMIT": "Último commit",
     "BUILT": "Compilado"

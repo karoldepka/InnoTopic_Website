@@ -18,6 +18,8 @@ import {stripHtml} from '../../../utils/html-utils'
 import {BrowserOdmStorage} from '../../../../AppFedSharedBrowser/odm-browser/BrowserOdmStorage'
 import {VoiceMemoService} from '../../../audio/voice-memo.service'
 import {summarizePatch} from '../../OdmItem$2'
+import {TimeTrackingService} from '../../../../../apps/OrYoL/time-tracking/time-tracking.service'
+import {TimeTrackingToolbarComponent} from '../../../../../apps/OrYoL/time-tracking/time-tracking-toolbar/time-tracking-toolbar.component'
 
 @Component({
     selector: 'app-sync-popover',
@@ -35,6 +37,7 @@ import {summarizePatch} from '../../OdmItem$2'
         AsyncPipe,
         JsonPipe,
         TranslatePipe,
+        TimeTrackingToolbarComponent,
     ],
 })
 export class SyncPopoverComponent extends BaseComponent implements OnInit {
@@ -66,6 +69,10 @@ export class SyncPopoverComponent extends BaseComponent implements OnInit {
     private alertController: AlertController,
     private browserOdmStorage: BrowserOdmStorage,
     public voiceMemoService: VoiceMemoService,
+    // GH #78: reuses the same toolbarEntries$ the app-root toolbar's mic/time-tracking bar
+    // already shows, so this popover's "currently tracking" section stays in sync with it for
+    // free instead of re-deriving its own view of what's being tracked.
+    public timeTrackingService: TimeTrackingService,
     injector: Injector,
   ) {
     super(injector)

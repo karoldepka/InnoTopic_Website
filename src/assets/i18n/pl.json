@@ -66,6 +66,7 @@
     "OPTIONS": "Opcje",
     "FORCE_RELOAD": "Wymuś odświeżenie",
     "RELEASE_MIC": "Zwolnij mikrofon",
+    "CURRENTLY_TRACKING": "Aktualnie śledzone:",
     "BRANCH": "Gałąź",
     "LAST_COMMIT": "Ostatni commit",
     "BUILT": "Zbudowano"

@@ -66,6 +66,7 @@
     "OPTIONS": "Options",
     "FORCE_RELOAD": "Force Reload",
     "RELEASE_MIC": "Release Microphone",
+    "CURRENTLY_TRACKING": "Currently tracking:",
     "BRANCH": "Branch",
     "LAST_COMMIT": "Last commit",
     "BUILT": "Built"

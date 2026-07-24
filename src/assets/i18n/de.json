@@ -65,6 +65,7 @@
     "OPTIONS": "Optionen",
     "FORCE_RELOAD": "Neu laden erzwingen",
     "RELEASE_MIC": "Mikrofon freigeben",
+    "CURRENTLY_TRACKING": "Wird gerade verfolgt:",
     "BRANCH": "Branch",
     "LAST_COMMIT": "Letzter Commit",
     "BUILT": "Erstellt am"

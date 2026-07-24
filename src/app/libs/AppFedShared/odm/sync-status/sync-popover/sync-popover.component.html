@@ -4,6 +4,15 @@
 
   {{ 'SYNC.APP_AND_SYNC_STATUS' | translate }}
 </h4>
+
+<!-- GH #78: same toolbarEntries$ the app-root toolbar's own time-tracking bar shows. -->
+<div
+  *ngIf="(timeTrackingService.toolbarEntries$ | async)?.length"
+  class="currently-tracking"
+>
+  <ion-note>{{ 'SYNC.CURRENTLY_TRACKING' | translate }}</ion-note>
+  <app-time-tracking-toolbar></app-time-tracking-toolbar>
+</div>
 <div class="expandable-section">
   <button class="expand-toggle" (click)="onClickAboutAppToggle()">
     {{ 'SYNC.ABOUT_APP' | translate }} <ion-icon [name]="aboutAppExpanded ? 'chevron-up' : 'chevron-down'" style="vertical-align: middle; font-size: 14px"></ion-icon>
