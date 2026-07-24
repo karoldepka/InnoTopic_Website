@@ -222,10 +222,10 @@ export class TimeTrackingService {
     // return entry
   }
 
-  pauseCurrentOrNoop() {
+  pauseCurrentOrNoop(opts?: { skipEmit: boolean }) {
     if ( this.currentEntries /* FIxME this is array so will always be non-nullish, e.g. []; also could contain MRU items; mruAndCurrentlyTrackingEntries */ ) {
       for ( let entryToPause of this.currentEntries ) {
-        entryToPause.pauseOrNoop()
+        entryToPause.pauseOrNoop(opts)
       }
     }
   }

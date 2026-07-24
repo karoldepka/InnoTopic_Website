@@ -158,7 +158,13 @@ export class TimeTrackedEntry /* extends OverlayOdmItem$ */ {
       return
     }
     if ( ! opts?.inParallel ) {
-      this.timeTrackingService.pauseCurrentOrNoop()
+      // Don't let pauseCurrentOrNoop() emit per-entry here (GH #124): each pause it triggers would
+      // otherwise broadcast timeTrackedEntries$ with *this* item not yet started, so the toolbar's
+      // "no item currently tracking -> show the last paused one" fallback (toolbarEntries$'s
+      // showLastPausedItemIfNoItemCurrentlyTracking) briefly re-shows the item being switched
+      // *away* from as if it were still current. The single emit below (after this item's own
+      // start is patched too) reflects both halves of the switch atomically instead.
+      this.timeTrackingService.pauseCurrentOrNoop({skipEmit: true})
     }
     // this.ttData.nowTrackingSince = this.now() // FIXME this.ttData might be undefined; ??= {} ?
     const dataItemPatch: TTPatch = {
@@ -194,7 +200,7 @@ export class TimeTrackedEntry /* extends OverlayOdmItem$ */ {
   }
 
 
-  pauseOrNoop() {
+  pauseOrNoop(opts?: { skipEmit: boolean }) {
     if (!this.val?.isTrackingNow) {
       return // no-op
     }
@@ -213,7 +219,9 @@ export class TimeTrackedEntry /* extends OverlayOdmItem$ */ {
     }
     this.patchItemTimeTrackingData(dataItemPatch)
     this.clearTimeouts()
-    this.timeTrackingService.emitTimeTrackedEntry(this) // this should not be needed - source of truth should be obs$
+    if ( ! opts?.skipEmit ) {
+      this.timeTrackingService.emitTimeTrackedEntry(this) // this should not be needed - source of truth should be obs$
+    }
     this.timeTrackingPeriodsService.onPeriodEnd(this)
     this.currentPeriod = undefined
   }
