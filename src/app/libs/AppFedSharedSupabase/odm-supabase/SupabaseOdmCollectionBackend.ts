@@ -334,18 +334,41 @@ export class SupabaseOdmCollectionBackend<TRaw> extends OdmCollectionBackend<TRa
             // that window (e.g. an item another device synced while this one was offline) would
             // otherwise be silently missed until the next full page reload. Re-run the same
             // incremental, cursor-based fetch used on initial load to catch up.
-            this.fetchRows(queryOpts)
-              .then(rows => {
-                this.emitRowsAsAdded(rows, listener)
-                callback?.()
-              })
-              .catch(error => this.errorAlert('subscribeToChanges reconnect catch-up error', error))
+            void this.catchUpAfterReconnect(queryOpts, listener, callback)
           }
           hasConnectedBefore = true
         }
       })
 
     void channel
+  }
+
+  /** The realtime *channel* reconnecting (SUBSCRIBED firing again) is a separate concern from the
+   * plain REST catch-up fetchRows() call above actually succeeding - a transient blip on the
+   * PostgREST endpoint right at that moment would otherwise silently and permanently miss whatever
+   * changed during the disconnect window, since nothing else re-triggers this catch-up until
+   * another full channel disconnect/reconnect cycle happens (which may never happen again). Retry
+   * a few times with a short backoff before giving up and surfacing an error. */
+  private async catchUpAfterReconnect(
+    queryOpts: QueryOpts,
+    listener: OdmCollectionBackendListener<TRaw, OdmItemId<TRaw>>,
+    callback: () => void,
+  ): Promise<void> {
+    const maxAttempts = 3
+    for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+      try {
+        const rows = await this.fetchRows(queryOpts)
+        this.emitRowsAsAdded(rows, listener)
+        callback?.()
+        return
+      } catch (error) {
+        if (attempt === maxAttempts) {
+          this.errorAlert(`subscribeToChanges reconnect catch-up error (gave up after ${maxAttempts} attempts)`, error)
+          return
+        }
+        await new Promise(resolve => setTimeout(resolve, 1000 * attempt))
+      }
+    }
   }
 
   private emitRowsAsAdded(rows: PostgresOdmRow<TRaw>[], listener: OdmCollectionBackendListener<TRaw>): void {
