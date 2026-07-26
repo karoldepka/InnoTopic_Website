@@ -5,7 +5,7 @@ import { NgFor, NgIf } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { TimePassingComponent } from '../../../libs/AppFedShared/time/time-passing/time-passing.component';
 import { MindfulnessTrackingService } from './mindfulness-tracking.service'
-import { MindfulnessGoalsService } from './mindfulness-goals.service'
+import { MindfulnessSettingsService } from './mindfulness-settings.service'
 
 @Component({
     selector: 'app-mindfulness',
@@ -68,13 +68,19 @@ export class MindfulnessPage extends BaseComponent implements OnInit, OnDestroy 
   constructor(
     private changeDetectorRef: ChangeDetectorRef,
     private mindfulnessTrackingService: MindfulnessTrackingService,
-    private mindfulnessGoalsService: MindfulnessGoalsService,
+    private mindfulnessSettingsService: MindfulnessSettingsService,
     injector: Injector,
   ) {
     super(injector)
   }
 
-  ngOnInit() {
+  async ngOnInit() {
+    const settings = await this.mindfulnessSettingsService.getSettings()
+    if (settings.lastDurationSeconds && settings.lastDurationSeconds > 0 && !this.isTimerRunning) {
+      this.selectedDurationSeconds = settings.lastDurationSeconds
+      this.remainingSeconds = this.selectedDurationSeconds
+      this.changeDetectorRef.detectChanges()
+    }
   }
 
   ngOnDestroy() {
@@ -99,7 +105,7 @@ export class MindfulnessPage extends BaseComponent implements OnInit, OnDestroy 
     try {
       const [totals, goals] = await Promise.all([
         this.mindfulnessTrackingService.getTodayAndWeekTotals(),
-        this.mindfulnessGoalsService.getGoals(),
+        this.mindfulnessSettingsService.getSettings(),
       ])
       this.todayMs = totals.todayMs
       this.weekMs = totals.weekMs
@@ -114,7 +120,7 @@ export class MindfulnessPage extends BaseComponent implements OnInit, OnDestroy 
   }
 
   saveGoals() {
-    this.mindfulnessGoalsService.saveGoals({
+    this.mindfulnessSettingsService.saveGoals({
       goalMinutesPerDay: this.goalMinutesPerDay,
       goalMinutesPerWeek: this.goalMinutesPerWeek,
     })
@@ -162,6 +168,7 @@ export class MindfulnessPage extends BaseComponent implements OnInit, OnDestroy 
   selectTimerDuration(durationSeconds: number) {
     this.selectedDurationSeconds = durationSeconds
     this.resetTimer()
+    this.mindfulnessSettingsService.saveLastDurationSeconds(durationSeconds)
   }
 
   applyManualDuration() {
