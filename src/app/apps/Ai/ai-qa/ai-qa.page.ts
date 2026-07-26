@@ -10,6 +10,7 @@ import {
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { AlertController, IonicModule, ToastController } from '@ionic/angular';
+import {presentDismissableToast} from '../../../libs/AppFedShared/utils/toast-utils';
 import {
   ColumnDef,
   ExpandedState,
@@ -224,13 +225,12 @@ export class AiQaPage implements OnInit {
     // The approved Q&A are now saved as Learn drafts — remove them from the pending list.
     this.gen.questions.set(this.gen.questions().filter((_, i) => !selected.has(i)));
     this.selectedQIndices.set(new Set<number>());
-    const toast = await this.toastCtrl.create({
+    await presentDismissableToast(this.toastCtrl, {
       message: `Approved ${approved.length} Q&A → saved to Learn as AI drafts.`,
       duration: 2500,
       position: 'bottom',
       color: 'success',
     });
-    await toast.present();
   }
 
   /** Persist Q&A into the Learn store as AI-created drafts (whenGeneratedByAi + draftedAt),
@@ -298,13 +298,12 @@ export class AiQaPage implements OnInit {
       qaCount++;
     }
 
-    const toast = await this.toastCtrl.create({
+    await presentDismissableToast(this.toastCtrl, {
       message: `Saved ${categoryIdToItem.size} categories and ${qaCount} Q&A to Learn (as AI drafts).`,
       duration: 2500,
       position: 'bottom',
       color: 'success',
     });
-    await toast.present();
   }
 
   addRootCategory(): void { this.gen.tree.set(addCategoryChild(this.gen.tree())); }

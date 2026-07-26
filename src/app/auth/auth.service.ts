@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { ignorePromise } from '../libs/AppFedShared/utils/promiseUtils';
 import { Router } from '@angular/router';
 import { ToastController } from '@ionic/angular';
+import {presentDismissableToast} from '../libs/AppFedShared/utils/toast-utils'
 import { User } from 'firebase/auth';
 
 import {errorAlert} from '../libs/AppFedShared/utils/log'
@@ -126,13 +127,12 @@ export class AuthService {
 
   /** Show a transient success toast to give the user positive feedback. */
   async showSuccessToast(message: string) {
-    const toast = await this.toastController.create({
+    await presentDismissableToast(this.toastController, {
       message,
       duration: 2500,
       position: 'bottom',
       color: 'success',
     })
-    await toast.present()
   }
 
   login() {

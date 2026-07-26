@@ -1,5 +1,6 @@
 import {Injectable, Injector} from '@angular/core';
 import {ToastController} from '@ionic/angular'
+import {presentDismissableToast} from '../utils/toast-utils'
 import {CachedSubject} from '../utils/cachedSubject2/CachedSubject2'
 import {appGlobals} from '../g'
 import {BaseService} from '../base.service'
@@ -134,13 +135,12 @@ export class SyncStatusService extends BaseService {
       return
     }
     this.lastNetworkErrorToastAt = now
-    this.injector.get(ToastController).create({
+    presentDismissableToast(this.injector.get(ToastController), {
       message: 'Network problem - your change is saved on this device and will sync automatically once you\'re back online.',
       duration: 6000,
       color: 'warning',
       position: 'bottom',
-    }).then(toast => toast.present())
-      .catch(toastError => console.error('maybeShowNetworkErrorToast failed', toastError))
+    }).catch(toastError => console.error('maybeShowNetworkErrorToast failed', toastError))
   }
 
   private isLikelyNetworkError(error: any): boolean {

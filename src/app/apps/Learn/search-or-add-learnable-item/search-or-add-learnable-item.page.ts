@@ -12,6 +12,7 @@ import {debounceTime, distinctUntilChanged, finalize} from 'rxjs/operators'
 import {LingueeService} from '../natural-langs/linguee.service'
 import {MerriamWebsterDictService} from '../natural-langs/merriam-webster-dict.service'
 import { PopoverController, ToastController, IonicModule } from '@ionic/angular'
+import {presentDismissableToast} from '../../../libs/AppFedShared/utils/toast-utils'
 import {ListOptionsComponent} from './list-options/list-options.component'
 import {ListOptions, ListOptionsData} from './list-options'
 import {JournalEntryItemsService} from '../../Journal/core/journal-entries.service'
@@ -426,17 +427,16 @@ export class SearchOrAddLearnableItemPageComponent extends BaseComponent impleme
   }
 
   private async presentToast(message: string, color: 'success' | 'danger' | 'warning' | 'medium' = 'success') {
-    const toast = await this.toastController.create({
+    await presentDismissableToast(this.toastController, {
       message,
       duration: 2400,
       color,
       position: 'bottom',
     })
-    await toast.present()
   }
 
   private async presentAddedToast(item$: LearnItem$, message: string, beforeUndo?: () => void) {
-    const toast = await this.toastController.create({
+    await presentDismissableToast(this.toastController, {
       message: this.withOfflineSaveHint(message),
       duration: 5000,
       color: 'success',
@@ -456,12 +456,11 @@ export class SearchOrAddLearnableItemPageComponent extends BaseComponent impleme
         },
       ],
     })
-    await toast.present()
   }
 
   private async presentDuplicateToast(existingItem$: LearnItem$, addAnyway: () => void) {
     const title = this.getPlainItemTitle(existingItem$) || 'that item'
-    const toast = await this.toastController.create({
+    await presentDismissableToast(this.toastController, {
       message: `Looks like "${title}" already exists.`,
       duration: 7000,
       color: 'warning',
@@ -477,7 +476,6 @@ export class SearchOrAddLearnableItemPageComponent extends BaseComponent impleme
         },
       ],
     })
-    await toast.present()
   }
 
   private formatAddError(error: any, fallback: string): string {

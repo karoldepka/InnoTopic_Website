@@ -4,6 +4,7 @@ import {LearnItemItemsService} from '../core/learn-item-items.service'
 import {DocumentReference, collection, doc, getDoc} from 'firebase/firestore'
 import {getAppFirestore} from '../../../libs/AppFedSharedFirebase/firebase-app'
 import { AlertController, IonicModule, ToastController } from '@ionic/angular'
+import {presentDismissableToast} from '../../../libs/AppFedShared/utils/toast-utils'
 import {LearnItem, LearnItemId} from '../models/LearnItem'
 import {ignorePromise} from '../../../libs/AppFedShared/utils/promiseUtils'
 import {stripHtml} from '../../../libs/AppFedShared/utils/html-utils'
@@ -242,18 +243,17 @@ export class LearnItemDetailsPage extends BaseComponent implements OnInit, OnDes
   async restore() {
     const title = this.getShortTitle()
     this.item$.unarchive()
-    const toast = await this.toastController.create({
+    await presentDismissableToast(this.toastController, {
       message: title ? `"${title}" restored.` : 'Item restored.',
       duration: 2400,
       color: 'success',
       position: 'bottom',
     })
-    await toast.present()
   }
 
   private async confirmArchive(title: string) {
     this.item$.archive()
-    const toast = await this.toastController.create({
+    await presentDismissableToast(this.toastController, {
       message: title ? `"${title}" archived.` : 'Item archived.',
       duration: 6000,
       color: 'medium',
@@ -266,7 +266,6 @@ export class LearnItemDetailsPage extends BaseComponent implements OnInit, OnDes
         },
       ],
     })
-    await toast.present()
   }
 
   private getShortTitle(): string {

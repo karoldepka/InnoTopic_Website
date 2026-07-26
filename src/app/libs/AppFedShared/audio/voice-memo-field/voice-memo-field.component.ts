@@ -6,6 +6,7 @@ import {ActiveMicHolder, readVoiceMemos, readVoiceMemosForField, VoiceAttachable
 import {VoiceTranscriptionService} from '../voice-transcription.service'
 import {FeatureService} from '../../feature.service'
 import {formatDurationMmSs} from '../../utils/stringUtils'
+import {presentDismissableToast} from '../../utils/toast-utils'
 
 declare const MediaRecorder: any
 
@@ -589,7 +590,7 @@ export class VoiceMemoFieldComponent implements OnInit, OnDestroy, ActiveMicHold
     this.changeDetectorRef.markForCheck()
 
     let restored = false
-    this.toastController.create({
+    presentDismissableToast(this.toastController, {
       message: 'Recording deleted.',
       duration: 6000,
       color: 'medium',
@@ -604,7 +605,6 @@ export class VoiceMemoFieldComponent implements OnInit, OnDestroy, ActiveMicHold
         },
       }],
     }).then(async toast => {
-      await toast.present()
       await toast.onDidDismiss()
       if (!restored) {
         this.voiceMemoService.deleteMemo(collection, itemId, memoRef)

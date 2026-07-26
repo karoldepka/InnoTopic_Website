@@ -39,6 +39,7 @@ import {getActiveElementCaretPos, getSelectionCursorState} from '../../../../lib
 import {isNullish, trimToUndefined} from '../../../../libs/AppFedShared/utils/utils'
 import {nullish} from '../../../../libs/AppFedShared/utils/type-utils'
 import {AlertController, PopoverController, ToastController} from '@ionic/angular'
+import {presentDismissableToast} from '../../../../libs/AppFedShared/utils/toast-utils'
 import {TreeNodeMenuPopoverComponent} from '../tree-node-menu/tree-node-menu-popover.component'
 import {INodeContentComponent} from './INodeContentComponent'
 import {CachedSubject} from '../../../../libs/AppFedShared/utils/cachedSubject2/CachedSubject2'
@@ -458,7 +459,7 @@ export class NodeContentComponent implements OnInit, AfterViewInit, OnDestroy, I
     if ( nodeToFocus ) {
       this.treeHost.focusNode(nodeToFocus as any, this.columns.lastColumn, {cursorPosition: -1})
     }
-    this.injector.get(ToastController).create({
+    presentDismissableToast(this.injector.get(ToastController), {
       message: 'Item deleted.',
       duration: 6000,
       color: 'medium',
@@ -470,7 +471,7 @@ export class NodeContentComponent implements OnInit, AfterViewInit, OnDestroy, I
           parent2?.addChild(siblingAbove as any, deletedNode as any)
         },
       }],
-    }).then(toast => toast.present())
+    })
   }
 
   onArrowLeft() {

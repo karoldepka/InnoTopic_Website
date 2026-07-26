@@ -14,12 +14,13 @@ class MockToastController {
   createCalls = 0
   presentCalls = 0
 
-  async create(_opts: any): Promise<{present: () => Promise<void>}> {
+  async create(_opts: any): Promise<{present: () => Promise<void>, addEventListener: () => void}> {
     this.createCalls++
     return {
       present: async () => {
         this.presentCalls++
       },
+      addEventListener: () => {}, // presentDismissableToast() wires a click-to-dismiss listener
     }
   }
 }

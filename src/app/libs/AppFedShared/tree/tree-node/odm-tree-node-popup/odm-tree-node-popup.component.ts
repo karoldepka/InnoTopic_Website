@@ -5,6 +5,7 @@ import {LearnItem} from '../../../../../apps/Learn/models/LearnItem'
 import {LearnItem$} from '../../../../../apps/Learn/models/LearnItem$'
 import {stripHtml} from '../../../utils/html-utils'
 import { ToastController, IonicModule } from '@ionic/angular'
+import {presentDismissableToast} from '../../../utils/toast-utils'
 import { Router, RouterLink } from '@angular/router'
 import { NgIf, NgFor, AsyncPipe } from '@angular/common';
 import { OdmCheckbox } from '../../../../AppFedSharedIonic/odm-ui/bound-checkbox/odm-checkbox';
@@ -197,17 +198,16 @@ export class OdmTreeNodePopupComponent implements OnInit {
   }
 
   private async presentToast(message: string, color: 'success' | 'danger' | 'warning' | 'medium' = 'success') {
-    const toast = await this.toastController.create({
+    await presentDismissableToast(this.toastController, {
       message,
       duration: 2200,
       color,
       position: 'bottom',
     })
-    await toast.present()
   }
 
   private async presentAddedToast(item$: LearnItem$, message: string) {
-    const toast = await this.toastController.create({
+    await presentDismissableToast(this.toastController, {
       message: this.withOfflineSaveHint(message),
       duration: 5000,
       color: 'success',
@@ -227,12 +227,11 @@ export class OdmTreeNodePopupComponent implements OnInit {
         },
       ],
     })
-    await toast.present()
   }
 
   private async presentDuplicateToast(existingItem$: LearnItem$, addAnyway: () => void) {
     const title = this.getPlainItemTitle(existingItem$) || 'that child'
-    const toast = await this.toastController.create({
+    await presentDismissableToast(this.toastController, {
       message: `"${title}" is already in this branch.`,
       duration: 7000,
       color: 'warning',
@@ -248,7 +247,6 @@ export class OdmTreeNodePopupComponent implements OnInit {
         },
       ],
     })
-    await toast.present()
   }
 
   private formatError(error: any, fallback: string) {

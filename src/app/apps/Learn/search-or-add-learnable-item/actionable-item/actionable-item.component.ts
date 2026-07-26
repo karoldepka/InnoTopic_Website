@@ -16,6 +16,7 @@ import { SelectionCheckboxComponent } from './selection-checkbox/selection-check
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { Subscription } from 'rxjs';
 import {stripHtml} from '../../../../libs/AppFedShared/utils/html-utils'
+import {presentDismissableToast} from '../../../../libs/AppFedShared/utils/toast-utils'
 
 
 /* TODO rename to  list-item */
@@ -180,18 +181,17 @@ export class ActionableItemComponent extends BaseComponent implements OnInit, On
     this.stopRowNavigation(event)
     const title = this.getShortTitle()
     this.item.unarchive()
-    const toast = await this.toastController.create({
+    await presentDismissableToast(this.toastController, {
       message: title ? `"${title}" restored.` : 'Item restored.',
       duration: 2400,
       color: 'success',
       position: 'bottom',
     })
-    await toast.present()
   }
 
   private async confirmArchive(title: string) {
     this.item.archive()
-    const toast = await this.toastController.create({
+    await presentDismissableToast(this.toastController, {
       message: title ? `"${title}" archived.` : 'Item archived.',
       duration: 6000,
       color: 'medium',
@@ -204,7 +204,6 @@ export class ActionableItemComponent extends BaseComponent implements OnInit, On
         },
       ],
     })
-    await toast.present()
   }
 
   private stopRowNavigation(event: Event) {

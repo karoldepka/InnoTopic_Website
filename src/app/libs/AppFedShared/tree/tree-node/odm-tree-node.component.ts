@@ -3,6 +3,7 @@ import {OdmTreeNode} from './OdmTreeNode'
 import {OdmItem$2} from '../../odm/OdmItem$2'
 import {AuthService} from '../../../../auth/auth.service'
 import { ToastController, IonicModule } from '@ionic/angular'
+import {presentDismissableToast} from '../../utils/toast-utils'
 import { OdmTreeNodeContentComponent } from './tree-node-content/odm-tree-node-content.component';
 import { NgIf, NgFor, AsyncPipe } from '@angular/common';
 
@@ -74,7 +75,7 @@ export class OdmTreeNodeComponent implements OnInit {
     try {
       this.treeNode.isExpanded = true
       this.focusNewChildTitleWhenRendered(newItem.id)
-      const toast = await this.toastController.create({
+      await presentDismissableToast(this.toastController, {
         message: 'Draft item added.',
         duration: 5000,
         color: 'success',
@@ -90,27 +91,24 @@ export class OdmTreeNodeComponent implements OnInit {
           },
         ],
       })
-      await toast.present()
     } catch (error: any) {
       console.error('Unable to add child from shortcut', error)
-      const toast = await this.toastController.create({
+      await presentDismissableToast(this.toastController, {
         message: error?.message ?? 'Could not add a child item.',
         duration: 2400,
         color: 'danger',
         position: 'bottom',
       })
-      await toast.present()
     }
   }
 
   private async presentToast(message: string, color: 'success' | 'danger' | 'warning' | 'medium' = 'success') {
-    const toast = await this.toastController.create({
+    await presentDismissableToast(this.toastController, {
       message,
       duration: 2200,
       color,
       position: 'bottom',
     })
-    await toast.present()
   }
 
   trackById(index: number, node: OdmTreeNode) {

@@ -2,6 +2,7 @@ import {Injectable} from '@angular/core'
 import {Router} from '@angular/router'
 import {ToastController} from '@ionic/angular'
 import {BrowserOdmStorage} from './BrowserOdmStorage'
+import {presentDismissableToast} from '../../AppFedShared/utils/toast-utils'
 
 /** Per-collection "open the winning item" URL builders. Not a generic cross-collection routing
  * contract - just what's registered so far. Collections without an entry here still get a
@@ -29,7 +30,7 @@ export class OdmConflictToastService {
 
   private async presentConflictToast(collection: string, winnerId: string): Promise<void> {
     const buildUrl = COLLECTION_ROUTES[collection]
-    const toast = await this.toastController.create({
+    await presentDismissableToast(this.toastController, {
       message: `A conflicting edit was found in ${collection}. Kept the most recent version - the other is saved for recovery.`,
       duration: 8000,
       color: 'warning',
@@ -38,6 +39,5 @@ export class OdmConflictToastService {
         ? [{text: 'Open', handler: () => this.router.navigateByUrl(buildUrl(winnerId))}]
         : [],
     })
-    await toast.present()
   }
 }

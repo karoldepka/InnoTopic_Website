@@ -1,6 +1,7 @@
 import {Injectable} from '@angular/core'
 import {ToastController} from '@ionic/angular'
 import {BrowserOdmStorage} from './BrowserOdmStorage'
+import {presentDismissableToast} from '../../AppFedShared/utils/toast-utils'
 
 /** Subscribes to BrowserOdmStorage.connectionRecovered$ and surfaces a brief, reassuring toast,
  * so a local-cache connection drop (e.g. a tab left open across a deploy that bumps the
@@ -25,12 +26,11 @@ export class IndexedDbHealthToastService {
       return
     }
     this.lastToastAt = now
-    this.toastController.create({
+    presentDismissableToast(this.toastController, {
       message: 'Local storage had a brief hiccup and reconnected automatically - nothing was lost.',
       duration: 5000,
       color: 'warning',
       position: 'bottom',
-    }).then(toast => toast.present())
-      .catch(error => console.error('IndexedDbHealthToastService maybeShowToast failed', error))
+    }).catch(error => console.error('IndexedDbHealthToastService maybeShowToast failed', error))
   }
 }
