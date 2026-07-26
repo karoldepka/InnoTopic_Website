@@ -56,3 +56,39 @@ export function contrastRatio(hexA: string, hexB: string): number {
   const darker = Math.min(lumA, lumB);
   return (lighter + 0.05) / (darker + 0.05);
 }
+
+function rgbToXyz([r, g, b]: RGB): RGB {
+  const [rl, gl, bl] = [r, g, b].map(v => {
+    v /= 255;
+    return v > 0.04045 ? Math.pow((v + 0.055) / 1.055, 2.4) : v / 12.92;
+  }) as RGB;
+  const x = (rl * 0.4124 + gl * 0.3576 + bl * 0.1805) * 100;
+  const y = (rl * 0.2126 + gl * 0.7152 + bl * 0.0722) * 100;
+  const z = (rl * 0.0193 + gl * 0.1192 + bl * 0.9505) * 100;
+  return [x, y, z];
+}
+
+function xyzToLab([x, y, z]: RGB): RGB {
+  const [xr, yr, zr] = [x / 95.047, y / 100, z / 108.883].map(v =>
+    v > 0.008856 ? Math.cbrt(v) : (7.787 * v) + 16 / 116
+  ) as RGB;
+  return [(116 * yr) - 16, 500 * (xr - yr), 200 * (yr - zr)];
+}
+
+/** Perceptual color difference (CIE76 deltaE) between two colors - unlike contrastRatio() above
+ * (luminance-only, order-independent lightness), this also accounts for hue/saturation, so it
+ * catches e.g. two similarly-bright but very different-looking colors as "close" only when a
+ * human eye would actually see them that way. Needed because primary and secondary are used
+ * side-by-side to distinguish UI state (e.g. a selected vs. unselected button) - two colors that
+ * both contrast fine against the background individually can still be near-indistinguishable from
+ * each other, which contrastRatio() alone can't detect. Rule of thumb: <10 reads as "the same
+ * color" at a glance, >20 is clearly two distinct colors even at a glance. */
+export function colorDistance(hexA: string, hexB: string): number {
+  const labA = xyzToLab(rgbToXyz(getRgbColorFromHex(hexA)));
+  const labB = xyzToLab(rgbToXyz(getRgbColorFromHex(hexB)));
+  return Math.sqrt(
+    Math.pow(labA[0] - labB[0], 2) +
+    Math.pow(labA[1] - labB[1], 2) +
+    Math.pow(labA[2] - labB[2], 2)
+  );
+}

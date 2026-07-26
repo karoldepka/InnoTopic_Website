@@ -153,7 +153,9 @@ export const themesMapById: { [key: string]: Theme } = setIdsFromKeys({
   'Dark Gray and blue': theme({
     comment: '',
     primary: '#686868', // GH: was #2f2f2f - contrast ratio ~1.2 against the default background, below the 3:1 UI minimum
-    secondary: '#007197', // GH: was #006b8f - contrast ratio ~2.96 against the default background, below the 3:1 UI minimum
+    // GH: was #007197 - too close to the gray primary (deltaE ~31) to read as a distinct
+    // "selected" color next to it; a more saturated, vivid blue stands apart from a flat gray.
+    secondary: '#0066ff',
   }),
   'Dark Gray and purplish': theme({
     comment: 'Beetroot',
@@ -207,7 +209,9 @@ export const themesMapById: { [key: string]: Theme } = setIdsFromKeys({
     comment: 'Bright background',
     background: '#dbeef5',
     primary: '#0b3d5c',
-    secondary: '#00838f',
+    // GH: was #00838f - a teal too close to the navy primary (deltaE ~15) to read as a distinct
+    // "selected" color next to it; a warm coral accent contrasts clearly with the icy blue primary.
+    secondary: '#c1440e',
     experimental: true,
   }),
   'Ocean Breeze': theme({

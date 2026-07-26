@@ -1,6 +1,6 @@
 import {describe, it, expect} from 'vitest'
 import {themesArray} from './themes.data'
-import {shadeColor, contrastRatio} from './color-utils'
+import {shadeColor, contrastRatio, colorDistance} from './color-utils'
 
 /** Validates every non-disabled theme's primary/secondary actually stand out against its own
  * background, at the default brightness (50%) ThemeCalculator.updateColors() computes it at -
@@ -24,6 +24,28 @@ describe('theme background/primary/secondary contrast', () => {
 
     it(`"${theme.id}": secondary is legible against its background`, () => {
       expect(contrastRatio(theme.secondary, background)).toBeGreaterThanOrEqual(MIN_UI_CONTRAST)
+    })
+  }
+})
+
+/** GH: "the themes cannot have a similar primary&secondary color, because secondary is used to
+ * distinguish things like a button/selector being selected" - primary and secondary are used
+ * side-by-side to convey UI state (e.g. TimerPresetComponent's selected-vs-unselected preset), so
+ * beyond each individually contrasting against the background (above), they must also be clearly
+ * distinguishable from *each other*. contrastRatio() alone can't catch this (it's luminance-only,
+ * so e.g. pure red and pure blue at matched lightness can read as "high contrast" while looking
+ * like two shades of the same color) - colorDistance()'s perceptual deltaE is what actually
+ * matches "would a person glancing at these two buttons tell them apart". */
+describe('theme primary/secondary distinctness', () => {
+  const MIN_COLOR_DISTANCE = 35
+
+  for (const theme of themesArray) {
+    if (theme.disabled) {
+      continue
+    }
+
+    it(`"${theme.id}": primary and secondary are visually distinct from each other`, () => {
+      expect(colorDistance(theme.primary, theme.secondary)).toBeGreaterThanOrEqual(MIN_COLOR_DISTANCE)
     })
   }
 })
