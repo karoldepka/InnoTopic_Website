@@ -25,6 +25,7 @@ import {
   updateCategoryNode,
 } from './ai-qa-tree.utils';
 import {QaDuplicateDetectorService} from './qa-duplicate-detector.service';
+import {showDesktopNotification} from '../../../libs/AppFedShared/utils/desktop-notification';
 
 export type QaIntegrationMode = 'vercel-ai-sdk' | 'copilotkit';
 
@@ -492,6 +493,7 @@ export class AiQaGeneratorService {
     this.modelName.set(response?.modelName || this.modelName());
     const count = countCategoryNodes(this.tree());
     this.categoryStatus.set(response?.assistantMessage || `Generated ${count} categories`);
+    this.notifyGenerationFinished('Categories generated', `${count} categories ready in LifeSuite AI Q&A.`);
   }
 
   private stampQuestions(response: QuestionAnswerResponse | undefined): QuestionAnswer[] {
@@ -575,6 +577,10 @@ export class AiQaGeneratorService {
     } finally {
       this.appendMode = false;
       this.preAppendQuestions = [];
+      // Every branch above (clean finish, gave-up-after-replacement-rounds, or duplicate-check
+      // unavailable) already stamped a final, human-readable questionStatus() - reuse it here
+      // rather than re-deriving a separate message per branch.
+      this.notifyGenerationFinished('Q&A generated', this.questionStatus());
     }
   }
 
@@ -587,6 +593,16 @@ export class AiQaGeneratorService {
       contentModifiedAt: n.contentModifiedAt ?? now,
       children: this.stampTreeDraftedAt(n.children, now),
     }));
+  }
+
+  /** Only bothers the user with a desktop notification if they've actually navigated away/
+   * switched tabs while this (slow, LLM-backed) generation was running - if the tab is still
+   * focused they can already see the result land live via the streaming signals above. */
+  private notifyGenerationFinished(title: string, body: string): void {
+    if (typeof document !== 'undefined' && document.hasFocus()) {
+      return;
+    }
+    void showDesktopNotification(title, {body});
   }
 
   private formatError(error: unknown): string {
