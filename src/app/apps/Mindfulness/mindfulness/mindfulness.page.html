@@ -143,6 +143,18 @@
       </div>
     </section>
 
+    <section class="mindfulness-mantra" aria-label="Mantra">
+      <span class="mindfulness-mantra__text">{{ currentMantra }}</span>
+      <ion-button
+        size="small"
+        fill="clear"
+        aria-label="Show a different mantra"
+        (click)="shuffleMantra()"
+      >
+        <ion-icon slot="icon-only" name="shuffle-outline"></ion-icon>
+      </ion-button>
+    </section>
+
     <div class="fancy">
 
       <p>Don't hesitate to spend some time on this. It will pay off!</p>

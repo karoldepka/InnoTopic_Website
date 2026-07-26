@@ -6,6 +6,7 @@ import { FormsModule } from '@angular/forms';
 import { TimePassingComponent } from '../../../libs/AppFedShared/time/time-passing/time-passing.component';
 import { MindfulnessTrackingService } from './mindfulness-tracking.service'
 import { MindfulnessSettingsService } from './mindfulness-settings.service'
+import { mindfulnessMantras } from './mindfulness-mantras.data'
 
 @Component({
     selector: 'app-mindfulness',
@@ -64,6 +65,8 @@ export class MindfulnessPage extends BaseComponent implements OnInit, OnDestroy 
   goalMinutesPerWeek: number | null = null
 
   private isLoadingTotals = false
+
+  currentMantra = this.pickRandomMantra()
 
   constructor(
     private changeDetectorRef: ChangeDetectorRef,
@@ -124,6 +127,20 @@ export class MindfulnessPage extends BaseComponent implements OnInit, OnDestroy 
       goalMinutesPerDay: this.goalMinutesPerDay,
       goalMinutesPerWeek: this.goalMinutesPerWeek,
     })
+  }
+
+  /** Picks a different mantra than the one currently shown (when there's more than one to choose
+   * from) so clicking "shuffle" always visibly changes something. */
+  shuffleMantra() {
+    let next = this.pickRandomMantra()
+    while (next === this.currentMantra && mindfulnessMantras.length > 1) {
+      next = this.pickRandomMantra()
+    }
+    this.currentMantra = next
+  }
+
+  private pickRandomMantra(): string {
+    return mindfulnessMantras[Math.floor(Math.random() * mindfulnessMantras.length)]
   }
 
   /** e.g. 90 minutes -> "1h 30m", 45 minutes -> "45m". */
