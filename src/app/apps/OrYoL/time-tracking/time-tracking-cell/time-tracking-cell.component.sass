@@ -1,22 +1,18 @@
 
 .timeTrackingNow
   font-weight: bold
-  //background-color: var(--highlight)
   background-image: linear-gradient(to right, var(--ion-color-primary), var(--ion-color-secondary))
+  // GH: the elapsed-time text and title span (both plain, unstyled children - see the .html)
+  // otherwise inherit the app's default --ion-text-color, which isn't guaranteed to read against
+  // this gradient background on every theme - contrast-color is what's meant to sit on top of
+  // primary/secondary, same as the pause icon already does via its own inline style.
+  color: var(--ion-color-primary-contrast)
+
 .startPauseIcon
   margin-left: -2px
 
-i
+// GH: was `i` - dead (every icon here is <ion-icon>, never a plain <i>), so the idle play icon
+// fell back to the default text color instead of the theme's primary.
+ion-icon
   color: var(--ion-color-primary)
-
-app-time-tracking-cell
-  //color: var(--ion-text-color)
-  color: blue
-
-timeTrackingNow
-  i
-    color: var(--ion-color-primary-contrast) !important
-  app-time-tracking-cell
-    //color: var(--ion-color-secondary-contrast) !important
-    color: red !important
 
