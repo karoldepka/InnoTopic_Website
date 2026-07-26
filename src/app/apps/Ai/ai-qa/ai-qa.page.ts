@@ -240,13 +240,23 @@ export class AiQaPage implements OnInit {
     for (const qa of questions) {
       const data: Partial<LearnItem> = {
         title: qa.question,
-        answer: qa.answer,
+        answer: this.answerHtmlWithImage(qa),
         categories: qa.categoryPath || qa.categoryId,
         whenGeneratedByAi: now,
         draftedAt: now,
       };
       this.learnItems.add(Object.assign(new LearnItem(), data));
     }
+  }
+
+  /** Appends the (optional, on-demand-generated) illustration as a plain `<img>` tag onto the
+   * answer's HTML - LearnItem.answer is already an HtmlString rendered via the same rich-text
+   * pipeline used elsewhere, and that pipeline (RichTextEditComponent.convertInlineImagesToBlobs)
+   * already knows how to offload an inline `data:` image to proper blob storage the next time
+   * this item is opened for editing, so this doesn't need its own upload step here. */
+  private answerHtmlWithImage(qa: QuestionAnswer): string {
+    const answer = qa.answer ?? '';
+    return qa.imageDataUrl ? `${answer}<p><img src="${qa.imageDataUrl}" alt=""></p>` : answer;
   }
 
   rejectSelected(): void {
@@ -285,7 +295,7 @@ export class AiQaPage implements OnInit {
     for (const qa of this.gen.questions()) {
       const data: Partial<LearnItem> = {
         title: qa.question,
-        answer: qa.answer,
+        answer: this.answerHtmlWithImage(qa),
         whenGeneratedByAi: now,
         draftedAt: now,
       };

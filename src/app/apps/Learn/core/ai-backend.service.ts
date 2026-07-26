@@ -55,6 +55,19 @@ export interface QuestionAnswer {
   approvedAt?: number;
   lastModifiedAt?: number;
   contentModifiedAt?: number;
+  /** A `data:` URI for an AI-generated illustration, populated on-demand (per-card "Generate
+   * image" button, never generated automatically in bulk) rather than returned alongside the
+   * question/answer themselves - see AiQaGeneratorService.generateQuestionImage(). */
+  imageDataUrl?: string;
+}
+
+export interface QuestionImageRequest {
+  question: string;
+  answer?: string;
+}
+
+export interface QuestionImageResponse {
+  imageDataUrl: string;
 }
 
 export interface QuestionAnswerRequest {
@@ -99,6 +112,10 @@ export class AiBackendService {
 
   generateQuestionAnswers(request: QuestionAnswerRequest): Observable<QuestionAnswerResponse> {
     return this.http.post<QuestionAnswerResponse>(this.apiUrl('/category-tree/questions'), request);
+  }
+
+  generateQuestionImage(request: QuestionImageRequest): Observable<QuestionImageResponse> {
+    return this.http.post<QuestionImageResponse>(this.apiUrl('/category-tree/questions/image'), request);
   }
 
   generateAnswer(question: string, context: string = ''): Observable<AIResponse> {

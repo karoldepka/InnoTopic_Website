@@ -26,6 +26,7 @@ import {
 } from './ai-qa-tree.utils';
 import {QaDuplicateDetectorService} from './qa-duplicate-detector.service';
 import {showDesktopNotification} from '../../../libs/AppFedShared/utils/desktop-notification';
+import {errorAlert} from '../../../libs/AppFedShared/utils/log';
 
 export type QaIntegrationMode = 'vercel-ai-sdk' | 'copilotkit';
 
@@ -104,6 +105,9 @@ export class AiQaGeneratorService {
   readonly categoryLoading = signal(false);
   readonly questionLoading = signal(false);
   readonly subcategoryLoading = signal(false);
+  /** Indices into `questions()` currently fetching an illustration - a Set rather than a single
+   * flag since generating an image for one card shouldn't block doing the same for another. */
+  readonly questionImageLoadingIndices = signal<ReadonlySet<number>>(new Set());
 
   readonly categoryCount = computed(() => countCategoryNodes(this.tree()));
 
@@ -369,6 +373,36 @@ export class AiQaGeneratorService {
       console.error('[subcategories]', error);
     } finally {
       this.subcategoryLoading.set(false);
+    }
+  }
+
+  /** Generates (or regenerates) a single flashcard's illustration - always an explicit, one-at-a-
+   * time user action (never triggered automatically alongside bulk category/Q&A generation),
+   * since image generation is far more expensive per-item than the text generation above. */
+  async generateQuestionImage(index: number): Promise<void> {
+    const item = this.questions()[index];
+    if (!item || this.questionImageLoadingIndices().has(index)) return;
+
+    this.questionImageLoadingIndices.update(indices => new Set(indices).add(index));
+    try {
+      const response = await firstValueFrom(this.aiBackend.generateQuestionImage({
+        question: item.question,
+        answer: item.answer,
+      }));
+      const current = this.questions();
+      if (current[index] === item) {
+        const updated = [...current];
+        updated[index] = { ...item, imageDataUrl: response.imageDataUrl };
+        this.questions.set(updated);
+      }
+    } catch (error) {
+      errorAlert('Could not generate an image for this flashcard', this.formatError(error));
+    } finally {
+      this.questionImageLoadingIndices.update(indices => {
+        const next = new Set(indices);
+        next.delete(index);
+        return next;
+      });
     }
   }
 

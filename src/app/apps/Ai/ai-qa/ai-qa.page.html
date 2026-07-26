@@ -268,6 +268,24 @@
               @if (answerVisible(item, i)) {
                 <p class="q-answer">{{ item.answer || '…' }}</p>
               }
+              <div class="q-image">
+                @if (item.imageDataUrl) {
+                  <img [src]="item.imageDataUrl" [alt]="item.question" class="q-image__img" />
+                }
+                <ion-button
+                  fill="clear"
+                  size="small"
+                  [disabled]="gen.questionImageLoadingIndices().has(i)"
+                  (click)="gen.generateQuestionImage(i)"
+                >
+                  @if (gen.questionImageLoadingIndices().has(i)) {
+                    <ion-spinner name="dots" slot="start"></ion-spinner>
+                  } @else {
+                    <ion-icon name="image-outline" slot="start"></ion-icon>
+                  }
+                  {{ item.imageDataUrl ? 'Regenerate image' : 'Generate image' }}
+                </ion-button>
+              </div>
             </article>
           }
         } @else {

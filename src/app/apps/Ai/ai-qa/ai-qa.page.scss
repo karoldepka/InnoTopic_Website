@@ -335,6 +335,20 @@
   line-height: 1.42;
 }
 
+.q-image {
+  margin-top: 6px;
+
+  ion-button { margin: 0; --padding-start: 4px; --padding-end: 8px; font-size: 0.82rem; }
+}
+
+.q-image__img {
+  display: block;
+  width: 100%;
+  max-width: 220px;
+  border-radius: 6px;
+  margin-bottom: 4px;
+}
+
 // ── Q&A approve/reject bar ────────────────────────────────────────────────────
 
 .q-actions {

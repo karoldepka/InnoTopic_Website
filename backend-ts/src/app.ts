@@ -3,6 +3,7 @@ import { cors } from 'hono/cors';
 import { logger } from 'hono/logger';
 import { categoriesRouter } from './routes/categories.js';
 import { qaRouter } from './routes/qa.js';
+import { qaImageRouter } from './routes/qa-image.js';
 import { quizRouter } from './routes/quiz.js';
 import { copilotRouter } from './routes/copilotkit.js';
 import { odmRouter } from './routes/odm.js';
@@ -20,6 +21,7 @@ app.use('*', logger());
 
 app.route('/', categoriesRouter);
 app.route('/', qaRouter);
+app.route('/', qaImageRouter);
 app.route('/', quizRouter);
 app.route('/', copilotRouter);
 app.route('/', odmRouter);
