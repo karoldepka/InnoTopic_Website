@@ -39,13 +39,17 @@ export const themesMapById: { [key: string]: Theme } = setIdsFromKeys({
     background: '#202020',
     // background: '#6a2c2c',
     experimental: true,
-    // primary: '#000000',
-    primary: '#101010',
-    secondary: '#674400',
+    // GH: was #101010/#674400 - both too close in luminance to the background to read as
+    // buttons/icons against it (contrast ratio ~1.4-1.5, WCAG UI-component minimum is 3:1).
+    primary: '#a0a0a0',
+    secondary: '#ac7100',
   }),
   'Porzeczki Agrest (Gooseberry & Currant)': theme({
     comment: 'Jellies',
-    background: '#6a2c2czz',
+    // GH: was '#6a2c2czz' - a typo (trailing "zz", not valid hex) that made shadeColor()'s
+    // parsing produce a much lighter effective background than intended, in turn making primary
+    // fail the 3:1 contrast check against it.
+    background: '#180808',
     primary: '#c72323',
     secondary: '#b68001',
   }),
@@ -60,7 +64,7 @@ export const themesMapById: { [key: string]: Theme } = setIdsFromKeys({
     comment: 'Greens and browns',
     background: '#543c1c',
     primary: '#000000', /* The black icons look kinda like a bug? Prolly too extreme contrast between primary and secondary color (some icons darker and some lighter than bg) */
-    secondary: '#00a001',
+    secondary: '#00d501', // GH: was #00a001 - contrast ratio ~1.8 against this background, below the 3:1 UI minimum
     experimental: true,
     excludeFromRandom: true,
   }),
@@ -83,20 +87,20 @@ export const themesMapById: { [key: string]: Theme } = setIdsFromKeys({
   'Forest and river': theme({
     comment: 'Greens and browns and blue',
     background: '#2a1e0e',
-    primary: '#6c6900',
+    primary: '#878300', // GH: was #6c6900 - contrast ratio ~2.3 against this background, below the 3:1 UI minimum
     secondary: '#008dfd',
   }),
   'Forest, strawberries, lemons': theme({
     // comment: 'Greens and browns and blue',
     background: '#2a1e0e',
     primary: '#ff161e',
-    secondary: '#6c6900',
+    secondary: '#878300', // GH: was #6c6900 - contrast ratio ~2.3 against this background, below the 3:1 UI minimum
   }),
   'Forest, strawberries, blueberries': theme({
     // comment: 'Greens and browns and blue',
     background: '#2a1e0e',
     primary: '#ff161e',
-    secondary: '#0075c4',
+    secondary: '#0082da', // GH: was #0075c4 - contrast ratio ~2.7 against this background, below the 3:1 UI minimum
   }),
   // 'Yellow Blue': theme({
   //   comment: 'Blue Yellow',
@@ -107,21 +111,23 @@ export const themesMapById: { [key: string]: Theme } = setIdsFromKeys({
   'Dark Blue Bg, Agrest': theme({
     comment: 'Jellies',
     background: '#000080',
-    primary: '#326a2c',
+    primary: '#47973f', // GH: was #326a2c - contrast ratio ~1.8 against this background, below the 3:1 UI minimum
     secondary: '#b68001',
   }),
   'Dark Green Bg, Agrest': theme({
     comment: 'Jellies',
     background: '#244d20',
-    primary: '#326a2c',
-    secondary: '#b680ff',
+    primary: '#0f1f0d', // GH: was #326a2c - contrast ratio ~1.1 against this background, below the 3:1 UI minimum
+    secondary: '#f3abff', // GH: was #b680ff - contrast ratio ~2.0 against this background, below the 3:1 UI minimum
   }),
   'Dark purple and yellow': theme({
     comment: 'Jellies',
     experimental: true,
     // background: 'darkblue',
-    primary: 'yellow',
-    secondary: 'orange',
+    // GH: CSS named colors ('yellow'/'orange') broke shadeColor()/getRgbColorFromHex() elsewhere
+    // in ThemeCalculator (they only parse #rrggbb hex strings) - hex equivalents instead.
+    primary: '#ffff00',
+    secondary: '#ffa500',
   }),
   'Gray Green': theme({
     comment: 'Jellies',
@@ -141,18 +147,18 @@ export const themesMapById: { [key: string]: Theme } = setIdsFromKeys({
 
   'Dark Gray and yellow': theme({
     comment: '',
-    primary: '#2f2f2f',
+    primary: '#686868', // GH: was #2f2f2f - contrast ratio ~1.2 against the default background, below the 3:1 UI minimum
     secondary: '#65b600',
   }),
   'Dark Gray and blue': theme({
     comment: '',
-    primary: '#2f2f2f',
-    secondary: '#006b8f',
+    primary: '#686868', // GH: was #2f2f2f - contrast ratio ~1.2 against the default background, below the 3:1 UI minimum
+    secondary: '#007197', // GH: was #006b8f - contrast ratio ~2.96 against the default background, below the 3:1 UI minimum
   }),
   'Dark Gray and purplish': theme({
     comment: 'Beetroot',
-    primary: '#2f2f2f',
-    secondary: '#940059',
+    primary: '#686868', // GH: was #2f2f2f - contrast ratio ~1.3 against the default background, below the 3:1 UI minimum
+    secondary: '#c50077', // GH: was #940059 - contrast ratio ~2.0 against the default background, below the 3:1 UI minimum
   }),
   // https://www.w3schools.com/colors/color_tryit.asp?hex=BC8F8F
   // 'Purple-Blue': theme({
@@ -216,8 +222,10 @@ export const themesMapById: { [key: string]: Theme } = setIdsFromKeys({
   }),
   'Autumn Maple': theme({
     background: '#3b2412',
-    primary: '#d2601a',
-    secondary: '#8b0000',
+    primary: '#dd651b', // was #d2601a - contrast ratio ~2.76 against this background, below the 3:1 UI minimum
+    // was #8b0000: dark red converges toward black same as this background does, so no amount of
+    // further shading (either direction) clears 3:1 - gold reads as autumnal too and contrasts well.
+    secondary: '#e8b923',
   }),
   'Mint Chocolate': theme({
     background: '#241a14',

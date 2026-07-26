@@ -44,3 +44,15 @@ export function luminance(rgb: RGB) {
   });
   return r * 0.2126 + g * 0.7152 + b * 0.0722;
 };
+
+/** WCAG 2.x contrast ratio (1 = identical, 21 = black-on-white) between two colors, order-
+ * independent. Used to validate a theme's primary/secondary actually stand out against its own
+ * background - a color pair can each individually have "good" contrast against black/white text
+ * (per luminance() above) while still being too close to *each other* to be legible together. */
+export function contrastRatio(hexA: string, hexB: string): number {
+  const lumA = luminance(getRgbColorFromHex(hexA));
+  const lumB = luminance(getRgbColorFromHex(hexB));
+  const lighter = Math.max(lumA, lumB);
+  const darker = Math.min(lumA, lumB);
+  return (lighter + 0.05) / (darker + 0.05);
+}
