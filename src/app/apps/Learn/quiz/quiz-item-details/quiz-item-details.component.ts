@@ -9,7 +9,6 @@ import {QuizService} from '../../core/quiz/quiz.service'
 import {Subscription} from 'rxjs'
 import {nullish} from '../../../../libs/AppFedShared/utils/type-utils'
 import { NgIf, NgFor, AsyncPipe } from '@angular/common';
-import { ImportanceBannerComponent } from '../../shared/importance-banner/importance-banner.component';
 import { BreadcrumbsComponent } from '../../../../libs/AppFedShared/breadcrumbs/breadcrumbs.component';
 import { ItemSideComponent } from '../../shared/item-side/item-side.component';
 import { OdmTreeComponent } from '../../../../libs/AppFedShared/tree/tree/odm-tree.component';
@@ -24,7 +23,6 @@ import {importanceDescriptors} from '../../models/fields/importance.model'
     styleUrls: ['./quiz-item-details.component.sass'],
     imports: [
         NgIf,
-        ImportanceBannerComponent,
         BreadcrumbsComponent,
         ItemSideComponent,
         NgFor,
