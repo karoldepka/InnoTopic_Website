@@ -11,6 +11,7 @@ import {nullish} from '../../../libs/AppFedShared/utils/type-utils'
 import {OryOdmItemsService} from './ory-odm-items.service'
 import {OryOdmItem, OryOdmItemId} from './OryOdmItem'
 import type {ItemId} from '../../../libs/AppFedShared/odm/OdmCollectionBackend'
+import {odmTimestampToMillis} from '../../../libs/AppFedShared/odm/utils'
 
 /** ODM/Supabase-backed `DbTreeService` - see the OrYoL tree migration plan. GH #89 unify-the-
  * tree-worlds: a parent-child relationship (`NodeInclusion` in old Firestore-era terms) is now
@@ -46,6 +47,13 @@ export class SupabaseTreeService extends DbTreeService {
    * (which would leave the stale copy under the old parent, since nothing else ever removes it -
    * see the "onRemoved... ignoring" note in OdmService2.createBackendListener()). */
   private deliveredParentIdsByChildId = new Map<string, Set<string>>()
+  /** `whenLastModified` (as millis) at the time each child was last delivered - lets a pass skip
+   * re-delivering a node whose data genuinely hasn't changed since then (see its use in
+   * flushDeliverable() below). Every real mutation path (patchNow/patchThrottled/saveNowToDb, via
+   * setLastModifiedIfNecessary()) bumps whenLastModified, including inclusion-only changes
+   * (setParentInclusion() is always immediately followed by one of those) - so this is a reliable
+   * "did anything actually change" signal, not just a content-only one. */
+  private lastDeliveredWhenLastModifiedMsByChildId = new Map<string, number | undefined>()
   private listener?: DbTreeListener
   private loadStarted = false
 
@@ -80,6 +88,26 @@ export class SupabaseTreeService extends DbTreeService {
     this.oryItemsService.odmCollectionBackend.loadTreeDescendantsOf(itemId as OryOdmItemId, this.oryItemsService.createBackendListener())
   }
 
+  /** True when `childItemId` needs no redelivery this pass: same parent set as last delivered
+   * (so not even a same-parent reorder - orderNum changes go through patchNow() too, see
+   * lastDeliveredWhenLastModifiedMsByChildId's doc comment) and whenLastModified hasn't moved
+   * since. Perf-only guard - every branch here fails open to "deliver" (parent-set check requires
+   * a *prior* delivery to compare against; missing/tied whenLastModified never counts as
+   * unchanged), so a bug here costs a redundant redelivery, never a missed one. Split out of
+   * flushDeliverable() so this non-obvious "why is it safe to skip" reasoning has its own home,
+   * separate from the delivery loop's own logic. */
+  private isUnchangedSinceLastDelivery(childItemId: string, currentParentIds: string[], cleanSingleParentMove: boolean, whenLastModifiedMs: number | undefined): boolean {
+    if (cleanSingleParentMove) {
+      return false // always a genuine relocation - must go through onNodeInclusionModified
+    }
+    const previousParentIds = this.deliveredParentIdsByChildId.get(childItemId)
+    const parentSetUnchanged = !!previousParentIds && previousParentIds.size === currentParentIds.length
+      && currentParentIds.every(pid => previousParentIds.has(pid))
+    return parentSetUnchanged
+      && whenLastModifiedMs !== undefined
+      && whenLastModifiedMs === this.lastDeliveredWhenLastModifiedMsByChildId.get(childItemId)
+  }
+
   private flushDeliverable(): void {
     if (!this.listener) {
       return
@@ -102,22 +130,31 @@ export class SupabaseTreeService extends DbTreeService {
         const previousParentIds = this.deliveredParentIdsByChildId.get(childItemId)
         const useCompositeIds = currentParentIds.length > 1
         const cleanSingleParentMove = !useCompositeIds && previousParentIds?.size === 1 && !previousParentIds.has(currentParentIds[0])
+        const whenLastModifiedMs = odmTimestampToMillis((itemData as any).whenLastModified)
 
-        for (const parentId of currentParentIds) {
-          const orderNum = inclusions[parentId].orderNum
-          const inclusionId = useCompositeIds ? childItemId + SupabaseTreeService.COMPOSITE_ID_SEP + parentId : childItemId
-          const nodeInclusion = new NodeInclusion(inclusionId, parentId, orderNum)
-          if (cleanSingleParentMove) {
-            // Re-parented (a move) - TreeModel needs the dedicated inclusion-moved path, not
-            // onNodeAddedOrModified, to actually relocate the existing node.
-            this.listener.onNodeInclusionModified(inclusionId, nodeInclusion, parentId)
-          } else {
-            // First delivery, or a routine content/order refresh of an already-delivered node -
-            // TreeModel.onNodeAddedOrModified handles both (see its "existingNodes" branch), same
-            // as Firestore's onSnapshot repeatedly redelivering current state.
-            this.listener.onNodeAddedOrModified(
-              new NodeAddEvent([], parentId, itemData, childItemId, 0, nodeInclusion))
+        // GH: flushDeliverable() re-runs on *every* patch anywhere in the tree (it's the only
+        // hook that can react to newly-reachable parents), so without this guard a single edit to
+        // one item redelivers every other already-stable reachable node too - each redelivery
+        // doing real work downstream (TreeModel change detection, onItemAddedOrModified$
+        // subscribers) - causing tree-wide lag that scales with tree size on every keystroke.
+        if (!this.isUnchangedSinceLastDelivery(childItemId, currentParentIds, cleanSingleParentMove, whenLastModifiedMs)) {
+          for (const parentId of currentParentIds) {
+            const orderNum = inclusions[parentId].orderNum
+            const inclusionId = useCompositeIds ? childItemId + SupabaseTreeService.COMPOSITE_ID_SEP + parentId : childItemId
+            const nodeInclusion = new NodeInclusion(inclusionId, parentId, orderNum)
+            if (cleanSingleParentMove) {
+              // Re-parented (a move) - TreeModel needs the dedicated inclusion-moved path, not
+              // onNodeAddedOrModified, to actually relocate the existing node.
+              this.listener.onNodeInclusionModified(inclusionId, nodeInclusion, parentId)
+            } else {
+              // First delivery, or a routine content/order refresh of an already-delivered node -
+              // TreeModel.onNodeAddedOrModified handles both (see its "existingNodes" branch), same
+              // as Firestore's onSnapshot repeatedly redelivering current state.
+              this.listener.onNodeAddedOrModified(
+                new NodeAddEvent([], parentId, itemData, childItemId, 0, nodeInclusion))
+            }
           }
+          this.lastDeliveredWhenLastModifiedMsByChildId.set(childItemId, whenLastModifiedMs)
         }
         this.deliveredParentIdsByChildId.set(childItemId, new Set(currentParentIds))
         this.reachableItemIds.add(childItemId)

@@ -309,6 +309,44 @@ describe('SupabaseTreeService.loadNodesTree - delivery ordering', () => {
     const eventsAfterMove = listener.addedOrModified.slice(addedOrModifiedCountBeforeMove)
     expect(eventsAfterMove.every(e => !(e.itemId === 'movable1' && e.directParentItemId === 'parentA'))).toBe(true)
   })
+
+  it('does not redeliver an unrelated, unchanged item just because some other item in the tree changed (perf: avoids tree-wide redelivery on every single edit)', async () => {
+    const {treeService, itemsBackend, listener} = setup()
+    const root = treeService.HARDCODED_ROOT_NODE_ITEM_ID
+    const whenLastModified = new Date('2024-01-01T00:00:00.000Z')
+    seedItemWithInclusion(itemsBackend, 'stable1', {title: 'Stable', whenLastModified}, root, 1, [root])
+
+    treeService.loadNodesTree(listener)
+    await flushMicrotasks()
+    expect(listener.addedOrModified.filter(e => e.itemId === 'stable1').length).toBe(1)
+
+    // Some *other* item changes - loadNodesTree() re-runs the whole reachable set (it has to, to
+    // pick up any newly-satisfiable parent), but 'stable1' itself hasn't changed at all.
+    seedItemWithInclusion(itemsBackend, 'other1', {title: 'Other'}, root, 2, [root])
+    treeService.loadNodesTree(listener)
+    await flushMicrotasks()
+
+    expect(listener.addedOrModified.filter(e => e.itemId === 'stable1').length).toBe(1)
+    expect(listener.addedOrModified.some(e => e.itemId === 'other1')).toBe(true)
+  })
+
+  it('still redelivers an item whose whenLastModified genuinely advanced, even with the same parent', async () => {
+    const {treeService, itemsBackend, listener} = setup()
+    const root = treeService.HARDCODED_ROOT_NODE_ITEM_ID
+    seedItemWithInclusion(itemsBackend, 'edited1', {title: 'Before', whenLastModified: new Date('2024-01-01T00:00:00.000Z')}, root, 1, [root])
+
+    treeService.loadNodesTree(listener)
+    await flushMicrotasks()
+    expect(listener.addedOrModified.filter(e => e.itemId === 'edited1').length).toBe(1)
+
+    seedItemWithInclusion(itemsBackend, 'edited1', {title: 'After', whenLastModified: new Date('2024-01-02T00:00:00.000Z')}, root, 1, [root])
+    treeService.loadNodesTree(listener)
+    await flushMicrotasks()
+
+    const edited1Events = listener.addedOrModified.filter(e => e.itemId === 'edited1')
+    expect(edited1Events.length).toBe(2)
+    expect(edited1Events[1].itemData.title).toBe('After')
+  })
 })
 
 /** Minimal duck-typed stand-in for an OryBaseTreeNode/OryNonRootTreeNode - only the surface
