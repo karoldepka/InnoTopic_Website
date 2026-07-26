@@ -178,6 +178,67 @@ export const themesMapById: { [key: string]: Theme } = setIdsFromKeys({
     secondary: '#e1b74d',
   }),
   // TODO: brown and green like forest
+
+  // GH: 10 more themes, including at least one genuinely bright background (not just a dark bg
+  // with a bright primary/secondary accent like the ones above) - relies on ThemeCalculator now
+  // computing --ion-text-color from the background's own luminance, not always assuming white
+  // text works.
+  'Sunny Yellow': theme({
+    comment: 'Bright background',
+    background: '#f5e050',
+    primary: '#1a1a1a',
+    secondary: '#c1440e',
+    experimental: true,
+  }),
+  'Cherry Blossom': theme({
+    comment: 'Bright background',
+    background: '#f7c6d9',
+    primary: '#7a1f3d',
+    secondary: '#3f7d20',
+    experimental: true,
+  }),
+  'Arctic Ice': theme({
+    comment: 'Bright background',
+    background: '#dbeef5',
+    primary: '#0b3d5c',
+    secondary: '#00838f',
+    experimental: true,
+  }),
+  'Ocean Breeze': theme({
+    background: '#062f3e',
+    primary: '#12b5b0',
+    secondary: '#ff6f59',
+  }),
+  'Lavender Dusk': theme({
+    background: '#2c1b3d',
+    primary: '#b892ff',
+    secondary: '#ff6ec7',
+  }),
+  'Autumn Maple': theme({
+    background: '#3b2412',
+    primary: '#d2601a',
+    secondary: '#8b0000',
+  }),
+  'Mint Chocolate': theme({
+    background: '#241a14',
+    primary: '#3ddc97',
+    secondary: '#f0e6d2',
+  }),
+  'Midnight Rose': theme({
+    background: '#1a0d14',
+    primary: '#e0218a',
+    secondary: '#d4af37',
+  }),
+  'Volcanic': theme({
+    background: '#1c1c1c',
+    primary: '#ff3b1f',
+    secondary: '#7a7a7a',
+  }),
+  'Citrus Grove': theme({
+    background: '#2b3a1e',
+    primary: '#9acd32',
+    secondary: '#ff8c00',
+  }),
 })
 
 export const themesArray = getDictionaryValuesAsArray(themesMapById)

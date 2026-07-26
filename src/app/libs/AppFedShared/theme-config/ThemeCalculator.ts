@@ -36,6 +36,15 @@ export class ThemeCalculator {
     const root = document.getElementsByTagName("BODY")[0] ! as HTMLElement;
     root.style.setProperty(`--ion-background-color`, background);
 
+    // GH: a bright-background theme (e.g. a light yellow) needs dark body text, not the app's
+    // usual light-on-dark assumption (--ion-text-color was previously left at Ionic's own static
+    // dark-mode default, i.e. always white, regardless of what the theme's own background
+    // actually was) - same luminance-threshold contrast check setColorProps() already uses for
+    // primary/secondary button labels, just applied to the background instead.
+    const backgroundLuminance = luminance(getRgbColorFromHex(background))
+    root.style.setProperty(`--ion-text-color`,
+      backgroundLuminance < themeOptions.contrastLuminanceThreshold ? 'white' : 'black');
+
     const itemAndTextBg = shadeColor(background, themeOptions.brightnessPercent / 85)
     // console.log(`itemAndTextBg`, itemAndTextBg)
     root.style.setProperty(`--ion-item-background`, itemAndTextBg);
