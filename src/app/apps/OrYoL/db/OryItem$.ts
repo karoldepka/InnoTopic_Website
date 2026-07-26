@@ -2,16 +2,12 @@ import {
   DbItemClass,
   DbItemField,
 } from './DbItemClass'
-import {CachedSubject} from '../../../libs/AppFedShared/utils/cachedSubject2/CachedSubject2'
-import {EventEmitter, Injector} from '@angular/core'
-import {SyncStatusService} from '../../../libs/AppFedShared/odm/sync-status.service'
-import {throttleTime} from 'rxjs/operators'
-import {TreeTableNodeContent} from '../tree-model/TreeTableNodeContent'
+import {Injector} from '@angular/core'
 import {OryItemsService} from '../core/ory-items.service'
-import {DbTreeService} from '../tree-model/db-tree-service'
-import {HasItemData, HasPatchThrottled, ItemData} from '../tree-model/has-item-data'
+import {OryOdmItemsService} from '../db-supabase/ory-odm-items.service'
+import {OryOdmItem$} from '../db-supabase/OryOdmItem$'
+import {HasPatchThrottled, ItemData} from '../tree-model/has-item-data'
 import {stripHtml} from '../../../libs/AppFedShared/utils/html-utils'
-import {summarizePatch} from '../../../libs/AppFedShared/odm/OdmItem$2'
 import {trimToUndefined} from '../../../libs/AppFedShared/utils/utils'
 
 export type ItemId = string //& { type: 'ItemId' }
@@ -25,95 +21,58 @@ export type DomainItemCtor = new (
   item$: OryItem$,
 ) => DomainItem$
 
-/** NOTE: this is probably similar to OdmItem$ (or its "can-change-type-at-runtime" variant GenericItem$)
- * thus candidate for merging
+/** GH: thin compatibility wrapper around `OryOdmItemsService`'s real, shared `OryOdmItem$` -
+ * this class used to keep its own separate `itemData`/`data$` copy, populated only when
+ * `TreeModel.onNodeAddedOrModified()` happened to call `onDataArrivedFromRemote()` on THIS
+ * SPECIFIC instance. Any other `OryItem$` created for the same id (`TreeModel.obtainItemById()`
+ * creating a second one for a node rendered in two branches, `MindfulnessTrackingService` making
+ * its own third one for `_mindfulness_<uid>`) had its own independent, possibly-stale copy - and
+ * since every write (`patchThrottled`/`patchNow`) always went through `SupabaseTreeService.
+ * patchItemData()` -> `OryOdmItemsService.obtainItem$ById().patchNow()` regardless, and that
+ * write reconstructs a whole sub-object (e.g. `TimeTrackedEntry`'s `timeTrack`) from *this
+ * instance's own* locally-held values with a shallow merge server-side, whichever stale mirror
+ * wrote last would silently clobber the other's just-written state - a classic lost-update race,
+ * and the concrete cause of recurring "edit conflict" reports on `/tree/_mindfulness`.
  *
- * NOTE: Before/during migrating OrYoL (tree) to OdmItem$ - think of the following scenario.
- * We have a component which has to display something which has data calculated from children, e.g. total time tracked on item and subitems.
- * Would that component accept OdmItem$ or tree node? Coz need to have access to recursive functions on tree children.
- * Maybe the recursive calculations should already be available on OdmItem$ with children.
- *
- * Think how this could be impacted by incremental loading.
- * - Aggregate value could be stored on all parents
- * - component could display a ... / spinner indicating aggregate data from children is still loading.
- *
- * Similar questions if something might depend on _parents_.
- *
- * Should TreeTableContent be shared between multiple nodes (same item in different paths)?
- * - one way to handle this could be to only allow TreeTableContent to access children (which should be the same in all paths), not parents.
- * - - in that sense TreeTableContent could become also to mean children (vertically) as content (not just cells - horizontally)
- *
- * */
+ * Every `OryItem$` for a given id now delegates its actual data/patch/save to the SAME shared
+ * `OryOdmItem$` (`OryOdmItemsService.obtainItem$ById()` - the same cache `SupabaseTreeService`
+ * already writes through), so no two mirrors can ever diverge regardless of how many wrapper
+ * instances exist - `obtainDomainItem()` below caches on that shared object too, so e.g.
+ * `TimeTrackedEntry` is deduplicated the same way. The wrapper's public shape (itemData/data$/
+ * patchThrottled/onDataArrivedFromRemote/obtainDomainItem/...) is kept identical to before so
+ * every existing `.content.dbItem` call site (tree cells, voice-memo fields, time-tracking, ...)
+ * needs zero changes. */
 export class OryItem$<TData = any> implements HasPatchThrottled<TData> {
 
+  /** Still referenced externally by `TreeTableNodeContent.canApplyDataToViewGivenColumnLastLocalEdit()`. */
   public static readonly DELAY_MS_BETWEEN_LOCAL_EDIT_AND_APPLYING_FROM_DB = 7000
-
 
   itemsService = this.injector.get(OryItemsService)
 
-  /** FIXME this is only needed for patchItemData; should be moved */
-  treeService = this.injector.get(DbTreeService)
-
-  private mapCtorToDomainItem = new Map<DomainItemCtor, DomainItem$>()
-
-  private whenLastModifiedLocallyByUser?: Date
+  /** The single real, server-synced object for this id - see class doc comment above. */
+  private realItem$: OryOdmItem$ = this.injector.get(OryOdmItemsService).obtainItem$ById(this.id as any)
 
   constructor(
     public injector: Injector,
     public id: ItemId,
-    public itemData?: TData
   ) {
-    this.subscribeDebouncedOnChangePerColumns()
   }
 
-  data$ = new CachedSubject<TData>()
+  get itemData(): TData | undefined {
+    return this.realItem$.currentVal as any
+  }
 
+  get data$() {
+    return this.realItem$.data$
+  }
+
+  /** Never actually set anywhere in the codebase (matches the previous behavior - kept for
+   * interface compatibility rather than removed outright, in case a future column-visibility
+   * feature wires it up). */
   itemClass?: DbItemClass
 
   hasField(field: DbItemField) {
     return !!this.itemClass?.hasField?.(field)
-  }
-
-  // ======== from TreeTableNodeContent:
-
-  // private mapColumnToEventEmitterOnChange = new Map<OryColumn, EventEmitter<any>>()
-  protected eventEmitterOnChange = new EventEmitter<any>()
-
-  private pendingThrottledItemDataPatch = {}
-
-  // isApplyingFromDbNow = false   /** TODO: to NodeContentViewSyncer */
-  protected syncStatusService = this.injector.get(SyncStatusService)
-
-  private unsavedChangesPromiseResolveFunc: (() => void) | undefined
-
-  /** ignoring column */
-  private getEventEmitterOnChangePerColumn(/*column?: OryColumn*/) {
-    return this.eventEmitterOnChange // now all columns have same emitter
-    // this should be via OdmItem$ anyway
-
-    // let eventEmitter = this.mapColumnToEventEmitterOnChange.get(column)
-    // if ( ! eventEmitter ) {
-    //   eventEmitter = new EventEmitter()
-    //   this.mapColumnToEventEmitterOnChange.set(column, eventEmitter)
-    // }
-    // return eventEmitter
-  }
-
-  /* TODO move the throttling to Item$
-* Here tackling bug with losing part of title when editing-then-indent.
-* When indenting, it's new UI component.
-*
-* Maybe indenting could force committing the delayed (throttled) change.
-*
-* @deprecated
-*  */
-  /** Best-effort user-visible label for sync-status messages - falls back through the field
-   * names used across item types (tree node title, or a question/name on domain items) down to
-   * the raw id if none are set yet. */
-  private getDisplayTitle(): string {
-    const data = this.itemData as any
-    const title = data?.title ?? data?.name ?? data?.question
-    return stripHtml(title)?.trim() || this.id
   }
 
   /** GH #75: whether this item's title is blank - HTML-aware (a TinyMCE-empty `<p></p>` strips
@@ -124,90 +83,17 @@ export class OryItem$<TData = any> implements HasPatchThrottled<TData> {
     return trimToUndefined(stripHtml(title) ?? undefined) === undefined
   }
 
-  /** Same "what changed and where" shape as OdmItem$2.describePendingChange() (see the sync
-   * popover's "Unsaved change" fallback) - this used to pass no titleOfChange at all here, so a
-   * pending OrYoL edit showed only the generic "Unsaved change" placeholder with no indication of
-   * which item or field. */
-  private describePendingChange(patch: any): string {
-    const patchSummary = summarizePatch(patch)
-    return `Modified "${this.getDisplayTitle()}"` + (patchSummary ? ` with ${patchSummary}` : '')
-  }
-
-  private subscribeDebouncedOnChangePerColumns() {
-    // for ( const column of this.columns.allColumns ) {
-    const throttleTimeConfig = {
-      leading: false /* probably thanks to this, the first change, of a series, is immediate (observed experimentally) */,
-      /* think about false; usually single character; but what if someone pastes something, then it will be fast;
-      plus a single character can give good indication that someone started writing */
-      trailing: true /* ensures last value is not lost;
-          http://reactivex.io/rxjs/class/es6/Observable.js~Observable.html#instance-method-throttleTime */
-    }
-    const scheduler = undefined
-    this.getEventEmitterOnChangePerColumn().pipe(
-      // why is this like that; what if I want to patch more than 1 field/column at once?
-      // cumulative patch approach better?
-      // e.g. for time-tracking
-      throttleTime(
-        TreeTableNodeContent.DELAY_MS_THROTTLE_EDIT_PATCHES_TO_DB , scheduler, throttleTimeConfig
-        // keep in mind that this might have something to do with the update events coming with delay (e.g. reorders)
-      )
-    ).subscribe((changeEvent) => {
-      // debugLog('onInputChanged; isApplyingFromDbNow', this.treeModel.isApplyingFromDbNow)
-      if (!this.itemsService.isApplyingFromDbNow) {
-        // const itemData = this.buildItemDataFromUi()
-        const ret = this.patchItemDataNonThrottled(this.pendingThrottledItemDataPatch) // patching here
-        this.syncStatusService.handleSavingPromise(ret.onPatchSentToRemote, `Saving "${this.getDisplayTitle()}"`)
-        this.unsavedChangesPromiseResolveFunc!.call(undefined)
-        this.unsavedChangesPromiseResolveFunc = undefined
-        this.pendingThrottledItemDataPatch = {}
-      } // else: no need to react, since it is being applied from Db
-    })
-    // }
-  }
-
-  /**
-   * ============== THIS is the main thing to replace
-   * - has `any` item-data type
-   * - not throttled
-   * - will be replaced by OdmItem$::patchThrottled
-   *
-   * Note this is not throttled and bypasses incoming self-change protection */
-  patchItemDataNonThrottled(itemDataPatch: any /* TData */): { onPatchSentToRemote: Promise<void> } {
-    // TODO this should use odmitem$
-    let ret = this.treeService.patchItemData(this.id, itemDataPatch)
-    // TODO: fireOnChangeItemDataOfChildOnParents ?
-    return ret
-    // this.itemData$.next()
-  }
-
-
-
   patchThrottled(patch: any/*FIXME */) {
-    this.whenLastModifiedLocallyByUser = new Date()
-    Object.assign(this.itemData as any /* FIXME narrow item-data patch typing */, patch)
-
-    this.pendingThrottledItemDataPatch = {
-      ... this.pendingThrottledItemDataPatch,
-      ... patch,
-    }
-    // console.log(`patchThrottled`, patch, `this.unsavedChangesPromiseResolveFunc`, this.unsavedChangesPromiseResolveFunc)
-    if ( ! this.unsavedChangesPromiseResolveFunc ) {
-      const unsavedPromise = new Promise<void>((resolve) => {
-        this.unsavedChangesPromiseResolveFunc = resolve
-        // console.log('in promise executor func this.unsavedChangesPromiseResolveFunc = resolve', resolve)
-      })
-      // console.log('outside of promise this.unsavedChangesPromiseResolveFunc = resolve', this.unsavedChangesPromiseResolveFunc)
-      this.syncStatusService.handleUnsavedPromise(unsavedPromise, this.describePendingChange(patch)) // using the crude placeholder func to piggy-back on the promise-based approach
-    }
-    this.data$.next(this.itemData !) // FIXME this should be replaced with OdmItemData
-
-    this.getEventEmitterOnChangePerColumn().emit('something') // FIXME make this cumulative patch, not per-column
-    this.itemsService.onItemWithDataPatchedByUserLocally$.next([this, patch]) // NOTE this is throttled
-    this.itemsService.onItemAddedOrModified$.next(this) // NOTE this is throttled
+    this.realItem$.patchThrottled(patch)
+    // Preserves OryItem$'s existing role as an adapter onto OrYoL's own event bus - e.g.
+    // TimeTrackingService listens for isDone patches (auto-pause) and for local self-emits here,
+    // independent of the shared OryOdmItem$'s own (unrelated) locallyVisibleChanges$ stream.
+    this.itemsService.onItemWithDataPatchedByUserLocally$.next([this, patch])
+    this.itemsService.onItemAddedOrModified$.next(this)
   }
 
   getItemData(): ItemData | undefined {
-    return this.data$.lastVal
+    return this.realItem$.getItemData()
   }
 
   getId() {
@@ -215,22 +101,15 @@ export class OryItem$<TData = any> implements HasPatchThrottled<TData> {
   }
 
   onDataArrivedFromRemote(itemData: TData | undefined) {
-    this.itemData = itemData
-    const lastLocMod = this.whenLastModifiedLocallyByUser?.getTime() ?? 0
-    const lastLocModMsAgo = Date.now() - lastLocMod // might wanna use monotonic clock
-    // console.log(`lastLocModMsAgo`, lastLocModMsAgo)
-    if ( itemData && lastLocModMsAgo > TreeTableNodeContent.DELAY_MS_THROTTLE_EDIT_PATCHES_TO_DB ) {
-      this.data$.nextWithCache(itemData)
+    if (itemData !== undefined) {
+      this.realItem$.applyDataFromDbAndEmit(itemData as any)
     }
   }
 
   /** type MyClassInstance = InstanceType<typeof MyClass>; */
   obtainDomainItem<TCtor extends DomainItemCtor>(ctor: TCtor): InstanceType<TCtor> {
-    let ret = this.mapCtorToDomainItem.get(ctor)
-    if ( !ret ) {
-      ret = new ctor(this.injector, this)
-      this.mapCtorToDomainItem.set(ctor, ret)
-    }
-    return ret
+    // Cached on the shared realItem$, not on this wrapper - so e.g. TimeTrackedEntry is the same
+    // instance regardless of which OryItem$ wrapper (or how many) requested it for this id.
+    return this.realItem$.obtainDomainItem(ctor as any)
   }
 }

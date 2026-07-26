@@ -53,7 +53,7 @@ export class MindfulnessTrackingService {
       // GH #27 follow-up: show the anchor item in the OrYoL tree itself, not just as a hidden
       // time-tracking target.
       await this.dbTreeService.upsertRootInclusionIfMissing(itemId)
-      this.mindfulnessItem$ = new OryItem$(this.injector, itemId, {})
+      this.mindfulnessItem$ = new OryItem$(this.injector, itemId)
       this.entry = this.timeTrackingService.obtainEntryForItem(this.mindfulnessItem$)
     }
     return this.entry
