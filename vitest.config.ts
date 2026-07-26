@@ -19,6 +19,7 @@ export default defineConfig({
       'src/app/apps/Learn/search-or-add-learnable-item/mic/mic.component.spec.ts',
       'src/app/apps/Learn/core/quiz/quiz-hint-reveal.spec.ts',
       'src/app/apps/Learn/quiz/quiz-item-details/quiz-answer-revealer/quiz-answer-revealer.component.spec.ts',
+      'src/app/apps/Learn/what-next/what-next-destination-ranking.spec.ts',
       // Was never actually wired in before (orphaned, silently not running, same class of gap as
       // OdmItem$2.spec.ts above) - found while adding the onlyAiGenerated test (GH #100).
       'src/app/apps/Learn/core/quiz/quiz.service.spec.ts',

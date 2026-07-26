@@ -19,22 +19,32 @@
     <span *ngIf="g.feat.showTodosNotes">This page is also useful for a version with just Learn - e.g. processing, fun cravings (boredom/focus level), etc</span>
 
     <span *ngIf="g.feat.showTodosNotes">First stuff that has to be done quickly every day anyway (independent of time available or boredom) - will become a habit</span>
-    <ion-button *ngIf="g.feat.showExperimental" [routerLink]="'/learn/item/LearnItem__2022-05-26__17.33.46.061Z_'">Affirmations</ion-button>
-    <ion-button (click)="cravingFun()">Craving&nbsp;<span style="text-emphasis: 'x' orange"><!--Orange as warning (not negative)-->fun</span>&nbsp;Panic Button <span>&nbsp;</span> <ion-note> (Quiz/Tasks)</ion-note></ion-button>
+
     <div class="primary-learn-actions">
       <app-quiz-button />
-      <ion-button routerLink="/ai/qa" size="big">
-        Generate questions, answers
+    </div>
+
+    <ion-searchbar
+      class="destination-search"
+      placeholder="Search what to do next…"
+      [debounce]="150"
+      showClearButton="always"
+      (ionInput)="onSearchChange($any($event).detail.value ?? '')"
+      (ionClear)="onSearchChange('')"
+    ></ion-searchbar>
+
+    <div class="destination-list">
+      <ion-button
+        *ngFor="let destination of filteredDestinations"
+        [size]="destination.size === 'big' ? 'default' : 'small'"
+        (click)="go(destination)"
+      >
+        {{ destination.label }}<span>&nbsp;</span>
+        <ion-note *ngIf="destination.note">&nbsp;{{ destination.note }}</ion-note>
       </ion-button>
-      <ion-button routerLink="/learn/ai-chat">
-        AI Chat
-      </ion-button>
-      <ion-button routerLink="/copilotkit">
-        CopilotKit
-      </ion-button>
-      <ion-button routerLink="/learn/bow-quiz">
-        Bow Quiz
-      </ion-button>
+      <p *ngIf="searchTerm.trim() && ! filteredDestinations.length" class="no-results">
+        <ion-note>No matches for "{{ searchTerm }}"</ion-note>
+      </p>
     </div>
 
     <ng-container *ngIf="g.feat.mockups">
@@ -47,102 +57,35 @@
 
       <ion-note><p>This will be automatically sorted depending on scheduling</p></ion-note>
 
-      <ion-button *ngIf="g.feat.mockups" [disabled]="true">Automatic mode</ion-button>
+      <ion-button [disabled]="true">Automatic mode</ion-button>
 
       <!-- TODO: hierarchical, e.g.
         learning: quiz, processing
         planning: day, week, long-term
       -->
 
-    </ng-container>
-
-    <ion-button [routerLink]="'/tree'">
-      Why Bother?&nbsp;
-      <ion-note>Why am I doing all this?</ion-note>
-      <!-- minimize regret -->
-      <!-- tired / am I doing this? -->
-      <!-- would display personal mission statement; with templates like personal, safety, relationships; maslow -->
-    </ion-button>
-
-    <ion-button *ngIf="feat.tutorial.unpolished" [routerLink]="'/lifedvisor'">Lifedvisor</ion-button>
-    <ion-button [routerLink]="'/ask'">Lifedvisor</ion-button>
-
-
-    <div
-      style="border: 4px solid green; border-radius: 7px; display: inline-block"
-    >
-      <ion-button [routerLink]="'/tree'">
-        Plan
+      <ion-button [disabled]="true">Physical Exercises (WITH TIMER)
+        <!-- Timer can run in background or big timer on fullscreen -->
+        <!-- affirmations / motivational stuff can be displayed -->
       </ion-button>
-    </div>
 
-    <ion-button *ngIf="feat.tutorial.unpolished" [routerLink]="'/tutorial'">LifeSuite App Tutorial</ion-button>
+      <ion-button [disabled]="true">N-Minute rule</ion-button>
 
-    <ion-button *ngIf="g.feat.mockups" [disabled]="true">Physical Exercises (WITH TIMER)
-      <!-- Timer can run in background or big timer on fullscreen -->
-      <!-- affirmations / motivational stuff can be displayed -->
-    </ion-button>
+      <ion-button [disabled]="true">Process Inboxes/TODOs</ion-button>
 
-    <ion-button *ngIf="g.feat.mockups" [disabled]="true">N-Minute rule</ion-button>
+      <ion-button [disabled]="true">Affirmations Quiz</ion-button>
 
-    <ion-button *ngIf="g.feat.mockups" [disabled]="true">Process Inboxes/TODOs</ion-button>
+      <ion-button [disabled]="true">Learn</ion-button>
 
-    <ion-button [routerLink]="'/mindfulness'">Mindfulness</ion-button>
-    <ion-button *ngIf="g.feat.showExperimental" [routerLink]="'/contemplate-life'">
-      Contemplate&nbsp; <!-- Big Pictures --> <ion-note>Life Overviews<!--(here life overview diagrams)--></ion-note>
-      life in some pictures: https://www.linkedin.com/posts/hubertmisztela_livr-ugcPost-7025890241727090688-V2KH/?utm_source=share&utm_medium=member_desktop
-    </ion-button>
-    <!-- Other keywords: internalize -->
-    <ion-button [routerLink]="'/sleep'">Sleep</ion-button>
+      <ion-button [disabled]="true">Execute routine</ion-button>
 
+      <ion-button [disabled]="true">Work on routines</ion-button>
 
-    <ion-button *ngIf="g.feat.mockups" [disabled]="true">Affirmations Quiz</ion-button>
+      <!-- could be button - work on health (mental / physical), do something fun, increase ENERGY -->
 
-    <span *ngIf="g.feat.showUgly">Learning:</span>
-
-<!--    <app-process-button></app-process-button>-->
-
-    <ion-button *ngIf="g.feat.showExperimental" [routerLink]="'/item-processing'">Process Learn Items (& tasks)</ion-button>
-    <ion-button *ngIf="g.feat.showExperimental" [routerLink]="'/categories'">Categories</ion-button>
-    <ion-button *ngIf="g.feat.showExperimental" [routerLink]="'/categories-stats'">
-      <!--      <ion-icon name="ba" slot="start" />-->
-      Categories Stats
-    </ion-button>
-
-    <ion-button *ngIf="g.feat.mockups" [disabled]="true">Learn</ion-button>
-
-
-    <ion-button [routerLink]="'/learn'">
-      Do tasks&nbsp;
-<!--      <ion-note>TODO: link to items list with tasks preset; maybe some tasks stats times per importance, milestones, etc</ion-note>-->
-    </ion-button>
-
-    <ion-button [routerLink]="'/journal/write'">Write Journal</ion-button>
-
-    <ion-button [routerLink]="'/journal'">RETROSPECTIVE</ion-button>
-    <ion-button [routerLink]="'/success-chance'">
-      <ion-icon name="happy-outline" slot="start" />
-      Success Probability Calc
-    </ion-button>
-    <ion-button [routerLink]="'/exponential-improvement'">
-      <ion-icon name="trending-up-outline" slot="start" />
-      Exponential Improvement<span *ngIf="feat.showUgly">&nbsp;Calc</span>
-    </ion-button>
-    <ion-button *ngIf="g.feat.showExperimental" [routerLink]="['/learn/stats']">
-      <ion-icon name="bar-chart-outline" slot="start" />
-      Check Your progress
-    </ion-button>
-
-
-
-    <ion-button *ngIf="g.feat.mockups" [disabled]="true">Execute routine</ion-button>
-
-    <ion-button *ngIf="g.feat.mockups" [disabled]="true">Work on routines</ion-button>
-
-    <!-- could be button - work on health (mental / physical), do something fun, increase ENERGY -->
-
-    <!-- TODO: (good) stimulants (coffee, etc.) right amount -->
-    <!-- TODO: energy also right amount -->
+      <!-- TODO: (good) stimulants (coffee, etc.) right amount -->
+      <!-- TODO: energy also right amount -->
+    </ng-container>
 
   </div>
 

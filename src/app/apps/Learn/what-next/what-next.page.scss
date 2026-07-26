@@ -18,3 +18,19 @@ app-quiz-button {
 app-quiz-button ion-button {
   margin: 0;
 }
+
+.destination-search {
+  padding: 0;
+}
+
+.destination-list {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.no-results {
+  width: 100%;
+}
