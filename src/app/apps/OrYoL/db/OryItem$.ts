@@ -9,6 +9,7 @@ import {OryOdmItem$} from '../db-supabase/OryOdmItem$'
 import {HasPatchThrottled, ItemData} from '../tree-model/has-item-data'
 import {stripHtml} from '../../../libs/AppFedShared/utils/html-utils'
 import {trimToUndefined} from '../../../libs/AppFedShared/utils/utils'
+import {CachedSubject} from '../../../libs/AppFedShared/utils/cachedSubject2/CachedSubject2'
 
 export type ItemId = string //& { type: 'ItemId' }
 
@@ -62,8 +63,12 @@ export class OryItem$<TData = any> implements HasPatchThrottled<TData> {
     return this.realItem$.currentVal as any
   }
 
-  get data$() {
-    return this.realItem$.data$
+  /** Typed against this wrapper's own `TData` (matching the old plain-field behavior), not the
+   * shared `OryOdmItem$`'s concrete `OryOdmItem | nullish` - callers overwhelmingly use `OryItem$`
+   * with no explicit type param (`TData = any`), which needs `.data$.lastVal.foo` to keep working
+   * without a null-check the previous implementation never required either. */
+  get data$(): CachedSubject<TData> {
+    return this.realItem$.data$ as unknown as CachedSubject<TData>
   }
 
   /** Never actually set anywhere in the codebase (matches the previous behavior - kept for
