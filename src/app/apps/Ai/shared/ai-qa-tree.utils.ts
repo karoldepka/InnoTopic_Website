@@ -12,6 +12,17 @@ function safeChildren(node: CategoryNode): CategoryNode[] {
   return Array.isArray(node.children) ? node.children : [];
 }
 
+/** GH #129: detects the specific corruption signature seen when a streamed AI response got
+ * silently truncated mid-token by the underlying partial-JSON repair (Vercel AI SDK's fixJson) -
+ * a required text field ending in a lone, unmatched formatting character (a stray backtick from
+ * an inline-code span, or a dangling "&") rather than a complete word/sentence. A field genuinely
+ * ending this way in real generated content is vanishingly unlikely, so this is a safe, targeted
+ * check - not a general profanity/quality filter. */
+export function isTruncatedText(text: string | undefined | null): boolean {
+  if (!text) return false;
+  return /[`&]\s*$/.test(text.trim());
+}
+
 export function flattenCategoryTree(
   nodes: CategoryNode[],
   depth = 0,

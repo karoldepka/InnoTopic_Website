@@ -20,6 +20,7 @@ import {
   countCategoryNodes,
   countLeafNodes,
   flattenCategoryTree,
+  isTruncatedText,
   setLeafQuestionCounts,
   sumQuestionCounts,
   updateCategoryNode,
@@ -433,13 +434,20 @@ export class AiQaGeneratorService {
   private async generateCategoriesWithVercel(request: CategoryTreeRequest): Promise<CategoryTreeResponse> {
     await this.categoryObject.submit(request);
     if (this.categoryObject.error) throw this.categoryObject.error;
-    return this.categoryObject.object as CategoryTreeResponse;
+    const response = this.categoryObject.object as CategoryTreeResponse;
+    const truncatedTitle = flattenCategoryTree(response?.tree ?? []).find(row => isTruncatedText(row.node.title));
+    if (truncatedTitle) throw new Error(`Generation produced cut-off text ("${truncatedTitle.node.title}") - please try again`);
+    return response;
   }
 
   private async generateQuestionsWithVercel(request: QuestionAnswerRequest): Promise<QuestionAnswerResponse> {
     await this.questionObject.submit(request);
     if (this.questionObject.error) throw this.questionObject.error;
-    return this.questionObject.object as QuestionAnswerResponse;
+    const response = this.questionObject.object as QuestionAnswerResponse;
+    const truncated = (response?.items ?? []).find(item =>
+      isTruncatedText(item.question) || isTruncatedText(item.answer) || isTruncatedText(item.categoryPath));
+    if (truncated) throw new Error(`Generation produced cut-off text ("${truncated.question}") - please try again`);
+    return response;
   }
 
   private async generateCategoriesWithCopilot(request: CategoryTreeRequest): Promise<CategoryTreeResponse> {

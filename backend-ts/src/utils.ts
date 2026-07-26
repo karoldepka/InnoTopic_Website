@@ -12,11 +12,21 @@ export function sseData(event: Record<string, unknown>): string {
   return `data: ${JSON.stringify(event)}\n\n`;
 }
 
-/** Iterates a ReadableStream<string> and yields chunks with leading markdown fences stripped. */
+/** Iterates a ReadableStream<string> and yields chunks with leading markdown fences stripped.
+ *
+ * GH #129: a ``` fence marker can arrive split across two chunks (e.g. one chunk ends in "``"
+ * and the next begins "`json\n...") - stripping per-chunk in isolation missed that split, leaking
+ * 1-2 stray backticks into the actual JSON text. That's usually harmless (a bare backtick needs no
+ * escaping in JSON), but occasionally landed right at a spot that made the accumulated text fail
+ * strict parsing, silently falling back to Vercel AI SDK's partial-JSON repair - which truncates
+ * to the last position it can still parse, i.e. exactly the "cut off text" symptom reported.
+ * Fixed by carrying any trailing backticks over to be considered together with the next chunk's
+ * leading characters, so a split fence is still recognized as one. */
 export async function* stripJsonFences(
   stream: ReadableStream<string>,
 ): AsyncGenerator<string> {
   let jsonStarted = false;
+  let pendingBackticks = '';
   for await (const chunk of stream as unknown as AsyncIterable<string>) {
     let c = chunk;
     if (!jsonStarted) {
@@ -27,9 +37,17 @@ export async function* stripJsonFences(
       c = c.slice(idx);
       jsonStarted = true;
     }
+    c = pendingBackticks + c;
+    pendingBackticks = '';
     c = c.replace(/```/g, '');
+    const trailingBackticks = c.match(/`+$/);
+    if (trailingBackticks) {
+      pendingBackticks = trailingBackticks[0];
+      c = c.slice(0, -pendingBackticks.length);
+    }
     if (c) yield c;
   }
+  if (pendingBackticks) yield pendingBackticks;
 }
 
 /** Extracts a human-readable message from an AI SDK RetryError / APICallError. */
