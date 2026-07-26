@@ -11,6 +11,7 @@ import {
   CategoryTreeRequest,
   CategoryTreeResponse,
   ExistingCategory,
+  FileTreeRequest,
   QuestionAnswer,
   QuestionAnswerRequest,
   QuestionAnswerResponse,
@@ -95,6 +96,10 @@ export class AiQaGeneratorService {
   });
 
   // Exposed state signals
+  /** GH #130: the picked local directory, if any - set once (before generateCategories()) and
+   * read by both category and Q&A generation, since Q&A generation happens in a later, separate
+   * call that still needs the same file contents to write content-grounded questions. */
+  readonly fileTree = signal<FileTreeRequest | undefined>(undefined);
   readonly tree = signal<CategoryNode[]>([]);
   readonly questions = signal<QuestionAnswer[]>([]);
   readonly existingCategories = signal<ExistingCategory[]>([]);
@@ -166,7 +171,11 @@ export class AiQaGeneratorService {
   }
 
   async generateCategories(topic: string, integration: QaIntegrationMode, webSearch: boolean, matchExisting = false): Promise<void> {
-    if (!topic.trim() || this.categoryLoading()) return;
+    // GH #130: a picked directory makes the text topic optional guidance rather than required -
+    // "no prompt" means "go broad and deep on the whole directory" per the request, not "nothing
+    // to generate from".
+    const fileTree = this.fileTree();
+    if ((!topic.trim() && !fileTree) || this.categoryLoading()) return;
 
     // Preserve any categories already present and append the freshly generated ones.
     const existing = this.tree();
@@ -176,7 +185,7 @@ export class AiQaGeneratorService {
     this.categoryAbortController = new AbortController();
     this.categoryLoading.set(true);
     this.categoryError.set('');
-    this.categoryStatus.set('Generating categories…');
+    this.categoryStatus.set(fileTree ? `Generating categories for "${fileTree.rootName}"…` : 'Generating categories…');
     this.tree.set(this.preAppendTree);
 
     const request: CategoryTreeRequest = {
@@ -184,6 +193,7 @@ export class AiQaGeneratorService {
       tree: cloneCategoryTree(this.preAppendTree),
       web_search: webSearch,
       match_existing: matchExisting,
+      fileTree,
     };
 
     try {
@@ -222,6 +232,7 @@ export class AiQaGeneratorService {
     const request: QuestionAnswerRequest = {
       tree: cloneCategoryTree(this.tree()),
       web_search: webSearch,
+      fileTree: this.fileTree(),
       ...(this.preAppendQuestions.length && {
         existingQuestions: this.preAppendQuestions.map(q => q.question),
       }),
@@ -293,6 +304,7 @@ export class AiQaGeneratorService {
     const request: QuestionAnswerRequest = {
       tree: adjustedTree,
       web_search: webSearch,
+      fileTree: this.fileTree(),
       existingQuestions: this.preAppendQuestions.map(q => q.question),
     };
     const targetCount = this.preAppendQuestions.length + additionalCount;
@@ -601,6 +613,7 @@ export class AiQaGeneratorService {
         const replacementRequest: QuestionAnswerRequest = {
           tree: setLeafQuestionCounts(cloneCategoryTree(this.tree()), perLeaf),
           web_search: webSearch,
+          fileTree: this.fileTree(),
           existingQuestions: [...new Set(excludedQuestions)],
         };
         response = integration === 'vercel-ai-sdk'

@@ -129,6 +129,25 @@
   gap: 8px;
 }
 
+.directory-picker {
+  margin-top: 4px;
+
+  ion-button { margin: 0; }
+}
+
+.picked-directory {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.85rem;
+  padding: 4px 8px;
+  border: 1px solid rgba(155, 169, 186, 0.22);
+  border-radius: 6px;
+
+  span { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  ion-button { --padding-start: 4px; --padding-end: 4px; }
+}
+
 // ── Scroll areas ─────────────────────────────────────────────────────────────
 // Mobile: no overflow-y — let ion-content page-scroll the whole thing.
 // Adding overflow-y here creates inner scrollbars alongside ion-content's own

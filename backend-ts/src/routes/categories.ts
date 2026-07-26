@@ -10,18 +10,25 @@ import type { CategoryTreeRequest, MoreSubcategoriesRequest } from '../types.js'
 
 export const categoriesRouter = new Hono();
 
+// GH #130: directory-mode requests carry an optional (possibly empty) guidance message instead of
+// a required topic string - fall back to the directory name so web search still has something
+// sensible to search for.
+function resolveSearchQuery(body: CategoryTreeRequest): string {
+  return body.fileTree ? (body.message?.trim() || body.fileTree.rootName) : body.message;
+}
+
 // ─── Debug: return raw prompt without calling the model ───────────────────────
 
 categoriesRouter.post('/category-tree/debug-prompt', async (c) => {
   const body = await c.req.json<CategoryTreeRequest>();
-  const searchResults = body.web_search ? await webSearch(body.message) : [];
+  const searchResults = body.web_search ? await webSearch(resolveSearchQuery(body)) : [];
   const existingCategories = loadExistingCategories();
   const prompt = buildCategoryTreeMessages(body, existingCategories, searchResults);
   return c.json({ model: MODEL_NAME, ...prompt });
 });
 categoriesRouter.post('/ai-api/category-tree/debug-prompt', async (c) => {
   const body = await c.req.json<CategoryTreeRequest>();
-  const searchResults = body.web_search ? await webSearch(body.message) : [];
+  const searchResults = body.web_search ? await webSearch(resolveSearchQuery(body)) : [];
   const existingCategories = loadExistingCategories();
   const prompt = buildCategoryTreeMessages(body, existingCategories, searchResults);
   return c.json({ model: MODEL_NAME, ...prompt });
@@ -58,7 +65,7 @@ categoriesRouter.get('/ai-api/categories/existing', handleExistingCategories);
 
 async function handleCategoryTreeStream(c: import('hono').Context) {
   const body = await c.req.json<CategoryTreeRequest>();
-  const searchResults = body.web_search ? await webSearch(body.message) : [];
+  const searchResults = body.web_search ? await webSearch(resolveSearchQuery(body)) : [];
   const existingCategories = loadExistingCategories();
   const { system, messages } = buildCategoryTreeMessages(body, existingCategories, searchResults);
 
@@ -81,7 +88,7 @@ categoriesRouter.post('/ai-api/category-tree/stream-json', handleCategoryTreeStr
 
 async function handleCategoryTreeStreamSSE(c: import('hono').Context) {
   const body = await c.req.json<CategoryTreeRequest>();
-  const searchResults = body.web_search ? await webSearch(body.message) : [];
+  const searchResults = body.web_search ? await webSearch(resolveSearchQuery(body)) : [];
   const existingCategories = loadExistingCategories();
   const { system, messages } = buildCategoryTreeMessages(body, existingCategories, searchResults);
 
@@ -109,7 +116,7 @@ categoriesRouter.post('/ai-api/category-tree-stream', handleCategoryTreeStreamSS
 
 async function handleCategoryTree(c: import('hono').Context) {
   const body = await c.req.json<CategoryTreeRequest>();
-  const searchResults = body.web_search ? await webSearch(body.message) : [];
+  const searchResults = body.web_search ? await webSearch(resolveSearchQuery(body)) : [];
   const existingCategories = loadExistingCategories();
   const { system, messages } = buildCategoryTreeMessages(body, existingCategories, searchResults);
 

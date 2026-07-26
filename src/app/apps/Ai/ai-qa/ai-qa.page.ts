@@ -29,6 +29,7 @@ import {
   updateCategoryNode,
 } from '../shared/ai-qa-tree.utils';
 import { AiQaGeneratorService } from '../shared/ai-qa-generator.service';
+import { isDirectoryPickerSupported, pickAndReadDirectory } from '../shared/directory-reader.util';
 import { QaDraftStore } from '../shared/qa-draft.store';
 import { LearnItemItemsService } from '../../Learn/core/learn-item-items.service';
 import { LearnItem } from '../../Learn/models/LearnItem';
@@ -53,6 +54,11 @@ export class AiQaPage implements OnInit {
   private readonly toastCtrl = inject(ToastController);
 
   readonly topic = signal('Agentic AI & UI interview questions');
+  /** GH #130: a picked local directory, mirrored here (rather than reading gen.fileTree()
+   * directly everywhere) just for the file/skipped counts the template shows once picked. */
+  readonly pickedDirectoryFileCount = signal(0);
+  readonly pickedDirectorySkippedCount = signal(0);
+  readonly directoryPickerSupported = isDirectoryPickerSupported();
   readonly webSearch = signal(true);
   readonly matchExisting = signal(false);
   readonly rawPromptMode = signal(false);
@@ -126,6 +132,32 @@ export class AiQaPage implements OnInit {
   }
 
   setTopic(v: string | null | undefined): void { this.topic.set(v || ''); }
+
+  /** GH #130: opens the browser's native directory picker and reads its files as generation
+   * context - a no-op (not an error) if the user cancels the picker. */
+  async pickDirectory(): Promise<void> {
+    try {
+      const result = await pickAndReadDirectory();
+      if (!result) return;
+      this.gen.fileTree.set(result);
+      this.pickedDirectoryFileCount.set(result.entries.filter(e => !e.isDirectory && e.content !== undefined).length);
+      this.pickedDirectorySkippedCount.set(result.skippedCount);
+    } catch (error) {
+      console.error('[ai-qa] pickDirectory failed', error);
+      await presentDismissableToast(this.toastCtrl, {
+        message: 'Could not read that directory.',
+        duration: 3000,
+        color: 'danger',
+        position: 'bottom',
+      });
+    }
+  }
+
+  clearDirectory(): void {
+    this.gen.fileTree.set(undefined);
+    this.pickedDirectoryFileCount.set(0);
+    this.pickedDirectorySkippedCount.set(0);
+  }
 
   generateCategories(): void {
     this.gen.generateCategories(this.topic(), 'vercel-ai-sdk', this.webSearch(), this.matchExisting());

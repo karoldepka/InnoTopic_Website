@@ -30,11 +30,26 @@ export interface CategoryNode {
   contentModifiedAt?: number;
 }
 
+/** GH #130: a user-picked local directory read entirely in the browser (see
+ * `apps/Ai/shared/directory-reader.util.ts`) - `content` is only present for files that were
+ * actually read (text/code extensions, under the reader's size caps). */
+export interface FileTreeEntry {
+  path: string;
+  isDirectory: boolean;
+  content?: string;
+}
+
+export interface FileTreeRequest {
+  rootName: string;
+  entries: FileTreeEntry[];
+}
+
 export interface CategoryTreeRequest {
   message: string;
   tree: CategoryNode[];
   web_search?: boolean;
   match_existing?: boolean;
+  fileTree?: FileTreeRequest;
 }
 
 export interface CategoryTreeResponse {
@@ -74,6 +89,7 @@ export interface QuestionAnswerRequest {
   tree: CategoryNode[];
   web_search?: boolean;
   existingQuestions?: string[];
+  fileTree?: FileTreeRequest;
 }
 
 export interface QuestionAnswerResponse {

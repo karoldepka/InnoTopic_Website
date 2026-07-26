@@ -15,11 +15,27 @@ export interface ExistingCategory {
   aliases: string[];
 }
 
+/** GH #130: a user-picked local directory read entirely in the browser (File System Access API) -
+ * `content` is only present for files that were actually read (text/code extensions, under the
+ * frontend's size caps); everything else (binary files, oversized files, directories themselves)
+ * is still listed so the model can see the full layout even where it can't see file contents. */
+export interface FileTreeEntry {
+  path: string;
+  isDirectory: boolean;
+  content?: string;
+}
+
+export interface FileTreeRequest {
+  rootName: string;
+  entries: FileTreeEntry[];
+}
+
 export interface CategoryTreeRequest {
   message: string;
   tree: CategoryNode[];
   web_search?: boolean;
   match_existing?: boolean;
+  fileTree?: FileTreeRequest;
 }
 
 export interface QuestionAnswer {
@@ -33,6 +49,7 @@ export interface QuestionAnswerRequest {
   tree: CategoryNode[];
   web_search?: boolean;
   existingQuestions?: string[];
+  fileTree?: FileTreeRequest;
 }
 
 export interface MoreSubcategoriesRequest {

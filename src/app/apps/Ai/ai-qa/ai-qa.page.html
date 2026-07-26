@@ -20,15 +20,33 @@
           rows="3"
           autoGrow="true"
           fill="outline"
-          placeholder="Rust interview questions"
+          [placeholder]="gen.fileTree() ? 'Optional: e.g. high level questions about kotlin files and their dirs' : 'Rust interview questions'"
           [value]="topic()"
           (ionInput)="setTopic($any($event).detail.value)"
         ></ion-textarea>
 
-        <div class="examples">
+        <div class="examples" *ngIf="!gen.fileTree()">
           <ion-button fill="clear" size="small" (click)="topic.set('Rust interview questions')">Rust</ion-button>
           <ion-button fill="clear" size="small" (click)="topic.set('Angular signals and RxJS')">Angular</ion-button>
           <ion-button fill="clear" size="small" (click)="topic.set('Postgres performance')">Postgres</ion-button>
+        </div>
+
+        <!-- ── GH #130: generate from a local directory instead of/alongside a text topic ──── -->
+        <div class="directory-picker" *ngIf="directoryPickerSupported">
+          <ion-button *ngIf="!gen.fileTree()" fill="outline" size="small" (click)="pickDirectory()">
+            <ion-icon name="folder-outline" slot="start"></ion-icon>
+            Pick folder…
+          </ion-button>
+          <div class="picked-directory" *ngIf="gen.fileTree() as pickedTree">
+            <ion-icon name="folder-outline"></ion-icon>
+            <span>
+              {{ pickedTree.rootName }} — {{ pickedDirectoryFileCount() }} file{{ pickedDirectoryFileCount() === 1 ? '' : 's' }}
+              <ng-container *ngIf="pickedDirectorySkippedCount()">, {{ pickedDirectorySkippedCount() }} skipped</ng-container>
+            </span>
+            <ion-button fill="clear" size="small" (click)="clearDirectory()" aria-label="Clear picked folder">
+              <ion-icon name="close-outline" slot="icon-only"></ion-icon>
+            </ion-button>
+          </div>
         </div>
 
         <div class="actions">
@@ -53,7 +71,7 @@
           <ion-button
             expand="block"
             [color]="gen.categoryLoading() ? 'danger' : 'primary'"
-            [disabled]="!gen.categoryLoading() && !topic().trim()"
+            [disabled]="!gen.categoryLoading() && !topic().trim() && !gen.fileTree()"
             (click)="gen.categoryLoading() ? gen.stopCategories() : (rawPromptMode() ? sendRawPrompt() : generateCategories())"
           >
             <ion-icon
