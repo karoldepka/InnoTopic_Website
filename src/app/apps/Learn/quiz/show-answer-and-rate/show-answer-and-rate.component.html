@@ -1,29 +1,30 @@
 <div
-  style="display: flex; order: 1; align-items: stretch /* stretch *//*; height: 4.5rem;*/"
+  style="display: flex; order: 1; align-items: stretch"
 >
-  <ion-button
-    class="stretch-btn"
-    (click)="showHint()"
-  >HINT</ion-button>
+  <div style="display: flex; flex: 1; align-items: stretch; justify-content: center">
+    <ion-button
+      class="stretch-btn"
+      (click)="showHint()"
+    >HINT</ion-button>
 
-  <ion-button
-    class="stretch-btn"
-    (click)="showAnswer()"
-  >Show answer</ion-button>
+    <ion-button
+      class="stretch-btn"
+      (click)="showAnswer()"
+    >Show answer</ion-button>
 
-  <ion-button
-    class="stretch-btn"
-    [routerLink]="$safeNavigationMigration(item$ ?. getRouterLinkUrl())"
-  >
-    <ion-icon name="create-outline" />
-  </ion-button>
+    <ion-button
+      class="stretch-btn"
+      [routerLink]="$safeNavigationMigration(item$ ?. getRouterLinkUrl())"
+    >
+      <ion-icon name="create-outline" />
+    </ion-button>
 
-  <app-time-passing
-    *ngIf="feat.userActivityTiming"
-    style="font-size: 95%; color: white; margin-left: 3px; align-self: center"
-    [isCountDown]="false"
-   />
-  <div style="flex-grow: 1"></div>
+    <app-time-passing
+      *ngIf="feat.userActivityTiming"
+      style="font-size: 95%; color: white; margin-left: 3px; align-self: center"
+      [isCountDown]="false"
+     />
+  </div>
 
   <ion-button *ngIf="feat.showUgly" (click)="toggleHide()">^</ion-button>
 
@@ -32,7 +33,7 @@
 
 <div
   *ngIf="(showAnswer$ | async) || (showHint$ | async)"
-  style="display: block; order: 0"
+  style="display: flex; flex-direction: column; align-items: center; order: 0"
   [hidden]="hide"
 >
   <ng-container
