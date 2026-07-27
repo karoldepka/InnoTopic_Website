@@ -20,6 +20,10 @@ export class Config {
    * unreviewed row-layout change on an already-dense tree table, unlike useTinyMceTitleEditor
    * above which defaults on because it's the already-adopted primary path. */
   showVoiceMemoIndicator = false
+
+  /** GH #90: soft embossed dual light/dark shadow on sub-nodes instead of the plain single
+   * drop-shadow, as an experiment - off by default since it's unreviewed. */
+  neumorphicTreeNodeShadows = false
 }
 
 const ORYOL_CONFIG_KEY = 'OrYoL_Config'

@@ -18,6 +18,15 @@ $nested-tree-node-margin: 5px;
   animation: nested-tree-node-animation 0.7s;
 }
 
+/** GH #90: soft embossed dual light/dark shadow instead of the plain single drop-shadow above -
+ * semi-transparent white/black (rather than hardcoded colors) so it reads reasonably across this
+ * app's many theme background colors instead of just the dark ones it was eyeballed against. */
+.nested-tree-node.neumorphic-tree-node {
+  box-shadow:
+    -2px -2px 4px rgba(255, 255, 255, 0.08),
+    3px 3px 6px rgba(0, 0, 0, 0.45);
+}
+
 .isDragOver {
   background: red;
 }

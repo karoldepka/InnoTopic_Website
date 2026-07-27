@@ -4,6 +4,7 @@
     'ancestor-of-focused': treeNode.highlight.isAncestorOfFocusedNode(),
     'node-content-container': true,
     'nested-tree-node': ! treeNode.isVisualRoot,
+    'neumorphic-tree-node': ! treeNode.isVisualRoot && (configService.config$ | async)?.neumorphicTreeNodeShadows,
     'isDragOver': isDragOver
   }"
   draggable="false"
