@@ -1,6 +1,7 @@
 import {Component, HostListener, ChangeDetectionStrategy} from '@angular/core';
 
 import {Platform, PopoverController} from '@ionic/angular';
+import {Router} from '@angular/router';
 import { Capacitor } from '@capacitor/core';
 import { SplashScreen } from '@capacitor/splash-screen';
 import { StatusBar, Style } from '@capacitor/status-bar';
@@ -36,6 +37,7 @@ export class AppComponent {
     public syncStatusService: SyncStatusService,
     public optionsService: OptionsService,
     public popoverController: PopoverController,
+    private router: Router,
   ) {
     this.initializeApp();
   }
@@ -67,6 +69,29 @@ export class AppComponent {
         return await popover.present();
       }
     })
+  }
+
+  /** Bare "j" (mnemonic for Journal) jumps straight to a new journal entry from anywhere in the
+   * app - no modifier needed, since every modifier combo that reads as "J" is already taken by
+   * the browser itself (Ctrl+J opens Chrome/Firefox/Edge's Downloads, Ctrl+Shift+J opens Chrome
+   * DevTools' console) and Ctrl+Alt+J risks colliding with AltGr on non-US keyboard layouts. A
+   * bare unmodified letter is exactly the convention Gmail/GitHub/Linear/Notion/Trello already use
+   * for their own primary "create new" shortcut, and browsers never reserve it.
+   *
+   * `event.composedPath()[0]` (not `event.target`) - keydown is a composed event, so `target` on a
+   * `document`-level listener gets retargeted to the shadow-DOM *host* (e.g. `<ion-input>`, not
+   * its inner native `<input>`), which would silently defeat a `tagName === 'INPUT'` check. */
+  @HostListener('document:keydown', ['$event'])
+  handleGlobalKeydown(event: KeyboardEvent) {
+    if (event.key !== 'j' || event.ctrlKey || event.metaKey || event.altKey) {
+      return
+    }
+    const target = event.composedPath()[0] as HTMLElement | undefined
+    if (target?.isContentEditable || ['INPUT', 'TEXTAREA', 'SELECT'].includes(target?.tagName ?? '')) {
+      return
+    }
+    event.preventDefault()
+    this.router.navigateByUrl('/journal/write/new')
   }
 
   @HostListener('window:beforeunload', ['$event'])
