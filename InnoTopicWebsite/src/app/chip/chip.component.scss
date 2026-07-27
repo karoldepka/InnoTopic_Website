@@ -36,7 +36,7 @@
 
   transition: all 0.3s ease-in-out;
 
-  &:hover {
+  &:hover, &.force-hover {
     box-shadow: var(--shadow-offset) var(--shadow-offset) var(--shadow-blur-radius) var(--shadow-light), calc(-1 * var(--shadow-offset)) calc(-1 * var(--shadow-offset)) var(--shadow-blur-radius) var(--shadow-dark);
   }
 

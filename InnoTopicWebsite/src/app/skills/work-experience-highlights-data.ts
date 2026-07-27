@@ -82,8 +82,8 @@ export const highlights = {
     'Google Vertex AI': {},
     'Google Gemini': {},
     'Perplexity.ai': {},
-    'Quora Poe': {}, // (Platform for Open Exploration) is a service developed by Quora and launched in December 2022.
-    'Hume AI': {},
+    // 'Quora Poe': {}, // (Platform for Open Exploration) is a service developed by Quora and launched in December 2022.
+    // 'Hume AI': {},
     Ollama: {}, // nod to locally running
     // Python: {},
     PyTorch: {},
@@ -579,7 +579,7 @@ export const highlights = {
       Firebase: {},
       // Supabase: {},
       // TODO PocketBase - Open Source realtime backend in 1 file (good id, relations, rich text)
-      RxDB: {},
+      // RxDB: {},
       // ===== analytics: (helps in comprehension, discovery, tracking)
       // TODO "Apache Spark": {},
       // TODO "Apache Druid": {}, /* analytics*/

@@ -24,7 +24,6 @@ import { config } from '../../config';
 
   h1.section-title {
     box-sizing: border-box;
-    width: 100%;
     line-height: 1.1;
   }`],
   template: `

@@ -4,6 +4,7 @@ import {
 } from '@angular/core';
 import { BooksComponent } from '../books/books.component';
 import { ThreeDTextComponent } from '../shared/threed-text/threed-text.component';
+import { PrintService } from '../TopicFriendsShared3/topics-core/print.service';
 import { WorkExperienceComponent } from '../skills/work-experience.component';
 import { WorkProjectsSectionComponent } from '../work-projects/work-projects-section/work-projects-section.component';
 import { ExternalProfilesComponent } from './external-profiles/external-profiles.component';
@@ -29,11 +30,19 @@ import { TopicsGraphComponent } from './topics-graph/topics-graph.component';
 })
 export class CvPageComponent implements OnInit {
 
+  /**
+   * When printing, every @defer'd section below should render eagerly instead of lazily.
+   * AppComponent already injects PrintService in its constructor, so this static field is
+   * guaranteed correct for the current navigation by the time this component renders.
+   */
+  protected readonly isPrint = PrintService.isPrint
+
   constructor() { }
 
   ngOnInit() {
     // document.title = 'Karol Depka Pradzinski - InnoTopic.com'
-    document.title = 'Karol Depka Pradzinski - React, Python, Rust, AWS'
+    // document.title = 'Karol Depka Pradzinski - React, Python, Rust, AWS'
+    document.title = 'Karol Depka Pradzinski - Kotlin, Java, Kafka, Python, Frontend, Vue.js'
   }
 
 }

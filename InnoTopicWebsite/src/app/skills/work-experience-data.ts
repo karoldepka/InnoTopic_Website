@@ -33,8 +33,8 @@ export class WorkExperienceData {
       we(advanced, expert),
     Nx:
       we(intermediate, expert),
-    xplat: // nstudio
-      we(intermediate, expert),
+    // xplat: // nstudio
+    //   we(intermediate, expert),
     WebPack:
       we(intermediate, advanced),
     'Chart.js':
@@ -88,6 +88,13 @@ export class WorkExperienceData {
       we(intermediate, expert),
     TypeScript:
       we(advanced /* FIXME very_advanced */, expert),
+          Java:
+      we(advanced),
+    // TODO: FindBugs, PMD (TODO: check CODACY (written in Scala) from Leo, Lisbon -> Silicon Valley)
+    Spring:
+      we(intermediate, advanced),
+    'Spring Boot':
+      we(intermediate, advanced),
     'Micro Frontends':
       we(advanced, expert),
     RxJS:
@@ -212,13 +219,6 @@ export class WorkExperienceData {
     // TODO: performance optimizations, profiling, UX
   }, false)
   additional = experience('Additional experience', 'learning more, but not as critical for me now', {
-    Java:
-      we(advanced),
-    // TODO: FindBugs, PMD (TODO: check CODACY (written in Scala) from Leo, Lisbon -> Silicon Valley)
-    Spring:
-      we(intermediate, advanced),
-    'Spring Boot':
-      we(intermediate, advanced),
     JUnit:
       we(advanced),
     TestNG:

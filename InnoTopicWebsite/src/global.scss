@@ -38,11 +38,24 @@ html, body {
     display: none !important;
   }
 
+  // Browsers strip background colors/images when printing unless told otherwise, which is why
+  // print always came out white regardless of the selected theme. Force the current theme's own
+  // colors (CSS custom properties set by ThemeConfigEffects) to actually print instead.
+  * {
+    print-color-adjust: exact !important;
+    -webkit-print-color-adjust: exact !important;
+  }
+
   html, body, app-root, ion-router-outlet {
     overflow: visible !important;
     height: auto !important;
     max-height: none !important;
     position: static !important;
+  }
+
+  html, body {
+    background-color: var(--ion-background-color, #fff) !important;
+    color: var(--ion-text-color, #000) !important;
   }
 
   ion-content {
@@ -53,6 +66,7 @@ html, body {
     overflow: visible !important;
     --overflow: visible;
     contain: none !important;
+    background-color: var(--ion-background-color, #fff) !important;
   }
 
   // Override ion-content's shadow DOM scroll container

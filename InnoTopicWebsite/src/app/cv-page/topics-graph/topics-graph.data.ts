@@ -191,6 +191,7 @@ export const nodeConnections: GraphConnections = {
                             strengthMul: strength.big,
                             sizeMult: size.veryBig,
                             connections: {
+                              Kotlin: { sizeMult: size.veryBig },
                               Gradle: {},
                               Groovy: {},
                               "OpenShift": { sizeMult: size.small, strengthMul: strength.veryBig },
@@ -205,7 +206,7 @@ export const nodeConnections: GraphConnections = {
                               }
                             }
                           },
-                          Kotlin: { sizeMult: size.veryBig },
+
                         },
                       },
                     },

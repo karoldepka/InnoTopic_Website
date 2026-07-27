@@ -4,13 +4,17 @@
 
 html, body
   height: 100%
+  // .section-title breaks out to 100vw for full-bleed backgrounds; vw includes the
+  // scrollbar's width on non-overlay scrollbars, which would otherwise add a few px
+  // of horizontal overflow/scrollbar.
+  overflow-x: hidden
 
 body
   margin: 0
   //font-family: Roboto, "Helvetica Neue", sans-serif
   font-family: Karla, "Helvetica Neue", sans-serif
   font-weight: lighter
-  color: black
+  color: var(--ion-text-color, black)
   &.dark-theme
     background: #404040
     color: white
@@ -39,10 +43,6 @@ body
     font-size: 16px !important
   @media screen and (max-width: $break-small)
     font-size: 14px !important
-
-.mat-app-background
-  background: white !important
-  background: black !important
 
 h4
   margin: 0.5em
@@ -120,15 +120,21 @@ app-other-profile-user-name p
 
 .section-title
   background-color: var(--ion-color-primary)
-  margin-top: 25px
-  margin-left: 0px
   color: var(--ion-color-primary-contrast)
-  padding: 15px
+  margin-top: 25px
   text-transform: uppercase
+  // Break out of the centered .container so the background spans the full viewport,
+  // while padding keeps the text aligned with the container's own content edge.
+  width: 100vw
+  margin-left: calc(50% - 50vw)
+  padding: 15px calc(50vw - 50% + 10px)
   @media screen and (max-width: $break-medium)
     margin-top: 20px
     margin-bottom: 10px
-    padding: 10px
+    padding-top: 10px
+    padding-bottom: 10px
+    padding-left: calc(50vw - 50%)
+    padding-right: calc(50vw - 50%)
 
 .container
   max-width: $break-medium
@@ -147,7 +153,7 @@ model-viewer
   z-index: -9999
 
 body
-  background-color: #e0e0e0
+  background-color: var(--ion-background-color, #fff)
 
 @media print
   .container

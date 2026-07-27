@@ -1,6 +1,7 @@
 import {
   ChangeDetectionStrategy,
   Component,
+  input,
 } from '@angular/core';
 
 @Component({
@@ -11,4 +12,6 @@ import {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ChipComponent {
+  /** Forces the :hover neumorphic shadow to show without an actual pointer hover - for showcases/demos. */
+  forceMouseOver = input(false);
 }

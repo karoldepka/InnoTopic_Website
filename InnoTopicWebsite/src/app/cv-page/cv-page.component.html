@@ -30,7 +30,7 @@
 <!--</model-viewer>-->
 
 <div class="graph-container">
-  @defer (on idle) {
+  @defer (on idle; when isPrint) {
     <app-globe-switcher />
   } @placeholder {
     <div class="graph-placeholder" aria-hidden="true"></div>
@@ -38,7 +38,7 @@
 <!--  <app-tech-graph></app-tech-graph>-->
 <!--  <app-tech-graph-d3-index1></app-tech-graph-d3-index1>-->
 <!--  <app-tech-graph-d3-index1></app-tech-graph-d3-index1>-->
-  @defer (on viewport; prefetch on idle) {
+  @defer (on viewport; prefetch on idle; when isPrint) {
     <app-topics-graph />
   } @placeholder {
     <div class="topics-graph-placeholder" aria-hidden="true"></div>
@@ -63,19 +63,19 @@
 <!--  <li>Could also be a quick video per-</li>-->
 <!--</ol>-->
 
-@defer (on viewport; prefetch on idle) {
+@defer (on viewport; prefetch on idle; when isPrint) {
   <app-work-experience /> <!-- rename to work-skills ? -->
 } @placeholder {
   <div class="section-placeholder work-experience-placeholder" aria-hidden="true"></div>
 }
 
-@defer (on viewport; prefetch on idle) {
+@defer (on viewport; prefetch on idle; when isPrint) {
   <app-work-projects-section />
 } @placeholder {
   <div class="section-placeholder work-projects-placeholder" aria-hidden="true"></div>
 }
 
-@defer (on viewport; prefetch on idle) {
+@defer (on viewport; prefetch on idle; when isPrint) {
   <app-books />
 } @placeholder {
   <div class="section-placeholder books-placeholder" aria-hidden="true"></div>
