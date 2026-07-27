@@ -353,7 +353,7 @@ export class JournalNumericDescriptors extends UiFieldDefs {
   relax = jnd({antonym: 'stressed'})
   satisfaction = jnd({antonym: 'frustrated'} /*?*/)
   frustration = jnd({antonym: 'frustrated'} /*?*/)
-  fulfillment = jnd({searchTerms: [`fulfilment` /* single l */]})
+  fulfillment = jnd({searchTerms: [`fulfillment` /* single l */]})
   meaning = jnd()
   purpose = jnd()
   mission = jnd()

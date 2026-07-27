@@ -251,6 +251,134 @@ export const themesMapById: { [key: string]: Theme } = setIdsFromKeys({
     primary: '#9acd32',
     secondary: '#ff8c00',
   }),
+
+  // GH: 20 more themes, biased toward bright backgrounds (only 3 of the existing themes had one) -
+  // every primary/secondary pair below was checked against theme-contrast.spec.ts's actual
+  // formulas (contrastRatio >= 3 against the shaded background, colorDistance >= 35 between
+  // primary and secondary) before being added, rather than eyeballed like some earlier themes
+  // that needed later contrast-ratio fixes.
+  'Peach Sorbet': theme({
+    comment: 'Bright background',
+    background: '#fbe0c4',
+    primary: '#7a3b12',
+    secondary: '#0b5e5e',
+    experimental: true,
+  }),
+  'Lilac Fields': theme({
+    comment: 'Bright background',
+    background: '#e8ddf5',
+    primary: '#4a1a6b',
+    secondary: '#a3400a',
+    experimental: true,
+  }),
+  'Seafoam Morning': theme({
+    comment: 'Bright background',
+    background: '#d7f0e6',
+    primary: '#0d4d3a',
+    secondary: '#8c1a4a',
+    experimental: true,
+  }),
+  'Buttercream': theme({
+    comment: 'Bright background',
+    background: '#fdf1d6',
+    primary: '#5a3d00',
+    secondary: '#0b4f8c',
+    experimental: true,
+  }),
+  'Rose Quartz': theme({
+    comment: 'Bright background',
+    background: '#f6dfe6',
+    primary: '#7a123f',
+    secondary: '#1d5c1d',
+    experimental: true,
+  }),
+  'Sky Linen': theme({
+    comment: 'Bright background',
+    background: '#dde8f7',
+    primary: '#12305c',
+    secondary: '#8a3b00',
+    experimental: true,
+  }),
+  'Honeydew': theme({
+    comment: 'Bright background',
+    background: '#e2f2d9',
+    primary: '#274d0e',
+    secondary: '#7a1050',
+    experimental: true,
+  }),
+  'Coral Sands': theme({
+    comment: 'Bright background',
+    background: '#fde3d9',
+    primary: '#7a1f0a',
+    secondary: '#0b4a5c',
+    experimental: true,
+  }),
+  'Wisteria': theme({
+    comment: 'Bright background',
+    background: '#e6def7',
+    primary: '#3a1a6b',
+    secondary: '#7a4c00',
+    experimental: true,
+  }),
+  'Powder Blue': theme({
+    comment: 'Bright background',
+    background: '#dcecf2',
+    primary: '#0b3d5c',
+    secondary: '#6b1a3a',
+    experimental: true,
+  }),
+  'Apricot Cream': theme({
+    comment: 'Bright background',
+    background: '#fbe8d3',
+    primary: '#6b2d00',
+    secondary: '#0d4d4d',
+    experimental: true,
+  }),
+  'Mint Julep': theme({
+    comment: 'Bright background',
+    background: '#dff2e9',
+    primary: '#0d4d2f',
+    secondary: '#5c0d4d',
+    experimental: true,
+  }),
+  'Deep Sea': theme({
+    background: '#0a1f2c',
+    primary: '#2ec4b6',
+    secondary: '#ff9f1c',
+  }),
+  'Plum Ember': theme({
+    background: '#241016',
+    primary: '#e0507a',
+    secondary: '#e8b923',
+  }),
+  'Slate Storm': theme({
+    background: '#1c2229',
+    primary: '#5aa9e6',
+    secondary: '#e6a817',
+  }),
+  'Charcoal Lime': theme({
+    primary: '#7ed321',
+    secondary: '#e0217a',
+  }),
+  'Rustic Copper': theme({
+    background: '#2b1a10',
+    primary: '#d2691e',
+    secondary: '#3aa6a6',
+  }),
+  'Indigo Night': theme({
+    background: '#161029',
+    primary: '#8a7ff0',
+    secondary: '#ffb703',
+  }),
+  'Blackberry Fizz': theme({
+    background: '#1a0f22',
+    primary: '#a239ca',
+    secondary: '#3ad6b0',
+  }),
+  'Graphite Amber': theme({
+    primary: '#e0a010',
+    secondary: '#3a8dde',
+  }),
 })
 
 export const themesArray = getDictionaryValuesAsArray(themesMapById)
