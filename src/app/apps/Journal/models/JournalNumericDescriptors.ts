@@ -387,7 +387,7 @@ export class JournalNumericDescriptors extends UiFieldDefs {
   })
   preparedness = jnd({
     isShortListed: true,
-    searchTerms: [`readiness`],
+    searchTerms: [`readiness`, `ready`],
   })
   /** https://www.quora.com/Whats-the-difference-between-self-control-and-self-discipline */
   'self-discipline' = jnd()
@@ -457,6 +457,8 @@ export class JournalNumericDescriptors extends UiFieldDefs {
     isShortListed: true,
   })
   moderation = jnd({searchTerms: [`junkie`], antonym: [`excess`, `binge`, `binging`]})
+  humility = jnd({searchTerms: [`modesty`, `humbleness`], antonym: [`arrogance`, `pride`, `vanity`]})
+  gratitude = jnd()
   addictions = jnd({lowerIsBetter})
   withdrawal_syndrome = jnd({lowerIsBetter})
   junkie = jnd({})
