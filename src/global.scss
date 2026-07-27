@@ -283,6 +283,18 @@ body {
   text-shadow: yellow 1px 1px 2px;
 }
 
+/* GH #80: marks a paragraph as coming from voice dictation, so it reads as visually distinct from
+   text that was typed/already there rather than blending in silently. */
+.voice-dictated {
+  font-style: italic;
+  color: var(--ion-color-medium);
+}
+
+.voice-dictated::before {
+  content: "🎤 ";
+  font-style: normal;
+}
+
 .tox-menubar {
   //overflow-x: scroll;
   overflow-x: hidden;

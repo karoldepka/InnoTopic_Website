@@ -749,10 +749,14 @@ export class RichTextEditComponent extends AbstractCellComponent implements OnIn
    * caret, matching `insertTranscript()`'s reasoning - the field may not even be focused while
    * recording. Multiple recordings on the same field each get their own baseline (see
    * `finalizeLiveTranscript()`), so they accumulate as separate paragraphs rather than each
-   * replacing the last. */
+   * replacing the last.
+   *
+   * GH #80: the `voice-dictated` class (styled in global.scss) marks the paragraph as
+   * voice-dictated rather than silently merging it into whatever text was already there - its own
+   * `<p>` already keeps it visually separate. */
   updateLiveTranscript(text: string) {
     this.liveTranscriptBaselineHtml ??= this.formControl1.value ?? ''
-    this.formControl1.setValue(this.liveTranscriptBaselineHtml + `<p>${escapeHtml(text)}</p>`)
+    this.formControl1.setValue(this.liveTranscriptBaselineHtml + `<p class="voice-dictated">${escapeHtml(text)}</p>`)
   }
 
   /** Locks in the current content as the new baseline, so the *next* recording's live updates

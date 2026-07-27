@@ -6,7 +6,7 @@ import {splitAndTrim} from '../../../libs/AppFedShared/utils/stringUtils'
 import {AuthService} from '../../../auth/auth.service'
 import {debugLog, errorAlert} from '../../../libs/AppFedShared/utils/log'
 import {UntypedFormControl} from '@angular/forms'
-import {htmlToId, stripHtml} from '../../../libs/AppFedShared/utils/html-utils'
+import {escapeHtml, htmlToId, stripHtml} from '../../../libs/AppFedShared/utils/html-utils'
 import {Subscription} from 'rxjs'
 import {debounceTime, distinctUntilChanged, finalize} from 'rxjs/operators'
 import {LingueeService} from '../natural-langs/linguee.service'
@@ -607,10 +607,16 @@ export class SearchOrAddLearnableItemPageComponent extends BaseComponent impleme
 
   /** Appends the transcribed voice memo to the quick-add draft text, rather than overwriting it -
    * this is a plain TinyMCE quick-add field (not tied to any single saved item's field), so the
-   * transcript lands in the same draft the mic's newly-created item's recording is attached to. */
+   * transcript lands in the same draft the mic's newly-created item's recording is attached to.
+   *
+   * GH #80: `searchFormControl` holds TinyMCE HTML (see `SearchOrAddTextEditorComponent`), so the
+   * transcript is escaped and wrapped in its own `voice-dictated`-marked paragraph, matching
+   * `RichTextEditComponent.insertTranscript()`'s handling of the same scenario elsewhere - the
+   * previous plain string concatenation left raw unescaped text sitting inside HTML and gave no
+   * visual separation from whatever draft text was already there. */
   onQuickAddTranscriptReady(transcript: string) {
     const existing = this.searchFormControl.value ?? ''
-    this.searchFormControl.setValue(existing ? `${existing} ${transcript}` : transcript)
+    this.searchFormControl.setValue(existing + `<p class="voice-dictated">${escapeHtml(transcript)}</p>`)
   }
 
 }
