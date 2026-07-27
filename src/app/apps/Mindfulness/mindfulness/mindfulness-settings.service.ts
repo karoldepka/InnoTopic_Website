@@ -9,6 +9,7 @@ const SETTINGS_COLLECTION = 'MindfulnessGoals'
 const SETTINGS_ROW_ID = '_singleton'
 
 export interface MindfulnessSettings {
+  goalMinutesPerHour: number | null
   goalMinutesPerDay: number | null
   goalMinutesPerWeek: number | null
   /** The timer duration (seconds) last picked via a preset or the manual minutes/seconds
@@ -17,6 +18,7 @@ export interface MindfulnessSettings {
 }
 
 const DEFAULT_SETTINGS: MindfulnessSettings = {
+  goalMinutesPerHour: null,
   goalMinutesPerDay: null,
   goalMinutesPerWeek: null,
   lastDurationSeconds: null,
@@ -52,13 +54,14 @@ export class MindfulnessSettingsService {
       return {...DEFAULT_SETTINGS}
     }
     return {
+      goalMinutesPerHour: data?.data?.goalMinutesPerHour ?? null,
       goalMinutesPerDay: data?.data?.goalMinutesPerDay ?? null,
       goalMinutesPerWeek: data?.data?.goalMinutesPerWeek ?? null,
       lastDurationSeconds: data?.data?.lastDurationSeconds ?? null,
     }
   }
 
-  async saveGoals(goals: Pick<MindfulnessSettings, 'goalMinutesPerDay' | 'goalMinutesPerWeek'>): Promise<void> {
+  async saveGoals(goals: Pick<MindfulnessSettings, 'goalMinutesPerHour' | 'goalMinutesPerDay' | 'goalMinutesPerWeek'>): Promise<void> {
     await this.patchSettings(goals)
   }
 

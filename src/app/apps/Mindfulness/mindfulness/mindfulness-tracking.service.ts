@@ -21,6 +21,7 @@ function mindfulnessItemId(userId: string): string {
 }
 
 export interface MindfulnessTotals {
+  hourMs: number
   todayMs: number
   weekMs: number
 }
@@ -75,10 +76,11 @@ export class MindfulnessTrackingService {
   }
 
   /** Sums every stored TimeTrackingPeriod for the current user's mindfulness anchor item into
-   * "today" and "this week" (Monday start) totals. An open period (`end == null`, still running)
-   * counts up to "now". */
+   * "this hour", "today" and "this week" (Monday start) totals. An open period (`end == null`,
+   * still running) counts up to "now". */
   async getTodayAndWeekTotals(): Promise<MindfulnessTotals> {
     const now = new Date()
+    const startOfHour = new Date(now.getFullYear(), now.getMonth(), now.getDate(), now.getHours())
     const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate())
     const dayOfWeekMondayFirst = (now.getDay() + 6) % 7
     const startOfWeek = new Date(startOfToday)
@@ -86,6 +88,7 @@ export class MindfulnessTrackingService {
 
     const periods = await this.timeTrackingPeriodsService.getPeriodsForItem(mindfulnessItemId(this.authService.userId as string))
 
+    let hourMs = 0
     let todayMs = 0
     let weekMs = 0
     for (const raw of periods) {
@@ -94,10 +97,11 @@ export class MindfulnessTrackingService {
       if (!start || !end) {
         continue
       }
+      hourMs += this.overlapMs(start, end, startOfHour, now)
       todayMs += this.overlapMs(start, end, startOfToday, now)
       weekMs += this.overlapMs(start, end, startOfWeek, now)
     }
-    return {todayMs, weekMs}
+    return {hourMs, todayMs, weekMs}
   }
 
   private overlapMs(periodStart: Date, periodEnd: Date, rangeStart: Date, rangeEnd: Date): number {

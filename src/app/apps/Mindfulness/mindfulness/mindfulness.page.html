@@ -112,6 +112,10 @@
       </ion-button>
 
       <div *ngIf="showMore" class="mindfulness-stats__details">
+        <p *ngIf="formatDurationParts(hourMs) as hourParts">
+          This hour: <strong>{{ hourParts.main }}</strong><small class="duration-seconds"> {{ hourParts.seconds }}</small>
+          <span *ngIf="goalMinutesPerHour"> / goal {{ goalMinutesPerHour }}m</span>
+        </p>
         <p *ngIf="formatDurationParts(todayMs) as todayParts">
           Today: <strong>{{ todayParts.main }}</strong><small class="duration-seconds"> {{ todayParts.seconds }}</small>
           <span *ngIf="goalMinutesPerDay"> / goal {{ goalMinutesPerDay }}m</span>
@@ -122,6 +126,14 @@
         </p>
 
         <div class="mindfulness-goals" aria-label="Mindfulness goals">
+          <ion-input
+            type="number"
+            inputmode="numeric"
+            min="0"
+            placeholder="Goal min/hour"
+            aria-label="Goal minutes per hour"
+            [(ngModel)]="goalMinutesPerHour"
+          ></ion-input>
           <ion-input
             type="number"
             inputmode="numeric"

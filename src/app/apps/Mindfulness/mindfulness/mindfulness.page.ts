@@ -56,9 +56,13 @@ export class MindfulnessPage extends BaseComponent implements OnInit, OnDestroy 
    * default so the page stays focused on the timer itself. */
   showMore = false
 
+  hourMs = 0
+
   todayMs = 0
 
   weekMs = 0
+
+  goalMinutesPerHour: number | null = null
 
   goalMinutesPerDay: number | null = null
 
@@ -110,8 +114,10 @@ export class MindfulnessPage extends BaseComponent implements OnInit, OnDestroy 
         this.mindfulnessTrackingService.getTodayAndWeekTotals(),
         this.mindfulnessSettingsService.getSettings(),
       ])
+      this.hourMs = totals.hourMs
       this.todayMs = totals.todayMs
       this.weekMs = totals.weekMs
+      this.goalMinutesPerHour = goals.goalMinutesPerHour
       this.goalMinutesPerDay = goals.goalMinutesPerDay
       this.goalMinutesPerWeek = goals.goalMinutesPerWeek
     } catch (error) {
@@ -124,6 +130,7 @@ export class MindfulnessPage extends BaseComponent implements OnInit, OnDestroy 
 
   saveGoals() {
     this.mindfulnessSettingsService.saveGoals({
+      goalMinutesPerHour: this.goalMinutesPerHour,
       goalMinutesPerDay: this.goalMinutesPerDay,
       goalMinutesPerWeek: this.goalMinutesPerWeek,
     })
