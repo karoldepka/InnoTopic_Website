@@ -2,5 +2,6 @@
     "search.exclude": {
         "export/**": true
     },
-    "workbench.colorTheme": "Abyss"
+    "workbench.colorTheme": "Abyss",
+    "deepscan.enable": true
 }

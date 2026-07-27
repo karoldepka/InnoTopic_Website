@@ -9,8 +9,8 @@ describe('NaturalLanguagesComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [ NaturalLanguagesComponent ],
-      imports: [IonicModule.forRoot()]
+      // NaturalLanguagesComponent is standalone: belongs in imports, not declarations.
+      imports: [NaturalLanguagesComponent, IonicModule.forRoot()]
     }).compileComponents();
 
     fixture = TestBed.createComponent(NaturalLanguagesComponent);

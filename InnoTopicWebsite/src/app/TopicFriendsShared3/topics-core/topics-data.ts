@@ -1020,7 +1020,7 @@ export class AI {
     logoSize: [1200, 348],
     logoSmallIcon: 'keras-logo-small.jpg',
   }*/)
-
+  // TODO Add https://github.com/modelcontextprotocol icon
 }
 
 export class AI_Hardware {

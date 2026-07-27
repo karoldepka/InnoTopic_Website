@@ -1,5 +1,6 @@
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { IonicModule } from '@ionic/angular';
+import { provideMockStore } from '@ngrx/store/testing';
 
 import { BooksComponent } from './books.component';
 
@@ -9,8 +10,10 @@ describe('BooksComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [ BooksComponent ],
-      imports: [IonicModule.forRoot()]
+      // BooksComponent is standalone: belongs in imports, not declarations.
+      imports: [BooksComponent, IonicModule.forRoot()],
+      // app-three-d-text (rendered in this component's template) injects Store<{themeConfig}>.
+      providers: [provideMockStore()],
     }).compileComponents();
 
     fixture = TestBed.createComponent(BooksComponent);

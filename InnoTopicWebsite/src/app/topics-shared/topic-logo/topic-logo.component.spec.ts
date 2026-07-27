@@ -1,5 +1,4 @@
 import { waitForAsync, ComponentFixture, TestBed } from '@angular/core/testing';
-import { Topic } from '../../TopicFriendsShared3/topics-core/Topic';
 import { TopicsService } from '../../TopicFriendsShared3/topics-core/topics.service';
 
 import {
@@ -13,7 +12,8 @@ describe('TopicLogoComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [ TopicLogoComponent ],
+      // TopicLogoComponent is standalone: belongs in imports, not declarations.
+      imports: [ TopicLogoComponent ],
       providers: [ TopicsService ],
     })
     .compileComponents();
@@ -25,17 +25,19 @@ describe('TopicLogoComponent', () => {
 
   it('should create', () => {
     component = fixture.componentInstance;
+    fixture.componentRef.setInput('topic', 'Angular');
     fixture.detectChanges();
     expect(component).toBeTruthy();
   });
 
   it('should handle custom icon size', () => {
     component = fixture.componentInstance;
-    component.topic = 'Nx'
+    // JUnit has an active (non-square) logoSize in topics-data.ts, unlike e.g. 'Nx' whose
+    // logoSize is currently commented out there - use a topic that actually exercises this path.
+    fixture.componentRef.setInput('topic', 'JUnit');
     fixture.detectChanges();
-    const t = component.topic as unknown as Topic
 
-    expect(component.width).toBeGreaterThan(defaultIconHeight);
-    expect(component.height).toBe(defaultIconHeight);
+    expect(component.dimensions().width).toBeGreaterThan(defaultIconHeight);
+    expect(component.dimensions().height).toBe(defaultIconHeight);
   });
 });

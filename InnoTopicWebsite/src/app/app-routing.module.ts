@@ -4,6 +4,7 @@ import { RouterModule, Routes } from '@angular/router';
 const loadExperiments = () => import('./experiments/experiments.module').then(m => m.ExperimentsPageModule);
 const loadShirtGenerator = () => import('./shirt-generator/shirt-generator.module').then(m => m.ShirtGeneratorPageModule);
 const loadThemeDemo = () => import('./themes/theme-demo/theme-demo.module').then(m => m.ThemeDemoPageModule);
+const loadThemeList = () => import('./themes/theme-list/theme-list.page').then(m => m.ThemeListPage);
 const loadTopicsGraph = () => import('./cv-page/topics-graph/topics-graph.component').then(m => m.TopicsGraphComponent);
 
 const routes: Routes = [
@@ -23,6 +24,10 @@ const routes: Routes = [
   {
     path: 'theme',
     loadChildren: loadThemeDemo
+  },
+  {
+    path: 'themes',
+    loadComponent: loadThemeList
   },
   {
     path: 'shirt',

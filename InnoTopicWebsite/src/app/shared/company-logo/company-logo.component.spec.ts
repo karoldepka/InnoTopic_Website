@@ -8,7 +8,8 @@ describe('CompanyLogoComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [ CompanyLogoComponent ]
+      // CompanyLogoComponent is standalone: belongs in imports, not declarations.
+      imports: [ CompanyLogoComponent ]
     })
     .compileComponents();
   }));

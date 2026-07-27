@@ -8,7 +8,8 @@ describe('PersonalDataComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [ PersonalDataComponent ]
+      // PersonalDataComponent is standalone: belongs in imports, not declarations.
+      imports: [ PersonalDataComponent ]
     })
     .compileComponents();
   }));

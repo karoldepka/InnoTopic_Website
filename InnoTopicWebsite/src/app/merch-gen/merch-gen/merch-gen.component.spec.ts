@@ -9,8 +9,8 @@ describe('MerchGenComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [ MerchGenComponent ],
-      imports: [IonicModule.forRoot()]
+      // MerchGenComponent is standalone: belongs in imports, not declarations.
+      imports: [MerchGenComponent, IonicModule.forRoot()]
     }).compileComponents();
 
     fixture = TestBed.createComponent(MerchGenComponent);

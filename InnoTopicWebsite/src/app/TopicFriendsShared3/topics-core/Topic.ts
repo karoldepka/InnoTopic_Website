@@ -1,3 +1,4 @@
+import { errorAlert } from '../../utils/utils';
 
 function escapeRegexp(s: any) {
   return s.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
@@ -80,9 +81,7 @@ export class Topic {
     //   this.urls = new TopicUrls(null, null, null, null, null, null) // for firebase, because it does not allow to save undefined
     // }
     if ( this.id.match(/\.|#|\$|\[|\]|\//) ) {
-      const message = 'Topic id contains illegal char: '
-      console.error(message, this)
-      window.alert(message + this.id)
+      errorAlert('Topic id contains illegal char:', this.id)
       return null as any
     }
   }

@@ -1,20 +1,18 @@
 <img
-  [src]="url"
+  [src]="url()"
   alt=""
   class='topic-logo-img'
   loading="lazy"
   decoding="async"
-  [ngStyle]="styles"
+  [ngStyle]="styles()"
   onerror="this.style.display='none'"
-  title="{{_topic.name}}"
+  title="{{resolvedTopic()?.name}}"
 >
-<!--url: {{url}}-->
+<!-- (Obsolete Comment) url: {{url}}-->
 
-<ng-container
-  *ngIf="debug_showText"
->
-  <span style="font-size: 3px">{{_topic.name}}</span>
-</ng-container>
+@if (debug_showText) {
+  <span style="font-size: 3px">{{resolvedTopic()?.name}}</span>
+}
 
 <!--<svg width="50" height="50 " viewBox="0 0 100 100">-->
 <!--&lt;!&ndash;  <use attr.xlink:href="{{url}}" >&ndash;&gt;-->

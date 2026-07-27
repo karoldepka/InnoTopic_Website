@@ -1,3 +1,5 @@
 export const config = {
-  shirtMode: true
+  shirtMode: true,
+  useThreeDSectionHeaders: false,
+  useThreeDTextPerspective: false,
 }

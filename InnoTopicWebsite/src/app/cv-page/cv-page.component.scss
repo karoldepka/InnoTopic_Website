@@ -39,6 +39,11 @@ app-external-profiles {
       margin: 0 16px 0 0;
       flex-shrink: 0;
     }
+
+    app-three-d-text.profile-section-title.three-d-text--enabled {
+      width: 32px;
+      height: 300px;
+    }
   }
 }
 

@@ -8,7 +8,8 @@ describe('PoweredByComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [ PoweredByComponent ]
+      // PoweredByComponent is standalone: belongs in imports, not declarations.
+      imports: [ PoweredByComponent ]
     })
     .compileComponents();
   }));

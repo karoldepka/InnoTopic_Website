@@ -8,7 +8,8 @@ describe('WorldMapComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [ WorldMapComponent ]
+      // WorldMapComponent is standalone: belongs in imports, not declarations.
+      imports: [ WorldMapComponent ]
     })
     .compileComponents();
   }));

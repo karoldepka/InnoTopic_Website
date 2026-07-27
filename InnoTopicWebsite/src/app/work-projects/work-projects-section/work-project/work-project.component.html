@@ -1,6 +1,12 @@
 <section class="project">
   <h3>
-    <div><fa-icon [icon]="faLaptop"></fa-icon><span><label>  Project: </label> {{projectTitle}}</span></div>
+    <div>
+      <fa-icon [icon]="faLaptop"></fa-icon>
+      <span>
+        <label>  Project: </label>
+        <app-hashtag-replacer [text]="projectTitleWithTopicTags" />
+      </span>
+    </div>
     <!-- FIXME: position & size of laptop icon -->
     <div *ngIf="project.roles; let roles">
       <!-- FIXME replace / remove icon (<fa> not working after moving to ionic) -->
@@ -13,7 +19,7 @@
   >
     <span *ngIf="project.description; let description">
     </span>
-    <app-hashtag-replacer [text]="description" />
+    <app-hashtag-replacer [text]="projectDescriptionWithTopicTags" />
 
   </ng-container>
 

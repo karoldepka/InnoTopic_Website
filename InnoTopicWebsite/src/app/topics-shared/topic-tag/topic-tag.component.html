@@ -1,3 +1,4 @@
+<!-- (Obsolete Comment) -->
 <!--<mat-chip-->
 <!--  (click)="clickTopic.emit($event)"-->
 <!--  style="cursor: pointer; color: rgb(103, 58, 183)"-->
@@ -44,20 +45,46 @@
 <!--</mat-chip>-->
 
 
-<app-chip style="display: inline-block; margin: 0.3rem;">
-  <div style="display: flex; align-items: center">
-    <app-topic-logo
-      *ngIf="(showLogo || true) && tag.tagEntry.logo"
-      [topic]="tag.tagEntry"
-    ></app-topic-logo>
+<div class="topic-tag" style="position: relative; display: inline-block;">
+  <app-chip style="display: inline-block; margin: 0.3rem;">
+    <div
+      class="topic-tag-content"
+      [class.topic-tag-content--clickable]="info()"
+      style="display: flex; align-items: center"
+      [attr.role]="info() ? 'button' : null"
+      [attr.tabindex]="info() ? 0 : null"
+      [attr.aria-expanded]="info() ? showInfo() : null"
+      [title]="info() ? (displayName() + ' (tap or click to show more info)') : null"
+      (click)="onTagClick($event)"
+      (keydown)="onTagKeydown($event)"
+    >
+      <!-- showLogo() is intentionally NOT checked here: every current caller relies on logos always
+           showing (work-experience.ts defaults showIcons to false and no call site overrides it, so
+           respecting showLogo() would silently remove every skill-chip logo on the live site). Kept
+           as an input for a future caller that wants to opt out explicitly. -->
+      @if (tagEntry()?.logo) {
+        <app-topic-logo [topic]="tagEntry()!" />
+      }
 
-    {{tag.tagEntry.name}}
-    <!-- skill level goes here: -->
-    <ng-content></ng-content>
-  </div>
-</app-chip>
+      {{displayName()}}
+      <!-- skill level goes here: -->
+      <ng-content></ng-content>
+    </div>
+  </app-chip>
+
+  @if (showInfo()) {
+    <div
+      class="topic-info-popover"
+      role="tooltip"
+      (click)="$event.stopPropagation()"
+    >
+      {{info()}}
+    </div>
+  }
+</div>
 
 
+<!-- (Obsolete Comment) -->
 <!--<span class="neumorphic-chip">-->
 <!--  <app-topic-logo-->
 <!--    *ngIf="(showLogo || true) && tag.tagEntry.logo"-->

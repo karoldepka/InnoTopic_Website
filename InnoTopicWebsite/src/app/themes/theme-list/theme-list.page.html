@@ -1,0 +1,40 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button mode="md" [defaultHref]="'/'"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Themes</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <div class="theme-list-page container">
+    <h1 class="section-title">Themes</h1>
+    <p>
+      Pick a ready-made theme below, or fine-tune every color and shadow yourself on the
+      <a routerLink="/theme-demo">Theme Preferences</a> page.
+    </p>
+
+    <ion-grid>
+      <ion-row>
+        @for (preset of presets; track preset.name) {
+          <ion-col size="6" size-md="4" size-lg="3">
+            <button
+              type="button"
+              class="theme-preset-card"
+              [class.theme-preset-card--active]="activePresetName() === preset.name"
+              (click)="applyPreset(preset)"
+            >
+              <span class="theme-preset-swatch" [style.background]="preset.config.ion_background_color">
+                <span class="theme-preset-dot" [style.background]="preset.config.ion_color_primary"></span>
+                <span class="theme-preset-dot" [style.background]="preset.config.ion_color_secondary"></span>
+              </span>
+              <span class="theme-preset-name">{{ preset.name }}</span>
+              <span class="theme-preset-kind">{{ preset.kind }}</span>
+            </button>
+          </ion-col>
+        }
+      </ion-row>
+    </ion-grid>
+  </div>
+</ion-content>

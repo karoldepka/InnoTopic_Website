@@ -8,7 +8,8 @@ describe('SpacerComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [ SpacerComponent ]
+      // SpacerComponent is standalone: belongs in imports, not declarations.
+      imports: [ SpacerComponent ]
     })
     .compileComponents();
   }));

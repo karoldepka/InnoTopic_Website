@@ -9,8 +9,8 @@ describe('ChipComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [ ChipComponent ],
-      imports: [IonicModule.forRoot()]
+      // ChipComponent is standalone: belongs in imports, not declarations.
+      imports: [ChipComponent, IonicModule.forRoot()]
     }).compileComponents();
 
     fixture = TestBed.createComponent(ChipComponent);

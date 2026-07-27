@@ -8,7 +8,8 @@ describe('ExternalProfilesComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [ ExternalProfilesComponent ]
+      // ExternalProfilesComponent is standalone: belongs in imports, not declarations.
+      imports: [ ExternalProfilesComponent ]
     })
     .compileComponents();
   }));

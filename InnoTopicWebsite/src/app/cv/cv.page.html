@@ -7,7 +7,8 @@
     <ion-title></ion-title>
     <ion-buttons slot="end">
       <span routerLink="/chat" class="clickable" style="margin-right: 15px;">AI CHAT</span>
-      <span (click)="showThemeConfig = !showThemeConfig" class="clickable">THEME</span>
+      <span routerLink="/themes" class="clickable" style="margin-right: 15px;">THEMES</span>
+      <span (click)="showThemeConfig = !showThemeConfig" class="clickable">CUSTOMIZE THEME</span>
     </ion-buttons>
     @if (showThemeConfig) {
       @defer {

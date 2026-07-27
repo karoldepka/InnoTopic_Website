@@ -1,16 +1,14 @@
-import { Component, OnInit } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+} from '@angular/core';
 
 @Component({
   selector: 'app-chip',
   standalone: true,
-  imports: [],
   templateUrl: './chip.component.html',
   styleUrls: ['./chip.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ChipComponent  implements OnInit {
-
-  constructor() { }
-
-  ngOnInit() {}
-
+export class ChipComponent {
 }

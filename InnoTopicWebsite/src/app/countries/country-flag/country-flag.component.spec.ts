@@ -8,7 +8,8 @@ describe('CountryFlagComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [ CountryFlagComponent ]
+      // CountryFlagComponent is standalone: belongs in imports, not declarations.
+      imports: [ CountryFlagComponent ]
     })
     .compileComponents();
   }));

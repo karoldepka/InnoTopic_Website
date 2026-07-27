@@ -9,8 +9,8 @@ describe('HeaderComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [ HeaderComponent ],
-      imports: [IonicModule.forRoot()]
+      // HeaderComponent is standalone: belongs in imports, not declarations.
+      imports: [HeaderComponent, IonicModule.forRoot()]
     }).compileComponents();
 
     fixture = TestBed.createComponent(HeaderComponent);

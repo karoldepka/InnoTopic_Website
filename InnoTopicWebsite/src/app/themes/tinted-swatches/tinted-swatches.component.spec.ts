@@ -9,8 +9,8 @@ describe('TintedSwatchesComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [ TintedSwatchesComponent ],
-      imports: [IonicModule.forRoot()]
+      // TintedSwatchesComponent is standalone: belongs in imports, not declarations.
+      imports: [TintedSwatchesComponent, IonicModule.forRoot()]
     }).compileComponents();
 
     fixture = TestBed.createComponent(TintedSwatchesComponent);

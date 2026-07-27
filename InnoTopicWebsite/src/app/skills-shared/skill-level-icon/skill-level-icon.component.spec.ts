@@ -8,7 +8,8 @@ describe('SkillLevelIconComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [ SkillLevelIconComponent ]
+      // SkillLevelIconComponent is standalone: belongs in imports, not declarations.
+      imports: [ SkillLevelIconComponent ]
     })
     .compileComponents();
   }));

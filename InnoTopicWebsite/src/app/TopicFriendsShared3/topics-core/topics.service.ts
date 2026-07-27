@@ -8,6 +8,7 @@ import {
 } from './topics';
 import { topicsArr } from './topics-data';
 import { topicsOld } from './topics-data-old';
+import { topicInfoById } from './topic-info.data';
 
 
 interface IdToTopicMap {
@@ -47,9 +48,7 @@ export class TopicsService {
     // console.log('topicsArr', topicsArr)
     topicsArr.forEach(t => {
       if ( this.getTopicByIdIfExisting(t.id) ) {
-        const errorPrefix = 'TOPIC DUPLICATE WITH OLD topics (old one might be overriding data) : ';
-        console.warn(errorPrefix, t.id)
-        window.alert(errorPrefix + ' ' +  t.id)
+        errorAlert('TOPIC DUPLICATE WITH OLD topics (old one might be overriding data):', t.id)
       }
     })
     this.topics.push(... topicsArr)
@@ -80,15 +79,15 @@ export class TopicsService {
     // console.log('getTopicByIdIfExisting topicIdOrName', topicIdOrName)
     // TODO: change to hash-map, while doing topic management
     if ( topicIdOrName == null) {
-      let message = 'topicIdOrName wrong: ' + topicIdOrName;
-      alert(message)
+      const message = 'topicIdOrName wrong: ' + topicIdOrName;
+      errorAlert(message)
       throw(new Error(message))
     }
     topicsArray = topicsArray || this.topics
     let retVal = topicsArray.find((topic: Topic) => {
       let id = topic.id;
       if ( id == null ) {
-        alert('id null for topic ' + topic.name)
+        errorAlert('id null for topic', topic.name)
       }
       return id.toLowerCase() === topicIdOrName.toLowerCase()
     })
@@ -111,9 +110,7 @@ export class TopicsService {
     }
 
     if ( this.topicExistsById(newTopic.id, topicsArray) ) {
-      const message2 = 'Duplicate topic: '
-      console.error('Duplicate topic: ', newTopic)
-      window.alert('Duplicate topic: ' + newTopic.id)
+      errorAlert('Duplicate topic:', newTopic.id)
       return null
     }
 
@@ -129,6 +126,18 @@ export class TopicsService {
 
   topicExistsById(topicId: string, topicsArray?: any) {
     return !! this.getTopicByIdIfExisting(topicId, topicsArray)
+  }
+
+  /**
+   * Single source of truth for "what short info do we have about this topic":
+   * prefers data set directly on the Topic, falls back to the separate topic-info.data.ts lookup.
+   */
+  getTopicInfo(topic: Topic | undefined | null): string | undefined {
+    if ( ! topic ) {
+      return undefined
+    }
+    return topic.comments || topic.description || topic.tagline
+      || topicInfoById[topic.id] || topicInfoById[topic.name]
   }
 
 }

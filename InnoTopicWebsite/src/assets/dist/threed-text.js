@@ -14,6 +14,7 @@ World`,
   roughness: 0.15,
   envIntensity: 1.5,
   fov: 75,
+  perspective: !0,
   capitalize: !1,
   rotateZ: 0
 }, H = new T(new f(0, 0, 1), 0), X = (
@@ -133,6 +134,7 @@ class N extends HTMLElement {
       "roughness",
       "env-intensity",
       "fov",
+      "perspective",
       "scroll-zoom",
       "primary-color",
       "secondary-color",
@@ -180,6 +182,9 @@ class N extends HTMLElement {
         case "fov":
           this._cfg.fov = parseFloat(t);
           break;
+        case "perspective":
+          this._cfg.perspective = t !== "false", this._rebuildCamera();
+          return;
         case "capitalize":
           this._cfg.capitalize = t !== "false";
           break;
@@ -280,7 +285,16 @@ class N extends HTMLElement {
   }
   _zoomCameraAtClientPoint(e, s, t) {
     if (!this._camera) return;
-    const i = this._worldPointAtClientPoint(e, s), a = Math.max(2, Math.min(80, this._camera.position.z * t));
+    const i = this._worldPointAtClientPoint(e, s);
+    if (!this._isPerspectiveCamera(this._camera)) {
+      const o = Math.max(0.05, Math.min(20, this._camera.zoom / t));
+      if (o === this._camera.zoom) return;
+      this._camera.zoom = o, this._camera.updateProjectionMatrix();
+      const r = this._worldPointAtClientPoint(e, s);
+      !i || !r || (this._camera.position.x += i.x - r.x, this._camera.position.y += i.y - r.y, this._camera.updateMatrixWorld(!0));
+      return;
+    }
+    const a = Math.max(2, Math.min(80, this._camera.position.z * t));
     if (a === this._camera.position.z) return;
     this._camera.position.z = a;
     const o = this._worldPointAtClientPoint(e, s);
@@ -304,6 +318,22 @@ class N extends HTMLElement {
   _scheduleUpdate() {
     this._debounceTimer && clearTimeout(this._debounceTimer), this._debounceTimer = setTimeout(() => this._updateMesh(), 60);
   }
+  _createCamera() {
+    const e = (this.offsetWidth || 800) / (this.offsetHeight || 400), s = this._cfg.perspective ? new A(this._cfg.fov, e, 0.1, 1e4) : new Z(-e, e, 1, -1, 0.1, 1e4);
+    return s.position.z = 15, s.lookAt(0, 0, 0), s;
+  }
+  _rebuildCamera() {
+    const e = this._camera, s = this._createCamera();
+    e && (s.position.x = e.position.x, s.position.y = e.position.y), this._camera = s, this._textBoundingSize ? this._fitCameraToTextSize(this._textBoundingSize) : this._updateCameraProjection();
+  }
+  _isPerspectiveCamera(e) {
+    return !!e && e.isPerspectiveCamera === !0;
+  }
+  _updateCameraProjection() {
+    if (!this._camera) return;
+    const e = (this.offsetWidth || 800) / (this.offsetHeight || 400);
+    this._isPerspectiveCamera(this._camera) ? this._camera.aspect = e : (this._camera.left = -e, this._camera.right = e, this._camera.top = 1, this._camera.bottom = -1), this._camera.updateProjectionMatrix();
+  }
   // ── Three.js scene ────────────────────────────────────────────────────────
   _initScene() {
     const e = this._canvas, s = new E({
@@ -315,8 +345,8 @@ class N extends HTMLElement {
     s.toneMapping = R, s.toneMappingExposure = 1, this._renderer = s;
     const t = new S();
     this._scene = t;
-    const i = new A(75, 1, 0.1, 1e4);
-    i.position.z = 15, this._camera = i, t.add(new F(16777215, 0.5));
+    const i = this._createCamera();
+    this._camera = i, t.add(new F(16777215, 0.5));
     const a = new L(16777215, 1);
     a.position.set(10, 10, 10), t.add(a);
     const o = new x(16711935, 1);
@@ -329,7 +359,7 @@ class N extends HTMLElement {
   _resize() {
     var t, i;
     const e = this.offsetWidth || 800, s = this.offsetHeight || 400;
-    (t = this._renderer) == null || t.setPixelRatio(window.devicePixelRatio), (i = this._renderer) == null || i.setSize(e, s, !1), this._camera && (this._camera.aspect = e / s, this._camera.updateProjectionMatrix());
+    (t = this._renderer) == null || t.setPixelRatio(window.devicePixelRatio), (i = this._renderer) == null || i.setSize(e, s, !1), this._textBoundingSize ? this._fitCameraToTextSize(this._textBoundingSize) : this._updateCameraProjection();
   }
   _applyAutoSize() {
     if (!this._textBoundingSize || !this._autoSize) return;
@@ -338,22 +368,26 @@ class N extends HTMLElement {
   }
   _onFontSizeChange() {
     if (!(!this._autoSize || !this._textBoundingSize)) {
-      if (this._applyAutoSize(), this._camera) {
-        const e = this.offsetWidth || 800, s = this.offsetHeight || 400;
-        this._camera.aspect = e / s, this._camera.updateProjectionMatrix();
-      }
+      this._applyAutoSize();
       this._textBoundingSize && this._fitCameraToTextSize(this._textBoundingSize);
     }
   }
   _fitCameraToTextSize(e) {
     if (!this._camera) return;
-    const s = this._camera.fov * Math.PI / 180, t = Math.tan(s / 2), i = this._camera.aspect, a = this._cfg.rotateZ * (Math.PI / 180), o = Math.abs(Math.cos(a)), r = Math.abs(Math.sin(a)), c = e.x * o + e.y * r, m = (e.x * r + e.y * o) / 2 / t, _ = c / 2 / (t * i), g = Math.max(m, _) + e.z / 2;
-    this._camera.position.set(0, 0, Math.max(g, 0.5)), this._camera.lookAt(0, 0, 0), this._camera.updateMatrixWorld(!0);
+    const s = (this.offsetWidth || 800) / (this.offsetHeight || 400), t = this._cfg.rotateZ * (Math.PI / 180), i = Math.abs(Math.cos(t)), a = Math.abs(Math.sin(t)), o = e.x * i + e.y * a, r = e.x * a + e.y * i;
+    if (!this._isPerspectiveCamera(this._camera)) {
+      const c = Math.max(r, o / s), p = c * s;
+      this._camera.left = -p / 2, this._camera.right = p / 2, this._camera.top = c / 2, this._camera.bottom = -c / 2, this._camera.zoom = 1, this._camera.position.set(0, 0, 15), this._camera.lookAt(0, 0, 0), this._camera.updateProjectionMatrix(), this._camera.updateMatrixWorld(!0);
+      return;
+    }
+    this._camera.aspect = s;
+    const c = this._camera.fov * Math.PI / 180, p = Math.tan(c / 2), m = r / 2 / p, _ = o / 2 / (p * s), g = Math.max(m, _) + e.z / 2;
+    this._camera.position.set(0, 0, Math.max(g, 0.5)), this._camera.lookAt(0, 0, 0), this._camera.updateProjectionMatrix(), this._camera.updateMatrixWorld(!0);
   }
   async _updateMesh() {
     if (!this._scene || !this._envMap) return;
     const e = ++this._updateId;
-    this._camera && this._camera.fov !== this._cfg.fov && (this._camera.fov = this._cfg.fov, this._camera.updateProjectionMatrix());
+    this._isPerspectiveCamera(this._camera) && this._camera.fov !== this._cfg.fov && (this._camera.fov = this._cfg.fov, this._camera.updateProjectionMatrix());
     const s = `${this._cfg.fontSize}px`;
     this.style.fontSize !== s && (this.style.fontSize = s);
     try {
@@ -381,8 +415,7 @@ class N extends HTMLElement {
       r.position.sub(p);
       const m = c.getSize(new f());
       if (this._textBoundingSize = m, this._autoSize && (this._applyAutoSize(), this._camera)) {
-        const _ = this.offsetWidth || 800, g = this.offsetHeight || 400;
-        this._camera.aspect = _ / g, this._camera.updateProjectionMatrix();
+        this._updateCameraProjection();
       }
       this._fitCameraToTextSize(m);
     } catch (t) {
