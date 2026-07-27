@@ -334,7 +334,7 @@ export class Backend {
   'GraalVM' = tWide('graalvm_rabbit_icon.svg')
   Kong = tWide('kong-icon.svg'/* { tagline: 'the fastest cloud native API platform.' } */)
   GraphQL = t()
-  RabbitMQ = t()
+  RabbitMQ = tNarrow('rabbitmq-icon.svg')
   Swagger = t()
   OpenAPI = t('openapi-icon.svg') /* https://www.openapis.org/ ; Compatible with JSON Schema */
   // TODO https://www.asyncapi.com/ (has svgporn)

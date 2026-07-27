@@ -187,6 +187,8 @@ export class WorkOrganisationsAndProjectsData {
           'Working directly with #CEO & #Director_of_Operations. Communication in #English, #Spanish, #Polish. #Python #Django + #TypeScript app using #MongoDB and #MariaDB .',
         topicsById: {
           'Mailgun': {},
+          'RabbitMQ': {},
+          'Kafka': {},
           'Rust': {},
           'reCAPTCHA': {},
           'Terraform': {},
