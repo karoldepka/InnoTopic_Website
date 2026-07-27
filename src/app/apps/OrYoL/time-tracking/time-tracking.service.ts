@@ -1,7 +1,9 @@
 import {Injectable, Injector} from '@angular/core';
+
 import {TimeService} from '../core/time.service'
 import {HasItemData, HasPatchThrottled} from '../tree-model/has-item-data'
 import {OryItemsService} from '../core/ory-items.service'
+import {OryItem$} from '../db/OryItem$'
 import {TimeTrackingPeriod, TimeTrackingPeriodsService} from './time-tracking-periods.service'
 import {CachedSubject} from '../../../libs/AppFedShared/utils/cachedSubject2/CachedSubject2'
 import {TimeTrackedEntry} from './TimeTrackedEntry'
@@ -140,10 +142,8 @@ export class TimeTrackingService {
     public timeService: TimeService,
     public dataItemsService: OryItemsService,
     private timeTrackingPeriodsService: TimeTrackingPeriodsService,
+    private injector: Injector,
   ) {
-    this.timeTrackingPeriodsService.activePeriods$.subscribe((periods: TimeTrackingPeriod[] | null | undefined) => {
-      // this.
-    })
     // console.log('TimeTrackingService constructor()')
     // console.trace('TimeTrackingService constructor()')
     if ( TimeTrackingService._the ) {
@@ -152,6 +152,25 @@ export class TimeTrackingService {
     } else {
       TimeTrackingService._the = this
     }
+
+    // GH: boot-time discovery of what's currently tracked, without needing /tree's full sync.
+    // TimeTrackingPeriodsService.activePeriods$ is derived from TimeTrackingPeriodsOdmService's
+    // own (much smaller) collection, which already loads independently of /tree - see that
+    // service's constructor. Building an OryItem$ per active period's itemId here (a) triggers
+    // OryOdmItemsService's own construction+load if nothing else has yet (this service is already
+    // constructed at boot via the always-present app-wide toolbar), and (b) reuses the exact same
+    // shared-object caching the OryItem$ unification already gives every other consumer, so this
+    // is never a second, disconnected mirror of an item some other UI is also showing.
+    this.timeTrackingPeriodsService.activePeriods$.subscribe((periods: TimeTrackingPeriod[] | null | undefined) => {
+      for (const period of periods ?? []) {
+        const item$ = new OryItem$(this.injector, period.itemId) as unknown as TimeTrackable
+        const entry = this.obtainEntryForItem(item$)
+        // Re-broadcast to timeTrackedEntries$/the toolbar whenever this item's own real data
+        // arrives (it may well be undefined right now, immediately after construction) - entries
+        // are plain object references in that array, so nothing else re-emits it on our behalf.
+        entry.timeTrackVal$.subscribe(() => this.emitTimeTrackedEntry(entry))
+      }
+    })
 
     // pause tracking of items which are done:
     this.dataItemsService.onItemWithDataPatchedByUserLocally$.subscribe((event: [HasItemData<TimeTrackableItemData>, any]) => {
@@ -163,7 +182,9 @@ export class TimeTrackingService {
       }
     })
 
-    // detect item being tracked when loading from DB: (probably this is not needed anymore since we query periods)
+    // Live updates while /tree's own sync pipeline is actually running (edits, or another
+    // machine's changes arriving) - the activePeriods$ subscription above is what covers boot
+    // time / before /tree has ever loaded, this one keeps handling the rest.
     this.dataItemsService.onItemAddedOrModified$.subscribe((addedOrModifiedDataItem: HasItemData<TimeTrackableItemData>) => {
       const itemData = addedOrModifiedDataItem.getItemData()
       const ttData: TimeTrackingPersistentData | undefined = itemData?.timeTrack

@@ -46,6 +46,25 @@ export class TimeTrackingPeriodsService extends BaseService {
   ) {
     super(injector)
     this.featLocal = this.g.feat.timeTrackingPeriods
+
+    // GH: TimeTrackingPeriodsOdmService's own (much smaller) collection already loads
+    // independently of /tree's full sync - OdmService2's constructor kicks off
+    // setBackendListenerIfNecessary() unconditionally as soon as this service is first injected
+    // anywhere (e.g. via the app-wide toolbar), regardless of whether /tree has ever been visited.
+    // Deriving activePeriods$ here (previously declared but never populated) is what actually lets
+    // TimeTrackingService discover what's currently tracked from this - see its constructor.
+    this.periodsOdmService.localItems$.subscribe(items => {
+      const active = items
+        .filter(item$ => item$.val?.itemId && item$.val?.start && item$.val?.end == null)
+        .map(item$ => new TimeTrackingPeriod(
+          item$.id as string,
+          item$.val!.itemId as string,
+          item$.val!.start!,
+          null,
+          item$,
+        ))
+      this.activePeriods$.nextWithCache(active)
+    })
   }
 
   onPeriodEnd(entry: TimeTrackedEntry) {
