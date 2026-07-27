@@ -1,39 +1,15 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="LifeSuite favicon">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 110 110" role="img" aria-label="LifeSuite favicon">
+  <rect width="110" height="110" fill="#000000"/>
+  <path fill="url(#cloudGrad)" d="M41.9761 13C37.092 13 33.041 16.3486 31.8813 20.8733C31.7506 20.8733 31.6526 20.8406 31.5219 20.8406C25.7558 20.8406 21.0677 25.5287 21.0677 31.2948C21.0677 32.0789 21.1657 32.8466 21.3454 33.5817C16.5757 35.5418 13.2271 40.2135 13.2271 45.6693C13.2271 47.7275 13.7498 49.6386 14.5829 51.3701C10.6625 53.6243 8 57.806 8 62.6574C8 68.0968 11.3323 72.7685 16.0693 74.7287C15.9223 75.4801 15.8406 76.2478 15.8406 77.0319C15.8406 83.5331 21.1004 88.7928 27.6016 88.7928C28.2713 88.7928 28.9247 88.7111 29.5618 88.5968C31.1299 93.2522 35.4749 96.6335 40.6693 96.6335C47.1705 96.6335 52.4303 91.3737 52.4303 84.8725V23.4542C52.4303 17.688 47.7422 13 41.9761 13Z"/>
+  <path fill="url(#letterGrad)" d="M66.2169 86.35C65.1124 86.35 64.2169 85.4545 64.2169 84.35V25.1636C64.2169 24.0591 65.1124 23.1636 66.2169 23.1636H74.4982C75.6028 23.1636 76.4982 24.0591 76.4982 25.1636V73.5816C76.4982 74.6862 77.3937 75.5816 78.4982 75.5816H100.714C101.819 75.5816 102.714 76.477 102.714 77.5816V84.35C102.714 85.4545 101.819 86.35 100.714 86.35H66.2169Z"/>
   <defs>
-    <!-- Dark navy background -->
-    <linearGradient id="bgGrad" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%"   stop-color="#0e1d2e"/>
-      <stop offset="100%" stop-color="#1a3050"/>
+    <linearGradient id="cloudGrad" x1="30.2151" y1="13" x2="30.2151" y2="96.6335" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#BAD2FD"/>
+      <stop offset="1" stop-color="#4A8BFA"/>
     </linearGradient>
-    <!-- Light blue cloud: bright top-left → deeper blue -->
-    <linearGradient id="cloudGrad" x1="0" y1="0" x2="0.4" y2="1">
-      <stop offset="0%"   stop-color="#c8f0ff"/>
-      <stop offset="58%"  stop-color="#6dd4ff"/>
-      <stop offset="100%" stop-color="#3aaceb"/>
-    </linearGradient>
-    <!-- Orange L: warm amber → deep orange -->
-    <linearGradient id="letterGrad" x1="0" y1="0" x2="0.5" y2="1">
-      <stop offset="0%"   stop-color="#ffde90"/>
-      <stop offset="55%"  stop-color="#ff8a00"/>
-      <stop offset="100%" stop-color="#e06000"/>
+    <linearGradient id="letterGrad" x1="79.0504" y1="3.34997" x2="79.0504" y2="107.768" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FDCBAB"/>
+      <stop offset="1" stop-color="#FA904A"/>
     </linearGradient>
   </defs>
-
-  <!-- Full-bleed background (100% of viewBox) -->
-  <rect width="64" height="64" fill="url(#bgGrad)"/>
-
-  <!--
-    Original logo paths are in a 86×76 coordinate space.
-    Scale = 56/86 ≈ 0.6512 → rendered width = 56 px (4 px left margin, 4 px right margin).
-    Rendered height = 75.5 × 0.6512 ≈ 49.2 px → centred vertically:
-      y offset = 4 + (56 − 49.2) / 2 ≈ 7.4 px  (top ≈ 7.4 px, bottom ≈ 7.4 px)
-    All geometry ≥ 4 px from every canvas edge.
-  -->
-  <g transform="translate(4,7.4) scale(0.6512)">
-    <path fill="url(#cloudGrad)"
-      d="M30.5938,0c-4.3978,0-8.0456,3.01526-9.0899,7.08953-.1176,0-.2059-.02942-.3236-.02942-5.1921,0-9.4134,4.22139-9.4134,9.41349c0,.706.0882,1.3973.25,2.0592-4.2949,1.765-7.31016,5.9717-7.31016,10.8843c0,1.8533.47067,3.5742,1.22081,5.1333C2.3975,36.5802,0,40.3456,0,44.714c0,4.898,3.00055,9.1046,7.26603,10.8697-.13238.6766-.20592,1.3679-.20592,2.0739c0,5.854,4.73619,10.5901,10.59019,10.5901.603,0,1.1914-.0735,1.765-.1765c1.412,4.192,5.3245,7.2366,10.0018,7.2366c5.854,0,10.5902-4.7361,10.5902-10.5901v-55.30422C40.0073,4.22136,35.7859,0,30.5938,0Z"/>
-    <path fill="url(#letterGrad)"
-      transform="translate(-0.21686,0)"
-      d="M52.4215,64.2472c-.9946,0-1.8009-.8063-1.8009-1.8009v-53.29442c0-.99461.8063-1.8009,1.8009-1.8009h7.4569c.9946,0,1.8009.80629,1.8009,1.8009v43.59802c0,.9946.8063,1.8009,1.8009,1.8009h20.0045c.9946,0,1.8009.8063,1.8009,1.8009v6.0946c0,.9946-.8063,1.8009-1.8009,1.8009h-31.0632Z"/>
-  </g>
 </svg>
