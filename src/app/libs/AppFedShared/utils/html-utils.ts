@@ -66,6 +66,27 @@ export function trimHtmlWhitespace(html: string): string {
   return doc.body.innerHTML
 }
 
+/** Converts plain text to HTML, preserving ```-fenced code blocks as `<pre><code>` (so indentation
+ * survives - a plain `\n` -> `<br>` replace collapses leading spaces on every line, since normal
+ * HTML flow text collapses whitespace outside `<pre>`) while still converting newlines in the
+ * surrounding prose to `<br>` as before. AI-generated Q&A answers (e.g. from /ai/qa, especially the
+ * code-file-based generation from GH #130) often include a fenced code example inline in an
+ * otherwise-plain-text answer. */
+function convertPlainTextToHtml(text: string): string {
+  const FENCE_RE = /```(\w*)\n?([\s\S]*?)```/g
+  let html = ''
+  let lastIndex = 0
+  let match: RegExpExecArray | null
+  while ((match = FENCE_RE.exec(text))) {
+    html += text.slice(lastIndex, match.index).replace(/\n/g, `<br>`)
+    const code = match[2].replace(/\n$/, '')
+    html += `<pre><code>${escapeHtml(code)}</code></pre>`
+    lastIndex = FENCE_RE.lastIndex
+  }
+  html += text.slice(lastIndex).replace(/\n/g, `<br>`)
+  return html
+}
+
 export function convertToHtmlIfNeeded(htmlOrPlainString?: string | null) {
   if ( ! htmlOrPlainString ) {
     return htmlOrPlainString
@@ -81,7 +102,7 @@ export function convertToHtmlIfNeeded(htmlOrPlainString?: string | null) {
     // were rendering with a genuinely blank line on top, because that empty leading paragraph is
     // real, valid HTML once it reaches the rich-text editor, not something a later string .trim()
     // can remove.
-    htmlOrPlainString = trimmed ? `<p>${trimmed.replace(/\n/g, `<br>`)}</p>` : ''
+    htmlOrPlainString = trimmed ? `<p>${convertPlainTextToHtml(trimmed)}</p>` : ''
   } else {
     // console.log('convertToHtmlIfNeeded is html:', htmlOrPlainString)
     htmlOrPlainString = trimHtmlWhitespace(htmlOrPlainString)

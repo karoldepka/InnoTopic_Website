@@ -17,6 +17,28 @@ describe('convertToHtmlIfNeeded', () => {
     expect(convertToHtmlIfNeeded('Line one\nLine two')).toBe('<p>Line one<br>Line two</p>')
   })
 
+  it('preserves indentation in a fenced code block instead of collapsing it', () => {
+    // AI-generated Q&A answers (e.g. from /ai/qa) can include a fenced code example inline in an
+    // otherwise plain-text answer - a plain \n -> <br> replace would collapse each line's leading
+    // spaces, since normal HTML flow text collapses whitespace outside <pre>.
+    const answer = 'Example:\n```kotlin\nfun main() {\n    println("Hi")\n}\n```\nThat prints Hi.'
+    expect(convertToHtmlIfNeeded(answer)).toBe(
+      '<p>Example:<br><pre><code>fun main() {\n    println(&quot;Hi&quot;)\n}</code></pre><br>That prints Hi.</p>'
+    )
+  })
+
+  it('escapes HTML-special characters inside a fenced code block', () => {
+    const answer = '```\nif (a < b && b > 0) { c = &d; }\n```'
+    expect(convertToHtmlIfNeeded(answer)).toBe(
+      '<p><pre><code>if (a &lt; b &amp;&amp; b &gt; 0) { c = &amp;d; }</code></pre></p>'
+    )
+  })
+
+  it('handles a fenced code block with no language tag', () => {
+    const answer = '```\n  indented\n    more indented\n```'
+    expect(convertToHtmlIfNeeded(answer)).toBe('<p><pre><code>  indented\n    more indented</code></pre></p>')
+  })
+
   it('strips a genuinely empty leading paragraph from already-html input', () => {
     expect(convertToHtmlIfNeeded('<p></p><p>Real content</p>')).toBe('<p>Real content</p>')
   })
