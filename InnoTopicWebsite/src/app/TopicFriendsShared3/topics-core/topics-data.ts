@@ -984,6 +984,7 @@ export class AI {
   'Anthropic' = tWide('anthropic-icon.svg')
   'AI21 Labs' = tWide('ai21.svg')
   'Mistral AI' = tWide('mistral-ai-icon.svg')
+  'Qwen' = tNarrow('qwen-icon.svg')
   'Aleph Alpha' = tNarrow('aleph-alpha-icon.svg')
   'LAION' = t()
   'Ollama' = tNarrow('ollama.svg')
@@ -1089,8 +1090,9 @@ export class Social /* and media platforms AndMediaPlatforms */ {
   'Spotify' = tNarrow('spotify-icon.svg') // also podcasts
   'Meetup' = tWide(`meetup-seeklogo.com.svg`)
   'LinkedIn' = t('linkedin-icon')
-  'Mastodon' = t('mastodon-icon')
-  TODO 'Threads' = t('mastodon-icon')
+  'Mastodon' = tNarrow('mastodon-icon')
+  'Threads' = tNarrow('threads-icon.svg')
+  'x.com' = tNarrow('threads-icon.svg')
 }
 
 

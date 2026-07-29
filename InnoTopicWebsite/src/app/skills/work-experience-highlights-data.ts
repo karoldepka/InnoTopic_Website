@@ -542,7 +542,8 @@ export const highlights = {
       Vimeo: {},
       LinkedIn: {},
       Mastodon: {},
-      // TODO: x.com (twitter)
+      Threads: {},
+      "x.com": {}, // (FKA twitter)
       Meetup: {},
       Discord: {}, // AI stuff
       'Y Combinator': {}, // also Hacker News ( https://news.ycombinator.com/ ) where stuff emerges; also social and kinda comprehension
