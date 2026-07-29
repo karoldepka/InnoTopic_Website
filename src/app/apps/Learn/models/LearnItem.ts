@@ -260,14 +260,30 @@ export class LearnItem extends OdmInMemItem implements QuizzableData {
     return null
   }
 
-  public matchesSearch(search: string): boolean {
-    search = (search || '').trim().toLowerCase()
-    if ( search.length === 0 ) {
+  public matchesSearch(search: string, useRegex = false): boolean {
+    const trimmedSearch = (search || '').trim()
+    if ( trimmedSearch.length === 0 ) {
       return true
     }
+    if ( useRegex ) {
+      let regex: RegExp
+      try {
+        // Not lowercased (unlike the plain-substring path below) - 'i' alone gives
+        // case-insensitivity without corrupting case-sensitive escapes like \D/\S/\W/\B that
+        // .toLowerCase() on the pattern source would silently mangle.
+        regex = new RegExp(trimmedSearch, 'i')
+      } catch {
+        return false // invalid pattern - matches nothing rather than throwing mid-quiz-filter
+      }
+      return sidesDefsArray.some(side => {
+        const sideVal = this.getSideVal(side)?.replace(/<img src="data:image\/png;base64,.*"/gi, '')
+        return !! sideVal && regex.test(sideVal)
+      })
+    }
+    const search_ = trimmedSearch.toLowerCase()
     return sidesDefsArray.some(side => {
       const sideVal = this.getSideVal(side)?.replace(/<img src="data:image\/png;base64,.*"/gi, '')
-      return sideVal ?. toLowerCase() ?. includes(search)
+      return sideVal ?. toLowerCase() ?. includes(search_)
     })
   }
 

@@ -167,26 +167,40 @@ export class LearnItem$
     }
   }
 
-  matchesAnyFilterText(textFilterStrings: string[]): boolean {
+  matchesAnyFilterText(textFilterStrings: string[], useRegex = false): boolean {
     if ( ! textFilterStrings ?. length ) {
       return true
     }
 
     return textFilterStrings.some(searchedStr => {
-      return this.val?.matchesSearch(searchedStr)
+      return this.val?.matchesSearch(searchedStr, useRegex)
     })
   }
 
-  public hasAnyCategory(searchCategories: ItemCategory[]): boolean {
+  public hasAnyCategory(searchCategories: ItemCategory[], useRegex = false): boolean {
     if ( ! searchCategories ?. length ) {
       return true
     }
     // FIXME: getEffectiveCategories -- as array / Set
     // const myCategories = (this.getFieldVal(sidesDefs.categories) as string ?? '') ?. toLowerCase()
-    const myCategories = this.getEffectiveCategories()?.toLowerCase()
+    const myCategories = this.getEffectiveCategories()
     // console.log(`myCategories getEffectiveCategories()`, myCategories)
+    if ( useRegex ) {
+      if ( ! myCategories ) {
+        return false
+      }
+      return searchCategories.some(pattern => {
+        try {
+          // Not lowercased - same case-sensitive-escape reasoning as LearnItem.matchesSearch().
+          return new RegExp(pattern, 'i').test(myCategories)
+        } catch {
+          return false // invalid pattern - matches nothing rather than throwing mid-quiz-filter
+        }
+      })
+    }
+    const myCategoriesLower = myCategories?.toLowerCase()
     return searchCategories.some(
-      searchCategory => myCategories ?. includes(searchCategory)
+      searchCategory => myCategoriesLower ?. includes(searchCategory)
     )
   }
 

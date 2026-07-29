@@ -40,6 +40,16 @@
          />
       </div>
 
+      <div class="quiz-option--regex">
+        <ion-checkbox
+          class="quiz-toggle-cell"
+          labelPlacement="end"
+          [formControl]="controls.useRegexFilters"
+        >
+          TREAT CATEGORIES / TEXT FILTER AS REGEX
+        </ion-checkbox>
+      </div>
+
       <div class="quiz-option quiz-option--toggles">
         <div class="quiz-toggle-grid">
           <ion-checkbox

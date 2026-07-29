@@ -268,8 +268,18 @@ export class QuizService {
 
   /** Potentially move to QuizItemChooser or QuizItemsFilter... */
   private filterByCategories(item$s: LearnItem$[], quizOptions: QuizOptions) {
+    const useRegex = !! quizOptions.useRegexFilters
     const trimAllFunc = (strings?: string[]) => strings ?. map(string => string ?.trim())
-    const getArr = (inputStr?: string) => trimAllFunc(inputStr ?. trim() ?. toLowerCase() ?. split(',')) ?? []
+    // Regex mode: the whole field is one pattern - no comma-splitting (a literal comma is common
+    // in real patterns, e.g. `\d{1,3}`) and no lowercasing (would corrupt case-sensitive escapes
+    // like \D/\S/\W/\B; case-insensitivity comes from the 'i' flag downstream instead).
+    const getArr = (inputStr?: string) => {
+      const trimmed = inputStr ?. trim()
+      if ( ! trimmed ) {
+        return []
+      }
+      return useRegex ? [trimmed] : (trimAllFunc(trimmed.toLowerCase().split(',')) ?? [])
+    }
     const filterCategories: string[] = getArr(quizOptions.categories)
     const textFilterStrings: string[] = getArr(quizOptions.textFilter)
     console.log(`textFilterStrings`, textFilterStrings) /* FIXME: this could be the slowdown during typing; as it prolly string-filters all thousands of items on every save */
@@ -294,9 +304,9 @@ export class QuizService {
       item$s = item$s.filter(
         (item$) => {
           // return true
-          const hasAnyCategory = item$.hasAnyCategory(filterCategories)
+          const hasAnyCategory = item$.hasAnyCategory(filterCategories, useRegex)
           // console.log('hasAnyCategory', hasAnyCategory, item$.val?.title, filterCategories)
-          return hasAnyCategory && item$.matchesAnyFilterText(textFilterStrings)
+          return hasAnyCategory && item$.matchesAnyFilterText(textFilterStrings, useRegex)
         }
       )
     }

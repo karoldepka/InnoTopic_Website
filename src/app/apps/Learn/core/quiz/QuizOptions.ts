@@ -25,6 +25,10 @@ export class QuizOptions {
     public onlyAiGenerated: boolean = false,
     /** GH #128: reads the question/answer aloud via the browser's SpeechSynthesis API. */
     public textToSpeechEnabled: boolean = false,
+    /** Interpret `categories`/`textFilter` above as a single regex pattern each (case-insensitive,
+     * no comma-splitting) instead of the default comma-separated-substrings-OR'd-together
+     * matching. */
+    public useRegexFilters: boolean = false,
     // TODO: priorityByImportances: 0 .. 1 -- 0 - ignore importances, 1 - items of highest importance go first
     // in-between - probabilities
   ) {
