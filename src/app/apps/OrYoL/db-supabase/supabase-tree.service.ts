@@ -226,7 +226,20 @@ export class SupabaseTreeService extends DbTreeService {
     // OdmItem$2.saveNowToDb() already tracks its own sync-status promise internally
     // (OdmService2.saveNowToDb -> syncStatusService.handleSavingPromise) - nothing more to do
     // here.
-    const item$ = this.oryItemsService.createOdmItem$(newNode.itemId as OryOdmItemId, Object.assign(new OryOdmItem(), newNode.content.itemData))
+    //
+    // Must reuse the shared obtainItem$ById() instance rather than createOdmItem$()'ing a fresh,
+    // disconnected object: by the time this runs, TreeTableNodeContent.setTreeNodeAndInit() (via
+    // OryItem$'s constructor, earlier in this same TreeNode.addChild() call) has already obtained
+    // and seeded the real cached item$ for newNode.itemId with its initial title. A second
+    // freestanding object for that same id collides with the cached one in
+    // OdmService2._ensureItemAdded() (same class of bug as GH #125/#126's OryItem$ wrapper fix,
+    // just never applied here) and, worse, silently wins the write with only this call's minimal
+    // itemData, clobbering whatever the cached instance already held.
+    const item$ = this.oryItemsService.obtainItem$ById(newNode.itemId as OryOdmItemId)
+    // Belt-and-suspenders, not the normal case: the tree-model flow above always seeds this first,
+    // but any other caller reaching addChildNode() without that prior step still gets its new
+    // node's initial itemData applied rather than saving a blank row.
+    item$.currentVal ??= Object.assign(new OryOdmItem(), newNode.content.itemData)
     const parentItem$ = this.oryItemsService.obtainItem$ById(parentNode.itemId as OryOdmItemId)
     item$.setParentInclusion(parentItem$, newNode.nodeInclusion?.orderNum ?? 0)
     item$.saveNowToDb()
