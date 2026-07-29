@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<svg fill="rgb(26,26,26)"  width="256px" height="192px" viewBox="0 0 256 192" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" preserveAspectRatio="xMidYMid">
+<svg width="256px" height="192px" viewBox="0 0 256 192" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" preserveAspectRatio="xMidYMid">
     <defs>
         <radialGradient cx="59.1702583%" cy="15.5559933%" fx="59.1702583%" fy="15.5559933%" r="47.5403908%" id="radialGradient-1">
-            <stop stop-color="rgb(102,102,102)" offset="0%"></stop>
-            <stop stop-color="rgb(81,81,81)" offset="100%"></stop>
+            <stop stop-color="rgb(204,204,204)" offset="0%"></stop>
+            <stop stop-color="rgb(170,170,170)" offset="100%"></stop>
         </radialGradient>
     </defs>
     <g>

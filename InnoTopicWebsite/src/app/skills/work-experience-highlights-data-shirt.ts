@@ -57,6 +57,7 @@ export const highlights = {
       Java: {},
       Scala: {},
       Kotlin: {},
+      Ktor: {},
       "Spring Boot": {},
       Kafka: {},
     },
@@ -320,7 +321,7 @@ export const highlights = {
       'WebAssembly Package Manager (WAPM)':
         {} /* https://wapm.io/startpage/logo.svg */,
       Wasmtime: {},
-      Fermyon: {}, // https://github.com/fermyon/spin ; microservices in webassembly // too ugly; but this will have tiny icons anyway
+      // Fermyon: {}, // https://github.com/fermyon/spin ; microservices in webassembly // too ugly; but this will have tiny icons anyway
       Rust: {},
       Tauri: {},
       Tokio: {},
@@ -468,7 +469,9 @@ export const highlights = {
       // TODO: AI: 'FIXME GRAB shirt.data.ts': {},
       // TODO: AI: Gpt4all: {}, // open-source
       // TODO: AI: Nomic: {}, (has embedding model)
-      // TODO: AI: 'https://www.deepseek.com/': {},
+      TODO: AI: 'https://www.deepseek.com/': {},
+      TODO: AI: 'Model Context Protocol': {},
+      TODO: https://www.moonshot.ai/
       // TODO: AI: 'https://falconllm.tii.ae/': {}, // TII logo if necessary
       // TODO: AI: 'Mistral Orca / openorca etc': {}, // TODO MIXTRAL DOPLHIN 8x7B
       // TODO: AI: LongNet: {}, // https://abishpius.medium.com/say-goodbye-to-llm-token-limits-soon-longnet-scaling-transformers-to-1-000-000-000-tokens-1db51388d3d#:~:text=Longnet%20has%20a%20Vastly%20larger%20token,limit%20than%20all%20the%20current%20LLM%20models
@@ -496,7 +499,9 @@ export const highlights = {
       // TODO: AI: 'Amazon PartyRock': {}, // similar to vercel v0 a bit?
       // TODO: AI: https://runwayml.com/ai-magic-tools/gen-2/ (text to video, multimodal)
       // TODO: AI: https://github.com/apache/mxnet
-      // TODO: AI: 'x.ai Grok': {},
+      'x.ai Grok': {},
+      'Qwen': {},
+      "Aleph Alpha": {}
       // TODO: AI: 'Google Project IDX': {}, // https://idx.dev/
       // TODO: AI: 'Google Duet AI': {},
       // TODO: AI: 'Google Palm': {},
@@ -568,6 +573,7 @@ export const highlights = {
       Vimeo: {},
       LinkedIn: {},
       Mastodon: {},
+      Threads: {},
       // TODO: x.com (twitter)
       Meetup: {},
       Discord: {}, // AI stuff

@@ -149,14 +149,14 @@ export const highlights = {
       // "Svelte": {},
       // TODO: Frontend: HTMX: {},
       // TODO: Frontend: Biome: {}, // small icon frontend
-      Qwik: {},
-      SolidJS: {},
+      // Qwik: {},
+      // SolidJS: {},
       // Mithril: {},
       // Marko: {},
       // Rax: {},
       // Remix: {},
       // Riot: {},
-      'Alpine.js': {},
+      // 'Alpine.js': {},
       Astro: {},
       // Inferno: {},
       // TODO akita; elf https://github.com/ngneat/elf built on top of RxJS
@@ -173,10 +173,10 @@ export const highlights = {
       // TODO: Frontend: 'https://million.dev/': {},
 
       jQuery: {} /* kinda as a joke / to test someone */,
-      'Hotwired Turbo': {} /* DHH, does not use TS nor JSDoc nor .d.ts */,
-      'Hotwired Stimulus': {} /* DHH, does not use TS nor JSDoc nor .d.ts */,
+      // 'Hotwired Turbo': {} /* DHH, does not use TS nor JSDoc nor .d.ts */,
+      // 'Hotwired Stimulus': {} /* DHH, does not use TS nor JSDoc nor .d.ts */,
       Nx: {},
-      Rush: {}, // https://rushstack.io/
+      // Rush: {}, // https://rushstack.io/
       PWA: {},
 
       // TODO: lighthouse, web.dev
@@ -194,7 +194,7 @@ export const highlights = {
       // 'Windi CSS': {}, // sunsetting
       Bootstrap: {},
       'Material Design': {},
-      'Chakra UI': {},
+      // 'Chakra UI': {},
       // Mantine: {},
       // Bulma: {},
       'Web Components': {},
@@ -223,14 +223,14 @@ export const highlights = {
       Recoil: {},
       // "Jotai": {}, - commented-out coz stands out too much and reminds me of some period of paranoia over which icons to add; just 13k GH stars anyway
       // "Zustand": {}, // ugly and bad contrast
-      Akita: {}, // TODO elf
+      // Akita: {}, // TODO elf
       NgRx: {},
       NGXS: {},
       Pinia: {},
       MobX: {}, // TODO FIXME MobX-State-Tree https://github.com/mobxjs/mobx-state-tree/blob/b6c1c9b29d7bd7525ac6588f8f67f6c13eb17b2b/website/static/img/mobx-state-tree-logo.svg
       'MobX-State-Tree': {}, // TODO FIXME MobX-State-Tree https://github.com/mobxjs/mobx-state-tree/blob/b6c1c9b29d7bd7525ac6588f8f67f6c13eb17b2b/website/static/img/mobx-state-tree-logo.svg
       // https://github.com/simple-icons/simple-icons/issues/4352
-      Effect: {},
+      // Effect: {},
       Vercel: {},
       Netlify: {},
       Jamstack: {},
@@ -242,7 +242,7 @@ export const highlights = {
       // TODO Parcel
       Vite: {}, // https://github.com/pocketbase/pocketbase
       Vitest: {},
-      Biome: {},
+      // Biome: {},
       pnpm: {},
       /* TODO: Spring Framework */
       /* FIXME: more backend: OpenAPI, maybe JSON Schema, websockets, socket.io maybe */
@@ -278,7 +278,7 @@ export const highlights = {
       ReactiveX: {},
       Storybook: {},
       // ==== TESTING
-      AVA: {},
+      // AVA: {},
       Selenium: {},
       TestCafe: {},
       Cypress: {},
@@ -292,7 +292,7 @@ export const highlights = {
       WebAssembly: {},
       AssemblyScript: {},
       'WebAssembly System Interface (WASI)': {},
-      Wasmer: {},
+      // Wasmer: {},
       // 'WebAssembly Package Manager (WAPM)': {} /* https://wapm.io/startpage/logo.svg */,
       // Wasmtime: {},
       // Fermyon: {}, // https://github.com/fermyon/spin ; microservices in webassembly // too ugly; but this will have tiny icons anyway
@@ -339,7 +339,7 @@ export const highlights = {
       // TODO: Lowcode: 'FIXME Rowy': {}, // or next to notion
       // TODO: Lowcode:'FIXME nocodb': {}, // or next to notion
 
-      Coda: {},
+      // Coda: {},
       Zapier: {},
       IFTTT: {},
       Kong: {} /* The Cloud Native API Management Platform */,
@@ -349,8 +349,8 @@ export const highlights = {
       // ====  LowCode / NoCode:
       Shopify: {},
       Budibase: {},
-      Bubble: {},
-      Framer: {},
+      // Bubble: {},
+      // Framer: {},
       WebFlow: {},
       // Wix: {},
 
@@ -591,9 +591,9 @@ export const highlights = {
       MongoDB: {},
       ArangoDB: {},
       SurrealDB: {} /* Also vector DB, written in Rust */,
-      Xata: {},
-      Dgraph: {},
-      Fauna: {},
+      // Xata: {},
+      // Dgraph: {},
+      // Fauna: {},
       // TODO: https://github.com/MaterializeInc/materialize - Streaming DB, Rust
       // "RethinkDB": {}, /* disabled to save space and optimize layout for print */
       // ====== Vector / Embeddings DB-s (Databases)
@@ -602,7 +602,7 @@ export const highlights = {
       Redis: {}, // has vec db too supposedly
       Pinecone: {},
       LlamaIndex: {},
-      Vespa: {},
+      // Vespa: {},
       Weaviate: {},
       Chroma: {},
 

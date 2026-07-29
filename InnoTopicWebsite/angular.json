@@ -91,11 +91,13 @@
               "buildTarget": "app:build:development"
             },
             "ci": {
-              "progress": false
+              "progress": false,
+              "hmr": false
             }
           },
           "options": {
-            "proxyConfig": "./src/proxy.conf.json"
+            "proxyConfig": "./src/proxy.conf.json",
+            "hmr": true
           },
           "defaultConfiguration": "development"
         },

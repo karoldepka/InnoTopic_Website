@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg fill="rgb(26,26,26)"  width="256px" height="259px" viewBox="0 0 256 259" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<svg width="256px" height="259px" viewBox="0 0 256 259" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
     <title>Shape</title>
     <defs>
         <linearGradient x1="0%" y1="49.9993686%" x2="100%" y2="49.9993686%" id="linearGradient-1">
-            <stop stop-color="rgb(93,93,93)" offset="0%"></stop>
-            <stop stop-color="rgb(102,102,102)" offset="100%"></stop>
+            <stop stop-color="rgb(170,170,170)" offset="0%"></stop>
+            <stop stop-color="rgb(204,204,204)" offset="100%"></stop>
         </linearGradient>
     </defs>
     <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">

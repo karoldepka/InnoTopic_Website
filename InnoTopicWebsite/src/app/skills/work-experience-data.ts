@@ -299,23 +299,23 @@ export class WorkExperienceData {
     // TODO: PHP, Laravel (EpicElite)
     // TODO: ApolloServer
   })
-  wishList = experience('Wish-list', 'things on my radar; learning bits and pieces when I can', {
-    'D Language': we(),
-    Julia: we(),
-    // WebAssembly: we(),
-    Algolia: we(),
-    ArangoDB: we(),
-    JHipster: we(),
-    // Meteor: we(),
-    Aurelia: we(),
-    PouchDB: we(),
-    'Plastic SCM': we(),
-    Workbox: we(),
-    // Keras: we(),
-    // Hoodie: we(),
-    // Bazel: we(),
-    // TODO: Blazor, .NET Core
-  })
+  // wishList = experience('Wish-list', 'things on my radar; learning bits and pieces when I can', {
+  //   'D Language': we(),
+  //   Julia: we(),
+  //   // WebAssembly: we(),
+  //   Algolia: we(),
+  //   ArangoDB: we(),
+  //   JHipster: we(),
+  //   // Meteor: we(),
+  //   Aurelia: we(),
+  //   PouchDB: we(),
+  //   'Plastic SCM': we(),
+  //   Workbox: we(),
+  //   // Keras: we(),
+  //   // Hoodie: we(),
+  //   // Bazel: we(),
+  //   // TODO: Blazor, .NET Core
+  // })
 }
 
 // TODO: check for duplicates

@@ -113,7 +113,7 @@ export class WorkOrganisationsAndProjectsData {
       }),
       'eCommerce Orders SLA real-time monitor and analytics platform': project({
         roles: 'Staff Engineer, #Rust, #React, #Angular Developer',
-        description: 'Using #Rust, #Python, #Java, #Kafka, #Spring_Boot, #DynamoDB, #MongoDB and #Django + #TypeScript Web App. ' +
+        description: 'Using #Rust, #Python, #Java, #DynamoDB, #MongoDB and #Django + #TypeScript Web App. ' +
           'Working directly with #CTO and #Senior_Principal_Engineer. ' +
           'Working with big brands like #Amazon, Walmart, Adidas, Puma.',
         topicsById: {
@@ -163,9 +163,10 @@ export class WorkOrganisationsAndProjectsData {
           'Django': {},
           'Java': {},
           'Kotlin': {},
-          'Spring': {},
-          'Spring Boot': {},
-          'Kafka': {},
+          // 'Spring': {},
+          // 'Spring Boot': {},
+          // 'Kafka': {},
+          // 'Kafka Streams': {},
           // TODO: PyCharm
         }
       })
@@ -189,6 +190,8 @@ export class WorkOrganisationsAndProjectsData {
           'Mailgun': {},
           'RabbitMQ': {},
           'Kafka': {},
+          'Kafka Streams': {},
+          'Spring Boot': {},
           'Rust': {},
           'reCAPTCHA': {},
           'Terraform': {},
@@ -239,7 +242,6 @@ export class WorkOrganisationsAndProjectsData {
           'Laravel': {},
           'PandaDoc': {},
           'Java': {},
-          'Kafka': {},
           'Kotlin': {},
         }
       })
@@ -299,6 +301,7 @@ export class WorkOrganisationsAndProjectsData {
           'Spring': {},
           "Spring Boot": {},
           'Kafka': {},
+          'Kafka Streams': {},
           Python: {},
           Django: {},
           Karma: {},

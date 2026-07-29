@@ -353,6 +353,10 @@ export class TopicsGraphComponent implements OnInit {
     nodeCircleOverlay.append("title")
       .text(titleFunc);
 
+    // Extra slack beyond each circle's own radius when clamping to the SVG bounds, so the
+    // stroke/anti-aliasing at the very edge of a node doesn't get visually cut off by the viewBox.
+    const boundaryPadding = 4;
+
     function ticked() {
       // allLinksGroup
       //   .attr("x1", function(d: any) { return d.source.x; })
@@ -361,8 +365,8 @@ export class TopicsGraphComponent implements OnInit {
       //   .attr("y2", function(d: any) { return d.target.y; });
       if(self.graphHasContainer) {
         perNodeMainGroup
-          .attr("cx", function(d: any) { return d.x = Math.max(radiusFunc(d), Math.min(width - radiusFunc(d), d.x)); })
-          .attr("cy", function(d: any) { return d.y = Math.max(radiusFunc(d), Math.min(height - radiusFunc(d), d.y)); });
+          .attr("cx", function(d: any) { return d.x = Math.max(radiusFunc(d) + boundaryPadding, Math.min(width - radiusFunc(d) - boundaryPadding, d.x)); })
+          .attr("cy", function(d: any) { return d.y = Math.max(radiusFunc(d) + boundaryPadding, Math.min(height - radiusFunc(d) - boundaryPadding, d.y)); });
       } else {
         perNodeMainGroup
           .attr("x", function(d: any) { return (d.x - radiusFunc(d) ); })

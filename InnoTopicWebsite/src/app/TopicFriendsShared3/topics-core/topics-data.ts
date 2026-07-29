@@ -249,7 +249,7 @@ export class Frontend {
   Recoil = tWide('recoil-icon')
   Jotai = tWide('jotai')
   Zustand = tWide('zustand--logo512.png--vectorizer.ai--cropped.svg') // tagline: '🐻 Bear necessities for state management in React'
-  Pinia = tWide() // vue state management
+  Pinia = tNarrow('pinia.svg') // vue state management
   Effect = tSquare('effect-icon.svg') // is it frontend or backend or both?
 
   React = tWide()
@@ -376,6 +376,7 @@ export class Backend {
   Spring = t('spring-icon.svg')
   'Spring Boot' = t()
   'Kafka' = tNarrow('kafka-icon.svg')
+  'Kafka Streams' = tNarrow('kafka-icon.svg')
   'OpenShift' = tWide('openshift.svg')
   'Hazelcast' = tNarrow('hazelcast-icon.svg')
 
@@ -983,6 +984,7 @@ export class AI {
   'Anthropic' = tWide('anthropic-icon.svg')
   'AI21 Labs' = tWide('ai21.svg')
   'Mistral AI' = tWide('mistral-ai-icon.svg')
+  'Aleph Alpha' = tNarrow('aleph-alpha-icon.svg')
   'LAION' = t()
   'Ollama' = tNarrow('ollama.svg')
   Gradio = tWide('gradio-icon.svg')
@@ -1088,7 +1090,9 @@ export class Social /* and media platforms AndMediaPlatforms */ {
   'Meetup' = tWide(`meetup-seeklogo.com.svg`)
   'LinkedIn' = t('linkedin-icon')
   'Mastodon' = t('mastodon-icon')
+  TODO 'Threads' = t('mastodon-icon')
 }
+
 
 export class Roles /* and responsibilities and posts */ {
   'Lead developer' = tNoIcon()
@@ -1155,7 +1159,8 @@ export type Topics =
   Frontend & Frontend_Visual & Frontend_And_Backend_App_Platforms &
   Graphics &
   Backend & Other & Testing & Tools & Languages & OS & Mobile & Cloud &
-  Project_Management_Tools & Version_Control & Databases & Monitoring_and_observability &
+  Project_Management_Tools & Version_Control & Databases &
+  Monitoring_and_observability &
   Java & JavaScript & Build_Systems_And_Package_Managers &
   AI & AI_Hardware &
   Crypto & FunAndSports & Social &

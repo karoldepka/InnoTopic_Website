@@ -9,6 +9,7 @@ import {
 import { topicsArr } from './topics-data';
 import { topicsOld } from './topics-data-old';
 import { topicInfoById } from './topic-info.data';
+import { formatTopicExtendedInfo, topicsDataExtended } from './topics-data-extended';
 
 
 interface IdToTopicMap {
@@ -136,7 +137,9 @@ export class TopicsService {
     if ( ! topic ) {
       return undefined
     }
+    const extended = (topicsDataExtended as any)[topic.id] || (topicsDataExtended as any)[topic.name]
     return topic.comments || topic.description || topic.tagline
+      || (extended && formatTopicExtendedInfo(extended))
       || topicInfoById[topic.id] || topicInfoById[topic.name]
   }
 

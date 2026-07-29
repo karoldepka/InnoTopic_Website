@@ -19,7 +19,6 @@ import { TopicsGraphComponent } from './topics-graph/topics-graph.component';
     ExternalProfilesComponent,
     GlobeSwitcherComponent,
     PersonalDataComponent,
-    ThreeDTextComponent,
     TopicsGraphComponent,
     WorkExperienceComponent,
     WorkProjectsSectionComponent,

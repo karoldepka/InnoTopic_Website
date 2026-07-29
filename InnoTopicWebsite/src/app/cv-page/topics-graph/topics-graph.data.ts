@@ -151,7 +151,11 @@ export const nodeConnections: GraphConnections = {
                   },
                   'Vue.js': {
                     strengthMul: 0.5,
-                    sizeMult: size.veryBig
+                    sizeMult: size.veryBig,
+                    connections: {
+                      // Vuex: {},
+                      Pinia: {},
+                    }
                   },
                   'React': { /*...weak*/
                     strengthMul: 0.5,
@@ -194,9 +198,14 @@ export const nodeConnections: GraphConnections = {
                               Kotlin: { sizeMult: size.veryBig },
                               Gradle: {},
                               Groovy: {},
-                              "OpenShift": { sizeMult: size.small, strengthMul: strength.veryBig },
-                              "Hazelcast": { sizeMult: size.small, strengthMul: strength.veryBig },
-                              "Kafka": { sizeMult: size.small, strengthMul: strength.veryBig, },
+                              // "OpenShift": { sizeMult: size.small, strengthMul: strength.veryBig },
+                              // "Hazelcast": { sizeMult: size.small, strengthMul: strength.veryBig },
+                              "Kafka": {
+                                sizeMult: size.small, strengthMul: strength.veryBig,
+                                connections: {
+                                  "Kafka Streams": { sizeMult: size.verySmall, strengthMul: strength.veryBig },
+                                },
+                              },
                               "Spring": { sizeMult: size.veryBig },
                               "Spring Boot": {
                                 strengthMul: strength.veryBig,

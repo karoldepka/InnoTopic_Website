@@ -95,4 +95,8 @@ export class UserOtherProfilesComponent implements OnInit {
   getFormControl(descriptor: UserOtherProfileDescriptor) {
     return (this.formControls as any)[descriptor.id]
   }
+
+  hasProfile(descriptor: UserOtherProfileDescriptor) {
+    return !!(this.otherProfiles as any)?.[descriptor.id]
+  }
 }

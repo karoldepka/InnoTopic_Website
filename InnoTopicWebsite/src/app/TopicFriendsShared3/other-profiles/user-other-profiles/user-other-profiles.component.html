@@ -12,11 +12,11 @@
   *ngFor="let descriptor of descriptorsList"
 >
   <app-other-profile-user-name
-    *ngIf="getFormControl(descriptor); let value"
+    *ngIf="hasProfile(descriptor) && getFormControl(descriptor); let value"
     [descriptor]="descriptor"
     [parentFormGroup]="formGroup"
     [thisFormControl]="value"
-  ></app-other-profile-user-name>
+  />
 
 </ng-container>
 <!--</div>-->
