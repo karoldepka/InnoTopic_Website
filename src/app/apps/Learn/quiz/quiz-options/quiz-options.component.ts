@@ -42,6 +42,18 @@ export class QuizOptionsComponent implements OnInit {
     this.categoriesExpanded = !this.categoriesExpanded
   }
 
+  /** Top-level sections of the options panel - collapsed by default so the panel opens compact;
+   * each is expanded independently by clicking its own header. */
+  groupsExpanded: {[group in 'filters' | 'scheduling' | 'stats']: boolean} = {
+    filters: false,
+    scheduling: false,
+    stats: false,
+  }
+
+  toggleGroup(group: 'filters' | 'scheduling' | 'stats') {
+    this.groupsExpanded[group] = !this.groupsExpanded[group]
+  }
+
   /* TODO use some options syncer util, maybe OptionsFormControl directive */
   controls: { [k in keyof QuizOptions]: UntypedFormControl} = {
     dePrioritizeNewMaterial: new UntypedFormControl(false),

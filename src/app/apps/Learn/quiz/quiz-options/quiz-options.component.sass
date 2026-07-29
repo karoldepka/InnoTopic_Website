@@ -2,6 +2,37 @@
   display: block
   padding: 0.75rem
 
+.quiz-groups
+  display: flex
+  flex-direction: column
+  gap: 0.5rem
+
+.quiz-group
+  border: 1px solid rgba(var(--ion-text-color-rgb, 255, 255, 255), 0.12)
+  border-radius: 6px
+  background: rgba(var(--ion-text-color-rgb, 255, 255, 255), 0.03)
+  padding: 0.6rem
+
+.quiz-group--collapsed
+  padding-bottom: 0.6rem
+
+.quiz-group__header
+  display: flex
+  align-items: center
+  justify-content: space-between
+  gap: 0.4rem
+  cursor: pointer
+  user-select: none
+  font-size: 0.82rem
+  font-weight: 700
+  line-height: 1.15
+  text-transform: uppercase
+  letter-spacing: 0.02em
+  color: var(--ion-color-light, var(--ion-text-color))
+
+.quiz-group .quiz-options-grid
+  margin-top: 0.6rem
+
 .quiz-options-grid
   display: grid
   grid-template-columns: repeat(12, minmax(0, 1fr))

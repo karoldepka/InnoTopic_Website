@@ -1,6 +1,6 @@
 
 <ion-button
-  *ngIf="side && isVisible(item$.val$ | async) && (! formControl.value) && ! editorOpened && isDependencySatisfied()"
+  *ngIf="side && isVisible(item$.val$ | async) && (! formControl.value || side.collapsedByDefault) && ! editorOpened && isDependencySatisfied()"
   (click)="editorOpened = true; focusEditor()"
   color="gray"
   [ngClass]="{ answerBorder: side.id === answerDescr.id }"
@@ -17,7 +17,7 @@
 <div
   class="expanded-editor"
   style="margin: 3px"
-  *ngIf="side && isVisible(item$.val$ | async) && (editorOpened || formControl.value)"
+  *ngIf="side && isVisible(item$.val$ | async) && (editorOpened || (formControl.value && ! side.collapsedByDefault))"
   (click)="focusEditor()"
 > <!-- https://github.com/tinymce/tinymce-angular/issues/130 -->
 

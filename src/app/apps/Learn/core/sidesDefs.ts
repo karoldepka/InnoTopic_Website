@@ -16,6 +16,10 @@ export class Side {
   isHint ? : boolean
   onlyForLearn ? : boolean
   hideByDefault ? : boolean
+  /** Unlike `hideByDefault` (hides the side entirely), this still shows the side but collapsed to
+   * just its clickable title, even once it has a value - e.g. `categories`' long breadcrumb-style
+   * path otherwise dominates the quiz card. */
+  collapsedByDefault ? : boolean
   searchTerms ? : string | string[]
 
   get iconFullPath() {
@@ -79,6 +83,7 @@ export class SidesDefs {
   })
   categories = side({
     ask: false,
+    collapsedByDefault: true,
   })
   /** for a 2-way asking */
   question2 = side({
