@@ -3,6 +3,7 @@ import {Theme, ThemeId, themesArray, themesMapById} from './themes.data'
 import {ThemeCalculator, ThemeOptions} from './ThemeCalculator'
 import {BaseService} from '../base.service'
 import {environment} from '../../../../environments/environment'
+import {FaviconThemeService} from './favicon-theme.service'
 
 @Injectable({
   providedIn: 'root'
@@ -10,6 +11,8 @@ import {environment} from '../../../../environments/environment'
 export class ThemeService extends BaseService {
 
   themeCalculator = new ThemeCalculator()
+
+  private faviconThemeService = this.injector.get(FaviconThemeService)
 
   brightnessPercent = 50
 
@@ -49,6 +52,7 @@ export class ThemeService extends BaseService {
     console.log('setTheme', theme)
     this.theme = theme
     this.themeCalculator.updateColors(this.getThemeOptions())
+    this.faviconThemeService.updateFavicon(theme)
   }
 
   setBrightnessPercent(brightnessPercent: number) {
