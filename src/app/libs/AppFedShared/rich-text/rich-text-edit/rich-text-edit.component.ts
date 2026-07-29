@@ -512,6 +512,36 @@ export class RichTextEditComponent extends AbstractCellComponent implements OnIn
         */,
       setup: (editor: any) => {
         console.log('setup')
+        // Every programmatic content replacement (the tinymce-angular wrapper's writeValue(),
+        // called whenever formControl1.setValue() runs - e.g. a reactive re-sync from
+        // NodeContentViewSyncer/ViewSyncer racing an in-progress edit, or any other caller that
+        // sets this control's value) goes through editor.setContent() under the hood, which always
+        // collapses the caret to the very start of the document - TinyMCE has no built-in "keep the
+        // cursor where it was" option for this. Only bother saving/restoring while this editor
+        // actually has focus: an update landing while the user is elsewhere has no cursor here
+        // worth preserving, and skipping it avoids stealing focus via moveToBookmark(). A bookmark
+        // (not a plain numeric offset) survives the surrounding content changing shape somewhat;
+        // if it still fails to resolve against genuinely different content, restoring is simply
+        // skipped rather than throwing - same "best-effort, never worse than the reset" trade-off
+        // as leaving the caret whereever setContent put it.
+        let pendingCaretBookmark: any
+        editor.on('BeforeSetContent', () => {
+          if (editor.hasFocus()) {
+            pendingCaretBookmark = editor.selection.getBookmark(2, true)
+          }
+        })
+        editor.on('SetContent', () => {
+          if (pendingCaretBookmark) {
+            const bookmarkToRestore = pendingCaretBookmark
+            pendingCaretBookmark = undefined
+            try {
+              editor.selection.moveToBookmark(bookmarkToRestore)
+            } catch {
+              // Content changed too much for this bookmark to resolve - leave the caret as-is
+              // rather than throwing.
+            }
+          }
+        })
         editor.on('PastePreProcess', (event: any) => {
           // Work around a long-standing, still-unfixed TinyMCE bug (tinymce/tinymce#6629):
           // its paste-image scanner assumes any `data:...;base64,` <img> src it finds has a
