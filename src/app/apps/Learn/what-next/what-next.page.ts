@@ -1,6 +1,6 @@
 import {Component, Injector, OnInit, ChangeDetectionStrategy} from '@angular/core';
 import {ThemeService} from '../../../libs/AppFedShared/theme-config/theme.service'
-import { Router, RouterLink } from '@angular/router'
+import { Router } from '@angular/router'
 import {FeatureService} from '../../../libs/AppFedShared/feature.service'
 import {BaseComponent} from '../../../libs/AppFedShared/base/base.component'
 import { IonicModule } from '@ionic/angular';
@@ -25,7 +25,6 @@ import {rankDestinations, WhatNextDestination} from './what-next-destination-ran
         SyncStatusIconComponent,
         NgIf,
         NgFor,
-        RouterLink,
         QuizButtonComponent,
         EnergyGraphComponent,
     ],
