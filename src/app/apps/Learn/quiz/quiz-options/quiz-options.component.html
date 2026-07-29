@@ -1,7 +1,14 @@
 <section class="quiz-options-grid">
-  <div class="quiz-option quiz-option--input">
-    <div class="quiz-option__label">CATEGORIES</div>
+  <div class="quiz-option quiz-option--input" [class.quiz-option--collapsed]="!categoriesExpanded">
+    <div
+      class="quiz-option__label quiz-option__label--toggle"
+      (click)="toggleCategories()"
+    >
+      CATEGORIES
+      <ion-icon [name]="categoriesExpanded ? 'chevron-up' : 'chevron-down'"></ion-icon>
+    </div>
     <ion-input
+      *ngIf="categoriesExpanded"
       class="quiz-option__input"
       [formControl]="controls.categories"
       [clearInput]="true"

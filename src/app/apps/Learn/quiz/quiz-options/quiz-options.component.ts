@@ -1,4 +1,5 @@
 import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
+import { NgIf } from '@angular/common'
 import { Form, UntypedFormControl, UntypedFormGroup, ReactiveFormsModule } from '@angular/forms'
 import {QuizService} from '../../core/quiz/quiz.service'
 import {ViewSyncer} from '../../../../libs/AppFedShared/odm/ui/ViewSyncer'
@@ -20,6 +21,7 @@ import { QuizFocusLevelComponent } from './quiz-focus-level/quiz-focus-level.com
     changeDetection: ChangeDetectionStrategy.Eager,
     styleUrls: ['./quiz-options.component.sass'],
     imports: [
+        NgIf,
         IonicModule,
         ReactiveFormsModule,
         NumericPickerComponent,
@@ -33,6 +35,12 @@ export class QuizOptionsComponent implements OnInit {
 
   funButtonsDesc = buttonsDesc
   importanceButtonsDesc = importanceButtonsDesc
+
+  categoriesExpanded = false
+
+  toggleCategories() {
+    this.categoriesExpanded = !this.categoriesExpanded
+  }
 
   /* TODO use some options syncer util, maybe OptionsFormControl directive */
   controls: { [k in keyof QuizOptions]: UntypedFormControl} = {

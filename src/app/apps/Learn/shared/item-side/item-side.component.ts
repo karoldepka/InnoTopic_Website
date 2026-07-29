@@ -70,6 +70,11 @@ export class ItemSideComponent implements OnInit {
   @Input()
   showMic = true
 
+  /** Quiz sets this to false - the "Fill with AI" answer button defeats the point of being
+   * quizzed, so it's only meant for the regular item-editing page. */
+  @Input()
+  showAiFillButton = true
+
 
   formControls ! : SideFormControlsDict
 

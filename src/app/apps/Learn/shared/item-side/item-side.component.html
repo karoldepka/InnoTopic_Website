@@ -33,7 +33,7 @@
       [side]="side"
      />
     <ion-button
-      *ngIf="side.id === answerDescr.id"
+      *ngIf="side.id === answerDescr.id && showAiFillButton"
       size="small"
       fill="clear"
       [disabled]="aiLoading"
