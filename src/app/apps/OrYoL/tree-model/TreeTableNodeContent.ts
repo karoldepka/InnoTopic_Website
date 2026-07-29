@@ -179,10 +179,20 @@ export class TreeTableNodeContent <
     const column = cell.column
     const patch = {}
     column.setValueOnItemData(patch, inputNewValue)
+    // Recorded *before* patchThrottled() below, not after: patchThrottled() synchronously emits
+    // on dbItem.data$ (Object.assign(currentVal, patch) then locallyVisibleChanges$.next(...)),
+    // which NodeContentComponent listens to and reacts to via
+    // NodeContentViewSyncer.applyItemDataValuesToViews() -> canApplyDataToViewGivenColumnLocalEdits().
+    // On the very *first* edit ever made to a column, that check's `!lastEditedByColumn` branch
+    // returns true (nothing recorded yet) - if this line ran after patchThrottled(), that reactive
+    // call would race ahead of the recording and see "no local edit," incorrectly re-applying
+    // itemData through setInputValue() and (for TinyMCE cells) resetting the caret to the start of
+    // the field on that very first keystroke. Recording first ensures the guard always sees a
+    // just-now edit time, consistent with every subsequent keystroke.
+    this.whenLastEditedLocallyByColumn.set(column, new Date())
     this.patchThrottled(patch)
     // this.getEventEmitterOnChangePerColumn().emit(column) // FIXME make this cumulative patch, not per-column
     // this.editedHere.set(column, true)
-    this.whenLastEditedLocallyByColumn.set(column, new Date())
 
     column.setValueOnItemData(this.itemData, inputNewValue) // NOTE this was moved from NodeContentComponent::onInputChanged
   }
