@@ -2,11 +2,11 @@ import {AfterViewInit, Component, ElementRef, Input, OnDestroy, OnInit, ViewChil
 import {debugLog} from '../../../../libs/AppFedShared/utils/log'
 import {LearnItem} from '../../models/LearnItem'
 import {Side} from '../../core/sidesDefs'
-import {Observable} from 'rxjs'
+import {Observable, Subscription, filter, take} from 'rxjs'
 import {NumericPickerVal} from '../../../../libs/AppFedSharedIonic/ratings/numeric-picker/numeric-picker.component'
 import {LearnItem$} from '../../models/LearnItem$'
 import {QuizService} from '../../core/quiz/quiz.service'
-import {Subscription} from 'rxjs'
+import {QuizSpeechService} from '../../core/quiz/quiz-speech.service'
 import {nullish} from '../../../../libs/AppFedShared/utils/type-utils'
 import { NgIf, NgFor, AsyncPipe } from '@angular/common';
 import { BreadcrumbsComponent } from '../../../../libs/AppFedShared/breadcrumbs/breadcrumbs.component';
@@ -71,12 +71,24 @@ export class QuizItemDetailsComponent implements OnInit, OnDestroy, AfterViewIni
 
   constructor(
     public quizService: QuizService,
+    private quizSpeech: QuizSpeechService,
   ) {
     // debugLog('QuizItemDetailsComponent ctor')
   }
 
   ngOnInit() {
     this.quizService.onNewQuestion()
+    if (this.quizService.options2$.val?.textToSpeechEnabled) {
+      // This whole component is recreated per quiz item (see the *ngFor "hack" in quiz.page.html),
+      // so ngOnInit fires exactly once per item - take(1) on the first non-null emission reads the
+      // question aloud once, rather than re-speaking on every unrelated itemVal$ update.
+      this.itemVal$ ?. pipe(
+        filter(itemVal => !! itemVal),
+        take(1),
+      ).subscribe(itemVal => {
+        this.quizSpeech.speak(itemVal ?. getQuestion() || itemVal ?. title)
+      })
+    }
   }
 
   // private scrollToBottom() {
@@ -96,6 +108,15 @@ export class QuizItemDetailsComponent implements OnInit, OnDestroy, AfterViewIni
         setTimeout(() => {
           this.answersChild?.nativeElement?.scrollIntoView()
         }, 200)
+        if (this.quizService.options2$.val?.textToSpeechEnabled) {
+          const itemVal = this.item$?.currentVal
+          const answerText = itemVal
+            ?.getSidesWithAnswers()
+            .map(side => itemVal.getSideVal(side))
+            .filter(val => !! val)
+            .join('. ')
+          this.quizSpeech.speak(answerText)
+        }
       }
     })
   }

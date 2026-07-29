@@ -23,6 +23,8 @@ export class QuizOptions {
      * but enabling both together would always yield zero items - the UI doesn't currently guard
      * against that combination. */
     public onlyAiGenerated: boolean = false,
+    /** GH #128: reads the question/answer aloud via the browser's SpeechSynthesis API. */
+    public textToSpeechEnabled: boolean = false,
     // TODO: priorityByImportances: 0 .. 1 -- 0 - ignore importances, 1 - items of highest importance go first
     // in-between - probabilities
   ) {
