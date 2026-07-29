@@ -691,7 +691,7 @@ export class Cloud {
     Scale to millions.
     Supabase is an open source Firebase alternative. Start your project with a Postgres database, Authentication, instant APIs, Edge Functions, Realtime subscriptions, and Storage.*/
   'Redis' = tWide('redis.svg')
-  'Firebase' = tNarrow(/*{
+  'Firebase' = tNarrow("firebase-icon.svg"/*{
     subTopics: {
       // most are from firebase console left navbar:
       'Authentication': t(),
@@ -953,6 +953,7 @@ export class AI {
   OpenAI = t('openai-icon')
   "Magic.dev" = tWide('magic.dev.svg') // Magic is working on frontier-scale code models to build a coworker, not just a copilot.
   xAI = t('x.ai.svg')
+  "xAI Grok" = t('grok-icon.svg')
   // Hardware / futurism / robots / self-driving:
   'Apple' = tNarrow('apple.svg')
   'Tesla' = tWide('tesla-icon.svg')
@@ -982,6 +983,7 @@ export class AI {
   'Google Vertex AI' = tNarrow('vertexai.svg') // MLOps
   'Meta' = tWide('meta-icon.svg')
   'Anthropic' = tWide('anthropic-icon.svg')
+  'Claude' = tNarrow('claude-icon.svg')
   'AI21 Labs' = tWide('ai21.svg')
   'Mistral AI' = tWide('mistral-ai-icon.svg')
   'Qwen' = tNarrow('qwen-icon.svg')

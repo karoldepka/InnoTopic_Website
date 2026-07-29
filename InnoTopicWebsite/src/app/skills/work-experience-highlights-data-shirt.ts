@@ -73,7 +73,9 @@ export const highlights = {
     // ==== AI:
 
     Anthropic: {},
+    Claude: {},
     OpenAI: {},
+    "OpenAI Codex": {},
     'Mistral AI': {},
     xAI: {},
     'Amazon Bedrock': {},
@@ -538,6 +540,7 @@ export const highlights = {
       'Google Vertex AI': {},
       'Mistral AI': {},
       Anthropic: {},
+      Claude: {},
       'AI21 Labs': {},
       // TODO: AI: 'TODO Meta': {}, // (llama, FAISS)
       'Open Assistant': {},
