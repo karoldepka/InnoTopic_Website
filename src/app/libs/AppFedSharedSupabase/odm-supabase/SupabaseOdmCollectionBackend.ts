@@ -340,6 +340,21 @@ export class SupabaseOdmCollectionBackend<TRaw> extends OdmCollectionBackend<TRa
         }
       })
 
+    // Belt-and-suspenders alongside the channel's own SUBSCRIBED-after-a-drop path above: the
+    // browser's `online` event is the more reliable/immediate signal on mobile/backgrounded tabs,
+    // where the OS can suspend the realtime WebSocket for a while after connectivity actually
+    // returns before it gets around to reconnecting on its own. Same pattern as
+    // OdmService2.resumePendingEditsNow()'s outbound-edit counterpart. Only fires once this
+    // backend has connected at least once (skips a redundant, merely-idempotent catch-up racing
+    // the initial setListener() fetch on a normal online page load).
+    if (typeof window !== 'undefined') {
+      window.addEventListener('online', () => {
+        if (hasConnectedBefore) {
+          void this.catchUpAfterReconnect(queryOpts, listener, callback)
+        }
+      })
+    }
+
     void channel
   }
 
