@@ -6,25 +6,33 @@
       <app-flags flags="de at pl gb us es es-ct fr lu in ae" />
       <p>…cross-platform experience: </p>
       <span>
-      <app-topic-logo *ngFor="let topic of highlights.crossPlatform.ids" [topic]="topic" />
+      @for (topic of highlights.crossPlatform.ids; track topic) {
+        <app-topic-logo [topic]="topic" />
+      }
 
       </span>
     </div>
     <div>
       <p>Modern <strong>Full-Stack Development</strong>, focused on</p>
 
-     <app-topic-logo *ngFor="let topic of highlights.main.ids" [topic]="topic" />
+     @for (topic of highlights.main.ids; track topic) {
+       <app-topic-logo [topic]="topic" />
+     }
 <!--     TODO: Secondary:-->
 <!--     <app-topic-logo *ngFor="let topic of highlights.secondaryHighlightsCv.ids" [topic]="topic" />-->
 
       <p>ecosystems, with a strong "utility belt":</p>
       <span>
         <!-- TODO: tooltips -->
-       <app-topic-logo *ngFor="let topic of highlights.utility.ids" [topic]="topic" />
+       @for (topic of highlights.utility.ids; track topic) {
+         <app-topic-logo [topic]="topic" />
+       }
       </span>
       <p>with a broad and polyglot general experience:</p>
       <span>
-       <app-topic-logo *ngFor="let topic of highlights.broad.ids" [topic]="topic" />
+       @for (topic of highlights.broad.ids; track topic) {
+         <app-topic-logo [topic]="topic" />
+       }
       </span>
     </div>
   </div>
@@ -46,14 +54,12 @@
     <br>
     <p id="legend">Legend:</p>
 
-      <ng-container
-        *ngFor="let level of skillLevels"
-      >
+      @for (level of skillLevels; track level) {
         <app-skill-level-icon
           [skillLevel]="level"
         ></app-skill-level-icon>
         &nbsp;<span style="text-transform: uppercase">{{level}}</span>
-      </ng-container>
+      }
 
   <!--    <img style="width: 12px; height: 12px" src="assets/images/icons/signal/signal-solid-2.svg">-->
   <!--    <app-skill-levels-icons [skillLevels]="{have: 'beginner', want: 'expert'}"></app-skill-levels-icons>-->
@@ -72,10 +78,11 @@
   </div>
 
 
-  <app-work-experience-by-status-section
-    *ngFor="let experience of experiencesByStatusArray"
-    [experience]="experience"
-  ></app-work-experience-by-status-section>
+  @for (experience of experiencesByStatusArray; track experience.title) {
+    <app-work-experience-by-status-section
+      [experience]="experience"
+    ></app-work-experience-by-status-section>
+  }
 
 </section>
 

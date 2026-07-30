@@ -2,27 +2,36 @@
 <div class="container">
   <app-three-d-text text="Organisations and Projects"></app-three-d-text>
 
-  <section class="organisation" *ngFor="let orgKV of keyValOrdered(organisationsAndProjects)">
-    <!--<ng-template let-org="orgKV.value">-->
+  @for (orgKV of keyValOrdered(organisationsAndProjects); track orgKV.key) {
+    <section class="organisation">
+      <!--<ng-template let-org="orgKV.value">-->
 
-    <h2>
-      <img alt="Organization Logo" *ngIf='orgKV.value.logoFileName' width=auto height=50 loading="lazy" decoding="async" src="assets/images/clients/{{orgKV.value.logoFileName}}">
-      <span>{{orgKV.key}}</span>
-      <span class="years">{{orgKV.value.time[0]}} - {{orgKV.value.time[1]}}</span>
-      <app-flags [flags]="orgKV.value.flags"></app-flags>
-      <span class="comment" *ngIf="orgKV.value.locations; let locations">{{locations}} </span>
-    </h2>
-    <app-hashtag-replacer [text]="orgKV.value.description" />
-    <a *ngIf="orgKV.value.linkedInRecommendations" href="https://www.linkedin.com/in/karoldepka" target="_blank">
-      Please also take a look at {{orgKV.value.linkedInRecommendations}} {{orgKV.value.linkedInRecommendations > 1 ? 'recommendations' : 'recommendation'}} on
-      <img alt="LinkedIn Logo" class="linkedin-logo" height="14px" loading="lazy" decoding="async" src="assets/images/logos/linkedin.svg"> <!-- TODO LinkedIn Logo; TODO: underline link -->
-    </a>
-    <app-work-project
-      *ngFor="let projKV of keyValOrdered(orgKV.value.projects)"
-      [project]="projKV.value"
-      [projectTitle]="projKV.key"
-    ></app-work-project>
+      <h2>
+        @if (orgKV.value.logoFileName) {
+          <img alt="Organization Logo" width=auto height=50 loading="lazy" decoding="async" src="assets/images/clients/{{orgKV.value.logoFileName}}">
+        }
+        <span>{{orgKV.key}}</span>
+        <span class="years">{{orgKV.value.time[0]}} - {{orgKV.value.time[1]}}</span>
+        <app-flags [flags]="orgKV.value.flags"></app-flags>
+        @if (orgKV.value.locations; as locations) {
+          <span class="comment">{{locations}} </span>
+        }
+      </h2>
+      <app-hashtag-replacer [text]="orgKV.value.description" />
+      @if (orgKV.value.linkedInRecommendations) {
+        <a href="https://www.linkedin.com/in/karoldepka" target="_blank">
+          Please also take a look at {{orgKV.value.linkedInRecommendations}} {{orgKV.value.linkedInRecommendations > 1 ? 'recommendations' : 'recommendation'}} on
+          <img alt="LinkedIn Logo" class="linkedin-logo" height="14px" loading="lazy" decoding="async" src="assets/images/logos/linkedin.svg"> <!-- TODO LinkedIn Logo; TODO: underline link -->
+        </a>
+      }
+      @for (projKV of keyValOrdered(orgKV.value.projects); track projKV.key) {
+        <app-work-project
+          [project]="projKV.value"
+          [projectTitle]="projKV.key"
+        ></app-work-project>
+      }
 
-  <!--</ng-template>-->
-  </section>
+    <!--</ng-template>-->
+    </section>
+  }
 </div>

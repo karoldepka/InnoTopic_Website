@@ -9,6 +9,8 @@
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
+    "e2e": "playwright test",
+    "e2e:ui": "playwright test --ui",
     "lint": "ng lint"
   },
   "private": true,
@@ -57,6 +59,7 @@
     "@angular/language-service": "^22.0.2",
     "@capacitor/cli": "4.7.3",
     "@ionic/angular-toolkit": "^12.3.0",
+    "@playwright/test": "^1.62.0",
     "@types/d3-color": "^1.4.5",
     "@types/d3-contour": "^3.0.6",
     "@types/d3-drag": "^1.2.8",

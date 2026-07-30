@@ -1,1 +1,3 @@
-<app-topic-logo *ngFor="let topic of topicIds" [topic]="topic" />
+@for (topic of topicIds; track topic) {
+  <app-topic-logo [topic]="topic" />
+}

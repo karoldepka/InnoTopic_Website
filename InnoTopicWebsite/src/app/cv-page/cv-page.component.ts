@@ -41,7 +41,7 @@ export class CvPageComponent implements OnInit {
   ngOnInit() {
     // document.title = 'Karol Depka Pradzinski - InnoTopic.com'
     // document.title = 'Karol Depka Pradzinski - React, Python, Rust, AWS'
-    document.title = 'Karol Depka Pradzinski - Kotlin, Java, Kafka, Python, Frontend, Vue.js'
+    document.title = 'Karol Depka Pradzinski - Kotlin, Java, Kafka, TypeScript, Frontend, Vue.js'
   }
 
 }

@@ -1,11 +1,12 @@
 <div style="margin-bottom: 1rem">
-  <app-chip
-    *ngFor="let num of [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]"
-    style="display: inline-block;"
-    [forceMouseOver]="true"
-  >
-    NEUMORPHIC CHIP
-  </app-chip>
+  @for (num of [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]; track num) {
+    <app-chip
+      style="display: inline-block;"
+      [forceMouseOver]="true"
+    >
+      NEUMORPHIC CHIP
+    </app-chip>
+  }
 
 </div>
 
@@ -13,33 +14,35 @@
 
 <!--val: {{themeColor$ | async | json}} ||-->
 
-<section *ngFor="let colorName of colorNames">
-  <ion-button [color]='colorName' fill="clear">Clear
-    <ion-icon  slot="start" name="star"></ion-icon>
-  </ion-button>
-  <ion-button [color]='colorName' fill="clear" disabled="true">
-    <ion-icon  slot="start" name="star"></ion-icon>
-    Disabled
-  </ion-button>
-  <ion-button [color]='colorName' fill="outline">
-    <ion-icon  slot="start" name="star"></ion-icon>
-    Outline
-  </ion-button>
-  <ion-button [color]='colorName' fill="outline" disabled="true">
-    <ion-icon  slot="start" name="star"></ion-icon>
-    Disabled
-  </ion-button>
-<!--  <ion-button [color]='colorName' fill="solid">Solid</ion-button>-->
-  <ion-button [color]='colorName'>
-    <ion-icon  slot="start" name="star"></ion-icon>
-    Solid
-  </ion-button>
-  <ion-button [color]='colorName' disabled="true">
-    <ion-icon slot="start" name="star"></ion-icon>
-    Disabled
-  </ion-button>
+@for (colorName of colorNames; track colorName) {
+  <section>
+    <ion-button [color]='colorName' fill="clear">Clear
+      <ion-icon  slot="start" name="star"></ion-icon>
+    </ion-button>
+    <ion-button [color]='colorName' fill="clear" disabled="true">
+      <ion-icon  slot="start" name="star"></ion-icon>
+      Disabled
+    </ion-button>
+    <ion-button [color]='colorName' fill="outline">
+      <ion-icon  slot="start" name="star"></ion-icon>
+      Outline
+    </ion-button>
+    <ion-button [color]='colorName' fill="outline" disabled="true">
+      <ion-icon  slot="start" name="star"></ion-icon>
+      Disabled
+    </ion-button>
+  <!--  <ion-button [color]='colorName' fill="solid">Solid</ion-button>-->
+    <ion-button [color]='colorName'>
+      <ion-icon  slot="start" name="star"></ion-icon>
+      Solid
+    </ion-button>
+    <ion-button [color]='colorName' disabled="true">
+      <ion-icon slot="start" name="star"></ion-icon>
+      Disabled
+    </ion-button>
 
-</section>
+  </section>
+}
 
 
 <!--<ion-button aria-label="Favorite">-->

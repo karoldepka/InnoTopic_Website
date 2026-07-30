@@ -17,23 +17,33 @@
   />
 
   <div class="topics" style="gap: 50px; margin-bottom: 110px;">
-    <app-topic-logo [size]="160" *ngFor="let topic of highlights.main.ids" [topic]="topic" />
+    @for (topic of highlights.main.ids; track topic) {
+      <app-topic-logo [size]="160" [topic]="topic" />
+    }
   </div>
 
   <div class="topics" style="gap: 15px; margin-bottom: 110px;">
-    <app-topic-logo [size]="95" *ngFor="let topic of highlights.secondaryHighlights.ids" [topic]="topic" />
+    @for (topic of highlights.secondaryHighlights.ids; track topic) {
+      <app-topic-logo [size]="95" [topic]="topic" />
+    }
   </div>
 
   <div class="topics" style="gap: 30px;">
-    <app-topic-logo [size]="70" *ngFor="let topic of highlights.utility.ids" [topic]="topic" />
+    @for (topic of highlights.utility.ids; track topic) {
+      <app-topic-logo [size]="70" [topic]="topic" />
+    }
   </div>
 
   <div class="topics" style="margin-top: 35px;">
-    <app-topic-logo [size]="70" *ngFor="let topic of highlights.broad.ids" [topic]="topic" />
+    @for (topic of highlights.broad.ids; track topic) {
+      <app-topic-logo [size]="70" [topic]="topic" />
+    }
   </div>
 
   <div class="topics" style="margin-top: 35px;">
-    <app-topic-logo [size]="100" *ngFor="let topic of highlights.personalInterests.ids" [topic]="topic" />
+    @for (topic of highlights.personalInterests.ids; track topic) {
+      <app-topic-logo [size]="100" [topic]="topic" />
+    }
   </div>
 
 <!--  <div class="topics">-->

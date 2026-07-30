@@ -1,25 +1,28 @@
-<ng-container *ngFor="let category of topicCategoriesArray">
-  <section style="page-break-inside: avoid" *ngIf="hasExperienceInCategory(category)">
-    <p>{{categoryTitle(category.name)}}</p>
-    <!--  <hr>-->
-<!--    <mat-chip-list>-->
-    <span>
-<!--      {{category.topicsArray | json}}-->
-      <ng-container *ngFor="let topic of category.topicsArray">
-<!--        TOPIC_: {{topic.id}}-->
-<!--        experience[topic.id]: {{experienceByName[topic.name]}}-->
-        <app-topic-skill *ngIf="experienceByName[topic.name]; let experienceItem"
-                        [tId]="experienceItem.topicId"
-                        [skillLevels]="experienceItem?.skillLevels"
-                        [showLogo]="showIcons"
-        ></app-topic-skill><!--    [skillLevels]="exp.skillLevels"-->
-      </ng-container>
-    </span>
-<!--    </mat-chip-list>-->
+@for (category of topicCategoriesArray; track category.name) {
+  @if (hasExperienceInCategory(category)) {
+    <section style="page-break-inside: avoid">
+      <p>{{categoryTitle(category.name)}}</p>
+      <!--  <hr>-->
+  <!--    <mat-chip-list>-->
+      <span>
+  <!--      {{category.topicsArray | json}}-->
+        @for (topic of category.topicsArray; track topic.name) {
+  <!--        TOPIC_: {{topic.id}}-->
+  <!--        experience[topic.id]: {{experienceByName[topic.name]}}-->
+          @if (experienceByName[topic.name]; as experienceItem) {
+            <app-topic-skill
+                            [tId]="experienceItem.topicId"
+                            [skillLevels]="experienceItem?.skillLevels"
+                            [showLogo]="showIcons"
+            ></app-topic-skill><!--    [skillLevels]="exp.skillLevels"-->
+          }
+        }
+      </span>
+  <!--    </mat-chip-list>-->
 
-  </section>
-
-</ng-container>
+    </section>
+  }
+}
 
 <!--byCategory-->
 <!--<pre>{{byCategory | json}}</pre>-->

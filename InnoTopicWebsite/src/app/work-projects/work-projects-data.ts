@@ -481,7 +481,6 @@ export class WorkOrganisationsAndProjectsData {
           'GCP - Google Cloud Platform': {},
           'GitHub': {},
           Docker: {},
-
         }
       },
       'LifeSuite': {

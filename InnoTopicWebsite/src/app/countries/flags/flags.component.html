@@ -1,7 +1,5 @@
-<ng-container
-  *ngFor="let flag of flagsArray"
->
+@for (flag of flagsArray; track flag) {
   <app-country-flag
     [country]="flag"
   ></app-country-flag>
-</ng-container>
+}

@@ -34,13 +34,15 @@
   </p>
   <div style="display: flex; flex-wrap: wrap;">
 
-    <div *ngFor="let book of books" >
-      <img width=130 height=130 [attr.src]="book.coverUrl"
-           loading="lazy"
-           decoding="async"
-           [attr.alt]="book.id"
-           [attr.title]="book.id">
-    </div>
+    @for (book of books; track book.id) {
+      <div>
+        <img width=130 height=130 [attr.src]="book.coverUrl"
+             loading="lazy"
+             decoding="async"
+             [attr.alt]="book.id"
+             [attr.title]="book.id">
+      </div>
+    }
 
   </div>
 

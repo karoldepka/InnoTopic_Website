@@ -18,14 +18,15 @@
         <p>Ask me anything about wisdom, strength, or design projects!</p>
       </div>
 
-      <div *ngFor="let message of chat.messages" 
-           [ngClass]="{'message-user': message.role === 'user', 'message-ai': message.role === 'assistant'}"
-           class="message-bubble-wrapper">
-        <div class="message-bubble glass-bubble">
-          <div class="message-sender">{{ message.role === 'user' ? 'You' : 'Assistant' }}</div>
-          <div class="message-text">{{ getMessageText(message) }}</div>
+      @for (message of chat.messages; track message.id) {
+        <div [ngClass]="{'message-user': message.role === 'user', 'message-ai': message.role === 'assistant'}"
+             class="message-bubble-wrapper">
+          <div class="message-bubble glass-bubble">
+            <div class="message-sender">{{ message.role === 'user' ? 'You' : 'Assistant' }}</div>
+            <div class="message-text">{{ getMessageText(message) }}</div>
+          </div>
         </div>
-      </div>
+      }
 
       <!-- Loading / Streaming Indicator -->
       <div *ngIf="chat.status === 'streaming'" class="typing-indicator-wrapper">
