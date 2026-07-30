@@ -45,6 +45,16 @@ export function luminance(rgb: RGB) {
   return r * 0.2126 + g * 0.7152 + b * 0.0722;
 };
 
+/** WCAG "UI component" contrast minimum (not the stricter 4.5:1 body-text one - these are
+ * buttons/icons, not paragraphs). Shared by theme-contrast.spec.ts (enforced at theme-data commit
+ * time) and theme-config.component.ts (displayed live in the theme picker) so both agree on what
+ * "passes". */
+export const MIN_UI_CONTRAST = 3
+
+/** Empirically-picked colorDistance() threshold below which two colors read as "the same color"
+ * at a glance - see colorDistance()'s doc comment. Shared the same way as MIN_UI_CONTRAST above. */
+export const MIN_COLOR_DISTANCE = 35
+
 /** WCAG 2.x contrast ratio (1 = identical, 21 = black-on-white) between two colors, order-
  * independent. Used to validate a theme's primary/secondary actually stand out against its own
  * background - a color pair can each individually have "good" contrast against black/white text

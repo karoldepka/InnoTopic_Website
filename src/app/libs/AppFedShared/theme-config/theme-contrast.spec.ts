@@ -1,6 +1,6 @@
 import {describe, it, expect} from 'vitest'
 import {themesArray} from './themes.data'
-import {shadeColor, contrastRatio, colorDistance} from './color-utils'
+import {shadeColor, contrastRatio, colorDistance, MIN_UI_CONTRAST, MIN_COLOR_DISTANCE} from './color-utils'
 
 /** Validates every non-disabled theme's primary/secondary actually stand out against its own
  * background, at the default brightness (50%) ThemeCalculator.updateColors() computes it at -
@@ -9,8 +9,6 @@ import {shadeColor, contrastRatio, colorDistance} from './color-utils'
  * color sitting on it. WCAG's 3:1 "UI component" threshold (not the stricter 4.5:1 body-text one -
  * these are buttons/icons, not paragraphs) - see color-utils.contrastRatio's doc comment. */
 describe('theme background/primary/secondary contrast', () => {
-  const MIN_UI_CONTRAST = 3
-
   for (const theme of themesArray) {
     if (theme.disabled) {
       continue // already known-broken and excluded from selection - not this test's concern
@@ -37,8 +35,6 @@ describe('theme background/primary/secondary contrast', () => {
  * like two shades of the same color) - colorDistance()'s perceptual deltaE is what actually
  * matches "would a person glancing at these two buttons tell them apart". */
 describe('theme primary/secondary distinctness', () => {
-  const MIN_COLOR_DISTANCE = 35
-
   for (const theme of themesArray) {
     if (theme.disabled) {
       continue
