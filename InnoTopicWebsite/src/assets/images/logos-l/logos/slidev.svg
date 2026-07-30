@@ -1,21 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg fill="rgb(150,150,150)" width="256px" height="256px" viewBox="0 0 256 256" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" preserveAspectRatio="xMidYMid">
+<svg fill="rgb(131,131,131)" width="256px" height="256px" viewBox="0 0 256 256" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" preserveAspectRatio="xMidYMid">
     <title>slidev</title>
     <defs>
         <linearGradient x1="0%" y1="-8.88888889%" x2="100%" y2="100%" id="linearGradient-1">
-            <stop stop-color="rgb(202,202,202)" offset="0%"></stop>
+            <stop stop-color="rgb(209,209,209)" offset="0%"></stop>
             <stop stop-color="rgb(186,186,186)" offset="100%"></stop>
         </linearGradient>
         <linearGradient x1="-10.5555556%" y1="-12.2222222%" x2="84.5361111%" y2="100%" id="linearGradient-2">
-            <stop stop-color="rgb(218,218,218)" offset="0%"></stop>
-            <stop stop-color="rgb(198,198,198)" offset="100%"></stop>
+            <stop stop-color="rgb(233,233,233)" offset="0%"></stop>
+            <stop stop-color="rgb(204,204,204)" offset="100%"></stop>
         </linearGradient>
         <linearGradient x1="-0.132239836%" y1="-8.07272088%" x2="12.3609146%" y2="104.494726%" id="linearGradient-3">
-            <stop stop-color="rgb(224,224,224)" offset="0%"></stop>
-            <stop stop-color="rgb(224,224,224)" offset="0.01%"></stop>
-            <stop stop-color="rgb(219,219,219)" offset="8.33333%"></stop>
-            <stop stop-color="rgb(211,211,211)" offset="60.1773%"></stop>
-            <stop stop-color="rgb(207,207,207)" offset="100%"></stop>
+            <stop stop-color="rgb(243,243,243)" offset="0%"></stop>
+            <stop stop-color="rgb(243,243,243)" offset="0.01%"></stop>
+            <stop stop-color="rgb(235,235,235)" offset="8.33333%"></stop>
+            <stop stop-color="rgb(223,223,223)" offset="60.1773%"></stop>
+            <stop stop-color="rgb(217,217,217)" offset="100%"></stop>
         </linearGradient>
     </defs>
     <g>

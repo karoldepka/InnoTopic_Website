@@ -55,7 +55,7 @@ export class WorkOrganisationsAndProjectsData {
     // subTitle: '(formerly known as CommerceHub / ChannelAdvisor / DSCO)',
     // TODO: some info that it was e-commerce
     flags: 'es uk us pt',
-    time: ['2023', 'present' /* TODO: make months optional */],
+    time: ['September 2023', 'July 2026' /* TODO: make months optional */],
     linkedInRecommendations: 0,
     locations: `Málaga, remote, Madrid`,
     logoFileName: `Rithum/rithum-icon.svg`,
@@ -65,7 +65,9 @@ export class WorkOrganisationsAndProjectsData {
         roles: 'Staff Engineer',
         description: 'Using #Python and #Amazon_Bedrock with #DynamoDB and #MongoDB and #Django + #TypeScript & #Rust Web App. ' +
           'Working directly with #CTO and #Senior_Principal_Engineer and other #Staff_Engineer. ' +
-          'Working with big brands like #Amazon, Walmart, Adidas, Puma.',
+          'Working with big brands like #Amazon, Walmart, Adidas, Puma. ' +
+          'Application processed millions of events per day in realtime.',
+
         topicsById: {
           'Java': {},
           'Django': {},
@@ -108,7 +110,8 @@ export class WorkOrganisationsAndProjectsData {
       }),
       'eCommerce Orders SLA real-time monitor and analytics platform': project({
         roles: 'Staff Engineer, #Rust, #React, #Angular Developer',
-        description: 'Using #Rust, #Python, #Java, #DynamoDB, #MongoDB and #Django + #TypeScript Web App. ' +
+        description: 'Using #Rust, #Python, #Java, #DynamoDB, #MongoDB ' +
+          'and #Django + #TypeScript Web App. ' +
           'Working directly with #CTO and #Senior_Principal_Engineer. ' +
           'Working with big brands like #Amazon, Walmart, Adidas, Puma.' +
           'Application processed millions of events per day in realtime.',
@@ -175,17 +178,18 @@ export class WorkOrganisationsAndProjectsData {
       'EpicElite Platform': project({
         roles: 'Lead/Senior Full-Stack Developer & Interviewing and Recruiting (Consultant)',
         description: 'Recruited and interviewed 5 Developers and a UI/UX/Web/Graphics Designer. I was a #Team_Lead of 5 Developers. Did code&architecture reviews.' +
-          'Working directly with #CEO & #Director_of_Operations. Communication in #English, #Spanish, #Polish. #Python #Django + #TypeScript app using #MongoDB and #MariaDB .',
+          'Working directly with #CEO & #Director_of_Operations. Communication in #English, #Spanish, #Polish. ' +
+          '"#Python #Django + #TypeScript app using #MongoDB and #MariaDB .',
         topicsById: {
           'Mailgun': {},
           'RabbitMQ': {},
           'Kafka': {},
           'Kafka Streams': {},
           'Spring Boot': {},
-          'Rust': {},
           'reCAPTCHA': {},
           'Terraform': {},
           'Angular': {},
+          'Vue.js': {},
           'Angular Material': {},
           'AG Grid': {},
           'GraphQL': {},
@@ -233,6 +237,7 @@ export class WorkOrganisationsAndProjectsData {
           'PandaDoc': {},
           'Java': {},
           'Kotlin': {},
+          'Hexagonal Architecture': {},
         }
       })
     },
@@ -280,6 +285,7 @@ export class WorkOrganisationsAndProjectsData {
           'I developed the Angular + Bootstrap app from scratch and helped with the Node.js + MongoDB backend (conceptually as well as in development). Communication in #English and #German.',
         // recommendations: '',
         topicsById: {
+          "Vue.js": {},
           Angular: {
             subTopics: {
               'i18n': {} /* FIXME */

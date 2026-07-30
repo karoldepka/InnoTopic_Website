@@ -1,13 +1,13 @@
-<svg fill="rgb(150,150,150)" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 348.61 100">
+<svg fill="rgb(131,131,131)" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 348.61 100">
   <defs>
     <linearGradient id="a" x1="263.36" y1="14.74" x2="333.47" y2="84.85" gradientUnits="userSpaceOnUse">
-      <stop offset="0" stop-color="rgb(193,193,193)"/>
-      <stop offset="1" stop-color="rgb(173,173,173)"/>
+      <stop offset="0" stop-color="rgb(196,196,196)"/>
+      <stop offset="1" stop-color="rgb(166,166,166)"/>
     </linearGradient>
     <linearGradient id="b" x1="262.64" y1="15.46" x2="332.75" y2="85.57" xlink:href="#a"/>
     <style>
       .text {
-        fill: rgb(158,158,158);
+        fill: rgb(144,144,144);
       }
       .gear {
         fill: url(#a);
@@ -17,7 +17,7 @@
       }
       @media (prefers-color-scheme: dark) {
         .text,.gear,.dots {
-          fill: rgb(224,224,224);
+          fill: rgb(243,243,243);
         }
       }
     </style>

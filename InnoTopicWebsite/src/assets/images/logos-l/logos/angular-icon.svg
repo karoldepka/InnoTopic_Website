@@ -1,18 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg fill="rgb(150,150,150)" width="256px" height="271px" viewBox="0 0 256 271" version="1.1" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid">
+<svg fill="rgb(131,131,131)" width="256px" height="271px" viewBox="0 0 256 271" version="1.1" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid">
     <title>Angular</title>
     <defs>
         <linearGradient x1="25.0714876%" y1="90.9292007%" x2="96.1321855%" y2="55.1837089%" id="linearGradient-1">
-            <stop stop-color="rgb(185,185,185)" offset="0%"></stop>
-            <stop stop-color="rgb(192,192,192)" offset="24%"></stop>
-            <stop stop-color="rgb(191,191,191)" offset="35.2%"></stop>
-            <stop stop-color="rgb(190,190,190)" offset="49.4%"></stop>
-            <stop stop-color="rgb(190,190,190)" offset="74.5%"></stop>
-            <stop stop-color="rgb(178,178,178)" offset="100%"></stop>
+            <stop stop-color="rgb(184,184,184)" offset="0%"></stop>
+            <stop stop-color="rgb(195,195,195)" offset="24%"></stop>
+            <stop stop-color="rgb(193,193,193)" offset="35.2%"></stop>
+            <stop stop-color="rgb(192,192,192)" offset="49.4%"></stop>
+            <stop stop-color="rgb(192,192,192)" offset="74.5%"></stop>
+            <stop stop-color="rgb(174,174,174)" offset="100%"></stop>
         </linearGradient>
         <linearGradient x1="21.8628652%" y1="12.0575311%" x2="68.3669921%" y2="68.2103006%" id="linearGradient-2">
-            <stop stop-color="rgb(212,212,212)" offset="0%"></stop>
-            <stop stop-color="rgb(224,224,224)" stop-opacity="0" offset="100%"></stop>
+            <stop stop-color="rgb(224,224,224)" offset="0%"></stop>
+            <stop stop-color="rgb(243,243,243)" stop-opacity="0" offset="100%"></stop>
         </linearGradient>
     </defs>
     <g>

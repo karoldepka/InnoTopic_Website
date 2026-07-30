@@ -1,6 +1,6 @@
-<svg fill="rgb(150,150,150)" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+<svg fill="rgb(131,131,131)" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
   <style>
-    .regular{fill:rgb(203,203,203);} .dark-left{fill:rgb(180,180,180);} .dark-right{fill:rgb(167,167,167);} .light{fill:rgb(224,224,224);}
+    .regular{fill:rgb(210,210,210);} .dark-left{fill:rgb(176,176,176);} .dark-right{fill:rgb(157,157,157);} .light{fill:rgb(243,243,243);}
   </style>
 
   <path class="light"      d="M144 32 l112 112 -112 112 l-112 -112z"/>

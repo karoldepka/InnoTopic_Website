@@ -1,15 +1,15 @@
-<svg fill="rgb(150,150,150)" width="885" height="936" xmlns="http://www.w3.org/2000/svg">
+<svg fill="rgb(131,131,131)" width="885" height="936" xmlns="http://www.w3.org/2000/svg">
   <defs>
     <radialGradient id="a" cx="0" cy="0" r="1"
                     gradientTransform="matrix(0 507.22601 -479.57501 0 442.9857483 427.93551636)"
                     gradientUnits="userSpaceOnUse">
-      <stop stop-color="rgb(222,222,222)"/>
-      <stop offset="1" stop-color="rgb(193,193,193)"/>
+      <stop stop-color="rgb(239,239,239)"/>
+      <stop offset="1" stop-color="rgb(196,196,196)"/>
     </radialGradient>
     <radialGradient id="b" cx="0" cy="0" r="1"
                     gradientTransform="matrix(314.00042 156.99986 -140.10327 280.20717 441.99906213 454.49818724)"
                     gradientUnits="userSpaceOnUse">
-      <stop offset=".271" stop-color="rgb(224,224,224)"/>
+      <stop offset=".271" stop-color="rgb(243,243,243)"/>
       <stop offset="1" stop-color="rgb(188,188,188)"/>
     </radialGradient>
   </defs>

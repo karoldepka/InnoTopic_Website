@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg fill="rgb(150,150,150)" width="256px" height="256px" viewBox="0 0 256 256" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" preserveAspectRatio="xMidYMid">
+<svg fill="rgb(131,131,131)" width="256px" height="256px" viewBox="0 0 256 256" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" preserveAspectRatio="xMidYMid">
     <title>Edgio</title>
     <defs>
         <linearGradient x1="3.18474651%" y1="2.86627895%" x2="57.3248613%" y2="58.9172635%" id="edgioLinearGradient-1">
-            <stop stop-color="rgb(173,173,173)" offset="0%"></stop>
-            <stop stop-color="rgb(175,175,175)" offset="100%"></stop>
+            <stop stop-color="rgb(167,167,167)" offset="0%"></stop>
+            <stop stop-color="rgb(169,169,169)" offset="100%"></stop>
         </linearGradient>
         <radialGradient cx="104.36188%" cy="13.087638%" fx="104.36188%" fy="13.087638%" r="94.5754841%" id="edgioRadialGradient-2">
-            <stop stop-color="rgb(184,184,184)" offset="0%"></stop>
-            <stop stop-color="rgb(184,184,184)" stop-opacity="0" offset="100%"></stop>
+            <stop stop-color="rgb(183,183,183)" offset="0%"></stop>
+            <stop stop-color="rgb(183,183,183)" stop-opacity="0" offset="100%"></stop>
         </radialGradient>
         <radialGradient cx="68.748982%" cy="120.915701%" fx="68.748982%" fy="120.915701%" r="68.4871381%" id="edgioRadialGradient-3">
             <stop stop-color="rgb(186,186,186)" offset="0%"></stop>
@@ -19,6 +19,6 @@
         <rect fill="url(#edgioLinearGradient-1)" x="0" y="0" width="256" height="256"></rect>
         <rect fill="url(#edgioRadialGradient-2)" x="0" y="0" width="256" height="256"></rect>
         <rect fill="url(#edgioRadialGradient-3)" x="0" y="0" width="256" height="256"></rect>
-        <polygon fill="rgb(224,224,224)" points="170.908427 77.2014079 187.133362 47.9481495 68.8666627 47.9481495 68.8666627 208.051403 187.133362 208.051403 170.989449 178.757831 100.749379 178.757831 100.749379 141.938707 156.504312 141.938707 165.486678 112.645136 100.749379 112.645136 100.749379 77.2014079"></polygon>
+        <polygon fill="rgb(243,243,243)" points="170.908427 77.2014079 187.133362 47.9481495 68.8666627 47.9481495 68.8666627 208.051403 187.133362 208.051403 170.989449 178.757831 100.749379 178.757831 100.749379 141.938707 156.504312 141.938707 165.486678 112.645136 100.749379 112.645136 100.749379 77.2014079"></polygon>
     </g>
 </svg>

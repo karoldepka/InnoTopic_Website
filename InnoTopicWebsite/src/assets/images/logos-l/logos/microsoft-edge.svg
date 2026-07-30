@@ -1,36 +1,36 @@
 <?xml version="1.0" encoding="utf-8"?>
-<svg fill="rgb(150,150,150)" width="256px" height="256px" viewBox="0 0 256 256" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<svg fill="rgb(131,131,131)" width="256px" height="256px" viewBox="0 0 256 256" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
 	<defs>
 		<linearGradient id="linearGradient-1" gradientUnits="userSpaceOnUse" x1="63.3343" y1="757.83" x2="241.6165" y2="757.83" gradientTransform="matrix(1 0 0 1 -4.63 -580.8098)">
-			<stop  offset="0" style="stop-color:rgb(180,180,180)"/>
-			<stop  offset="1" style="stop-color:rgb(176,176,176)"/>
+			<stop  offset="0" style="stop-color:rgb(177,177,177)"/>
+			<stop  offset="1" style="stop-color:rgb(171,171,171)"/>
 		</linearGradient>
 		<radialGradient id="radialGradient-1" cx="161.83" cy="788.4008" r="95.38" gradientTransform="matrix(0.9999 0 0 0.9498 -4.6217 -570.3868)" gradientUnits="userSpaceOnUse">
-			<stop  offset="0.72" style="stop-color:rgb(150,150,150);stop-opacity:0"/>
-			<stop  offset="0.95" style="stop-color:rgb(150,150,150);stop-opacity:0.53"/>
-			<stop  offset="1" style="stop-color:rgb(150,150,150)"/>
+			<stop  offset="0.72" style="stop-color:rgb(131,131,131);stop-opacity:0"/>
+			<stop  offset="0.95" style="stop-color:rgb(131,131,131);stop-opacity:0.53"/>
+			<stop  offset="1" style="stop-color:rgb(131,131,131)"/>
 		</radialGradient>
 		<linearGradient id="linearGradient-2" gradientUnits="userSpaceOnUse" x1="157.4013" y1="680.5561" x2="46.0276" y2="801.8683" gradientTransform="matrix(1 0 0 1 -4.63 -580.8098)">
-			<stop  offset="0" style="stop-color:rgb(202,202,202)"/>
-			<stop  offset="0.16" style="stop-color:rgb(199,199,199)"/>
-			<stop  offset="0.67" style="stop-color:rgb(191,191,191)"/>
-			<stop  offset="1" style="stop-color:rgb(188,188,188)"/>
+			<stop  offset="0" style="stop-color:rgb(209,209,209)"/>
+			<stop  offset="0.16" style="stop-color:rgb(205,205,205)"/>
+			<stop  offset="0.67" style="stop-color:rgb(194,194,194)"/>
+			<stop  offset="1" style="stop-color:rgb(189,189,189)"/>
 		</linearGradient>
 		<radialGradient id="radialGradient-2" cx="-773.6357" cy="746.7146" r="143.24" gradientTransform="matrix(0.15 -0.9898 0.8 0.12 -410.7182 -656.3412)" gradientUnits="userSpaceOnUse">
-			<stop  offset="0.76" style="stop-color:rgb(150,150,150);stop-opacity:0"/>
-			<stop  offset="0.95" style="stop-color:rgb(150,150,150);stop-opacity:0.5"/>
-			<stop  offset="1" style="stop-color:rgb(150,150,150)"/>
+			<stop  offset="0.76" style="stop-color:rgb(131,131,131);stop-opacity:0"/>
+			<stop  offset="0.95" style="stop-color:rgb(131,131,131);stop-opacity:0.5"/>
+			<stop  offset="1" style="stop-color:rgb(131,131,131)"/>
 		</radialGradient>
 		<radialGradient id="radialGradient-3" cx="230.5926" cy="-106.0381" r="202.4299" gradientTransform="matrix(-3.999750e-02 0.9998 -2.1299 -7.998414e-02 -190.7749 -191.6354)" gradientUnits="userSpaceOnUse">
-			<stop  offset="0" style="stop-color:rgb(214,214,214)"/>
-			<stop  offset="0.11" style="stop-color:rgb(214,214,214)"/>
-			<stop  offset="0.23" style="stop-color:rgb(213,213,213)"/>
-			<stop  offset="0.31" style="stop-color:rgb(212,212,212)"/>
-			<stop  offset="0.67" style="stop-color:rgb(209,209,209)"/>
+			<stop  offset="0" style="stop-color:rgb(228,228,228)"/>
+			<stop  offset="0.11" style="stop-color:rgb(228,228,228)"/>
+			<stop  offset="0.23" style="stop-color:rgb(226,226,226)"/>
+			<stop  offset="0.31" style="stop-color:rgb(225,225,225)"/>
+			<stop  offset="0.67" style="stop-color:rgb(220,220,220)"/>
 		</radialGradient>
 		<radialGradient id="radialGradient-4" cx="536.3567" cy="-117.7029" r="97.34" gradientTransform="matrix(0.28 0.9598 -0.78 0.23 -1.9279 -410.3179)" gradientUnits="userSpaceOnUse">
-			<stop  offset="0" style="stop-color:rgb(224,224,224)"/>
-			<stop  offset="1" style="stop-color:rgb(224,224,224);stop-opacity:0"/>
+			<stop  offset="0" style="stop-color:rgb(243,243,243)"/>
+			<stop  offset="1" style="stop-color:rgb(243,243,243);stop-opacity:0"/>
 		</radialGradient>
 	</defs>
 	<g>

@@ -1,8 +1,8 @@
-<svg fill="rgb(150,150,150)" id="Logo" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="768" height="768" viewBox="0 0 768 768">
+<svg fill="rgb(131,131,131)" id="Logo" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="768" height="768" viewBox="0 0 768 768">
   <defs>
     <style>
       .cls-1 {
-        fill: rgb(195,195,195);
+        fill: rgb(199,199,199);
       }
 
       .cls-1, .cls-2, .cls-3, .cls-4, .cls-5, .cls-6 {
@@ -10,19 +10,19 @@
       }
 
       .cls-2 {
-        fill: rgb(202,202,202);
-      }
-
-      .cls-3 {
         fill: rgb(209,209,209);
       }
 
+      .cls-3 {
+        fill: rgb(221,221,221);
+      }
+
       .cls-4 {
-        fill: rgb(218,218,218);
+        fill: rgb(233,233,233);
       }
 
       .cls-5 {
-        fill: rgb(224,224,224);
+        fill: rgb(243,243,243);
       }
     </style>
   </defs>

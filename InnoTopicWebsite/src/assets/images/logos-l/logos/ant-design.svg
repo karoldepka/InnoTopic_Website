@@ -1,27 +1,27 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg fill="rgb(150,150,150)" width="256px" height="256px" viewBox="0 0 256 256" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<svg fill="rgb(131,131,131)" width="256px" height="256px" viewBox="0 0 256 256" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
     <!-- Generator: Sketch 61 (89581) - https://sketch.com -->
     <title>Group</title>
     <desc>Created with Sketch.</desc>
     <defs>
         <linearGradient x1="62.1023273%" y1="0%" x2="108.19718%" y2="37.8635764%" id="linearGradient-1">
-            <stop stop-color="rgb(203,203,203)" offset="0%"></stop>
-            <stop stop-color="rgb(218,218,218)" offset="100%"></stop>
+            <stop stop-color="rgb(211,211,211)" offset="0%"></stop>
+            <stop stop-color="rgb(234,234,234)" offset="100%"></stop>
         </linearGradient>
         <linearGradient x1="69.644116%" y1="0%" x2="54.0428975%" y2="108.456714%" id="linearGradient-2">
-            <stop stop-color="rgb(219,219,219)" offset="0%"></stop>
-            <stop stop-color="rgb(201,201,201)" offset="37.8600687%"></stop>
+            <stop stop-color="rgb(235,235,235)" offset="0%"></stop>
+            <stop stop-color="rgb(207,207,207)" offset="37.8600687%"></stop>
             <stop stop-color="rgb(188,188,188)" offset="100%"></stop>
         </linearGradient>
         <linearGradient x1="69.6908165%" y1="-12.9743587%" x2="16.7228981%" y2="117.391248%" id="linearGradient-3">
-            <stop stop-color="rgb(220,220,220)" offset="0%"></stop>
-            <stop stop-color="rgb(205,205,205)" offset="41.472606%"></stop>
-            <stop stop-color="rgb(191,191,191)" offset="100%"></stop>
+            <stop stop-color="rgb(237,237,237)" offset="0%"></stop>
+            <stop stop-color="rgb(214,214,214)" offset="41.472606%"></stop>
+            <stop stop-color="rgb(193,193,193)" offset="100%"></stop>
         </linearGradient>
         <linearGradient x1="68.1279872%" y1="-35.6905737%" x2="30.4400914%" y2="114.942679%" id="linearGradient-4">
-            <stop stop-color="rgb(224,224,224)" offset="0%"></stop>
-            <stop stop-color="rgb(205,205,205)" offset="51.2635191%"></stop>
-            <stop stop-color="rgb(191,191,191)" offset="100%"></stop>
+            <stop stop-color="rgb(243,243,243)" offset="0%"></stop>
+            <stop stop-color="rgb(214,214,214)" offset="51.2635191%"></stop>
+            <stop stop-color="rgb(193,193,193)" offset="100%"></stop>
         </linearGradient>
     </defs>
     <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">

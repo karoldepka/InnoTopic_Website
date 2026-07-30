@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg fill="rgb(150,150,150)" width="256px" height="232px" viewBox="0 0 256 232" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" preserveAspectRatio="xMidYMid">
+<svg fill="rgb(131,131,131)" width="256px" height="232px" viewBox="0 0 256 232" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" preserveAspectRatio="xMidYMid">
 	<g>
-		<polygon fill="rgb(207,207,207)" points="127.9998 0.0002 55.8548 7.6282 -0.0002 82.6072 127.9998 231.6622 255.9998 82.6072 200.1458 7.6282"></polygon>
-		<polygon fill="rgb(192,192,192)" points="0 82.6076 128 231.6616 51.846 82.6076"></polygon>
-		<polygon fill="rgb(192,192,192)" points="204.1533 82.6076 128.0003 231.6616 255.9993 82.6076"></polygon>
-		<polygon fill="rgb(206,206,206)" points="51.8463 82.6076 128.0003 231.6616 204.1543 82.6076"></polygon>
-		<polygon fill="rgb(214,214,214)" points="55.8548 7.6282 51.8458 82.6072 127.9998 0.0002"></polygon>
-		<polygon fill="rgb(214,214,214)" points="204.1533 82.6076 200.1453 7.6276 128.0003 0.0006"></polygon>
-		<polygon fill="rgb(206,206,206)" points="204.1542 82.6076 255.9992 82.6076 200.1452 7.6276"></polygon>
-		<polygon fill="rgb(206,206,206)" points="0 82.6076 51.846 82.6076 55.855 7.6276"></polygon>
-		<polygon fill="rgb(224,224,224)" points="127.9998 0.0002 51.8458 82.6072 204.1538 82.6072"></polygon>
+		<polygon fill="rgb(217,217,217)" points="127.9998 0.0002 55.8548 7.6282 -0.0002 82.6072 127.9998 231.6622 255.9998 82.6072 200.1458 7.6282"></polygon>
+		<polygon fill="rgb(194,194,194)" points="0 82.6076 128 231.6616 51.846 82.6076"></polygon>
+		<polygon fill="rgb(194,194,194)" points="204.1533 82.6076 128.0003 231.6616 255.9993 82.6076"></polygon>
+		<polygon fill="rgb(215,215,215)" points="51.8463 82.6076 128.0003 231.6616 204.1543 82.6076"></polygon>
+		<polygon fill="rgb(228,228,228)" points="55.8548 7.6282 51.8458 82.6072 127.9998 0.0002"></polygon>
+		<polygon fill="rgb(228,228,228)" points="204.1533 82.6076 200.1453 7.6276 128.0003 0.0006"></polygon>
+		<polygon fill="rgb(215,215,215)" points="204.1542 82.6076 255.9992 82.6076 200.1452 7.6276"></polygon>
+		<polygon fill="rgb(215,215,215)" points="0 82.6076 51.846 82.6076 55.855 7.6276"></polygon>
+		<polygon fill="rgb(243,243,243)" points="127.9998 0.0002 51.8458 82.6072 204.1538 82.6072"></polygon>
 	</g>
 </svg>

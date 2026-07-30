@@ -12,12 +12,11 @@
 <!--      &lt;!&ndash; margin-right: -4px - causes wrapping in Firefox, but not in Chrome or Safari &ndash;&gt;-->
 <!--    </fa-icon>-->
 <!--    img1-->
-    <img
+    <app-skill-level-icon
       *ngIf='useSignalLevels'
       class="skill-icon signal-icon"
-      loading="lazy"
-      decoding="async"
-      src="assets/images/icons/signal/{{skillIconSignal(skillLevels?.have)}}.svg">
+      [skillLevel]="skillLevels?.have!"
+    ></app-skill-level-icon>
   </ng-template>
 
   <ng-template [ngIf]="skillLevels?.want"><!--↗-->
@@ -28,16 +27,14 @@
 <!--      &lt;!&ndash; margin-right: -5px - causes wrapping in Firefox, but not in Chrome or Safari &ndash;&gt;-->
 <!--    </fa-icon>-->
 
-    <img
+    <app-skill-level-icon
       *ngIf='useSignalLevels'
       class="skill-icon want signal-icon"
-      loading="lazy"
-      decoding="async"
-      src="assets/images/icons/signal/{{skillIconSignal(skillLevels?.want)}}.svg"> <!-- FIXME: contrast in dark mode -->
+      [skillLevel]="skillLevels?.want!"
+    ></app-skill-level-icon>
 
   </ng-template>
   <!--<span>{{text}}</span>-->
   <!--Sk2: {{skillLevels | json}}-->
 
 </div>
-
