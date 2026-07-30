@@ -58,6 +58,7 @@ export const nodeConnections: GraphConnections = {
                 sizeMult: size.veryBig,
                 strengthMul: 1.5,
                 connections: {
+                  Serverless: {sizeMult: size.small},
                   Docker: {
                     sizeMult: size.medium,
                   },
@@ -195,7 +196,10 @@ export const nodeConnections: GraphConnections = {
                             strengthMul: strength.big,
                             sizeMult: size.veryBig,
                             connections: {
-                              Kotlin: { sizeMult: size.veryBig },
+                              Kotlin: { sizeMult: size.veryBig,
+                                connections: {
+                                  Ktor: {sizeMult: size.small}
+                                }},
                               Gradle: {},
                               Groovy: {},
                               // "OpenShift": { sizeMult: size.small, strengthMul: strength.veryBig },
@@ -206,13 +210,14 @@ export const nodeConnections: GraphConnections = {
                                   "Kafka Streams": { sizeMult: size.verySmall, strengthMul: strength.veryBig },
                                 },
                               },
-                              "Spring": { sizeMult: size.veryBig },
-                              "Spring Boot": {
-                                strengthMul: strength.veryBig,
-                                sizeMult: size.veryBig,
-                                /* TODO could display old stuff as faded/transparent/grayed */
-                                // ...small
-                              }
+                              "Spring": { sizeMult: size.veryBig, connections: {
+                                "Spring Boot": {
+                                  strengthMul: strength.veryBig,
+                                  sizeMult: size.veryBig,
+                                  /* TODO could display old stuff as faded/transparent/grayed */
+                                  // ...small
+                                }
+                              }},
                             }
                           },
 
@@ -223,7 +228,11 @@ export const nodeConnections: GraphConnections = {
                   'Stencil': {
                     strengthMul: 2,
                     connections: {
-                      'Web Components': {},
+                      'Web Components': {
+                        connections: {
+                          Lit: {},
+                        }
+                      },
                     }
                   }
                 },

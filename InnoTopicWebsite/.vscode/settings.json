@@ -3,5 +3,8 @@
         "export/**": true
     },
     "workbench.colorTheme": "Abyss",
-    "deepscan.enable": true
+    "deepscan.enable": true,
+    "cSpell.words": [
+        "Multiplatform"
+    ]
 }

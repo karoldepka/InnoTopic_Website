@@ -60,6 +60,7 @@ export const highlights = {
       Kotlin: {},
       "Spring Boot": {},
       Kafka: {},
+      Ktor: {},
     },
 
     Python: {},

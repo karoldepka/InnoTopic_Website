@@ -201,6 +201,7 @@ export class Frontend {
   'Vue.js' = tWide({logo: 'vue'})
   'Nuxt' = tWide('nuxt-icon')
   'Hono' = tNarrow('hono.svg')
+  'Fastify' = tWide('fastify-icon.svg')
   'Backbone.js' = tNarrow('backbone-icon.svg')
   'Gridsome' = t({logo: 'gridsome-icon.svg'})
   'Svelte' = tNarrow('svelte-icon') // https://github.com/sveltejs/branding
@@ -375,6 +376,7 @@ export class Backend {
 
   Spring = t('spring-icon.svg')
   'Spring Boot' = t()
+  'Ktor' = tSquare('ktor-icon.svg')
   'Kafka' = tNarrow('kafka-icon.svg')
   'Kafka Streams' = tNarrow('kafka-icon.svg')
   'OpenShift' = tWide('openshift.svg')
@@ -383,9 +385,11 @@ export class Backend {
   Hibernate = t()
   "Fermyon" = tNarrow('fermyon-icon.svg') /* too ugly */ // wasm instead of docker { tagline: 'Fermyon Cloud is the easiest way to deploy and manage cloud native WebAssembly applications with Spin, our developer tool.', pressKitUrl: 'https://design.fermyon.dev/' }'
 
+  Serverless = tWide()
   Docker = tWide('docker-simple'/* https://www.docker.com/company/newsroom/media-resources */)
   'Vagrant' = tNarrow('vagrant-icon.svg')
   Terraform = t('terraform-icon.svg') /* company: HashiCorp */
+  "AWS CDK" = tSquare('Arch_AWS-Cloud-Development-Kit_16.svg') /* company: HashiCorp */
   Ansible = t('ansible-icon.svg')
   Kubernetes = t(/* they had a typo: 'kubernets.svg'*/)
   Elasticsearch = t(/* https://www.elastic.co/brand */)
@@ -713,7 +717,7 @@ export class Cloud {
     /* logos SVG-s: https://googlecloudcheatsheet.withgoogle.com/ */
   })
 
-  "Vector Databases" = tSquare('generic/fontawesome/database.svg')
+  "Vector Databases" = tSquare('generic/fontawesome/table.svg')
 
   Algolia = t('algolia-icon.svg') /* new icon ~2023 */
   "Meilisearch" = tWide('meilisearch-icon-wide.svg')  /* Rust 99% */
