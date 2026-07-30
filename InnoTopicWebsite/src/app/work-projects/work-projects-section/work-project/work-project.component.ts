@@ -29,10 +29,6 @@ export class WorkProjectComponent implements OnInit {
 
   @Input() projectTitle!: string
 
-  get projectTitleWithTopicTags(): string {
-    return this.addTopicHashTags(this.projectTitle)
-  }
-
   get projectDescriptionWithTopicTags(): string {
     return this.addTopicHashTags(this.project?.description ?? '')
   }

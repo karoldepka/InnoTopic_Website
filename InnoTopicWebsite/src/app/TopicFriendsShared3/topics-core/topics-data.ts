@@ -259,7 +259,7 @@ export class Frontend {
   // Million = tWide() TODO: https://million.dev/ ; Make React 70% faster
   Preact = t()
   Gatsby = t('Gatsby-Monogram.svg', /* https://www.gatsbyjs.com/guidelines/logo */)
-  "Next.js" = t('nextjs-icon-export.svg')
+  "Next.js" = t('nextjs-icon.svg')
   // "Next.js" = t('nextjs-icon.svg')
   "Remix" = t('remix-icon.svg') /* https://remix.run/ */
   // TODO: Chakra, Playwright

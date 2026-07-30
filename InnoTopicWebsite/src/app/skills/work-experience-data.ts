@@ -218,87 +218,87 @@ export class WorkExperienceData {
     glTF: we(),
     // TODO: performance optimizations, profiling, UX
   }, false)
-  additional = experience('Additional experience', 'learning more, but not as critical for me now', {
-    JUnit:
-      we(advanced),
-    TestNG:
-      we(intermediate),
-    Jenkins:
-      we(intermediate),
-    RubyMine:
-      we(intermediate),
-    Swift:
-      we(intermediate, advanced),
-    Gatsby:
-      we(),
-    Redux:
-      we(intermediate),
-    Ember:
-      we(beginner),
-    // 'Vue.js':
-    //   we(beginner, advanced),
-    Kubernetes:
-      we(beginner),
-  })
-  expandingTo = experience('Expanding to', 'actively learning and ready to take projects', {
-    // Dart: we(intermediate, advanced),
-    // Angular Dart
-    // TODO: Swagger
-    Capacitor: we(intermediate, expert),
-    Stencil: we(intermediate, expert),
-    Flutter: we(),
-    Dart: we(),
-    NativeScript: we(),
-    Cypress: we(intermediate, expert),
-    'Vue.js': we(intermediate, expert),
-    'Angular Elements': we(),
-    'SVG.js': we(),
-    Akita: we(),
-    TensorFlow: we(),
-    NestJS: we(),
-    Deno: we(intermediate, expert),
-    Storybook: we(beginner, advanced),
-    'DDD - Domain-Driven Design': we(intermediate, advanced),
-    'Vite': we(intermediate, advanced),
-    'SurrealDB': we(),
-    // TODO: Scully https://github.com/scullyio/scully -- The Static Site Generator for Angular apps
-  })
-  earlier = experience('Earlier experience',
-    'always curious to learn more, but no particular need right now',
-    {
-    'Java Swing':
-      we(advanced),
-    Hibernate:
-      we(intermediate, advanced),
-    Maven:
-      we(advanced),
-    Subversion:
-      we(advanced),
-    Groovy:
-      we(intermediate, advanced),
-    Scala:
-      we(intermediate, advanced),
-    Eclipse:
-      we(advanced),
-    Ruby:
-      we(intermediate, advanced),
-    Perl:
-      we(intermediate),
-    C:
-      we(intermediate),
-    'C++':
-      we(intermediate),
-    'C#':
-      we(intermediate, advanced),
-    '.NET':
-      we(intermediate),
-    Lua:
-      we(beginner),
-    'AOP - Aspect-Oriented Programming':
-      we(intermediate),
-    // TODO: PHP, Laravel (EpicElite)
-    // TODO: ApolloServer
-  })
+  // additional = experience('Additional experience', 'learning more, but not as critical for me now', {
+  //   JUnit:
+  //     we(advanced),
+  //   TestNG:
+  //     we(intermediate),
+  //   Jenkins:
+  //     we(intermediate),
+  //   RubyMine:
+  //     we(intermediate),
+  //   Swift:
+  //     we(intermediate, advanced),
+  //   Gatsby:
+  //     we(),
+  //   Redux:
+  //     we(intermediate),
+  //   Ember:
+  //     we(beginner),
+  //   // 'Vue.js':
+  //   //   we(beginner, advanced),
+  //   Kubernetes:
+  //     we(beginner),
+  // })
+  // expandingTo = experience('Expanding to', 'actively learning and ready to take projects', {
+  //   // Dart: we(intermediate, advanced),
+  //   // Angular Dart
+  //   // TODO: Swagger
+  //   Capacitor: we(intermediate, expert),
+  //   Stencil: we(intermediate, expert),
+  //   Flutter: we(),
+  //   Dart: we(),
+  //   NativeScript: we(),
+  //   Cypress: we(intermediate, expert),
+  //   'Vue.js': we(intermediate, expert),
+  //   'Angular Elements': we(),
+  //   'SVG.js': we(),
+  //   Akita: we(),
+  //   TensorFlow: we(),
+  //   NestJS: we(),
+  //   Deno: we(intermediate, expert),
+  //   Storybook: we(beginner, advanced),
+  //   'DDD - Domain-Driven Design': we(intermediate, advanced),
+  //   'Vite': we(intermediate, advanced),
+  //   'SurrealDB': we(),
+  //   // TODO: Scully https://github.com/scullyio/scully -- The Static Site Generator for Angular apps
+  // })
+  // earlier = experience('Earlier experience',
+  //   'always curious to learn more, but no particular need right now',
+  //   {
+  //   'Java Swing':
+  //     we(advanced),
+  //   Hibernate:
+  //     we(intermediate, advanced),
+  //   Maven:
+  //     we(advanced),
+  //   Subversion:
+  //     we(advanced),
+  //   Groovy:
+  //     we(intermediate, advanced),
+  //   Scala:
+  //     we(intermediate, advanced),
+  //   Eclipse:
+  //     we(advanced),
+  //   Ruby:
+  //     we(intermediate, advanced),
+  //   Perl:
+  //     we(intermediate),
+  //   C:
+  //     we(intermediate),
+  //   'C++':
+  //     we(intermediate),
+  //   'C#':
+  //     we(intermediate, advanced),
+  //   '.NET':
+  //     we(intermediate),
+  //   Lua:
+  //     we(beginner),
+  //   'AOP - Aspect-Oriented Programming':
+  //     we(intermediate),
+  //   // TODO: PHP, Laravel (EpicElite)
+  //   // TODO: ApolloServer
+  // })
   // wishList = experience('Wish-list', 'things on my radar; learning bits and pieces when I can', {
   //   'D Language': we(),
   //   Julia: we(),
