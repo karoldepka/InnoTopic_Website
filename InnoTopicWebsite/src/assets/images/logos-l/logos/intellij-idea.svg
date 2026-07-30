@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg width="256px" height="256px" viewBox="0 0 256 256" version="1.1" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid">
+<svg fill="rgb(170,170,170)" width="256px" height="256px" viewBox="0 0 256 256" version="1.1" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid">
     <title>IntelliJ IDEA</title>
     <defs>
         <linearGradient x1="37.0363882%" y1="51.0173323%" x2="178.130095%" y2="41.8613414%" id="intellijLinearGradient-1">

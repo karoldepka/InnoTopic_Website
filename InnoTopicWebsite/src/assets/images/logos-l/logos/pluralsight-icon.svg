@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg width="256px" height="256px" viewBox="0 0 256 256" version="1.1" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid">
+<svg fill="rgb(170,170,170)" width="256px" height="256px" viewBox="0 0 256 256" version="1.1" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid">
     <title>Pluralsight</title>
     <defs>
         <linearGradient x1="49.9986825%" y1="1.57575758%" x2="49.9986825%" y2="100.442688%" id="pluralsightLinearGradient-1">
-            <stop stop-color="rgb(176,176,176)" offset="0%"></stop>
-            <stop stop-color="rgb(170,170,170)" offset="100%"></stop>
+            <stop stop-color="rgb(186,186,186)" offset="0%"></stop>
+            <stop stop-color="rgb(182,182,182)" offset="100%"></stop>
         </linearGradient>
     </defs>
     <g>

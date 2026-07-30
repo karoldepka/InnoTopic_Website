@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg width="512px" height="165px" viewBox="0 0 512 165" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" preserveAspectRatio="xMidYMid">
+<svg fill="rgb(170,170,170)" width="512px" height="165px" viewBox="0 0 512 165" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" preserveAspectRatio="xMidYMid">
     <defs>
         <polygon id="path-1" points="0 108.28075 0 0.527317666 49.4555966 54.5979219 99.1248526 0.527317666 148.132095 54.3176745 197.509968 0.527317666 197.509968 108.529023 148.68728 163.269614 99.1248526 109.268761 49.5624267 163.269614"></polygon>
         <linearGradient x1="12.932%" y1="9.052%" x2="71.216%" y2="81.625%" id="linearGradient-3">

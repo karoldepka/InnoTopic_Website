@@ -1,18 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg width="256px" height="256px" viewBox="0 0 256 256" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" preserveAspectRatio="xMidYMid">
+<svg fill="rgb(170,170,170)" width="256px" height="256px" viewBox="0 0 256 256" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" preserveAspectRatio="xMidYMid">
     <title>Edgio</title>
     <defs>
         <linearGradient x1="3.18474651%" y1="2.86627895%" x2="57.3248613%" y2="58.9172635%" id="edgioLinearGradient-1">
-            <stop stop-color="rgb(170,170,170)" offset="0%"></stop>
-            <stop stop-color="rgb(171,171,171)" offset="100%"></stop>
+            <stop stop-color="rgb(181,181,181)" offset="0%"></stop>
+            <stop stop-color="rgb(182,182,182)" offset="100%"></stop>
         </linearGradient>
         <radialGradient cx="104.36188%" cy="13.087638%" fx="104.36188%" fy="13.087638%" r="94.5754841%" id="edgioRadialGradient-2">
-            <stop stop-color="rgb(177,177,177)" offset="0%"></stop>
-            <stop stop-color="rgb(177,177,177)" stop-opacity="0" offset="100%"></stop>
+            <stop stop-color="rgb(186,186,186)" offset="0%"></stop>
+            <stop stop-color="rgb(186,186,186)" stop-opacity="0" offset="100%"></stop>
         </radialGradient>
         <radialGradient cx="68.748982%" cy="120.915701%" fx="68.748982%" fy="120.915701%" r="68.4871381%" id="edgioRadialGradient-3">
-            <stop stop-color="rgb(179,179,179)" offset="0%"></stop>
-            <stop stop-color="rgb(179,179,179)" stop-opacity="0" offset="100%"></stop>
+            <stop stop-color="rgb(187,187,187)" offset="0%"></stop>
+            <stop stop-color="rgb(187,187,187)" stop-opacity="0" offset="100%"></stop>
         </radialGradient>
     </defs>
     <g>

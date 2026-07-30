@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg width="256px" height="171px" viewBox="0 0 256 171" version="1.1" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid">
+<svg fill="rgb(170,170,170)" width="256px" height="171px" viewBox="0 0 256 171" version="1.1" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid">
     <title>Meta</title>
     <defs>
         <linearGradient x1="13.8784354%" y1="55.9337491%" x2="89.143574%" y2="58.6936324%" id="linearGradient-1">
-            <stop stop-color="rgb(170,170,170)" offset="0%"></stop>
-            <stop stop-color="rgb(170,170,170)" offset="40%"></stop>
-            <stop stop-color="rgb(187,187,187)" offset="83%"></stop>
+            <stop stop-color="rgb(197,197,197)" offset="0%"></stop>
+            <stop stop-color="rgb(197,197,197)" offset="40%"></stop>
+            <stop stop-color="rgb(201,201,201)" offset="83%"></stop>
             <stop stop-color="rgb(204,204,204)" offset="100%"></stop>
         </linearGradient>
         <linearGradient x1="54.3150272%" y1="82.782443%" x2="54.3150272%" y2="39.3067715%" id="linearGradient-2">
             <stop stop-color="rgb(204,204,204)" offset="0%"></stop>
-            <stop stop-color="rgb(170,170,170)" offset="100%"></stop>
+            <stop stop-color="rgb(197,197,197)" offset="100%"></stop>
         </linearGradient>
     </defs>
     <g>

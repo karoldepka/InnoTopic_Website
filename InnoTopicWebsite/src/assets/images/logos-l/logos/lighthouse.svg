@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg width="256px" height="256px" viewBox="0 0 256 256" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" preserveAspectRatio="xMidYMid">
+<svg fill="rgb(170,170,170)" width="256px" height="256px" viewBox="0 0 256 256" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" preserveAspectRatio="xMidYMid">
     <defs>
         <path d="M53.4829517,15.7295112 L45.838174,15.7295112 C42.597311,6.560134 33.8657117,0 23.5942668,0 C10.5698308,0 0,10.5698308 0,23.5942668 C0,36.6187028 10.5698308,47.1907116 23.5942668,47.1907116 L53.4829517,47.1907116 C62.169477,47.1871051 69.2100591,40.1455481 69.2124629,31.4590224 C69.2088571,22.7733472 62.1686268,15.733117 53.4829517,15.7295112 Z" id="path-1"></path>
         <linearGradient x1="49.994%" y1="0.226%" x2="49.994%" y2="99.725%" id="linearGradient-3">

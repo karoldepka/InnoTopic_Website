@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg width="64px" height="64px" viewBox="0 0 64 64" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<svg fill="rgb(170,170,170)" width="64px" height="64px" viewBox="0 0 64 64" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
     <title>Icon-Architecture/48/Arch_Amazon-Lookout-for-Vision_48</title>
     <g id="Icon-Architecture/48/Arch_Amazon-Lookout-for-Vision_48" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-        <g id="Icon-Architecture-BG/48/Machine-Learning" fill="rgb(170,170,170)">
+        <g id="Icon-Architecture-BG/48/Machine-Learning" fill="rgb(185,185,185)">
             <rect id="Rectangle" x="0" y="0" width="64" height="64"></rect>
         </g>
         <g id="Icon-Service/48/Amazon-Lookout-for-Vision_48" transform="translate(10.000000, 10.000000)" fill="rgb(204,204,204)">

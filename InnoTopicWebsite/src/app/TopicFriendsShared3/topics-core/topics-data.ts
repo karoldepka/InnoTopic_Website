@@ -852,7 +852,7 @@ export class Other {
   IFTTT = tWide('ifttt.svg')
   // ======== LowCode / NoCode / CMS:
   Shopify = tNarrow()
-  PrestaShop = tSquare()
+  PrestaShop = tSquare('prestashop-icon.svg')
   WebFlow = t('webflow-mark-vector-blue.svg') /* https://brand-at.webflow.io/resources#logos */
   Wix = tWide()
   'Vercel V0' = tWide('vercel-v0-icon.svg')
@@ -892,6 +892,7 @@ export class Other {
   'Data Structures' = t('project-diagram-solid.svg')
   'OOP - Object Oriented Programming' = t('project-diagram-solid.svg')
   'SOLID Principles' = t('project-diagram-solid.svg')
+  'Hexagonal Architecture' = t('generic/hexagon-svgrepo-com.svg')
   'API Design' = t('project-diagram-solid.svg')
   'Library Design' = t('project-diagram-solid.svg')
   'FP - Functional Programming' = t('project-diagram-solid.svg')

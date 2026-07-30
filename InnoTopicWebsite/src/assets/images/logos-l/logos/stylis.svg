@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg width="512px" height="201px" viewBox="0 0 512 201" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" preserveAspectRatio="xMidYMid">
+<svg fill="rgb(170,170,170)" width="512px" height="201px" viewBox="0 0 512 201" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" preserveAspectRatio="xMidYMid">
     <title>Stylis</title>
     <defs>
         <linearGradient x1="47.1649%" y1="1.3158%" x2="47.1649%" y2="81.5789%" id="stylis-linearGradient-1">
-            <stop stop-color="rgb(170,170,170)" offset="0%"></stop>
+            <stop stop-color="rgb(197,197,197)" offset="0%"></stop>
             <stop stop-color="rgb(204,204,204)" offset="100%"></stop>
         </linearGradient>
     </defs>

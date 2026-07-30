@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg width="80px" height="80px" viewBox="0 0 80 80" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<svg fill="rgb(170,170,170)" width="80px" height="80px" viewBox="0 0 80 80" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
     <!-- Generator: Sketch 64 (93537) - https://sketch.com -->
     <title>Icon-Architecture/64/Arch_Amazon-Augmented-AI-A2I_64</title>
     <desc>Created with Sketch.</desc>
     <defs>
         <linearGradient x1="0%" y1="100%" x2="100%" y2="0%" id="linearGradient-1">
-            <stop stop-color="rgb(170,170,170)" offset="0%"></stop>
-            <stop stop-color="rgb(186,186,186)" offset="100%"></stop>
+            <stop stop-color="rgb(179,179,179)" offset="0%"></stop>
+            <stop stop-color="rgb(191,191,191)" offset="100%"></stop>
         </linearGradient>
     </defs>
     <g id="Icon-Architecture/64/Arch_Amazon-Augmented-AI-A2I_64" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">

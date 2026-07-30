@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg width="40px" height="40px" viewBox="0 0 40 40" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<svg fill="rgb(170,170,170)" width="40px" height="40px" viewBox="0 0 40 40" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
     <title>Icon-Architecture/32/Arch_AWS-Deep-Learning-AMIs_32</title>
     <g id="Icon-Architecture/32/Arch_AWS-Deep-Learning-AMIs_32" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-        <g id="Icon-Architecture-BG/32/Machine-Learning" fill="rgb(170,170,170)">
+        <g id="Icon-Architecture-BG/32/Machine-Learning" fill="rgb(185,185,185)">
             <rect id="Rectangle" x="0" y="0" width="40" height="40"></rect>
         </g>
         <g id="Icon-Service/32/AWS-Deep-Learning-AMIs_32" transform="translate(6.000000, 6.000000)" fill="rgb(204,204,204)">

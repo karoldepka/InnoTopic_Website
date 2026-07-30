@@ -1,26 +1,26 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg width="512px" height="118px" viewBox="0 0 512 118" version="1.1" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid">
+<svg fill="rgb(170,170,170)" width="512px" height="118px" viewBox="0 0 512 118" version="1.1" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid">
     <title>stepsize</title>
     <defs>
         <linearGradient x1="32.5211793%" y1="-18.7047263%" x2="102.580638%" y2="72.9922366%" id="stepsizeLinearGradient-1">
-            <stop stop-color="rgb(170,170,170)" offset="0%"></stop>
-            <stop stop-color="rgb(170,170,170)" offset="19.8075%"></stop>
+            <stop stop-color="rgb(199,199,199)" offset="0%"></stop>
+            <stop stop-color="rgb(199,199,199)" offset="19.8075%"></stop>
             <stop stop-color="rgb(204,204,204)" offset="100%"></stop>
         </linearGradient>
         <linearGradient x1="-2.43757963%" y1="26.9081723%" x2="67.6207613%" y2="118.609414%" id="stepsizeLinearGradient-2">
-            <stop stop-color="rgb(170,170,170)" offset="0%"></stop>
-            <stop stop-color="rgb(170,170,170)" offset="19.8075%"></stop>
+            <stop stop-color="rgb(199,199,199)" offset="0%"></stop>
+            <stop stop-color="rgb(199,199,199)" offset="19.8075%"></stop>
             <stop stop-color="rgb(204,204,204)" offset="100%"></stop>
         </linearGradient>
         <linearGradient x1="67.4788207%" y1="118.709138%" x2="-2.58063795%" y2="27.0087523%" id="stepsizeLinearGradient-3">
             <stop stop-color="rgb(204,204,204)" offset="0%"></stop>
-            <stop stop-color="rgb(170,170,170)" offset="80.1925%"></stop>
-            <stop stop-color="rgb(170,170,170)" offset="100%"></stop>
+            <stop stop-color="rgb(199,199,199)" offset="80.1925%"></stop>
+            <stop stop-color="rgb(199,199,199)" offset="100%"></stop>
         </linearGradient>
         <linearGradient x1="102.437661%" y1="73.0925715%" x2="32.3769713%" y2="-18.6126792%" id="stepsizeLinearGradient-4">
             <stop stop-color="rgb(204,204,204)" offset="0%"></stop>
-            <stop stop-color="rgb(170,170,170)" offset="80.1925%"></stop>
-            <stop stop-color="rgb(170,170,170)" offset="100%"></stop>
+            <stop stop-color="rgb(199,199,199)" offset="80.1925%"></stop>
+            <stop stop-color="rgb(199,199,199)" offset="100%"></stop>
         </linearGradient>
     </defs>
     <g>
@@ -28,19 +28,19 @@
         <g transform="translate(0.000000, 0.000000)">
             <path d="M125.820925,27.7156302 L105.641966,0.399414985 L47.8751914,0.399414985 L30.070284,55.4276716 L50.2492437,82.7439838 L67.6584219,27.7156302 L125.820925,27.7156302 Z M75.5717141,32.8623739 L95.3549445,60.1783627 L78.3414957,115.206716 L20.1786688,115.206716 L0,87.8907275 L58.1625359,87.8907275 L75.5717141,32.8623739 Z" fill="rgb(204,204,204)"></path>
             <polygon fill="rgb(204,204,204)" points="78.0805859 115.600182 49.1529055 115.513859 57.8553931 87.8836147"></polygon>
-            <polygon fill="rgb(175,175,175)" points="49.147086 115.505453 20.2194056 115.41913 28.9218932 87.7888854"></polygon>
-            <polygon fill="rgb(175,175,175)" points="66.5559408 60.2540168 95.4836212 60.3403401 86.7811336 87.9705846"></polygon>
-            <polygon fill="rgb(170,170,170)" points="-1.77635684e-15 87.7132313 28.9277127 87.7992313 20.2252251 115.429476"></polygon>
-            <polygon fill="rgb(170,170,170)" points="95.4836212 60.3377537 66.5559408 60.2517537 75.2584284 32.6211859"></polygon>
+            <polygon fill="rgb(200,200,200)" points="49.147086 115.505453 20.2194056 115.41913 28.9218932 87.7888854"></polygon>
+            <polygon fill="rgb(200,200,200)" points="66.5559408 60.2540168 95.4836212 60.3403401 86.7811336 87.9705846"></polygon>
+            <polygon fill="rgb(199,199,199)" points="-1.77635684e-15 87.7132313 28.9277127 87.7992313 20.2252251 115.429476"></polygon>
+            <polygon fill="rgb(199,199,199)" points="95.4836212 60.3377537 66.5559408 60.2517537 75.2584284 32.6211859"></polygon>
             <polygon fill="rgb(204,204,204)" points="57.8544232 87.8836147 86.7821036 87.969938 78.079616 115.600182"></polygon>
             <polygon fill="url(#stepsizeLinearGradient-1)" points="49.147086 115.514829 57.8486036 87.8855545 28.9209232 87.7995546"></polygon>
             <polygon fill="url(#stepsizeLinearGradient-2)" points="57.8544232 87.8855545 86.7821036 87.9705846 66.5559408 60.2540168"></polygon>
-            <polygon fill="rgb(170,170,170)" points="47.738432 3.23308228e-05 76.6661124 0.0861616427 67.9636249 27.7166001"></polygon>
-            <polygon fill="rgb(175,175,175)" points="76.671932 0.0978977314 105.599612 0.184027043 96.8971248 27.8142392"></polygon>
-            <polygon fill="rgb(175,175,175)" points="59.2630771 55.3491077 30.3353967 55.2631077 39.0378843 27.6328633"></polygon>
+            <polygon fill="rgb(199,199,199)" points="47.738432 3.23308228e-05 76.6661124 0.0861616427 67.9636249 27.7166001"></polygon>
+            <polygon fill="rgb(200,200,200)" points="76.671932 0.0978977314 105.599612 0.184027043 96.8971248 27.8142392"></polygon>
+            <polygon fill="rgb(200,200,200)" points="59.2630771 55.3491077 30.3353967 55.2631077 39.0378843 27.6328633"></polygon>
             <polygon fill="rgb(204,204,204)" points="125.818986 27.8902166 96.8913052 27.8038933 105.594116 0.17368118"></polygon>
             <polygon fill="rgb(204,204,204)" points="30.3353967 55.2624611 59.2630771 55.3484611 50.5605896 82.9787056"></polygon>
-            <polygon fill="rgb(170,170,170)" points="67.9645948 27.7166001 39.0369144 27.6302768 47.739402 1.77635684e-15"></polygon>
+            <polygon fill="rgb(199,199,199)" points="67.9645948 27.7166001 39.0369144 27.6302768 47.739402 1.77635684e-15"></polygon>
             <polygon fill="url(#stepsizeLinearGradient-3)" points="67.9704143 27.7166001 96.8980947 27.8016302 76.671932 0.0852887105"></polygon>
             <polygon fill="url(#stepsizeLinearGradient-4)" points="59.260814 55.3491077 67.9636249 27.7188633 39.0369144 27.6328633"></polygon>
         </g>

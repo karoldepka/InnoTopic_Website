@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg width="512px" height="111px" viewBox="0 0 512 111" version="1.1" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid">
+<svg fill="rgb(170,170,170)" width="512px" height="111px" viewBox="0 0 512 111" version="1.1" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid">
     <title>SurrealDB</title>
     <defs>
         <linearGradient x1="21.2495009%" y1="26.2140821%" x2="68.2452832%" y2="73.2590608%" id="surrealDBLinearGradient-1">

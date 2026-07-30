@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg width="256px" height="256px" viewBox="0 0 256 256" version="1.1" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid">
+<svg fill="rgb(170,170,170)" width="256px" height="256px" viewBox="0 0 256 256" version="1.1" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid">
     <title>Emacs</title>
     <defs>
         <linearGradient x1="25.1405003%" y1="20.1364773%" x2="92.3935234%" y2="101.47711%" id="emacsLinearGradient-1">
-            <stop stop-color="rgb(185,185,185)" offset="0%"></stop>
-            <stop stop-color="rgb(180,180,180)" stop-opacity="0.99607843" offset="56.639391%"></stop>
-            <stop stop-color="rgb(178,178,178)" stop-opacity="0.99215686" offset="100%"></stop>
+            <stop stop-color="rgb(188,188,188)" offset="0%"></stop>
+            <stop stop-color="rgb(184,184,184)" stop-opacity="0.99607843" offset="56.639391%"></stop>
+            <stop stop-color="rgb(183,183,183)" stop-opacity="0.99215686" offset="100%"></stop>
         </linearGradient>
         <linearGradient x1="90.7163375%" y1="79.0920364%" x2="32.7486929%" y2="9.82547129%" id="emacsLinearGradient-2">
-            <stop stop-color="rgb(170,170,170)" offset="0%"></stop>
-            <stop stop-color="rgb(173,173,173)" offset="100%"></stop>
+            <stop stop-color="rgb(177,177,177)" offset="0%"></stop>
+            <stop stop-color="rgb(179,179,179)" offset="100%"></stop>
         </linearGradient>
     </defs>
     <g>

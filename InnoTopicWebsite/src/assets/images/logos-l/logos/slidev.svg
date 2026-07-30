@@ -1,21 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg width="256px" height="256px" viewBox="0 0 256 256" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" preserveAspectRatio="xMidYMid">
+<svg fill="rgb(170,170,170)" width="256px" height="256px" viewBox="0 0 256 256" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" preserveAspectRatio="xMidYMid">
     <title>slidev</title>
     <defs>
         <linearGradient x1="0%" y1="-8.88888889%" x2="100%" y2="100%" id="linearGradient-1">
-            <stop stop-color="rgb(184,184,184)" offset="0%"></stop>
-            <stop stop-color="rgb(170,170,170)" offset="100%"></stop>
+            <stop stop-color="rgb(194,194,194)" offset="0%"></stop>
+            <stop stop-color="rgb(187,187,187)" offset="100%"></stop>
         </linearGradient>
         <linearGradient x1="-10.5555556%" y1="-12.2222222%" x2="84.5361111%" y2="100%" id="linearGradient-2">
-            <stop stop-color="rgb(198,198,198)" offset="0%"></stop>
-            <stop stop-color="rgb(181,181,181)" offset="100%"></stop>
+            <stop stop-color="rgb(201,201,201)" offset="0%"></stop>
+            <stop stop-color="rgb(192,192,192)" offset="100%"></stop>
         </linearGradient>
         <linearGradient x1="-0.132239836%" y1="-8.07272088%" x2="12.3609146%" y2="104.494726%" id="linearGradient-3">
             <stop stop-color="rgb(204,204,204)" offset="0%"></stop>
             <stop stop-color="rgb(204,204,204)" offset="0.01%"></stop>
-            <stop stop-color="rgb(199,199,199)" offset="8.33333%"></stop>
-            <stop stop-color="rgb(192,192,192)" offset="60.1773%"></stop>
-            <stop stop-color="rgb(188,188,188)" offset="100%"></stop>
+            <stop stop-color="rgb(201,201,201)" offset="8.33333%"></stop>
+            <stop stop-color="rgb(198,198,198)" offset="60.1773%"></stop>
+            <stop stop-color="rgb(196,196,196)" offset="100%"></stop>
         </linearGradient>
     </defs>
     <g>

@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg width="256px" height="253px" viewBox="0 0 256 253" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" preserveAspectRatio="xMidYMid">
+<svg fill="rgb(170,170,170)" width="256px" height="253px" viewBox="0 0 256 253" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" preserveAspectRatio="xMidYMid">
     <title>AsyncAPI</title>
     <defs>
         <linearGradient x1="90.6423393%" y1="10.3370074%" x2="12.5432059%" y2="88.4290482%" id="asyncAPILinearGradient-1">
-            <stop stop-color="rgb(184,184,184)" offset="0%"></stop>
-            <stop stop-color="rgb(183,183,183)" stop-opacity="96" offset="3%"></stop>
-            <stop stop-color="rgb(179,179,179)" stop-opacity="70" offset="23%"></stop>
-            <stop stop-color="rgb(176,176,176)" stop-opacity="49" offset="43%"></stop>
-            <stop stop-color="rgb(174,174,174)" stop-opacity="32" offset="61%"></stop>
-            <stop stop-color="rgb(172,172,172)" stop-opacity="20" offset="77%"></stop>
-            <stop stop-color="rgb(171,171,171)" stop-opacity="13" offset="90%"></stop>
-            <stop stop-color="rgb(170,170,170)" stop-opacity="10" offset="100%"></stop>
+            <stop stop-color="rgb(192,192,192)" offset="0%"></stop>
+            <stop stop-color="rgb(191,191,191)" stop-opacity="96" offset="3%"></stop>
+            <stop stop-color="rgb(189,189,189)" stop-opacity="70" offset="23%"></stop>
+            <stop stop-color="rgb(187,187,187)" stop-opacity="49" offset="43%"></stop>
+            <stop stop-color="rgb(185,185,185)" stop-opacity="32" offset="61%"></stop>
+            <stop stop-color="rgb(184,184,184)" stop-opacity="20" offset="77%"></stop>
+            <stop stop-color="rgb(184,184,184)" stop-opacity="13" offset="90%"></stop>
+            <stop stop-color="rgb(183,183,183)" stop-opacity="10" offset="100%"></stop>
         </linearGradient>
     </defs>
     <g>

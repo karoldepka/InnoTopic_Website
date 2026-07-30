@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg width="256px" height="342px" viewBox="0 0 256 342" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" preserveAspectRatio="xMidYMid">
+<svg fill="rgb(170,170,170)" width="256px" height="342px" viewBox="0 0 256 342" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" preserveAspectRatio="xMidYMid">
     <title>Power BI</title>
     <defs>
         <path d="M142.222222,14.2222222 C142.222222,6.36750222 148.589867,0 156.444444,0 L241.777778,0 C249.632356,0 256,6.36750222 256,14.2222222 L256,327.111111 C256,334.965689 249.632356,341.333333 241.777778,341.333333 L14.2222222,341.333333 C6.36764444,341.333333 0,334.965689 0,327.111111 L0,184.888889 C0,177.034311 6.36764444,170.666667 14.2222222,170.666667 L71.1114667,170.666667 L71.1114667,99.5555556 C71.1114667,91.7009778 77.4791111,85.3333333 85.3336889,85.3333333 L142.222222,85.3333333 L142.222222,14.2222222 Z" id="power-bi-path-1"></path>
