@@ -516,7 +516,7 @@ export class WorkOrganisationsAndProjectsData {
           'Gravit Designer': {},
           'Affinity Designer': {},
           Docker: {},
-
+          "Hexagonal Architecture": {},
         }
       },
       'CloudTime': {

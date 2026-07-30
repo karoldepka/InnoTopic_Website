@@ -42,7 +42,7 @@ import { config } from '../../config';
         [attr.capitalize]="true"
       ></threed-text>
     } @else {
-      <h1 class="section-title">{{ text }}</h1>
+      <h1 class="section-title shiny-effect">{{ text }}</h1>
     }
   `,
 })

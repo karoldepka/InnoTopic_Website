@@ -190,4 +190,29 @@ app-hashtag-replacer app-topic-tag
     &:hover
       box-shadow: unset !important
 
+// Pluggable shiny effect (emulated environment map)
+.shiny-effect
+  --shiny-color: rgba(255, 255, 255, 0.6)
+  --shiny-speed: 4s
+  position: relative
+  overflow: hidden
+  &::after
+    content: ''
+    position: absolute
+    top: -100%
+    left: -100%
+    width: 300%
+    height: 300%
+    pointer-events: none
+    background: linear-gradient(110deg, transparent 40%, rgba(255, 255, 255, 0) 44.5%, var(--shiny-color) 45%, var(--shiny-color) 55%, rgba(255, 255, 255, 0) 55.5%, transparent 60%)
+    mix-blend-mode: overlay
+    animation: shiny-sweep var(--shiny-speed) infinite linear
+    z-index: 5
+
+@keyframes shiny-sweep
+  0%
+    transform: translate(-33%, -33%)
+  100%
+    transform: translate(33%, 33%)
+
 
