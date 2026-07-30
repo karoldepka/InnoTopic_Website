@@ -194,6 +194,7 @@ app-hashtag-replacer app-topic-tag
 .shiny-effect
   --shiny-color: rgba(255, 255, 255, 0.6)
   --shiny-speed: 4s
+  --shiny-gradient: linear-gradient(110deg, transparent 35%, rgba(255, 255, 255, 0) 40%, var(--shiny-color) 45%, var(--shiny-color) 55%, rgba(255, 255, 255, 0) 60%, transparent 65%)
   position: relative
   overflow: hidden
   &::after
@@ -204,10 +205,13 @@ app-hashtag-replacer app-topic-tag
     width: 300%
     height: 300%
     pointer-events: none
-    background: linear-gradient(110deg, transparent 40%, rgba(255, 255, 255, 0) 44.5%, var(--shiny-color) 45%, var(--shiny-color) 55%, rgba(255, 255, 255, 0) 55.5%, transparent 60%)
+    background: var(--shiny-gradient)
     mix-blend-mode: overlay
     animation: shiny-sweep var(--shiny-speed) infinite linear
     z-index: 5
+
+.shiny-effect--sharp
+  --shiny-gradient: linear-gradient(110deg, transparent 40%, rgba(255, 255, 255, 0) 44.5%, var(--shiny-color) 45%, var(--shiny-color) 55%, rgba(255, 255, 255, 0) 55.5%, transparent 60%)
 
 @keyframes shiny-sweep
   0%

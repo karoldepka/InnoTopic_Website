@@ -206,9 +206,6 @@ export const nodeConnections: GraphConnections = {
                               // "Hazelcast": { sizeMult: size.small, strengthMul: strength.veryBig },
                               "Kafka": {
                                 sizeMult: size.small, strengthMul: strength.veryBig,
-                                connections: {
-                                  "Kafka Streams": { sizeMult: size.verySmall, strengthMul: strength.veryBig },
-                                },
                               },
                               "Spring": { sizeMult: size.veryBig, connections: {
                                 "Spring Boot": {

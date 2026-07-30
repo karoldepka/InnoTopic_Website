@@ -1,4 +1,4 @@
-import { Directive, HostBinding, Input } from '@angular/core';
+import { Directive, HostBinding, Input, booleanAttribute } from '@angular/core';
 
 @Directive({
   selector: '[appShinyEffect]',
@@ -6,7 +6,10 @@ import { Directive, HostBinding, Input } from '@angular/core';
 })
 export class ShinyEffectDirective {
   @HostBinding('class.shiny-effect')
-  @Input() appShinyEffect: boolean | string = true;
+  @Input({ transform: booleanAttribute }) appShinyEffect = true;
+
+  @HostBinding('class.shiny-effect--sharp')
+  @Input({ transform: booleanAttribute }) sharp = false;
 
   constructor() {}
 }

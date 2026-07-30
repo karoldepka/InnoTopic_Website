@@ -1,25 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg fill="rgb(170,170,170)" width="256px" height="256px" viewBox="0 0 256 256" version="1.1" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid">
+<svg fill="rgb(150,150,150)" width="256px" height="256px" viewBox="0 0 256 256" version="1.1" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid">
     <title>MPS</title>
     <defs>
         <linearGradient x1="75.7%" y1="132.916667%" x2="-19.4666667%" y2="11.0333333%" id="mpsLinearGradient-1">
-            <stop stop-color="rgb(185,185,185)" offset="6%"></stop>
-            <stop stop-color="rgb(192,192,192)" offset="87%"></stop>
+            <stop stop-color="rgb(183,183,183)" offset="6%"></stop>
+            <stop stop-color="rgb(199,199,199)" offset="87%"></stop>
         </linearGradient>
         <linearGradient x1="76.4645944%" y1="92.4166667%" x2="28.6675778%" y2="-29.4666667%" id="mpsLinearGradient-2">
-            <stop stop-color="rgb(185,185,185)" offset="5%"></stop>
-            <stop stop-color="rgb(186,186,186)" offset="18%"></stop>
+            <stop stop-color="rgb(183,183,183)" offset="5%"></stop>
+            <stop stop-color="rgb(184,184,184)" offset="18%"></stop>
             <stop stop-color="rgb(188,188,188)" offset="39%"></stop>
-            <stop stop-color="rgb(190,190,190)" offset="67%"></stop>
-            <stop stop-color="rgb(192,192,192)" offset="87%"></stop>
+            <stop stop-color="rgb(194,194,194)" offset="67%"></stop>
+            <stop stop-color="rgb(199,199,199)" offset="87%"></stop>
         </linearGradient>
         <linearGradient x1="33.8010666%" y1="103.028279%" x2="64.8540035%" y2="-21.3983523%" id="mpsLinearGradient-3">
-            <stop stop-color="rgb(192,192,192)" offset="12%"></stop>
-            <stop stop-color="rgb(196,196,196)" offset="36%"></stop>
-            <stop stop-color="rgb(199,199,199)" offset="58%"></stop>
-            <stop stop-color="rgb(202,202,202)" offset="77%"></stop>
-            <stop stop-color="rgb(203,203,203)" offset="92%"></stop>
-            <stop stop-color="rgb(204,204,204)" offset="100%"></stop>
+            <stop stop-color="rgb(199,199,199)" offset="12%"></stop>
+            <stop stop-color="rgb(207,207,207)" offset="36%"></stop>
+            <stop stop-color="rgb(215,215,215)" offset="58%"></stop>
+            <stop stop-color="rgb(220,220,220)" offset="77%"></stop>
+            <stop stop-color="rgb(223,223,223)" offset="92%"></stop>
+            <stop stop-color="rgb(224,224,224)" offset="100%"></stop>
         </linearGradient>
     </defs>
     <g>

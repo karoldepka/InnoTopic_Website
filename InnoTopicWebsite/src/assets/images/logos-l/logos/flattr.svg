@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<svg fill="rgb(170,170,170)" width="256px" height="257px" viewBox="0 0 256 257" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" preserveAspectRatio="xMidYMid">
+<svg fill="rgb(150,150,150)" width="256px" height="257px" viewBox="0 0 256 257" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" preserveAspectRatio="xMidYMid">
     <defs>
         <linearGradient x1="50.000371%" y1="2.10915516e-14%" x2="50.000371%" y2="99.9970316%" id="linearGradient-1">
-            <stop stop-color="rgb(193,193,193)" offset="0%"></stop>
-            <stop stop-color="rgb(204,204,204)" offset="100%"></stop>
+            <stop stop-color="rgb(201,201,201)" offset="0%"></stop>
+            <stop stop-color="rgb(224,224,224)" offset="100%"></stop>
         </linearGradient>
         <linearGradient x1="49.9966606%" y1="99.9985158%" x2="49.9966606%" y2="0.000742098506%" id="linearGradient-2">
-            <stop stop-color="rgb(202,202,202)" offset="0%"></stop>
-            <stop stop-color="rgb(195,195,195)" offset="100%"></stop>
+            <stop stop-color="rgb(221,221,221)" offset="0%"></stop>
+            <stop stop-color="rgb(205,205,205)" offset="100%"></stop>
         </linearGradient>
     </defs>
 	<g>

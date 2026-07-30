@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg fill="rgb(170,170,170)" width="256px" height="154px" viewBox="0 0 256 154" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" preserveAspectRatio="xMidYMid">
+<svg fill="rgb(150,150,150)" width="256px" height="154px" viewBox="0 0 256 154" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" preserveAspectRatio="xMidYMid">
     <defs>
         <linearGradient x1="-2.77777778%" y1="32%" x2="100%" y2="67.5555556%" id="linearGradient-1">
-            <stop stop-color="rgb(197,197,197)" offset="0%"></stop>
-            <stop stop-color="rgb(204,204,204)" offset="100%"></stop>
+            <stop stop-color="rgb(210,210,210)" offset="0%"></stop>
+            <stop stop-color="rgb(224,224,224)" offset="100%"></stop>
         </linearGradient>
     </defs>
     <g>

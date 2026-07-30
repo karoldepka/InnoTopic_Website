@@ -1,18 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg fill="rgb(170,170,170)" width="256px" height="256px" viewBox="0 0 256 256" version="1.1" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid">
+<svg fill="rgb(150,150,150)" width="256px" height="256px" viewBox="0 0 256 256" version="1.1" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid">
     <title>Apidog</title>
     <defs>
         <linearGradient x1="0%" y1="36.3007109%" x2="99.9956691%" y2="64.6113742%" id="linearGradient-1">
-            <stop stop-color="rgb(190,190,190)" offset="0%"></stop>
-            <stop stop-color="rgb(183,183,183)" offset="100%"></stop>
+            <stop stop-color="rgb(195,195,195)" offset="0%"></stop>
+            <stop stop-color="rgb(177,177,177)" offset="100%"></stop>
         </linearGradient>
         <linearGradient x1="102.837018%" y1="70.7770711%" x2="-5.65474532%" y2="28.962418%" id="linearGradient-2">
-            <stop stop-color="rgb(195,195,195)" offset="0%"></stop>
-            <stop stop-color="rgb(204,204,204)" offset="100%"></stop>
+            <stop stop-color="rgb(205,205,205)" offset="0%"></stop>
+            <stop stop-color="rgb(224,224,224)" offset="100%"></stop>
         </linearGradient>
         <linearGradient x1="49.9412852%" y1="69.2152071%" x2="23.6694604%" y2="32.8598311%" id="linearGradient-3">
-            <stop stop-color="rgb(195,195,195)" offset="0%"></stop>
-            <stop stop-color="rgb(204,204,204)" offset="100%"></stop>
+            <stop stop-color="rgb(205,205,205)" offset="0%"></stop>
+            <stop stop-color="rgb(224,224,224)" offset="100%"></stop>
         </linearGradient>
     </defs>
     <g>

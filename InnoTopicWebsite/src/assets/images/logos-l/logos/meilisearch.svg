@@ -1,18 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg fill="rgb(170,170,170)" width="256px" height="150px" viewBox="0 0 256 150" version="1.1" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid">
+<svg fill="rgb(150,150,150)" width="256px" height="150px" viewBox="0 0 256 150" version="1.1" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid">
     <title>Meilisearch</title>
     <defs>
         <linearGradient x1="153.820608%" y1="-7.63826138%" x2="19.1721041%" y2="89.2387581%" id="meilisearchLinearGradient-1">
-            <stop stop-color="rgb(204,204,204)" offset="0%"></stop>
-            <stop stop-color="rgb(200,200,200)" offset="100%"></stop>
+            <stop stop-color="rgb(224,224,224)" offset="0%"></stop>
+            <stop stop-color="rgb(216,216,216)" offset="100%"></stop>
         </linearGradient>
         <linearGradient x1="117.3253%" y1="-7.63849731%" x2="-17.3229972%" y2="89.2384892%" id="meilisearchLinearGradient-2">
-            <stop stop-color="rgb(204,204,204)" offset="0%"></stop>
-            <stop stop-color="rgb(200,200,200)" offset="100%"></stop>
+            <stop stop-color="rgb(224,224,224)" offset="0%"></stop>
+            <stop stop-color="rgb(216,216,216)" offset="100%"></stop>
         </linearGradient>
         <linearGradient x1="80.8280376%" y1="-7.63849731%" x2="-53.8207274%" y2="89.2384892%" id="meilisearchLinearGradient-3">
-            <stop stop-color="rgb(204,204,204)" offset="0%"></stop>
-            <stop stop-color="rgb(200,200,200)" offset="100%"></stop>
+            <stop stop-color="rgb(224,224,224)" offset="0%"></stop>
+            <stop stop-color="rgb(216,216,216)" offset="100%"></stop>
         </linearGradient>
     </defs>
     <g>
