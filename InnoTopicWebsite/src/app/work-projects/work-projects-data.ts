@@ -114,7 +114,7 @@ export class WorkOrganisationsAndProjectsData {
           'and #Django + #TypeScript Web App. ' +
           'Working directly with #CTO and #Senior_Principal_Engineer. ' +
           'Working with big brands like #Amazon, Walmart, Adidas, Puma.' +
-          'Application processed millions of events per day in realtime.',
+          ' Application processed millions of events per day in realtime.',
         topicsById: {
           'AWS CDK': {},
           'Rust': {},
@@ -155,7 +155,7 @@ export class WorkOrganisationsAndProjectsData {
           'Python': {},
           'Django': {},
           'Java': {},
-          'Kotlin': {},
+          // 'Kotlin': {},
           // 'Spring': {},
           // 'Spring Boot': {},
           // 'Kafka': {},
@@ -179,8 +179,9 @@ export class WorkOrganisationsAndProjectsData {
         roles: 'Lead/Senior Full-Stack Developer & Interviewing and Recruiting (Consultant)',
         description: 'Recruited and interviewed 5 Developers and a UI/UX/Web/Graphics Designer. I was a #Team_Lead of 5 Developers. Did code&architecture reviews.' +
           'Working directly with #CEO & #Director_of_Operations. Communication in #English, #Spanish, #Polish. ' +
-          '"#Python #Django + #TypeScript app using #MongoDB and #MariaDB .',
+          '"#Python #Django + #TypeScript app using #MongoDB and #MariaDB . ',
         topicsById: {
+          'Microservices': {},
           'Mailgun': {},
           'RabbitMQ': {},
           'Kafka': {},
@@ -274,7 +275,7 @@ export class WorkOrganisationsAndProjectsData {
 
   'AIG (as Consultant)' = org({
     flags: 'pl de at es gb us', /* FIXME */
-    time: [2017, 2018],
+    time: ['October 2017', 'July 2018'],
     logoFileName: 'AIG_logo.svg.png', /* USE https://vectorizer.ai/ ! works really well */
     linkedInRecommendations: 2,
     locations: 'Heilbronn - Germany, Málaga - Spain (remote)',
@@ -319,7 +320,7 @@ export class WorkOrganisationsAndProjectsData {
           'Git': {},
         }
       },
-      'Customer-facing application for managing insurance plans and customer data': {
+      'Customer-facing application for managing insurance plans and customer data. Millions of users.': {
         roles: 'Senior Angular & Node.js & Java/Kotlin Developer',
         description: '' /* FIXME */,
         topicsById: {
@@ -332,6 +333,8 @@ export class WorkOrganisationsAndProjectsData {
           Gradle: {},
           'Spring': {},
           "Spring Boot": {},
+          'Kafka': {},
+          'Kafka Streams': {},
           Less: {},
           'Node.js': {},
           'Express.js': {},

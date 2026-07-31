@@ -1,26 +1,48 @@
-@for (category of topicCategoriesArray; track category.name) {
-  @if (hasExperienceInCategory(category)) {
-    <section style="page-break-inside: avoid">
-      <p>{{categoryTitle(category.name)}}</p>
-      <!--  <hr>-->
-  <!--    <mat-chip-list>-->
-      <span>
-  <!--      {{category.topicsArray | json}}-->
-        @for (topic of category.topicsArray; track topic.name) {
-  <!--        TOPIC_: {{topic.id}}-->
-  <!--        experience[topic.id]: {{experienceByName[topic.name]}}-->
-          @if (experienceByName[topic.name]; as experienceItem) {
-            <app-topic-skill
-                            [tId]="experienceItem.topicId"
-                            [skillLevels]="experienceItem?.skillLevels"
-                            [showLogo]="showIcons"
-            ></app-topic-skill><!--    [skillLevels]="exp.skillLevels"-->
-          }
-        }
-      </span>
-  <!--    </mat-chip-list>-->
+<ng-template #categoryTopics let-category>
+  @for (topic of category.topicsArray; track topic.name) {
+    @if (experienceByName[topic.name]; as experienceItem) {
+      <app-topic-skill
+        [tId]="experienceItem.topicId"
+        [skillLevels]="experienceItem?.skillLevels"
+        [showLogo]="showIcons"
+      />
+    }
+  }
+</ng-template>
 
-    </section>
+@switch (flagsService.workProjectSkillsLayout()) {
+  @case ('flat') {
+    <span>
+      @for (exp of experienceArr; track exp.topicId) {
+        <app-topic-skill
+          [tId]="exp.topicId"
+          [skillLevels]="exp?.skillLevels"
+          [showLogo]="showIcons"
+        />
+      }
+    </span>
+  }
+  @case ('grouped-inline') {
+    <span>
+      @for (category of topicCategoriesArray; track category.name) {
+        @if (hasExperienceInCategory(category)) {
+          <span class="category-label-inline">{{categoryTitle(category.name)}}:</span>
+          <ng-container [ngTemplateOutlet]="categoryTopics" [ngTemplateOutletContext]="{$implicit: category}" />
+        }
+      }
+    </span>
+  }
+  @default {
+    @for (category of topicCategoriesArray; track category.name) {
+      @if (hasExperienceInCategory(category)) {
+        <section style="page-break-inside: avoid">
+          <p>{{categoryTitle(category.name)}}</p>
+          <span>
+            <ng-container [ngTemplateOutlet]="categoryTopics" [ngTemplateOutletContext]="{$implicit: category}" />
+          </span>
+        </section>
+      }
+    }
   }
 }
 

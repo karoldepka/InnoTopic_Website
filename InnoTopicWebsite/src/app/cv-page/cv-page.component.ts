@@ -11,12 +11,14 @@ import { ExternalProfilesComponent } from './external-profiles/external-profiles
 import { GlobeSwitcherComponent } from './globe-switcher/globe-switcher.component';
 import { PersonalDataComponent } from './personal-data/personal-data.component';
 import { TopicsGraphComponent } from './topics-graph/topics-graph.component';
+import { FeatureFlagsPopoverComponent } from '../shared/feature-flags-popover/feature-flags-popover.component';
 
 @Component({
   standalone: true,
   imports: [
     BooksComponent,
     ExternalProfilesComponent,
+    FeatureFlagsPopoverComponent,
     GlobeSwitcherComponent,
     PersonalDataComponent,
     TopicsGraphComponent,

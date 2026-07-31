@@ -1,4 +1,4 @@
-import {Component, Input, OnInit, ViewEncapsulation,} from '@angular/core';
+import {Component, effect, Input, OnInit, ViewEncapsulation,} from '@angular/core';
 import {topics} from '../../TopicFriendsShared3/topics-core/topics-data';
 import {nodeConnections, nodeLinks, preset, sizes, strengths} from "./topics-graph.data";
 import {GraphConnections, GraphNode, GraphNodeId, LinkByIds} from "./topics-graph.types";
@@ -8,6 +8,7 @@ import {drag as d3Drag} from 'd3-drag';
 import {forceCenter, forceCollide, forceLink, forceManyBody, forceSimulation} from 'd3-force';
 import {event as d3Event, select} from 'd3-selection';
 import {zoom as d3Zoom} from 'd3-zoom';
+import {FeatureFlagsService} from '../../shared/feature-flags/feature-flags.service';
 
 @Component({
   standalone: true,
@@ -22,17 +23,30 @@ export class TopicsGraphComponent implements OnInit {
 
   public d3Nodes: any[] = [];
   private d3Links: LinkByIds[] = [...nodeLinks];
-  graphHasContainer = false;
+
+  /** True once the graph has rendered once, so the flag effect below doesn't fire before there's anything to rebuild. */
+  private graphInitialized = false;
 
   // idea: new/expanding-to topics could be with effect e.g. static noise or fading in-out, e.g. qwik, turbopack; while old, permanently faded
   // TODO: try d3.forceRadial(radius[, x][, y])
 
   constructor(
-    private activatedRoute: ActivatedRoute
-  ) { }
+    private activatedRoute: ActivatedRoute,
+    protected flagsService: FeatureFlagsService,
+  ) {
+    // Rebuild the (already-fetched) graph whenever the "contain nodes" feature flag is toggled from the popover.
+    effect(() => {
+      this.flagsService.graphContainer();
+      if (this.graphInitialized) {
+        this.initD3Graph();
+      }
+    });
+  }
 
   ngOnInit() {
-    this.graphHasContainer = !! this.activatedRoute.snapshot.queryParams['container']; // Jay and Samyak this is better than Boolean(). e.g. container=1
+    if (this.activatedRoute.snapshot.queryParams['container']) { // e.g. container=1 - Jay and Samyak this is better than Boolean()
+      this.flagsService.graphContainer.set(true);
+    }
     // console.log('generateNodes', this.d3Nodes)
     this.generateNodes(this.connections)
     // console.log('d3Nodes', this.d3Nodes)
@@ -82,6 +96,7 @@ export class TopicsGraphComponent implements OnInit {
 
       })
       this.initD3Graph() // FIXME
+      this.graphInitialized = true
     })
     // console.log(`topic logos`, topicLogosResponses)
     // console.log(`topic logos topicLogosTexts`, topicLogosTexts)
@@ -152,7 +167,7 @@ export class TopicsGraphComponent implements OnInit {
 
     /* Base Example: Force-Directed Graph: https://bl.ocks.org/mbostock/4062045 */
     const simulation: any = forceSimulation<any>();
-      if(this.graphHasContainer) {
+      if(this.flagsService.graphContainer()) {
         simulation.nodes(this.d3Nodes)
           .force("link", forceLink<any, any>().id(function(d: any) { return d.id; })
             .strength(function(d: any) {
@@ -363,7 +378,7 @@ export class TopicsGraphComponent implements OnInit {
       //   .attr("y1", function(d: any) { return d.source.y; })
       //   .attr("x2", function(d: any) { return d.target.x; })
       //   .attr("y2", function(d: any) { return d.target.y; });
-      if(self.graphHasContainer) {
+      if(self.flagsService.graphContainer()) {
         perNodeMainGroup
           .attr("cx", function(d: any) { return d.x = Math.max(radiusFunc(d) + boundaryPadding, Math.min(width - radiusFunc(d) - boundaryPadding, d.x)); })
           .attr("cy", function(d: any) { return d.y = Math.max(radiusFunc(d) + boundaryPadding, Math.min(height - radiusFunc(d) - boundaryPadding, d.y)); });

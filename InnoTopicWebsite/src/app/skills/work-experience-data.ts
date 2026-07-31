@@ -17,6 +17,8 @@ import {
 
 export class WorkExperienceData {
   main = experience('Main Experience', 'extensive usage and always honing my skills and learning', {
+    Java:
+      we(advanced, expert),
     Python:
       we(advanced, expert),
     Rust:
@@ -28,7 +30,9 @@ export class WorkExperienceData {
     Angular:
       we(advanced, expert),
     React:
-      we(advanced),
+      we(advanced, expert),
+    "Vue.js":
+      we(advanced, expert),
     Codelyzer:
       we(advanced, expert),
     Nx:
@@ -36,6 +40,10 @@ export class WorkExperienceData {
     // xplat: // nstudio
     //   we(intermediate, expert),
     WebPack:
+      we(intermediate, advanced),
+    Vite:
+      we(intermediate, advanced),
+    Playwright:
       we(intermediate, advanced),
     'Chart.js':
       we(advanced),
@@ -88,12 +96,14 @@ export class WorkExperienceData {
       we(intermediate, expert),
     TypeScript:
       we(advanced /* FIXME very_advanced */, expert),
-          Java:
-      we(advanced),
     // TODO: FindBugs, PMD (TODO: check CODACY (written in Scala) from Leo, Lisbon -> Silicon Valley)
     Spring:
       we(intermediate, advanced),
     'Spring Boot':
+      we(intermediate, advanced),
+    'Kafka':
+      we(intermediate, advanced),
+    'Kafka Streams':
       we(intermediate, advanced),
     'Micro Frontends':
       we(advanced, expert),
@@ -199,6 +209,7 @@ export class WorkExperienceData {
     'Design Patterns': we(advanced, expert),
     'Antipatterns': we(advanced, expert),
     'Software Architecture': we(advanced, expert),
+    'Hexagonal Architecture': we(advanced, expert),
     'Refactoring': we(advanced, expert),
     'Code Review': we(advanced, expert),
     'TDD - Test-Driven Development': we(advanced, expert),

@@ -53,6 +53,8 @@ export class TopicTagComponent implements OnInit {
   /* Input-only for convenience; don't use internally; as it might have been mangled */
   tId = input.required<string>()
   showLogo = input(true)
+  /** Drops the fixed pill font-size/padding so the tag blends into surrounding running text instead of standing out as a discrete tag. */
+  inline = input(false)
 
   clickTopic = output<Topic | undefined>()
 

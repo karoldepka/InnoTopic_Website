@@ -614,7 +614,6 @@ export class Languages {
   Nim = tWide('nim-lang-icon-wide.svg')
   'Google Carbon' = tSquare('google-carbon-icon.svg')
   Rust = t()
-  // RustRover = t()
   Tauri = tNarrow('tauri.svg')
   Tokio = tWide('tokio-icon.svg') // https://tokio.rs/img/tokio-horizontal.svg
   Tonic = tWide('tonic-icon.svg')
@@ -803,6 +802,7 @@ export class Version_Control {
     categories: 'ProjectManagementTools' /* secondary categories */,
   })
   GitLab = t({
+    logo: 'gitlab-icon.svg',
     categories: 'ProjectManagementTools' /* secondary categories */,
   })
   'Gerrit' = tNoIcon()

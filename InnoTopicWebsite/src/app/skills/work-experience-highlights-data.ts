@@ -113,20 +113,20 @@ export const highlights = {
     'Hugging Face': {},
     'Supabase': {},
     'Firebase': {},
-    ...{ /* Stuff added for interviews */
-      Swift: {},
-      Dart: {},
-      Flutter: {},
-      "C#": {},
-      ".NET": {},
-    }
+    // ...{ /* Stuff added for interviews */
+    //   Swift: {},
+    //   Dart: {},
+    //   Flutter: {},
+    //   "C#": {},
+    //   ".NET": {},
+    // }
   }),
   crossPlatform: topics({
     Python: {},
     HTML5: {},
     Ionic: {},
     Electron: {} /* TODO: mark as non-main experience */,
-    Tauri: {},
+    // Tauri: {},
     // TODO: Rust:  clap
     // TODO: Rust: Tonic: {} /* TODO: mark as non-main experience */,
     // TODO: Rust: 'https://bevyengine.org/': {} /* TODO: Near Rust */,
@@ -213,7 +213,7 @@ export const highlights = {
       // React Native would also be here, but same logo
       Flutter: {},
       Expo: {} /* TODO: mark as non-main experience; (in nx project template; here and in expanding-to) */,
-      'Compose Multiplatform': {},
+      // 'Compose Multiplatform': {},
       // TODO: Frontend: 'https://avaloniaui.net/': {}, // .NET ; https://marketplace.visualstudio.com/items?itemName=AvaloniaTeam.vscode-avalonia
       Electron: {} /* TODO: mark as non-main experience */,
       // "NW.js": {}, // bad contrast and kinda old stuff anyway
@@ -239,7 +239,7 @@ export const highlights = {
       Turborepo: {},
       esbuild: {},
       'Speedy Web Compiler (SWC)': {},
-      Rollup: {},
+      // Rollup: {},
       // TODO Parcel
       Vite: {}, // https://github.com/pocketbase/pocketbase
       Vitest: {},
@@ -261,17 +261,17 @@ export const highlights = {
       // SVGO: {},
       // SVGator: {},
       Figma: {},
-      UXPin: {},
-      Zeplin: {},
-      Dribbble: {},
+      // UXPin: {},
+      // Zeplin: {},
+      // Dribbble: {},
       // ==== vector graphics, svg:
-      GreenSock: {},
+      // GreenSock: {},
       'D3.js': {},
       SVG: {},
       // ===== 3d graphics:
       WebGL: {},
       glTF: {} /* FIXME too big */,
-      WebGPU: {},
+      // WebGPU: {},
       Blender: {},
 
       // "AG Grid": {}, // old logo; and trying to conserve horizontal space
@@ -284,31 +284,31 @@ export const highlights = {
       TestCafe: {},
       Cypress: {},
       Playwright: {},
-      'Testing Library': {}, // https://github.com/testing-library not just react; has 6.7M npm/week; https://testing-library.com/
-      'Nightwatch.js': {},
-      UserTesting: {},
-      BrowserStack: {}, // high on stackshare
+      // 'Testing Library': {}, // https://github.com/testing-library not just react; has 6.7M npm/week; https://testing-library.com/
+      // 'Nightwatch.js': {},
+      // UserTesting: {},
+      // BrowserStack: {}, // high on stackshare
       Jest: {},
       //// ====== WebAssembly (WASM):
       WebAssembly: {},
       AssemblyScript: {},
-      'WebAssembly System Interface (WASI)': {},
+      // 'WebAssembly System Interface (WASI)': {},
       // Wasmer: {},
       // 'WebAssembly Package Manager (WAPM)': {} /* https://wapm.io/startpage/logo.svg */,
       // Wasmtime: {},
       // Fermyon: {}, // https://github.com/fermyon/spin ; microservices in webassembly // too ugly; but this will have tiny icons anyway
       Rust: {},
-      Tauri: {},
-      Tokio: {},
+      // Tauri: {},
+      // Tokio: {},
       // Dioxus: {},
-      Yew: {},
-      Tonic: {},
-      "JetBrains RustRover": {}, // #Rust
+      // Yew: {},
+      // Tonic: {},
+      // "JetBrains RustRover": {}, // #Rust
       /// ===== ^^^^^ End of Frontend / UI / UX / WASM related
       // ========= Frontend-Backed communication protocols:
       GraphQL: {},
       Apollo: {} /* TODO Apollo Studio? */,
-      'Altair GraphQL Client': {},
+      // 'Altair GraphQL Client': {},
       Swagger: {},
       OpenAPI: {},
       // TODO
@@ -320,9 +320,9 @@ export const highlights = {
       // ^^ stuff that is kinda frontend-related
       Datadog: {},
       Grafana: {},
-      Snyk: {} /*  --- comments: includes/bought deepcode */,
-      OWASP: {} /*  */,
-      CodeSee: {},
+      // Snyk: {} /*  --- comments: includes/bought deepcode */,
+      // OWASP: {} /*  */,
+      // CodeSee: {},
       /// Version control and collaboration:
       Git: {},
       GitHub: {},
@@ -342,17 +342,17 @@ export const highlights = {
 
       // Coda: {},
       Zapier: {},
-      IFTTT: {},
+      // IFTTT: {},
       Kong: {} /* The Cloud Native API Management Platform */,
       // ==== headless CMS:
-      Storyblok: {},
-      Strapi: {}, // 54k stars GH! Self-hosted or Cloud, RESTful or GraphQL
+      // Storyblok: {},
+      // Strapi: {}, // 54k stars GH! Self-hosted or Cloud, RESTful or GraphQL
       // ====  LowCode / NoCode:
-      Shopify: {},
-      Budibase: {},
+      // Shopify: {},
+      // Budibase: {},
       // Bubble: {},
       // Framer: {},
-      WebFlow: {},
+      // WebFlow: {},
       // Wix: {},
 
       // TODO: https://github.com/imartinez/privateGPT
@@ -374,26 +374,26 @@ export const highlights = {
       // 'Open VSX Registry': {},
       // Carbide: {},
       // "Cloud9": {},
-      'JetBrains Fleet': {}, // https://www.jetbrains.com/company/brand/
+      // 'JetBrains Fleet': {}, // https://www.jetbrains.com/company/brand/
       WebStorm: {},
       PyCharm: {},
       //
-      'JetBrains DataLore': {},
-      'JetBrains AI Assistant': {},
+      // 'JetBrains DataLore': {},
+      // 'JetBrains AI Assistant': {},
       Jupyter: {},
       Conda: {},
-      Anaconda: {},
+      // Anaconda: {},
       // TODO: python poetry
-      'Google Colaboratory': {},
+      // 'Google Colaboratory': {},
       // Observable: {},
       'Hugging Face': {},
       // TODO: AI: kaggle -  data sets, models
 
       // ===== TODO MLOPS (MLOps)
-      Cohere: {},
-      'Weights & Biases': {},
+      // Cohere: {},
+      // 'Weights & Biases': {},
       // https://clear.ml/
-      'Open Neural Network Exchange': {},
+      // 'Open Neural Network Exchange': {},
       // TODO AutoGPT
       // TODO FIXME MUST_HAVE: AI: https://github.com/langchain-ai/langchain - LangChain must have
       // TODO: AI: 'LangChain': {},
@@ -407,9 +407,9 @@ export const highlights = {
       // nat.dev - like openrouter -- near perplexity
       // todo maybe some azure AI
       NumPy: {},
-      PyTorch: {},
-      pandas: {},
-      'Google JAX': {},
+      // PyTorch: {},
+      // pandas: {},
+      // 'Google JAX': {},
       // TODO AI: https://www.pola.rs/ - Polars Rust for AI/ML From Luis Lopez CommerceHub; DataFrames for the new era - play on Pandas? "Built by developers for developers to achieve up to 50x Performance"
       // TODO AI: Dask
       // TODO AI: Vaex
@@ -420,17 +420,17 @@ export const highlights = {
       // whereas my higher-level stuff like LLM-s for coding, with bigger icons, almost as big as TypeScript, Angular, second row
       // TODO: ONNX | Home -- Open Neural Network Exchange -- The open standard for machine learning interoperability
 
-      TensorFlow: {},
-      Keras: {},
+      // TensorFlow: {},
+      // Keras: {},
       // TODO: AI: 'nvidia.svg': {},
       // ============== AI-powered coding
       // TODO: AI: prompt engineering
       // 'Builder.io': {}, // https://www.youtube.com/watch?v=bRFLE9qi3t8&ab_channel=Steve%28Builder.io%29 -- MIT License
       // TODO: Frontend: 'FIXME https://github.com/BuilderIO/mitosis': {},
-      'Vercel V0': {}, // vercel-v0-icon
-      'GitHub Copilot': {},
+      // 'Vercel V0': {}, // vercel-v0-icon
+      // 'GitHub Copilot': {},
       // TODO: AI-powered coding: 'GitHub Copilot in Terminal': {},
-      Tabnine: {},
+      // Tabnine: {},
       // TODO: AI-powered coding: "https://www.jetbrains.com/ai/": {}, // jetbrains ai assistant // got the swirly logo
       // CodiumAI: {},
       // Safurai: {},
@@ -447,12 +447,12 @@ export const highlights = {
       // TODO: AI: 'https://falconllm.tii.ae/': {}, // TII logo if necessary
       // TODO: AI: 'Mistral Orca / openorca etc': {}, // TODO MIXTRAL DOPLHIN 8x7B
       // TODO: AI: LongNet: {}, // https://abishpius.medium.com/say-goodbye-to-llm-token-limits-soon-longnet-scaling-transformers-to-1-000-000-000-tokens-1db51388d3d#:~:text=Longnet%20has%20a%20Vastly%20larger%20token,limit%20than%20all%20the%20current%20LLM%20models
-      Sourcegraph: {},
-      'Cody AI': {},
+      // Sourcegraph: {},
+      // 'Cody AI': {},
       MetaMage: {},
       // Rift: {},
       // Blackbox - https://marketplace.visualstudio.com/items?itemName=Blackboxapp.blackbox
-      Continue: {},
+      // Continue: {},
       // "MetaMage": {},
       // TabbyML: {}, // TOO complex shape
       // TODO: https://learn.microsoft.com/en-us/semantic-kernel/overview/ -- Semantic Kernel
@@ -461,9 +461,9 @@ export const highlights = {
       'Amazon CodeWhisperer': {}, // https://aws-icons.com/icons/augmented-ai-a2i -> https://aws.amazon.com/architecture/icons/
       'Amazon Bedrock': {},
       'Amazon SageMaker': {}, // ipynb?
-      'Amazon Comprehend': {},
-      'Amazon Kendra': {},
-      'Amazon Lex': {},
+      // 'Amazon Comprehend': {},
+      // 'Amazon Kendra': {},
+      // 'Amazon Lex': {},
       // TODO: AI: 'Amazon Titan': {}, // mas multimodal
       // TODO: AI: 'Amazon SageMaker Studio': {}, // https://aws.amazon.com/sagemaker/studio/
       // TODO: AI: JupyterLab // https://jupyter.org/try
@@ -478,16 +478,16 @@ export const highlights = {
       // TODO: AI: Google Bard, Lamda, https://ai.meta.com/llama/ meta llama, "Meta AI"
       // TODO: AI: https://github.com/langgenius/dify - "An Open-Source Assistants API and GPTs alternative. Dify.AI is an LLM application development platform. It integrates the concepts of Backend as a Service and LLMOps, covering the core tech stack required for building generative AI-native applications, including a built-in RAG engine."
 
-      'Microsoft Bing': {},
-      'Microsoft Copilot': {},
-      'AutoGen': {}, // 'Microsoft AutoGen' old id
+      // 'Microsoft Bing': {},
+      // 'Microsoft Copilot': {},
+      // 'AutoGen': {}, // 'Microsoft AutoGen' old id
       LangChain: {},
       // TODO: AI: https://smythos.com/
-      'C3 AI': {}, // enterprise AI
+      // 'C3 AI': {}, // enterprise AI
 
       OpenAI: {},
       // TODO: AI: OpenAI Gym
-      'Magic.dev': {}, /* --- unlimited context window? ? */
+      // 'Magic.dev': {}, /* --- unlimited context window? ? */
       // === Hardware / self-driving / robots / futurism :
       // Tesla: {},
       // Neuralink: {},
@@ -499,31 +499,31 @@ export const highlights = {
 
       // 'Home Assistant': {},
 
-      Phind: {},
+      // Phind: {},
       'Perplexity.ai': {},
 
-      'Google Bard': {},
+      // 'Google Bard': {},
       'Google Gemini': {},
-      'Google DeepMind': {},
-      'Google Vertex AI': {},
-      'Mistral AI': {},
+      // 'Google DeepMind': {},
+      // 'Google Vertex AI': {},
+      // 'Mistral AI': {},
       Anthropic: {},
-      'AI21 Labs': {},
+      // 'AI21 Labs': {},
       // TODO: AI: 'TODO Meta': {}, // (llama, FAISS)
-      'Open Assistant': {},
+      // 'Open Assistant': {},
       // LAION: {},
       Ollama: {},
-      Gradio: {},
-      Streamlit: {}, // chat: https://docs.streamlit.io/knowledge-base/tutorials/build-conversational-apps
+      // Gradio: {},
+      // Streamlit: {}, // chat: https://docs.streamlit.io/knowledge-base/tutorials/build-conversational-apps
       // TODO: AI: "https://github.com/joaomdmoura/crewAI": {},
-      'Stability AI': {},
+      // 'Stability AI': {},
       'Stable Diffusion': {},
       // Midjourney: {},
       // Runway: {}, // https://runwayml.com/
       // TODO: AI: AutoGPT: {},
       // TODO: AI: 'https://www.rabbit.tech/': {}, // rabbit r1 - https://twitter.com/PatrickJS__/status/1744976985313660968
       // TODO: AI: 'https://www.aie.foundation/': {},
-      Markdown: {},
+      // Markdown: {},
       // TODO: AI (competition to markdown): Asciidoctor: {}, // asciidoc
 
       // ===== BlockChain / CryptoCurrencies
@@ -531,24 +531,24 @@ export const highlights = {
       // 'Basic Attention Token (BAT)': {},
       Bitcoin: {},
       Solidity: {},
-      Web3: {},
-      'web3.js' /* FIXME */: {},
-      'ethers.js': {},
-      Solid: {},
+      // Web3: {},
+      // 'web3.js' /* FIXME */: {},
+      // 'ethers.js': {},
+      // Solid: {},
 
       // ==== Social / Content / Discovery / comprehension / influencers
-      YouTube: {},
-      Twitch: {}, // live codings
-      Spotify: {}, // live codings
-      Vimeo: {},
-      LinkedIn: {},
-      Mastodon: {},
-      Threads: {},
-      "x.com": {}, // (FKA twitter)
-      Meetup: {},
-      Discord: {}, // AI stuff
-      'Y Combinator': {}, // also Hacker News ( https://news.ycombinator.com/ ) where stuff emerges; also social and kinda comprehension
-      'Sequoia Capital': {}, // Andrew Ng etc. AI Fund
+      // YouTube: {},
+      // Twitch: {}, // live codings
+      // Spotify: {}, // live codings
+      // Vimeo: {},
+      // LinkedIn: {},
+      // Mastodon: {},
+      // Threads: {},
+      // "x.com": {}, // (FKA twitter)
+      // Meetup: {},
+      // Discord: {}, // AI stuff
+      // 'Y Combinator': {}, // also Hacker News ( https://news.ycombinator.com/ ) where stuff emerges; also social and kinda comprehension
+      // 'Sequoia Capital': {}, // Andrew Ng etc. AI Fund
       // TODO  "TechCrunch": {}, // also discovery and comprehension https://www.techstars.com/portfolio
       // TODO  "TechStars": {},
       // TODO  "CrunchBase": {},
@@ -562,21 +562,21 @@ export const highlights = {
       // TODO: postrgres, redis (also vec db) ,, pgvector
       // MySQL vec db -- planetscale - https://planetscale.com/blog/planetscale-is-bringing-vector-search-and-storage-to-mysql https://planetscale.com/ logo svgporn
       // TODO Azure Cosmos DB
-      Feathers: {},
-      '8base': {},
-      Algolia: {},
-      Meilisearch: {},
-      Typesense: {},
+      // Feathers: {},
+      // '8base': {},
+      // Algolia: {},
+      // Meilisearch: {},
+      // Typesense: {},
       // "Elastic.co": {}, // tagline: 'Search. Observe. Protect.'. Rationale for own icon: it's kinda on the level of aws/azure/gcp with lots of products
       OpenSearch: {},
       Elasticsearch: {},
-      Logstash: {},
-      Kibana: {},
-      Beats: {},
+      // Logstash: {},
+      // Kibana: {},
+      // Beats: {},
       'Microsoft Azure': {},
       AWS: {},
       // TODO FIXME Google Cloud
-      'AWS Amplify': {},
+      // 'AWS Amplify': {},
       // TODO 'CouchBase', 'CouchDB',
       Firebase: {},
       // Supabase: {},
@@ -587,12 +587,12 @@ export const highlights = {
       // TODO "Apache Druid": {}, /* analytics*/
       // TODO  "Apache Superset": {}, // lot of typescript and python
 
-      Prisma: {},
+      // Prisma: {},
       // "Drizzle ORM": {},
       PostgreSQL: {},
       MongoDB: {},
-      ArangoDB: {},
-      SurrealDB: {} /* Also vector DB, written in Rust */,
+      // ArangoDB: {},
+      // SurrealDB: {} /* Also vector DB, written in Rust */,
       // Xata: {},
       // Dgraph: {},
       // Fauna: {},
@@ -602,17 +602,17 @@ export const highlights = {
       // - https://en.wikipedia.org/wiki/Vector_database
       // - https://learn.microsoft.com/en-us/semantic-kernel/memories/vector-db
       Redis: {}, // has vec db too supposedly
-      Pinecone: {},
-      LlamaIndex: {},
+      // Pinecone: {},
+      // LlamaIndex: {},
       // Vespa: {},
-      Weaviate: {},
-      Chroma: {},
+      // Weaviate: {},
+      // Chroma: {},
 
-      Milvus: {},
+      // Milvus: {},
       // TODO: AI: 'Milvus Zilliz': {},
-      Qdrant: {},
+      // Qdrant: {},
       // TODO: AI: Faiss: {},
-      'Apache Cassandra': {},
+      // 'Apache Cassandra': {},
       // FAISS is (from meta) is another thing related to embeddings / vector db; but no logo currently
 
       // TODO: some vector db-s https://www.youtube.com/watch?v=klTvEwg3oJ4&ab_channel=Fireship
@@ -673,12 +673,12 @@ export const highlights = {
     // ====== Crypto
     Bitcoin: {},
     Ethereum: {},
-    "Basic Attention Token (BAT)": {},
-    Solidity: {},
-    "Web3": {},
-    "web3.js": {},
-    "ethers.js": {},
-    "Solid": {},
+    // "Basic Attention Token (BAT)": {},
+    // Solidity: {},
+    // "Web3": {},
+    // "web3.js": {},
+    // "ethers.js": {},
+    // "Solid": {},
 
 
     Go: {},
@@ -692,12 +692,12 @@ export const highlights = {
     Ruby: {},
     Python: {},
     // TODO: AI: PyScript: {}, // by anaconda
-    mypy: {},
-    'Python Pyre': {},
-    Pyright: {},
+    // mypy: {},
+    // 'Python Pyre': {},
+    // Pyright: {},
     // TODO: pytype - 🦆✔ - by google - https://github.com/google/pytype #Python static type analyzer
     // TODO: AI: 'OpenAI Triton': {},
-    Julia: {},
+    // Julia: {},
     // TODO: AI: 'Wolfram Language': {},
     // TODO: AI: 'Wolfram Mathematica': {},
 

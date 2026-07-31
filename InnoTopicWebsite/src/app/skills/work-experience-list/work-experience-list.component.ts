@@ -14,6 +14,7 @@ import {
 } from '../../utils/dictionary-utils';
 
 import { groupByKeepingOrder } from '../../utils/utils';
+import { FeatureFlagsService } from '../../shared/feature-flags/feature-flags.service';
 
 @Component({
   selector: 'app-work-experience-list',
@@ -37,6 +38,7 @@ export class WorkExperienceListComponent implements OnInit {
 
   constructor(
     public topicsService: TopicsService,
+    protected flagsService: FeatureFlagsService,
   ) {
   }
 

@@ -52,9 +52,7 @@ export function splitIntoHashtagParts(text: string): HashtagTextPart[] {
   template: `
     @for (part of processedText(); track $index) {
       @if (part.isTag) {
-        <app-topic-tag [tId]="part.tagText!.slice(1)">
-          <!--          {{ part.tagText }}-->
-        </app-topic-tag>
+        <app-topic-tag [tId]="part.tagText!.slice(1)" [inline]="true" />
       } @else {
         {{ part.text }}
       }

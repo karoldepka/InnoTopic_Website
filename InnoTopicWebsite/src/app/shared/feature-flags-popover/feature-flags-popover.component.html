@@ -1,0 +1,41 @@
+<div
+  class="feature-flags-trigger"
+  role="button"
+  tabindex="0"
+  title="Feature flags"
+  aria-label="Feature flags"
+  [attr.aria-expanded]="open()"
+  (click)="toggleOpen()"
+  (keydown.enter)="toggleOpen()"
+  (keydown.space)="toggleOpen()"
+>🚩</div>
+
+@if (open()) {
+  <div class="feature-flags-panel" role="menu" (click)="$event.stopPropagation()">
+    <div class="feature-flags-panel-title">Feature Flags</div>
+    @for (flag of flagsService.flags; track flag.key) {
+      <div class="feature-flag-row">
+        @if (flag.type === 'boolean') {
+          <label class="feature-flag-control">
+            <input
+              type="checkbox"
+              [checked]="flag.signal()"
+              (change)="flagsService.toggle(flag)"
+            />
+            <span class="feature-flag-label">{{ flag.label }}</span>
+          </label>
+        } @else {
+          <label class="feature-flag-control">
+            <span class="feature-flag-label">{{ flag.label }}</span>
+            <select [value]="flag.signal()" (change)="flagsService.setValue(flag, $any($event.target).value)">
+              @for (option of flag.options; track option.value) {
+                <option [value]="option.value">{{ option.label }}</option>
+              }
+            </select>
+          </label>
+        }
+        <span class="feature-flag-description">{{ flag.description }}</span>
+      </div>
+    }
+  </div>
+}
