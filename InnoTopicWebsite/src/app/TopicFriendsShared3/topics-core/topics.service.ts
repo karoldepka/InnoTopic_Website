@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, signal } from '@angular/core';
 import { errorAlert } from '../../utils/utils';
 import {
   Topic,
@@ -9,7 +9,14 @@ import {
 import { topicsArr } from './topics-data';
 import { topicsOld } from './topics-data-old';
 import { topicInfoById } from './topic-info.data';
-import { formatTopicExtendedInfo, topicsDataExtended } from './topics-data-extended';
+
+const runWhenIdle = (callback: () => void) => {
+  if ('requestIdleCallback' in window) {
+    (window as any).requestIdleCallback(callback, { timeout: 2000 });
+    return;
+  }
+  setTimeout(callback, 500);
+};
 
 
 interface IdToTopicMap {
@@ -44,6 +51,16 @@ export class TopicsService {
 
   public topics: Topic[] = this.transformTags(topicsOld);
 
+  /**
+   * topics-data-extended.ts is a large (2000+ entry) dictionary only needed for the
+   * click-to-reveal info popover on a topic tag - loading it eagerly would bloat and
+   * slow down the initial bundle for something most page views never open. Loaded lazily
+   * on idle instead; getTopicInfo() reads extendedDataLoaded() so any computed() depending
+   * on it (e.g. topic-tag's info()) re-evaluates once the chunk arrives.
+   */
+  private extendedData: typeof import('./topics-data-extended') | undefined
+  private readonly extendedDataLoaded = signal(false)
+
   constructor(
   ) {
     // console.log('topicsArr', topicsArr)
@@ -53,6 +70,13 @@ export class TopicsService {
       }
     })
     this.topics.push(... topicsArr)
+
+    runWhenIdle(() => {
+      import('./topics-data-extended').then(mod => {
+        this.extendedData = mod
+        this.extendedDataLoaded.set(true)
+      })
+    })
     // console.log('all topics', this.topics)
   }
 
@@ -137,9 +161,11 @@ export class TopicsService {
     if ( ! topic ) {
       return undefined
     }
-    const extended = (topicsDataExtended as any)[topic.id] || (topicsDataExtended as any)[topic.name]
+    this.extendedDataLoaded() // tracked so callers recompute once the lazy chunk lands
+    const extendedMap = this.extendedData?.topicsDataExtended as any
+    const extended = extendedMap && (extendedMap[topic.id] || extendedMap[topic.name])
     return topic.comments || topic.description || topic.tagline
-      || (extended && formatTopicExtendedInfo(extended))
+      || (extended && this.extendedData!.formatTopicExtendedInfo(extended))
       || topicInfoById[topic.id] || topicInfoById[topic.name]
   }
 
