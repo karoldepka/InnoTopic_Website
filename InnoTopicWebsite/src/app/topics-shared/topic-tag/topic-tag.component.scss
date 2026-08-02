@@ -175,8 +175,21 @@ app-chip {
   }
 }
 
+.topic-tag-content {
+  display: flex;
+  align-items: center;
+}
+
 .topic-tag-content--clickable {
   cursor: pointer;
+}
+
+// Baseline instead of center: lets the tag's own text sit on the surrounding
+// paragraph's text baseline (set on app-chip's .chip-inline too) instead of
+// vertically centering the whole icon+text row, which drifted the tag text
+// a few px below the running text's baseline.
+.topic-tag-content--inline {
+  align-items: baseline;
 }
 
 .topic-info-popover {

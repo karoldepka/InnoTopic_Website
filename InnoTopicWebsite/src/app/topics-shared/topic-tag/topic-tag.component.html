@@ -50,7 +50,7 @@
     <div
       class="topic-tag-content"
       [class.topic-tag-content--clickable]="info()"
-      style="display: flex; align-items: center"
+      [class.topic-tag-content--inline]="inline()"
       [attr.role]="info() ? 'button' : null"
       [attr.tabindex]="info() ? 0 : null"
       [attr.aria-expanded]="info() ? showInfo() : null"
