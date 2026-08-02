@@ -1,14 +1,22 @@
 import {Component, ChangeDetectionStrategy, OnInit} from '@angular/core'
-import {NgIf} from '@angular/common'
+import {NgIf, AsyncPipe, NgFor, DatePipe} from '@angular/common'
 import {IonicModule} from '@ionic/angular'
 import {UntypedFormControl, ReactiveFormsModule} from '@angular/forms'
-import {firstValueFrom} from 'rxjs'
+import {firstValueFrom, map} from 'rxjs'
 import {JournalEntryItemsService} from '../core/journal-entries.service'
 import {JournalEntry} from '../models/JournalEntry'
 import {stripHtml} from '../../../libs/AppFedShared/utils/html-utils'
 import {AiBackendService} from '../../Learn/core/ai-backend.service'
 import {JournalAiAdviceSettingsOdmService, JOURNAL_AI_ADVICE_SETTINGS_ID} from './journal-ai-advice-settings-odm.service'
 import {JournalAiAdviceSettings} from './JournalAiAdviceSettings'
+import {AiAdviceOdmService} from '../../../libs/AppFedShared/ai-advice/ai-advice-odm.service'
+import {OdmTimestampToDatePipe} from '../../../libs/AppFedShared/odm/odm-timestamp-to-date.pipe'
+import {odmTimestampToDate} from '../../../libs/AppFedShared/odm/utils'
+
+/** Scopes the shared AiAdvice collection to just this feature's own history - see AiAdvice's
+ * `source` field doc comment. */
+const AI_ADVICE_SOURCE = 'journal'
+const MAX_RECENT_ADVICE_SHOWN = 5
 
 interface JournalAdviceHistoryEntry {
   whenCreated: string
@@ -33,7 +41,7 @@ const LOCAL_STORAGE_KEY = 'LifeSuite_JournalAiAdviceSettings'
   templateUrl: './journal-ai-advice.component.html',
   changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./journal-ai-advice.component.sass'],
-  imports: [IonicModule, ReactiveFormsModule, NgIf],
+  imports: [IonicModule, ReactiveFormsModule, NgIf, NgFor, AsyncPipe, DatePipe, OdmTimestampToDatePipe],
 })
 export class JournalAiAdviceComponent implements OnInit {
 
@@ -48,9 +56,22 @@ export class JournalAiAdviceComponent implements OnInit {
 
   private readonly settingsItem$ = this.settingsService.obtainItem$ById(JOURNAL_AI_ADVICE_SETTINGS_ID)
 
+  /** GH #137 follow-up: advice is now persisted (local+server, via AiAdviceOdmService, same sync
+   * path as any other ODM item) instead of being lost the moment this popover closes - shown here
+   * newest-first so a past answer is still reachable next time this popover opens. */
+  recentAdvice$ = this.aiAdviceService.localItems$.pipe(
+    map(items => items
+      .filter(item$ => item$.val?.source === AI_ADVICE_SOURCE)
+      .slice()
+      .sort((a, b) => (odmTimestampToDate(b.val?.whenCreated)?.getTime() ?? 0) - (odmTimestampToDate(a.val?.whenCreated)?.getTime() ?? 0))
+      .slice(0, MAX_RECENT_ADVICE_SHOWN)
+    )
+  )
+
   constructor(
     private journalEntriesService: JournalEntryItemsService,
     private settingsService: JournalAiAdviceSettingsOdmService,
+    private aiAdviceService: AiAdviceOdmService,
     private aiBackend: AiBackendService,
   ) { }
 
@@ -100,6 +121,12 @@ export class JournalAiAdviceComponent implements OnInit {
         this.aiBackend.post<JournalAdviceResponse>('/journal-advice', {entries})
       )
       this.adviceText = response.advice
+      this.aiAdviceService.add({
+        source: AI_ADVICE_SOURCE,
+        advice: response.advice,
+        modelName: response.modelName,
+        truncated: response.truncated,
+      })
       if (response.truncated) {
         this.adviceError = 'This advice may be cut off - try again if it looks incomplete.'
       }

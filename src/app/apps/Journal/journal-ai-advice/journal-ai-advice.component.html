@@ -18,4 +18,12 @@
 
   <p *ngIf="adviceError" class="journal-ai-advice__error">{{ adviceError }}</p>
   <div *ngIf="adviceText" class="journal-ai-advice__result">{{ adviceText }}</div>
+
+  <ng-container *ngIf="recentAdvice$ | async as recentAdvice">
+    <h3 *ngIf="recentAdvice.length" class="journal-ai-advice__history-heading">Past advice</h3>
+    <div *ngFor="let item$ of recentAdvice" class="journal-ai-advice__result journal-ai-advice__history-item">
+      <div class="journal-ai-advice__history-when">{{ item$.val?.whenCreated | odmDate | date:'short' }}</div>
+      {{ item$.val?.advice }}
+    </div>
+  </ng-container>
 </ion-content>
