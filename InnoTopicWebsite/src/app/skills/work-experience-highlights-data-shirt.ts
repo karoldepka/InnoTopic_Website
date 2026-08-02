@@ -467,7 +467,6 @@ export const highlights = {
       // TODO: AI:  "https://github.com/AntonOsika/gpt-engineer": {}, // -- no logo
       // TODO: AI: "Aider": {}, // -- no logo except on discord
       // TODO: AI: 'https://replicate.com/': {}, // MLops? Maybe not on shirt but should be on AI graph
-      // TODO: AI: 'TODO https://github.com/streamlit/streamlit': {},
       // TODO: AI: 'TODO https://github.com/oobabooga/text-generation-webui': {},
       // TODO: AI: 'FIXME GRAB shirt.data.ts': {},
       // TODO: AI: Gpt4all: {}, // open-source

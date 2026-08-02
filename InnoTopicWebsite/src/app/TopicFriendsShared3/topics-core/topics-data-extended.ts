@@ -13,6 +13,7 @@ import { Topics } from './topics-data';
 export interface TopicExtendedInfo {
   tagline?: string
   website?: string
+  githubRepo?: string
   wikipediaEntry?: string
   description?: string
   whenFirstReleased?: string
