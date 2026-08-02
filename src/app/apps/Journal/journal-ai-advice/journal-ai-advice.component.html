@@ -11,13 +11,13 @@
     <ion-input type="number" min="1" inputmode="numeric" [formControl]="formControls.maxEntriesHistory"></ion-input>
   </ion-item>
 
-  <ion-button expand="block" [disabled]="adviceLoading" (click)="getAdvice()">
-    <ion-spinner *ngIf="adviceLoading" name="dots"></ion-spinner>
-    <ng-container *ngIf="!adviceLoading">Get AI advice</ng-container>
+  <ion-button expand="block" [disabled]="adviceLoading()" (click)="getAdvice()">
+    <ion-spinner *ngIf="adviceLoading()" name="dots"></ion-spinner>
+    <ng-container *ngIf="!adviceLoading()">Get AI advice</ng-container>
   </ion-button>
 
-  <p *ngIf="adviceError" class="journal-ai-advice__error">{{ adviceError }}</p>
-  <div *ngIf="adviceText" class="journal-ai-advice__result">{{ adviceText }}</div>
+  <p *ngIf="adviceError()" class="journal-ai-advice__error">{{ adviceError() }}</p>
+  <div *ngIf="adviceText()" class="journal-ai-advice__result">{{ adviceText() }}</div>
 
   <ng-container *ngIf="recentAdvice$ | async as recentAdvice">
     <h3 *ngIf="recentAdvice.length" class="journal-ai-advice__history-heading">Past advice</h3>

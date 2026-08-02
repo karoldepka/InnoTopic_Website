@@ -1,4 +1,4 @@
-import {Component, ChangeDetectionStrategy, OnInit} from '@angular/core'
+import {Component, ChangeDetectionStrategy, OnInit, signal} from '@angular/core'
 import {NgIf, AsyncPipe, NgFor, DatePipe} from '@angular/common'
 import {IonicModule} from '@ionic/angular'
 import {UntypedFormControl, ReactiveFormsModule} from '@angular/forms'
@@ -50,9 +50,13 @@ export class JournalAiAdviceComponent implements OnInit {
     maxEntriesHistory: new UntypedFormControl(DEFAULT_MAX_ENTRIES_HISTORY),
   }
 
-  adviceLoading = false
-  adviceText = ''
-  adviceError = ''
+  // Signals rather than plain fields (NG0100 fix): getAdvice() below can flip these from an async
+  // callback that settles fast enough (e.g. an immediate network failure) to land inside Angular's
+  // dev-mode double-check window for the same CD cycle that already read the old value - signals
+  // are safe against that class of ExpressionChangedAfterItHasBeenCheckedError by design.
+  adviceLoading = signal(false)
+  adviceText = signal('')
+  adviceError = signal('')
 
   private readonly settingsItem$ = this.settingsService.obtainItem$ById(JOURNAL_AI_ADVICE_SETTINGS_ID)
 
@@ -102,25 +106,25 @@ export class JournalAiAdviceComponent implements OnInit {
   }
 
   async getAdvice() {
-    if (this.adviceLoading) return
+    if (this.adviceLoading()) return
     const maxDays = Number(this.formControls.maxDaysHistory.value) || DEFAULT_MAX_DAYS_HISTORY
     const maxEntries = Number(this.formControls.maxEntriesHistory.value) || DEFAULT_MAX_ENTRIES_HISTORY
     const entries = this.buildHistoryEntries(maxDays, maxEntries)
 
     if (!entries.length) {
-      this.adviceError = 'No journal entries with text in that range yet.'
-      this.adviceText = ''
+      this.adviceError.set('No journal entries with text in that range yet.')
+      this.adviceText.set('')
       return
     }
 
-    this.adviceLoading = true
-    this.adviceError = ''
-    this.adviceText = ''
+    this.adviceLoading.set(true)
+    this.adviceError.set('')
+    this.adviceText.set('')
     try {
       const response = await firstValueFrom(
         this.aiBackend.post<JournalAdviceResponse>('/journal-advice', {entries})
       )
-      this.adviceText = response.advice
+      this.adviceText.set(response.advice)
       this.aiAdviceService.add({
         source: AI_ADVICE_SOURCE,
         advice: response.advice,
@@ -128,13 +132,13 @@ export class JournalAiAdviceComponent implements OnInit {
         truncated: response.truncated,
       })
       if (response.truncated) {
-        this.adviceError = 'This advice may be cut off - try again if it looks incomplete.'
+        this.adviceError.set('This advice may be cut off - try again if it looks incomplete.')
       }
     } catch (e) {
-      this.adviceError = 'Could not get AI advice - please try again.'
+      this.adviceError.set('Could not get AI advice - please try again.')
       console.error('[journal-ai-advice] generation failed', e)
     } finally {
-      this.adviceLoading = false
+      this.adviceLoading.set(false)
     }
   }
 
