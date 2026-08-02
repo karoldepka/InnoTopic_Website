@@ -25,6 +25,12 @@
 
 
     <ion-buttons slot="end">
+      <ion-icon
+        style="margin-right: 7px;"
+        class="action-icon"
+        name="bulb"
+        (click)="onClickAiAdvice($event)"
+       />
       <ion-icon *ngIf="feat.beforeProductization" style="margin-right: 7px;" class="action-icon" name="book-outline" slot="end" [routerLink]="['/learn']" />
       <odm-sync-status-icon></odm-sync-status-icon>
 

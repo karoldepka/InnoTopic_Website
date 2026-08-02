@@ -7,12 +7,13 @@ import {JournalEntry$} from '../models/JournalEntry$'
 import { ActivatedRoute, Router, RouterLink } from '@angular/router'
 import {CachedSubject} from '../../../libs/AppFedShared/utils/cachedSubject2/CachedSubject2'
 import {BaseComponent} from '../../../libs/AppFedShared/base/base.component'
-import { IonicModule } from '@ionic/angular';
+import { IonicModule, PopoverController } from '@ionic/angular';
 import { AppLogoComponent } from '../../Common/app-logo/app-logo.component';
 import { NgIf, NgFor } from '@angular/common';
 import { TimePassingComponent } from '../../../libs/AppFedShared/time/time-passing/time-passing.component';
 import { SyncStatusIconComponent } from '../../../libs/AppFedShared/odm/sync-status/sync-status-icon.component';
 import { JournalItemEditComponent } from './journal-item-edit/journal-item-edit.component';
+import { JournalAiAdviceComponent } from '../journal-ai-advice/journal-ai-advice.component';
 import { TranslatePipe } from '@ngx-translate/core';
 
 @Component({
@@ -60,6 +61,7 @@ export class JournalWritePage extends BaseComponent implements OnInit, OnDestroy
     public geoLocationService: ApfGeoLocationService,
     public activatedRoute: ActivatedRoute,
     public router: Router,
+    public popoverController: PopoverController,
     injector: Injector,
   ) {
     super(injector)
@@ -99,6 +101,17 @@ export class JournalWritePage extends BaseComponent implements OnInit, OnDestroy
 
   onBackClicked() {
     this.flushPendingEdits()
+  }
+
+  async onClickAiAdvice(event: any) {
+    const popover = await this.popoverController.create({
+      component: JournalAiAdviceComponent,
+      event: event,
+      translucent: true,
+      mode: 'ios',
+      cssClass: `my-popover`,
+    });
+    return await popover.present();
   }
 
   public initItem() {
