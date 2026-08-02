@@ -18,13 +18,19 @@ async function handleGenerateAnswer(c: import('hono').Context) {
   const searchResults = body.web_search ? await webSearch(body.question) : [];
   const { system, messages } = buildAnswerMessages(body.question, body.context ?? '', searchResults);
 
-  const { text } = await generateText({
+  const { text, finishReason } = await generateText({
     model: llm,
     system,
     messages,
+    // GH #138: with no explicit cap, an unspecified default (ours or an upstream proxy's) can be
+    // small enough to cut a real answer off mid code-block. `finishReason` below still surfaces a
+    // cut-off caused by anything else (a lower proxy-side cap, the model choosing to stop for its
+    // own reasons at this same limit, etc.) so the frontend can warn instead of silently saving
+    // truncated text.
+    maxOutputTokens: 4096,
     experimental_telemetry: { isEnabled: true, functionId: 'generate-answer' },
   });
-  return c.json({ answer: text, modelName: MODEL_NAME, searchResults });
+  return c.json({ answer: text, modelName: MODEL_NAME, searchResults, truncated: finishReason === 'length' });
 }
 
 async function handleGenerateAnswerStream(c: import('hono').Context) {

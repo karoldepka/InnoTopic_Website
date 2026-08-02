@@ -192,6 +192,17 @@ export class LearnItemDetailsPage extends BaseComponent implements OnInit, OnDes
         const marker = `#FilledByAI:(${modelName})`
         const answer = `${((response as any)?.answer || '').trim()}\n\n${marker}`.trim()
         this.item$.patchThrottled({[descriptor.id]: answer, whenGeneratedByAi: OdmBackend.nowTimestamp()} as any)
+        // GH #138: still save what came back (better than losing it) but flag it - a silently
+        // truncated answer (e.g. cut off mid code-block) otherwise looks like a normal saved
+        // answer with nothing telling the user it's incomplete.
+        if ((response as any)?.truncated) {
+          void presentDismissableToast(this.toastController, {
+            message: 'AI answer may be cut off - click the AI-fill button again to retry.',
+            duration: 6000,
+            color: 'warning',
+            position: 'bottom',
+          })
+        }
       },
       error: e => console.error('Error filling with AI', e),
     })

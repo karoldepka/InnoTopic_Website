@@ -7,6 +7,9 @@ export interface AIResponse {
   answer: string;
   modelName?: string;
   searchResults?: string[];
+  /** GH #138: true when the model/proxy stopped before finishing (AI SDK `finishReason ===
+   * 'length'`) - the saved answer is real but incomplete, e.g. cut off mid code-block. */
+  truncated?: boolean;
 }
 
 export interface ExistingCategory {
