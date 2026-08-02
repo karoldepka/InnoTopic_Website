@@ -31,6 +31,16 @@
 
 <ng-template #loading
 >
-  {{ 'COMMON.LOADING' | translate }}
-  // TODO: also "Please log in"
+  <!-- Without a logged-in user, itemVal$ never emits at all (auth-gated ODM sync) - a bare
+    "Loading" would then just spin forever instead of telling the user why. Same three states/
+    copy as JournalEntriesListPage's own login prompt. -->
+  <p *ngIf="!(authService.authUser$ | async) && !authService.authUser$.hasEmitted" class="ion-text-center">
+    {{ 'AUTH.AUTHENTICATING' | translate }}
+  </p>
+  <p *ngIf="!(authService.authUser$ | async) && authService.authUser$.hasEmitted" class="ion-text-center">
+    {{ 'JOURNAL.LOGIN_PROMPT_PREFIX' | translate }} <a [routerLink]="'/auth'">&lt; {{ 'JOURNAL.LOGIN_PROMPT_LINK' | translate }} &gt;</a> {{ 'JOURNAL.LOGIN_PROMPT_SUFFIX' | translate }}
+  </p>
+  <ng-container *ngIf="authService.authUser$ | async">
+    {{ 'COMMON.LOADING' | translate }}
+  </ng-container>
 </ng-template>

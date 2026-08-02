@@ -6,7 +6,9 @@ import {JOURNAL_SLOT_DESCRIPTORS} from '../../models/JournalSlotDescriptors'
 import {OdmTreeNode} from '../../../../libs/AppFedShared/tree/tree-node/OdmTreeNode'
 import {BaseComponent} from '../../../../libs/AppFedShared/base/base.component'
 import {FeatureService} from '../../../../libs/AppFedShared/feature.service'
+import {AuthService} from '../../../../auth/auth.service'
 import { NgIf, AsyncPipe } from '@angular/common';
+import { RouterLink } from '@angular/router';
 import { IonicModule } from '@ionic/angular';
 import { TimePointComponent } from '../../../../libs/AppFedShared/time/time-point/time-point.component';
 import { GeoLocComponent } from '../../../../libs/AppFedShared/geo-location/geo-loc/geo-loc.component';
@@ -35,6 +37,7 @@ import { OdmTimestampToDatePipe } from '../../../../libs/AppFedShared/odm/odm-ti
         AsyncPipe,
         TranslatePipe,
         OdmTimestampToDatePipe,
+        RouterLink,
     ],
 })
 export class JournalItemEditComponent extends BaseComponent implements OnChanges {
@@ -47,6 +50,8 @@ export class JournalItemEditComponent extends BaseComponent implements OnChanges
   alwaysVisibleDescriptorIds = ['general']
 
   featureService = this.injector.get(FeatureService)
+
+  authService = this.injector.get(AuthService)
 
   @Input()
   public item$P ! : JournalEntry$
