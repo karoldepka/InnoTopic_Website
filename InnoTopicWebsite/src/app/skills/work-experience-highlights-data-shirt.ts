@@ -472,8 +472,8 @@ export const highlights = {
       // TODO: AI: 'FIXME GRAB shirt.data.ts': {},
       // TODO: AI: Gpt4all: {}, // open-source
       // TODO: AI: Nomic: {}, (has embedding model)
-      // TODO: AI: 'https://www.deepseek.com/': {},
-      // TODO: AI: 'Model Context Protocol': {},
+      'DeepSeek': {},
+      // TODO: 'Model Context Protocol': {},
       // TODO: https://www.moonshot.ai/
       // TODO: AI: 'https://falconllm.tii.ae/': {}, // TII logo if necessary
       // TODO: AI: 'Mistral Orca / openorca etc': {}, // TODO MIXTRAL DOPLHIN 8x7B
@@ -484,7 +484,6 @@ export const highlights = {
       Rift: {},
       // Blackbox - https://marketplace.visualstudio.com/items?itemName=Blackboxapp.blackbox
       Continue: {},
-      // "MetaMage": {},
       // TabbyML: {}, // TOO complex shape
       // TODO: https://learn.microsoft.com/en-us/semantic-kernel/overview/ -- Semantic Kernel
       'OpenAI Codex': {},

@@ -993,6 +993,7 @@ export class AI {
   'Mistral AI' = tWide('mistral-ai-icon.svg')
   'Qwen' = tNarrow('qwen-icon.svg')
   'Aleph Alpha' = tNarrow('aleph-alpha-icon.svg')
+  'DeepSeek' = tWide('deepseek-icon.svg')
   'LAION' = t()
   'Ollama' = tNarrow('ollama.svg')
   Gradio = tWide('gradio-icon.svg')
