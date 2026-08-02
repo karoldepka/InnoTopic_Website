@@ -27,6 +27,17 @@
 
     <ion-buttons slot="end"
     >
+      <ion-button
+                  (click)="onClickAiAdvice($event)"
+      >
+        <ion-icon
+          class="action-icon"
+          name="bulb-outline"
+          slot="icon-only"
+         />
+
+      </ion-button>
+
       <ion-button style="margin-right: -5px;"
                   (click)="onClickListOptions($event)"
       >

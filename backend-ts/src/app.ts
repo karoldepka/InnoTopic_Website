@@ -8,6 +8,7 @@ import { quizRouter } from './routes/quiz.js';
 import { copilotRouter } from './routes/copilotkit.js';
 import { odmRouter } from './routes/odm.js';
 import { transcribeRouter } from './routes/transcribe.js';
+import { journalAdviceRouter } from './routes/journal-advice.js';
 import { MODEL_NAME } from './llm.js';
 
 /** The Hono app itself, with no runtime attached - shared by both the local dev server
@@ -26,6 +27,7 @@ app.route('/', quizRouter);
 app.route('/', copilotRouter);
 app.route('/', odmRouter);
 app.route('/', transcribeRouter);
+app.route('/', journalAdviceRouter);
 
 app.get('/health', c => c.json({ status: 'ok' }));
 app.get('/ai-api/health', c => c.json({ status: 'ok' }));

@@ -1,0 +1,21 @@
+<ion-content class="ion-padding">
+  <h3>Get AI advice</h3>
+
+  <ion-item lines="none">
+    <ion-label position="stacked">Max days of history</ion-label>
+    <ion-input type="number" min="1" inputmode="numeric" [formControl]="formControls.maxDaysHistory"></ion-input>
+  </ion-item>
+
+  <ion-item lines="none">
+    <ion-label position="stacked">Max journal entries of history</ion-label>
+    <ion-input type="number" min="1" inputmode="numeric" [formControl]="formControls.maxEntriesHistory"></ion-input>
+  </ion-item>
+
+  <ion-button expand="block" [disabled]="adviceLoading" (click)="getAdvice()">
+    <ion-spinner *ngIf="adviceLoading" name="dots"></ion-spinner>
+    <ng-container *ngIf="!adviceLoading">Get AI advice</ng-container>
+  </ion-button>
+
+  <p *ngIf="adviceError" class="journal-ai-advice__error">{{ adviceError }}</p>
+  <div *ngIf="adviceText" class="journal-ai-advice__result">{{ adviceText }}</div>
+</ion-content>

@@ -14,6 +14,7 @@ import { PopoverController, IonicModule } from '@ionic/angular'
 import {LocalOptionsPatchableObservable} from '../../Learn/core/options.service'
 import {ListOptionsData} from '../../Learn/search-or-add-learnable-item/list-options'
 import {TimelineListOptionsComponent} from './timeline-list-options/timeline-list-options.component'
+import {JournalAiAdviceComponent} from '../journal-ai-advice/journal-ai-advice.component'
 import {BaseComponent} from '../../../libs/AppFedShared/base/base.component'
 import { RouterLink } from '@angular/router';
 import { AppLogoComponent } from '../../Common/app-logo/app-logo.component';
@@ -135,6 +136,17 @@ export class JournalEntriesListPage extends BaseComponent implements OnInit {
 
   trackById(index: number, item: JournalEntry$) {
     return item.id
+  }
+
+  async onClickAiAdvice(event: any) {
+    const popover = await this.popoverController.create({
+      component: JournalAiAdviceComponent,
+      event: event,
+      translucent: true,
+      mode: 'ios',
+      cssClass: `my-popover`,
+    });
+    return await popover.present();
   }
 
   async onClickListOptions(event: any) {
