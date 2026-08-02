@@ -472,8 +472,8 @@ export const highlights = {
       // TODO: AI: 'FIXME GRAB shirt.data.ts': {},
       // TODO: AI: Gpt4all: {}, // open-source
       // TODO: AI: Nomic: {}, (has embedding model)
-      'DeepSeek': {},
-      // TODO: 'Model Context Protocol': {},
+       'DeepSeek': {},
+      // TODO: AI: 'Model Context Protocol': {},
       // TODO: https://www.moonshot.ai/
       // TODO: AI: 'https://falconllm.tii.ae/': {}, // TII logo if necessary
       // TODO: AI: 'Mistral Orca / openorca etc': {}, // TODO MIXTRAL DOPLHIN 8x7B

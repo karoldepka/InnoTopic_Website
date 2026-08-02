@@ -12,6 +12,8 @@ import { Topics } from './topics-data';
  */
 export interface TopicExtendedInfo {
   tagline?: string
+  website?: string
+  wikipediaEntry?: string
   description?: string
   whenFirstReleased?: string
 }
