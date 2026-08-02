@@ -6,20 +6,20 @@
   display: flex
   flex-wrap: wrap
   align-items: flex-start
-  gap: 4px
+  gap: var(--space-1)
 
 .field-visibility-toggles
   flex: 1 1 100%
   display: flex
   flex-wrap: wrap
-  gap: 4px
-  margin-bottom: 4px
+  gap: var(--space-1)
+  margin-bottom: var(--space-1)
 
 .field-visibility-toggle
   flex: 0 0 auto
   font-size: 0.8rem
   opacity: 0.75
-  padding: 4px 8px
+  padding: var(--space-1) var(--space-2)
 
 .slot-cell
   display: flex
@@ -27,8 +27,8 @@
   flex: 1 1 100%
   flex-wrap: wrap
   border-bottom: 1px solid var(--ion-border-color, rgba(0, 0, 0, 0.1))
-  padding-bottom: 2px
-  margin-bottom: 4px
+  padding-bottom: var(--space-0-5)
+  margin-bottom: var(--space-1)
 
   // app-expand-toggle is `display: contents` (see that component's .sass) so its projected
   // app-comment-thread becomes a direct flex item of .slot-cell itself - force it onto its own
@@ -52,7 +52,7 @@
   flex: 0 1 9rem
   min-width: 8rem
   opacity: 0.75
-  padding: 4px 8px 0
+  padding: var(--space-1) var(--space-2) 0
 
 // Any empty cell - a bare slot (kind: 'slot') with no children yet, or any other kind with no
 // value set yet (a star rating, a bucket picker, or plain text) - renders as a compact pill

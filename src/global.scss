@@ -109,6 +109,22 @@ html {
 
   //--ion-background-color: lightgreen;
   //--ion-color-primary: orange;
+
+  // Spacing scale for gap/padding/margin, in rem (scales with the user's root font-size setting,
+  // unlike a fixed px value) - same numbering/step sizes as Tailwind's default scale (1 = 0.25rem
+  // = 4px at the default 16px root) since that's a widely-recognized convention, chosen to exactly
+  // cover the small px values already used throughout this app's compact list/cell UI (2, 4, 6, 8,
+  // 10, 12, 16px, ...) rather than forcing existing spacing to a different, incompatible grid.
+  --space-0-5: 0.125rem;  /* 2px */
+  --space-1: 0.25rem;     /* 4px */
+  --space-1-5: 0.375rem;  /* 6px */
+  --space-2: 0.5rem;      /* 8px */
+  --space-2-5: 0.625rem;  /* 10px */
+  --space-3: 0.75rem;     /* 12px */
+  --space-4: 1rem;        /* 16px */
+  --space-5: 1.25rem;     /* 20px */
+  --space-6: 1.5rem;      /* 24px */
+  --space-8: 2rem;        /* 32px */
 }
 
 // Ionic's own fab-vertical-bottom/-top CSS is a flat 10px with no safe-area term at all
@@ -138,9 +154,9 @@ ion-fab[vertical="top"] {
 .slot-pill {
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: var(--space-1);
   border-radius: 999px;
-  padding: 4px 10px;
+  padding: var(--space-1) var(--space-2-5);
   font: inherit;
   opacity: 0.75;
   cursor: pointer;

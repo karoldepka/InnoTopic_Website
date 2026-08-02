@@ -1,8 +1,8 @@
 .slot-picker
   display: flex
   flex-direction: column
-  gap: 4px
-  padding: 4px 0
+  gap: var(--space-1)
+  padding: var(--space-1) 0
 
 .slot-picker__search
   padding: 0
@@ -10,8 +10,8 @@
 .slot-picker__chips
   display: flex
   flex-wrap: wrap
-  gap: 6px
-  padding: 2px 8px
+  gap: var(--space-1-5)
+  padding: var(--space-0-5) var(--space-2)
 
 // Box model (padding/border-radius/font/opacity) comes from the shared .slot-pill global class
 // (see global.scss) - matches TreeNodeCellsComponent's .slot-cell--compact pill (the item-details
