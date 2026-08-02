@@ -13,7 +13,10 @@
   font-size: 0.9em
   padding: 4px 8px
   border-radius: 8px
-  background: var(--ion-color-light, rgba(0, 0, 0, 0.04))
+  // --ion-color-light is a fixed near-white regardless of theme - on this always-dark UI that made
+  // comment bubbles nearly invisible (near-white bg under inherited white text). --ion-color-step-150
+  // is the theme's own dark-mode-aware subtle-highlight token.
+  background: var(--ion-color-step-150, rgba(255, 255, 255, 0.06))
 
 .comment-thread__text
   white-space: pre-wrap

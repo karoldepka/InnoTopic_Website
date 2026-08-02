@@ -13,27 +13,26 @@
   gap: 6px
   padding: 2px 8px
 
+// Box model (padding/border-radius/font/opacity) comes from the shared .slot-pill global class
+// (see global.scss) - matches TreeNodeCellsComponent's .slot-cell--compact pill (the item-details
+// page's own "empty field" chip) so both render at the same size; only the outline styling stays
+// local here, since (unlike that filled-background chip) this one addable one is drawn as an
+// outline until picked.
 .slot-picker__chip
-  display: flex
-  align-items: center
-  gap: 4px
   background: none
   border: 1px solid var(--ion-color-medium)
   color: var(--ion-color-medium)
-  border-radius: 999px
-  padding: 2px 10px
-  font-size: 0.85em
-  cursor: pointer
-  opacity: 0.75
 
   &:hover
-    opacity: 1
     color: var(--ion-color-primary)
     border-color: var(--ion-color-primary)
 
 // Already on screen (possibly still compact) - picking it jumps to it rather than adding
 // anything, so it's styled as a solid/filled chip instead of the addable ones' outline style.
 .slot-picker__chip--visible
-  background: var(--ion-color-light, rgba(255, 255, 255, 0.08))
+  // See TreeNodeCellsComponent's .slot-cell--compact:hover for why --ion-color-light (fixed
+  // near-white) is wrong here on this always-dark UI - --ion-color-step-150 is the theme-aware
+  // subtle-highlight token.
+  background: var(--ion-color-step-150, rgba(255, 255, 255, 0.08))
   border-style: dashed
   opacity: 0.9

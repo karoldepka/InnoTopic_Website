@@ -12,7 +12,7 @@
     @for (descriptor of visibleChips; track descriptor.id) {
       <button
         type="button"
-        class="slot-picker__chip"
+        class="slot-picker__chip slot-pill"
         [class.slot-picker__chip--visible]="isAlreadyVisible(descriptor)"
         (click)="pickSlot(descriptor)"
       >

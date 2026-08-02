@@ -61,19 +61,17 @@
 // together instead of stacking into a wall of empty rows/widgets. `flex: 0 0 auto` (not the 100%
 // every other cell gets) is what lets it share a line with its neighbours in the :host flex-wrap
 // container above.
+// Box model (padding/border-radius/font/opacity) comes from the shared .slot-pill global class
+// (see global.scss) - only this component's own layout/color specifics stay local here.
 .slot-cell--compact
   flex: 0 0 auto
-  align-items: center
-  gap: 4px
   border: 1px solid var(--ion-border-color, rgba(0, 0, 0, 0.15))
-  border-radius: 999px
-  padding: 4px 10px
   margin-bottom: 0
   background: transparent
   color: inherit
-  font: inherit
-  opacity: 0.75
 
   &:hover
-    opacity: 1
-    background: var(--ion-color-light, rgba(0, 0, 0, 0.05))
+    // --ion-color-light is a fixed near-white (#f4f5f8) regardless of theme - on this always-dark
+    // UI that put near-white background under the inherited white text, making the label
+    // unreadable. --ion-color-step-150 is the theme's own dark-mode-aware subtle-highlight token.
+    background: var(--ion-color-step-150, rgba(255, 255, 255, 0.08))

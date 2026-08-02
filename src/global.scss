@@ -88,6 +88,16 @@ html {
   color-scheme: dark; // https://github.com/mdn/yari/pull/6102
 }
 
+// Android WebView/Chrome's default tap-highlight is an opaque-ish gray/white overlay painted
+// over the whole tapped element until release - on raw <button>s like .slot-pill (no ion-button
+// ripple to mask it) that washes green-on-dark text out to near-illegible for the duration of the
+// tap. Nothing in the app's own CSS disables it (only third-party TinyMCE skin CSS does, and only
+// inside its own editor), so every plain button/link inherits the browser default. :hover/:active
+// styles already provide tap feedback, so this is safe to disable app-wide.
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
 :root {
 
   --secondary: var(--ion-color-secondary); /* FIXME make consistent */
@@ -120,6 +130,26 @@ ion-fab[vertical="top"] {
   color: var(--ion-color-primary);
 }
 
+// Shared pill/chip box model for compact field affordances - used by both
+// TreeNodeCellsComponent's .slot-cell--compact (an empty/not-yet-filled field, rendered inline on
+// an item's own details) and SlotPickerComponent's .slot-picker__chip (the "Add a field…" search
+// suggestions), so the two render at a consistent size instead of each component defining its own
+// padding/font independently and silently drifting apart.
+.slot-pill {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  border-radius: 999px;
+  padding: 4px 10px;
+  font: inherit;
+  opacity: 0.75;
+  cursor: pointer;
+
+  &:hover {
+    opacity: 1;
+  }
+}
+
 .action-color {
   color: var(--ion-color-primary);
 }
@@ -137,35 +167,32 @@ ul, ol {
 }
 
 body {
-  scrollbar-color: green black;
+  scrollbar-color: var(--ion-color-secondary) var(--ion-background-color, #000); /* Firefox */
   overflow-y: hidden; /* Hide vertical scrollbar */
   overflow-x: hidden; /* Hide horizontal scrollbar */
 }
 
-::-webkit-scrollbar {
-  width: 16px;
-  height: 16px; }
-
-::-webkit-scrollbar-thumb {
-  background-color: rgba(0, 0, 0, 0.2);
-  -webkit-box-shadow: inset 1px 1px 0 rgba(0,0,0,0.10),inset 0 -1px 0 rgba(0,0,0,0.07);
+// GH #139: selection/scrollbar previously used hardcoded colors (a literal `green`, `#393812`)
+// unrelated to the active theme - tie both to --ion-color-secondary so they follow theme changes.
+::selection {
+  background: var(--ion-color-secondary);
+  color: var(--ion-color-secondary-contrast, #000);
 }
-
 
 ::-webkit-scrollbar {
   height: 12px;
   width: 12px;
-  background: #000;
+  background: var(--ion-background-color, #000);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #393812;
+  background: var(--ion-color-secondary);
   -webkit-border-radius: 1ex;
   -webkit-box-shadow: 0px 1px 2px rgba(0, 0, 0, 0.75);
 }
 
 ::-webkit-scrollbar-corner {
-  background: #000;
+  background: var(--ion-background-color, #000);
 }
 
 // ===
