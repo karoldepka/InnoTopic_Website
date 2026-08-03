@@ -64,3 +64,6 @@ typings/
 
 .idea
 .DS_Store
+
+# Compiled output (e.g. svg-conversions/demo's Trunk/wasm-pack build, when run from repo root)
+/dist
