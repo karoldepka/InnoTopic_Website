@@ -14,10 +14,7 @@
     "lint": "ng lint"
   },
   "private": true,
-  "workspaces": [
-    "packages/*",
-    "../svg-conversions"
-  ],
+  "packageManager": "pnpm@11.9.0",
   "dependencies": {
     "@ai-sdk/angular": "^2.0.206",
     "@angular/animations": "^22.0.2",
@@ -35,7 +32,12 @@
     "@fortawesome/angular-fontawesome": "^5.0.0",
     "@fortawesome/fontawesome-svg-core": "^7.2.0",
     "@fortawesome/free-solid-svg-icons": "^7.2.0",
+    "@innotopic/gradient-shadow-ui": "workspace:*",
+    "@innotopic/plasma-ui": "workspace:*",
+    "@innotopic/theme-ui": "workspace:*",
+    "@innotopic/topics-ui": "workspace:*",
     "@ionic/angular": "^8.8.11",
+    "@ionic/core": "^8.8.11",
     "ai": "^6.0.205",
     "d3-color": "^1.4.1",
     "d3-contour": "^4.0.2",

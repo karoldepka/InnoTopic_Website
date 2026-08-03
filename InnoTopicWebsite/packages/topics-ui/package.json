@@ -12,7 +12,7 @@
   },
   "dependencies": {
     "lit": "^3.2.1",
-    "svg-conversion": "*"
+    "svg-conversion": "workspace:*"
   },
   "devDependencies": {
     "typescript": "~6.0.3"

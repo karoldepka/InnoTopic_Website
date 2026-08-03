@@ -16,7 +16,7 @@
     "dev": "stencil build --dev --watch --serve"
   },
   "dependencies": {
-    "@innotopic/topics-ui": "*",
+    "@innotopic/topics-ui": "workspace:*",
     "@stencil/store": "^2.0.16"
   },
   "devDependencies": {
