@@ -10,10 +10,6 @@
 
 </div>
 
-<!--[style.margin]="(((themeColor$ | async).themeConfig.shadow_blur_radius) + abs(((themeColor$ | async).themeConfig.shadow_offset)))/2 + 2 + 'px'"-->
-
-<!--val: {{themeColor$ | async | json}} ||-->
-
 @for (colorName of colorNames; track colorName) {
   <section>
     <ion-button [color]='colorName' fill="clear">Clear

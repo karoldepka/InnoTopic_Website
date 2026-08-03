@@ -1,0 +1,48 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button mode="md" [defaultHref]="'/'"></ion-back-button>
+    </ion-buttons>
+    <ion-title>2026 RAG Tech Stack</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <div class="rag-stack-page">
+    <header class="rag-intro">
+      <h1>2026 RAG Tech Stack</h1>
+      <p class="rag-intro-subtitle">Master these 9 agentic layers.</p>
+      <p class="rag-intro-tagline">Demos happen above the waterline. Production is decided underwater.</p>
+    </header>
+
+    <div class="iceberg">
+      @for (layer of layers; track layer.title) {
+        <section
+          class="iceberg-layer"
+          [class.iceberg-layer--underwater]="layer.index > waterlineAfterLayer"
+          [style.--depth]="layer.index"
+        >
+          <div class="layer-heading">
+            <span class="layer-index">{{ ('0' + layer.index).slice(-2) }}</span>
+            <h2 class="layer-title">{{ layer.title }}</h2>
+          </div>
+          <p class="layer-desc">{{ layer.description }}</p>
+          <div class="layer-tools">
+            @for (tool of layer.tools; track tool) {
+              <app-topic-tag [tId]="tool" />
+            }
+          </div>
+        </section>
+
+        @if (layer.index === waterlineAfterLayer) {
+          <div class="waterline">
+            <svg class="waterline-wave" viewBox="0 0 1200 40" preserveAspectRatio="none">
+              <path d="M0,20 C150,45 350,-5 600,20 C850,45 1050,-5 1200,20 L1200,40 L0,40 Z" />
+            </svg>
+            <span class="waterline-label">🌊 waterline — demos end here, production begins</span>
+          </div>
+        }
+      }
+    </div>
+  </div>
+</ion-content>

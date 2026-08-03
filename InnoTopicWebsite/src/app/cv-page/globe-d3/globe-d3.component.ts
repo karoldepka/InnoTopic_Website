@@ -1,10 +1,8 @@
 import { Component, AfterViewInit, OnDestroy, ElementRef, ViewChild, NgZone } from '@angular/core';
-import { Store } from '@ngrx/store';
-import { take } from 'rxjs/operators';
+import { themeState } from '@innotopic/theme-ui';
 import { select } from 'd3-selection';
 import { geoOrthographic, geoPath, geoGraticule, geoDistance } from 'd3-geo';
 import { drag } from 'd3-drag';
-import { ThemeConfigState } from '../../models/theme-config-state.model';
 import { WORK_CITIES, WorkCity } from '../work-cities';
 
 const WORKED_ISO3 = new Set(['DEU', 'AUT', 'POL', 'GBR', 'USA', 'ESP', 'LUX', 'IND', 'ARE']);
@@ -29,15 +27,11 @@ export class GlobeD3Component implements AfterViewInit, OnDestroy {
 
   constructor(
     private ngZone: NgZone,
-    private store: Store<{ themeConfig: ThemeConfigState }>,
   ) {}
 
   ngAfterViewInit() {
     this.ngZone.runOutsideAngular(async () => {
-      const primaryColor = await this.store
-        .select(s => s.themeConfig.ion_color_primary)
-        .pipe(take(1))
-        .toPromise();
+      const primaryColor = themeState.ion_color_primary;
       const geojson = await fetch('assets/data/countries.geojson').then(r => r.json());
       this.buildGlobe(geojson, primaryColor ?? '#3498db');
     });

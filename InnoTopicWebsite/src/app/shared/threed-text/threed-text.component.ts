@@ -1,9 +1,16 @@
 import { Component, Input, CUSTOM_ELEMENTS_SCHEMA, OnInit, NgZone } from '@angular/core';
 import { AsyncPipe } from '@angular/common';
-import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs';
-import { ThemeConfigState } from '../../models/theme-config-state.model';
+import { themeState, onThemeStateChange, ThemeConfigState } from '@innotopic/theme-ui';
 import { config } from '../../config';
+
+/** Bridges @innotopic/theme-ui's plain reactive store into an RxJS Observable for the async pipe. */
+function themeColor$(key: keyof Pick<ThemeConfigState, 'ion_color_primary' | 'ion_color_secondary'>): Observable<string> {
+  return new Observable<string>(subscriber => {
+    subscriber.next(themeState[key]);
+    return onThemeStateChange(key, (value: string) => subscriber.next(value));
+  });
+}
 
 @Component({
   selector: 'app-three-d-text',
@@ -58,11 +65,10 @@ export class ThreeDTextComponent implements OnInit {
   secondaryColor$: Observable<string>;
 
   constructor(
-    store: Store<{ themeConfig: ThemeConfigState }>,
     private ngZone: NgZone,
   ) {
-    this.primaryColor$ = store.select(state => state.themeConfig.ion_color_primary);
-    this.secondaryColor$ = store.select(state => state.themeConfig.ion_color_secondary);
+    this.primaryColor$ = themeColor$('ion_color_primary');
+    this.secondaryColor$ = themeColor$('ion_color_secondary');
   }
 
   ngOnInit() {

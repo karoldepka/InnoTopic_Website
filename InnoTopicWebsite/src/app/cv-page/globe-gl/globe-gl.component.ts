@@ -1,8 +1,6 @@
 import { Component, AfterViewInit, OnDestroy, ElementRef, ViewChild, NgZone } from '@angular/core';
 import { NgIf } from '@angular/common';
-import { Store } from '@ngrx/store';
-import { take } from 'rxjs/operators';
-import { ThemeConfigState } from '../../models/theme-config-state.model';
+import { themeState } from '@innotopic/theme-ui';
 import { WORK_CITIES, WorkCity } from '../work-cities';
 
 interface CityArc { start: WorkCity; end: WorkCity; }
@@ -41,7 +39,6 @@ export class GlobeGlComponent implements AfterViewInit, OnDestroy {
 
   constructor(
     private ngZone: NgZone,
-    private store: Store<{ themeConfig: ThemeConfigState }>,
   ) {}
 
   ngAfterViewInit() {
@@ -51,10 +48,7 @@ export class GlobeGlComponent implements AfterViewInit, OnDestroy {
   private async init() {
     const tick = () => new Promise<void>(r => setTimeout(r, 0));
     try {
-      const primaryColor = await this.store
-        .select(s => s.themeConfig.ion_color_primary)
-        .pipe(take(1))
-        .toPromise();
+      const primaryColor = themeState.ion_color_primary;
 
       const [{ default: Globe }, geojson] = await Promise.all([
         import('globe.gl'),

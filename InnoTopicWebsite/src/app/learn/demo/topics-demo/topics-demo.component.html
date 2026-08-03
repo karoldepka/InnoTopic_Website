@@ -1,0 +1,51 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button mode="md" [defaultHref]="'/'"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Lit Topics Demo</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <div class="topics-demo-page">
+    <h1>@innotopic/topics-ui</h1>
+    <p class="intro">
+      The two custom elements below - <code>&lt;topic-logo&gt;</code> and <code>&lt;topic-tag&gt;</code> -
+      are used directly here, with no Angular wrapper in between.
+    </p>
+
+    <section>
+      <h2>&lt;topic-logo&gt;</h2>
+      <p class="hint">Just the icon, at a couple of sizes.</p>
+      <div class="logo-row">
+        @for (t of logoTopics; track t) {
+          <topic-logo [topic]="t" [size]="28"></topic-logo>
+        }
+      </div>
+      <div class="logo-row">
+        @for (t of logoTopics; track t) {
+          <topic-logo [topic]="t" [size]="48"></topic-logo>
+        }
+      </div>
+    </section>
+
+    <section>
+      <h2>&lt;topic-tag&gt;</h2>
+      <p class="hint">Tags with a pointer cursor have extra info - click one to reveal it.</p>
+      <div class="tag-row">
+        @for (t of tagTopics; track t) {
+          <topic-tag [tId]="t"></topic-tag>
+        }
+      </div>
+    </section>
+
+    <section>
+      <h2>Inline, via &lt;topic-hashtag-replacer&gt;</h2>
+      <p class="hint">The same #hashtag-in-a-sentence parsing used throughout the CV.</p>
+      <p class="sentence">
+        <topic-hashtag-replacer [text]="sentence"></topic-hashtag-replacer>
+      </p>
+    </section>
+  </div>
+</ion-content>

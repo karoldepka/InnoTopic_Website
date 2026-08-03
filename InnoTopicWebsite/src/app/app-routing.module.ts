@@ -6,6 +6,10 @@ const loadShirtGenerator = () => import('./shirt-generator/shirt-generator.modul
 const loadThemeDemo = () => import('./themes/theme-demo/theme-demo.module').then(m => m.ThemeDemoPageModule);
 const loadThemeList = () => import('./themes/theme-list/theme-list.page').then(m => m.ThemeListPage);
 const loadTopicsGraph = () => import('./cv-page/topics-graph/topics-graph.component').then(m => m.TopicsGraphComponent);
+const loadRagStackInfographic = () => import('./learn/infographics/rag-stack/rag-stack.component').then(m => m.RagStackComponent);
+const loadTopicsDemo = () => import('./learn/demo/topics-demo/topics-demo.component').then(m => m.TopicsDemoComponent);
+const loadThemeUiDemo = () => import('./learn/demo/theme-ui-demo/theme-ui-demo.component').then(m => m.ThemeUiDemoComponent);
+const loadPlasmaDemo = () => import('./learn/demo/plasma-demo/plasma-demo.component').then(m => m.PlasmaDemoComponent);
 
 const routes: Routes = [
   {
@@ -44,6 +48,22 @@ const routes: Routes = [
   {
     path: 'topics-graph',
     loadComponent: loadTopicsGraph,
+  },
+  {
+    path: 'learn/infographics/rag-stack',
+    loadComponent: loadRagStackInfographic,
+  },
+  {
+    path: 'learn/demo/topics',
+    loadComponent: loadTopicsDemo,
+  },
+  {
+    path: 'learn/demo/theme',
+    loadComponent: loadThemeUiDemo,
+  },
+  {
+    path: 'learn/demo/plasma',
+    loadComponent: loadPlasmaDemo,
   },
   {
     path: 'graph',

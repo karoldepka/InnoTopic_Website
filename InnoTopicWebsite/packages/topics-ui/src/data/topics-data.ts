@@ -1,0 +1,1264 @@
+import {
+  getDictionaryValuesAsArray,
+  setIdsFromKeys,
+} from './dictionary-utils';
+import {
+  Topic,
+  TopicUrls,
+} from './Topic';
+import {
+  tag,
+  tagLogoType,
+  tagNoIcon,
+  TopicCategory,
+} from './topics';
+
+export type TopicData = Partial<Topic>
+export type TopicDataOrLogo = TopicData | string
+
+function coerceLogoToTopicData(topicData: TopicDataOrLogo): TopicData {
+  // console.log('coerceLogoToTopicData: topicData = ', topicData);
+  if (typeof (topicData) === 'string') {
+    topicData = {
+      logo: topicData as string,
+    }
+  }
+  // console.log('coerceLogoToTopicData: coerced topicData = ', topicData);
+  return topicData;
+}
+
+export function t(topicData?: TopicDataOrLogo, iconWebsiteTodo?: string | string[]) {
+  topicData = coerceLogoToTopicData(/*'OFF__' + */topicData !)
+  const topic = Object.create(Topic.prototype)
+  Object.assign(topic, topicData)
+  // console.log(`t()`, `topicData`, topicData, `topic`, topic, `topic.id`, topic.id)
+  // TODO: instantiate Topic class (once we have id). But be careful, if using Object.create, ctor is not called
+  // console.log('topic instantiated', topic)
+
+  // instantiate as soon as possible, even incomplete object; even before ID
+  // to have access to utility methods e.g. fluent API like .setLogo()
+  // and to avoid changing object prototype
+  // when having id and post-processing, call smth like finaliseAndValidate, which will post-process/mangle id/name if necessary (keep in mind topics-old which already have name&id)
+  // https://jeena.net/constructor-object-create
+  return topic
+}
+
+
+/* Just a placeholder and redirect */
+export function tNarrow(topicData?: TopicDataOrLogo, logoSize?: number[]) {
+  return tWide(topicData, logoSize)
+}
+
+export function tSquare(topicData?: TopicDataOrLogo, logoSize?: number[]) {
+  return tWide(topicData, logoSize)
+}
+
+
+export function tWide(topicData?: TopicDataOrLogo, logoSize?: number[]) {
+  topicData = coerceLogoToTopicData(/*'zfdfadfas' +*/ topicData!);
+  return t({...topicData, logoTypeWide: true, logoSize})
+}
+
+export function tNoIcon(topicData?: TopicData) {
+  return t({...topicData, logo: null /* null not undefined, coz we know it's not available */})
+}
+
+
+export class Frontend_Visual {
+  Bulma = tNarrow(/* {tagline: 'Modern CSS framework based on Flexbox'} */)
+  'Chakra UI' = t('chakra-ui-icon'/* {tagline: '⚡️ Simple, Modular & Accessible UI Components for your React Applications'} */)
+  'Mantine' = tNarrow('mantine-icon.svg'/* {tagline: 'A fully featured React components library'} */)
+}
+
+/** TODO split (here, not in highlights) into
+ * Frontend - UI/visual (bigger icons for me) (ui libs - where is the line - if it deals with HTML markup; or generates smth visual html/css/svg etc; sass, webgl; maybe docusaurus)
+ *  - another criterion: stuff that I actually use for my own apps; e.g. I wouldnt care too much about e.g. Business Intelligence (yest?)
+ * Frontend - Other (includes libs like lodash, state mgmt) */
+export class Frontend {
+
+  'Frontend' = tSquare('generic/frontend')
+  'HTML5' = t({logo: 'html-5.svg'})
+  'CSS3' = t({logo: 'css-3.svg'})
+  'PWA' = tWide()
+  'D3.js' = t({logo: 'd3.svg'}) // TODO Vega [Lite] - on top of d3. From Luis Sanchez
+  'Chart.js' = t({logo: "chart-js.svg" /* non-standard svg*/})
+  'Stylus' = tWide()
+  'Less' = tWide('less-nomasks.svg')
+  'Sass' = tWide()
+  'PostCSS' = t() /* sponsored by tailwind */
+  'Headless UI' = tSquare('headlessui-icon.svg') // Completely unstyled, fully accessible UI components, designed to integrate beautifully with Tailwind CSS.
+  'Tailwind CSS' = tWide('tailwindcss-icon.svg')
+  'Windi CSS' = tNarrow('windi-css.svg')
+  // TODO: https://www.pollen.style/
+
+  PouchDB = t({categories: 'Databases'})
+  PrimeNG = t({
+    iconWebsite: 'https://www.primefaces.org/press-kit/',
+    iconUrl: 'https://www.primefaces.org/presskit/primeng-logo.svg',
+    urls: new TopicUrls(
+      'https://www.primefaces.org/primeng',
+      undefined,
+      'https://github.com/primefaces/primeng',
+      'https://www.npmjs.com/package/primeng',
+      'https://stackoverflow.com/questions/tagged/primeng',
+      undefined,
+      'https://twitter.com/prime_ng'
+    )
+  })
+  Nx = tWide({
+    logo: 'nx-logo-white.svg',
+    // logoSize: [1048, 652], // FIXME
+    iconUrl: 'https://raw.githubusercontent.com/nrwl/nx/master/nx-logo.png',
+  })
+  Rush = tWide('rush-icon.svg')
+  xplat = tWide('xplat-logo.png', [899, 393])
+  'Web Components' = tWide('webcomponents')
+  // TODO https://github.com/ampproject/amphtml
+  "Lit" = tWide('lit-icon.svg') /* lit elements (Moises) */
+  // TODO: https://www.webcomponents.org/ logo
+  WebPack = t()
+  "Rollup" = t('rollupjs.svg') /* comments: The bundler behind Vite */
+  Vite = t('vitejs')
+  Vitest = t()
+  "Speedy Web Compiler (SWC)" = tWide('swc') /* written in rust */
+  "esbuild" = t()
+  Turbopack = t('turbopack-icon.svg')
+  Turborepo = t('turborepo-icon.svg')
+  Biome = t('biome-icon.svg') // Rust
+  pnpm = t('pnpm-icon')
+  Angular = tNarrow({
+    logo: 'angular-icon',
+    urls: new TopicUrls(
+      'https://angular.io/',
+      'https://en.wikipedia.org/wiki/Angular_(application_platform)',
+      'https://github.com/angular/angular',
+      undefined,
+      'https://stackoverflow.com/questions/tagged/angular',
+      'https://stackshare.io/angular-2',
+      'https://twitter.com/angular',
+    ),
+    subTopics: {
+      'Flex-Layout': t({
+        urls: new TopicUrls(undefined, 'https://github.com/angular/flex-layout'),
+      }),
+      'Flex-Layout Responsive API': t({
+        urls: new TopicUrls(undefined, 'https://github.com/angular/flex-layout/wiki/Responsive-API'),
+      }),
+      'Change Detection': t(),
+      'Dependency Injection': t({
+        shortName: 'DI'
+      }),
+      'Modules': t(),
+      'Router': t(),
+      'Reactive Forms': t(),
+      'Template-Driven Forms': t(),
+      'Lazy Loading': t(),
+      'i18n': t(),
+      'HTTP': t(),
+      'Angular Universal': t(),
+    }
+  })
+  Codelyzer = t()
+  'Angular Elements' = t('angular-elements-logo.png')
+  'Angular Material' = t()
+  AngularJS = tNoIcon({
+    urls: new TopicUrls(
+      undefined,
+      'https://en.wikipedia.org/wiki/AngularJS',
+      'https://github.com/angular/angular.js',
+      undefined,
+      'https://stackoverflow.com/questions/tagged/angularjs',
+      'https://stackshare.io/angularjs',
+      undefined,
+    )
+  })
+
+  Ionic = t({
+    /* logos: https://ionicframework.com/press */
+    // logo: 'ionic-light-logo-black.svg',
+    // logo: 'ionic-logotype-white-on-blue-cropped-print-fixed.svg',
+    logo: 'ionic-logo-affinity-export-import-print-fix.svg',
+    urls: new TopicUrls(
+      'https://ionicframework.com/',
+      'https://en.wikipedia.org/wiki/Ionic_(mobile_app_framework)',
+      'https://github.com/ionic-team/ionic',
+      'https://www.npmjs.com/package/ionic',
+      'https://stackoverflow.com/questions/tagged/ionic-framework',
+      'https://stackshare.io/ionic',
+      'https://twitter.com/Ionicframework',
+    ),
+    subTopics: {
+      Stencil: tNoIcon(),
+      Capacitor: tNoIcon(),
+    }
+  })
+  Stencil = tWide('stenciljs-icon.svg')
+  "WebKit" = t()
+  "NW.js" = t('nodewebkit') /* NW.js */
+  'Electron' = t()
+  'Expo' = t('expo-icon')
+  'Compose Multiplatform' = tNarrow('compose-multiplatform.svg') /* Develop stunning shared UIs for Android, iOS, desktop, and web. JetBrains. https://stackshare.io/compose-mp */
+  'Vue.js' = tWide({logo: 'vue'})
+  'Nuxt' = tWide('nuxt-icon')
+  'Hono' = tNarrow('hono.svg')
+  'Fastify' = tWide('fastify-icon.svg')
+  'Backbone.js' = tNarrow('backbone-icon.svg')
+  'Gridsome' = t({logo: 'gridsome-icon.svg'})
+  'Svelte' = tNarrow('svelte-icon') // https://github.com/sveltejs/branding
+  // TODO Phoenix  https://www.phoenixframework.org/  supposedly most loved; https://github.com/phoenixframework/phoenix
+  'SolidJS' = t('solidjs-icon')
+  'Qwik' = tNarrow('qwik-icon.svg')
+  'Astro' = t('astro-icon.svg')
+  "Inferno" = t()
+  'Mithril' = t()
+  'Marko' = tWide('marko-cropped.svg')
+  'Alpine.js' = tWide('alpinejs-icon.svg')
+  'Rax' = t()
+  'Riot' = t()
+  // TODO: Turbo (DHH dropping TypeScript, and not even jsdoc nor .d.ts). + hotwire stimulus
+  'Vercel' = tWide('vercel-icon.svg')
+  // ===== headless CMS:
+  'Storyblok' = t('storyblok-icon.svg')
+  "Strapi" = tSquare('strapi-icon.svg')
+
+  // TODO: https://web.dev/
+
+  Lodash = t()
+  'TypeDI' = tNoIcon() // TODO move to Frontend & Backend / JavaScript / TypeScript
+  'TypeStack' = tNoIcon()
+
+  Bootstrap = tWide()
+  'React-Bootstrap' = t('react-bootstrap.svg')
+  "Material Design" = t('Google_Material_Design_Logo.svg')
+  "Material UI" = tWide('material-ui.svg')
+  jQuery = tWide('jquery-icon-cropped.svg')
+  "Hotwired Turbo" = tNarrow('hotwired-turbo.svg') // "Hotwire is an alternative approach to building modern web applications without using much JavaScript by sending HTML instead of JSON over the wire."
+  "Hotwired Stimulus" = tNarrow('hotwired-stimulus.svg')
+  'AG Grid' = tWide('ag-grid')
+  'ApexCharts.js' = tNoIcon()
+  AngularFire = tNoIcon()
+  NgRx = t() // https://ngrx.io/presskit
+  // NGXS = t({logo: 'ngxs.png', logoSize: [442, 132]})
+  NGXS = t() // https://github.com/adisreyaj/store/pull/1/commits/4a7702048653a5261694c40b6ceb61f77a82b59a#diff-feb17517a55f6687ca9433cf00fab45526e32f6b05f018096c0806f1dc767ac8
+  MobX = t()
+  "MobX-State-Tree" = t(`mobx-state-tree-logo.svg`
+    /* https://github.com/mobxjs/mobx-state-tree/blob/b6c1c9b29d7bd7525ac6588f8f67f6c13eb17b2b/website/static/img/mobx-state-tree-logo.svg
+    * https://github.com/mobxjs/mobx-state-tree/blob/master/website/static/img/mobx-state-tree-logo.svg
+    * */)
+  Redux = t()
+  "Redux Toolkit" = t(`redux--toolkit.svg`)
+  Recoil = tWide('recoil-icon')
+  Jotai = tWide('jotai')
+  Zustand = tWide('zustand--logo512.png--vectorizer.ai--cropped.svg') // tagline: '🐻 Bear necessities for state management in React'
+  Pinia = tNarrow('pinia.svg') // vue state management
+  Effect = tSquare('effect-icon.svg') // is it frontend or backend or both?
+
+  React = tWide()
+
+  // TODO: https://web.dev/baseline/ (on MDN)
+  // Million = tWide() TODO: https://million.dev/ ; Make React 70% faster
+  Preact = t()
+  Gatsby = t('Gatsby-Monogram.svg', /* https://www.gatsbyjs.com/guidelines/logo */)
+  "Next.js" = t('nextjs-icon.svg')
+  // "Next.js" = t('nextjs-icon.svg')
+  "Remix" = t('remix-icon.svg') /* https://remix.run/ */
+  // TODO: Chakra, Playwright
+  GreenSock = t('greensock-icon.svg')
+  Ember = tWide()
+  WebSocket = t()
+  'Chrome Extensions' = t('chrome.svg')
+  'Dexie.js' = t('dexie-js.svg')
+  'Aurelia' = t()
+  'Font Awesome' = t('fort-awesome-alt-brands.svg')
+  Workbox = tWide('workbox-icon.svg')
+  'SVG.js' = t('svg-js.png' /* WTF, PNG for an SVG lib :D */)
+  'Storybook' = t('storybook-icon.svg')
+  // TODO: storyblok?
+  'DDD - Domain-Driven Design' = t('project-diagram-solid.svg')
+  // TODO Scully
+  Lighthouse = t('google--lighthouse-logo.svg' /*
+    https://developers.google.com/web/tools/lighthouse
+    https://developers.google.com/web/tools/lighthouse/images/lighthouse-logo.svg*/
+  )
+  'three.js' = t('threejs.svg'/*
+    https://threejs.org/
+    pressKit: https://github.com/mrdoob/three.js/issues/2789
+
+   */)
+  'WebGL' = tWide('webgl-cropped.svg',
+    /* pressKit: https://www.khronos.org/legal/trademarks/
+     logoFile: https://www.khronos.org/assets/utilities/retrieveFile.php?d=webgl&t=logopacks*/
+  )
+  'glTF' = tWide({logo: 'GlTF_Official_Logo.svg', /*logoSize: [1250, 1168]*/ }
+    /* pressKit: https://www.khronos.org/legal/trademarks/
+     logoFile: https://www.khronos.org/assets/utilities/retrieveFile.php?d=gltf&t=logopacks
+     https://upload.wikimedia.org/wikipedia/en/d/dd/GlTF_Official_Logo.svg
+     https://www.khronos.org/assets/images/api_logos/gltf.svg
+     */
+  )
+  'WebGPU' = tWide('webgpu-icon--cropped.svg',
+    // https://github.com/samdauwe/webgpu-native-examples/commit/24f4d0e3c470afe0ebdf0672a915e778e652bcbc // https://github.com/gpuweb/admin/issues/14
+  )
+  'Micro Frontends' = tNoIcon(/* https://martinfowler.com/articles/micro-frontends.html */)
+}
+
+export class JavaScript {
+  Promises = t()
+  JavaScript = t()
+  // RxJS = tNoIcon()
+  RxJS = t('reactivex')
+  // TODO: more like ecosystem
+}
+
+export class Java {
+  // TODO: more like ecosystem
+
+}
+
+export class Backend {
+  // TODO: hapi fastify apollo-server koa
+  // TODO: type-graphql, typeORM
+  'Backend' = t('generic/fontawesome/server.svg')
+  'Microservices' = tNoIcon()
+  'TypeORM' = tNoIcon()
+  'TypeGraphQL' = t(`typegraphql-icon.svg` /* https://github.com/MichalLytek/type-graphql/issues/824 */)
+  'Altair GraphQL Client' = t(`altair`) // https://altairgraphql.dev/
+  'Apollo' = t(`apollostack.svg`)
+  'Apollo Studio' = t(`apollostack.svg`)
+
+  'Node.js' = tWide({
+    logo: 'nodejs-icon.svg',
+    logoSmallIcon: 'nodejs-icon.svg',
+  })
+  'NestJS' = t(`nest--logo-small.ede75a6b.svg`)
+  // 'GraalVM' = tWide('graalvm-rgb-cropped.svg')
+  'GraalVM' = tWide('graalvm_rabbit_icon.svg')
+  Kong = tWide('kong-icon.svg'/* { tagline: 'the fastest cloud native API platform.' } */)
+  GraphQL = t()
+  RabbitMQ = tNarrow('rabbitmq-icon.svg')
+  Swagger = t()
+  OpenAPI = t('openapi-icon.svg') /* https://www.openapis.org/ ; Compatible with JSON Schema */
+  // TODO https://www.asyncapi.com/ (has svgporn)
+  Django = tSquare('django-icon.svg')
+  Laravel = t()
+
+  'Express.js' = tWide({
+    logo: 'expressjs-icon.svg',
+    subTopics: [
+      tag('Kraken.js', 'krakenjs', 'http://krakenjs.com/'),
+      tag('FeathersJS', 'feathersjs', 'https://feathersjs.com/'),
+      tag('LoopBack', 'loopback', 'https://loopback.io/'),
+      tag('MEAN Stack', 'meanio', 'http://mean.io/'),
+      tag('Sails', 'sails', 'http://sailsjs.com/'),
+    ],
+    urls: new TopicUrls(
+      'https://expressjs.com',
+      'https://en.wikipedia.org/wiki/Express.js',
+      'https://github.com/expressjs/express',
+      'https://www.npmjs.com/package/express',
+      'https://stackoverflow.com/questions/tagged/express',
+      'https://stackshare.io/expressjs',
+      'https://twitter.com/expressjs',
+      // TODO: 'https://alternativeto.net/software/expressjs/',
+    )
+  })
+
+  'Deno' = t()
+  "Bun" = tWide() /* TODO: mark as non-main experience; written in Zig */
+
+
+  KeystoneJS = t({
+    urls: new TopicUrls(
+      'http://keystonejs.com/'
+    ),
+  })
+  // TODO: adonis ?
+
+  Spring = t('spring-icon.svg')
+  'Spring Boot' = t()
+  'Ktor' = tSquare('ktor-icon.svg')
+  'Kafka' = tNarrow('kafka-icon.svg')
+  'Kafka Streams' = tNarrow('kafka-icon.svg')
+  'OpenShift' = tWide('openshift.svg')
+  'Hazelcast' = tNarrow('hazelcast-icon.svg')
+
+  Hibernate = t()
+  "Fermyon" = tNarrow('fermyon-icon.svg') /* too ugly */ // wasm instead of docker { tagline: 'Fermyon Cloud is the easiest way to deploy and manage cloud native WebAssembly applications with Spin, our developer tool.', pressKitUrl: 'https://design.fermyon.dev/' }'
+
+  Serverless = tWide()
+  Docker = tWide('docker-simple'/* https://www.docker.com/company/newsroom/media-resources */)
+  'Vagrant' = tNarrow('vagrant-icon.svg')
+  Terraform = t('terraform-icon.svg') /* company: HashiCorp */
+  "AWS CDK" = tSquare('Arch_AWS-Cloud-Development-Kit_16.svg') /* company: HashiCorp */
+  Ansible = t('ansible-icon.svg')
+  Kubernetes = t(/* they had a typo: 'kubernets.svg'*/)
+  Elasticsearch = t(/* https://www.elastic.co/brand */)
+  OpenSearch = t('opensearch-icon.svg')
+  Kibana = t(/* https://www.elastic.co/brand */)
+  Logstash = t(/* https://www.elastic.co/brand */)
+  Beats = t(/* https://www.elastic.co/brand */)
+  // Analytics
+  // TODO: https://superset.apache.org/
+  NGINX = tWide()
+  'Ruby On Rails' = t()
+}
+
+
+export class Frontend_And_Backend_App_Platforms {
+  JHipster = tWide("jhipster-icon.svg")
+  Meteor = tWide('meteor-icon.svg')
+  Hoodie = tWide() // redirects to rxdb
+  Feathers = t('feathersjs.svg') // The API and Real-time Application Framework
+  Akita = tWide() // https://github.com/datorama/akita
+  // feathers
+  // Amplify
+}
+
+/** Important coz META-quality to make sense of the rest of topics */
+export class Comprehension_Comparators_Security_And_Exploring {
+  StackShare = tWide() // {tagline: 'Tech Stack Intelligence" }
+  Openbase = t('openbase-icon-full.svg') // { tagline: 'Compare open-source packages with powerful metrics and user reviews.' }
+  SVGPorn = tWide ('svgporn') // { tagline: 'Compare open-source packages with powerful metrics and user reviews.' }
+  SVGO = t ('svgo-icon') // Node.js tool for optimizing SVG files; https://github.com/svg/svgo
+
+  // https://tidelift.com/
+  // https://npms.io/about - quality/popularity scores
+
+  // TODO npmjs.com ?
+  // https://libraries.io/npm/@feathersjs%2Ffeathers
+  // codeclimate
+  // stackoverflow to see tag stats
+  // NOTE: this is highly related to security like Snyk
+  // https://bestofjs.org/projects/typebox
+  // https://chaoss.community/ ?
+  // https://opensource.com/article/19/8/measure-project
+  // https://openjsf.org/
+}
+
+
+export class Testing {
+  "AVA" = tWide()
+  "Selenium" = t()
+  TestCafe = tWide()
+  Cypress = t('cypress-icon.svg' /*`cypress-io-logo-round-flat.svg`*/)
+  Playwright = tWide() /* Playwright is a framework for Web Testing and Automation. It allows testing Chromium, Firefox and WebKit with a single API. By Microsoft. */
+  "Testing Library" = tSquare()
+  "Nightwatch.js" = tNarrow('nightwatch.svg')
+  "UserTesting" = tNarrow('user-testing-icon.svg')
+  BrowserStack = t()
+  "User Testing" = t()
+  Spock = tNoIcon()
+  Jest = t()
+  Karma = t()
+  Jasmine = t()
+  JUnit = t({logo: 'Junit.fe42161b-ugly.svg', logoSize: [125, 84], iconUrl: `https://zebrunner.com/`})
+  TestNG = t({logo: 'testng.png', logoSize: [634, 176]})
+  Cucumber = t()
+  Calabash = tNoIcon()
+  Cobertura = tNoIcon()
+  Mockito = tNoIcon()
+}
+
+export class Tools {
+  // browsers:
+  "Brave Browser" = tNarrow('brave.svg')
+
+  // TODO: arc browser
+
+  WebStorm = t(/* https://www.jetbrains.com/de-de/company/brand/logos/ */)
+  PyCharm = t(/* https://www.jetbrains.com/de-de/company/brand/logos/ */)
+  'JetBrains Fleet' = t('jetbrains-fleet-icon.svg')
+  //  TODO: 'JetBrains ReSharper' = t('') // C#
+  // TODO: 'Rider' = t('') // C#
+  RubyMine = t()
+  // 'Android Studio' = t('Android_Studio_icon_OFF.svg')
+  'Android Studio' = tNoIcon()
+  Eclipse = t('eclipse-icon.svg')
+  'IntelliJ IDEA' = t()
+  'NetBeans' = t('apache-netbeans')
+  'Visual Studio' = t()
+  'Visual Studio Code' = tWide('visual-studio-code--no-masks.svg')
+  'VSCodium' = tWide('vscodium-codium_cnl.svg')
+  "Open VSX Registry" = tWide('open-vsx-registry-icon.svg')
+  'Warp' = tWide('warp-icon.svg')
+  'Vim' = t()
+  // ==== CI:
+  'CircleCI' = t()
+  'Travis CI' = t()
+  'Jenkins' = tNarrow('jenkins-icon2.svg')
+  'Zeplin' = tWide()
+  'Dribbble' = t(`dribbble-ball-mark.svg`) // https://dribbble.com/media-kit
+  'Slack' = t('slack-icon.svg')
+  'PandaDoc' = tNoIcon() /* FIXME logo */
+  'Snyk' = tWide()
+  "OWASP" = t('owasp-icon')
+  'CodeSee' = tWide('codesee-icon') // move to comprehension?
+  // TODO maybe https://stepsize.com/
+  'Netlify' = tWide('netlify-icon.svg') /* https://www.netlify.com/press/#logos */
+  'Jamstack' = tSquare('jamstack-icon.svg') /* https://www.netlify.com/jamstack/ */
+  'VirtualBox' = t({
+    iconUrl: 'https://icons8.com/icons/set/oracle-vm-virtualbox'
+  })
+}
+
+export class Project_Management_Tools {
+  'Pivotal Tracker' = t(`pivotal_tracker.svg`)
+  'Bugzilla' = tNoIcon()
+  'Trello' = t()
+  'JTrac' = t()
+  'Trac' = t()
+  'Redmine' = t()
+  'TeamForge' = tNoIcon({
+    organisation: 'CollabNet',
+  })
+  'Jira' = tWide()
+  // TODO: Clubhouse
+  // TODO: Monday.com
+  'Agile Central' = tNoIcon()
+  'YouTrack' = t({
+    organisation: 'JetBrains',
+  })
+}
+
+/** TODO and UI UX */
+export class Graphics {
+  SVG = t({
+    // logo: 'svg-logo-v.svg',
+    categories: 'Frontend',
+  })
+  // Design Ops
+  Figma = t()
+  UXPin = t('UXPin-Logo-BlackFill-export.svg')
+  SVGator = tWide('svgator-icon.svg')
+  InVision = t()
+  Blender = tWide()
+  'Adobe Illustrator' = t('Adobe_Illustrator_CC_icon.svg')
+  'Adobe Photoshop' = t('adobe--photoshop-32x32.svg')
+  'Adobe Creative Cloud' = t('adobe--creativecloud-32x32.svg')
+  'Affinity Designer' = t('affinity-designer.svg')
+  'Gravit Designer' = t('gravitio-icon.svg')
+  // 'GIMP' = t('gimp-wilber-big.png')
+  'GIMP' = tNoIcon()
+  'Inkscape' = tWide('inkscape-icon.svg')
+}
+
+export class Markup_And_Config_Languages {
+  // https://github.com/json5/json5-logo/tree/master
+  // yaml
+  // hcl
+}
+
+export class Languages {
+  'JetBrains MPS' = t()
+  Java = t()
+  Go = tWide('go-logo-white.svg')
+  TypeScript = t('typescript-icon')
+  Kotlin = t({
+    logo: 'kotlin-icon.svg',
+    categories: 'Mobile',
+  })
+  Swift = t()
+  Ruby = t()
+  Crystal = t()
+  Sorbet = tSquare('sorbet-logo-white-sparkles.svg')
+  Markdown = tWide()
+
+  Python = t({
+    urls: new TopicUrls(
+      'https://www.python.org/',
+      'https://en.wikipedia.org/wiki/Python_(programming_language)',
+      'https://github.com/python',
+      undefined,
+      'https://stackoverflow.com/questions/tagged/python',
+      'https://stackshare.io/python',
+      'https://twitter.com/ThePSF'
+    )
+  })
+  mypy = tWide('mypy-icon.svg') // #AI #Python
+  'Python Pyre' = tWide('pyre-icon.svg') // #Python
+  'Pyright' = tWide('pyright-icon.svg') // #Python
+  'Flask' = tWide('flask-icon.svg') // #Python
+  'FastAPI' = tSquare('fastapi-icon.svg') // #Python
+  Mojo = tWide('modular-mojo-icon') // #AI #Python
+  Hack = tWide()
+  Haxe = t()
+  Scala = t()
+  "Eclipse Ceylon" = tWide('ceylon-icon.svg')
+  Clojure = t()
+  ClojureScript = tSquare('cljs.svg')
+  Perl = t()
+  Raku = tWide('raku-cropped.svg')
+  Fortran = t()
+  COBOL = tWide('cobol.svg')
+  Rexx = tWide('rexx-icon.svg') // Rexx (Restructured Extended Executor)
+  Amiga = tWide('amiga-icon.svg')
+  Commodore = tWide('commodore-logo.svg')
+
+  /// those were actually kinda before C ^
+
+  C = t()
+  'HolyC' = tNarrow('HolyC_Logo.svg')
+  'C++' = t()
+  'C#' = t('c_sharp.svg')
+  'F#' = tWide('fsharp.svg')
+  Dart = t()
+  Groovy = tWide()
+  Elm = t()
+  CoffeeScript = tWide('coffeescript.svg')
+  PureScript = tWide('purescript-icon')
+  ReScript = tSquare('rescript-icon')
+  "Roc Lang" = tNarrow('roc-lang-icon.svg')
+  Imba = tWide('imba-icon')
+  'Mint Lang' = tWide('mint-lang-icon-wide.svg')
+  Zig = tWide('zig-icon.svg')
+  Nim = tWide('nim-lang-icon-wide.svg')
+  'Google Carbon' = tSquare('google-carbon-icon.svg')
+  Rust = t()
+  Tauri = tNarrow('tauri.svg')
+  Tokio = tWide('tokio-icon.svg') // https://tokio.rs/img/tokio-horizontal.svg
+  Tonic = tWide('tonic-icon.svg')
+  Dioxus = tNarrow('dioxus-icon.svg')
+  Yew = tNarrow('yew-icon.svg')
+  "JetBrains RustRover" = tSquare('jetbrains-rustrover-icon.svg')
+  WebAssembly = t({
+    categories: "Frontend",
+    ecosystem: "JavaScript",
+  })
+  "WebAssembly System Interface (WASI)" = tWide('wasi-icon-cropped-wide.svg')
+  "Wasmtime" = tWide('bytecode-alliance-logo-icon.svg')
+  "Wasmer" = tNarrow('wasmer-icon.svg')
+  "WebAssembly Package Manager (WAPM)" = tNarrow('wapm-icon.svg')
+  AssemblyScript = t()
+
+  Bash = t('bash-icon.svg')
+  Lua = t('lua-no-text.svg')
+  Prolog = tSquare('prolog-icon.svg')
+  Eiffel = tWide('eiffel-no-text.svg')
+  Erlang = tWide('erlang-no-text.svg')
+  Elixir = tWide('elixir-pluginIcon-crop--for-print-fix.svg') /* https://plugins.jetbrains.com/plugin/7522-elixir for print fix */ // -- other options: simpler, black & white: https://logosear.ch/logos/elixir/index.html
+  Haskell = tWide('haskell-icon')
+  Lisp = tWide('lisp-logo.svg')
+  OCaml = tWide('ocaml-no-text.svg'/* https://ocaml.org/docs/logos.html  http://ocaml.org/logo/Colour/SVG/colour-logo.svg
+      Square -- https://ocaml.org/img/OCaml_Sticker.svg */)
+  'R Language' = tWide('r-lang.svg')
+  'V Language' = t('v-logo.svg')
+  'D Language' = tWide('dlang-simple'/*, 'https://en.wikipedia.org/wiki/File:D_Programming_Language_logo.svg'*/)
+  Julia = tWide('julia-dots-no-text.svg', /*{
+    logo: ,
+    iconWebsite: ['https://github.com/JuliaLang/julia-logo-graphics/tree/master/images', 'https://github.com/JuliaLang/julia-logo-graphics/blob/master/images/julia-logo-color.svg'],
+  }*/)
+  PHP = tWide()
+  // TODO: PHP & Hack lang, HHVM
+}
+
+export class OS {
+  Linux = t('linux-tux-black-white.svg')
+  'Ubuntu Linux' = t('ubuntu.svg')
+  'SUSE Linux' = tWide('suse.svg')
+  'RedHat Linux' = t('redhat-icon.svg')
+  'CentOS Linux' = tWide('centos.svg')
+  'Debian Linux' = t('debian.svg')
+  'Fedora Linux' = t('fedora.svg' /* Officially just "Fedora", but better for filtering*/)
+  'macOS' = t('macosx.svg')
+  'Microsoft Windows' = t('microsoft-windows-icon.svg')
+}
+
+export class Mobile {
+  Mobile = tNarrow('generic/fontawesome/mobile.svg')
+  iOS = t()
+  Android = tWide({
+    logo: 'android-icon.svg',
+    subTopics: {
+      'Recycler View': tNoIcon({}),
+    }
+  })
+  Capacitor = t(`capacitor-icon.svg`) // FIXME: remove (is in sub-topics of Ionic)
+  Cordova = t()
+  PhoneGap = t()
+  NativeScript = t()
+  "React Native" = tWide('react.svg')
+  Flutter = tWide('flutter.svg')
+  'Java Micro Edition' = t('java')
+  'BlackBerry' = tNoIcon()
+}
+
+export class Cloud {
+  Cloud = tWide('generic/fontawesome/cloud.svg')
+  // TODO: cloud-native
+  'Refine' = tSquare('refine-icon.svg') /* A React Framework for building internal tools, admin panels, dashboards & B2B apps with unmatched flexibility. */
+  'Outline' = tNarrow('outline-icon.svg') // https://www.getoutline.com/images/logo.svg
+  'Appwrite' = tWide('appwrite-icon.svg')
+  'AppFlowy' = tWide('appflowy-icon.svg')
+  // TODO: Maybe RocketChat?
+  'Supabase' = tNarrow('supabase-icon.svg') /* open source Firebase alternative supabase.com; https://supabase.com/brand-assets ; https://golden.com/wiki/Supabase-YX5N66V ; Build in a weekend.
+    Scale to millions.
+    Supabase is an open source Firebase alternative. Start your project with a Postgres database, Authentication, instant APIs, Edge Functions, Realtime subscriptions, and Storage.*/
+  'Redis' = tWide('redis.svg')
+  'Firebase' = tNarrow("firebase-icon.svg"/*{
+    subTopics: {
+      // most are from firebase console left navbar:
+      'Authentication': t(),
+      'Realtime Database': t('Firebase-realtime-database.svg'),
+      'Storage': t('Firebase-storage.svg'),
+      'Hosting': t('Firebase-hosting.svg'),
+      'Cloud Functions': t(),
+      'Stability': t(),
+      'Crashlytics': t('Crashlytics.svg'),
+      'Analytics': t(),
+      'Grow': t(),
+    }
+  }*/)
+  'Cloud Firestore' = t('firebase-firestore.svg')
+
+  'GCP - Google Cloud Platform' = tWide({
+    logo: 'google-cloud.svg',
+    iconUrl: 'logo_gcp_hexagon_rgb.png'
+    /* logos SVG-s: https://googlecloudcheatsheet.withgoogle.com/ */
+  })
+
+  "Vector Databases" = tSquare('generic/fontawesome/table.svg')
+
+  Algolia = t('algolia-icon.svg') /* new icon ~2023 */
+  "Meilisearch" = tWide('meilisearch-icon-wide.svg')  /* Rust 99% */
+  "Typesense" = tWide('typesense-icon.svg')
+  MindsDB = tWide('mindsdb-icon-wide.svg') // { iconUrl: 'mindsdb-icon-wide.svg', comments: 'Embedding AI in DB (select query from models e.g. from HuggingFace'}); automatic #MLOps
+  Weaviate = tWide('weaviate-icon--crop-simplified.svg') // https://weaviate.io/img/site/weaviate-nav-logo-light.svg // original had base64 png-s // simple orig was green https://github.com/weaviate/weaviate
+  Chroma = tWide('chroma.svg') // https://github.com/chroma-core/chroma /* the AI-native open-source embedding database; www.trychroma.com */
+  Milvus = tWide('milvus-icon.svg') // https://milvus.io/
+  Qdrant = tNarrow('qdrant-icon.svg') // https://qdrant.tech/ ; from Luis Lopez CommerceHub
+  Pinecone = tNarrow('pinecone-icon.svg')
+  Vespa = tNarrow('vespa-icon.svg')
+  LlamaIndex = tNarrow('llamaindex-icon2-gradient.svg') // AKA gpt-index
+  "Apache Cassandra" = tWide('cassandra-icon.svg') // also vector DB according to https://en.wikipedia.org/wiki/Vector_database#cite_note-7
+  /// TODO next to elastic, algolia
+
+  // =====
+
+  // TODO: CockroachDB
+  tRPC = t('trpc-icon.svg') // end-to-end typescript typesafe; powered by Vercel. https://trpc.io/media (RIGHT CLICK on logo! I'm impressed :D)
+  Zod = tWide('zod-no-shadow.svg')
+  "Microsoft Azure" = t('microsoft-azure')
+  AWS = tWide()
+  'AWS Amplify' = tWide('aws-amplify.svg')
+
+  // FIXME: companies:
+  Amazon = tWide('Amazon.svg')
+
+  CollabNet = tNoIcon()
+  ALM = tNoIcon()
+  NXP = tNoIcon()
+  Ericsson = tNoIcon()
+  // TODO: CLoudFlare - has its own databases, D1, on the edge
+}
+
+export class Monitoring_and_observability {
+  Grafana = tNarrow()
+  'Datadog' = t('datadog-icon')
+  'Dynatrace' = t('dynatrace-icon')
+  'Sentry' = tWide('sentry-icon.svg')
+  OpenTelemetry = t('opentelemetry-icon.svg')
+  Langfuse = tNoIcon() // LLM observability & tracing platform
+}
+
+// TODO: business intelligence / analytics - metabase, apache superset
+
+// TODO: ai -> vector_databases
+
+export class Databases {
+  Databases = tSquare('generic/fontawesome/database.svg')
+  "8base" = t('8base-icon') // like Hasura; "Create custom JavaScript and TypeScript logic and run as 8base Serverless Functions."
+  Prisma = tWide() /* "Next-generation Node.js and TypeScript ORM" */
+  MongoDB = tWide('mongodb-icon.svg')
+  DynamoDB = tSquare('aws-dynamodb.svg')
+  ArangoDB = tWide('arangodb-icon.svg') /* native multi-model database with flexible data models for documents, graphs, and key-values. Build high performance applications using a convenient SQL-like query language or JavaScript extensions. */
+  Mongoose = tNoIcon()
+  // TODO
+  NoSQL = tNoIcon()
+  SQL = tNoIcon()
+  PostgreSQL = t() // it's also a data framework
+  MySQL = t('mysql-icon.svg')
+  MariaDB = t('mariadb-icon.svg')
+  Oracle = tWide('oracle-icon.svg')
+  IndexedDB = tNoIcon()
+  SurrealDB = t('surrealdb-icon.svg') // Multi-modal. ACID transactions, while scaling horizontally. Feels like SQL, but uses arrows to connect nodes and edges
+  Xata = t('xata-icon') // Postgres + Elastic. Feels like a developer-friendly alternative to Notion or AirTable. Treats your data like a spreadsheet.
+  Dgraph = tNarrow('dgraph-icon-no-gradient.svg')
+  Fauna = t('fauna-icon') /* document db that supports joins; custom query language called FQL; closed-source */
+  RethinkDB = tWide('rethinkdb')
+  "RxDB" = tNarrow('rxdb-icon') /* A fast, offline-first, reactive database for JavaScript Applications */
+  // TODO: sqlite
+  // EdgeDB - Graph-Relational; types not tables; eliminates need for joins
+}
+
+export class Version_Control {
+  Git = t({
+    logo: 'git-icon.svg',
+    subTopics: {
+      Rebase: {},
+      Submodules: {},
+      Bisect: {},
+    }
+  })
+  GitHub = t({
+    logo: 'github-icon',
+    categories: 'ProjectManagementTools' /* secondary categories */,
+  })
+  GitLab = t({
+    logo: 'gitlab-icon.svg',
+    categories: 'ProjectManagementTools' /* secondary categories */,
+  })
+  'Gerrit' = tNoIcon()
+  Subversion = t()
+  'Plastic SCM' = t()
+
+}
+
+
+/*
+* Tech topics.
+*
+* Grouping (pick the right granularity based on count) :
+*/
+export class Other {
+  'Mailgun' = t('mailgun-icon.svg')
+  'reCAPTCHA' = t('recaptcha-icon.svg') // TODO: crop icon only
+  'AudioSalad' = t(`audiosalad-traced.svg`)
+  'WorldFirst' = tNoIcon()
+  'Payoneer' = tWide()
+  'PayPal' = t()
+  'TransferWise' = tNoIcon()
+  'Axios' = tNoIcon()
+  // === Social platforms, comprehension, investors:
+  'Discord' = tWide(`discord-icon.svg`)
+  'Y Combinator' = tWide(`ycombinator.svg`)
+  'Sequoia Capital' = tNarrow(`sequoia-capital-icon.svg`)
+  'Wikipedia' = tWide(`generic/fun/wikipedia-w2.svg`)
+  'Google Play' = t('google-play-icon')
+  'WordPress' = t('wordpress-icon.svg')
+  '.NET' = tSquare('dotnet.svg'/*, 'https://github.com/dotnet/brand/blob/main/logo/dotnet-logo.svg'*/)
+  'Blazor' = tWide('blazor2.svg', /*['https://worldvectorlogo.com/logo/blazor', 'https://dotnet.microsoft.com/apps/aspnet/web-apps/blazor']*/)
+  // 'NET.smth' = t('dotnet.svg') // for testing dot
+  // 'test' = t('dotnet.svg')
+
+  ReactiveX = t()
+  Airtable = tWide()
+  Notion = t('notion-icon-no-text.svg')
+  Coda = t('coda-icon.svg')
+  Observable = t('observablehq.svg') // "Collaborative data platform and canvas"; "Explore, analyze and explain data. As a team."
+  Carbide = t('carbide.svg')
+  Replit = tNarrow('replit-icon.svg') /* highlights: social coding; computation token currency; AI-assisted IDE (Ghostwriter) */
+  "Ghostwriter" = tNarrow('ghostwriter-icon-cropped.svg') /* #AI #IDE */
+  "Cursor.sh" = tNarrow('cursor-icon.svg') /* for Alvarito  :) */
+  "Rift" = tWide('rift-icon.svg') /* #AI #VScode*/
+  Zapier = t('zapier-icon')
+  IFTTT = tWide('ifttt.svg')
+  // ======== LowCode / NoCode / CMS:
+  Shopify = tNarrow()
+  PrestaShop = tNarrow('prestashop-icon.svg')
+  WebFlow = t('webflow-mark-vector-blue.svg') /* https://brand-at.webflow.io/resources#logos */
+  Wix = tWide()
+  'Vercel V0' = tWide('vercel-v0-icon.svg')
+  'Builder.io' = tNarrow('builder-io-icon.svg')
+  'Budibase' = tSquare('budibase-icon.svg')
+  'Bubble' = t('bubble-icon') /** is a **visual programming language**, a no-code development platform and an application platform as a service, developed by Bubble Group, that enables non-technical people to build web applications without needing to type code */
+  'Framer' = t()
+  'AFFiNE' = tWide('affine-icon.svg')
+  'Metabase' = tSquare('metabase.svg')
+  'Apache Superset' = tWide('apache-superset-icon.svg')
+  'ClickHouse' = tWide('clickhouse-icon.svg')
+  'Apache Spark' = tNarrow('apache-spark-icon.svg')
+  'Odoo' = tSquare('odoo-icon.svg')
+  'Mattermost' = tSquare('mattermost-icon.svg') /* Mattermost is an open source platform for secure collaboration across the entire software development lifecycle.. ;;; like open-source slack? */
+  'n8n' = tWide('n8n-icon.svg')
+
+
+  RegExp = t('_icon_hammer-solid.svg')
+  'Java Swing' = t('java')
+  'Google Maps' = tNarrow('google-maps.svg')
+  'Mapbox' = t('mapbox-icon.svg')
+  Guice = tNoIcon()
+  SOAP = tNoIcon()
+  XML = tNoIcon()
+  'XML Schema' = tNoIcon()
+  BiPRO = tNoIcon()
+  DDEX = tNoIcon()
+  PDF = tNoIcon()
+  iText = tNoIcon()
+  JAXB = tNoIcon()
+  'Customer Support' = t('user-solid.svg')
+  'Agile' = t('project-diagram-solid.svg')
+  'Scrum' = t('project-diagram-solid.svg')
+  'ALM' = t('project-diagram-solid.svg') // FIXME alias/shortname used in tags in collabnet experience
+  'ALM - Application Lifecycle Management' = t('project-diagram-solid.svg')
+  'Algorithms' = t('project-diagram-solid.svg')
+  'Data Structures' = t('project-diagram-solid.svg')
+  'OOP - Object Oriented Programming' = t('project-diagram-solid.svg')
+  'SOLID Principles' = t('project-diagram-solid.svg')
+  'Hexagonal Architecture' = t('generic/hexagon-svgrepo-com.svg')
+  'API Design' = t('project-diagram-solid.svg')
+  'Library Design' = t('project-diagram-solid.svg')
+  'FP - Functional Programming' = t('project-diagram-solid.svg')
+  'AOP - Aspect-Oriented Programming' = t('project-diagram-solid.svg')
+  'Design Patterns' = t('project-diagram-solid.svg')
+  'Software Architecture' = t('project-diagram-solid.svg')
+  // TODO: UML
+  'Refactoring' = t('_icon_hammer-solid.svg')
+  'Code Review' = t('project-diagram-solid.svg')
+  'TDD - Test-Driven Development' = t('project-diagram-solid.svg')
+  'BDD - Behavior-Driven Development' = t('project-diagram-solid.svg')
+  'DSL - Domain-Specific Languages' = t('project-diagram-solid.svg')
+  'Antipatterns' = t('project-diagram-solid.svg')
+  'Making Presentations' = t('project-diagram-solid.svg')
+  'Leadership' = t('project-diagram-solid.svg')
+  'Lead' = t('project-diagram-solid.svg') // FIXME better icon
+  'Staff Engineer' = t('project-diagram-solid.svg')
+  'Performance Optimization' = t('project-diagram-solid.svg')
+  'Performance Profiling' = t('project-diagram-solid.svg')
+  'UX - User Experience' = t('project-diagram-solid.svg')
+  'Troubleshooting' = t('project-diagram-solid.svg')
+  'Graphic Design' = t('project-diagram-solid.svg')
+  'Testing' = t('project-diagram-solid.svg')
+  // TODO: google docs
+}
+
+/** crypto / blockchain / decentralized */
+export class Crypto {
+  Bitcoin = t()
+  Ethereum = t()
+  "Basic Attention Token (BAT)" = tWide('brave_basic_attention_token_logo.svg')
+  Solidity = t()
+  "Web3" = t()
+  "web3.js" = t('web3js')
+  "ethers.js" = tWide('ethers.svg')
+  "Solid" = tWide() // https://solidproject.org/ (re-decentralizing the web)
+}
+
+
+/** AI / Machine Learning ML */
+export class AI {
+  "Artificial Intelligence" = tSquare('generic/ai.svg')
+  "LLM" = tSquare('generic/ai.svg' /*TODO*/)
+  "C3 AI" = tWide('c3-ai.svg')
+  "LangChain" = tWide('langchain.svg')
+  "AutoGen" = tWide('autogen-icon.svg')
+  "Microsoft Bing" = tNarrow('bing.svg')
+  "Microsoft Copilot" = tNarrow('microsoft-copilot-icon.svg')
+  "GitHub Copilot" = tWide('github-copilot.svg')
+  "Tabnine" = tNarrow('tabnine-icon.svg')
+  // "JetBrains AI Assistant"
+  // TODO: CodeGPT / https://www.codegpt.co/#start
+  // TODO: AskCodi /  https://www.askcodi.com/
+  "CodiumAI" = tWide('codium-icon.svg' /* from svgporn */)
+  "Safurai" = tWide('safurai-icon.svg')
+  "Sourcegraph" = tWide('sourcegraph.svg')
+  "Cody AI" = tWide('cody-icon.svg')
+  "Continue" = tWide('continue-icon.svg')
+  "MetaMage" = tNarrow('metamage-icon.svg')
+  "All Hands AI" = tNarrow('all-hands-ai-icon.svg')
+  // "TabbyML" = tNarrow('OFF' + 'tabbyml-icon.svg')
+  "OpenAI Codex" = tNarrow('openai-codex')
+  OpenAI = t('openai-icon')
+  "Magic.dev" = tWide('magic.dev.svg') // Magic is working on frontier-scale code models to build a coworker, not just a copilot.
+  xAI = t('x.ai.svg')
+  "xAI Grok" = t('grok-icon.svg')
+  // Hardware / futurism / robots / self-driving:
+  'Apple' = tNarrow('apple.svg')
+  'Tesla' = tWide('tesla-icon.svg')
+  'Neuralink' = tWide('neuralink-icon.svg')
+  'Limitless AI' = tSquare('limitless-ai-icon.svg')
+  '1X Technologies' = tWide('1x-technologies.svg') // https://www.1x.tech/ // autonomous robots; "Founded in Norway."
+  'Boston Dynamics' = tNarrow('boston-dynamics.svg')
+  'Stanford University' = tNarrow('stanford-university-icon.svg') // https://mobile-aloha.github.io/
+
+  'Home Assistant' = tWide('home-assistant-icon.svg') // iot / hardware / smart home
+
+  'Phind' = tWide('phind.svg')
+  'Amazon Q' = tNarrow('amazon-q.svg')
+  'Amazon CodeWhisperer' = tSquare('Arch_Amazon-CodeWhisperer_16.svg')
+  'Amazon Bedrock' = tSquare('Arch_Amazon-Bedrock_16.svg')
+  'Amazon SageMaker' = tSquare('Arch_Amazon-SageMaker_16.svg')
+  'Amazon Lex' = tSquare('Arch_Amazon-Lex_16.svg')
+  'Amazon Comprehend' = tSquare('Arch_Amazon-Comprehend_16.svg') // Gewinnen Sie wertvolle Einblicke und Erkenntnisse aus Ihren Textdokumenten
+  'Amazon Kendra' = tSquare('Arch_Amazon-Kendra_16.svg')
+  'Perplexity.ai' = tNarrow('perplexity-ai.svg')
+  'Hume AI' = tWide('hume-ai-icon.svg', /*{slogan: "Empathic AI to serve human well-being"} "EMPATHIC VOICE INTERFACE (EVI)"*/)
+  'Quora Poe' = tWide('quora-poe.svg')
+  'Open Assistant' = tWide('open-assistant-icon-wide.svg') // https://github.com/LAION-AI/Open-Assistant
+  'Google Bard' = tSquare('Google_Bard_logo.svg')
+  'Google Gemini' = tSquare('google-gemini-icon.svg')
+  'Google DeepMind' = tSquare('google-deepmind-icon.svg')
+  'Google Vertex AI' = tNarrow('vertexai.svg') // MLOps
+  'Meta' = tWide('meta-icon.svg')
+  'Anthropic' = tWide('anthropic-icon.svg')
+  'Claude' = tNarrow('claude-icon.svg')
+  'AI21 Labs' = tWide('ai21.svg')
+  'Mistral AI' = tWide('mistral-ai-icon.svg')
+  'Qwen' = tNarrow('qwen-icon.svg')
+  'Aleph Alpha' = tNarrow('aleph-alpha-icon.svg')
+  'DeepSeek' = tWide('deepseek-icon.svg')
+  'LAION' = t()
+  'Ollama' = tNarrow('ollama.svg')
+  Gradio = tWide('gradio-icon.svg')
+  Streamlit = tWide('streamlit.svg')
+  MLflow = tWide('mlflow-icon.svg')
+  RAGFlow = tNarrow('ragflow-icon.svg')
+  AnythingLLM = tWide('anything-llm-icon.svg')
+  Quivr = tWide('quivr-icon.svg')
+  v7 = tWide('v7.svg') // https://www.v7labs.com/
+  Botpress = tSquare('botpress-icon.svg')
+
+  // ====== RAG tooling: no dedicated icon sourced yet, so rendered as text-only chips (tNoIcon)
+  // rather than a fabricated/incorrect logo. Added for the "2026 RAG Tech Stack" infographic.
+  Ragas = tNoIcon() // RAG answer/retrieval-quality evaluation framework
+  LangSmith = tNoIcon() // LangChain's tracing & evaluation platform
+  TruLens = tNoIcon() // LLM app evaluation & tracing
+  DeepEval = tNoIcon() // open-source LLM evaluation framework
+  CrewAI = tNoIcon() // multi-agent orchestration framework
+  Haystack = tNoIcon() // deepset's RAG/search orchestration framework
+  DSPy = tNoIcon() // Stanford's declarative LLM pipeline framework
+  'Voyage AI' = tNoIcon() // embedding models (acquired by MongoDB)
+  BGE = tNoIcon() // BAAI General Embedding models
+  'Unstructured.io' = tNoIcon() // document/data extraction for LLM pipelines
+  LlamaParse = tNoIcon() // LlamaIndex's document parsing service
+  Docling = tNoIcon() // IBM's document conversion toolkit
+  PyMuPDF = tNoIcon() // Python PDF extraction library
+  Firecrawl = tNoIcon() // web scraping/crawling for LLM pipelines
+  Mem0 = tNoIcon() // long-term memory layer for AI agents
+  Zep = tNoIcon() // memory/context store for AI agents
+  LangGraph = tNoIcon() // LangChain's agent/state-graph orchestration
+  'Guardrails AI' = tNoIcon() // output validation/guardrails framework
+  'NeMo Guardrails' = tNoIcon() // NVIDIA's LLM guardrails toolkit
+
+  'Stable Diffusion' = tWide('stable-diffusion-logo-vectorizer.ai.svg') // not official?
+  'Midjourney' = tWide('midjourney.svg')
+  'Runway' = tSquare('runwayml-icon.svg')
+  'Stability AI' = tSquare('stability-ai-icon.svg' /* by vectorizer.ai */) // https://www.linkedin.com/company/stability-ai/
+  'Google Colaboratory' = tWide('google-colab-icon-wide.svg')
+  TensorFlow = t()
+  NumPy = t()
+  'Hugging Face' = tWide('hugging-face-icon.svg')
+  'Cohere' = tSquare('cohere-icon.svg')
+  "Weights & Biases" = tSquare('weights-and-biases-icon.svg')
+  "Open Neural Network Exchange" = t('onnxai-icon.svg') /* ONNX  acronym; */ // https://www.vectorlogo.zone/logos/onnxai/index.html
+  "Google JAX" = tWide('Google_JAX_logo.svg') // https://jax.readthedocs.io/en/latest/
+  Jupyter = tWide('jupyter-icon2')
+  "Conda" = tNarrow('conda-icon.svg')
+  "Anaconda" = tNarrow('anaconda-icon.svg')
+  "JetBrains DataLore" = t('jetbrains-datalore-icon.svg')
+  "JetBrains AI Assistant" = tSquare('jetbrains-ai-assistant-icon.svg')
+  Polars = tWide('polars-icon.svg') // Rust
+  PyTorch = tWide('pytorch-icon')
+  pandas = tNarrow('pandas-icon.svg')
+  Keras = t/*Wide*/('keras.svg'/*{
+    https://github.com/valohai/ml-logos/blob/master/keras.svg
+    logo: 'keras-logo-2018-large-1200.png',
+    logoSize: [1200, 348],
+    logoSmallIcon: 'keras-logo-small.jpg',
+  }*/)
+  // TODO Add https://github.com/modelcontextprotocol icon
+}
+
+export class AI_Hardware {
+  NVIDIA = tWide('nvidia-icon.svg')
+  Groq = tNarrow('groq-icon.svg')
+}
+
+
+export class Build_Systems_And_Package_Managers {
+  Gradle = t()
+  Maven = tWide('maven_OFF')
+  Yarn = t()
+  NPM = tWide()
+  Bazel = t(`bazel-icon.svg`)
+}
+
+export class FunAndSports {
+  Volleyball = t(`generic/fun/volleyball-ball-solid.svg`) /* TODO FIVB logo - cool*/ /* TODO: beach volleyball icon - net on the sand */
+  'Interpersonal Networking' = tWide('generic/users-solid-cropped.svg')
+  'Hiking' = t('generic/fun/hiking-solid')
+  Outdoors = tWide('generic/fun/cloud-sun-solid-cropped.svg')
+  Nature = t('generic/fun/tree-solid.svg')
+  'Car trips' = tWide('generic/fun/car-solid-cropped.svg')
+  'Karate' = tWide('generic/sports/karate.svg')
+  'Bicycle' = tWide('generic/fun/bicycle-solid-cropped.svg')
+  'Table Tennis' = t('generic/fun/table-tennis-solid.svg') /* search terms: ping pong */
+  Padel = t('generic/fun/tennis-ball-svgrepo-com.svg')/* search terms: paddle paddel */
+  Swimming = tWide('generic/fun/swimmer-solid-karol.svg')
+  Chess = t('generic/fun/chess-solid.svg')
+  "Game of Life" = tWide({
+    logo: 'generic/game-of-life.svg', // hacker symbol, emergence
+  })
+  "Mandelbrot Set" = tWide({
+    logo: 'generic/math/mandelbrot-set.svg',
+    attribution: "Mandelbrot Fractal by Christian Frost from Noun Project (CC BY 3.0)",
+    author: "Christian Frost",
+    downloadedFrom: "Noun Project",
+    license: "CC BY 3.0",
+    url: "https://thenounproject.com/icon/mandelbrot-fractal-103125/",
+  })
+  "Euler's identity" = tSquare('generic/math/eulers-identity.svg')
+  "ℵω" = tWide('generic/math/ℵω.svg') // TODO: make square
+  "All-Seeing Eye" = tSquare('generic/mind/all-seeing-eye.svg')
+  "🕉" = tWide('generic/mind/🕉.svg')
+  "Judaism" = tWide('generic/mind/judaism.svg')
+  "Yin and Yang" = tSquare('generic/mind/yin-yang.svg')
+  "Eye of Horus" = tWide('generic/mind/eye-of-horus-svgrepo-com.svg')
+  "Sirius Disclosure" = tWide('generic/mind/sirius-disclosure.svg')
+  'Triskelion' = t('generic/fun/triskelion-2024-2-no-stroke.svg')
+  'Business' = t('generic/business--chart-line-square.svg')
+  'Psychology' = tWide('generic/brain-solid-cropped.svg') // & neuroscience
+  'Ѱ' = tNarrow('generic/mind/Ѱ.svg') // & neuroscience
+  'Ѱƛ⍹' = tWide('generic/mind/Ѱƛ⍹.svg')
+  'ΜΔΜΑ' = tWide('generic/mind/ΜΔΜΑ.svg')
+  'The_Spirit_Molecule' = tWide('generic/mind/The_Spirit_Molecule.svg')
+  'Guitar' = t('generic/fun/heavy-metal-sharpen-guitar-like-an-insect-svgrepo-com.svg')
+  'ASG' = t('generic/fun/gun.svg')
+}
+
+export class Social /* and media platforms AndMediaPlatforms */ {
+  'YouTube' = tWide('youtube-icon.svg')
+  'Vimeo' = tWide('vimeo-icon.svg')
+  'Twitch' = tNarrow('twitch.svg') // also live coding
+  'Spotify' = tNarrow('spotify-icon.svg') // also podcasts
+  'Meetup' = tWide(`meetup-seeklogo.com.svg`)
+  'LinkedIn' = t('linkedin-icon')
+  'Mastodon' = tNarrow('mastodon-icon')
+  'Threads' = tNarrow('threads-icon.svg')
+  'x.com' = tNarrow('threads-icon.svg')
+}
+
+
+export class Roles /* and responsibilities and posts */ {
+  'Lead developer' = tNoIcon()
+  'Developer' = tNoIcon()
+  'Team Lead' = tNoIcon()
+  'Tech Lead' = tNoIcon()
+  'CEO' = tNoIcon()
+  'CTO' = tNoIcon()
+  'Staff Engineer' = tNoIcon()
+  'Director of Operations' = tNoIcon()
+  'Senior Principal Engineer' = tNoIcon()
+}
+
+export class Organizations /* and companies and clients */ {
+  // get name() {
+  //   return 'Companies'
+  // }
+  // get subtitle() {
+  //   return 'and companies and clients'
+  // }
+
+  InnoTopic = tNarrow('InnoTopic.svg')
+
+  Intel = tNoIcon()
+
+  EuroStat = tWide('countries/eu.svg')
+  "European Union" = tWide('countries/eu.svg')
+  "TopicFriends" = tNoIcon() // FIXME icon
+}
+
+
+export class Natural_Languages /* and responsibilities and posts */ {
+  // TODO: generate from descriptors; or this be the main descriptors
+  'English' = tWide('countries/gb.svg')
+  'Polish' = tWide('countries/pl.svg')
+  'Spanish' = tWide('countries/es.svg')
+  'German' = tWide('countries/de.svg') // TODO: ['at-at, 'de-de', 'de-ch'] multi-icon
+  'French' = tWide('countries/fr.svg')
+  'Portuguese' = tWide('countries/pt.svg')
+  'Russian' = tWide('countries/ru.svg')
+  'Italian' = tWide('countries/it.svg')
+  'Catalan' = tWide('countries/es-ct.svg')
+}
+
+export function processTopics<T extends Object>(inputTopics: T/*: Topics*/): T {
+  // inputTopics = setIdsFromKeys(inputTopics, 'name')
+  for (let topicKey of Object.getOwnPropertyNames(inputTopics)) {
+    if ( inputTopics.hasOwnProperty(topicKey) ) {
+      // console.log('transformTopics', topicKey)
+      let topic: Topic = (inputTopics as any)[topicKey] as Topic
+      if ( ! topic ) {
+        topic = new Topic(topicKey)
+      }
+      ;(inputTopics as any)[topicKey] = topic
+      topic.setNameAndLogoAndId(topicKey) // TODO ; or setNameAndIdAndIcon
+      topic.sealAndValidate() // finalise / solidify
+    }
+  }
+  return inputTopics
+}
+
+export type Topics =
+  Comprehension_Comparators_Security_And_Exploring &
+  Frontend & Frontend_Visual & Frontend_And_Backend_App_Platforms &
+  Graphics &
+  Backend & Other & Testing & Tools & Languages & OS & Mobile & Cloud &
+  Project_Management_Tools & Version_Control & Databases &
+  Monitoring_and_observability &
+  Java & JavaScript & Build_Systems_And_Package_Managers &
+  AI & AI_Hardware &
+  Crypto & FunAndSports & Social &
+  Roles & Natural_Languages & Organizations
+
+function mergeTopics<T1, T2, T3, T4, T5>(t1: T1, t2: T2, t3: T3, t4: T4, t5?: T5) {
+  return Object.assign({}, Object.create(t1 as any), Object.create(t2 as any), Object.create(t3 as any), Object.create(t4 as any), Object.create(t5 as any));
+}
+
+function processCategory(cat: TopicCategory): TopicCategory {
+  // let catName = cat.constructor.name;
+  let catName = cat.name;
+  // (cat as any).name = catName
+  let catTopics = cat.topicsById;
+  Object.keys(catTopics).forEach(key => {
+    // console.log('processing category key', key)
+    // if ( key !== 'name' ) {
+    let topic = catTopics[key];
+    topic.category = catName
+    // }
+  });
+  cat.topicsArray = getDictionaryValuesAsArray(cat.topicsById)
+  return cat
+}
+
+/** Note: names are specified as strings, because in ng prod build, class names are lost */
+export const topicCategoriesArray = [
+  new TopicCategory('Comparators', new Comprehension_Comparators_Security_And_Exploring()),
+  new TopicCategory('Frontend', new Frontend()),
+  new TopicCategory('Frontend - Visual', new Frontend_Visual()),
+  new TopicCategory('Backend', new Backend()),
+  new TopicCategory('Frontend and backend app platforms', new Frontend_And_Backend_App_Platforms()),
+  new TopicCategory('Testing', new Testing()),
+  new TopicCategory('Tools', new Tools()),
+  new TopicCategory('Languages', new Languages()),
+  new TopicCategory('Databases', new Databases()),
+  new TopicCategory('Monitoring and observability', new Monitoring_and_observability()),
+  new TopicCategory('Version Control', new Version_Control()),
+  new TopicCategory('Project Management Tools', new Project_Management_Tools()),
+  new TopicCategory('Graphics', new Graphics()),
+  new TopicCategory('OS', new OS()),
+  new TopicCategory('Mobile', new Mobile()),
+  new TopicCategory('Cloud', new Cloud()),
+  new TopicCategory('Java', new Java),
+  new TopicCategory('JavaScript', new JavaScript()),
+  new TopicCategory('Build Systems and package managers', new Build_Systems_And_Package_Managers()),
+  new TopicCategory('AI', new AI()),
+  new TopicCategory('AI Hardware', new AI_Hardware()),
+  new TopicCategory('Other', new Other()),
+  new TopicCategory('Crypto', new Crypto()),
+  new TopicCategory('Fun and Sports', new FunAndSports()),
+  new TopicCategory('Social', new Social()),
+  new TopicCategory('Roles', new Roles()),
+  new TopicCategory('Organizations', new Organizations()),
+  new TopicCategory('Natural Languages', new Natural_Languages()),
+]
+
+export const topics: Topics = processTopics(
+  // mergeTopics(Frontend, Backend, Other, Testing, {})
+  // mergeTopics(new Frontend, Backend, Other, Testing, {})
+  Object.assign({}, ... topicCategoriesArray.map(cat => processCategory(cat).topicsById))
+)
+
+export const topicsArr = getDictionaryValuesAsArray(topics as { [p: string]: any })
+
+
+// FIXME: duplicate detector; write using o1 GPT

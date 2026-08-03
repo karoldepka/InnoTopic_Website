@@ -15,26 +15,6 @@
       <a routerLink="/theme-demo">Theme Preferences</a> page.
     </p>
 
-    <ion-grid>
-      <ion-row>
-        @for (preset of presets; track preset.name) {
-          <ion-col size="6" size-md="4" size-lg="3">
-            <button
-              type="button"
-              class="theme-preset-card"
-              [class.theme-preset-card--active]="activePresetName() === preset.name"
-              (click)="applyPreset(preset)"
-            >
-              <span class="theme-preset-swatch" [style.background]="preset.config.ion_background_color">
-                <span class="theme-preset-dot" [style.background]="preset.config.ion_color_primary"></span>
-                <span class="theme-preset-dot" [style.background]="preset.config.ion_color_secondary"></span>
-              </span>
-              <span class="theme-preset-name">{{ preset.name }}</span>
-              <span class="theme-preset-kind">{{ preset.kind }}</span>
-            </button>
-          </ion-col>
-        }
-      </ion-row>
-    </ion-grid>
+    <theme-selector></theme-selector>
   </div>
 </ion-content>

@@ -1,0 +1,94 @@
+:host {
+  display: block;
+}
+
+.field-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  margin-bottom: 16px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 0.85rem;
+}
+
+.field-label {
+  color: var(--ion-text-color, inherit);
+  opacity: 0.8;
+}
+
+input[type='color'] {
+  width: 48px;
+  height: 32px;
+  padding: 0;
+  border: 1px solid var(--ion-color-step-150, rgba(128, 128, 128, 0.3));
+  border-radius: 6px;
+  background: none;
+  cursor: pointer;
+}
+
+input[type='range'] {
+  width: 160px;
+}
+
+.corners-section {
+  margin-bottom: 16px;
+}
+
+.corners-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.lock-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: 1px solid var(--ion-color-step-150, rgba(128, 128, 128, 0.3));
+  border-radius: 6px;
+  background: none;
+  color: var(--ion-text-color, inherit);
+  cursor: pointer;
+  transition: background-color 0.15s ease-in-out, border-color 0.15s ease-in-out;
+}
+
+.lock-toggle:hover {
+  background: var(--ion-color-step-50, rgba(128, 128, 128, 0.08));
+}
+
+.lock-toggle[aria-pressed='true'] {
+  border-color: var(--ion-color-primary, #007bff);
+  color: var(--ion-color-primary, #007bff);
+}
+
+.corners-grid {
+  display: grid;
+  grid-template-columns: repeat(2, auto);
+  gap: 12px 20px;
+}
+
+.preview {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  padding: 16px;
+  border-radius: 8px;
+  background: var(--ion-color-step-50, rgba(128, 128, 128, 0.08));
+}
+
+.preview-label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  opacity: 0.7;
+  margin-right: 4px;
+}

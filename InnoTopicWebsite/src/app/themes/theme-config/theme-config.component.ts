@@ -1,70 +1,17 @@
-import {Component, OnInit} from '@angular/core';
-import {FormBuilder, FormGroup} from '@angular/forms';
-import {ReactiveFormsModule} from '@angular/forms';
-import {Store} from '@ngrx/store';
-import {Observable, take} from 'rxjs';
+import { Component, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
+import { HeaderComponent } from '../../header/header.component';
+import '@innotopic/theme-ui';
 
-import {ThemeConfigState} from "../../models/theme-config-state.model";
-import {updateThemeConfig} from "../../store/actions/theme-config-actions";
-import {IonicModule} from "@ionic/angular";
-import {HeaderComponent} from "../../header/header.component";
-import {TintedSwatchesComponent} from "../tinted-swatches/tinted-swatches.component";
-// import {testLibFunc} from "themes-lib";
-
+/**
+ * Thin wrapper around @innotopic/theme-ui's <theme-configurator> custom element - the color
+ * pickers/shadow sliders/live preview all live there now (see the "retire NgRx" decision).
+ */
 @Component({
   selector: 'app-theme-config',
   standalone: true,
-  imports: [
-    HeaderComponent,
-    IonicModule,
-    ReactiveFormsModule,
-    TintedSwatchesComponent,
-  ],
+  imports: [HeaderComponent],
   templateUrl: './theme-config.component.html',
-  styleUrls: ['./theme-config.component.scss'],
+  schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class ThemeConfigComponent implements OnInit {
-  themeConfigForm: FormGroup;
-
-  themeConfig$: Observable<ThemeConfigState>;
-
-  constructor(private fb: FormBuilder, private store: Store<{ themeConfig: ThemeConfigState }>) {
-    // testLibFunc()
-    this.themeConfigForm = this.fb.group({
-      ion_color_primary: '',
-      ion_color_secondary: '',
-      ion_background_color: '',
-      shadow_offset: '',
-      // shadow_offset_x: '',
-      // shadow_offset_y: '',
-      shadow_blur_radius: '',
-      shadow_opacity: '50',
-    });
-
-    this.themeConfig$ = this.store.select('themeConfig');
-  }
-
-  ngOnInit(): void {
-    this.themeConfig$.pipe(
-      take(1) // prevent endless loop
-    )
-      .subscribe((themeConfig) => {
-        this.themeConfigForm.patchValue(themeConfig);
-
-        // {
-        //   ion_color_primary: themeConfig.ion_color_primary,
-        //     ion_color_secondary: themeConfig.ion_color_secondary,
-        //   ion_background_color: themeConfig.ion_background_color,
-        //   shadow_offset_x: themeConfig.shadow_offset_x,
-        //   shadow_offset_y: themeConfig.shadow_offset_y,
-        //   shadow_blur_radius: themeConfig.shadow_blur_radius,
-        // }
-
-
-      });
-
-    this.themeConfigForm.valueChanges.subscribe((value) => {
-      this.store.dispatch(updateThemeConfig(value));
-    });
-  }
+export class ThemeConfigComponent {
 }

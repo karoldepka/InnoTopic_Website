@@ -201,6 +201,7 @@ export class Frontend {
   'Vue.js' = tWide({logo: 'vue'})
   'Nuxt' = tWide('nuxt-icon')
   'Hono' = tNarrow('hono.svg')
+  'Fly' = tWide('fly-icon.svg')
   'Fastify' = tWide('fastify-icon.svg')
   'Backbone.js' = tNarrow('backbone-icon.svg')
   'Gridsome' = t({logo: 'gridsome-icon.svg'})
@@ -756,6 +757,8 @@ export class Monitoring_and_observability {
   'Datadog' = t('datadog-icon')
   'Dynatrace' = t('dynatrace-icon')
   'Sentry' = tWide('sentry-icon.svg')
+  OpenTelemetry = t('opentelemetry-icon.svg')
+  Langfuse = tNoIcon() // LLM observability & tracing platform
 }
 
 // TODO: business intelligence / analytics - metabase, apache superset
@@ -1004,6 +1007,28 @@ export class AI {
   Quivr = tWide('quivr-icon.svg')
   v7 = tWide('v7.svg') // https://www.v7labs.com/
   Botpress = tSquare('botpress-icon.svg')
+
+  // ====== RAG tooling: no dedicated icon sourced yet, so rendered as text-only chips (tNoIcon)
+  // rather than a fabricated/incorrect logo. Added for the "2026 RAG Tech Stack" infographic.
+  Ragas = tNoIcon() // RAG answer/retrieval-quality evaluation framework
+  LangSmith = tNoIcon() // LangChain's tracing & evaluation platform
+  TruLens = tNoIcon() // LLM app evaluation & tracing
+  DeepEval = tNoIcon() // open-source LLM evaluation framework
+  CrewAI = tNoIcon() // multi-agent orchestration framework
+  Haystack = tNoIcon() // deepset's RAG/search orchestration framework
+  DSPy = tNoIcon() // Stanford's declarative LLM pipeline framework
+  'Voyage AI' = tNoIcon() // embedding models (acquired by MongoDB)
+  BGE = tNoIcon() // BAAI General Embedding models
+  'Unstructured.io' = tNoIcon() // document/data extraction for LLM pipelines
+  LlamaParse = tNoIcon() // LlamaIndex's document parsing service
+  Docling = tNoIcon() // IBM's document conversion toolkit
+  PyMuPDF = tNoIcon() // Python PDF extraction library
+  Firecrawl = tNoIcon() // web scraping/crawling for LLM pipelines
+  Mem0 = tNoIcon() // long-term memory layer for AI agents
+  Zep = tNoIcon() // memory/context store for AI agents
+  LangGraph = tNoIcon() // LangChain's agent/state-graph orchestration
+  'Guardrails AI' = tNoIcon() // output validation/guardrails framework
+  'NeMo Guardrails' = tNoIcon() // NVIDIA's LLM guardrails toolkit
 
   'Stable Diffusion' = tWide('stable-diffusion-logo-vectorizer.ai.svg') // not official?
   'Midjourney' = tWide('midjourney.svg')

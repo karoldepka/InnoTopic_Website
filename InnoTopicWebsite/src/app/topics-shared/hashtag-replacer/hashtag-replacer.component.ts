@@ -1,68 +1,28 @@
 import {
   ChangeDetectionStrategy,
   Component,
-  computed,
+  CUSTOM_ELEMENTS_SCHEMA,
   input,
 } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { TopicTagComponent } from '../topic-tag/topic-tag.component';
+import '@innotopic/topics-ui';
+
+// Re-exported for work-project.component.ts, which imports these directly from this file path
+// for its own auto-hashtag boundary-detection regex (not just via the component's template).
+export { splitIntoHashtagParts, HASHTAG_BODY_CHAR_CLASS } from '@innotopic/topics-ui';
+export type { HashtagTextPart } from '@innotopic/topics-ui';
 
 /**
- * Characters allowed inside a #hashtag body (after the leading char).
- * Single source of truth: also used by WorkProjectComponent's auto-hashtag boundary
- * detection, so both agree on what still counts as "part of the tag" (e.g. so that
- * "Gerrit" inside the plain-text word "Gerrit-based" is NOT mistaken for a tag boundary).
+ * Thin wrapper around @innotopic/topics-ui's <topic-hashtag-replacer> custom element (the
+ * Lit port of this same component - see that package for the actual #hashtag parsing logic,
+ * still the same splitIntoHashtagParts() extracted there for unit-testability).
  */
-export const HASHTAG_BODY_CHAR_CLASS = 'A-Za-z0-9_.+-'
-
-const HASHTAG_REGEX = new RegExp(`#([A-Za-z0-9_][${HASHTAG_BODY_CHAR_CLASS}]*[A-Za-z0-9_+]|[A-Za-z0-9_])`, 'g')
-
-export interface HashtagTextPart {
-  text: string;
-  isTag: boolean;
-  tagText?: string;
-}
-
-/** Extracted as a pure function so the parsing logic is unit-testable without spinning up Angular. */
-export function splitIntoHashtagParts(text: string): HashtagTextPart[] {
-  const parts: HashtagTextPart[] = [];
-  HASHTAG_REGEX.lastIndex = 0
-  let match: RegExpExecArray | null;
-  let lastIndex = 0;
-
-  while ((match = HASHTAG_REGEX.exec(text)) !== null) {
-    if (match.index > lastIndex) {
-      parts.push({ text: text.slice(lastIndex, match.index), isTag: false });
-    }
-    parts.push({ text: match[0], isTag: true, tagText: match[0] });
-    lastIndex = match.index + match[0].length;
-  }
-
-  if (lastIndex < text.length) {
-    parts.push({ text: text.slice(lastIndex), isTag: false });
-  }
-
-  return parts;
-}
-
 @Component({
   selector: 'app-hashtag-replacer',
   standalone: true,
-  imports: [CommonModule, TopicTagComponent],
-  template: `
-    @for (part of processedText(); track $index) {
-      @if (part.isTag) {
-        <app-topic-tag [tId]="part.tagText!.slice(1)" [inline]="true" />
-      } @else {
-        {{ part.text }}
-      }
-    }
-  `,
+  template: `<topic-hashtag-replacer [text]="text()"></topic-hashtag-replacer>`,
   changeDetection: ChangeDetectionStrategy.OnPush,
+  schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
 export class HashtagReplacerComponent {
-
   text = input('Test Hello #Angular and #Ionic™ ! ');
-
-  protected readonly processedText = computed(() => splitIntoHashtagParts(this.text() ?? ''));
 }

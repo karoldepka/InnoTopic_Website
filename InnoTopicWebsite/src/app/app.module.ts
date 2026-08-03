@@ -1,4 +1,4 @@
-import {inject, NgModule, provideAppInitializer} from '@angular/core';
+import {NgModule, provideAppInitializer} from '@angular/core';
 import {provideHttpClient} from '@angular/common/http';
 import { BrowserModule } from '@angular/platform-browser';
 import { RouteReuseStrategy } from '@angular/router';
@@ -8,31 +8,24 @@ import { IonicModule, IonicRouteStrategy } from '@ionic/angular';
 import { AppComponent } from './app.component';
 import { AppRoutingModule } from './app-routing.module';
 
-import {Store, StoreModule} from '@ngrx/store';
-import { EffectsModule } from '@ngrx/effects';
-import { ThemeConfigEffects } from './store/effects/theme-config.effects';
-import {initialState, themeConfigReducer} from "./store/reducers/theme-config-reducer";
-import {updateThemeConfig} from "./store/actions/theme-config-actions";
-import {STORE_DEVTOOLS_IMPORTS} from "./store/store-devtools.imports";
+import { injectThemeTokens, initThemeConfig } from '@innotopic/theme-ui';
+// @innotopic/theme-ui's custom elements (<theme-selector>/<theme-configurator>) are Stencil
+// dist-custom-elements output, which - unlike Lit's auto-registering @customElement - never
+// self-defines on import; the loader's defineCustomElements() is Stencil's own registration
+// step (same pattern this app already uses for @ionic/core/loader in main.ts).
+import { defineCustomElements } from '@innotopic/theme-ui/loader';
 
-
-function readStoredThemeConfig() {
-  const storageVal = localStorage.getItem('theme_config');
-
-  if (!storageVal) {
-    return initialState;
-  }
-
-  try {
-    return JSON.parse(storageVal);
-  } catch {
-    localStorage.removeItem('theme_config');
-    return initialState;
-  }
-}
-
-export function initializeThemeConfig(store: Store) {
-  store.dispatch(updateThemeConfig(readStoredThemeConfig()));
+/**
+ * @innotopic/theme-ui's store already loads persisted config from localStorage at creation
+ * time (module load) - this just registers the @property/transition tokens, applies the
+ * (already-loaded) state to the DOM's CSS vars, and defines the package's custom elements,
+ * once at startup. Replaces the old NgRx themeConfig slice + ThemeConfigEffects +
+ * APP_INITIALIZER dispatch - see the migration plan's "retire NgRx" decision.
+ */
+function initializeThemeConfig() {
+  injectThemeTokens();
+  initThemeConfig();
+  defineCustomElements(window);
 }
 
 @NgModule({
@@ -43,14 +36,11 @@ export function initializeThemeConfig(store: Store) {
     BrowserModule,
     IonicModule.forRoot(),
     AppRoutingModule,
-    StoreModule.forRoot({themeConfig: themeConfigReducer}),
-    EffectsModule.forRoot([ThemeConfigEffects]),
-    ...STORE_DEVTOOLS_IMPORTS,
   ],
   providers: [
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
     provideHttpClient(),
-    provideAppInitializer(() => initializeThemeConfig(inject(Store))),
+    provideAppInitializer(() => initializeThemeConfig()),
   ],
   bootstrap: [AppComponent],
 })

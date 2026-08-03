@@ -29,6 +29,12 @@ log.txt
 /out-tsc
 /bazel-out
 
+# packages/* are separately-built libs (Angular/Stencil) - their own compiled output shouldn't be
+# committed any more than the app's own top-level /dist above.
+packages/*/dist
+packages/*/loader
+packages/*/.stencil
+
 # Node
 /node_modules
 npm-debug.log

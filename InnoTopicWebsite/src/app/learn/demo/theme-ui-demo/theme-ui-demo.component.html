@@ -1,0 +1,62 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button mode="md" [defaultHref]="'/'"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Stencil Theme Demo</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <div class="theme-ui-demo-page">
+    <h1>@innotopic/theme-ui</h1>
+    <p class="intro">
+      The two custom elements below - <code>&lt;theme-selector&gt;</code> and
+      <code>&lt;theme-configurator&gt;</code> - are used directly here, with no Angular wrapper
+      in between. Both read and write the same theme store, so changes made in one show up
+      live in the other, and everywhere else on the site.
+    </p>
+
+    <section>
+      <h2>&lt;theme-selector&gt;</h2>
+      <p class="hint">Presets, including the Neumorphism and Neubrutalism corner/shadow looks.</p>
+      <theme-selector></theme-selector>
+    </section>
+
+    <section>
+      <h2>&lt;gradient-shadow&gt;</h2>
+      <p class="hint">
+        From <code>@innotopic/gradient-shadow-ui</code> - wraps any shape or text in a shadow
+        that sweeps from the primary to the secondary theme color. Change the theme above and
+        watch these shadows shift and animate along with it.
+      </p>
+      <div class="gradient-shadow-row">
+        <gradient-shadow class="gradient-shadow-text">Gradient Shadow</gradient-shadow>
+        <gradient-shadow [attr.angle]="45">
+          <div class="demo-shape demo-shape--circle"></div>
+        </gradient-shadow>
+        <gradient-shadow [attr.angle]="200" [attr.distance]="55" [attr.blur-radius]="8">
+          <div class="demo-shape demo-shape--square"></div>
+        </gradient-shadow>
+      </div>
+    </section>
+
+    <section>
+      <h2>&lt;animated-plasma&gt;</h2>
+      <p class="hint">
+        From <code>@innotopic/plasma-ui</code> - a WebGL demoscene-style plasma effect. Not
+        theme-driven, just a fun decorative background.
+      </p>
+      <animated-plasma class="plasma-demo" [attr.scale]="6" [attr.speed]="1"></animated-plasma>
+    </section>
+
+    <section>
+      <h2>&lt;theme-configurator&gt;</h2>
+      <p class="hint">
+        Freeform colors, shadow, and per-corner radius - lock the padlock to keep all four
+        corners in sync, or unlock it to set each corner independently.
+      </p>
+      <theme-configurator></theme-configurator>
+    </section>
+  </div>
+</ion-content>

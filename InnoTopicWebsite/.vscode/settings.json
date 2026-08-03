@@ -5,6 +5,9 @@
     "workbench.colorTheme": "Abyss",
     "deepscan.enable": true,
     "cSpell.words": [
-        "Multiplatform"
+        "Gridsome",
+        "Multiplatform",
+        "Ollama",
+        "Qwik"
     ]
 }

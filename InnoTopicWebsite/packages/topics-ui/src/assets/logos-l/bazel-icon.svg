@@ -1,0 +1,15 @@
+<svg fill="rgb(131,131,131)" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <style>
+    .regular{fill:rgb(210,210,210);} .dark-left{fill:rgb(176,176,176);} .dark-right{fill:rgb(157,157,157);} .light{fill:rgb(243,243,243);}
+  </style>
+
+  <path class="light"      d="M144 32 l112 112 -112 112 l-112 -112z"/>
+  <path class="regular"    d="M32 144 v112 l112 112 v-112z"/>
+
+  <path class="light"      d="M368 32  l112 112 -112 112 -112 -112z"/>
+  <path class="regular"    d="M480 144 v112 l-112 112 v-112z"/>
+
+  <path class="regular"    d="M256 144 l112 112 -112 112 -112 -112z"/>
+  <path class="dark-left"  d="M256 368 v112 l-112 -112  v-112z"/>
+  <path class="dark-right" d="M256 368 l112 -112 v112 l-112 112z"/>
+</svg>

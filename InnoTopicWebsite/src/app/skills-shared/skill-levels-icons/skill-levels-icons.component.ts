@@ -11,7 +11,6 @@ import {
   UserSkillLevelsHaveWant,
   UserSkillLevelsHaveWant2,
 } from '../../TopicFriendsShared3/skills/skills-core/user-skills';
-import { TopicInterest } from '../../topics-shared/topic-tag/topic-tag.component';
 
 export const skillsIconsSignal = {
   none: 'signal-solid-1',
