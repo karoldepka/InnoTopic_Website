@@ -54,9 +54,10 @@ test('clicking a tracked item in the time-tracking toolbar navigates to it', asy
   await expect(rows).not.toHaveCount(countBefore, {timeout: 20_000})
   const newRow = rows.last()
 
-  // Start time-tracking on the new node via its row's own play icon - this is what makes it
-  // appear in the time-tracking toolbar at all (TimeTrackingService.toolbarEntries$).
-  await newRow.locator('ion-icon[name="play"]').click()
+  // Start time-tracking on the new node via its row's own start icon - this is what makes it
+  // appear in the time-tracking toolbar at all (TimeTrackingService.toolbarEntries$). A custom
+  // SVG (record-circle-with-clock-cutout), not a named ionicon - selector matches on src instead.
+  await newRow.locator('ion-icon[src*="time-track-start"]').click()
   await expect(newRow.locator('ion-icon[name="pause"]')).toBeVisible({timeout: 10_000})
 
   // The toolbar renders its own separate app-time-tracking-cell instance for this entry (not the

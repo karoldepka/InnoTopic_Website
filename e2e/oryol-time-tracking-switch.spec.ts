@@ -40,7 +40,9 @@ test('Ctrl+Enter on a second item stops tracking the first and starts tracking t
   await expect(rowB.locator('ion-icon[name="pause"]')).toBeVisible({timeout: 10_000})
 
   // ---- A was switched off, not marked done ----
-  await expect(rowA.locator('ion-icon[name="play"]')).toBeVisible({timeout: 10_000})
+  // Start icon is a custom SVG (record-circle-with-clock-cutout), not a named ionicon - selector
+  // matches on src instead.
+  await expect(rowA.locator('ion-icon[src*="time-track-start"]')).toBeVisible({timeout: 10_000})
   await expect(rowA.locator('ion-icon[name="pause"]')).toHaveCount(0)
 
   // Clean up: stop tracking B (A is already stopped) - avoids leaving an actively-tracking
