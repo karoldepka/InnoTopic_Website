@@ -1,0 +1,82 @@
+
+<ion-button
+  *ngIf="side && isVisible(item$.val$ | async) && (! formControl.value || side.collapsedByDefault) && ! editorOpened && isDependencySatisfied()"
+  (click)="editorOpened = true; focusEditor()"
+  color="gray"
+  [ngClass]="{ answerBorder: side.id === answerDescr.id }"
+>
+  <app-side-icon
+    [side]="side"
+   />
+  &nbsp;
+
+  <!-- TODO: focus editor -->
+  <ion-note>{{side.title}}</ion-note>
+</ion-button>
+
+<div
+  class="expanded-editor"
+  style="margin: 3px"
+  *ngIf="side && isVisible(item$.val$ | async) && (editorOpened || (formControl.value && ! side.collapsedByDefault))"
+  (click)="focusEditor()"
+> <!-- https://github.com/tinymce/tinymce-angular/issues/130 -->
+
+  <div
+    style="
+      padding: 0.5rem;
+      border-radius: 6px 6px 0px 0px;
+      margin-bottom: 3px;
+      background-color: var(--apf-item-header-background)
+    "
+  >
+    <app-side-label
+      [side]="side"
+     />
+    <ion-button
+      *ngIf="side.id === answerDescr.id && showAiFillButton"
+      size="small"
+      fill="clear"
+      [disabled]="aiLoading"
+      (click)="fillWithAI(); $event.stopPropagation()"
+      title="Fill with AI"
+    >
+      <ion-spinner
+        *ngIf="aiLoading"
+        name="dots"
+       />
+      <span
+        *ngIf="! aiLoading"
+        style="font-size: 1.2rem"
+      >✨</span>
+    </ion-button>
+    <!--    <ion-button size="small">Reveal</ion-button>-->
+  </div>
+
+<!--
+  // TODO on text editors - tangible area background:
+  // &#45;&#45;background: var(&#45;&#45;ion-item-background, var(&#45;&#45;ion-background-color, #fff));
+-->
+
+  <app-rich-text-edit
+    *ngIf="! showRevealButton"
+    [viewSyncer]="viewSyncer"
+    [formControl1]="formControl"
+    [enableLinkPreview]="true"
+    [collection]="item$.odmService.className"
+    [itemRef]="item$"
+   />
+  <!-- This will prolly be refactored to OdmCell? -->
+
+  <app-quiz-answer-revealer
+    *ngIf="showRevealButton"
+    [formControl1]="formControl"
+   />
+
+</div>
+
+<app-voice-memo-field
+  *ngIf="showMic && side && isVisible(item$.val$ | async)"
+  [item$]="item$"
+  [fieldId]="side.id"
+  (transcriptReady)="onTranscriptReady($event)"
+></app-voice-memo-field>

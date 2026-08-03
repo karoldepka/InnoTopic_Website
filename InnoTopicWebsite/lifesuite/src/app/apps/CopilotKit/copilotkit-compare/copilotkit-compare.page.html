@@ -1,0 +1,18 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button mode="md" [defaultHref]="'/ai'"></ion-back-button>
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+    <ion-title>AI Copilot</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="copilot-compare-page">
+  <deep-chat
+    [connect]="deepChatCopilotConnect"
+    [introMessage]="deepChatIntroMessage"
+    [chatStyle]="deepChatChatStyle"
+    [messageStyles]="deepChatMessageStyles"
+  ></deep-chat>
+</ion-content>

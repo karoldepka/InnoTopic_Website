@@ -1,0 +1,68 @@
+
+<div *ngIf="item$ else noItem">
+
+
+  <app-breadcrumbs
+    *ngIf="! (itemVal$ | async)?.hideAncestorsInQuiz"
+    [item$]="item$"
+   />
+
+  <app-item-side-editor
+    [item$]="item$ !"
+    [side]="$safeNavigationMigration((itemVal$ ! | async) ?. getSideWithQuestionOrFirstNonEmpty())"
+    [showMic]="false"
+    [showAiFillButton]="false"
+   />
+
+  <div
+    #answers
+    style="border: 3px var(--answerBorderColor) solid; border-radius: 6px; padding: 6px"
+    *ngIf="(showHint$ | async) || (showAnswer$ | async)"
+  >
+    <ng-container
+      *ngIf="(showHint$ | async)"
+    >
+      <app-item-side-editor
+        *ngFor="let hintSide of getVisibleHintSides((itemVal$ | async), (showHint$ | async))"
+        [item$]="item$ !"
+        [side]="hintSide"
+        [showMic]="false"
+        [showAiFillButton]="false"
+       />
+    </ng-container>
+
+    <ng-container *ngFor="let answerSide of (itemVal$ | async) ?. getSidesWithAnswers()">
+      <!--      <hr>-->
+<!--      <app-side-label-->
+<!--        *ngIf="(showHint$ | async) && ! (showAnswer$ | async)"-->
+<!--        [side]="answerSide"-->
+<!--      ></app-side-label>-->
+
+      <app-item-side-editor
+        [item$]="item$ !"
+        [side]="answerSide"
+        [showRevealButton]="! (showAnswer$ | async)"
+        [showMic]="false"
+        [showAiFillButton]="false"
+       />
+
+    </ng-container>
+  </div>
+
+
+  <app-tree
+    *ngIf="(showAnswer$ | async) && (item$?.childrenList$ | async)?.length"
+    [rootItem]="item$!"
+  />
+
+<!--  <app-show-answer-and-rate-->
+<!--  ></app-show-answer-and-rate>-->
+
+</div>
+
+<ng-template #noItem>
+  <div style="margin: 1rem; display: flex; align-items: center; gap: 0.5rem">
+    {{ quizLoaded ? 'No quiz item' : 'Loading Quiz...' }}
+    <ion-button size="small" (click)="loadAll()">Load All</ion-button>
+  </div>
+</ng-template>

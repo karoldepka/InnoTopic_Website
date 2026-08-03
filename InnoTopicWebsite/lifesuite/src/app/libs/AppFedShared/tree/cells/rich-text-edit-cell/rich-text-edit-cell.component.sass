@@ -1,0 +1,29 @@
+// align-items: center, not the default stretch - app-voice-memo-field (the mic/playback button,
+// a sibling of the actual editor div below) used to stretch to match the editor's full height on
+// a multi-line field, pinning its own icon near the top instead of vertically centering next to
+// the editor - confirmed live on a tall "general" field.
+\:host
+  display: flex
+  align-items: center
+
+.rich-text-edit-cell
+  display: flex
+  align-items: center
+  flex: 1 1 auto
+  gap: 2px
+
+// app-voice-memo-field's own :host sets flex-grow: 1 unconditionally (needed where it's the only
+// flex participant in its row) - here it's a sibling of .rich-text-edit-cell (the actual editor),
+// which also grows, so without this override the two would split the row roughly evenly instead
+// of the editor getting the space and the mic/playback controls just their natural width.
+app-voice-memo-field
+  flex: 0 1 auto
+
+[contenteditable]
+  width: 100%
+  vertical-align: middle
+  padding-top: 4px // hack for centering text in contenteditable
+  padding-left: 3px // coz chrome focus border was making cursor and characters hard to see at leftmost pos
+
+//[contenteditable] *
+//  vertical-align: middle

@@ -1,0 +1,206 @@
+<div class="qa-workbench">
+  <section class="prompt-panel">
+    <div class="panel-heading">
+      <h1>{{ integrationTitle }}</h1>
+      <div class="heading-actions">
+        <ion-button id="impl-info-trigger" fill="clear" size="small" class="info-btn">
+          <ion-icon name="information-circle-outline" slot="icon-only"></ion-icon>
+        </ion-button>
+        <ion-popover trigger="impl-info-trigger" triggerAction="click" [dismissOnSelect]="true">
+          <ng-template>
+            <ion-list lines="none">
+              <ion-item>
+                <ion-label class="ion-text-wrap">
+                  <strong>{{ integrationTitle }}</strong><br>
+                  <small>{{ integrationSubtitle }}</small>
+                </ion-label>
+              </ion-item>
+            </ion-list>
+          </ng-template>
+        </ion-popover>
+      </div>
+    </div>
+
+    <label class="field-label" for="qa-topic">Topic</label>
+    <ion-textarea
+      id="qa-topic"
+      [value]="topic()"
+      rows="4"
+      autoGrow="true"
+      fill="outline"
+      placeholder="Rust interview questions"
+      (ionInput)="setTopic($any($event).detail.value)"
+    ></ion-textarea>
+
+    <div class="example-row" aria-label="Topic examples">
+      <ion-button fill="clear" size="small" (click)="setExampleTopic('Rust interview questions')">Rust</ion-button>
+      <ion-button fill="clear" size="small" (click)="setExampleTopic('Angular signals and RxJS')">Angular</ion-button>
+      <ion-button fill="clear" size="small" (click)="setExampleTopic('Postgres performance interview questions')">Postgres</ion-button>
+    </div>
+
+    <div class="action-row">
+      <ion-toggle
+        labelPlacement="end"
+        [checked]="webSearch()"
+        (ionChange)="setWebSearch($any($event).detail.checked)"
+      >Web search</ion-toggle>
+
+      <ion-button
+        [color]="gen.categoryLoading() ? 'danger' : 'primary'"
+        [disabled]="!gen.categoryLoading() && !topic().trim()"
+        (click)="gen.categoryLoading() ? stopCategories() : generateCategories()"
+      >
+        <ion-icon [name]="gen.categoryLoading() ? 'stop-circle-outline' : 'sparkles-outline'" slot="start"></ion-icon>
+        {{ gen.categoryLoading() ? 'Stop' : 'Step 1: Generate Categories' }}
+      </ion-button>
+    </div>
+
+    <div class="status-line" [class.error]="gen.categoryError()">
+      {{ gen.categoryError() || gen.categoryStatus() }}
+      <ion-button
+        *ngIf="lastDeletedTree()"
+        fill="clear"
+        size="small"
+        color="warning"
+        (click)="undoDelete()"
+      >
+        <ion-icon name="arrow-undo-outline" slot="start"></ion-icon>
+        Undo delete
+      </ion-button>
+    </div>
+
+    <div class="metrics-row">
+      <span>{{ gen.categoryCount() }} categories</span>
+      <span>{{ requestedQuestionCount() }} requested Q&A</span>
+      <span>{{ gen.existingCategories().length }} existing</span>
+      <span *ngIf="gen.modelName()">{{ gen.modelName() }}</span>
+    </div>
+  </section>
+
+  <section class="tree-panel">
+    <div class="panel-bar">
+      <h2>Categories</h2>
+      <ion-button fill="clear" size="small" (click)="addRootCategory()">
+        <ion-icon name="add-outline" slot="icon-only"></ion-icon>
+      </ion-button>
+    </div>
+
+    <div class="tree-table" *ngIf="categoryRows().length; else emptyTree">
+      <div class="tree-table-header" aria-hidden="true">
+        <span></span>
+        <span>Category</span>
+        <span></span>
+        <span class="col-qcount">Q&amp;A&nbsp;#</span>
+        <span></span>
+        <span></span>
+      </div>
+      <div
+        class="category-row"
+        *ngFor="let row of categoryRows(); trackBy: trackCategoryRow"
+        [style.padding-left]="nodeIndent(row.depth)"
+      >
+        <ion-button
+          fill="clear"
+          size="small"
+          class="collapse-btn"
+          [class.invisible]="!row.hasChildren"
+          [attr.aria-label]="isCategoryCollapsed(row.node.id) ? 'Expand ' + row.node.title : 'Collapse ' + row.node.title"
+          (click)="toggleCategoryCollapsed(row.node.id)"
+        >
+          <ion-icon [name]="isCategoryCollapsed(row.node.id) ? 'chevron-forward-outline' : 'chevron-down-outline'" slot="icon-only"></ion-icon>
+        </ion-button>
+
+        <input
+          class="category-title"
+          [value]="row.node.title"
+          [attr.aria-label]="'Category title ' + row.path"
+          (input)="renameCategory(row.node.id, $any($event.target).value)"
+        />
+
+        <span
+          class="existing-chip"
+          *ngIf="row.node.isExistingCategory || row.node.matchedExistingCategoryId"
+          [title]="row.node.matchedExistingCategoryTitle || row.node.matchedExistingCategoryId || ''"
+        >existing</span>
+
+        <input
+          class="question-count"
+          type="number"
+          min="0"
+          max="50"
+          [value]="row.node.questionCount"
+          [attr.aria-label]="'Question count for ' + row.path"
+          (input)="changeQuestionCount(row.node.id, $any($event.target).value)"
+        />
+
+        <ion-button fill="clear" size="small" [attr.aria-label]="'Add child to ' + row.path" (click)="addChildCategory(row.node.id)">
+          <ion-icon name="add-outline" slot="icon-only"></ion-icon>
+        </ion-button>
+        <ion-button fill="clear" color="danger" size="small" [attr.aria-label]="'Delete ' + row.path" (click)="deleteCategory(row.node.id)">
+          <ion-icon name="trash-outline" slot="icon-only"></ion-icon>
+        </ion-button>
+      </div>
+    </div>
+
+    <ng-template #emptyTree>
+      <div class="empty-state">No categories yet.</div>
+    </ng-template>
+
+    <div class="footer-row">
+      <ion-button
+        [color]="gen.questionLoading() ? 'danger' : 'secondary'"
+        [disabled]="!gen.questionLoading() && (!gen.tree().length || requestedQuestionCount() === 0)"
+        (click)="gen.questionLoading() ? stopQuestions() : generateQuestions()"
+      >
+        <ion-icon [name]="gen.questionLoading() ? 'stop-circle-outline' : 'checkmark-outline'" slot="start"></ion-icon>
+        {{ gen.questionLoading() ? 'Stop' : 'Generate Q&A' }}
+      </ion-button>
+    </div>
+  </section>
+
+  <section class="questions-panel">
+    <div class="panel-bar">
+      <h2>Questions</h2>
+      <div class="question-actions">
+        <ion-toggle
+          labelPlacement="end"
+          [checked]="showAnswers()"
+          (ionChange)="showAnswers.set($any($event).detail.checked)"
+        >Show answers</ion-toggle>
+        <ion-button fill="clear" size="small" [disabled]="!gen.questions().length" (click)="copyQuestions()">
+          <ion-icon name="copy-outline" slot="icon-only"></ion-icon>
+        </ion-button>
+        <ion-button fill="clear" size="small" [disabled]="!gen.questions().length" (click)="exportJson()">
+          <ion-icon name="download-outline" slot="icon-only"></ion-icon>
+        </ion-button>
+      </div>
+    </div>
+
+    <div class="status-line" [class.error]="gen.questionError()">
+      {{ gen.questionError() || gen.questionStatus() }}
+    </div>
+
+    <div class="question-list" *ngIf="gen.questions().length; else emptyQuestions">
+      <article class="question-card" *ngFor="let item of gen.questions(); let index = index; trackBy: trackQuestion">
+        <div class="question-path">{{ item.categoryPath || item.categoryId }}</div>
+        <div class="question-row">
+          <strong>{{ item.question }}</strong>
+          <ion-button
+            fill="clear"
+            size="small"
+            [disabled]="showAnswers()"
+            [attr.aria-expanded]="answerVisible(item, index)"
+            (click)="toggleAnswer(item, index)"
+          >
+            <ion-icon [name]="answerVisible(item, index) ? 'eye-off-outline' : 'eye-outline'" slot="icon-only"></ion-icon>
+          </ion-button>
+        </div>
+        <p class="answer-text" *ngIf="answerVisible(item, index)">{{ item.answer || '…' }}</p>
+      </article>
+    </div>
+
+    <ng-template #emptyQuestions>
+      <div class="empty-state">No questions yet.</div>
+    </ng-template>
+  </section>
+</div>

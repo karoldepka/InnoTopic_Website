@@ -1,0 +1,19 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button default-href="/journal"></ion-back-button>
+    </ion-buttons>
+    <ion-title>{{ (isLogin ? 'AUTH.LOG_IN_TITLE' : 'AUTH.SIGN_UP_TITLE') | translate }}</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-col size="10" offset="1">
+  <ion-content>
+    <app-login-email-password [hidden]="!isLogin"></app-login-email-password>
+    <app-signup-email-password [hidden]="isLogin"></app-signup-email-password>
+
+    <ion-button fill="outline" color="primary" expand="block" (click)="onAuthSwitch()">{{ 'AUTH.SWITCH_TO' | translate }}
+      {{ (isLogin ? 'AUTH.SIGNUP' : 'AUTH.LOGIN') | translate }}
+    </ion-button>
+  </ion-content>
+</ion-col>

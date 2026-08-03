@@ -1,0 +1,386 @@
+import {OdmItemId} from '../../../libs/AppFedShared/odm/OdmItemId'
+import {OdmInMemItem} from '../../../libs/AppFedShared/odm/OdmItem$2'
+import {OdmTimestamp} from '../../../libs/AppFedShared/odm/OdmBackend'
+import {Side, SidesDefs, sidesDefsArray, sidesDefsHintsArray, SideVal} from '../core/sidesDefs'
+import {nullish} from '../../../libs/AppFedShared/utils/type-utils'
+import {Rating} from './fields/self-rating.model'
+import {ImportanceDescriptors} from './fields/importance.model'
+import {htmlToId, stripHtml} from '../../../libs/AppFedShared/utils/html-utils'
+import {parseDurationToMs, parseTimeDistribution} from '../../../libs/AppFedShared/utils/time/parse-duration'
+import {QuizzableData} from '../core/quiz/quiz'
+import {FunDescriptors, FunLevelDescriptors} from './fields/fun-level.model'
+import {MentalEffortLevelDescriptors} from './fields/mental-effort-level.model'
+import {isNotNullish, isNullish, isNullishOrEmptyOrBlank} from '../../../libs/AppFedShared/utils/utils'
+import {parseDate} from '../../../libs/AppFedShared/utils/time/parse-date'
+import {Deferrability, Urgency} from './planning-prioritizing.model'
+import {daysAsMs, hoursAsMs, isInFuture, isInThePastOrNullish} from '../../../libs/AppFedShared/utils/time/date-time-utils'
+import {StatusDef, StatusId, statuses} from './statuses.model'
+import {Dict} from '../../../libs/AppFedShared/utils/dictionary-utils'
+import {VoiceMemoRecord} from '../../../libs/AppFedShared/audio/voice-memo.service'
+import {TimeTrackingPersistentData} from '../../OrYoL/time-tracking/TimeTrackingPersistentData'
+
+export type LearnItemId = OdmItemId<LearnItem>
+
+
+export type PositiveInt = number & {constraint: 'positive int'}
+
+/** TOdo name NonNegativeInt */
+export type PositiveIntOrZero = number // & {constraint: 'positive int or zero'}
+
+export type IntensityVal = {
+  id: keyof ImportanceDescriptors,
+  numeric: number,
+}
+
+export type HtmlString = string
+
+
+export type ImportanceVal = IntensityVal
+export type ImportanceId = keyof ImportanceDescriptors
+
+export type FunVal = IntensityVal
+export type FunLevelId = keyof FunDescriptors
+export type FunLevelId2 = keyof FunLevelDescriptors
+
+export type MentalLevelVal = IntensityVal
+export type MentalLevelId = keyof MentalEffortLevelDescriptors
+
+
+/** LearnDoItemData */
+export class LearnItem extends OdmInMemItem implements QuizzableData {
+
+  id?: LearnItemId
+  whenAdded ! : OdmTimestamp
+  title?: string
+  answer?: string
+  isTask?: boolean
+  isToLearn?: boolean
+
+  hideAncestorsInQuiz?: boolean
+
+  /** Set when this item (or its content, e.g. a generated answer) was created by AI - lets us
+   * distinguish & filter AI content. Stamped on every AI-generation path, not just whole-item
+   * creation, so a pre-existing item that only later got an AI-filled answer is also covered. */
+  whenGeneratedByAi?: OdmTimestamp
+
+  /** Set while the item is an unreviewed draft (e.g. AI output awaiting approval). */
+  draftedAt?: OdmTimestamp
+
+  /** Marks an organizational category node: shown in lists but excluded from the quiz. */
+  isCategory?: boolean
+
+  status: StatusId | nullish
+
+  /** Set to a Date when done, null when undone. Truthy = done. */
+  whenDone?: Date | null
+
+  /** Identifies this node as originating from a template; stores the templateNodeClass (e.g. 'goal', 'action') */
+  templateNodeClass?: string
+
+  hasAudio?: true | null
+  /** Every voice memo recorded against any field (side) on this item - see VoiceMemoRecord's doc
+   * comment (one flat array, filtered per-field by `fieldId` at read time). */
+  voiceMemos?: VoiceMemoRecord[]
+  /** Live time-tracking state (start/pause) shared with OrYoL's time-tracking engine - see
+   * `TimeTrackable` in `apps/OrYoL/time-tracking/time-tracking.service.ts`. */
+  timeTrack?: TimeTrackingPersistentData
+  whenDeleted?: Date
+  lastSelfRating?: Rating
+  whenLastSelfRated?: OdmTimestamp
+
+  // isMarkedAsSelectedOrUnselected ? : boolean
+  isSelectedOrUnselected ? : boolean
+
+  /** storing zero could be useful for querying for stuff that was not yet rated */
+  selfRatingsCount ? : PositiveIntOrZero
+
+  /** synonyms: worth
+   * storing both name and numeric value, in case it changes in the future
+   */
+  importance ? : ImportanceVal
+
+  importanceCurrent ? : ImportanceVal
+
+  funEstimate ? : FunVal
+
+  mentalLevelEstimate ? : MentalLevelVal
+
+  physicalHealthImpact ? : MentalLevelVal /* fix */
+
+  mentalHealthImpact ? : IntensityVal /* fix */
+
+  /** keep in mind also: time-boxing */
+  time_estimate ? : HtmlString
+
+  money_estimate ? : HtmlString
+
+  start_after ? : string
+
+  start_before ? : string
+
+  finish_before ? : string
+
+  categories ? : HtmlString
+
+  /** quick hack for category field__de */
+  de ? : HtmlString
+  en ? : HtmlString
+  es ? : HtmlString
+
+
+    // idea: quizAvgMs ?: DurationMs /* can be calculated via quizTotalMs / selfRatingsCount, but we store for querying purposes */
+  // idea: quizTotalMs ?: DurationMs
+
+  /* FIXME: this should not be optional */
+  joinedSides ? () {
+    // this seems very slow
+    // const answerSides = this.getSidesWithAnswers()
+    return sidesDefsArray.map(side => {
+
+      const sideVal = this.getSideVal(side)
+      if (! sideVal ) {
+        return undefined
+      }
+
+      const substrLen = 1000
+      const sideValForDisplay = /*answerSides.includes(side) ?*/ sideVal?.substring(0, substrLen) +
+        (((sideVal?.length ?? 0) > substrLen) ? '...' : '')
+        // : sideVal
+      return sideValForDisplay
+      // ● ⇨ ► ⇛
+    }).filter(_ => !! _).join('<span style="color: var(--secondary)"> ⇶ </span>')
+  }
+
+  // getAnswers(): string[] {
+  //   return this.getSidesWithAnswers().map(side => this.getSideVal(side))
+  // }
+
+  /** TODO: move to Quiz */
+  public getSidesWithAnswers(): Side[] {
+    const ret: Side [] = []
+    let foundQuestionBefore = false
+    for (let side of sidesDefsArray) {
+      if ( side.isHint ) {
+        continue
+      }
+      const sideVal = this.getSideVal(side)
+      if (sideVal) {
+        if ( !side.ask || foundQuestionBefore ) {
+          ret.push(side)
+        } else {
+          foundQuestionBefore = true
+          // do not push
+        }
+      }
+    }
+    return ret
+  }
+
+  /** TODO: move to Quiz */
+  public getSidesWithHints(): Side[] {
+    const ret: Side [] = []
+    for (let side of sidesDefsHintsArray) {
+      const sideVal = this.getSideVal(side)
+      if ( sideVal ) {
+        ret.push(side)
+      }
+    }
+    return ret
+  }
+
+  public getSideVal(side ? : Side | nullish): string|undefined|null {
+    if ( ! side ) {
+      return null
+    }
+    return (this as any)[side.id] ?. trim ?. ()
+  }
+
+  /** TODO: move to Quiz */
+  getQuestionOrAnyString() {
+    const question = this.getQuestion()
+    if ( question ) {
+      return question
+    }
+    // TODO return title or smth?
+    // second attempt, without `ask` requirement
+  }
+
+  /** TODO: move to Quiz */
+  getQuestion(): SideVal {
+    return this.getSideVal(this.getSideWithQuestion())
+  }
+
+  /** TODO: move to Quiz */
+  getSideWithQuestionOrFirstNonEmpty(): Side | null {
+    return this.getSideWithQuestion()
+      ?? this.getFirstNonEmptySide()
+  }
+
+  getFirstNonEmptySide(): Side | null {
+    for (let side of sidesDefsArray) {
+      const sideVal = this.getSideVal(side)
+      if (sideVal) {
+        return side
+      }
+    }
+    return null
+  }
+
+  hasQAndA(): boolean {
+    // might be flaky
+    // return true
+    return (this.getSidesWithAnswers().length > 0) && !! this.getQuestion();
+  }
+
+  /** True if this item (or its content) was generated by AI. */
+  isAiGenerated(): boolean {
+    return !! this.whenGeneratedByAi
+  }
+
+  /** True while this item is an unreviewed draft. */
+  isDraft(): boolean {
+    return !! this.draftedAt
+  }
+
+  public needsProcessing(): boolean {
+    // TODO: (strip html) .split().toLower() === 'todo'
+    return ! this.hasQAndA() && this.isEffectivelyToLearn()
+  }
+
+  /** TODO: move to Quiz */
+  public getSideWithQuestion(): Side | null {
+    for (let side of sidesDefsArray) {
+      if (side.ask) {
+        const sideVal = this.getSideVal(side)
+        if (sideVal) {
+          return side
+        }
+      }
+    }
+    return null
+  }
+
+  public matchesSearch(search: string, useRegex = false): boolean {
+    const trimmedSearch = (search || '').trim()
+    if ( trimmedSearch.length === 0 ) {
+      return true
+    }
+    if ( useRegex ) {
+      let regex: RegExp
+      try {
+        // Not lowercased (unlike the plain-substring path below) - 'i' alone gives
+        // case-insensitivity without corrupting case-sensitive escapes like \D/\S/\W/\B that
+        // .toLowerCase() on the pattern source would silently mangle.
+        regex = new RegExp(trimmedSearch, 'i')
+      } catch {
+        return false // invalid pattern - matches nothing rather than throwing mid-quiz-filter
+      }
+      return sidesDefsArray.some(side => {
+        const sideVal = this.getSideVal(side)?.replace(/<img src="data:image\/png;base64,.*"/gi, '')
+        return !! sideVal && regex.test(sideVal)
+      })
+    }
+    const search_ = trimmedSearch.toLowerCase()
+    return sidesDefsArray.some(side => {
+      const sideVal = this.getSideVal(side)?.replace(/<img src="data:image\/png;base64,.*"/gi, '')
+      return sideVal ?. toLowerCase() ?. includes(search_)
+    })
+  }
+
+  getDurationEstimateMs() {
+    return parseDurationToMs(stripHtml(this.time_estimate) ?. trim())
+  }
+
+  getDurationEstimateMinutes() {
+    const strippedTrimmed = stripHtml(this.time_estimate) ?. trim()
+    const parseDurationToMs1: number | null | undefined = parseDurationToMs(strippedTrimmed)
+    if ( parseDurationToMs1 ) {
+      return parseDurationToMs1 / 60_000
+    } else {
+      return parseDurationToMs1
+    }
+  }
+
+  getDurationEstimateMinutesDistribution() {
+    const strippedTrimmed = stripHtml(this.time_estimate) ?. trim()
+    return parseTimeDistribution(strippedTrimmed)
+  }
+
+  // /** TODO: ROI could also take into account mental effort (maybe even fun), money (as also if something is more expensive, the decision requires more mental effort, time;
+  //  * more likely to get postponed */
+  // getRoi() {
+  //   const durationEstimateMs = this.getDurationEstimateMs()
+  //   if ( ! durationEstimateMs ) {
+  //     return undefined
+  //   }
+  //   // const importance = this.importance?.numeric
+  //   const importance = this.importance?.numeric
+  //   if ( ! importance ) {
+  //     return undefined
+  //   }
+  //   return importance / durationEstimateMs
+  // }
+
+
+  /* NOTE: will apply to Learn too (e.g. to master certain material before/after some date, it will be prioritized). */
+  getDeferrability(): Deferrability | nullish {
+    const date = this.getNearestDateForUrgency()
+    if ( date ) {
+      const msNow = Date.now()
+      const msDiff = date.getTime() - msNow
+      return msDiff as Deferrability
+      // overdue should have high urgency
+    } else {
+      return date as nullish // as Deferrability // TODO check type
+    }
+  }
+
+  getEffectiveDeferrability(): Deferrability {
+    return this.getDeferrability()
+      ?? ( daysAsMs(365) as Deferrability /* assuming we can do all stuff we entered in one year; unless specified as something more far away in time */ )
+  }
+
+  getNearestDateForUrgency(): Date | nullish {
+    return this.getStartBeforeDate() ?? this.getFinishBeforeDate()
+  }
+
+  private getStartAfterDate(): Date | nullish {
+    return parseDate(this.start_after)
+  }
+
+  getFinishBeforeDate(): Date | nullish {
+    return parseDate(this.finish_before)
+  }
+
+  getStartBeforeDate(): Date | nullish {
+    return parseDate(this.start_before)
+  }
+
+  getStatus(): StatusDef {
+    const statusId = htmlToId(this.status)
+    if ( isNotNullish(statusId) ) {
+      const statusByKey = (statuses as any as Dict<StatusDef>) [ statusId ]
+      if ( ! statusByKey ) {
+        return statuses.unknown
+      }
+      return statusByKey
+    } else {
+      return statuses.undefined
+    }
+  }
+
+  isMaybeDoableNow(): boolean | nullish {
+    return isInThePastOrNullish(this.getStartAfterDate() ?. getTime())
+      && (this.getStatus().isDoableNow ?? true /* since "maybe" */)
+  }
+
+  public isEffectivelyToLearn() {
+    return this.isToLearn || ! this.isTask
+  }
+}
+
+export type LearnItemSidesVals = {[sideKey in keyof SidesDefs]: string}
+
+export function field<T>(fieldName: keyof T) {
+  return fieldName
+}

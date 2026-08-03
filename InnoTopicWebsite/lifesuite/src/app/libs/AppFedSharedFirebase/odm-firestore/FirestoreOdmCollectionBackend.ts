@@ -1,0 +1,380 @@
+import {ItemId, OdmCollectionBackend, OdmCollectionBackendListener, QueryOpts} from "../../AppFedShared/odm/OdmCollectionBackend";
+import {EnvironmentInjector, Injector, runInInjectionContext} from "@angular/core";
+import {
+  Firestore,
+  QuerySnapshot,
+  collection,
+  doc,
+  getDocs,
+  getDocsFromCache,
+  limit as fsLimit,
+  onSnapshot,
+  orderBy,
+  query,
+  setDoc,
+  updateDoc,
+  where,
+} from "firebase/firestore";
+import {getAppFirestore} from "../firebase-app";
+import {OdmItemId} from "../../AppFedShared/odm/OdmItemId";
+import {ignorePromise} from "../../AppFedShared/utils/promiseUtils";
+import {OdmBackend} from "../../AppFedShared/odm/OdmBackend";
+import {debugLog, errorAlert, errorAlertAndThrow} from "../../AppFedShared/utils/log";
+import {isNotNullish} from '../../AppFedShared/utils/utils'
+import {assertTruthy} from '../../AppFedShared/utils/assertUtils'
+import {dateToStringSuitableForId} from '../../AppFedShared/odm/utils'
+
+
+export class FirestoreOdmCollectionBackend<TRaw> extends OdmCollectionBackend<TRaw> {
+
+  protected firestore: Firestore = getAppFirestore()
+  private environmentInjector = this.injector.get(EnvironmentInjector)
+
+  public collectionName = this.className;
+
+  constructor(
+    injector: Injector,
+    className: string,
+    odmBackend: OdmBackend,
+    public readonly opts: { dontStoreVersionHistory: boolean }
+    // listenToCollection = true,
+  ) {
+    super(injector, className, odmBackend)
+  }
+
+  /** Could also add archive here; and mark as deleted / trash */
+  deleteWithoutConfirmation(itemId: OdmItemId) {
+    console.log(`[DB] delete ${this.collectionName}/${itemId}`)
+    // DANGEROUS return  this. /* danger */ itemDoc(itemId) /* danger */  .delete()
+    return this.inInjectionContext(() => updateDoc(this.itemDoc(itemId), {
+      whenDeleted: new Date()
+    }))
+  }
+
+  saveNowToDb(item: TRaw, id: string, parentIds?: ItemId[], ancestorIds?: ItemId[], changedFieldsOnly?: Partial<TRaw>): Promise<any> {
+    if ( ! isNotNullish(id) ) {
+      this.errorAlert('id cannot be ' + id)
+    }
+
+    if ( ! this.opts.dontStoreVersionHistory ) {
+      this.saveToHistory(id, item, parentIds, ancestorIds) // NOTE: save to history FIRST, to prevent destroying the value
+    }
+
+    // no need to await promise; this can go in parallel
+    // FIXME though need to pass this promise to unsaved sync status pending
+
+    // FIXME: maybe we should save PREVIOUS value, but more  difficult to implement for now. Coz current value will be on the object itself,
+    // so no need to waste space duplicating. Though maybe it's good for
+
+
+    // TODO: also store ancestorIds for loading entire subtree in 1 query (e.g. for faster searching)
+    // debugLog('FirestoreOdmCollectionBackend saveNowToDb', item)
+
+    // FIXME: review this coz modified with sleep deprivation, while introducing saveToHistory()
+    console.log(`[DB] save ${this.collectionName}/${id}`, changedFieldsOnly ? `(partial: ${Object.keys(changedFieldsOnly).join(', ')})` : '(full)')
+    try {
+      // Incremental save: write only the changed fields (merge) when provided; otherwise the
+      // whole item. Version history (below/above) always stores the full snapshot.
+      const sourceForDocWrite = changedFieldsOnly ?? item
+      const dataToSave = this.toFirestoreData({
+        ... sourceForDocWrite,
+        ... (parentIds ? {
+          parentIds
+        } : {}),
+        ... (ancestorIds ? {
+          ancestorIds
+        } : {}),
+      })
+      const retPromise = this.inInjectionContext(() => setDoc(this.itemDoc(id), dataToSave/*.toDbFormat()*/, { merge: true }))
+      retPromise.catch(error => {
+        this.errorAlert('saveNowToDb this.itemDoc(id).set retPromise.catch', error)
+      })
+      // FIXME retPromise.catch() (error)
+      /* TODO: could store minLevelFromRoot number, for <= .where clause to limit number of levels */
+      return retPromise
+    } catch (error: any) {
+      throw this.errorAlertAndThrow(`saveNowToDb error: `, error, item, id)
+    }
+    // FIXME: update() to patch
+
+    // https://firebase.google.com/docs/firestore/query-data/listen#events-local-changes
+    /* Retrieved documents have a metadata.hasPendingWrites property that indicates whether the document has local changes that haven't been written to the backend yet.
+      You can use this property to determine the source of events received by your snapshot listener: */
+  }
+
+  private saveToHistory(id: string, item: TRaw, parentIds: ItemId[] | undefined, ancestorIds: ItemId[] | undefined): Promise<void> {
+    try {
+      const nowDate = new Date
+      const dataToSave = this.toFirestoreData({
+        /* FIXME refactor extract common part with saveNowToDb */
+        ...item,
+        ...(parentIds ? {
+          parentIds,
+        } : {}),
+        ...(ancestorIds ? {
+          ancestorIds,
+        } : {}),
+        itemId: id /* not calling it `id` coz the primary key is different */,
+        _historySnapshotTimestamp: nowDate /* FIXME find good name; `when` was too vague */,
+
+      })
+      const retPromise = this.inInjectionContext(() =>
+        setDoc(this.itemHistoryNewDocForNowTimePoint(nowDate, id), dataToSave/*.toDbFormat()*/)
+      )
+      retPromise.catch(error => {
+        this.errorAlert('saveToHistory this.itemHistoryNewDocForNowTimePoint(nowDate, id).set(...) retPromise.catch', error)
+      })
+
+      /* TODO: could store minLevelFromRoot number, for <= .where clause to limit number of levels */
+      return retPromise // FIXME need to pass this promise to unsaved for pending status too
+    } catch (error: any) {
+      throw this.errorAlertAndThrow(`saveNowToDb saving history error: `, error, item, id)
+    }
+  }
+
+  private collection() {
+    return collection(this.firestore, this.collectionName)
+  }
+
+  private historyCollection() {
+    return collection(this.firestore, this.collectionName + '__History')
+  }
+
+  private itemDoc(itemId: OdmItemId) {
+    return doc(this.collection(), itemId)
+  }
+
+  private itemHistoryNewDocForNowTimePoint(date: Date, itemId: OdmItemId) {
+    const path = itemId + '_' + dateToStringSuitableForId(date)
+    return doc(this.historyCollection(), path)
+  }
+
+  private inInjectionContext<T>(fn: () => T): T {
+    return runInInjectionContext(this.environmentInjector, fn)
+  }
+
+  private toFirestoreData<T>(value: T): T {
+    if ( value === undefined ) {
+      return null as T
+    }
+    if ( value === null || typeof value !== 'object' ) {
+      return value
+    }
+    if ( value instanceof Date ) {
+      return value
+    }
+    if ( this.isTimestampLike(value) ) {
+      return this.timestampLikeToDate(value) as T
+    }
+    if ( Array.isArray(value) ) {
+      return value.map(item => this.toFirestoreData(item)) as T
+    }
+
+    const prototype = Object.getPrototypeOf(value)
+    if ( prototype !== Object.prototype && prototype !== null ) {
+      return value
+    }
+
+    return Object.fromEntries(
+      Object.entries(value).map(([key, entryValue]) => [
+        key,
+        this.toFirestoreData(entryValue),
+      ])
+    ) as T
+  }
+
+  private isTimestampLike(value: any): value is { seconds: number, nanoseconds?: number, toDate?: () => Date } {
+    return typeof value?.seconds === 'number'
+      && ( value.nanoseconds === undefined || typeof value.nanoseconds === 'number' )
+      && ( typeof value.toDate === 'function' || value.constructor?.name === 'Timestamp' )
+  }
+
+  private timestampLikeToDate(value: { seconds: number, nanoseconds?: number, toDate?: () => Date }): Date {
+    const date = value.toDate?.()
+    if ( date instanceof Date && ! Number.isNaN(date.getTime()) ) {
+      return date
+    }
+
+    return new Date(value.seconds * 1000 + Math.floor((value.nanoseconds ?? 0) / 1000000))
+  }
+
+  /** IDEA: for more flexibility this could return an ARRAY of download DESCRIPTORS
+   * { promise:, name: 'LearnItem - last 10 days - from local/server'}
+   * */
+  override setListener(
+    listener: OdmCollectionBackendListener<TRaw, OdmItemId<TRaw>>,
+    /** FIXME move this to opts, also for readability coz integer is hard to judge what it does */
+    queryOpts: QueryOpts,
+    callback: () => void/*, name: string*/
+  )
+    : void
+  {
+    super.setListener(listener, queryOpts, callback);
+    console.log('setListener', this.collectionName, queryOpts)
+    // debugLog(`BEFORE this.collectionBackendReady$.subscribe(() => {`, this.collectionName)
+    this.collectionBackendReady$.subscribe(() => {
+      // debugLog(`IN this.collectionBackendReady$.subscribe(() => {`, this.collectionName)
+
+      // This could cause the race condition of items uninitialized when going from another route
+      const userId = this.authService.authUser$.lastVal!.uid
+      if ( ! userId ) {
+        this.errorAlert(`FirestoreOdmCollectionBackend before query - no userId`)
+      }
+      // console.log('FirestoreOdmCollectionBackend setListener')
+      // nDaysOldModified = 15
+      // getDocs
+      // .where('whenArchived', '==', null)
+      // .where('whenDeleted', '==', null)
+      let firestoreQuery = query(this.collection(), where('owner', '==', userId)) // TODO: use opts.limit / nLastModified
+      if ( queryOpts.limit ) {
+        firestoreQuery = query(firestoreQuery,
+          orderBy("whenLastModified", 'desc'), // TODO: use this also for listening
+          fsLimit(queryOpts.limit)) // FIXME hack limit count instead of date (coz what if user doesn't use app for some days)
+      }
+      if ( queryOpts.oneTimeGet ) { // TODO FIX Hack to use opts.nLastModified
+        const promise = (queryOpts.fromLocalCache ? getDocsFromCache(firestoreQuery) : getDocs(firestoreQuery))
+          // .orderBy("whenLastModified", 'desc') // TODO: use this also for listening
+          // .where('whenLastModified', '>=', new Timestamp(Date.now()/1000 - nDaysOldModified * 24*60*60, 0))
+          // .limit(50) // FIXME hack limit count instead of date (coz what if user doesn't use app for some days)
+          // this is just one-time get, not listening
+        promise.then((data: any /* HACK after AngularFire update */) => {
+          const docs = data.docs
+          console.log('query.get() docs.length', docs.length, queryOpts)
+          for ( let doc of docs ) {
+              listener?.onAdded(doc.id, doc.data() as TRaw)
+            }
+            listener?.onFinishedProcessingChangeSet()
+            callback()
+          }
+        )
+        promise.catch((caught: any) => {
+          this.errorAlert('setListener promise.catch; queryOpts', queryOpts, caught)
+        })
+        // return promise
+      } else {
+        if ( queryOpts.fromLocalCache ) {
+          this.errorAlert(`Don't know how to do queryOpts.fromLocalCache for onSnapshot (normally it would be in .get()) `, queryOpts)
+        }
+        const onError = (error: any) => {
+          this.errorAlert('setListener, onSnapshot onError', error)
+        }
+
+        onSnapshot(firestoreQuery, ((snapshot: QuerySnapshot<TRaw>) =>
+        {
+          console.log('firestore.collection(this.collectionName).onSnapshot', 'snapshot.docChanges().length',
+            this.collectionName, snapshot.docChanges().length)
+          // FIXME: let the service process in batch, for performance --> is this done now, thanks to onFinishedProcessing() ?
+          for ( let change of snapshot.docChanges() ) {
+            const docId = change.doc.id
+            const docData = change.doc.data()
+            // this.setOwnerIfNeeded(docData, docId)
+            if ( change.type === 'added' ) {
+              listener?.onAdded(docId, docData as TRaw)
+            } else if ( change.type === 'modified') {
+              listener?.onModified(docId, docData as TRaw)
+            } else if ( change.type === 'removed') {
+              listener?.onRemoved(docId)
+            }
+          }
+          listener?.onFinishedProcessingChangeSet()
+          callback?.()
+
+          // FIXME: only emit after processing finished
+
+        }) as any /* workaround after strict settings */, onError)
+      }
+
+      // this.collection().valueChanges().subscribe((coll: TRaw[]) => {
+      //   this.dbCollection$.nextWithCache(coll)
+      // })
+    })
+  }
+
+  loadChildrenOf(parentId: ItemId, listener: OdmCollectionBackendListener<TRaw>) {
+    assertTruthy(parentId, 'parentId')
+    const userId = this.authService.authUser$.lastVal?.uid
+    console.log(`[DB] loadChildrenOf ${this.collectionName} parent=${parentId}`)
+    const constraints = [where('parentIds', 'array-contains', parentId)] // child parent here
+    if ( userId ) {
+      constraints.push(where('owner', '==', userId))
+    }
+    const firestoreQuery = query(this.collection(), ...constraints)
+    const onError = (error: any) => {
+      this.errorLog('loadChildrenOf, onSnapshot onError', error)
+    }
+    onSnapshot(firestoreQuery, ((snapshot: QuerySnapshot<TRaw>) =>
+      {
+        console.log(`loadChildrenOf ${parentId} firestore.collection(this.collectionName).onSnapshot`, 'snapshot.docChanges().length',
+          this.collectionName, snapshot.docChanges().length)
+        // FIXME: let the service process in batch, for performance --> is this done now, thanks to onFinishedProcessing() ?
+        for ( let change of snapshot.docChanges() ) {
+          const docId = change.doc.id
+          const docData = change.doc.data()
+          // this.setOwnerIfNeeded(docData, docId)
+          if ( change.type === 'added' ) {
+            listener?.onAdded(docId, docData as TRaw)
+          } else if ( change.type === 'modified') {
+            listener?.onModified(docId, docData as TRaw)
+          } else if ( change.type === 'removed') {
+            listener?.onRemoved(docId)
+          }
+        }
+        listener?.onFinishedProcessingChangeSet()
+
+        // FIXME: only emit after processing finished
+
+      }) as any /* workaround after strict settings */, onError)
+
+  }
+
+  loadTreeDescendantsOf(ancestorId: ItemId, listener: OdmCollectionBackendListener<TRaw>) {
+    assertTruthy(ancestorId, 'ancestorId')
+    const userId = this.authService.authUser$.lastVal?.uid
+    console.log(`[DB] loadTreeDescendantsOf ${this.collectionName} ancestor=${ancestorId}`)
+    const constraints = [where('ancestorIds', 'array-contains', ancestorId)]
+    if ( userId ) {
+      constraints.push(where('owner', '==', userId))
+    }
+    const firestoreQuery = query(this.collection(), ...constraints)
+    const onError = (error: any) => {
+      this.errorLog('loadTreeDescendantsOf, onSnapshot onError', error)
+    }
+
+    onSnapshot(firestoreQuery, ((snapshot: QuerySnapshot<TRaw>) =>
+    {
+      console.log(`loadTreeDescendantsOf results ${ancestorId} firestore.collection(this.collectionName).onSnapshot`, 'snapshot.docChanges().length',
+        this.collectionName,
+        snapshot.docChanges().length)
+      // FIXME: let the service process in batch, for performance --> is this done now, thanks to onFinishedProcessing() ?
+      for ( let change of snapshot.docChanges() ) {
+        const docId = change.doc.id
+        const docData = change.doc.data()
+        // this.setOwnerIfNeeded(docData, docId)
+        if ( change.type === 'added' ) {
+          listener?.onAdded(docId, docData as TRaw)
+        } else if ( change.type === 'modified') {
+          listener?.onModified(docId, docData as TRaw)
+        } else if ( change.type === 'removed') {
+          listener?.onRemoved(docId)
+        }
+      }
+      listener?.onFinishedProcessingChangeSet()
+
+      // FIXME: only emit after processing finished
+
+    }) as any /* workaround after strict settings */, onError)
+
+  }
+
+  private errorAlert(...args: any[]) {
+    errorAlert('collectionName', this.collectionName, ...args)
+  }
+
+  private errorAlertAndThrow(...args: any[]) {
+    return errorAlertAndThrow('collectionName', this.collectionName, ...args)
+  }
+
+  private errorLog(...args: any[]) {
+    console.error('collectionName', this.collectionName, ...args)
+  }
+}

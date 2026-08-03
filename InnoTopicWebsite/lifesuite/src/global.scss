@@ -1,0 +1,387 @@
+@use 'sass:meta';
+
+// http://ionicframework.com/docs/theming/
+@import '@ionic/angular/css/core.css';
+@import '@ionic/angular/css/normalize.css';
+@import '@ionic/angular/css/structure.css';
+@import '@ionic/angular/css/typography.css';
+@import '@ionic/angular/css/display.css';
+@import '@ionic/angular/css/padding.css';
+@import '@ionic/angular/css/float-elements.css';
+@import '@ionic/angular/css/text-alignment.css';
+@import '@ionic/angular/css/text-transformation.css';
+@import '@ionic/angular/css/flex-utils.css';
+@import '@copilotkit/angular/styles.css';
+@import 'quill/dist/quill.core.css';
+@import 'quill/dist/quill.bubble.css';
+@import 'quill/dist/quill.snow.css';
+
+@include meta.load-css('global_oryol2');
+
+:root {
+  transition: all 2s; // FIXME test
+}
+
+.sc-ion-popover-ios-h {
+   --width: 380px;
+}
+
+::placeholder { /* Chrome, Firefox, Opera, Safari 10.1+ */
+  //color: red !important; ;;; also check --placeholder-color
+  opacity: 1; /* Firefox */
+}
+
+
+// ====  TINYMCE - TODO move to components when I unify search&add with item side text editors
+
+//* :has(p[data-mce-bogus]) {
+.mce-content-body { /* FIXME: this is not encapsulated to component */
+  background-color: var(--apf-rich-text-edit-background);
+  padding: 10px; // FIXME setting this to non-zero causes too big padding;
+  //padding: 0px;
+  p {
+    margin: 0;
+    //background-color: orange;
+  }
+
+  margin: 0px 0px 4px;
+
+}
+
+//p {
+//  background-color: blue;
+//}
+
+.mce-content-body[data-mce-placeholder]:not(.mce-visualblocks)::before {
+  /* https://www.w3schools.com/howto/howto_css_placeholder.asp */
+  /* https://www.tiny.cloud/blog/tinymce-placeholder-text/ */
+  //background-color: white;
+  color: var(--ion-text-color) !important; //rgba(118, 118, 118, 1);
+  opacity: 0.5;
+  padding-left: 0.55em; /* this can cause misalignment between blinking cursor and placeholder first letter */
+}
+
+
+// ==== BEGIN stuff that is edited via rich-text-editor (but also appears on items list)
+ul, ol {
+  padding-inline-start: 1.35rem;
+  ::marker {
+    color: var(--secondary);
+  }
+  margin-block-start: 0.3rem;
+  margin-block-end: 0.3rem;
+}
+
+li:first-child {
+  padding-top: 0;
+}
+
+// ======
+
+[contenteditable] {
+  -webkit-user-select: text;
+  user-select: text;
+}
+
+html {
+  scroll-behavior: smooth;
+  color-scheme: dark; // https://github.com/mdn/yari/pull/6102
+}
+
+// Android WebView/Chrome's default tap-highlight is an opaque-ish gray/white overlay painted
+// over the whole tapped element until release - on raw <button>s like .slot-pill (no ion-button
+// ripple to mask it) that washes green-on-dark text out to near-illegible for the duration of the
+// tap. Nothing in the app's own CSS disables it (only third-party TinyMCE skin CSS does, and only
+// inside its own editor), so every plain button/link inherits the browser default. :hover/:active
+// styles already provide tap feedback, so this is safe to disable app-wide.
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+:root {
+
+  --secondary: var(--ion-color-secondary); /* FIXME make consistent */
+  --primary: var(--ion-color-primary) /* FIXME: Ionic color */;
+
+  --answerBorderColor: #003b00;
+  //--answerBorderColorDark: darken(var(--answerBorderColor), 0);
+  --answerBorderColorDark: #002d00;
+
+  //--ion-background-color: lightgreen;
+  //--ion-color-primary: orange;
+
+  // Spacing scale for gap/padding/margin, in rem (scales with the user's root font-size setting,
+  // unlike a fixed px value) - same numbering/step sizes as Tailwind's default scale (1 = 0.25rem
+  // = 4px at the default 16px root) since that's a widely-recognized convention, chosen to exactly
+  // cover the small px values already used throughout this app's compact list/cell UI (2, 4, 6, 8,
+  // 10, 12, 16px, ...) rather than forcing existing spacing to a different, incompatible grid.
+  --space-0-5: 0.125rem;  /* 2px */
+  --space-1: 0.25rem;     /* 4px */
+  --space-1-5: 0.375rem;  /* 6px */
+  --space-2: 0.5rem;      /* 8px */
+  --space-2-5: 0.625rem;  /* 10px */
+  --space-3: 0.75rem;     /* 12px */
+  --space-4: 1rem;        /* 16px */
+  --space-5: 1.25rem;     /* 20px */
+  --space-6: 1.5rem;      /* 24px */
+  --space-8: 2rem;        /* 32px */
+}
+
+// Ionic's own fab-vertical-bottom/-top CSS is a flat 10px with no safe-area term at all
+// (unlike fab-horizontal-start/-end, which do add --ion-safe-area-left/right) - on Android's
+// enforced edge-to-edge display this puts bottom FABs partly under the system nav bar. This is
+// Ionic's own documented fix: add the safe-area inset on top of the existing offset.
+ion-fab[vertical="bottom"] {
+  bottom: calc(10px + var(--ion-safe-area-bottom, 0px));
+}
+
+ion-fab[vertical="top"] {
+  top: calc(10px + var(--ion-safe-area-top, 0px));
+}
+
+.action-icon {
+  cursor: pointer;
+  user-select: none;
+  padding: 2px;
+  color: var(--ion-color-primary);
+}
+
+// Shared pill/chip box model for compact field affordances - used by both
+// TreeNodeCellsComponent's .slot-cell--compact (an empty/not-yet-filled field, rendered inline on
+// an item's own details) and SlotPickerComponent's .slot-picker__chip (the "Add a field…" search
+// suggestions), so the two render at a consistent size instead of each component defining its own
+// padding/font independently and silently drifting apart.
+.slot-pill {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  border-radius: 999px;
+  padding: var(--space-1) var(--space-2-5);
+  font: inherit;
+  opacity: 0.75;
+  cursor: pointer;
+
+  &:hover {
+    opacity: 1;
+  }
+}
+
+.action-color {
+  color: var(--ion-color-primary);
+}
+
+ul, ol {
+  ::marker {
+    //color: var(--secondary)
+  }
+}
+
+.chrome-extension {
+  min-width: 500px;
+  max-width: auto;
+  min-height: 500px;
+}
+
+body {
+  scrollbar-color: var(--ion-color-secondary) var(--ion-background-color, #000); /* Firefox */
+  overflow-y: hidden; /* Hide vertical scrollbar */
+  overflow-x: hidden; /* Hide horizontal scrollbar */
+}
+
+// GH #139: selection/scrollbar previously used hardcoded colors (a literal `green`, `#393812`)
+// unrelated to the active theme - tie both to --ion-color-secondary so they follow theme changes.
+::selection {
+  background: var(--ion-color-secondary);
+  color: var(--ion-color-secondary-contrast, #000);
+}
+
+::-webkit-scrollbar {
+  height: 12px;
+  width: 12px;
+  background: var(--ion-background-color, #000);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--ion-color-secondary);
+  -webkit-border-radius: 1ex;
+  -webkit-box-shadow: 0px 1px 2px rgba(0, 0, 0, 0.75);
+}
+
+::-webkit-scrollbar-corner {
+  background: var(--ion-background-color, #000);
+}
+
+// ===
+
+/* Hide scrollbar for Chrome, Safari and Opera */
+.example::-webkit-scrollbar {
+  display: none;
+}
+
+/* Hide scrollbar for IE, Edge and Firefox */
+.example {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
+
+// ====
+
+
+.button-text {
+  //font-size: 72px;
+  //background: -webkit-linear-gradient(#fff, #aaf);
+  background: radial-gradient(var(--ion-color-secondary-contrast), var(--ion-color-secondary-contrast-muted));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+
+  //&:before {
+  //  content: attr(data-text);
+  //  position: absolute;
+  //  top: 0;
+  //  left: 0;
+  //  z-index: -1;
+  //  text-shadow: 0px 0px #000000;
+  //  // https://stuffandnonsense.co.uk/blog/a-quick-shot-of-gradient-text-and-text-shadow
+  //}
+}
+
+.my-popover {
+  --min-width: 300px;
+  --max-width: 500px;
+  //background: #FFF;
+}
+
+.dark-bg-highlight {
+  /*or just bg-hilite, coz relying on theme*/
+  background-color: #202020;
+}
+
+.source-code, pre {
+  font-family: Monaco;
+  color: var(--ion-color-primary-tint)
+}
+
+.done-text {
+  text-decoration: line-through;
+  opacity: 30%;
+}
+
+.fancy {
+  text-shadow: var(--ion-color-primary) 1px 1px 2px;
+  //text-shadow: #428CFFFF 1px 1px 2px;
+  //background: linear-gradient(#fff, #666);
+  background: linear-gradient(var(--ion-color-primary), #666);
+  //background: linear-gradient(#428CFFFF, #666);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  letter-spacing: 0.2em;
+  font-weight: bold;
+  font-variant: small-caps;
+  font-size: 120%;
+  transform: skew(5deg);
+}
+
+
+.positive {
+  text-shadow: var(--ion-color-secondary) 1px 1px 2px;
+  background: linear-gradient(#fff, #666);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  letter-spacing: 0.2em;
+  font-weight: bold;
+  font-variant: small-caps;
+  font-size: 120%;
+  //transform: skew(15deg);
+  animation: pulse-shadow 1s infinite;
+}
+
+@keyframes pulse-shadow {
+  0% {
+    text-shadow: var(--ion-color-secondary) 1px 1px 2px;
+  }
+  50% {
+    text-shadow: var(--ion-color-primary) 1px 1px 6px;
+  }
+}
+
+.concept {
+  text-shadow: white 1px 1px 2px;
+  background: linear-gradient(#fff, #666);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  letter-spacing: 0.2em;
+  font-weight: bold;
+  font-variant: small-caps;
+  font-size: 120%;
+  //transform: skew(15deg);
+}
+
+.negative {
+  color: red;
+  text-shadow: red 1px 1px 2px;
+}
+
+.warning {
+  color: yellow;
+  text-shadow: yellow 1px 1px 2px;
+}
+
+/* GH #80: marks a paragraph as coming from voice dictation, so it reads as visually distinct from
+   text that was typed/already there rather than blending in silently. */
+.voice-dictated {
+  font-style: italic;
+  color: var(--ion-color-medium);
+}
+
+.voice-dictated::before {
+  content: "🎤 ";
+  font-style: normal;
+}
+
+.tox-menubar {
+  //overflow-x: scroll;
+  overflow-x: hidden;
+}
+
+//ion-button::part(native) {
+//  background-color: red;
+//  font-size: 212px;
+//  font-weight: 500;
+//}
+
+//body > div.tox.tox-silver-sink.tox-tinymce-aux {
+//  body > div.tox.tox-silver-sink.tox-tinymce-aux > div > div {
+  .tox-notifications-container {
+
+    display: none; // HACK for tinymce domain somehow not recognized (apiKey)
+  }
+//}
+
+* {
+  //transition: all 1s ease-in-out;
+}
+
+// GH #92: AppComponent's persistent ion-header (ToolbarCommonItemsComponent - time-tracking +
+// quick-record mic, always visible regardless of which page is open) sits as a sibling of
+// ion-router-outlet, but Ionic's own ion-router-outlet CSS is `position: absolute; inset: 0`, so
+// every routed page fills the full viewport and overlaps this header instead of starting below
+// it. This is Ionic's own documented fix for a persistent header above the router outlet.
+// `> ion-router-outlet` (not a blanket rule) so tabs.page.html's own *nested* router-outlet,
+// which has nothing to do with this app-root header, is unaffected. The 56px offset matches
+// `md`-mode ion-toolbar's fixed height - ToolbarCommonItemsComponent is deliberately constrained
+// to a single non-wrapping row (see its own .sass) so this stays accurate regardless of how many
+// time-tracked entries are showing.
+ion-app > ion-router-outlet {
+  top: 56px;
+}
+
+// GH #58: "App & Sync Status" popover was stuck at Ionic's content-based auto width (quite
+// narrow, given the sync popover's content - pending-item lists, theme/language pickers - wants
+// real room). Roughly double that on desktop, and let it use nearly the full viewport on mobile.
+.sync-status-popover {
+  --width: min(90vw, 560px);
+
+  @media (max-width: 480px) {
+    --width: 94vw;
+  }
+}

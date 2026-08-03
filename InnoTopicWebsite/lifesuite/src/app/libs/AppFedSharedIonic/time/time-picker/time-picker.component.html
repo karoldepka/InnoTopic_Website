@@ -1,0 +1,61 @@
+
+<!--<ion-picker></ion-picker>-->
+<!--<ion-picker-column></ion-picker-column>-->
+
+
+<!--{{timer.durationSeconds}} seconds-->
+
+
+<div style="display: flex">
+    <app-number-picker id=hoursPicker [value]="pickerHours" (change)="pickerHours = $event; onChangeTime()"
+
+    ></app-number-picker>
+
+    <app-number-picker id=minutesPicker [value]="pickerMinutes" (change)="pickerMinutes = $event; onChangeTime()"
+
+    ></app-number-picker>
+
+    <app-number-picker id=secondsPicker [value]="pickerSeconds" (change)="pickerSeconds = $event; onChangeTime()"
+
+    ></app-number-picker>
+
+</div>
+<ion-button
+  (click)="openTimePicker()"
+>
+  Pick
+</ion-button>
+
+<ion-checkbox labelPlacement="end" [(ngModel)]="showTimePicker">Show time picker</ion-checkbox>
+
+<!--<div class="sc-ion-picker-md-h sc-ion-picker-md-s md picker-md hydrated">-->
+  <div
+    *ngIf="showTimePicker"
+    [hidden]="! showTimePicker"
+    class="picker-wrapper sc-ion-picker-md" style="height: 300px; width: 300px"
+  > <!-- NOTE: something here causes the page to hang -->
+    Picker:
+    <div class="picker-toolbar sc-ion-picker-md">
+      <div class="picker-toolbar-button sc-ion-picker-md">
+        <button type="button" class="picker-button ion-activatable sc-ion-picker-md">Done</button>
+      </div>
+    </div>
+    <div class="picker-columns sc-ion-picker-md">
+      <div class="picker-above-highlight sc-ion-picker-md"></div>
+
+      <ion-picker-column
+        [col]="colHours()" class="sc-ion-picker-md md picker-col hydrated"
+      ></ion-picker-column>
+
+
+      <div class="picker-below-highlight sc-ion-picker-md"></div>
+    </div>
+
+  </div>
+<!--</div>-->
+
+<!-- From Mike Hartington: https://demo.mobiscroll.com/jquery/datetime/mobile-display-modes# -->
+<!--IonPicker:-->
+<!--<ion-picker-->
+<!--  [columns]="[_pickerColumn]"-->
+<!--&gt;</ion-picker>-->

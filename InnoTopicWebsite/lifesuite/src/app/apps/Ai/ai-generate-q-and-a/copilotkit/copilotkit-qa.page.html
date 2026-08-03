@@ -1,0 +1,32 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button mode="md" defaultHref="/ai"></ion-back-button>
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+    <ion-title>Q&amp;A · CopilotKit</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="copilotkit-qa-page">
+  <div class="copilotkit-layout">
+    <section class="copilot-panel">
+      <div class="copilot-panel-header">
+        <h2>CopilotKit</h2>
+        <span>AG-UI · deep-chat</span>
+      </div>
+      <deep-chat
+        [connect]="deepChatConnect"
+        [introMessage]="deepChatIntroMessage"
+        [chatStyle]="deepChatChatStyle"
+        [messageStyles]="deepChatMessageStyles"
+      ></deep-chat>
+    </section>
+
+    <app-ai-qa-workbench
+      integration="copilotkit"
+      integrationTitle="CopilotKit"
+      integrationSubtitle="@copilotkit/angular HttpAgent"
+    ></app-ai-qa-workbench>
+  </div>
+</ion-content>

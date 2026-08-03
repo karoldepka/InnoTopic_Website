@@ -1,0 +1,58 @@
+import {Component, Input, OnInit, ChangeDetectionStrategy} from '@angular/core';
+import {TimerItem} from "../../core/TimerItem";
+import { ModalController, IonicModule } from "@ionic/angular";
+import {TimersService} from "../../core/timers.service";
+import {OverlayEventDetail} from '@ionic/core';
+import {TimerDetailsComponent} from "../timer-details/timer-details.component";
+import {debugLog} from "../../libs/AppFedShared/utils/log";
+import { NgClass, NgIf } from '@angular/common';
+import { TimeLeftOrDurationComponent } from '../time-left-or-duration/time-left-or-duration.component';
+
+@Component({
+    selector: 'app-timer-item',
+    templateUrl: './timer-item.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
+    styleUrls: ['./timer-item.component.sass'],
+    imports: [
+        IonicModule,
+        NgClass,
+        NgIf,
+        TimeLeftOrDurationComponent,
+    ],
+})
+export class TimerItemComponent implements OnInit {
+
+  @Input()
+  timer ! : TimerItem
+
+  get isRunning() { return this.timer.isRunning }
+
+  constructor(
+      private modalController: ModalController,
+      private timersService: TimersService,
+  ) { }
+
+  ngOnInit() {}
+
+
+  async onClickTimerItem(timer: TimerItem) {
+    debugLog('onSetDuration before', timer)
+
+    const modal: HTMLIonModalElement =
+        await this.modalController.create({
+          component: TimerDetailsComponent,
+          componentProps: {
+            timer: timer,
+          }
+        });
+    console.log('onSetDuration', modal)
+    await modal.present()
+
+    modal.onDidDismiss().then((detail: OverlayEventDetail) => {
+      if (detail !== null) {
+        // console.log('modal result:', detail.data);
+      }
+    });
+  }
+
+}

@@ -1,0 +1,472 @@
+// ── Host ──────────────────────────────────────────────────────────────────────
+// No height: 100% here. Setting height:100% on a child of ion-content's
+// .inner-scroll resolves to 100vh (the full inner-scroll height, which starts at
+// y=0 above the header), placing our element's bottom 112px below the viewport.
+// We avoid that by NOT setting any height on :host, and instead using
+// calc(100dvh - 112px) on the layout container at tablet/desktop below.
+//
+// Why 112px and not 56px: there are *two* stacked ion-header bars above
+// ion-content, not one - the app-root header (app.component.html's own
+// ion-header/app-toolbar-common-items) plus this page's own ion-header - each
+// 56px tall (GH #121: the footer action buttons were sticking out below the
+// viewport because this used to subtract only one of them).
+
+:host {
+  display: block;
+}
+
+// ── Layout container ──────────────────────────────────────────────────────────
+
+.qa-layout {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 12px 12px 62px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0)),
+    var(--ion-background-color);
+}
+
+// ── Panels ────────────────────────────────────────────────────────────────────
+
+.panel {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  border: 1px solid rgba(155, 169, 186, 0.28);
+  border-radius: 8px;
+  background: rgba(20, 24, 28, 0.72);
+}
+
+.panel-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  min-height: 52px;
+  padding: 8px 12px;
+  border-bottom: 1px solid rgba(155, 169, 186, 0.2);
+  flex-shrink: 0;
+
+  h2 {
+    margin: 0;
+    font-size: 1.05rem;
+    color: var(--ion-text-color);
+  }
+}
+
+.panel-body {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 12px;
+}
+
+.panel-foot {
+  display: flex;
+  justify-content: flex-end;
+  padding: 10px 12px;
+  border-top: 1px solid rgba(155, 169, 186, 0.2);
+  flex-shrink: 0;
+}
+
+.head-actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+// ── Status / metrics ──────────────────────────────────────────────────────────
+
+.status-line {
+  min-height: 22px;
+  padding: 4px 12px;
+  font-size: 0.84rem;
+  color: #c6d2df;
+  flex-shrink: 0;
+
+  &.error { color: #ffb4a8; }
+}
+
+.metrics {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+
+  span {
+    border: 1px solid rgba(122, 186, 152, 0.35);
+    border-radius: 999px;
+    padding: 2px 8px;
+    font-size: 0.76rem;
+    color: #b9dcc9;
+    background: rgba(60, 127, 91, 0.13);
+  }
+}
+
+.debug-raw {
+  margin: 8px 0 0;
+  padding: 10px;
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(255, 200, 100, 0.3);
+  border-radius: 6px;
+  font-size: 0.78rem;
+  color: #ffd080;
+  white-space: pre-wrap;
+  word-break: break-word;
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.examples {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px;
+}
+
+.actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.directory-picker {
+  margin-top: 4px;
+
+  ion-button { margin: 0; }
+}
+
+.picked-directory {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.85rem;
+  padding: 4px 8px;
+  border: 1px solid rgba(155, 169, 186, 0.22);
+  border-radius: 6px;
+
+  span { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  ion-button { --padding-start: 4px; --padding-end: 4px; }
+}
+
+// ── Scroll areas ─────────────────────────────────────────────────────────────
+// Mobile: no overflow-y — let ion-content page-scroll the whole thing.
+// Adding overflow-y here creates inner scrollbars alongside ion-content's own
+// scrollbar (double scrollbar). overflow-y: auto is added only at tablet/desktop
+// (below) where panels have a definite height from the grid.
+
+.tree-scroll {
+  padding: 8px;
+}
+
+.questions-scroll {
+  padding: 8px;
+}
+
+// ── Category tree table (TanStack model + custom markup) ─────────────────────
+
+.qa-tree {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+  font-size: 0.88rem;
+
+  thead > tr > th {
+    padding: 4px 6px;
+    font-size: 0.72rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--ion-color-medium);
+    border-bottom: 1px solid rgba(155, 169, 186, 0.2);
+    text-align: left;
+    background: rgba(14, 18, 22, 0.96);
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    white-space: nowrap;
+
+    &.col-num { text-align: right; width: 60px; }
+    &.col-btn { width: 32px; padding: 0; }
+  }
+
+  tbody > tr > td {
+    padding: 2px 4px;
+    vertical-align: middle;
+    border: none;
+
+    &.col-num { text-align: right; width: 60px; }
+    &.col-btn { width: 32px; padding: 0; }
+  }
+
+  tbody > tr:hover > td { background: rgba(255, 255, 255, 0.035); }
+
+  .cat-cell {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+  }
+}
+
+.cat-indent {
+  flex-shrink: 0;
+  display: inline-block;
+  height: 1px;
+}
+
+.cat-toggler {
+  flex-shrink: 0;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--ion-color-medium);
+  padding: 0;
+  width: 22px;
+  min-width: 22px;
+  height: 22px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  transition: background 0.12s, color 0.12s;
+
+  &:hover { color: var(--ion-color-light); background: rgba(255, 255, 255, 0.09); }
+
+  ion-icon { font-size: 0.8rem; }
+}
+
+.cat-toggler-spacer {
+  flex-shrink: 0;
+  display: inline-block;
+  width: 22px;
+  min-width: 22px;
+  height: 22px;
+}
+
+.cat-ordinal {
+  flex-shrink: 0;
+  font-size: 0.72rem;
+  font-variant-numeric: tabular-nums;
+  color: var(--ion-color-medium);
+  min-width: 1.5em;
+  text-align: right;
+}
+
+.cat-title,
+.cat-count {
+  min-width: 0;
+  height: 32px;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  padding: 5px 8px;
+  color: var(--ion-text-color);
+  background: transparent;
+  font: inherit;
+  transition: border-color 0.12s, background 0.12s;
+
+  &:hover { border-color: rgba(155, 169, 186, 0.25); }
+
+  &:focus {
+    outline: none;
+    border-color: rgba(155, 169, 186, 0.45);
+    background: rgba(4, 8, 12, 0.36);
+  }
+}
+
+.cat-title { flex: 1 1 auto; }
+
+.cat-count { text-align: right; }
+
+.existing-tag {
+  font-size: 0.7rem;
+  border: 1px solid rgba(122, 186, 152, 0.35);
+  border-radius: 4px;
+  padding: 1px 4px;
+  color: #9fd0bf;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 58px;
+}
+
+.invisible { visibility: hidden; pointer-events: none; }
+
+.empty {
+  margin: 12px 4px;
+  padding: 14px;
+  border: 1px dashed rgba(155, 169, 186, 0.34);
+  border-radius: 8px;
+  color: var(--ion-color-medium);
+  text-align: center;
+}
+
+// ── Panel head left group ──────────────────────────────────────────────────────
+
+.head-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+// ── Q&A cards ─────────────────────────────────────────────────────────────────
+
+.q-card {
+  border: 1px solid rgba(155, 169, 186, 0.22);
+  border-radius: 8px;
+  padding: 10px;
+  background: rgba(4, 8, 12, 0.24);
+  transition: border-color 0.15s, background 0.15s;
+
+  & + & { margin-top: 8px; }
+
+  &.q-selected {
+    border-color: rgba(var(--ion-color-primary-rgb), 0.55);
+    background: rgba(var(--ion-color-primary-rgb), 0.08);
+  }
+}
+
+.q-path {
+  margin-bottom: 4px;
+  color: #9fd0bf;
+  font-size: 0.75rem;
+}
+
+.q-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 8px;
+
+  ion-checkbox { flex-shrink: 0; margin-top: 2px; }
+  strong { flex: 1; font-size: 0.94rem; line-height: 1.35; min-width: 0; }
+}
+
+.q-ordinal {
+  color: var(--ion-color-medium);
+  font-variant-numeric: tabular-nums;
+  margin-right: 2px;
+}
+
+.q-answer {
+  margin: 8px 0 0;
+  border-left: 3px solid #7aba98;
+  padding-left: 9px;
+  color: #dce8f0;
+  line-height: 1.42;
+}
+
+.q-image {
+  margin-top: 6px;
+
+  ion-button { margin: 0; --padding-start: 4px; --padding-end: 8px; font-size: 0.82rem; }
+}
+
+.q-image__img {
+  display: block;
+  width: 100%;
+  max-width: 220px;
+  border-radius: 6px;
+  margin-bottom: 4px;
+}
+
+// ── Q&A approve/reject bar ────────────────────────────────────────────────────
+
+.q-actions {
+  display: flex;
+  gap: 8px;
+}
+
+// ── Tablet (768–1099px): 2-column grid ───────────────────────────────────────
+//
+// KEY: height: calc(100dvh - 112px) on .qa-layout is a direct, absolute value —
+// no height:100% percentage chains into ion-content's shadow DOM.
+//
+// Why this matters: ion-content's .inner-scroll has top:-112px (extends above
+// both stacked headers - the app-root one and this page's own, 56px each - to
+// y=0), so its total height = 100vh. A child with height:100% gets 100vh, but
+// starts at y=112, ending at y=112+100vh = 112px below viewport. Using
+// calc(100dvh - 112px) directly avoids that resolution entirely (GH #121: this
+// used to subtract only 56px, one header's worth, pushing the footer action
+// buttons off the bottom of the viewport).
+
+@media (min-width: 720px) and (max-width: 1099px) {
+  .qa-layout {
+    // box-sizing: border-box ensures padding is INCLUDED in the height value.
+    // Without it: total box = calc(100dvh - 112px) + 28px padding = 100dvh - 84px,
+    // which overflows ion-content's area (100dvh - 112px) by 28px → second scrollbar.
+    box-sizing: border-box;
+    height: calc(100dvh - 112px);
+    display: grid;
+    grid-template-columns: minmax(260px, 0.9fr) minmax(300px, 1.2fr);
+    grid-template-rows: minmax(0, 45%) 1fr;
+    overflow: hidden;
+    padding: 14px;
+    gap: 14px;
+  }
+
+  .prompt-panel {
+    grid-column: 1;
+    grid-row: 1;
+    overflow-y: auto;
+  }
+
+  .questions-panel {
+    grid-column: 1;
+    grid-row: 2;
+    overflow: hidden;
+    min-height: 0;
+  }
+
+  .tree-panel {
+    grid-column: 2;
+    grid-row: 1 / -1;
+    overflow: hidden;
+    min-height: 0;
+  }
+
+  // flex:1 + overflow-y:auto works here because panels have a definite height
+  // from the grid (1fr / auto), so flex:1 resolves to a positive number.
+  .tree-scroll,
+  .questions-scroll {
+    flex: 1;
+    min-height: 0;
+    max-height: none;
+    overflow-y: auto;
+  }
+}
+
+// ── Desktop (≥1100px): 3-column grid ─────────────────────────────────────────
+
+@media (min-width: 1100px) {
+  .qa-layout {
+    box-sizing: border-box;
+    height: calc(100dvh - 112px);
+    display: grid;
+    grid-template-columns: minmax(260px, 0.9fr) minmax(280px, 1fr) minmax(320px, 1.3fr);
+    grid-template-rows: 1fr;
+    overflow: hidden;
+    padding: 14px;
+    gap: 14px;
+  }
+
+  .prompt-panel { overflow-y: auto; }
+
+  .tree-panel,
+  .questions-panel {
+    overflow: hidden;
+    min-height: 0;
+  }
+
+  .tree-scroll,
+  .questions-scroll {
+    flex: 1;
+    min-height: 0;
+    max-height: none;
+    overflow-y: auto;
+  }
+}
+
+// ── Narrow mobile ────────────────────────────────────────────────────────────
+
+@media (max-width: 500px) {
+  .existing-tag { display: none; }
+}

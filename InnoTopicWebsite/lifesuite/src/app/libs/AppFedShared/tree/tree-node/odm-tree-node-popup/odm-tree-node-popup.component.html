@@ -1,0 +1,155 @@
+<div class="tree-node-popup">
+  <a
+    class="node-link"
+    [routerLink]="item$ . getRouterLinkUrl()"
+  >
+    {{ stripHtml((item$ . getTitleOrQuestion$() | async)) || 'Untitled item' }}
+  </a>
+
+  <ion-note
+    *ngIf="isOffline"
+    color="medium"
+    class="offline-note"
+  >
+    Offline: children are saved locally first.
+  </ion-note>
+
+  <ion-segment
+    [value]="newChildType"
+    mode="ios"
+  >
+    <ion-segment-button
+      value="learn"
+      (click)="setNewChildType('learn')"
+    >
+      <ion-label>Learn</ion-label>
+    </ion-segment-button>
+    <ion-segment-button
+      value="task"
+      (click)="setNewChildType('task')"
+    >
+      <ion-label>Task</ion-label>
+    </ion-segment-button>
+    <ion-segment-button
+      value="category"
+      (click)="setNewChildType('category')"
+    >
+      <ion-label>Category</ion-label>
+    </ion-segment-button>
+  </ion-segment>
+
+  <ion-item
+    lines="full"
+    class="child-title-item"
+  >
+    <ion-label position="stacked">New child</ion-label>
+    <ion-input
+      [value]="newChildTitle"
+      [disabled]="isAddingChild"
+      autocomplete="off"
+      enterkeyhint="done"
+      placeholder="Name this child"
+      (ionInput)="updateNewChildTitle($event)"
+      (keyup.enter)="addChild($event); $event.stopPropagation(); $event.preventDefault()"
+    />
+  </ion-item>
+
+  <ion-note
+    *ngIf="childTitleError"
+    color="danger"
+  >
+    {{ childTitleError }}
+  </ion-note>
+
+  <div class="popup-actions">
+    <ion-button
+      fill="solid"
+      size="small"
+      [disabled]="! canAddChild()"
+      (click)="addChild($event)"
+    >
+      <ion-spinner
+        *ngIf="isAddingChild"
+        name="dots"
+      />
+      <ion-icon
+        *ngIf="! isAddingChild"
+        name="add-circle-outline"
+        slot="start"
+      />
+      Add
+    </ion-button>
+
+    <ion-button
+      fill="clear"
+      color="medium"
+      size="small"
+      [disabled]="! newChildTitle || isAddingChild"
+      (click)="clearNewChild()"
+    >
+      <ion-icon
+        name="close-outline"
+        slot="start"
+      />
+      Clear
+    </ion-button>
+
+    <ion-button
+      fill="clear"
+      size="small"
+      [routerLink]="item$ . getRouterLinkUrl()"
+    >
+      <ion-icon
+        name="open-outline"
+        slot="start"
+      />
+      Open
+    </ion-button>
+
+    <ion-button
+      fill="clear"
+      color="danger"
+      size="small"
+      (click)="deleteWithConfirmation()"
+    >
+      <ion-icon
+        name="trash-outline"
+        slot="start"
+      />
+      Delete
+    </ion-button>
+  </div>
+
+  <odm-checkbox
+    [fieldName]="'hideAncestorsInQuiz'"
+    [item$]="item$"
+  >
+    Hide ancestors in quiz
+  </odm-checkbox>
+
+  <div class="popup-section templates-section">
+    <ion-button
+      fill="clear"
+      size="small"
+      (click)="showTemplates = !showTemplates"
+    >
+      <ion-icon name="layers-outline" slot="start" />
+      Apply Template
+      <ion-icon [name]="showTemplates ? 'chevron-up-outline' : 'chevron-down-outline'" slot="end" />
+    </ion-button>
+
+    <div *ngIf="showTemplates" class="templates-list">
+      <ion-button
+        *ngFor="let template of templates"
+        fill="outline"
+        size="small"
+        class="template-btn"
+        (click)="applyTemplate(template)"
+        [title]="template.description || template.label"
+      >
+        <ion-icon [name]="template.icon" slot="start" />
+        {{ template.label }}
+      </ion-button>
+    </div>
+  </div>
+</div>

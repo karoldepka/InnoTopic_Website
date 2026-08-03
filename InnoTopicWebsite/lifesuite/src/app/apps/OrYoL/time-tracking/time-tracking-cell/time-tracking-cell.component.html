@@ -1,0 +1,58 @@
+<div
+  style="display: flex; align-items: center; cursor: pointer; border-radius: 3px; padding: 1px; margin-right: 2px;"
+  [ngClass]="{timeTrackingNow: $safeNavigationMigration((timeTrackVal$ | async)?.isTrackingNow)}"
+>
+
+  <!--  val json: {{(timeTrackVal$ | async) | json}}-->
+
+  <ion-icon
+     *ngIf="(timeTrackVal$ | async)?.isTrackingNow"
+     style="vertical-align: middle; color: var(--ion-color-primary-contrast); font-size: 24px"
+     class="actionable startPauseIcon"
+     name="pause"
+     (click)="onPauseClicked($event)"
+  ></ion-icon>
+
+  <ion-icon
+     *ngIf="! (timeTrackVal$ | async)?.isTrackingNow"
+     style="vertical-align: middle; font-size: 24px"
+     class="actionable"
+     src="assets/icon/time-track-start.svg"
+     (click)="onPlayClicked($event)"
+     (press)="onPlayClicked($event, {inParallel: true})"
+  ></ion-icon>
+
+  <ion-icon
+     style="vertical-align: middle; font-size: 24px"
+     class="actionable startPauseIcon"
+     name="stop"
+     (press)="onStopClicked()"
+     *ngIf="false"
+  ></ion-icon>
+
+  <!-- ==== End start/pause icon-->
+
+  <app-time-passing
+    style="margin-left: 8px; margin-right: -2px"
+    *ngIf="
+        (((config$ | async)?.showTimeTrackedValue || toolBarMode )
+        && (timeTrackVal$ | async)?.wasTracked)
+        || (timeTrackVal$ | async)?.isTrackingNow"
+    [referenceTime]="$safeNavigationMigration((timeTrackVal$ | async)?.whenFirstStarted)"
+    [pausableEntry]="timeTrackedEntry"
+    [isCountDown]="false"
+  ></app-time-passing>
+
+  <span style="margin-left: 0.5em; margin-right: 4px" *ngIf="toolBarMode">
+    {{  getDisplayTitle(timeTrackedEntry.timeTrackable.data$ | async)}}
+  </span>
+
+  <ng-container
+    *ngIf="debugService.isDebug$.lastVal"
+  >
+    tt entry: {{$safeNavigationMigration((timeTrackVal$ | async)?.isTrackingNow) | json}}
+    tt start: {{$safeNavigationMigration((timeTrackVal$ | async)?.whenFirstStarted) | json}}
+    tt json: {{(timeTrackVal$ | async) | json}}
+  </ng-container>
+
+</div>

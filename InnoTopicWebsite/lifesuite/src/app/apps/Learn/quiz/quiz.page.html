@@ -1,0 +1,116 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button [defaultHref]="'/learn'" />
+    </ion-buttons>
+<!--    <ion-title>-->
+<!--    </ion-title>-->
+
+    <div style="display: flex; align-items: center">
+      <app-app-logo [withText]="false" />
+      <ion-title>
+        <span style="flex-grow: 1">&nbsp;QUIZ&nbsp;&nbsp;</span>
+        <span *ngIf="status$ | async as quizStatus" style="font-size: 12px; opacity: 70%">
+          {{ quizStatus.itemsLeft }} left
+        </span>
+      </ion-title>
+
+      <!--      <ion-button (click)="window.history.back()"><</ion-button>-->
+<!--        <ion-button routerLink="/learn"><</ion-button>-->
+
+<!--        <app-search-toolbar></app-search-toolbar>-->
+
+
+        <app-time-passing
+          *ngIf="feat.userActivityTiming"
+          style="font-size: 66%"
+          [isCountDown]="false"
+         />
+        <ion-buttons>
+          <ion-icon
+              *ngIf="feat.userActivityCountDownTimer"
+              class="action-icon" slot="end" size="50"
+                    (click)="onClickTimer($event)"
+                    name="timer-outline"
+           />
+
+          <ion-button (click)="showOptions = ! showOptions" size="large">
+
+            <ion-icon class="action-icon" slot="icon-only" name="settings-outline"
+
+             /> <!-- HERE-->
+          </ion-button>
+
+<!--          <ion-button>-->
+<!--            <ion-icon class="action-icon" slot="icon-only" name="bar-chart-outline" [routerLink]="['/learn/stats']"  />-->
+<!--          </ion-button>-->
+          <odm-sync-status-icon style="padding-right: 0.5rem" />
+        </ion-buttons>
+
+      </div>
+  </ion-toolbar>
+
+</ion-header>
+
+<ion-content #ionContent
+             [scrollX]="true"
+>
+
+  <div>
+    <div>
+      <app-quiz-options *ngIf="showOptions">
+      </app-quiz-options>
+    </div>
+
+<!--    <app-quiz-tips-->
+<!--    ></app-quiz-tips>-->
+    <!-- TODO extract `status$ | async` with ngIf let -->
+
+    <ng-container *ngIf="feat.distracting">
+      <div *ngIf="(status$ | async) let quizStatus" style="font-size: 12px; opacity: 70%;">
+        <div style="text-transform: uppercase">
+          next repetition:
+          <app-time-point
+            [time]="newDate(quizService.calculateWhenNextRepetitionMsEpochOrNullish($safeNavigationMigration(quizStatus ?. nextItem$)))"
+           />
+
+          <app-quiz-items-left
+            [quizStatus]="quizStatus"
+           />
+
+        </div>
+      </div>
+    </ng-container>
+
+    <div *ngIf="( status$ | async ) ?. itemsLeft === 0">
+      <app-quiz-finished
+       />
+    </div>
+
+    <div *ngIf="( status$ | async ) ?. itemsLeft !== 0">
+      <app-quiz-item-details
+        *ngFor="let item$ of [ nextItem$WhenRequested | async ]"
+        [item$]="item$"
+        [quizLoaded]="!!(status$ | async)"
+        [ionContent]="ionContent"
+      /> <!-- Hack: the entire component will be swapped on new item -->
+    </div>
+
+
+    <!--  <ng-container>(ahead of time by X hours)</ng-container>-->
+    <!--  <ng-container>(overdue X hours)</ng-container>-->
+
+    <!--  hoursDiff = {{ (quizService.calculateWhenNextRepetitionMsEpoch(item$ | async) - nowMs()) * 1000 * 3600 }}-->
+
+  </div>
+
+</ion-content>
+<ion-footer>
+  <app-show-answer-and-rate
+    *ngFor="let item$ of [ nextItem$WhenRequested | async ]"
+    [item$]="item$"
+  >
+    <!--     [hidden]="(editorService.status$ | async) ?. textEditorFocused" -->
+  </app-show-answer-and-rate>
+
+</ion-footer>

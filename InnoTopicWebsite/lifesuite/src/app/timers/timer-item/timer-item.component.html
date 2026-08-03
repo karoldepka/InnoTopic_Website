@@ -1,0 +1,21 @@
+<ion-item
+  [ngClass]="{runningTimer: isRunning}"
+  (click)="onClickTimerItem(timer)"
+>
+  <ng-container *ngIf="isRunning">
+    <ion-icon name="play-circle" />
+    <!-- TODO: can use animated icons: https://material.io/design/iconography/animated-icons.html#usage -->
+  </ng-container>
+
+  <app-time-left-or-duration
+    [timer]="timer"
+  ></app-time-left-or-duration>
+
+  <ion-label>{{timer.title}}</ion-label>
+  <!--            <ion-datetime display-format="MM/YYYY" picker-format="MMMM YYYY"></ion-datetime>-->
+  <!--      <ion-datetime (ionChange)="onChangeTime($event)" displayFormat="HH:mm"></ion-datetime>-->
+
+  <!--    Left3: {{timeLeft | amDuration: 'seconds'}} s-->
+  <!--    END: {{endTime |  amDateFormat }}-->
+
+</ion-item>

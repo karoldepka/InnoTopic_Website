@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module type="WEB_MODULE" version="4">
+  <component name="NewModuleRootManager">
+    <content url="file://$MODULE_DIR$">
+      <excludeFolder url="file://$MODULE_DIR$/.tmp" />
+      <excludeFolder url="file://$MODULE_DIR$/dist" />
+      <excludeFolder url="file://$MODULE_DIR$/platforms" />
+      <excludeFolder url="file://$MODULE_DIR$/temp" />
+      <excludeFolder url="file://$MODULE_DIR$/tmp" />
+      <excludeFolder url="file://$MODULE_DIR$/node_modules_OFF-ngcc-backup-file-error" />
+      <excludeFolder url="file://$MODULE_DIR$/node_modules_npm16" />
+      <excludeFolder url="file://$MODULE_DIR$/android/app/build" />
+      <excludeFolder url="file://$MODULE_DIR$/android/capacitor-cordova-android-plugins/build" />
+      <excludeFolder url="file://$MODULE_DIR$/OrYoL_OFF" />
+      <excludeFolder url="file://$MODULE_DIR$/ios_OFF" />
+      <excludeFolder url="file://$MODULE_DIR$/CloudTimeDroid/app/build" />
+      <excludeFolder url="file://$MODULE_DIR$/CloudTimeDroid/.gradle" />
+      <excludeFolder url="file://$MODULE_DIR$/node_modules_before_sass_1.57" />
+      <excludeFolder url="file://$MODULE_DIR$/www" />
+      <excludeFolder url="file://$MODULE_DIR$/.angular/cache" />
+      <excludeFolder url="file://$MODULE_DIR$/.firebase" />
+      <excludeFolder url="file://$MODULE_DIR$/plugins" />
+      <excludeFolder url="file://$MODULE_DIR$/documentation" />
+    </content>
+    <orderEntry type="inheritedJdk" />
+    <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="library" name="d3.v3" level="application" />
+    <orderEntry type="library" name="underscore.js" level="application" />
+  </component>
+</module>

@@ -1,0 +1,43 @@
+<div
+  class="numeric-picker__field-name"
+  *ngIf="numFieldDef"
+>
+  {{numFieldDef . uiName}}
+</div>
+<div class="numeric-picker__sub-label">
+  {{ selectedSubLabel }}&nbsp; <!-- nbsp to ensure constant height -->
+</div>
+<!-- TODO: move this into the button-->
+<div class="numeric-picker__buttons">
+
+  <ion-button
+    *ngFor="let btnDesc of buttonDescriptors.buttons"
+    class="numeric-picker__button"
+    [ngClass]="{ selectedButton: isSelected(btnDesc) }"
+    size="small"
+    (click)="onButtonClick(btnDesc)"
+  >
+    <!--
+        [color]="btnDesc.color"
+        fill="outline"
+    -->
+    {{ getDisplayedVariantForButton(btnDesc).label}}
+<!--    zza {{  selectedVariant ?. subLabel }}-->
+<!--    {{ isSelected(btnDesc) }}-->
+<!--    <ng-container *ngIf="isSelected(btnDesc)">-->
+<!--      {{ selectedVariant ?. subLabel }}-->
+<!--    </ng-container>-->
+    <ng-container
+      *ngIf="false && getDisplayedVariantForButton(btnDesc).subLabel let subLabel"
+    >
+      <br>
+      <ion-note>
+        {{subLabel}}
+      </ion-note>
+    </ng-container>
+    <!-- TODO (press)="setNumVal(n + .5)"-->
+<!--    {{(numVal === n + 0.5) ? numVal : n}}-->
+
+  </ion-button>
+  <ng-content select="[trailingAction]"></ng-content>
+</div>

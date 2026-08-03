@@ -1,0 +1,18 @@
+<ion-button class="quiz-button" routerLink="/learn/quiz" size="big">
+  <div class="button-text" data-text="QUIZX">
+    QUIZ
+  </div>
+
+  &nbsp;
+  <ng-container
+    *ngIf="feat.quiz.stressful"
+  >
+
+<!--    {{ ((quizService.quizStatus$ | async)?.itemsLeft) || "" }}-->
+<!--    <span style="opacity: 50%; font-size: 60%">-->
+<!--      &nbsp;{{ ((quizService.quizStatus$ | async)?.itemsLeftToday) || "" }}-->
+<!--    </span>-->
+
+  </ng-container>
+
+</ion-button>

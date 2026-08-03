@@ -1,0 +1,21 @@
+{
+  "appId": "com.innotopic.lifesuite",
+  "appName": "LifeSuite",
+  "npmClient": "npm",
+  "webDir": "www",
+  "plugins": {
+    "SafeArea": {
+      "statusBarStyle": "DEFAULT",
+      "navigationBarStyle": "DEFAULT",
+      "detectViewportFitCoverChanges": true,
+      "initialViewportFitCover": true
+    },
+    "SystemBars": {
+      "insetsHandling": "disable"
+    },
+    "FirebaseAuthentication": {
+      "skipNativeAuth": false,
+      "providers": ["google.com"]
+    }
+  }
+}

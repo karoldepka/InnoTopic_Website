@@ -1,0 +1,66 @@
+<!-- later toolbar, etc. page-wide -->
+
+<!-- note: this does not yet have ionic toolbar, ion-content; not scrollable -->
+
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+<!--      <ion-back-button [defaultHref]="'/learn'"></ion-back-button>-->
+      <app-app-logo [hideTextOnSmallScreens]="true"></app-app-logo>
+    </ion-buttons>
+    <div style="display: inline-flex; align-items: center; width: 100%">
+      <!--      Tree-->
+      <div style="flex-grow: 1; display: flex; align-items: center">
+        <!--          &nbsp; CARD DETAILS-->
+      </div>
+
+<!--      <fa-icon icon="indent" class="actionable"-->
+<!--      ></fa-icon>-->
+      <fa-icon *ngIf="this.feat.shopping.mockups" icon="shopping-cart" class="actionable"
+      ></fa-icon>
+
+<!--      cc-->
+      <ion-buttons>
+        <ion-button (click)="commandsService.toggleDone()">
+          <ion-icon class="action-color" name="checkmark-outline" slot="icon-only" />
+        </ion-button>
+        <ion-button (click)="commandsService.indentLeft()">
+          <ion-icon class="action-color" name="chevron-back-outline" slot="icon-only" />
+        </ion-button>
+        <ion-button (click)="commandsService.indentRight()">
+          <ion-icon class="action-color" name="chevron-forward-outline" slot="icon-only" />
+        </ion-button>
+        <ion-button (click)="commandsService.reorderUp()">
+          <ion-icon class="action-color" name="chevron-up-outline" slot="icon-only" />
+        </ion-button>
+        <ion-button (click)="commandsService.reorderDown()">
+          <ion-icon class="action-color" name="chevron-down-outline" slot="icon-only" />
+        </ion-button>
+<!--        <ion-button>-->
+<!--          <fa-icon slot="icon-only" icon="indent" class="actionable"-->
+<!--          ></fa-icon>-->
+<!--        </ion-button>-->
+<!--        <ion-button>-->
+<!--          <fa-icon icon="outdent" class="actionable"-->
+<!--          ></fa-icon>-->
+<!--        </ion-button>-->
+        <!-- fa: <i class="fa-regular fa-arrow-right-long-to-line"></i> - - - just has to-right version
+
+          indent / outdent ; command: indentIncrease
+        -->
+        <odm-sync-status-icon style="padding-right: 4px"></odm-sync-status-icon>
+      </ion-buttons>
+
+    </div>
+    <!--    <ion-title>-->
+    <!--      -->
+    <!--    </ion-title>-->
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+
+  <app-tree-host
+  ></app-tree-host>
+
+</ion-content>

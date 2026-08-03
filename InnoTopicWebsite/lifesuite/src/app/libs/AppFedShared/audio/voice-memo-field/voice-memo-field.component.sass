@@ -1,0 +1,71 @@
+// Host must itself be a flex participant with room to grow - otherwise the timeline row (flex-grow:
+// 1 inside .voice-memo-timeline) has nothing to actually grow against inside whatever flex row this
+// is placed in (mirrors the old PlayButtonComponent's host, which this supersedes). Vertical
+// padding keeps this from sitting flush against whatever divider/border the surrounding field
+// layout draws directly above/below it (e.g. Journal's field-list rows).
+:host
+  display: flex
+  align-items: center
+  flex-wrap: wrap
+  flex-grow: 1
+  gap: 4px
+  padding: 4px 0
+
+.voice-memo-list
+  display: flex
+  flex-direction: row
+  flex-wrap: wrap
+  align-items: center
+  flex-grow: 1
+  gap: 4px
+
+  // Visually separates the memo list from the record controls preceding it on the same row,
+  // rather than the two groups running straight into each other with only the flex gap between -
+  // only applies when those controls actually precede this (readOnly/allFields list-row contexts
+  // never show them at all, so there'd be nothing for a leading separator to separate from).
+  &.with-record-controls
+    padding-left: 6px
+    margin-left: 2px
+    border-left: 1px solid var(--ion-color-light, rgba(128, 128, 128, 0.4))
+
+.voice-memo-row
+  display: flex
+  align-items: center
+  gap: 2px
+  padding: 0 4px 0 0
+  border-right: 1px solid var(--ion-color-medium, #808080)
+
+  &:last-child
+    border-right: none
+    padding-right: 0
+
+.voice-memo-meta
+  font-size: 0.7rem
+  white-space: nowrap
+  color: var(--ion-color-medium, #808080)
+
+.voice-memo-total-duration
+  font-size: 0.7rem
+  white-space: nowrap
+  color: var(--ion-color-medium, #808080)
+  flex-basis: 100%
+
+.voice-memo-timeline
+  display: flex
+  align-items: center
+  gap: 4px
+  flex-grow: 1
+  min-width: 160px
+
+.voice-memo-time
+  font-size: 0.7rem
+  min-width: 2.2rem
+  position: relative
+  z-index: 1
+
+.voice-memo-live-transcript
+  font-size: 0.8rem
+  flex-basis: 100%
+
+  .interim
+    opacity: 0.6

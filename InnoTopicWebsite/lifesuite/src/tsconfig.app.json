@@ -1,0 +1,31 @@
+{
+  "extends": "../tsconfig.json",
+  "compilerOptions": {
+    "outDir": "../out-tsc/app",
+    "types": [
+      "chrome"
+    ],
+    // ======= Strictness / checks:
+    "strictNullChecks": true,
+    "noImplicitAny" : true,
+    "noImplicitOverride" : true,
+    "strict": true
+  },
+  "files": [
+    "main.ts",
+    "polyfills.ts",
+    "zone-flags.ts",
+//    "background/background.ts" /* disabled coz causes warning when running; and I dont work on extension now */
+  ],
+  "include": [
+    "src/**/*.d.ts"
+  ],
+  "angularCompilerOptions": {
+    "extendedDiagnostics": {
+      "checks": {
+        "nullishCoalescingNotNullable": "suppress",
+        "optionalChainNotNullable": "suppress"
+      }
+    }
+  }
+}

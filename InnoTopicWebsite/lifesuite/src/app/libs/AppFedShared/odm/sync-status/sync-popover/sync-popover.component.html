@@ -1,0 +1,105 @@
+<h4
+>
+  <!--  //  (click)="logIn()"-->
+
+  {{ 'SYNC.APP_AND_SYNC_STATUS' | translate }}
+</h4>
+
+<!-- GH #78: same toolbarEntries$ the app-root toolbar's own time-tracking bar shows. -->
+<div
+  *ngIf="(timeTrackingService.toolbarEntries$ | async)?.length"
+  class="currently-tracking"
+>
+  <ion-note>{{ 'SYNC.CURRENTLY_TRACKING' | translate }}</ion-note>
+  <app-time-tracking-toolbar></app-time-tracking-toolbar>
+</div>
+<div class="expandable-section">
+  <button class="expand-toggle" (click)="onClickAboutAppToggle()">
+    {{ 'SYNC.ABOUT_APP' | translate }} <ion-icon [name]="aboutAppExpanded ? 'chevron-up' : 'chevron-down'" style="vertical-align: middle; font-size: 14px"></ion-icon>
+  </button>
+  <app-about-app *ngIf="aboutAppExpanded"></app-about-app>
+</div>
+<!-- Revealed after 5 clicks on "About App" above, like Android's developer-options gesture. -->
+<app-feature-config *ngIf="showFeatureConfig"></app-feature-config>
+<app-theme-config></app-theme-config>
+<app-language-switcher></app-language-switcher>
+
+<p
+  *ngIf="(authUser$ | async)?.email as email"
+  class="email-reveal"
+  (click)="emailRevealed = ! emailRevealed"
+>
+  <ng-container *ngIf="emailRevealed; else emailHidden">{{email}}</ng-container>
+  <ng-template #emailHidden>&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull; <ion-note>{{ 'SYNC.TAP_TO_REVEAL_EMAIL' | translate }}</ion-note></ng-template>
+</p>
+
+<div
+  *ngIf="(authUser$ | async) else notLoggedIn"
+>
+  <ng-container
+    *ngIf="(durablePendingSyncItems$ | async) as pendingSyncItems"
+  >
+    <ng-container *ngIf="pendingSyncItems.length">
+      {{ 'SYNC.QUEUED_TO_SYNC' | translate }} {{pendingSyncItems.length}}
+      <ul>
+        <li *ngFor="let item of pendingSyncItems">
+          {{describePendingSyncItem(item.patch, item.collection, item.item_id)}}
+        </li>
+      </ul>
+    </ng-container>
+  </ng-container>
+
+  <ng-container
+    *ngIf="(syncStatus$ | async)?.pendingUploadsCount let count; else allUploaded"
+  >
+    {{ 'SYNC.UPLOADING_NOW' | translate }} {{count}}
+    <ul>
+      <li *ngFor="let description of pendingUploadDescriptions(syncStatus$ | async)">
+        {{description}}
+      </li>
+    </ul>
+
+  </ng-container>
+
+  <ng-container
+    *ngIf="(syncStatus$ | async)?.pendingDownloadsCount let count; else allDownloaded"
+  >
+    {{ 'SYNC.DOWNLOADING' | translate }} {{count}} {{ 'SYNC.COLLECTIONS' | translate }}: {{toArray($safeNavigationMigration((syncStatus$ | async)?.pendingDownloads)) | json}}
+  </ng-container>
+
+  <ng-template
+    #allUploaded
+  >
+    <p>{{ 'SYNC.ALL_UPLOADED' | translate }}</p>
+  </ng-template>
+
+  <ng-template
+    #allDownloaded
+  >
+    <p>{{ 'SYNC.ALL_DOWNLOADED' | translate }}</p>
+  </ng-template>
+
+</div>
+
+<ng-template
+  #notLoggedIn
+>
+  {{ 'SYNC.NOT_LOGGED_IN' | translate }}
+</ng-template>
+
+<div class="actions">
+  <ion-button size="small" (click)="logIn()">{{ 'AUTH.LOGIN' | translate }}</ion-button>
+  <ion-button size="small" fill="outline" (click)="logOut()">{{ 'SYNC.LOG_OUT' | translate }}</ion-button>
+  <ion-button size="small" fill="outline" (click)="openOptions()">{{ 'SYNC.OPTIONS' | translate }}</ion-button>
+  <ion-button size="small" fill="outline" (click)="forceReload()">{{ 'SYNC.FORCE_RELOAD' | translate }}</ion-button>
+  <ion-button
+    *ngIf="voiceMemoService.hasActiveMic$ | async"
+    size="small"
+    fill="outline"
+    color="warning"
+    (click)="releaseMic()"
+  >
+    <ion-icon slot="start" name="mic-off-outline"></ion-icon>
+    {{ 'SYNC.RELEASE_MIC' | translate }}
+  </ion-button>
+</div>

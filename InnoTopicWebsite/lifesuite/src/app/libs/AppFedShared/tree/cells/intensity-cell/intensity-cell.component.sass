@@ -1,0 +1,20 @@
+\:host
+  display: flex
+  flex: 1 1 auto
+  min-width: 0
+
+.intensity-cell
+  display: flex
+  align-items: center
+  gap: 4px
+  flex: 1 1 auto
+  min-width: 0
+  width: 100%
+
+.intensity-cell__picker
+  flex: 1 1 auto
+  // apf-numeric-picker's own .numeric-picker__buttons is `display: grid; grid-template-columns:
+  // repeat(auto-fit, minmax(4.5rem, 1fr))` - a flex item's default min-width is `auto` (its
+  // content's own min size), which fights a nested auto-fit grid and collapses it to one column.
+  // Forcing min-width: 0 lets it actually size against the *available* row width instead.
+  min-width: 0

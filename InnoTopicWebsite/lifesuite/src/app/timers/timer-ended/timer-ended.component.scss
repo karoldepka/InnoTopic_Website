@@ -1,0 +1,26 @@
+.blink {
+  animation: blink-animation 1s steps(2, start) infinite;
+  -webkit-animation: blink-animation 1s steps(2, start) infinite;
+}
+@keyframes blink-animation {
+  to {
+    background: black;
+    color: white;
+    //visibility: hidden;
+  }
+}
+@-webkit-keyframes blink-animation {
+  to {
+    background: black;
+    color: white;
+    //visibility: hidden;
+  }
+}
+
+ion-button ion-icon {
+  margin-right: 0.25rem
+}
+
+.flip-horiz {
+  transform: scaleX(-1)
+}

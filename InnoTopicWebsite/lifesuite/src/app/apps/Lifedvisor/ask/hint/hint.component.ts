@@ -1,0 +1,118 @@
+import {
+  Component,
+  Input,
+  OnInit,
+  ChangeDetectionStrategy
+} from '@angular/core';
+import {
+  LiHint, LiHintImpl,
+
+} from '../../shared-with-testcafe/Hint';
+import {Filter} from '../../shared-with-testcafe/text_search/Filter';
+import { IonicModule } from '@ionic/angular';
+import { NgClass, NgIf, NgFor } from '@angular/common';
+import { ReactiveFormsModule, FormsModule } from '@angular/forms';
+import { HintEmbedMediaComponent } from './hint-embed-media/hint-embed-media.component';
+import { StarRatingComponent } from '../../../../libs/AppFedSharedIonic/ratings/star-rating/star-rating.component';
+import { SelfRatingHistoryService } from '../../self-rating-history/self-rating-history.service';
+
+/** Hint, Wish, Problem / Question */
+@Component({
+    selector: 'app-hint[filter][wish]',
+    templateUrl: './hint.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
+    styleUrls: ['./hint.component.css'],
+    imports: [IonicModule, NgClass, NgIf, NgFor, ReactiveFormsModule, FormsModule, HintEmbedMediaComponent, StarRatingComponent]
+})
+export class HintComponent implements OnInit {
+
+  constructor(
+    private selfRatingHistoryService: SelfRatingHistoryService,
+  ) {
+    HintComponent.hintsCount ++
+    if ( HintComponent.hintsCount % 1 === 0 ) {
+      // console.log('HintComponent.hintsCount', HintComponent.hintsCount)
+    }
+  }
+
+  /** GH issue #31: logs a 5-star self-rating against this hint's stable id - a new append-only
+   * history entry per rating given (not overwriting a single "current rating" field), since a
+   * static /ask hint has no backing DB item of its own to store one on directly. */
+  onRate(rating: number) {
+    if ( ! this.wish?.id ) {
+      return
+    }
+    this.selfRatingHistoryService.addRating(this.wish.id, rating)
+  }
+
+  /** otherwise just qualities/problems */
+  @Input() includeHintsInSearch: boolean = false
+
+  /** FIXME move this logic out of component */
+  @Input()
+  isExpandedManually = false
+
+  /** FIXME move this logic out of component */
+  @Input()
+  isExpandedRecursively = false
+
+  @Input()
+  filter: Filter = Filter.NONE
+
+  @Input()
+  wish ! : LiHintImpl
+
+  /** FIXME move this logic out of component */
+  @Input()
+  ancestorMatchesFilter ? : boolean
+
+  get isOnlyVisibleToShowChild() {
+    return ! ( this.matchesFilter() || this.ancestorMatchesFilter )
+  }
+
+  get isAnyChildVisible() {
+    return this.wish.ifYes ?. some(childWish => {
+      return this.isVisibleViaFilter(childWish) && !childWish.isAtRoot
+    })
+  }
+
+  debug = {
+    showComponentName: true
+  }
+
+  static hintsCount = 0
+  static hintsCountStrings = 0
+
+  isCurrentHint = false
+
+  isCollapsed = false
+
+  get childrenToShow() {
+    return this.isThisLevelExpandedFullyEffectively ? this.wish.ifYes : this.wish.ifYesSortedByScoreFiltered
+  }
+
+  get isThisLevelExpandedFullyEffectively() {
+    return this.isExpandedManually || this.isExpandedRecursively
+  }
+
+  ngOnInit() {
+  }
+
+  onClickYes() {
+    this.isExpandedManually = true
+  }
+
+  matchesFilter(): boolean {
+    // return ( this.filter ?. trim() !== '') && this.wish.matchesFilter(this.filter)
+    return this.wish.matchesFilter(this.filter)
+  }
+
+  isVisibleViaFilter(hint: LiHintImpl) {
+    return hint.isVisibleViaFilter(this.filter)
+  }
+
+  isChildVisible(childHint: LiHintImpl) {
+    return this.isVisibleViaFilter(childHint) || this.ancestorMatchesFilter // || this.matchesFilter()
+    // return this.isVisibleViaFilter(childHint) || this.matchesFilter()
+  }
+}

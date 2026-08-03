@@ -1,0 +1,148 @@
+<!--<ng-container *ngIf="item"> &lt;!&ndash; hack for item being undefined in ion virtual scroll &ndash;&gt;-->
+
+<div
+  class="learn-list-item"
+  [routerLink]="['/learn/item/'+item.id]"
+>
+
+  <app-selection-checkbox
+    *ngIf="selection.isSelectionActive"
+    [selection]="selection"
+    [itemId]="item.id !"
+  ></app-selection-checkbox>
+
+  <span
+    *ngIf="feat.showAdvanced"
+    style="color: var(--secondary); font-size: 10px; opacity: 50%"
+  >
+    {{index+1}}.
+  </span>
+
+  <ion-badge *ngIf="item.val?.isCategory" color="medium" style="margin-right: 5px">CATEGORY</ion-badge>
+  <ion-badge *ngIf="item.val?.isAiGenerated()" color="tertiary" style="margin-right: 5px">AI</ion-badge>
+  <ion-badge *ngIf="item.val?.isDraft()" color="warning" style="margin-right: 5px">DRAFT</ion-badge>
+  <ion-badge *ngIf="item.isArchived()" color="medium" style="margin-right: 5px">ARCHIVED</ion-badge>
+  <ion-badge
+    *ngIf="(item$.odmService.conflictedItemIds$ | async)?.has(item.id!)"
+    color="danger"
+    style="margin-right: 5px"
+  >CONFLICT</ion-badge>
+
+  <ion-button
+    [id]="menuTriggerId"
+    class="row-icon-button"
+    fill="clear"
+    size="small"
+    title="Item menu"
+    aria-label="Item menu"
+    (click)="stopRowNavigationOnly($event)"
+  >
+    <ion-icon slot="icon-only" name="ellipsis-vertical"></ion-icon>
+  </ion-button>
+
+  <ion-popover [trigger]="menuTriggerId" triggerAction="click" [dismissOnSelect]="true">
+    <ng-template>
+      <ion-list lines="none">
+        <ion-item *ngIf="!item.isArchived()" button="true" (click)="archive($event)">
+          <ion-icon slot="start" name="archive-outline"></ion-icon>
+          <ion-label>Archive</ion-label>
+        </ion-item>
+        <ion-item *ngIf="item.isArchived()" button="true" (click)="restore($event)">
+          <ion-icon slot="start" name="arrow-undo-outline"></ion-icon>
+          <ion-label>Restore</ion-label>
+        </ion-item>
+      </ion-list>
+    </ng-template>
+  </ion-popover>
+
+  <!-- FIXME icon task / learnable / journal-entry / note -->
+  <ion-note *ngIf="g.feat.roiPoints.showUgly && item.val?.isTask">
+    TASK {{((item.getEffectiveRoi() || 0) * 1000000).toFixed(3)}} ROI
+  </ion-note>
+  <ion-button size="small"
+              *ngIf="feat.planToday.mockups"
+              (click)="addToToday($event)"
+  >
+    <!-- should be dot dot dot menu anyway -->
+    <ion-icon slot="icon-only"name="today-outline" />
+     <!-- TODO: checkbox if already included -->
+    <!-- TODO: later: this week / month / quarter / year -->
+  </ion-button>
+  <!--  <ion-note *ngIf="item.val?.isEffectivelyToLearn()">LEARN</ion-note>-->
+  <!--  <ion-note *ngIf="item.val?.isEffectivelyToLearn()">-->
+  <ion-icon style="margin-right: 7px; font-size: 25px; vertical-align: middle" color="secondary" name="book-outline" />
+
+  <ion-note *ngIf="item.val?.isTask">
+    <span *ngIf="item.val?.isTask && item.val?.isEffectivelyToLearn()">, &nbsp;</span>
+    TASK&nbsp;
+  </ion-note>
+<!--  </ion-note>-->
+
+  <span
+    style="color: var(--ion-color-primary)"
+    *ngIf="item.val?.importance?.numeric || '-'; let importanceNum"
+  >
+    <span *ngIf="g.feat.showUgly">{{getImportanceDescriptor() ?. numeric}}x </span>
+    {{getImportanceDescriptor() ?. abbrev}}
+  </span>
+
+  <ng-container
+    *ngIf="item.val?.importanceCurrent?.id"
+  > <!--  && ( item.val?.importance?.id !== item.val?.importanceCurrent?.id ) -->
+    {{item.val?.importance?.id}} {{item.val?.importanceCurrent?.id}}
+    <span
+        style="color: var(--ion-color-primary)"
+        *ngIf="item.val?.importanceCurrent?.numeric || '-'; let importanceNum"
+      >
+    ➤
+        <span *ngIf="g.feat.showUgly">{{ item.getEffectiveImportance() . numeric }}x </span>{{ item.getEffectiveImportance() . id }}
+    </span>
+  </ng-container>
+
+  {{ getFunLevelDescriptor() ?. icons }}
+
+  {{ getPhysicalHealthImpactLevelDescriptor() ?. icons
+      ?. replaceAll('😊', '🤸')
+      ?. replaceAll('😡', '💀')
+  }}
+
+  {{ getMentalHealthImpactLevelDescriptor() ?. icons ?. replaceAll('😊', '🧠') }}
+
+  <!--  id: {{item.id}}-->
+  <!--      {{item | json}}-->
+  <!--      <ion-title>{{item.title}}</ion-title>-->
+
+  &nbsp;<ion-icon
+    *ngIf="feat.mockups"
+    (click)="editEstimate();$event.stopPropagation()" class="action-icon" name="time"
+   />
+
+  &nbsp;
+  <ion-icon
+    *ngIf="item.val?.hasAudio"
+    name="mic"
+    style="margin-right: 4px"
+    title="Has voice memos"
+  ></ion-icon>
+
+  <span style="color: var(--ion-color-primary)">
+    {{ item.val?.lastSelfRating }}
+  </span>
+
+  <!--  <ng-container-->
+  <!--    *ngFor="let side of sidesDefsArray"-->
+  <!--  >-->
+  <!--    {{item[side.id] ? (item[side.id] + ' • ' ) : undefined }}-->
+  <!--  </ng-container>-->
+
+  <span [innerHTML]="joinedSidesOneLine()"></span> <!-- FIXME div not span (proper HTML) -->
+
+  <!--  <app-rich-text-view-->
+  <!--    [htmlString]="joinedSides()"-->
+  <!--  ></app-rich-text-view>-->
+
+  <!--  <hr>-->
+
+</div>
+
+<!--</ng-container>-->

@@ -1,0 +1,36 @@
+.primary-learn-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.primary-learn-actions > * {
+  align-self: center;
+}
+
+app-quiz-button {
+  display: flex;
+  align-items: center;
+}
+
+app-quiz-button ion-button {
+  margin: 0;
+}
+
+.destination-search {
+  padding: 0;
+}
+
+.destination-list {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.no-results {
+  width: 100%;
+}

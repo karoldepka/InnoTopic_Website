@@ -1,0 +1,50 @@
+<span
+  style="cursor: pointer; user-select: none; text-decoration: underline"
+  (click)="showStats = ! showStats"
+>Stats</span>
+
+<ng-container
+  *ngIf="(stats$ | async) let learnStats"
+>
+
+<ng-container
+  *ngIf="showStats"
+>
+  &nbsp;
+  <b>Q&A:</b>
+  {{ $safeNavigationMigration(learnStats ?. countWithQA) | json }}
+
+  <b>Audio:</b>
+  {{ $safeNavigationMigration(learnStats ?. countWithAudio) | json }}
+
+  <b>0+:</b>
+  {{ learnStats ?. countWithRatingPresent }}
+
+  <b>0.25+:</b>
+  {{ $safeNavigationMigration(learnStats ?. atLeast0_25) | json }} <!-- TODO: click to filter
+    - those could be candidates for simplifying / splitting, making Question more specific,
+    they might be CLOGGING the Quiz
+  -->
+
+  <b>0.5+:</b>
+  {{ $safeNavigationMigration(learnStats ?. atLeast05) | json }}
+
+  <b>1+:</b>
+  {{ $safeNavigationMigration(learnStats ?. atLeast1) | json }}
+
+  <b>1.5+:</b>
+  {{ $safeNavigationMigration(learnStats ?. atLeast1_5) | json }}
+
+  <b>2+:</b>
+  {{ $safeNavigationMigration(learnStats ?. atLeast2) | json }}
+
+  <span
+    *ngFor="let kv of (learnStats . countWithRatingEqual) ! | keyvalue"
+  >
+    <b>{{kv.key.replace('undefined', '-')}}:</b> {{kv.value}}
+
+  </span>
+</ng-container>
+
+</ng-container>
+

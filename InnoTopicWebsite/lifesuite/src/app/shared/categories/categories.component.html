@@ -1,0 +1,16 @@
+<div class="categories">
+  @for (node of (topLevelCategoryNodes$ | async) ?? []; track node.item$.id) {
+    <app-category-tree-node [treeNode]="node"></app-category-tree-node>
+  }
+
+  <div class="categories__add">
+    <ion-input
+      [(ngModel)]="newCategoryTitle"
+      placeholder="Add a category…"
+      (keydown.enter)="addTopLevelCategory()"
+    ></ion-input>
+    <ion-button fill="clear" size="small" (click)="addTopLevelCategory()" [disabled]="!newCategoryTitle.trim()">
+      <ion-icon name="add-outline" slot="icon-only"></ion-icon>
+    </ion-button>
+  </div>
+</div>

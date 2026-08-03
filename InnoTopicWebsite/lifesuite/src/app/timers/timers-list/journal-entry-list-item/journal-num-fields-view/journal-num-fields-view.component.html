@@ -1,0 +1,20 @@
+
+<ng-container
+  *ngFor="let fieldEntry of (val$ | async)?.getPresentCompositeFieldEntries()"
+> <!-- the entries are workaround for slow ngFor-s or too many async pipes -->
+  <!-- Even having this empty causes a massive slowdown on 292 journal entries x 150 fields = 43800 ; is ngFor so slow? -->
+<!--  {{field.id}}:-->
+  <span
+    style="color: var(--secondary)"
+  > <!-- TODO color -->
+    <!--     *ngIf="(val$ | async)?.getCompositeField(field) let fieldVal" -->
+    {{fieldEntry[0].title}}:
+    <ng-container *ngIf="fieldEntry[1] !== undefined; else noRating">
+      <b *ngIf="compactStarRatings">{{formatAsFiveScale(fieldEntry[1])}}/5</b>
+      <b *ngIf="!compactStarRatings">{{fieldEntry[1]}}</b>
+    </ng-container>
+    <ng-template #noRating></ng-template>
+    <span *ngIf="fieldEntry[2]" class="field-note">&nbsp;&mdash; {{fieldEntry[2]}}</span>
+  </span>
+
+</ng-container>

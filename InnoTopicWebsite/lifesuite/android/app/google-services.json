@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "545224902252",
+    "firebase_url": "https://cloudtime-app.firebaseio.com",
+    "project_id": "cloudtime-app",
+    "storage_bucket": "cloudtime-app.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:545224902252:android:ff68f433a361de5fadba49",
+        "android_client_info": {
+          "package_name": "com.innotopic.lifesuite"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "545224902252-h73ls58fqra4nsbsk2q9jbrql70qchtk.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.innotopic.lifesuite",
+            "certificate_hash": "c825840c4778967588347d5a2a765707679236c3"
+          }
+        },
+        {
+          "client_id": "545224902252-sk1umnfe2rrrc4apffn5pvu27t8h7tsj.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBKCYOYpTg8HhxV4YBfdLBYFNUOHpvkVyg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "545224902252-sk1umnfe2rrrc4apffn5pvu27t8h7tsj.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

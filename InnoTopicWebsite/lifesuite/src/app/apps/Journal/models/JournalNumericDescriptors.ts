@@ -1,0 +1,598 @@
+import {Dict, dictToArrayWithIds} from '../../../libs/AppFedShared/utils/dictionary-utils'
+import {UiFieldDef} from './JournalTextDescriptors'
+import {nullish} from '../../../libs/AppFedShared/utils/type-utils'
+
+// idea: later group them into key elements that have to be in balance:
+// e.g.:
+// - productivity
+// - excitement
+// - responsibility
+
+const isShortListed = true
+const moderateIsBetter = true
+const lowerIsBetter = true
+const specifyDuration = true
+
+export interface ILateInit {
+  lateInit(): any
+}
+
+export interface ILateInitWithMorph<TMorphInto> {
+  /** potentially can return another object into which it has "morphed" */
+  lateInitAndMorph(): TMorphInto
+}
+
+export function includes(searchIn: string | string[] | nullish , searchStringPreprocessed: string): boolean | nullish {
+  if ( typeof searchIn === `string` ) {
+    return searchIn ?. toLowerCase() ?. includes(searchStringPreprocessed)
+  } else {
+    return searchIn ?. some(s => includes(s, searchStringPreprocessed))
+  }
+}
+
+export class JournalNumericDescriptor extends UiFieldDef {
+
+  isShortListed?: boolean
+
+  searchTerms?: string | string[]
+
+  antonym?: string | string[]
+
+  acronym?: string | string[]
+
+
+  override get title() {
+    return this.id?.replace(/_/g, ' ')
+  }
+
+  constructor(data?: JndParams) {
+    super();
+
+    Object.assign(this, data)
+  }
+
+  matchesSearch(search: string) {
+    search = search ?. trim() ?. toLowerCase()
+    if ( includes(this.antonym, search) ) {
+      return true
+    }
+    return includes(this.title, search)
+      || includes(this.id, search)
+      || includes(this.searchTerms, search)
+      || includes(this.acronym, search)
+  }
+}
+
+type JndParams = {
+  /** difference between acronyms and abbreviations and how they relate to initialisms.: https://examples.yourdictionary.com/examples-of-acronyms.html */
+  acronym?: string | string[],
+  abbreviation?: string | string[],
+  antonym?: string | string[],
+  minLabel?: string,
+  maxLabel?: string,
+  subTitle?: string;
+  unit?: string;
+  lowerIsBetter?: true,
+  moderateIsBetter?: true,
+  specifyDuration ? : true,
+  idealValue?: number,
+  /* not yet implemented */
+  searchTerms?: string | string[],
+  isShortListed?: boolean,
+  isMetadata?: boolean,
+  /** shortlisted by me, but not for general public */
+  isCustomShortListed?: boolean,
+  /** Limiting factor */
+  isPersonalFocus?: boolean,
+  isPersonalBottleneck?: boolean,
+  isPersonalSourceOfWorry?: boolean,
+}
+
+function jnd(antonymOrData?: JndParams) {
+  return new JournalNumericDescriptor(antonymOrData)
+}
+
+export class UiFieldDefs {
+}
+
+/* related to variable Belohnung */
+export const slogans = [
+  `It's like Ben Franklin's method, only better.`,
+  `Play the Game of Life`,
+  `What gets measured, gets managed. - Peter Drucker`,
+  `Self-accountability`,
+  `Don't lose track of... tracking.`,
+  `To self-improve, You first need to self-assess.`,
+  `Are You aware of Self-awareness?`,
+  `A numeric self-rating is worth more than ... some quantity of words.`,
+]
+
+/** TODO: each numerical descriptor should have a text comment (some sort of "..." or comment bubble button which would expand comment field) */
+export class JournalNumericDescriptors extends UiFieldDefs {
+
+  static instance = new JournalNumericDescriptors()
+
+  confidentiality = jnd({subTitle: `of this journal entry`, minLabel: `advertised`/*public, published*/, maxLabel: `top-secret` /* encryption */,
+    searchTerms: [`secret secrecy private privacy discreet discretion discrete`],
+    /* 6: discrete; e.g. NSFW but nothing too deeply revealing about one's self */
+    /* 7: private */
+    /* default : 5 ?*/
+    isShortListed: true,
+    isMetadata: true,
+  })
+
+  importance = jnd({subTitle: `of this journal entry`, minLabel: `routine`, maxLabel: `revolution`,
+    isShortListed: true,
+    isMetadata: true,
+  })
+
+  mood = jnd({
+    searchTerms: [`happiness`, `happy`],
+    antonym: [`sad`, `depressed`],
+    isShortListed: true,
+  })
+  feeling_normal = jnd({
+    isPersonalFocus: true,
+    isShortListed: true,
+  })
+  /* TODO: being present in the moment, here and now
+  *   - enjoying the moment */
+  health = jnd({
+    isShortListed: true,
+  })
+  mental_health = jnd({
+    isShortListed: true,
+  })
+  left_chest_pain = jnd({
+    isPersonalBottleneck: true,
+    isPersonalSourceOfWorry: true,
+    lowerIsBetter: true,
+  })
+  left_hip_pain = jnd({
+    isPersonalBottleneck: false,
+    isPersonalSourceOfWorry: true,
+    lowerIsBetter: true,
+  })
+  kidney_pain_or_discomfort = jnd({
+    isPersonalBottleneck: true,
+    isPersonalSourceOfWorry: true,
+    lowerIsBetter: true,
+  })
+  blood_in_urine = jnd({
+    isPersonalBottleneck: true,
+    isPersonalSourceOfWorry: true,
+    lowerIsBetter: true,
+    searchTerms: [`pee`, `bleeding`, `kidney`]
+  })
+  back_pain = jnd({
+    lowerIsBetter: true,
+  })
+  buttocks_pain = jnd({
+    lowerIsBetter: true,
+    isPersonalBottleneck: true,
+    searchTerms: [`chair`, `sitting`]
+  })
+  foot_pain = jnd({
+    lowerIsBetter: true,
+    isPersonalBottleneck: true,
+    isPersonalSourceOfWorry: true,
+  })
+  foot_numbness = jnd({
+    lowerIsBetter: true,
+    isPersonalBottleneck: true,
+    isPersonalSourceOfWorry: true,
+  })
+  drinking_liquids = jnd({
+    lowerIsBetter: true,
+    isPersonalBottleneck: true,
+  })
+  blood_circulation = jnd({
+    isShortListed: true,
+    isCustomShortListed: true,
+  })
+  pain = jnd({isShortListed: true})
+  productivity = jnd({
+    isShortListed: true,
+    specifyDuration,
+  })
+  creativity = jnd()
+  ideas = jnd()
+  execution = jnd({
+    specifyDuration,
+  })
+  procrastination = jnd({
+    specifyDuration,
+  })
+  endorphins = jnd({
+    searchTerms: [ `runner's high`, 'endorphin rush'],
+  })
+  excitement = jnd({
+    searchTerms: [ `enthusiasm, dopamine`],
+    idealValue: 8 /* excessive excitement can cause `tension` */,
+    antonym: [`boredom?`, `apathy`],
+    isShortListed: true,
+    specifyDuration,
+  })
+  motivation = jnd({
+    isShortListed: true,
+  })
+  ambition = jnd({
+    searchTerms: [ `audacity`, `dreaming_big` ],
+  })
+  urgency = jnd()
+  sense_of_urgency = jnd()
+  patience = jnd({searchTerms: [`patient`]})
+  achievements = jnd({
+    isShortListed: true,
+  })
+  success = jnd({
+    searchTerms: `achievement`
+  }) /* prolly search term on achievements? */
+  // !!! TODO: those could/should be the ones from my big virtuous circle drawing!!!
+
+  /* ==== End of default shortlist of fields "to fill in a hurry".
+    Here could be "show more button */
+
+  'liking life' = jnd({searchTerms: [`life appreciation`, `gratefulness`, 'enjoying life']})
+  'enjoyment of current activity' = jnd()
+  'engagement' = jnd()
+  'empathy' = jnd()
+  'insensitivity' = jnd({moderateIsBetter: true, searchTerms: [`not give a fuck`]})
+  'indifference' = jnd({moderateIsBetter: true})
+  'assertiveness' = jnd()
+  'flow state' = jnd({
+    isShortListed: true,
+    specifyDuration,
+  })
+  'self-esteem' = jnd({
+    searchTerms: [`feeling of self-worth`, `self-respect`, `pride`],
+    isShortListed: true,
+  })
+  /* TODO: esteem / respect from others, */
+  guilt = jnd({lowerIsBetter: true}) /* mental state group */
+  shame = jnd({lowerIsBetter: true}) /* mental state group */
+  selfishness = jnd({lowerIsBetter: true, searchTerms: [`ego`, `egoism`], antonym: [`altruism`, `selflessness`]}) /* mental state group */
+  competitiveness = jnd({moderateIsBetter: true}) /* mental state group */
+  skill = jnd({subTitle: `for the tasks at hand`})
+  knowledge = jnd({subTitle: `for the tasks at hand`})
+  caution = jnd({moderateIsBetter: true, searchTerms: [`carefulness`], antonym: [`recklessness`, `carelessness`]})
+  passion = jnd()
+  adventure = jnd()
+  exploration = jnd()
+  travel = jnd()
+  novelty = jnd()
+  variety = jnd()
+  'sense of wonder' = jnd()
+  'peace of mind' = jnd({
+    isShortListed: true,
+  })
+  /** TODO maybe merge with peace of mind */
+  'calmness' = jnd({
+    searchTerms: [`tranquility`],
+    antonym: `drama`,
+    specifyDuration
+  })
+  drama = jnd({lowerIsBetter, })
+  'annoyance' = jnd({lowerIsBetter: true,})
+  anger = jnd({lowerIsBetter: true, searchTerms: [`angry`, `pissed off`]})
+  misanthropy = jnd({lowerIsBetter: true,})
+  hate = jnd({lowerIsBetter: true,})
+  love = jnd()
+  modesty = jnd({antonym: [`hubris`, `arrogance`, `bragging`, `showing off`, `egomania`, `showoff`, `to show off`]})
+  aggression = jnd({lowerIsBetter: true,})
+  testosterone = jnd({moderateIsBetter: true})
+  manliness = jnd({moderateIsBetter: true /* coz machismo ;) */})
+  // TODO: feminine-ness...
+  /** could be a search term on another one like calmness / resourcefulness */
+  'overwhelm' = jnd({lowerIsBetter: true,})
+  'resourcefulness' = jnd()
+  'irritability' = jnd({lowerIsBetter: true,})
+  determination = jnd({idealValue: 7.5,
+    isShortListed: true,
+    searchTerms: [`resolve`]
+  })
+  resilience = jnd({isShortListed: true})
+  striving = jnd({isShortListed: true})
+  strength = jnd({isShortListed: true})
+  self_reliance = jnd({isShortListed: true})
+  responsibility = jnd({isShortListed: true, searchTerms: [`responsableness`, `responsibleness`]})
+  maturity = jnd({searchTerms: [`being grown up`]})
+  reliability = jnd({isShortListed: true, searchTerms: [`trustworthiness`], antonym: [`flaky`, `flakiness`]})
+  // TODO physical strength, mental strength
+  // TODO power / influence
+  energy = jnd({idealValue: 8.5,
+    isShortListed: true,
+    antonym: [`tiredness`, `tired`, `apathy`] /* Note: also in "rest" */
+  })
+  hypomania = jnd({moderateIsBetter: true})
+  hope = jnd({
+    isShortListed: true,
+  })// merge optimism, hope?
+  optimism = jnd({
+    isShortListed: true,
+  })
+  reinterpretation = jnd({
+    isShortListed: true,
+  })
+  progress = jnd({
+    isShortListed: true,
+  })
+  effort = jnd({
+    isShortListed: true,
+  })
+  momentum = jnd({
+    isShortListed: true,
+  })
+  diet = jnd({
+    searchTerms: ['nutrition', 'food', 'eating'],
+    isShortListed: true,
+  })
+  overeating = jnd({
+    searchTerms: ['gorging', 'food', 'eating too much'],
+    isShortListed: true /* this will be personalised later */,
+    lowerIsBetter: true,
+  }) // other stuff for food/diet: eating sweets, eating junk foods, eating late/night
+  rest = jnd({antonym: 'tired', searchTerms: [`Somnolence`, `sleepy` /* Note; someone searches sleepy, but the might want to distinguish tired */]})
+  /** https://forum.wordreference.com/threads/drowsy-versus-sleepy.1010180/#post-14146420 */
+  'sleepiness' = jnd({lowerIsBetter: true, searchTerms: [`drowsiness`, `drowsy`, `sleepy`, `Somnolence`]})
+  'grogginess' = jnd({lowerIsBetter: true, searchTerms: [`groggy`]})
+  'sleep quality' = jnd({
+    isShortListed: true,
+    isPersonalBottleneck: true,
+  })
+  'sleep regularity' = jnd({searchTerms: `sleep pattern`})
+  'sleep quantity' = jnd({
+    specifyDuration,
+    unit: 'hours',
+  })
+  caffeine = jnd({lowerIsBetter: true})
+  coffee = jnd({lowerIsBetter: true})
+  breathing = jnd({
+    isShortListed: true,
+  })
+  relax = jnd({antonym: 'stressed'})
+  satisfaction = jnd({antonym: 'frustrated'} /*?*/)
+  frustration = jnd({antonym: 'frustrated'} /*?*/)
+  fulfillment = jnd({searchTerms: [`fulfillment` /* single l */]})
+  meaning = jnd()
+  purpose = jnd()
+  mission = jnd()
+  cravings = jnd({
+    lowerIsBetter: true,
+  })
+  'cravings for computer games' = jnd({
+    searchTerms: [`video gaming cravings temptations`],
+    lowerIsBetter: true,
+  })
+  'thinking_about_computer_games' = jnd({
+    lowerIsBetter: true,
+  })
+  'cravings for food' = jnd({
+    searchTerms: [`munchies`, `eat`, `temptations`],
+    lowerIsBetter: true,
+  })
+  'cravings for alcohol' = jnd({
+    lowerIsBetter: true,
+  })
+  'thinking_about_alcohol' = jnd({
+    lowerIsBetter: true,
+  })
+  cognition = jnd({searchTerms: [`smart`, `intelligence`, `understanding`, `mental performance`]})
+  thinking = jnd({searchTerms: [`smart`, `intelligence`, `understanding`, `mental performance`]})
+  'work quality' = jnd()
+  'work quantity' = jnd({idealValue: 8})
+  /** self-control? ... self-discipline */
+  discipline = jnd({
+    isShortListed: true,
+  })
+  preparedness = jnd({
+    isShortListed: true,
+    searchTerms: [`readiness`, `ready`],
+  })
+  /** https://www.quora.com/Whats-the-difference-between-self-control-and-self-discipline */
+  'self-discipline' = jnd()
+  /** Self-discipline says go, and keep it going. Self-control is discipline in the face of pressure from an immediate urge, desire or compulsion. Self-control relates to delaying immediate gratification of the senses. Its struggle is the conflict between intellectual knowing and emotional desiring.Mar 29, 2003*/
+  'self-control' = jnd()
+  'self-restraint' = jnd({searchTerms: [`powściągliwość`, `moderation`]})
+  'self-regulation' = jnd()
+  'willpower' = jnd()
+  /** **Will** Not **Want**: Self-Control Rather Than Motivation Explains the Female Advantage in Report Card Grades - https://pubmed.ncbi.nlm.nih.gov/25883522/*/
+  'wanting' = jnd()
+  routine = jnd({
+    isShortListed: true,
+  })
+  day_routine = jnd()
+  habits = jnd({
+    isShortListed: true,
+  })
+  punctuality = jnd()
+  cleanliness = jnd()
+  obsessiveness = jnd()
+  compulsions = jnd()
+  grooming = jnd()
+  order = jnd({antonym: 'chaos'})
+  focus = jnd({
+    antonym: `distraction`,
+    searchTerms: [`distractions`],
+    isShortListed: true,
+    specifyDuration,
+  })
+  clarity = jnd({
+    isShortListed: true,
+  })
+  'clear thinking' = jnd({
+    isShortListed: true,
+  })
+  'brainstorming' = jnd({} /* part of thinking / problem solving / troubleshooting */)
+  planning = jnd({
+    specifyDuration,
+  })
+  organizedness = jnd({
+    searchTerms: ['level being organized organised', 'organisedness', 'level of organization'],
+  })
+  time_available = jnd({})
+  prioritizing = jnd({})
+  return_on_investment = jnd({acronym: `ROI`})
+  'time tracking' = jnd()
+  outcome_independence = jnd({isShortListed, acronym: `OI`})
+  confidence = jnd({antonym: 'doubts'})
+  'self-confidence' = jnd({
+    antonym: 'doubts',
+    isShortListed: true,
+  })
+  'music enjoyment' = jnd({
+    specifyDuration,
+  })
+  'music quantity' = jnd({lowerIsBetter: true})
+  'music volume' = jnd({lowerIsBetter: true})
+  long_term_thinking = jnd({searchTerms: [`long time perspective`]})
+  perspective = jnd()
+  rationality = jnd()
+  pragmatism = jnd({searchTerms: [`practical`]})
+  /** note simple personal adjective */
+  realistic = jnd()
+  /** note simple personal adjective */
+  smart = jnd({searchTerms: [`clever`], antonym: `stupid`})
+  mindfulness = jnd({
+    isShortListed: true,
+  })
+  moderation = jnd({searchTerms: [`junkie`], antonym: [`excess`, `binge`, `binging`]})
+  humility = jnd({searchTerms: [`modesty`, `humbleness`], antonym: [`arrogance`, `pride`, `vanity`]})
+  gratitude = jnd()
+  addictions = jnd({lowerIsBetter})
+  withdrawal_syndrome = jnd({lowerIsBetter})
+  junkie = jnd({})
+  desire = jnd({searchTerms: [`wanting`,  /* is it the same as desire? but for sure related */ /* but "desire" has some carnal/sexual connotations" */]})
+  greed = jnd({moderateIsBetter: true})
+
+  'delaying of gratification' = jnd()
+  relationships = jnd({
+    isShortListed: true,
+  })
+  relationships_with_friends = jnd()
+  relationships_with_best_friends = jnd()
+  relationships_with_partner = jnd() /* FIXME rename romantic partner, business partner etc */
+  /* relationship with flatmate / roommate */
+  relationships_at_home = jnd()
+  relationships_with_coworkers = jnd()
+  relationships_with_business_partners = jnd()
+  relationships_with_family = jnd()
+  relationships_with_close_family = jnd() // parents
+  relationships_with_distant_family = jnd()
+  alcohol = jnd({
+    lowerIsBetter: true,
+    specifyDuration,
+  })
+  hangover_intensity = jnd({lowerIsBetter: true,})
+  'physical exercises' = jnd({
+    isShortListed: true,
+  })
+  'physical fitness' = jnd({
+    isShortListed: true,
+  })
+  /** TODO sport as sub-element of exercises */
+  sport = jnd({
+    isShortListed: true,
+    specifyDuration,
+    searchTerms: [`sports`],
+  })
+  bicycle = jnd({
+    specifyDuration,
+  })
+  hiking = jnd({
+    specifyDuration,
+  })
+
+  /*end sport subelements*/
+
+  sex = jnd({moderateIsBetter: true,})
+  premenstrual_syndrome = jnd({
+    acronym: 'PMS',
+    searchTerms: ['PMS', 'menstruation']
+  })
+  weather = jnd()
+
+  delegating = jnd()
+  leadership = jnd()
+  management = jnd()
+  infrastructure = jnd()
+  comfort = jnd({moderateIsBetter: true,})
+  ergonomy = jnd({moderateIsBetter: true,})
+  learning = jnd({
+    isShortListed: true,
+    specifyDuration,
+  })
+  memory = jnd()
+  'memory recall' = jnd()
+  'remembering' = jnd()
+  gaming = jnd({
+    unit: 'hours',
+    lowerIsBetter: true,
+    specifyDuration,
+  })
+  'skin itch' = jnd({
+    lowerIsBetter: true,
+  })
+  'balance' = jnd()
+  'harmony' = jnd()
+  'allergy' = jnd()
+  'food allergies' = jnd()
+  freedom = jnd()
+
+  worry = jnd({moderateIsBetter: true}) /* FIXME: de-duplicate; and with peace-of-mind */
+  concern = jnd({moderateIsBetter: true}) /* FIXME: de-duplicate; and with peace-of-mind */
+  anxiety = jnd({lowerIsBetter: true, searchTerms: ['fears', 'anxious']}) /* FIXME: de-duplicate; and with peace-of-mind */
+  tension = jnd({lowerIsBetter: true, searchTerms: [`tenseness`]}) /* FIXME: de-duplicate; and with peace-of-mind; related to excessive excitement */
+  relief = jnd() /* FIXME: de-duplicate; and with peace-of-mind; related to excessive excitement */
+  visualizing = jnd({moderateIsBetter: true})
+  long_term_vision = jnd({moderateIsBetter: true, searchTerms: `long-term vision`})
+  fun = jnd()
+  entertainment = jnd({moderateIsBetter, specifyDuration})
+  'guilt-free entertainment' = jnd({moderateIsBetter: true})
+  'nostalgia' = jnd({moderateIsBetter: true})
+  growth = jnd({
+    isShortListed: true,
+  })
+  efficiency = jnd()
+  effectiveness = jnd()
+
+  social_interactions = jnd({searchTerms: ['interacting with people', 'meetings', 'socializing']})
+  socializing = jnd({searchTerms: ['interacting with people', 'meetings', 'socializing', 'socialising']})
+  human_contact = jnd(/* not the same as socializing; superset */)
+  communication = jnd({searchTerms: ['understanding', 'talking']})
+  networking = jnd({searchTerms: ['social networking', 'meetings', 'business networking']})
+  teamwork = jnd({searchTerms: ['collaboration', 'meetings', 'working together']})
+
+  introspection = jnd()
+  self_discovery = jnd()
+
+
+  // Brian Tracy (No Excuses, chapter 2)
+  courage = jnd({antonym: 'fear'}) // / confidence ;; BUT courage is a kind of fearlessness even when lacking CONFIDENCE
+  character = jnd(/** group */)
+  integrity = jnd()
+  consistency = jnd()
+  compassion = jnd()
+  generosity = jnd()
+  persistence = jnd()
+  friendliness = jnd({searchTerms: ['being nice']})
+  temperance = jnd()
+
+
+  honesty = jnd()
+  honor = jnd()
+  goals = jnd(/* FIXME: this collides with text descriptor */)
+  life_goals = jnd()
+  written_goals = jnd()
+  being_in_denial = jnd({lowerIsBetter})
+  delusions = jnd({lowerIsBetter})
+  delusions_of_grandeur = jnd({lowerIsBetter})
+
+
+  // TODO: ego,
+  // TODO pride
+
+
+  array = dictToArrayWithIds(this as any as Dict<JournalNumericDescriptor>)
+
+}

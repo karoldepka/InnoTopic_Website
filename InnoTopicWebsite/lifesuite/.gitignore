@@ -1,0 +1,106 @@
+# Intentionally untracked files
+# https://git-scm.com/docs/gitignore
+
+# OS/editor noise
+*~
+*.sw[mnpcod]
+*.sublime-project
+*.sublime-workspace
+.DS_Store
+Thumbs.db
+UserInterfaceState.xcuserstate
+$RECYCLE.BIN/
+
+# Playwright e2e output
+test-results/
+playwright-report/
+blob-report/
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+log.txt
+testem.log
+libpeerconnection.log
+
+# Runtime data
+pids/
+*.pid
+*.seed
+*.pid.lock
+connect.lock
+
+# Dependencies
+node_modules/
+node_modules_*/
+jspm_packages/
+bower_components/
+.pnp/
+.pnp.js
+
+# Build and generated output
+dist/
+tmp/
+temp/
+out-tsc/
+www/
+coverage/
+.nyc_output/
+.angular/cache/
+.sass-cache/
+.sourcemaps/
+.tmp/
+.versions/
+.grunt/
+build/Release/
+*.tgz
+.yarn-integrity
+
+# TypeScript / legacy Angular generated files
+typings/
+e2e/*.js
+e2e/*.map
+
+# Python generated files
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.venv/
+venv/
+
+# IDEs and local tool state
+.vscode/
+.idea/workspace.xml
+.idea/compiler.xml
+.project
+.classpath
+.c9/
+*.launch
+.settings/
+
+# Environment/local config
+.env
+.env.*
+/env
+
+# Cordova/Capacitor generated platform artifacts
+platforms/
+plugins/
+plugins/android.json
+plugins/ios.json
+electron/app
+
+# Local archival/generated folders
+offrepo-gitignored/
+documentation/
+
+.vercel
+
+# Vitest browser-mode auto-generated failure screenshots
+__screenshots__/

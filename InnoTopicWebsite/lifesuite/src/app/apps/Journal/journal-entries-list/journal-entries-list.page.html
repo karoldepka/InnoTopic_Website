@@ -1,0 +1,168 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <!--      <ion-back-button [defaultHref]="'/'"></ion-back-button>-->
+      <ion-icon
+        slot="start"
+        [size]="'25px'"
+        [routerLink]="'/'"
+        name="arrow-back-outline"
+        class="action-icon"
+       />
+      <app-app-logo [withText]="false"></app-app-logo>
+
+    </ion-buttons>
+
+    <ion-title>{{ 'JOURNAL.TIMELINE_TITLE' | translate }}
+      <ng-container
+        *ngIf="feat.distracting"
+      >
+        &nbsp;
+        <ion-note>
+          {{(items$Sorted | async) ?. length}} /
+          {{(journalEntriesService.localItems$ | async) ?. length}}
+        </ion-note>
+      </ng-container>
+    </ion-title>
+
+    <ion-buttons slot="end"
+    >
+      <ion-button
+                  (click)="onClickAiAdvice($event)"
+      >
+        <ion-icon
+          class="action-icon"
+          name="bulb"
+          slot="icon-only"
+         />
+
+      </ion-button>
+
+      <ion-button style="margin-right: -5px;"
+                  (click)="onClickListOptions($event)"
+      >
+        <ion-icon
+          class="action-icon"
+          name="filter"
+          slot="icon-only"
+         />
+
+      </ion-button>
+
+      <ion-button *ngIf="feat.beforeProductization" [routerLink]="['/learn']">
+        <ion-icon class="action-color" name="book-outline" slot="icon-only" />
+      </ion-button>
+
+
+      <odm-sync-status-icon></odm-sync-status-icon>
+
+    </ion-buttons>
+
+  </ion-toolbar>
+  <ion-toolbar>
+    <ion-searchbar
+      [placeholder]="'JOURNAL.SEARCH_PLACEHOLDER' | translate"
+      [debounce]="200"
+      showClearButton="always"
+      (ionInput)="onSearchInput($event)"
+      (ionClear)="onSearchInput($event)"
+    ></ion-searchbar>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+
+  <!-- GH #66: authUser$ starts unemitted (neither a user nor confirmed-logged-out) until the
+    first real auth signal arrives - showing this prompt during that gap wrongly implied the user
+    was logged out before auth was even checked. hasEmitted distinguishes "not yet known" from
+    "known: no user" (see CachedSubject's own doc comment for the same distinction elsewhere). -->
+  <p *ngIf="!(authService.authUser$ | async) && !authService.authUser$.hasEmitted" class="ion-text-center" style="margin: 12px">
+    {{ 'AUTH.AUTHENTICATING' | translate }}
+  </p>
+  <p *ngIf="!(authService.authUser$ | async) && authService.authUser$.hasEmitted" class="ion-text-center" style="margin: 12px">
+    {{ 'JOURNAL.LOGIN_PROMPT_PREFIX' | translate }} <a [routerLink]="'/auth'">&lt; {{ 'JOURNAL.LOGIN_PROMPT_LINK' | translate }} &gt;</a> {{ 'JOURNAL.LOGIN_PROMPT_SUFFIX' | translate }}
+  </p>
+
+  <ion-fab vertical="bottom" horizontal="end" slot="fixed">
+    <!--    <ion-fab-button id='fabAddTimer2' (click)="onAddTimer()">-->
+    <!--      +-->
+    <!--&lt;!&ndash;      <ion-icon name="add-circle" />&ndash;&gt;-->
+    <!--    </ion-fab-button>-->
+    <ion-fab-button id='fabAddTimer' [routerLink]="'/journal/write/new'">
+      <ion-icon name="add-outline" />
+      <!--      <img src="assets/icon/CloudTime_Logo.svg" height="25rem">-->
+      <!--      +-->
+      <!--      <ion-icon name="add-circle" />-->
+    </ion-fab-button>
+
+  </ion-fab>
+
+  <ng-container
+    *ngIf="useVirtualScroll else nonVirtualScroll"
+  >
+    <!-- https://github.com/mhartington/cdk-virtual-scroll-ionic
+      https://stackblitz.com/edit/angular-vjmtpz
+      https://stackoverflow.com/questions/61213492/angular-cdk-virtual-scroll-viewport-does-not-render-correct-number-of-items
+      https://github.com/mhartington/cdk-virtual-scroll-ionic/commit/22c0b453cd059d7983d7908af3fc01ac291bc5d2#diff-4332cea4112c8f8b67046cb221632243
+      https://stackblitz.com/edit/cdk-virtual-scroll-autosize-zbvvxd?file=src%2Fapp%2Fapp.component.html
+      https://stackblitz.com/edit/cdk-virtual-scroll-simple-autosize-lxdfmu?file=app%2Fapp.component.scss
+      https://github.com/angular/components/issues/10113
+      https://stackblitz.com/angular/pogxdxayqgv?file=src%2Fapp%2Fcdk-virtual-scroll-context-example.html (not autosize)
+     -->
+<!--    ====== before viewport ======-->
+
+    <!-- https://stackblitz.com/edit/cdk-virtual-scroll-simple-autosize?file=package.json -->
+    <cdk-virtual-scroll-viewport
+      class="example-viewport" style="height: 100%" autosize  [minBufferPx]="1500" [maxBufferPx]="4500">
+      <!--autosize-->
+      <!-- [itemSize]="90" -->
+      <div
+        *cdkVirtualFor="let item$ of $safeNavigationMigration((items$Filtered | async)?.slice()); trackBy: trackById;
+                       let index = index;
+                       let count = count;
+                       let first = first;
+                       let last = last;
+                       let even = even;
+                       let odd = odd;">
+        <!-- TODO: /A/R/FlexLife/cloud-time-ion/node_modules/@angular/cdk-experimental/scrolling/auto-size-virtual-scroll.d.ts
+            AutoSizeVirtualScrollStrategy
+        -->
+        <!--    <div *cdkVirtualFor="let item of ['1', '2', '3'];-->
+        <!--                       let index = index;-->
+        <!--                       let count = count;-->
+        <!--                       let first = first;-->
+        <!--                       let last = last;-->
+        <!--                       let even = even;-->
+        <!--                       let odd = odd;"-->
+        <!--    >-->
+        <!--      <div>-->
+        <!--        item {{index}}-->
+        <!--        {{ item$ }}-->
+        <!--      </div>-->
+
+        <div>
+          <app-journal-entry-list-item
+            [item$]="item$"
+          ></app-journal-entry-list-item>
+        </div>
+
+      </div>
+    </cdk-virtual-scroll-viewport>
+  </ng-container>
+
+
+  <ng-template
+    #nonVirtualScroll
+  >
+    <ion-list >
+      <ng-container
+        *ngFor="let item$ of (items$Filtered | async); trackBy: trackById"
+      >
+        <app-journal-entry-list-item
+          [item$]="item$"
+        ></app-journal-entry-list-item>
+      </ng-container>
+    </ion-list>
+  </ng-template>
+
+</ion-content>

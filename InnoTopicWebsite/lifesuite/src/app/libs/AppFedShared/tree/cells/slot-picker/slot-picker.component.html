@@ -1,0 +1,24 @@
+<div class="slot-picker">
+  <ion-searchbar
+    class="slot-picker__search"
+    placeholder="Add a field…"
+    [debounce]="150"
+    showClearButton="always"
+    (ionInput)="onSearchChange($any($event).detail.value ?? '')"
+    (ionClear)="onSearchChange('')"
+  ></ion-searchbar>
+
+  <div class="slot-picker__chips">
+    @for (descriptor of visibleChips; track descriptor.id) {
+      <button
+        type="button"
+        class="slot-picker__chip slot-pill"
+        [class.slot-picker__chip--visible]="isAlreadyVisible(descriptor)"
+        (click)="pickSlot(descriptor)"
+      >
+        <app-slot-icon [descriptor]="descriptor"></app-slot-icon>
+        {{ descriptor.label }}
+      </button>
+    }
+  </div>
+</div>

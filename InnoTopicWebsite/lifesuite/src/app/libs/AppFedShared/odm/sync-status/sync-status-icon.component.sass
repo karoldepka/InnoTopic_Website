@@ -1,0 +1,22 @@
+\:host
+  display: inline-flex
+  align-items: center
+  position: relative
+
+.hide
+  opacity: 0
+
+.fade
+  //transition: opacity 3.5s ease-in-out
+  transition: opacity 2.5s ease-in-out
+
+// Bobs while an upload/download is actually in flight right now, as opposed to just being
+// queued/needed (static icon, no animation) - see SyncStatusIconComponent.isUploading$/isDownloading$.
+@keyframes sync-icon-bob
+  0%, 100%
+    transform: translateY(0)
+  50%
+    transform: translateY(-4px)
+
+.bob
+  animation: sync-icon-bob 1s ease-in-out infinite

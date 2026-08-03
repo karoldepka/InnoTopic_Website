@@ -1,0 +1,92 @@
+<ion-content>
+  <div
+    [formGroup]=formGroup
+    style="opacity: 50%; /*z-index: 99999*/"
+  >
+
+    <label class="checkbox" >
+      <input type="checkbox"
+             [checked]="debugService.isDebug$ | async"
+             (change)="onDebugChange($event)">
+      Debug
+    </label>
+
+    <label class="checkbox" >
+      <input type="checkbox"
+             [formControl]="controls.showMinMaxColumns"
+      >
+      Min/Max Cols
+    </label>
+
+    <label class="checkbox" >
+      <input type="checkbox"
+             [formControl]="controls.showAggregateValues"
+      >
+      Aggregate Values
+
+      <label class="checkbox" >
+        <input type="checkbox"
+               [formControl]="controls.showMissingValuesCount"
+        >
+        Missing Values Count
+      </label>
+
+    </label>
+
+    <label class="checkbox" >
+      <input type="checkbox"
+             [formControl]="controls.showTimeTrackedValue"
+      >
+      Time-tracked Values
+    </label>
+
+    <label class="checkbox" >
+      <input type="checkbox"
+             [formControl]="controls.planExecutionNotificationsEnabled"
+      >
+      Plan Execution Notifications Enabled
+    </label>
+
+    <label class="checkbox" >
+      <input type="checkbox"
+             [formControl]="controls.useTinyMceTitleEditor"
+      >
+      Rich Text Editor for Titles (TinyMCE)
+    </label>
+
+    <label class="checkbox" >
+      <input type="checkbox"
+             [formControl]="controls.showVoiceMemoIndicator"
+      >
+      Voice Memo Playback in Tree Rows
+    </label>
+
+    <label class="checkbox" >
+      <input type="checkbox"
+             [formControl]="controls.neumorphicTreeNodeShadows"
+      >
+      Neumorphic Sub-node Shadows (experimental)
+    </label>
+
+    Items: {{treeHost.treeModel.mapItemIdToNodes.keyCount}}
+
+    <div *ngIf="debugService.isDebug$ | async" class="backfill-section">
+      <ng-container *ngIf="(backfillService.progress$ | async) as progress; else noProgress">
+        <button type="button" [disabled]="!progress.done" (click)="runBackfillToSupabase()">
+          Backfill OrYoL to Supabase
+        </button>
+        <div>
+          {{progress.done ? 'Done' : 'Backfilling...'}}
+          {{progress.written}}/{{progress.total}} written{{progress.failed ? (', ' + progress.failed + ' failed') : ''}}
+        </div>
+      </ng-container>
+      <ng-template #noProgress>
+        <button type="button" (click)="runBackfillToSupabase()">
+          Backfill OrYoL to Supabase
+        </button>
+      </ng-template>
+    </div>
+
+  </div>
+
+</ion-content>

@@ -1,0 +1,85 @@
+import {
+  Component,
+  Input,
+  OnInit,
+  ChangeDetectionStrategy
+} from '@angular/core';
+import { DebugService } from '../../core/debug.service'
+import {Config, ConfigService} from '../../core/config.service'
+import {TimeTrackedEntry, TimeTrackingJsObjVal} from '../TimeTrackedEntry'
+import {CachedSubject} from '../../../../libs/AppFedShared/utils/cachedSubject2/CachedSubject2'
+import {stripHtml} from '../../../../libs/AppFedShared/utils/html-utils'
+import { NgClass, NgIf, AsyncPipe, JsonPipe } from '@angular/common';
+import { TimePassingComponent } from '../../AppFedSharedEmu/time/time-passing/time-passing.component';
+import { IonicModule } from '@ionic/angular';
+
+@Component({
+    selector: 'app-time-tracking-cell',
+    templateUrl: './time-tracking-cell.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
+    styleUrls: ['./time-tracking-cell.component.sass'],
+    imports: [NgClass, NgIf, TimePassingComponent, AsyncPipe, JsonPipe, IonicModule]
+})
+export class TimeTrackingCellComponent implements OnInit {
+
+  // get timeTrackedEntry() { return this.timeTrackingService.timeTrackedEntry$.lastVal }
+
+  @Input() timeTrackedEntry!: TimeTrackedEntry //  = new TimeTrackedEntry(this.timeTrackingServiceOff, null)
+
+  @Input() toolBarMode!: boolean
+
+  getDisplayTitle(data: any) {
+    return stripHtml(
+      data?. title
+    )?. substring(0, 20)
+  }
+
+  config$: CachedSubject<Config> = this.configService.config$
+
+  public timeTrackVal$!: CachedSubject<TimeTrackingJsObjVal | undefined>
+
+  constructor(
+    public configService: ConfigService,
+    public debugService: DebugService,
+  ) {
+
+  }
+
+  ngOnInit() {
+    this.timeTrackVal$ = this.timeTrackedEntry.timeTrackVal$
+    // this.timeTrackVal$.subscribe(val => {
+      // console.log(`this.timeTrackVal$.subscribe val`, val)
+    // })
+  }
+
+  // idea: long-press on pause would stop (and set done)
+
+  onStopClicked() {
+    // this.timeTrackingService.stopTimeTrackingOf()
+  }
+
+  onPlayClicked($event1: MouseEvent | Event, opts?: {inParallel: boolean}) {
+    const $event = $event1 as MouseEvent | { srcEvent: MouseEvent }
+    console.log(`onPlayClicked $event`, $event)
+    Notification.requestPermission().then(ret => {
+      console.log(`Notification.requestPermission .then`, ret)
+    })
+    this.timeTrackedEntry.startOrResumeTrackingIfNeeded(opts) // could be first start or unpause
+    if ( 'stopPropagation' in $event) {
+      $event.stopPropagation()
+    } else {
+      $event.srcEvent.stopPropagation()
+    }
+    if ( 'preventDefault' in $event ) {
+      $event.preventDefault()
+    } else {
+      $event.srcEvent.preventDefault()
+    }
+  }
+
+  onPauseClicked($event: MouseEvent) {
+    this.timeTrackedEntry.pauseOrNoop()
+    $event.stopPropagation()
+    // this.timeTrackingService.pause()
+  }
+}

@@ -1,0 +1,97 @@
+import {AfterViewInit, Component, Injector, OnInit, ChangeDetectionStrategy} from '@angular/core';
+import {QuizService} from '../core/quiz/quiz.service'
+import {Observable} from 'rxjs'
+import { PopoverController, IonicModule } from '@ionic/angular'
+import {QuizTimerPopoverComponent} from './quiz-timer-popover/quiz-timer-popover.component'
+import {LearnItem$} from '../models/LearnItem$'
+import {debugLog} from '../../../libs/AppFedShared/utils/log'
+import {Subject} from 'rxjs/internal/Subject'
+import {map, withLatestFrom} from 'rxjs/operators'
+import {EditorService} from '../../../libs/AppFedShared/rich-text/rich-text-edit/editor.service'
+import {nullish} from '../../../libs/AppFedShared/utils/type-utils'
+import {isNullish} from '../../../libs/AppFedShared/utils/utils'
+import {BaseComponent} from '../../../libs/AppFedShared/base/base.component'
+import {QuizStatus} from '../core/quiz/QuizStatus'
+import { AppLogoComponent } from '../../Common/app-logo/app-logo.component';
+import { NgIf, NgFor, AsyncPipe } from '@angular/common';
+import { TimePassingComponent } from '../../../libs/AppFedShared/time/time-passing/time-passing.component';
+import { SyncStatusIconComponent } from '../../../libs/AppFedShared/odm/sync-status/sync-status-icon.component';
+import { QuizOptionsComponent } from './quiz-options/quiz-options.component';
+import { TimePointComponent } from '../../../libs/AppFedShared/time/time-point/time-point.component';
+import { QuizItemsLeftComponent } from './quiz-items-left/quiz-items-left.component';
+import { QuizFinishedComponent } from './quiz-finished/quiz-finished.component';
+import { QuizItemDetailsComponent } from './quiz-item-details/quiz-item-details.component';
+import { ShowAnswerAndRateComponent } from './show-answer-and-rate/show-answer-and-rate.component';
+
+
+@Component({
+    selector: 'app-quiz',
+    templateUrl: './quiz.page.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
+    styleUrls: ['./quiz.page.sass'],
+    imports: [
+        IonicModule,
+        AppLogoComponent,
+        NgIf,
+        TimePassingComponent,
+        SyncStatusIconComponent,
+        QuizOptionsComponent,
+        TimePointComponent,
+        QuizItemsLeftComponent,
+        QuizFinishedComponent,
+        NgFor,
+        QuizItemDetailsComponent,
+        ShowAnswerAndRateComponent,
+        AsyncPipe,
+    ],
+})
+export class QuizPage extends BaseComponent implements OnInit, AfterViewInit  {
+
+  item$: LearnItem$ | undefined
+
+
+  // showOptions = true
+  showOptions = false
+
+  status$ = this.quizService.quizStatus$
+
+  nextItem$WhenRequested = this.quizService.nextItem$WhenRequested
+
+  constructor(
+    public quizService: QuizService,
+    public popoverController: PopoverController,
+    public editorService: EditorService,
+    injector: Injector,
+  ) {
+    super(injector)
+  }
+
+  ngOnInit() {
+  }
+
+  ngAfterViewInit(): void {
+    this.quizService.requestNextItem()
+  }
+
+  async onClickTimer(event: any) {
+    const popover = await this.popoverController.create({
+      component: QuizTimerPopoverComponent,
+      event: event,
+      translucent: true,
+      mode: 'ios' /* TODO */,
+    });
+    return await popover.present();
+  }
+
+  nowMs() {
+    return Date.now()
+  }
+
+  newDate(number: number | nullish) {
+    if ( isNullish(number) ) {
+      return number
+    }
+    return new Date(number)
+  }
+
+}

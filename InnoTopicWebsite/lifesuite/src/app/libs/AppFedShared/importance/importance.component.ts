@@ -1,0 +1,16 @@
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
+
+/** Visual representation of importance (e.g. icon) */
+@Component({
+    selector: 'app-importance',
+    templateUrl: './importance.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
+    styleUrls: ['./importance.component.sass'],
+})
+export class ImportanceComponent implements OnInit {
+
+  constructor() { }
+
+  ngOnInit() {}
+
+}

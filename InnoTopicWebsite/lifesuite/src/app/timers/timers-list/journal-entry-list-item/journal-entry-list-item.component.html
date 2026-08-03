@@ -1,0 +1,46 @@
+
+
+<div
+  *ngIf="(val$ | async) as itemVal"
+  [routerLink]="['/journal/entry/' + item$.id]"
+  style="cursor: pointer; border-bottom: #2a2a2a 3px solid; margin-bottom: 7px; padding-bottom: 7px; padding-left: 7px;"
+>
+
+  <app-time-point
+    [time]="$safeNavigationMigration(itemVal?.whenCreated | odmDate)"
+  ></app-time-point>
+
+  <ion-note
+    *ngIf="(item$.odmService.conflictedItemIds$ | async)?.has(item$.id!)"
+    color="danger"
+  >⚠ Conflict detected - an older edit was archived</ion-note>
+
+<!--  {{item$.val$ | async | json}}-->
+
+  <app-journal-num-fields-view
+    [item$]="item$"
+  ></app-journal-num-fields-view>
+
+  <app-journal-text-fields-view
+    [item$]="item$"
+  ></app-journal-text-fields-view>
+
+  <app-voice-memo-field
+    *ngIf="itemVal?.voiceMemos?.length"
+    [item$]="item$"
+    [allFields]="true"
+    [readOnly]="true"
+    (click)="$event.stopPropagation()"
+  ></app-voice-memo-field>
+
+  <div>
+<!--    <ion-note>-->
+<!--      TODO: this could/should be interwoven with time-tracking, moderation timers, ...-->
+      <!--
+        (no need to write it down manually), finishing tasks, adding learn entries, learn progress-es, voice memos, vlog entries,
+        LifeDvisor stuff (learning progress, comments)
+      -->
+<!--    </ion-note>-->
+  </div>
+</div>
+

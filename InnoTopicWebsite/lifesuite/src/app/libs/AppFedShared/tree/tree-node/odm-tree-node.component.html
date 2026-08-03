@@ -1,0 +1,65 @@
+<div
+  class="tree-node"
+  (keydown.control.s)="this.addChild()"
+  (keydown.alt.enter)="this.addChild()"
+  (keydown.control.enter)="this.addChild()"
+>
+  <!-- style="border: 2px solid var(--ion-item-background)" -->
+
+<!--  <button (click)="expanded = ! expanded">Expand</button>-->
+
+<!--  (press)="onPress($event)"-->
+<!--  [ngClass]="{collapsedIcon: ! treeNode.expanded}"-->
+
+<!--  id ({{treeNode.item$.id}})-->
+
+  <app-tree-node-content
+    [treeNode]="treeNode"
+  />
+
+<!--  children: {{(treeNode.childNodesList$ | async) ?. length}}-->
+<!--  childNodesList$: {{(treeNode.childNodesList$ | async) }}-->
+<!--  opts: {{(treeNode.item$.opts | json) }}-->
+
+  <ng-container
+    *ngIf="!(treeNode.childNodesList$ | async)"
+  >
+    <ion-note class="tree-loading">
+      <ion-spinner name="dots" />
+      Loading
+    </ion-note>
+  </ng-container>
+
+
+  <div class="tree-children" *ngIf="treeNode.isExpanded">
+    <div
+      *ngIf="(treeNode.childNodesList$ | async) let childNodesList"
+    >
+      <app-tree-node
+        *ngFor="let node of childNodesList; trackBy: trackById"
+        [treeNode]="node"
+      />
+
+    </div>
+
+
+<!--    <div-->
+<!--      *ngIf="!(treeNode.childNodesList$ | async)"-->
+<!--    >-->
+<!--      Loading.... <ion-spinner style="height: 15px"></ion-spinner>-->
+<!--    </div>-->
+
+    <!-- NOTE: we might already have some list, e.g. it's not fully loaded (coz need to finish another query),
+      and/or
+
+      hence, maybe: (childNodesListStatus$ | async)?.isLoadingFinished
+    -->
+
+  </div>
+
+
+<!--  <button (click)="addChild()">-->
+<!--    Add-->
+<!--  </button>-->
+
+</div>

@@ -1,0 +1,49 @@
+<!--<pre>-->
+<!--  themes (not just visual, also functionality):-->
+
+<!-- - excitement-->
+<!-- - before bed-->
+<!-- - fun-->
+<!-- - contemplate-->
+
+<!--settings:-->
+<!-- - contrast-->
+<!-- - brightness-->
+
+<!--Ideas:-->
+<!-- - each page / functionality could have a different theme; e.g. learning vs planning; as mental hook-->
+
+<!--</pre>-->
+
+
+<ion-range
+  [step]="0.2"
+  (ionChange)="onSliderChange($event)"
+></ion-range>
+<div class="theme-id">{{ themeService.theme.id }}</div>
+<div class="contrast-summary" title="Contrast of primary/secondary against background (WCAG UI minimum 3:1), and perceptual distance between primary and secondary (minimum 35)">
+  <span class="contrast-badge" [class.contrast-fail]="!currentThemeContrastInfo.primaryOk">P {{ currentThemeContrastInfo.primaryContrast | number:'1.1-1' }}</span>
+  <span class="contrast-badge" [class.contrast-fail]="!currentThemeContrastInfo.secondaryOk">S {{ currentThemeContrastInfo.secondaryContrast | number:'1.1-1' }}</span>
+  <span class="contrast-badge" [class.contrast-fail]="!currentThemeContrastInfo.distinctOk">&Delta; {{ currentThemeContrastInfo.distinctness | number:'1.0-0' }}</span>
+</div>
+<ion-button size="small" (click)="themeService.applyRandomTheme()">{{ 'SETTINGS.RANDOM_THEME' | translate }}</ion-button>
+<ion-button size="small" fill="outline" (click)="themeService.applyNextTheme()">{{ 'SETTINGS.NEXT_THEME' | translate }}</ion-button>
+<ion-button size="small" fill="outline" (click)="themesVisible = ! themesVisible">{{ 'SETTINGS.THEMES' | translate }}</ion-button>
+<div *ngIf="themesVisible">
+  <div *ngFor="let curTheme of themes"
+       style="cursor: pointer; margin-bottom: 4px"
+       (click)="themeService.setTheme(curTheme)"
+       [ngStyle]="{'background-color': curTheme.background}"
+  >
+    {{getThemeId(curTheme)}}<br>
+    <span [ngStyle]="{color: curTheme.primary}">{{ 'SETTINGS.PRIMARY' | translate }}</span>
+    <span class="contrast-badge" [class.contrast-fail]="!getContrastInfo(curTheme).primaryOk">{{ getContrastInfo(curTheme).primaryContrast | number:'1.1-1' }}</span>
+    &nbsp;
+    <span [ngStyle]="{color: curTheme.secondary}">{{ 'SETTINGS.SECONDARY' | translate }}</span>
+    <span class="contrast-badge" [class.contrast-fail]="!getContrastInfo(curTheme).secondaryOk">{{ getContrastInfo(curTheme).secondaryContrast | number:'1.1-1' }}</span>
+    &nbsp;
+    <span class="contrast-badge" [class.contrast-fail]="!getContrastInfo(curTheme).distinctOk">&Delta; {{ getContrastInfo(curTheme).distinctness | number:'1.0-0' }}</span>
+
+  </div>
+</div>
+

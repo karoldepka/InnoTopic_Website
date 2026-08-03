@@ -1,0 +1,202 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button mode="md" [defaultHref]="'/'"></ion-back-button>
+    </ion-buttons>
+
+    <ion-title>MINDFULNESS</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <div class="mindfulness-shell">
+    <app-time-passing
+      *ngIf="feat.userActivityTiming"
+      class="elapsed-time"
+      [isCountDown]="false"
+    ></app-time-passing>
+
+    <section class="mindfulness-timer" aria-label="Mindfulness timer">
+      <div class="timer-topline">
+        <ion-icon name="timer-outline" aria-hidden="true"></ion-icon>
+        <span>{{ timerStatusText }}</span>
+      </div>
+
+      <div class="timer-display" aria-live="polite">
+        <span>{{ timerMinutesText }}</span>
+        <span class="timer-separator">:</span>
+        <span>{{ timerSecondsText }}</span>
+      </div>
+
+      <div class="timer-progress" aria-hidden="true">
+        <div
+          class="timer-progress__bar"
+          [style.width.%]="timerProgressPercent"
+        ></div>
+      </div>
+
+      <div class="timer-presets" aria-label="Timer duration">
+        <ion-button
+          *ngFor="let preset of timerPresets"
+          class="timer-preset"
+          [class.is-selected]="selectedDurationSeconds === preset.durationSeconds"
+          size="small"
+          fill="clear"
+          (click)="selectTimerDuration(preset.durationSeconds)"
+        >
+          {{ preset.label }}
+        </ion-button>
+      </div>
+
+      <div class="timer-manual-entry" aria-label="Custom timer duration">
+        <ion-input
+          type="number"
+          inputmode="numeric"
+          min="0"
+          placeholder="min"
+          aria-label="Minutes"
+          [(ngModel)]="manualMinutes"
+        ></ion-input>
+        <span aria-hidden="true">:</span>
+        <ion-input
+          type="number"
+          inputmode="numeric"
+          min="0"
+          max="59"
+          placeholder="sec"
+          aria-label="Seconds"
+          [(ngModel)]="manualSeconds"
+        ></ion-input>
+        <ion-button
+          size="small"
+          fill="outline"
+          (click)="applyManualDuration()"
+        >Set</ion-button>
+      </div>
+
+      <div class="timer-actions">
+        <ion-button
+          class="timer-action"
+          [attr.aria-label]="isTimerRunning ? 'Pause mindfulness timer' : 'Start mindfulness timer'"
+          (click)="isTimerRunning ? pauseTimer() : startTimer()"
+        >
+          <ion-icon
+            slot="icon-only"
+            [name]="isTimerRunning ? 'pause' : 'play'"
+          ></ion-icon>
+          <span class="visually-hidden">
+            {{ isTimerRunning ? 'Pause mindfulness timer' : 'Start mindfulness timer' }}
+          </span>
+        </ion-button>
+
+        <ion-button
+          class="timer-action"
+          fill="outline"
+          aria-label="Reset mindfulness timer"
+          (click)="resetTimer()"
+        >
+          <ion-icon slot="icon-only" name="refresh"></ion-icon>
+          <span class="visually-hidden">Reset mindfulness timer</span>
+        </ion-button>
+      </div>
+    </section>
+
+    <section class="mindfulness-stats" aria-label="Mindfulness time tracked">
+      <ion-button
+        size="small"
+        fill="clear"
+        (click)="toggleShowMore()"
+      >
+        {{ showMore ? 'Hide' : 'Show' }} time tracked
+        <ion-icon [name]="showMore ? 'chevron-up' : 'chevron-down'" slot="end" />
+      </ion-button>
+
+      <div *ngIf="showMore" class="mindfulness-stats__details">
+        <p *ngIf="formatDurationParts(hourMs) as hourParts">
+          This hour: <strong>{{ hourParts.main }}</strong><small class="duration-seconds"> {{ hourParts.seconds }}</small>
+          <span *ngIf="goalMinutesPerHour"> / goal {{ goalMinutesPerHour }}m</span>
+        </p>
+        <p *ngIf="formatDurationParts(todayMs) as todayParts">
+          Today: <strong>{{ todayParts.main }}</strong><small class="duration-seconds"> {{ todayParts.seconds }}</small>
+          <span *ngIf="goalMinutesPerDay"> / goal {{ goalMinutesPerDay }}m</span>
+        </p>
+        <p *ngIf="formatDurationParts(weekMs) as weekParts">
+          This week: <strong>{{ weekParts.main }}</strong><small class="duration-seconds"> {{ weekParts.seconds }}</small>
+          <span *ngIf="goalMinutesPerWeek"> / goal {{ goalMinutesPerWeek }}m</span>
+        </p>
+
+        <div class="mindfulness-goals" aria-label="Mindfulness goals">
+          <ion-input
+            type="number"
+            inputmode="numeric"
+            min="0"
+            placeholder="Goal min/hour"
+            aria-label="Goal minutes per hour"
+            [(ngModel)]="goalMinutesPerHour"
+          ></ion-input>
+          <ion-input
+            type="number"
+            inputmode="numeric"
+            min="0"
+            placeholder="Goal min/day"
+            aria-label="Goal minutes per day"
+            [(ngModel)]="goalMinutesPerDay"
+          ></ion-input>
+          <ion-input
+            type="number"
+            inputmode="numeric"
+            min="0"
+            placeholder="Goal min/week"
+            aria-label="Goal minutes per week"
+            [(ngModel)]="goalMinutesPerWeek"
+          ></ion-input>
+          <ion-button size="small" fill="outline" (click)="saveGoals()">Save goals</ion-button>
+        </div>
+      </div>
+    </section>
+
+    <section class="mindfulness-mantra" aria-label="Mantra">
+      <span class="mindfulness-mantra__text">{{ currentMantra }}</span>
+      <ion-button
+        size="small"
+        fill="clear"
+        aria-label="Show a different mantra"
+        (click)="shuffleMantra()"
+      >
+        <ion-icon slot="icon-only" name="shuffle-outline"></ion-icon>
+      </ion-button>
+    </section>
+
+    <div class="fancy">
+
+      <p>Don't hesitate to spend some time on this. It will pay off!</p>
+
+      <p>Relax. Heal.</p>
+
+      <p>Breathe deeply.</p>
+
+      <p>Direct attention and awareness inwards.</p>
+
+      <p>Uninterrupted Focus.</p>
+
+      <p>Establish Self-Mastery.</p>
+
+      <p>WTP ! Get energized.</p>
+
+    </div>
+
+    <div class="mindfulness-images">
+      <img src="assets/images/mindfulness/forest--photo-1542202229-7d93c33f5d07.jpeg" alt="A peaceful forest image">
+      <img src="assets/images/mindfulness/jocelyne-yvonne-MCpBIwisljo-unsplash.jpg" alt="A peaceful forest image">
+    </div>
+  </div>
+
+  <!-- Idea: binaural beats -->
+  <!-- Idea: tranquil sounds -->
+  <!-- https://www.nytimes.com/guides/well/how-to-meditate#:~:text=Mindfulness%20meditation%20is%20the%20practice%20of%20actually%20being%20present%20in,present%20moment%20without%20any%20judgment. -->
+
+
+  <!-- TODO: when trying to navigate away from mindfulness, before time passed: dialog with "it will pay off" and a little time counter ~3s before able to press btn -->
+
+
+</ion-content>

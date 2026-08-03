@@ -1,0 +1,15 @@
+<span *ngIf="hasValidTime else noTimestamp">
+  {{ process(time) }}
+  {{ dayNames[time!.getDay()] }}
+</span>
+
+<ng-template #noTimestamp
+>
+  <ion-note>(no timestamp)</ion-note>
+</ng-template>
+
+<ng-container
+  *ngIf="isInFuture"
+>
+  &nbsp;<b>==== IN FUTURE ====</b>
+</ng-container>

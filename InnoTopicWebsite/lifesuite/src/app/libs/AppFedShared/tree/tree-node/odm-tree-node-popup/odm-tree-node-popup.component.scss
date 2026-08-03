@@ -1,0 +1,55 @@
+.tree-node-popup {
+  display: grid;
+  gap: 10px;
+  min-width: min(360px, calc(100vw - 32px));
+  max-width: 420px;
+  padding: 12px;
+}
+
+.node-link {
+  color: var(--ion-color-primary);
+  font-weight: 600;
+  line-height: 1.25;
+  text-decoration: none;
+}
+
+.offline-note {
+  font-size: 0.82rem;
+}
+
+.child-title-item {
+  --padding-start: 0;
+  --inner-padding-end: 0;
+}
+
+.popup-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+}
+
+ion-segment {
+  min-height: 36px;
+}
+
+ion-segment-button {
+  min-width: 0;
+}
+
+@media (max-width: 480px) {
+  .tree-node-popup {
+    min-width: calc(100vw - 24px);
+    padding: 10px;
+  }
+
+  .popup-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .popup-actions ion-button {
+    min-width: 0;
+    margin: 0;
+  }
+}

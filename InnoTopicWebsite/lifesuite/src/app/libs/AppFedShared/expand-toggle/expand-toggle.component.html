@@ -1,0 +1,15 @@
+<button
+  type="button"
+  class="expand-toggle"
+  (click)="toggle()"
+  [class.expand-toggle--active]="isOpen || hasContent"
+>
+  <ion-icon [name]="icon"></ion-icon>
+  @if (closedLabel || openLabel) {
+    <span>{{ isOpen ? openLabel : closedLabel }}</span>
+  }
+</button>
+
+@if (isOpen) {
+  <ng-content></ng-content>
+}

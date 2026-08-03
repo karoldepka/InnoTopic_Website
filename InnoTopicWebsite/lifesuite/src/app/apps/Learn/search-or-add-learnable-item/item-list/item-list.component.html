@@ -1,0 +1,27 @@
+<p style="margin: 10px" *ngIf="! learnDoService.itemsLoaded">
+  LOADING...
+  <ion-spinner></ion-spinner>
+</p>
+<p style="margin: 10px" *ngIf="learnDoService.itemsLoaded && ! this.filteredItem$s?.length">
+  NOTHING FOUND
+</p>
+
+<!-- cdk-virtual-scroll-viewport (autosize) replaced a previous ion-virtual-scroll attempt that had
+     bugs: wrong heights for items with audio, stale rendering on delete, blinking on array
+     changes, bad scrollbar styling. autosize measures each row's real rendered height (rather
+     than assuming a fixed estimate), so variable-height rows here (badges, audio play button,
+     free text) still render correctly while only the visible subset stays in the DOM. -->
+<cdk-virtual-scroll-viewport
+  autosize
+  style="height: 100%"
+  [minBufferPx]="1500"
+  [maxBufferPx]="4500"
+>
+  <div *cdkVirtualFor="let currItem of filteredItem$s; trackBy: trackByFn; let i = index">
+    <app-actionable-item
+      [index]="i"
+      [item]="currItem"
+      [selection]="listModel.selection"
+    ></app-actionable-item>
+  </div>
+</cdk-virtual-scroll-viewport>

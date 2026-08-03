@@ -1,0 +1,27 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button [defaultHref]="'/learn'" />
+    </ion-buttons>
+    <ion-title>Chart</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+
+  <p>
+    Data points: {{(items$ | async)?.length}}
+  </p>
+
+
+  <stacked-interactive-chart
+    style="width: 100%; display: block"
+    [data]="data"
+   />
+
+<!--  <pre>-->
+<!--    {{items$ | async | json}}-->
+<!--  </pre>-->
+
+
+</ion-content>

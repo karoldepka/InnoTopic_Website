@@ -1,0 +1,32 @@
+
+<!--   [apiKey]="'o9pxe54rr0n0ox46qj7gtlks0ilkpf7gmximm8syjqzjl184'"
+-->
+<editor
+  [init]="tinyMceInit"
+  [inline]="true"
+  [formControl]="formControl1"
+  [modelEvents]="'change input undo redo' + (enableModelEventNodeChange ? ' nodechange' : '')"
+  (onInit)="logEditor('tinyMce <editor (onInit)...'); viewSyncer?.onInitialDataWasSet(); onEditorInit()"
+  (onFocusIn)="onFocus(true)"
+  (onFocusOut)="onFocus(false)"
+  (blur)="onFocus(true)"
+
+  (keydown.arrowup)="focusCellAbove($event)"
+  (keydown.meta.arrowup)="focusCellAbove($event)"
+  (keydown.arrowdown)="focusCellBelow($event)"
+  (keydown.meta.arrowdown)="focusCellBelow($event)"
+
+>
+  <!--   (onFocus)="onFocus($event)"
+-->
+  <!-- FIXME:     modelEvents="change input undo redo nodechange" causes patching when opening details page -->
+  <!--  (ngModelChange)="onChangeEditor($event)"-->
+  <!--     (onSetContent)="logEditor('onSetContent')"
+  (onPostRender)="logEditor('onPostRender')"
+  -->
+  <!-- events: https://www.tiny.cloud/docs/advanced/events/#init
+    * Init -- actually called last?
+    * SetContent
+  -->
+
+</editor>

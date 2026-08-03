@@ -1,0 +1,46 @@
+<ng-container *ngIf="itemVal$ | async let itemVal else loading">
+
+  <div style="margin: 5px;">
+    <ng-container
+      *ngIf="feat.showExperimental"
+    >
+      {{ 'JOURNAL.SELF_IMPROVEMENT_GAME_PROMPT' | translate }}
+      <ion-note>{{ descriptors.length }} {{ 'JOURNAL.FIELDS' | translate }}</ion-note>
+
+    </ng-container>
+    <p style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap">
+      <app-time-point [time]="$safeNavigationMigration(itemVal?.whenCreated | odmDate)"></app-time-point>
+      <app-geo-loc [geoLoc]="$safeNavigationMigration(itemVal?.whereCreated)"></app-geo-loc>
+      <app-time-tracked-item-cell
+        *ngIf="featureService.timeTrackingEnabled"
+        [item$]="item$P"
+        [toolBarMode]="true"
+      ></app-time-tracked-item-cell>
+    </p>
+  </div>
+
+  <app-tree-node-cells
+    *ngIf="treeNode"
+    [treeNode]="treeNode"
+    [descriptors]="descriptors"
+    [autoExpandDescriptorId]="autoExpandDescriptorId"
+    [alwaysVisibleDescriptorIds]="alwaysVisibleDescriptorIds"
+  ></app-tree-node-cells>
+
+</ng-container>
+
+<ng-template #loading
+>
+  <!-- Without a logged-in user, itemVal$ never emits at all (auth-gated ODM sync) - a bare
+    "Loading" would then just spin forever instead of telling the user why. Same three states/
+    copy as JournalEntriesListPage's own login prompt. -->
+  <p *ngIf="!(authService.authUser$ | async) && !authService.authUser$.hasEmitted" class="ion-text-center">
+    {{ 'AUTH.AUTHENTICATING' | translate }}
+  </p>
+  <p *ngIf="!(authService.authUser$ | async) && authService.authUser$.hasEmitted" class="ion-text-center">
+    {{ 'JOURNAL.LOGIN_PROMPT_PREFIX' | translate }} <a [routerLink]="'/auth'">&lt; {{ 'JOURNAL.LOGIN_PROMPT_LINK' | translate }} &gt;</a> {{ 'JOURNAL.LOGIN_PROMPT_SUFFIX' | translate }}
+  </p>
+  <ng-container *ngIf="authService.authUser$ | async">
+    {{ 'COMMON.LOADING' | translate }}
+  </ng-container>
+</ng-template>

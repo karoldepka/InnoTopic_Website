@@ -1,0 +1,358 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button mode="md" defaultHref="/ai"></ion-back-button>
+      <ion-menu-button></ion-menu-button>
+      <app-app-logo [withText]="false"></app-app-logo>
+    </ion-buttons>
+    <ion-title>Q&amp;A Generator</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <div class="qa-layout">
+
+    <!-- ── PROMPT ─────────────────────────────────────────────────────────── -->
+    <section class="panel prompt-panel">
+      <div class="panel-head"><h2>Topic</h2></div>
+      <div class="panel-body">
+        <ion-textarea
+          rows="3"
+          autoGrow="true"
+          fill="outline"
+          [placeholder]="gen.fileTree() ? 'Optional: e.g. high level questions about kotlin files and their dirs' : 'Rust interview questions'"
+          [value]="topic()"
+          (ionInput)="setTopic($any($event).detail.value)"
+        ></ion-textarea>
+
+        <div class="examples" *ngIf="!gen.fileTree()">
+          <ion-button fill="clear" size="small" (click)="topic.set('Rust interview questions')">Rust</ion-button>
+          <ion-button fill="clear" size="small" (click)="topic.set('Angular signals and RxJS')">Angular</ion-button>
+          <ion-button fill="clear" size="small" (click)="topic.set('Postgres performance')">Postgres</ion-button>
+        </div>
+
+        <!-- ── GH #130: generate from a local directory instead of/alongside a text topic ──── -->
+        <div class="directory-picker" *ngIf="directoryPickerSupported">
+          <ion-button *ngIf="!gen.fileTree()" fill="outline" size="small" (click)="pickDirectory()">
+            <ion-icon name="folder-outline" slot="start"></ion-icon>
+            Pick folder…
+          </ion-button>
+          <div class="picked-directory" *ngIf="gen.fileTree() as pickedTree">
+            <ion-icon name="folder-outline"></ion-icon>
+            <span>
+              {{ pickedTree.rootName }} — {{ pickedDirectoryFileCount() }} file{{ pickedDirectoryFileCount() === 1 ? '' : 's' }}
+              <ng-container *ngIf="pickedDirectorySkippedCount()">, {{ pickedDirectorySkippedCount() }} skipped</ng-container>
+            </span>
+            <ion-button fill="clear" size="small" (click)="clearDirectory()" aria-label="Clear picked folder">
+              <ion-icon name="close-outline" slot="icon-only"></ion-icon>
+            </ion-button>
+          </div>
+        </div>
+
+        <div class="actions">
+          <ion-toggle
+            labelPlacement="end"
+            [checked]="webSearch()"
+            (ionChange)="webSearch.set($any($event).detail.checked)"
+          >Web search</ion-toggle>
+
+          <ion-toggle
+            labelPlacement="end"
+            [checked]="matchExisting()"
+            (ionChange)="matchExisting.set($any($event).detail.checked)"
+          >Match existing categories</ion-toggle>
+
+          <ion-toggle
+            labelPlacement="end"
+            [checked]="rawPromptMode()"
+            (ionChange)="rawPromptMode.set($any($event).detail.checked)"
+          >Raw prompt (debug)</ion-toggle>
+
+          <ion-button
+            expand="block"
+            [color]="gen.categoryLoading() ? 'danger' : 'primary'"
+            [disabled]="!gen.categoryLoading() && !topic().trim() && !gen.fileTree()"
+            (click)="gen.categoryLoading() ? gen.stopCategories() : (rawPromptMode() ? sendRawPrompt() : generateCategories())"
+          >
+            <ion-icon
+              [name]="gen.categoryLoading() ? 'stop-circle-outline' : 'sparkles-outline'"
+              slot="start"
+            ></ion-icon>
+            {{ gen.categoryLoading() ? 'Stop' : 'Generate Categories' }}
+          </ion-button>
+        </div>
+
+        <div class="status-line" [class.error]="gen.categoryError()">
+          {{ gen.categoryError() || gen.categoryStatus() }}
+        </div>
+
+        <div class="metrics">
+          <span>{{ gen.categoryCount() }} categories</span>
+          <span>{{ totalQCount() }} Q&amp;A requested</span>
+          <span>{{ gen.existingCategories().length }} existing</span>
+          <span *ngIf="gen.modelName()">{{ gen.modelName() }}</span>
+        </div>
+
+        <pre class="debug-raw" *ngIf="rawResponse()">{{ rawResponse() }}</pre>
+      </div>
+    </section>
+
+    <!-- ── CATEGORIES ────────────────────────────────────────────────────── -->
+    <section class="panel tree-panel">
+      <div class="panel-head">
+        <h2>Categories</h2>
+        <div class="head-actions">
+          <ion-button
+            *ngIf="lastDeletedTree()"
+            fill="outline"
+            size="small"
+            color="warning"
+            (click)="undoDelete()"
+          >
+            <ion-icon name="arrow-undo-outline" slot="start"></ion-icon>Undo
+          </ion-button>
+          <ion-button fill="clear" size="small" (click)="addRootCategory()">
+            <ion-icon name="add-outline" slot="icon-only"></ion-icon>
+          </ion-button>
+        </div>
+      </div>
+
+      <div class="tree-scroll">
+        @if (gen.tree().length) {
+          <table class="qa-tree">
+            <thead>
+              <tr>
+                <th class="cat-head">Category</th>
+                <th class="col-num">Q#</th>
+                <th class="col-btn"></th>
+                <th class="col-btn"></th>
+                <th class="col-btn"></th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (row of categoryTable.getRowModel().rows; track row.id) {
+                <tr class="cat-row">
+                  <td class="cat-cell">
+                    <span class="cat-indent" [style.width.px]="row.depth * 16"></span>
+                    @if (row.getCanExpand()) {
+                      <button
+                        type="button"
+                        class="cat-toggler"
+                        [attr.aria-label]="row.getIsExpanded() ? 'Collapse' : 'Expand'"
+                        (click)="row.toggleExpanded()"
+                      >
+                        <ion-icon [name]="row.getIsExpanded() ? 'chevron-down-outline' : 'chevron-forward-outline'"></ion-icon>
+                      </button>
+                    } @else {
+                      <span class="cat-toggler-spacer"></span>
+                    }
+                    <span class="cat-ordinal">{{ categoryOrdinal(row) }}</span>
+                    <input
+                      class="cat-title"
+                      [value]="row.original.title"
+                      [attr.aria-label]="'Category: ' + row.original.title"
+                      (input)="renameCategory(row.original.id, $any($event.target).value)"
+                    />
+                    @if (row.original.isExistingCategory || row.original.matchedExistingCategoryId) {
+                      <span
+                        class="existing-tag"
+                        [title]="row.original.matchedExistingCategoryTitle || row.original.matchedExistingCategoryId || ''"
+                      >existing</span>
+                    }
+                  </td>
+                  <td class="col-num">
+                    <input
+                      class="cat-count"
+                      type="number"
+                      min="0"
+                      max="50"
+                      [value]="row.original.questionCount"
+                      [attr.aria-label]="'Q count for ' + row.original.title"
+                      (input)="changeCount(row.original.id, $any($event.target).value)"
+                    />
+                  </td>
+                  <td class="col-btn">
+                    <ion-button fill="clear" size="small" [attr.aria-label]="'Add child to ' + row.original.title" (click)="addChild(row.original.id)">
+                      <ion-icon name="add-outline" slot="icon-only"></ion-icon>
+                    </ion-button>
+                  </td>
+                  <td class="col-btn">
+                    <ion-button
+                      fill="clear"
+                      size="small"
+                      [disabled]="gen.subcategoryLoading()"
+                      [attr.aria-label]="'Generate subcategories for ' + row.original.title"
+                      (click)="showMoreSubcategoriesDialog(row.original)"
+                    >
+                      <ion-icon name="sparkles-outline" slot="icon-only"></ion-icon>
+                    </ion-button>
+                  </td>
+                  <td class="col-btn">
+                    <ion-button fill="clear" size="small" color="danger" [attr.aria-label]="'Delete ' + row.original.title" (click)="deleteCategory(row.original.id)">
+                      <ion-icon name="trash-outline" slot="icon-only"></ion-icon>
+                    </ion-button>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        } @else {
+          <div class="empty">No categories yet.</div>
+        }
+      </div>
+
+      <div class="panel-foot">
+        <ion-button
+          [color]="gen.questionLoading() ? 'danger' : 'secondary'"
+          [disabled]="!gen.questionLoading() && (!gen.tree().length || totalQCount() === 0)"
+          (click)="gen.questionLoading() ? gen.stopQuestions() : generateQuestions()"
+        >
+          <ion-icon
+            [name]="gen.questionLoading() ? 'stop-circle-outline' : 'checkmark-outline'"
+            slot="start"
+          ></ion-icon>
+          {{ gen.questionLoading() ? 'Stop' : 'Generate Q&A' }}
+        </ion-button>
+        <ion-button
+          fill="outline"
+          color="tertiary"
+          [disabled]="gen.questionLoading() || (!gen.tree().length && !gen.questions().length)"
+          (click)="saveToLearn()"
+        >
+          <ion-icon name="save-outline" slot="start"></ion-icon>
+          Save to Learn
+        </ion-button>
+      </div>
+    </section>
+
+    <!-- ── QUESTIONS ─────────────────────────────────────────────────────── -->
+    <section class="panel questions-panel">
+      <div class="panel-head">
+        <div class="head-left">
+          <h2>Questions</h2>
+          @if (gen.questions().length) {
+            <ion-checkbox
+              [checked]="allQSelected()"
+              [indeterminate]="selectedQIndices().size > 0 && !allQSelected()"
+              (ionChange)="toggleSelectAll()"
+              aria-label="Select all questions"
+            ></ion-checkbox>
+          }
+        </div>
+        <div class="head-actions">
+          <ion-toggle
+            labelPlacement="end"
+            [checked]="showAnswers()"
+            (ionChange)="showAnswers.set($any($event).detail.checked)"
+          >Show answers</ion-toggle>
+          <ion-button fill="clear" size="small" [disabled]="!gen.questions().length" (click)="copyQuestions()">
+            <ion-icon name="copy-outline" slot="icon-only"></ion-icon>
+          </ion-button>
+          <ion-button fill="clear" size="small" [disabled]="!gen.questions().length" (click)="exportJson()">
+            <ion-icon name="download-outline" slot="icon-only"></ion-icon>
+          </ion-button>
+        </div>
+      </div>
+
+      <div class="status-line" [class.error]="gen.questionError()">
+        {{ gen.questionError() || gen.questionStatus() }}
+      </div>
+
+      <div class="questions-scroll">
+        @if (gen.questions().length) {
+          @for (item of gen.questions(); track $index; let i = $index) {
+            <article class="q-card" [class.q-selected]="selectedQIndices().has(i)">
+              <div class="q-path">{{ item.categoryPath || item.categoryId }}</div>
+              <div class="q-row">
+                <ion-checkbox
+                  [checked]="selectedQIndices().has(i)"
+                  (ionChange)="toggleQSelected(i)"
+                  aria-label="Select question"
+                ></ion-checkbox>
+                <strong><span class="q-ordinal">{{ i + 1 }}.</span> {{ item.question }}</strong>
+                <ion-button
+                  fill="clear"
+                  size="small"
+                  [disabled]="showAnswers()"
+                  [attr.aria-expanded]="answerVisible(item, i)"
+                  (click)="toggleAnswer(item, i)"
+                >
+                  <ion-icon
+                    [name]="answerVisible(item, i) ? 'eye-off-outline' : 'eye-outline'"
+                    slot="icon-only"
+                  ></ion-icon>
+                </ion-button>
+              </div>
+              @if (answerVisible(item, i)) {
+                <p class="q-answer">{{ item.answer || '…' }}</p>
+              }
+              <div class="q-image">
+                @if (item.imageDataUrl) {
+                  <img [src]="item.imageDataUrl" [alt]="item.question" class="q-image__img" />
+                }
+                <ion-button
+                  fill="clear"
+                  size="small"
+                  [disabled]="gen.questionImageLoadingIndices().has(i)"
+                  (click)="gen.generateQuestionImage(i)"
+                >
+                  @if (gen.questionImageLoadingIndices().has(i)) {
+                    <ion-spinner name="dots" slot="start"></ion-spinner>
+                  } @else {
+                    <ion-icon name="image-outline" slot="start"></ion-icon>
+                  }
+                  {{ item.imageDataUrl ? 'Regenerate image' : 'Generate image' }}
+                </ion-button>
+              </div>
+            </article>
+          }
+        } @else {
+          <div class="empty">No questions yet.</div>
+        }
+      </div>
+
+      @if (gen.questions().length || gen.questionLoading()) {
+        <div class="panel-foot q-actions">
+          @if (gen.questionLoading()) {
+            <ion-button
+              size="small"
+              color="danger"
+              (click)="gen.stopQuestions()"
+            >
+              <ion-icon name="stop-circle-outline" slot="start"></ion-icon>
+              Stop
+            </ion-button>
+          }
+          <ion-button
+            size="small"
+            color="success"
+            [disabled]="!selectedQIndices().size"
+            (click)="approveSelected()"
+          >
+            <ion-icon name="checkmark-outline" slot="start"></ion-icon>
+            Approve ({{ selectedQIndices().size }})
+          </ion-button>
+          <ion-button
+            size="small"
+            color="danger"
+            [disabled]="!selectedQIndices().size"
+            (click)="rejectSelected()"
+          >
+            <ion-icon name="close-outline" slot="start"></ion-icon>
+            Reject ({{ selectedQIndices().size }})
+          </ion-button>
+          <ion-button
+            size="small"
+            fill="outline"
+            [disabled]="gen.questionLoading()"
+            (click)="showMoreQADialog()"
+          >
+            <ion-icon name="add-outline" slot="start"></ion-icon>
+            More Q&amp;A…
+          </ion-button>
+        </div>
+      }
+    </section>
+
+  </div>
+</ion-content>

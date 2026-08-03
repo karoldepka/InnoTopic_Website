@@ -1,0 +1,20 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button mode="md" [defaultHref]="'/what-next'" />
+    </ion-buttons>
+    <ion-title>AI Chat</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content style="--padding-top: 1rem; --padding-start: 1rem; --padding-end: 1rem; --padding-bottom: 1rem">
+  <deep-chat
+    [connect]="deepChatConnect"
+    [requestBodyLimits]="deepChatRequestBodyLimits"
+    [introMessage]="deepChatIntroMessage"
+    [names]="deepChatNames"
+    [textInput]="deepChatTextInput"
+    [chatStyle]="deepChatChatStyle"
+    [messageStyles]="deepChatMessageStyles"
+  />
+</ion-content>

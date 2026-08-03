@@ -1,0 +1,35 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button mode="md" [defaultHref]="'/'"></ion-back-button>
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+    <ion-title>AI Integrations</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ai-hub-page">
+  <div class="ai-hub-grid">
+
+    <ion-card [routerLink]="'/ai-generate-q-and-a/copilotkit'" button>
+      <ion-card-header>
+        <ion-card-title>Q&amp;A · CopilotKit</ion-card-title>
+        <ion-card-subtitle>@copilotkit/angular · AG-UI</ion-card-subtitle>
+      </ion-card-header>
+      <ion-card-content>
+        Generate category trees and question-answer cards with a CopilotKit Angular chat beside the workbench.
+      </ion-card-content>
+    </ion-card>
+
+    <ion-card [routerLink]="'/ai/qa'" button>
+      <ion-card-header>
+        <ion-card-title>Q&amp;A · Vercel AI SDK</ion-card-title>
+        <ion-card-subtitle>@ai-sdk/angular · StructuredObject</ion-card-subtitle>
+      </ion-card-header>
+      <ion-card-content>
+        Generate category trees and question-answer cards through the Vercel AI SDK Angular adapter.
+      </ion-card-content>
+    </ion-card>
+
+  </div>
+</ion-content>

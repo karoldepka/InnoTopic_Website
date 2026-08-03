@@ -1,0 +1,39 @@
+<ion-content>
+  <ion-button id="buttonDismissTimerDetails" (click)="onClickDismiss()">
+    < Dismiss
+  </ion-button>
+
+  <ion-input
+    [formControl]="timerTitleControl"
+    id="timerTitle"
+    [clearInput]="true"
+    placeholder="Timer Title"
+    value="{{timer.title}}"
+  ></ion-input>
+  End: {{endTime | date }} <!-- TODO format time -->
+
+
+  <app-time-picker
+    [totalTimeSeconds]="timer.durationSeconds !"
+    (durationSecondsChanged)="onDurationSecondsChanged($event)"
+  ></app-time-picker>
+
+  <ion-button id="buttonDeleteTimer" (click)="confirmDelete()">
+    <ion-icon name="trash" />
+    &nbsp;Delete
+  </ion-button>
+
+  <ion-button *ngIf="! timer.isRunning" id="buttonStartTimer" (click)="timer.startTimer()">
+    <ion-icon name="play-circle" />
+    &nbsp;Start
+  </ion-button>
+  <ion-button *ngIf="timer.isRunning" id="buttonStopTimer" (click)="askStopTimer()">
+    <ion-icon name="square" />
+    &nbsp;Stop
+  </ion-button>
+  <ion-button *ngIf="timer.isRunning" id="buttonPauseTimer" (click)="askPauseTimer()">
+    <ion-icon name="pause" />
+    &nbsp;Pause
+  </ion-button>
+
+</ion-content>

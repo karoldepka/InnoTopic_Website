@@ -1,0 +1,167 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button [defaultHref]="'/learn'" />
+      <app-app-logo />
+      <ion-button (click)="navigationService.navigateToPrevious()">
+        <ion-icon slot="icon-only" name="chevron-back-outline" />
+      </ion-button>
+      <ion-button (click)="navigationService.navigateToNext()">
+        <ion-icon slot="icon-only" name="chevron-forward-outline" />
+      </ion-button>
+    </ion-buttons>
+    <div style="display: inline-flex; align-items: center; width: 100%">
+      <ng-container *ngIf="feat.showUgly">
+        <div *ngIf="(navigationService.status$ | async) let s" style="align-self: center">
+          {{s?.currentOrdinal}} / {{s?.totalCount}}, {{s.percent}}%
+        </div>
+      </ng-container>
+
+      <!-- <ion-button (click)="window.history.back()"><</ion-button> -->
+      <!--        <ion-button routerLink="/learn"><&lt;!&ndash; TODO: create component back-icon &ndash;&gt;</ion-button>-->
+
+      <div style="flex-grow: 1; display: flex; align-items: center">
+        <!--          &nbsp; CARD DETAILS-->
+      </div>
+
+      <app-time-passing
+        *ngIf="feat.userActivityTiming"
+
+        style="font-size: 80%; margin-right: 3px"
+        [isCountDown]="false"
+       />
+
+<!--      <app-process-button /> -->
+
+<!--      <app-quiz-button /> -->
+
+      {{ title }}
+
+      <ion-buttons>
+        <odm-sync-status-icon style="padding-right: 4px" />
+      </ion-buttons>
+
+    </div>
+<!--    <ion-title>-->
+<!--      -->
+<!--    </ion-title>-->
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding-horizontal">
+
+  <ng-container
+    *ngIf="(val$ | async) as itemVal else notLoaded"
+  >
+    <ng-container
+      *ngIf="g.feat.tutorial.unpolishedVisually"
+    >
+      <app-learn-item-details-hints
+        [hidden]="$safeNavigationMigration(itemVal ?. isTask)"
+      />
+
+      CREATED <app-time-point
+      [time]="$safeNavigationMigration(itemVal?.whenCreated | odmDate)"
+    />
+      MODIFIED <app-time-point
+      [time]="$safeNavigationMigration(itemVal?.whenLastModified | odmDate)"
+    />
+
+      <app-geo-loc [geoLoc]="$safeNavigationMigration(itemVal?.whereCreated)" />
+    </ng-container>
+
+    <div style="display: flex; flex-direction: row; width: 100%">
+      <app-item-class-edit
+        style="flex: 0 1 50%; padding: 4px 8px; box-sizing: border-box"
+        [item$]="item$"
+      />
+      <app-item-class-to-learn-edit
+        style="flex: 0 1 50%; padding: 4px 8px; box-sizing: border-box"
+        [item$]="item$"
+      />
+      <!-- TODO:
+        - isPublic / isBuiltIn / isOfficial for Vianey for Ukrainian
+        - and later draft/beta/published(release) status
+          - (which could be same/related to task statuses, thinking that each learn-item is also a task, or has task-workflow)
+      -->
+      <ng-container *ngIf="feat.showDebug">
+        <odm-checkbox
+          [fieldName]="'isOfficial'"
+          [item$]="item$"
+        >OFFICIAL</odm-checkbox>
+        <odm-checkbox
+          [fieldName]="'isPublished'"
+          [item$]="item$"
+        >PUBLISHED <!-- TODO store timestamp --></odm-checkbox>
+      </ng-container>
+
+    </div>
+
+    <app-statuses-edit
+      *ngIf="feat.workflowStatuses"
+      [item$]="item$"
+    />
+
+    <app-time-tracked-item-cell
+      *ngIf="featureService.timeTrackingEnabled && itemVal?.isTask"
+      [item$]="item$"
+    ></app-time-tracked-item-cell>
+
+    <ion-checkbox
+      labelPlacement="end"
+      [checked]="!!itemVal?.whenDone"
+      (ionChange)="toggleWhenDone()"
+    >
+      Done
+      <div *ngIf="itemVal?.whenDone" style="font-size: 0.85em; opacity: 0.75; margin-top: 2px">
+        {{ itemVal?.whenDone?.toISOString?.() }}
+      </div>
+    </ion-checkbox>
+
+    <app-self-rating
+      *ngIf="feat.potentiallyDangerous"
+      [hidden]="$safeNavigationMigration(itemVal ?. isTask)"
+      [item$]="item$"
+    />
+
+    <ion-button (click)="askDelete()">DELETE</ion-button>
+
+    <ion-button *ngIf="!item$.isArchived()" (click)="askArchive()">
+      <ion-icon slot="start" name="archive-outline"></ion-icon>
+      Archive
+    </ion-button>
+    <ion-button *ngIf="item$.isArchived()" (click)="restore()">
+      <ion-icon slot="start" name="arrow-undo-outline"></ion-icon>
+      Restore
+    </ion-button>
+
+    {{item$.getEffectiveCategories()}}
+
+    <app-item-sub-items
+      [item$]="item$"
+    />
+    <!--       *ngIf="feat.itemsTree.mockups"
+    -->
+
+    <app-tree-node-cells
+      [treeNode]="treeNode"
+      [descriptors]="visibleDescriptors"
+      [aiFillLoadingDescriptorId]="aiFillLoadingDescriptorId"
+      (aiFillRequested)="onAiFillRequested($event)"
+    ></app-tree-node-cells>
+
+  </ng-container>
+
+  <ng-template #notLoaded>
+    <div *ngIf="!itemLoadFinished; else itemMissing" style="margin: 20px">Loading...</div>
+    <ng-template #itemMissing>
+      <div style="margin: 20px">
+        Item not found: {{ id }}
+        <div *ngIf="itemLoadError" style="margin-top: 8px; color: var(--ion-color-danger)">
+          {{ itemLoadError }}
+        </div>
+      </div>
+    </ng-template>
+  </ng-template>
+
+</ion-content>

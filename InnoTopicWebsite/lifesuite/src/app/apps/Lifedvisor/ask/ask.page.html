@@ -1,0 +1,57 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button mode="md" [defaultHref]="'/'"></ion-back-button>
+      <app-app-logo></app-app-logo>
+    </ion-buttons>
+    <ion-buttons slot="start">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+    <ion-title>Search</ion-title>
+    <ion-buttons slot="end">
+      <ion-button [routerLink]="'/ask/log'">
+        <ion-icon slot="icon-only" name="list-outline" />
+      </ion-button>
+      <odm-sync-status-icon></odm-sync-status-icon>
+    </ion-buttons>
+
+  </ion-toolbar>
+
+  <ion-searchbar
+      [autofocus]="true"
+      [(ngModel)]="textFieldDummy"
+      (ngModelChange)="onChangeFilterText($event)"
+      id="askText"
+      [placeholder]="'Search problems/qualities/values/hints/questions/wishes'"
+      [debounce]="0"
+  ></ion-searchbar>
+
+  <ion-checkbox
+    class="expand-all-toggle"
+    id="expandAllButton"
+    labelPlacement="end"
+    [(ngModel)]="isExpandAll"
+  >Expand All</ion-checkbox>
+
+</ion-header>
+
+<ion-content
+    [fullscreen]="true"
+>
+
+  <ng-container *ngFor="let problem of rootHint.ifYesSortedByScoreFiltered">
+
+    <app-hint
+        *ngIf="isVisibleViaFilter(problem)"
+        [hidden]="! isVisibleViaFilter(problem)"
+        [ngClass]="{ hintVisible: isVisibleViaFilter(problem) }"
+        [filter]="filter"
+        [wish]="problem"
+        [isExpandedManually]="isExpandAll"
+        [isExpandedRecursively]="isExpandAll"
+    ></app-hint>
+
+  </ng-container>
+
+</ion-content>
+

@@ -1,0 +1,39 @@
+
+<div
+  [ngClass]="{blink: timer.isRunningAndOverdue}"
+  style="font-size: 3rem; height: 100%; display: flex; flex-direction: column"
+>
+  <div>
+    Timer Ended !
+  </div>
+  <!-- TODO: blink (maybe even background) to be well visible-->
+  {{timer.title}}
+
+  <app-time-left-or-duration
+    style="font-size: 3rem"
+    [timer]="timer"
+  ></app-time-left-or-duration>
+
+  <ion-button
+    id="buttonStopTimerAndDismiss"
+    (click)="onClickStopTimerAndDismiss()"
+  >
+    <ion-icon name="square" />
+    Stop and Dismiss
+  </ion-button>
+
+  <ion-button
+    id="buttonRestartTimer"
+    (click)="onClickRestart()"
+  >
+    <ion-icon name="refresh" class="flip-horiz" />
+    Restart
+  </ion-button>
+
+  <ion-button
+    id="buttonPostponeTimerOneMinute"
+    (click)="onClickPostponeOneMinute()"
+  >Postpone +1 minute
+  </ion-button>
+</div>
+

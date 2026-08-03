@@ -1,0 +1,16 @@
+
+<!--<ng-container-->
+<!--  *ngIf="(timeTrackingPeriodsService.activePeriods$ | async)?.length let trackedCount"-->
+<!--&gt;-->
+<!--  Tracking {{trackedCount}}-->
+<!--</ng-container>-->
+
+<app-time-tracking-cell
+  *ngFor="let entry of (timeTrackedEntries$ | async)"
+  [ngStyle]="{'display': 'inline-flex', 'opacity': entry.timeTrackable.getItemData()?.isDone ? '50%' : '100%' }"
+  (click)="navigateTo(entry)"
+  [timeTrackedEntry]="entry"
+  [toolBarMode]="true"
+></app-time-tracking-cell>
+
+<!--{{(timeTrackingService.timeTrackedEntry$ | async) | json}}-->

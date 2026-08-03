@@ -1,0 +1,162 @@
+\:host
+  display: block
+
+.mindfulness-shell
+  width: min(100%, 56rem)
+  margin: 0 auto
+  padding: 1rem
+
+.elapsed-time
+  display: block
+  margin-bottom: 0.75rem
+  color: var(--ion-text-color)
+  font-size: 0.95rem
+  opacity: 0.35
+
+.mindfulness-timer
+  display: grid
+  gap: 0.8rem
+  padding: 1rem
+  border: 1px solid rgba(var(--ion-text-color-rgb, 255, 255, 255), 0.14)
+  border-radius: 8px
+  background: rgba(var(--ion-text-color-rgb, 255, 255, 255), 0.07)
+
+.timer-topline
+  display: flex
+  align-items: center
+  gap: 0.45rem
+  font-size: 0.8rem
+  font-weight: 700
+  text-transform: uppercase
+  color: var(--ion-color-secondary)
+
+.timer-display
+  display: flex
+  align-items: baseline
+  justify-content: center
+  font-variant-numeric: tabular-nums
+  font-size: 4rem
+  font-weight: 800
+  line-height: 1
+
+.timer-separator
+  padding: 0 0.15em
+  color: var(--ion-color-secondary)
+
+.timer-progress
+  height: 0.45rem
+  overflow: hidden
+  border-radius: 999px
+  background: rgba(var(--ion-text-color-rgb, 255, 255, 255), 0.14)
+
+.timer-progress__bar
+  height: 100%
+  width: 0
+  border-radius: inherit
+  background: var(--ion-color-secondary)
+  transition: width 180ms linear
+
+.timer-presets
+  display: grid
+  grid-template-columns: repeat(5, minmax(0, 1fr))
+  gap: 0.4rem
+
+.timer-preset
+  min-width: 0
+  height: 2.35rem
+  margin: 0
+  font-weight: 700
+  --border-radius: 6px
+  --background-hover: rgba(var(--ion-text-color-rgb, 255, 255, 255), 0.12)
+
+.timer-preset.is-selected
+  --background: var(--ion-color-secondary)
+  --color: var(--ion-color-secondary-contrast)
+
+.timer-manual-entry
+  display: flex
+  align-items: center
+  justify-content: center
+  gap: 0.4rem
+  color: var(--ion-text-color)
+
+.timer-manual-entry ion-input
+  max-width: 4.5rem
+  text-align: center
+  --padding-start: 0.4rem
+  --padding-end: 0.4rem
+  border: 1px solid rgba(var(--ion-text-color-rgb, 255, 255, 255), 0.14)
+  border-radius: 6px
+
+.timer-actions
+  display: grid
+  grid-template-columns: repeat(2, 3.25rem)
+  justify-content: center
+  gap: 0.6rem
+
+.timer-action
+  width: 3.25rem
+  height: 3.25rem
+  margin: 0
+  --border-radius: 999px
+
+.visually-hidden
+  position: absolute
+  width: 1px
+  height: 1px
+  padding: 0
+  overflow: hidden
+  clip: rect(0, 0, 0, 0)
+  white-space: nowrap
+  border: 0
+
+.mindfulness-mantra
+  display: flex
+  align-items: center
+  justify-content: center
+  gap: 0.4rem
+  margin-top: 1rem
+  text-align: center
+
+.mindfulness-mantra__text
+  font-size: 1.3rem
+  font-weight: 700
+  color: var(--ion-color-secondary)
+
+.fancy
+  display: grid
+  gap: 0.55rem
+  margin: 1rem 0
+  font-size: 1.05rem
+  line-height: 1.45
+
+.fancy p
+  margin: 0
+
+.duration-seconds
+  font-size: 0.75em
+  opacity: 0.6
+
+.mindfulness-images
+  display: grid
+  grid-template-columns: repeat(2, minmax(0, 1fr))
+  gap: 0.75rem
+
+.mindfulness-images img
+  width: 100%
+  aspect-ratio: 4 / 3
+  object-fit: cover
+  border-radius: 8px
+
+@media (max-width: 640px)
+  .mindfulness-shell
+    padding: 0.75rem
+
+  .timer-display
+    font-size: 3rem
+
+  .timer-presets
+    grid-template-columns: repeat(3, minmax(0, 1fr))
+
+  .mindfulness-images
+    grid-template-columns: 1fr

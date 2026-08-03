@@ -1,0 +1,49 @@
+<div class="rich-text-edit-cell">
+  <app-rich-text-edit
+    style="flex-grow: 1"
+    [formControl1]="formControl"
+    [showToolbar]="true"
+    [showMenuBar]="true"
+    [toolbarSticky]="false"
+    [enterKeyOnlyWithShift]="enterKeyOnlyWithShift"
+    (enterKeydownIntercepted)="enterKeydownIntercepted.emit($event)"
+  ></app-rich-text-edit>
+
+  @if (showAiFillButton) {
+    <ion-button
+      size="small"
+      fill="clear"
+      [disabled]="aiFillLoading"
+      (click)="aiFillRequested.emit()"
+      title="Fill with AI"
+    >
+      @if (aiFillLoading) {
+        <ion-spinner name="dots"></ion-spinner>
+      } @else {
+        <span style="font-size: 1.2rem">✨</span>
+      }
+    </ion-button>
+  }
+</div>
+
+@if (includeLegacyRecording) {
+  <!-- Journal's 'general' field only - keeps recording on the parent item itself (not a child)
+    so the pre-unification legacy single-recording lookup (keyed to the parent) still works, and
+    transcribes live into the field's own text (each recording its own trailing paragraph) rather
+    than a child node - see includeLegacyRecording's doc comment. -->
+  <app-voice-memo-field
+    [item$]="cell.treeNode.item$"
+    [fieldId]="cell.column.id"
+    [includeLegacy]="true"
+    (interimTranscriptChanged)="onFieldInterimTranscriptChanged($event)"
+    (transcriptReady)="onFieldTranscriptReady($event)"
+  ></app-voice-memo-field>
+} @else {
+  <app-voice-memo-field
+    [fieldId]="'note'"
+    [createItemIfMissing]="voiceMemoChildController.createChild"
+    [createItemEagerlyOnRecordStart]="true"
+    (interimTranscriptChanged)="voiceMemoChildController.onInterimTranscriptChanged($event)"
+    (transcriptReady)="voiceMemoChildController.onTranscriptReady($event)"
+  ></app-voice-memo-field>
+}

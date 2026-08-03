@@ -1,0 +1,16 @@
+{
+  "$schema": "https://json.schemastore.org/prettierrc",
+  "printWidth": 80,
+  "tabWidth": 2,
+  "singleQuote": true,
+  "trailingComma": "all",
+  "endOfLine": "lf",
+  "overrides": [
+    {
+      "files": "*.html",
+      "options": {
+        "parser": "angular"
+      }
+    }
+  ]
+}

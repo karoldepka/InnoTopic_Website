@@ -1,0 +1,41 @@
+:host {
+  display: block;
+  /*padding: 16px;*/
+  background-color: var(--ion-background-color);
+}
+
+:host:hover {
+  border-left: var(--ion-color-secondary-contrast-muted) 3px solid;
+  /*background-color: var(--ion-color-secondary-contrast-muted);*/
+}
+
+.tree-node {
+  min-width: 0;
+}
+
+.tree-children {
+  margin-left: 22px;
+  padding-left: 8px;
+  border-left: 1px solid rgba(var(--ion-color-medium-rgb), 0.28);
+}
+
+.tree-loading {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-left: 36px;
+  min-height: 28px;
+  font-size: 0.82rem;
+}
+
+.tree-loading ion-spinner {
+  width: 16px;
+  height: 16px;
+}
+
+@media (max-width: 640px) {
+  .tree-children {
+    margin-left: 10px;
+    padding-left: 6px;
+  }
+}

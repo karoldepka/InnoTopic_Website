@@ -1,0 +1,63 @@
+<div
+  style="display: flex; order: 1; align-items: stretch"
+>
+  <div style="display: flex; flex: 1; align-items: stretch; justify-content: center">
+    <ion-button
+      class="stretch-btn"
+      (click)="showHint()"
+    >HINT</ion-button>
+
+    <ion-button
+      class="stretch-btn"
+      (click)="showAnswer()"
+    >Show answer</ion-button>
+
+    <ion-button
+      class="stretch-btn"
+      [routerLink]="$safeNavigationMigration(item$ ?. getRouterLinkUrl())"
+    >
+      <ion-icon name="create-outline" />
+    </ion-button>
+
+    <app-time-passing
+      *ngIf="feat.userActivityTiming"
+      style="font-size: 95%; color: white; margin-left: 3px; align-self: center"
+      [isCountDown]="false"
+     />
+  </div>
+
+  <ion-button *ngIf="feat.showUgly" (click)="toggleHide()">^</ion-button>
+
+</div>
+
+
+<div
+  *ngIf="(showAnswer$ | async) || (showHint$ | async)"
+  style="display: flex; flex-direction: column; align-items: center; order: 0"
+  [hidden]="hide"
+>
+  <ng-container
+    *ngIf="(showAnswer$ | async)"
+  >
+    <app-self-rating
+      [autoSave]="false"
+      [item$]="$safeNavigationMigration((quizStatus$ | async) ?. nextItem$) !"
+      (numericValue)="selfRating = $event; quizAnswersService.onSelfRate()"
+     />
+
+    <ion-button
+      (click)="applyAndNext()"
+      style="width: 100%; height: 3rem"
+    >
+      APPLY & NEXT
+      <ion-icon slot="end" style="color: var(--ion-color-secondary)" name="chevron-forward-outline" />
+<!--      {{(quizSelector$ | async)}}-->
+    </ion-button>
+
+  </ng-container>
+
+  <!-- TODO down-arrow to hide it, in case in case I want to edit.
+    OR: auto-hide in such a way, that it's not changing layout when text selected (maybe transparent click-through bottom bar?)
+  -->
+
+</div>

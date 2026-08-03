@@ -1,0 +1,44 @@
+import {Component, Input, OnInit, ChangeDetectionStrategy} from '@angular/core';
+import {LearnItem$} from '../../models/LearnItem$'
+import {BehaviorSubject} from 'rxjs'
+import { BreadcrumbsComponent } from '../../../../libs/AppFedShared/breadcrumbs/breadcrumbs.component';
+import { OdmTreeComponent } from '../../../../libs/AppFedShared/tree/tree/odm-tree.component';
+
+@Component({
+    selector: 'app-item-sub-items',
+    templateUrl: './item-sub-items.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
+    styleUrls: ['./item-sub-items.component.sass'],
+    imports: [BreadcrumbsComponent, OdmTreeComponent],
+})
+export class ItemSubItemsComponent implements OnInit {
+
+  /** maybe could strive to accept just OdmList$ */
+  @Input()
+  set item$(item$: LearnItem$) {
+    this._item$ = item$
+  }
+
+  get item$(): LearnItem$ {
+    return this._item$
+  }
+
+  private _item$!: LearnItem$
+
+  // list$!: BehaviorSubject<LearnItem$[]>
+
+
+  /* might want an @Input with root-based tree class like in OrYoL for operations on entire tree like calculating, finding node below, etc.
+  * The root is the one to which the URL points
+  * */
+
+  constructor() { }
+
+  ngOnInit() {
+    // this.list$ = this.item$.children$.list$
+  }
+
+  newItem() {
+    // this.item$.children$.add(new LearnItem$(this.item$.odmService, undefined, { title: 'Test title ' + new Date() } as any))
+  }
+}

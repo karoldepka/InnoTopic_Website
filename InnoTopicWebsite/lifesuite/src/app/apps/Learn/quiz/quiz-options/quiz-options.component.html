@@ -1,0 +1,178 @@
+<div class="quiz-groups">
+
+  <div class="quiz-group" [class.quiz-group--collapsed]="!groupsExpanded.filters">
+    <div
+      class="quiz-group__header"
+      (click)="toggleGroup('filters')"
+    >
+      FILTERS
+      <ion-icon [name]="groupsExpanded.filters ? 'chevron-up' : 'chevron-down'"></ion-icon>
+    </div>
+
+    <section
+      class="quiz-options-grid"
+      *ngIf="groupsExpanded.filters"
+    >
+      <div class="quiz-option quiz-option--input" [class.quiz-option--collapsed]="!categoriesExpanded">
+        <div
+          class="quiz-option__label quiz-option__label--toggle"
+          (click)="toggleCategories()"
+        >
+          CATEGORIES
+          <ion-icon [name]="categoriesExpanded ? 'chevron-up' : 'chevron-down'"></ion-icon>
+        </div>
+        <ion-input
+          *ngIf="categoriesExpanded"
+          class="quiz-option__input"
+          [formControl]="controls.categories"
+          [clearInput]="true"
+          [debounce]="300"
+         />
+      </div>
+
+      <div class="quiz-option quiz-option--input">
+        <div class="quiz-option__label">TEXT FILTER</div>
+        <ion-input
+          class="quiz-option__input"
+          [formControl]="controls.textFilter"
+          [clearInput]="true"
+          [debounce]="300"
+         />
+      </div>
+
+      <div class="quiz-option--regex">
+        <ion-checkbox
+          class="quiz-toggle-cell"
+          labelPlacement="end"
+          [formControl]="controls.useRegexFilters"
+        >
+          TREAT CATEGORIES / TEXT FILTER AS REGEX
+        </ion-checkbox>
+      </div>
+
+      <div class="quiz-option quiz-option--toggles">
+        <div class="quiz-toggle-grid">
+          <ion-checkbox
+            class="quiz-toggle-cell"
+            labelPlacement="end"
+            [formControl]="controls.dePrioritizeNewMaterial"
+          >
+            DE-PRIORITIZE NEW MATERIAL
+          </ion-checkbox>
+
+          <ion-checkbox
+            class="quiz-toggle-cell"
+            labelPlacement="end"
+            [formControl]="controls.skipTasks"
+          >
+            SKIP TASKS
+          </ion-checkbox>
+
+          <ion-checkbox
+            class="quiz-toggle-cell"
+            labelPlacement="end"
+            [formControl]="controls.onlyWithQA"
+          >
+            ONLY WITH Q&A
+          </ion-checkbox>
+
+          <ion-checkbox
+            class="quiz-toggle-cell"
+            labelPlacement="end"
+            [formControl]="controls.skipAiGenerated"
+          >
+            SKIP AI-GENERATED
+          </ion-checkbox>
+
+          <ion-checkbox
+            class="quiz-toggle-cell"
+            labelPlacement="end"
+            [formControl]="controls.onlyAiGenerated"
+          >
+            AI-GENERATED ONLY
+          </ion-checkbox>
+
+          <ion-checkbox
+            class="quiz-toggle-cell"
+            labelPlacement="end"
+            [formControl]="controls.textToSpeechEnabled"
+          >
+            READ ALOUD (TTS)
+          </ion-checkbox>
+        </div>
+      </div>
+      <!--<ion-button (click)="controls.minFunLevel.setValue('aa')">set fun level</ion-button>-->
+
+      <!--<app-fun-level-edit [formControl1]="controls.minFunLevel"></app-fun-level-edit>-->
+      <div class="quiz-option quiz-option--picker quiz-option--fun">
+        <div class="quiz-option__label">MIN FUN LEVEL</div>
+        <apf-numeric-picker
+          [buttonDescriptors]="funButtonsDesc"
+          [formControl]="controls.minFunLevel"
+        />
+      </div>
+
+      <div class="quiz-option quiz-option--picker quiz-option--importance">
+        <div class="quiz-option__label">MIN IMPORTANCE</div>
+        <apf-numeric-picker
+          [buttonDescriptors]="importanceButtonsDesc"
+          [formControl]="controls.minImportanceLevel"
+        />
+      </div>
+    </section>
+  </div>
+
+  <div class="quiz-group" [class.quiz-group--collapsed]="!groupsExpanded.scheduling">
+    <div
+      class="quiz-group__header"
+      (click)="toggleGroup('scheduling')"
+    >
+      SCHEDULING
+      <ion-icon [name]="groupsExpanded.scheduling ? 'chevron-up' : 'chevron-down'"></ion-icon>
+    </div>
+
+    <section
+      class="quiz-options-grid"
+      *ngIf="groupsExpanded.scheduling"
+    >
+      <div class="quiz-option quiz-option--slider">
+        <app-quiz-diligence-level
+          [control]="controls.powBaseX100"
+        />
+      </div>
+
+      <div class="quiz-option quiz-option--slider">
+        <app-quiz-interval-importance-scaling
+          [control]="controls.scaleIntervalsByImportance"
+        />
+      </div>
+
+      <div class="quiz-option quiz-option--slider">
+        <app-quiz-focus-level
+          [control]="controls.focusLevelProbabilities"
+        />
+      </div>
+    </section>
+  </div>
+
+  <div class="quiz-group" [class.quiz-group--collapsed]="!groupsExpanded.stats">
+    <div
+      class="quiz-group__header"
+      (click)="toggleGroup('stats')"
+    >
+      STATS
+      <ion-icon [name]="groupsExpanded.stats ? 'chevron-up' : 'chevron-down'"></ion-icon>
+    </div>
+
+    <section
+      class="quiz-options-grid"
+      *ngIf="groupsExpanded.stats"
+    >
+      <div class="quiz-option quiz-option--table">
+        <app-quiz-intervals
+        />
+      </div>
+    </section>
+  </div>
+
+</div>

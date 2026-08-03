@@ -1,0 +1,109 @@
+<div class="ion-padding">
+  <div class="node-summary-row">
+    <input type="checkbox"> <!-- will allow selecting multiple items -->
+    <!--{{treeNode.title}}-->
+    <!--<span [innerHTML]="'<script>window.alert()</script><b>TE</b>st'"></span>-->
+    <app-node-class-icon
+      [treeNode]="treeNode"
+    ></app-node-class-icon>
+    <span class="node-title" [innerHTML]="treeNode.title"></span>
+  </div>
+  In n Places:
+
+  <app-time-tracking-menu [treeNode]="treeNode"></app-time-tracking-menu>
+
+  <ion-button
+    (click)='addChild()'>
+    Add Sub-Item
+  </ion-button>
+
+  <ion-button
+    (click)="applyTemplate()"
+  >
+    Apply Template
+  </ion-button>
+
+  <app-tree-node-cells
+    *ngIf="slotTreeNode"
+    [treeNode]="slotTreeNode"
+    [descriptors]="slotDescriptors"
+    [onSlotChildCreated]="createRealNodeInclusionForSlotChild"
+  ></app-tree-node-cells>
+
+  <!--<ion-button-->
+  <!--  (click)="openDeleteConfirmationDialog()">-->
+  <!--  Delete-->
+  <!--</ion-button>-->
+  <ion-button
+    (click)="askArchiveItems()"
+  >
+    Archive
+  </ion-button>
+
+  <ion-button
+    (click)='navigateInto()'>
+    Navigate Into
+  </ion-button>
+
+  <ion-button
+    (click)='toClipboard()'>
+    To Clipboard
+  </ion-button>
+
+  <ion-button
+    *ngIf="clipboardService.hasContent"
+    (click)='pasteCopyHereFromClipboard()'>
+    Copy Here From Clipboard
+  </ion-button>
+
+  <ion-button
+    *ngIf="clipboardService.hasContent"
+    class="btn btn-primary"
+    (click)='pasteMoveHereFromClipboard()'>
+    Move Here From Clipboard
+  </ion-button>
+  <div style="display: flex; align-items: stretch; margin-top: .5em">
+    <app-voice-memo-field
+      [item$]="treeNode.content.dbItem"
+      [collection]="'OryItem'"
+      [fieldId]="'note'"
+      [includeLegacy]="true"
+    ></app-voice-memo-field>
+  </div>
+
+  <p style="margin-top: .5em">
+    Created: {{getWhenCreated()?.toISOString()}}
+  </p>
+
+  <ion-checkbox
+    labelPlacement="end"
+    [checked]="!!treeNode.content.itemData?.isDone"
+    (ionChange)="toggleDone()"
+  >
+    Done
+  </ion-checkbox>
+
+  <app-node-class-picker
+  ></app-node-class-picker>
+
+  <div *ngIf="sharingAvailable" class="sharing-section" style="margin-top: .5em">
+    <ion-button *ngIf="canShareThisSubtree" (click)="shareSubtree()">
+      Share this subtree...
+    </ion-button>
+
+    <div *ngIf="sharesLoaded && shares.length">
+      <p>Shared with:</p>
+      <div *ngFor="let share of shares" style="display: flex; align-items: center; gap: .5em">
+        <span>{{share.granted_to_uid}} ({{share.permission}})</span>
+        <ion-button
+          *ngIf="canShareThisSubtree"
+          size="small"
+          fill="clear"
+          (click)="revokeShare(share)"
+        >
+          Revoke
+        </ion-button>
+      </div>
+    </div>
+  </div>
+</div>

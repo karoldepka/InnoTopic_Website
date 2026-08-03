@@ -1,0 +1,20 @@
+<!--&nbsp;-->
+<!--<span-->
+<!--  style="cursor: pointer; user-select: none"-->
+<!--  (click)="onClickReveal()"-->
+<!--&gt;-->
+<!--  REVEAL-->
+<!--</span>-->
+<!--&nbsp;-->
+
+<ion-button
+  size="small"
+  (pointerdown)="onPressStart()"
+  (pointerup)="onPressEnd()"
+  (pointerleave)="onPressEnd()"
+  (pointercancel)="onPressEnd()"
+>
+  REVEAL
+</ion-button>
+
+{{ getValue() }}

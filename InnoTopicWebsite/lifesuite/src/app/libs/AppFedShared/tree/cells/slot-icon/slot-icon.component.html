@@ -1,0 +1,5 @@
+@if (descriptor.imageSrc) {
+  <img class="slot-icon slot-icon--image" [src]="descriptor.imageSrc" [style.opacity]="descriptor.imageOpacity ?? 1" alt="" />
+} @else {
+  <ion-icon class="slot-icon" [name]="iconName"></ion-icon>
+}

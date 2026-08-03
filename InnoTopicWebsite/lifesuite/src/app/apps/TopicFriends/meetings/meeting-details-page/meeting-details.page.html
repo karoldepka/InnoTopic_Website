@@ -1,0 +1,34 @@
+Meeting-details
+
+LEN: {{(formGroup.value|json).length}}
+<!--{{formGroup.value|json}}-->
+
+<form
+  [formGroup]="formGroup"
+>
+  <ion-input
+    [formControl]="formGroupControls.title"
+    placeholder="Title"
+  ></ion-input>
+
+  <ion-input
+    [formControl]="formGroupControls.location"
+    placeholder="Location"
+  ></ion-input>
+
+  <ion-input
+    [formControl]="formGroupControls.date"
+    placeholder="Date and Time"
+  ></ion-input>
+
+  <app-description-editor
+    [control]="formGroupControls.description"
+  ></app-description-editor>
+
+</form>
+
+<ion-button
+  (click)="onPublish()"
+>
+  Publish
+</ion-button>

@@ -1,0 +1,59 @@
+.node-and-children:hover {
+  //background: greenyellow;
+}
+
+.ancestor-of-focused {
+  //background: antiquewhite;
+}
+
+$nested-tree-node-margin: 5px;
+
+.nested-tree-node {
+  //border-left: 3px solid red;
+  //border-bottom: 2px solid #F8F8F8;
+  margin: 2px 0 2px $nested-tree-node-margin;
+  box-shadow: 0px 1px 3px 1px #111;
+  //margin-bottom: 20px;
+  border-radius: 3px;
+  animation: nested-tree-node-animation 0.7s;
+}
+
+/** GH #90: soft embossed dual light/dark shadow instead of the plain single drop-shadow above -
+ * semi-transparent white/black (rather than hardcoded colors) so it reads reasonably across this
+ * app's many theme background colors instead of just the dark ones it was eyeballed against. */
+.nested-tree-node.neumorphic-tree-node {
+  box-shadow:
+    -2px -2px 4px rgba(255, 255, 255, 0.08),
+    3px 3px 6px rgba(0, 0, 0, 0.45);
+}
+
+.isDragOver {
+  background: red;
+}
+
+@keyframes nested-tree-node-animation {
+  0% {
+    //padding-left: 100px;
+    opacity: 0.0;
+  }
+  100% {
+    //padding-left: 0px;
+    opacity: 1.0;
+  }
+}
+
+hr {
+  margin: 5px;
+  margin-left: 1px;
+  height: 4px;
+  display: block;
+  //height: 1px;
+  border: 0;
+  border-top: 2px solid #000;
+  //margin: 1em 0;
+  padding: 0;
+}
+
+.node-children {
+  margin-left: 13px /* node indent */
+}

@@ -1,0 +1,30 @@
+import {Component, Input, OnInit, ChangeDetectionStrategy} from '@angular/core';
+import {LearnItem$} from '../../../models/LearnItem$'
+import { ItemSubItemsComponent } from '../item-sub-items.component';
+
+@Component({
+    selector: 'app-item-sub-item',
+    templateUrl: './item-sub-item.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
+    styleUrls: ['./item-sub-item.component.scss'],
+    imports: [ItemSubItemsComponent],
+})
+export class ItemSubItemComponent implements OnInit {
+
+  @Input()
+  set item$(item$: LearnItem$) {
+    this._item$ = item$
+  }
+
+  get item$(): LearnItem$ {
+    return this._item$
+  }
+
+  private _item$!: LearnItem$
+  // @Input() item$!: OdmItem$2<any, any, any, any>
+
+  constructor() { }
+
+  ngOnInit() {}
+
+}

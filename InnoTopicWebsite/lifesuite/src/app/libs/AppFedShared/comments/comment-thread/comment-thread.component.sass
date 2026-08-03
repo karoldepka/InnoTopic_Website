@@ -1,0 +1,32 @@
+.comment-thread
+  display: flex
+  flex-direction: column
+  gap: var(--space-1)
+  padding: var(--space-1) var(--space-2) var(--space-2)
+
+.comment-thread__list
+  display: flex
+  flex-direction: column
+  gap: var(--space-1)
+
+.comment-thread__item
+  font-size: 0.9em
+  padding: var(--space-1) var(--space-2)
+  border-radius: var(--space-2)
+  // --ion-color-light is a fixed near-white regardless of theme - on this always-dark UI that made
+  // comment bubbles nearly invisible (near-white bg under inherited white text). --ion-color-step-150
+  // is the theme's own dark-mode-aware subtle-highlight token.
+  background: var(--ion-color-step-150, rgba(255, 255, 255, 0.06))
+
+.comment-thread__text
+  white-space: pre-wrap
+  word-break: break-word
+
+.comment-thread__when
+  font-size: 0.75em
+  opacity: 0.6
+
+.comment-thread__add
+  display: flex
+  align-items: flex-end
+  gap: var(--space-1)

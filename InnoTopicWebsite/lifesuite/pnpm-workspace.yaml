@@ -1,0 +1,19 @@
+allowBuilds:
+  '@firebase/util': true
+  '@fortawesome/fontawesome-common-types': true
+  '@fortawesome/fontawesome-svg-core': true
+  '@fortawesome/free-solid-svg-icons': true
+  '@parcel/watcher': true
+  '@scarf/scarf': true
+  esbuild: true
+  lmdb: true
+  msgpackr-extract: true
+  # Both pulled in by @huggingface/transformers (in-browser Whisper transcription) - only its
+  # browser/WASM path is used here (onnxruntime-web, bundled, no native build needed), never the
+  # Node backend or its image-preprocessing pipeline, so neither of these native build scripts is
+  # actually needed. Rejecting rather than approving native code execution for functionality
+  # that's unused.
+  onnxruntime-node: false
+  protobufjs: true
+  re2: true
+  sharp: false

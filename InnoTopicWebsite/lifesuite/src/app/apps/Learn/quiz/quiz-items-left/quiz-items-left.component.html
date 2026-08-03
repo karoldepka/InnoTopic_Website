@@ -1,0 +1,88 @@
+<!--qS: {{quizStatus | json}}-->
+
+<ng-container
+  *ngIf="quizStatus else loading"
+>
+  <div style="overflow: scroll; font-size: 12px">
+
+  <span>
+    | left:
+    <strong style="font-size: 12px; color: white">{{ quizStatus . itemsLeft }}</strong>
+    | next 12h:
+    {{ quizStatus . itemsLeftToday }}
+  </span>
+  <!--  {{ (quizStatus ?. itemsLeftByImportance) | json }}-->
+  <table>
+    <tr class="tableSectionHeader">
+      <td colspan="5" style="text-align: left">
+        PENDING FILTERED:
+      </td>
+    </tr>
+
+    <tr >
+      <td></td>
+
+      <td
+        *ngFor="let importance of importancesArray"
+        [ngClass]="{ highlight: isCurrentDisplayed(importance) }"
+      >
+        {{importance.abbrev}}
+      </td>
+    </tr>
+    <tr >
+      <td></td>
+
+      <td
+        *ngFor="let importance of importancesArray"
+        [ngClass]="{ highlight: isCurrentDisplayed(importance) }"
+      >
+        {{quizStatus !. itemsLeftByImportance ! [importance.id !]}}
+      </td>
+    </tr>
+    <tr>
+      <td>≥</td>
+      <td
+        *ngFor="let importance of importancesArray"
+      >
+        {{quizStatus !. itemsLeftByImportanceAtLeast ! [importance.id !] }}
+      </td>
+    </tr>
+
+
+    <tr class="tableSectionHeader" (click)="showTotals = ! showTotals" style="cursor: pointer; user-select: none">
+      <td colspan="5" style="text-align: left">
+        TOTAL FILTERED:
+      </td>
+    </tr>
+
+    <ng-container *ngIf="showTotals">
+    <tr >
+      <td></td>
+      <td
+        *ngFor="let importance of importancesArray"
+      >
+        {{quizStatus !. itemsCountByImportance ! [importance.id !]}}
+      </td>
+    </tr>
+    <tr>
+      <td>≥</td>
+      <td
+        *ngFor="let importance of importancesArray"
+      >
+        <!-- those could be clickable to set corresponding filter on list -->
+        {{quizStatus !. itemsCountByImportanceAtLeast ! [importance.id !] }}
+      </td>
+    </tr>
+    </ng-container>
+
+  </table>
+
+  </div>
+
+</ng-container>
+
+<ng-template #loading>
+  Loading...
+</ng-template>
+
+

@@ -1,0 +1,76 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+<!--      <ion-back-button [defaultHref]="'/'"></ion-back-button>-->
+      <ion-icon
+        [routerLink]="'/journal'"
+        (click)="onBackClicked()"
+        name="arrow-back-outline"
+        class="action-icon"
+        slot="start"
+       />
+      <app-app-logo [withText]="false"></app-app-logo>
+    </ion-buttons>
+    <!-- TODO: this will go to previous journal entry to correct it if necessary -->
+    <!-- TODO: Next button -->
+    <ion-title>
+      {{ 'JOURNAL.ENTRY_TITLE' | translate }}
+      &nbsp;
+      <app-time-passing
+        *ngIf="feat.userActivityTiming"
+        style="font-size: .8rem;"
+        [isCountDown]="false"
+      ></app-time-passing>
+    </ion-title>
+
+
+    <ion-buttons slot="end">
+      <ion-icon
+        style="margin-right: 7px;"
+        class="action-icon"
+        name="bulb"
+        (click)="onClickAiAdvice($event)"
+       />
+      <ion-icon *ngIf="feat.beforeProductization" style="margin-right: 7px;" class="action-icon" name="book-outline" slot="end" [routerLink]="['/learn']" />
+      <odm-sync-status-icon></odm-sync-status-icon>
+
+    </ion-buttons>
+
+
+    <!--    <ion-button slot="end" color="secondary"-->
+<!--                [routerLink]="'/journal/write/new'"-->
+<!--    >-->
+<!--&lt;!&ndash;      (click)="newEntry()"&ndash;&gt;-->
+<!--      NEW-->
+<!--    </ion-button>-->
+  </ion-toolbar>
+</ion-header>
+<ion-content>
+    <app-journal-item-edit
+      *ngFor="let item$ of item$FakeArray"
+      [item$P]="item$"
+      [autoExpandDescriptorId]="itemId === 'new' ? 'general' : undefined"
+    ></app-journal-item-edit>
+
+  <ion-fab *ngIf=showFab vertical="bottom" horizontal="end" slot="fixed">
+    <ion-fab-button id='fabNewJournalEntry'
+                    (click)="newItem()"
+    >
+      <img src="assets/icon/CloudTime_Logo.svg" height="25rem">
+    </ion-fab-button>
+  </ion-fab>
+
+  <ion-fab vertical="bottom" horizontal="end" slot="fixed">
+    <!--    <ion-fab-button id='fabAddTimer2' (click)="onAddTimer()">-->
+    <!--      +-->
+    <!--&lt;!&ndash;      <ion-icon name="add-circle" />&ndash;&gt;-->
+    <!--    </ion-fab-button>-->
+    <ion-fab-button id='fabNewItem' (click)="newItem()">
+      <ion-icon name="add-outline" />
+      <!--      <img src="assets/icon/CloudTime_Logo.svg" height="25rem">-->
+      <!--      +-->
+      <!--      <ion-icon name="add-circle" />-->
+    </ion-fab-button>
+  </ion-fab>
+
+</ion-content>
