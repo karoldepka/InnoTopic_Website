@@ -60,6 +60,7 @@ export class AiQaPage implements OnInit {
   readonly pickedDirectorySkippedCount = signal(0);
   readonly directoryPickerSupported = isDirectoryPickerSupported();
   readonly webSearch = signal(true);
+  readonly abcdAnswers = signal(false);
   readonly matchExisting = signal(false);
   readonly rawPromptMode = signal(false);
   readonly rawResponse = signal('');
@@ -193,7 +194,7 @@ export class AiQaPage implements OnInit {
   }
 
   generateQuestions(): void {
-    this.gen.generateQuestions('vercel-ai-sdk', this.webSearch());
+    this.gen.generateQuestions('vercel-ai-sdk', this.webSearch(), this.abcdAnswers());
     this.expandedAnswerKeys.set(new Set<string>());
   }
 
@@ -209,7 +210,7 @@ export class AiQaPage implements OnInit {
           text: 'Generate',
           handler: (data) => {
             const n = Math.max(1, Math.min(200, parseInt(data.count) || 10));
-            this.gen.generateMoreQuestions('vercel-ai-sdk', this.webSearch(), n);
+            this.gen.generateMoreQuestions('vercel-ai-sdk', this.webSearch(), n, this.abcdAnswers());
           },
         },
       ],

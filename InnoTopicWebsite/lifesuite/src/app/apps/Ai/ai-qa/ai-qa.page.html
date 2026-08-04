@@ -202,6 +202,12 @@
       </div>
 
       <div class="panel-foot">
+        <ion-checkbox
+          labelPlacement="end"
+          [checked]="abcdAnswers()"
+          [disabled]="gen.questionLoading()"
+          (ionChange)="abcdAnswers.set($any($event).detail.checked)"
+        >ABCD answers</ion-checkbox>
         <ion-button
           [color]="gen.questionLoading() ? 'danger' : 'secondary'"
           [disabled]="!gen.questionLoading() && (!gen.tree().length || totalQCount() === 0)"

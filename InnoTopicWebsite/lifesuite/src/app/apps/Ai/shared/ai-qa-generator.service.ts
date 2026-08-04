@@ -213,7 +213,7 @@ export class AiQaGeneratorService {
     }
   }
 
-  async generateQuestions(integration: QaIntegrationMode, webSearch: boolean): Promise<void> {
+  async generateQuestions(integration: QaIntegrationMode, webSearch: boolean, abcdAnswers = false): Promise<void> {
     if (!this.tree().length || this.questionLoading()) return;
 
     // If questions already exist, append rather than replace.
@@ -232,6 +232,7 @@ export class AiQaGeneratorService {
     const request: QuestionAnswerRequest = {
       tree: cloneCategoryTree(this.tree()),
       web_search: webSearch,
+      abcd_answers: abcdAnswers,
       fileTree: this.fileTree(),
       ...(this.preAppendQuestions.length && {
         existingQuestions: this.preAppendQuestions.map(q => q.question),
@@ -244,7 +245,7 @@ export class AiQaGeneratorService {
       const response = integration === 'vercel-ai-sdk'
         ? await this.generateQuestionsWithVercel(request)
         : await this.generateQuestionsWithCopilot(request);
-      await this.reconcileQuestions(response, baseline, targetCount, integration, webSearch);
+      await this.reconcileQuestions(response, baseline, targetCount, integration, webSearch, abcdAnswers);
     } catch (error) {
       if (this.questionAbortController?.signal.aborted) return;
       this.questionError.set(this.formatError(error));
@@ -286,7 +287,12 @@ export class AiQaGeneratorService {
     this.questionStatus.set(`${remaining.length} Q&A remaining`);
   }
 
-  async generateMoreQuestions(integration: QaIntegrationMode, webSearch: boolean, additionalCount: number): Promise<void> {
+  async generateMoreQuestions(
+    integration: QaIntegrationMode,
+    webSearch: boolean,
+    additionalCount: number,
+    abcdAnswers = false,
+  ): Promise<void> {
     if (this.questionLoading()) return;
 
     this.appendMode = true;
@@ -304,6 +310,7 @@ export class AiQaGeneratorService {
     const request: QuestionAnswerRequest = {
       tree: adjustedTree,
       web_search: webSearch,
+      abcd_answers: abcdAnswers,
       fileTree: this.fileTree(),
       existingQuestions: this.preAppendQuestions.map(q => q.question),
     };
@@ -314,7 +321,7 @@ export class AiQaGeneratorService {
       const response = integration === 'vercel-ai-sdk'
         ? await this.generateQuestionsWithVercel(request)
         : await this.generateQuestionsWithCopilot(request);
-      await this.reconcileQuestions(response, baseline, targetCount, integration, webSearch);
+      await this.reconcileQuestions(response, baseline, targetCount, integration, webSearch, abcdAnswers);
     } catch (error) {
       if (this.questionAbortController?.signal.aborted) return;
       this.appendMode = false;
@@ -568,6 +575,7 @@ export class AiQaGeneratorService {
     targetCount: number,
     integration: QaIntegrationMode,
     webSearch: boolean,
+    abcdAnswers: boolean,
   ): Promise<void> {
     const maxReplacementRounds = 3;
     let response = initialResponse;
@@ -613,6 +621,7 @@ export class AiQaGeneratorService {
         const replacementRequest: QuestionAnswerRequest = {
           tree: setLeafQuestionCounts(cloneCategoryTree(this.tree()), perLeaf),
           web_search: webSearch,
+          abcd_answers: abcdAnswers,
           fileTree: this.fileTree(),
           existingQuestions: [...new Set(excludedQuestions)],
         };

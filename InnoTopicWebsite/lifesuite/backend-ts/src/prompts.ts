@@ -161,6 +161,13 @@ DIRECTORY MODE (real file contents are provided below, matched to categories by 
 - If a category's file content wasn't included (e.g. binary or oversized file skipped by the
   browser), fall back to reasoning from the file name/path and category title only.`;
 
+const QA_ABCD_RULES = `
+
+MULTIPLE-CHOICE MODE:
+- Format every answer as exactly four choices, one per line, labelled "A.", "B.", "C.", and "D.".
+- Exactly one choice must be correct. Mark only that choice with "✓" after its label (for example, "B. ✓ Correct choice").
+- Make all distractors plausible and keep the choices concise. Do not add an explanation outside the four choices.`;
+
 export function buildQAMessages(
   req: QuestionAnswerRequest,
   searchResults: string[],
@@ -187,7 +194,9 @@ export function buildQAMessages(
     .join('\n\n');
 
   return {
-    system: req.fileTree ? QA_SYSTEM + QA_FILE_TREE_RULES : QA_SYSTEM,
+    system: QA_SYSTEM
+      + (req.fileTree ? QA_FILE_TREE_RULES : '')
+      + (req.abcd_answers ? QA_ABCD_RULES : ''),
     messages: [{ role: 'user' as const, content: userContent }],
   };
 }

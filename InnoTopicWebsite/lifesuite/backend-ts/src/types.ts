@@ -48,6 +48,7 @@ export interface QuestionAnswer {
 export interface QuestionAnswerRequest {
   tree: CategoryNode[];
   web_search?: boolean;
+  abcd_answers?: boolean;
   existingQuestions?: string[];
   fileTree?: FileTreeRequest;
 }

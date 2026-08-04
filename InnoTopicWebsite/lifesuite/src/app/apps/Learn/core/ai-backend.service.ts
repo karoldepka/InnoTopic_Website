@@ -91,6 +91,8 @@ export interface QuestionImageResponse {
 export interface QuestionAnswerRequest {
   tree: CategoryNode[];
   web_search?: boolean;
+  /** Generate multiple-choice answers with four options labelled A-D. */
+  abcd_answers?: boolean;
   existingQuestions?: string[];
   fileTree?: FileTreeRequest;
 }
