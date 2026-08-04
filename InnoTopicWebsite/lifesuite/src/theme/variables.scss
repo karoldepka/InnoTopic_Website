@@ -6,8 +6,15 @@
 
 /** Ionic CSS Variables **/
 :root {
-  --apf-text-edit-background: #222;
-  --apf-item-header-background: #222;
+  // Pure aliases onto --ion-item-background, which @innotopic/theme-ui's applyThemeConfig() now
+  // derives from the active theme's background + brightness (ported from LifeSuite's own
+  // ThemeCalculator, which used to set these JS-side on every theme change, incl. this same
+  // "prototype" --ion-border-color -> --ion-item-background link - now a static CSS relationship
+  // instead, since the underlying var already updates on every theme change).
+  --apf-text-edit-background: var(--ion-item-background);
+  --apf-rich-text-edit-background: var(--ion-item-background);
+  --apf-item-header-background: var(--ion-item-background);
+  --ion-border-color: var(--ion-item-background);
 
 
   /** primary **/

@@ -1,5 +1,6 @@
 import { createStore } from '@stencil/store'
 import { applyThemeConfig } from './apply-theme'
+import { updateFavicon } from './favicon-theme'
 import { defaultThemeConfig, ThemeConfigState } from './theme-config-state'
 
 const STORAGE_KEY = 'theme_config'
@@ -52,6 +53,7 @@ function scheduleApply() {
   queueMicrotask(() => {
     applyScheduled = false
     applyThemeConfig(state)
+    updateFavicon(state)
     persistThrottled()
   })
 }

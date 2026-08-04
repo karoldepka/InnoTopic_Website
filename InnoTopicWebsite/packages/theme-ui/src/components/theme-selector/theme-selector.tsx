@@ -1,7 +1,16 @@
-import { Component, forceUpdate, h } from '@stencil/core'
-import { themeState, setThemeConfig, initThemeConfig, onThemeStateChange } from '../../engine/theme-store'
+import { Component, Event, EventEmitter, forceUpdate, h } from '@stencil/core'
+import { themeState, initThemeConfig, onThemeStateChange } from '../../engine/theme-store'
 import { injectThemeTokens } from '../../engine/tokens'
 import { themePresets, ThemePreset } from '../../engine/theme-presets'
+import { applyPreset, findActivePreset } from '../../engine/theme-cycling'
+import type { ThemeConfigState } from '../../engine/theme-config-state'
+
+// disabled presets (known-broken/superseded, e.g. LifeSuite's ported "Black and Dark Brown") are
+// never shown here - everything else (including experimental ones) is, since this framework-
+// agnostic component has no equivalent of LifeSuite's own environment.showExperimentalThemes
+// gate. A consuming app that wants that gating builds its own picker against the plain engine
+// exports instead (see LifeSuite's theme-config.component.ts).
+const selectablePresets = themePresets.filter(preset => !preset.disabled)
 
 /**
  * Ports Angular's theme-list.page (the preset grid / "theme-selector"). No longer talks to
@@ -14,6 +23,12 @@ import { themePresets, ThemePreset } from '../../engine/theme-presets'
   shadow: true,
 })
 export class ThemeSelector {
+  /** Fires the full resulting config whenever a preset is picked - applyThemeConfig() (via
+   * setThemeConfig() below, through the store's own onChange->scheduleApply wiring) already
+   * re-themes the page as a side effect regardless of whether anyone listens to this; it exists
+   * so a host app can react too (e.g. persist the choice in its own settings model). */
+  @Event() themeConfigChange!: EventEmitter<ThemeConfigState>
+
   private unsubscribes: Array<() => void> = []
 
   connectedCallback() {
@@ -37,16 +52,14 @@ export class ThemeSelector {
   }
 
   private get activePresetName(): string | undefined {
-    const current = themeState
-    return themePresets.find(preset =>
-      preset.config.ion_background_color === current.ion_background_color
-      && preset.config.ion_color_primary === current.ion_color_primary
-      && preset.config.ion_color_secondary === current.ion_color_secondary,
-    )?.name
+    return findActivePreset(selectablePresets)?.name
   }
 
-  private applyPreset(preset: ThemePreset) {
-    setThemeConfig(preset.config)
+  private pickPreset(preset: ThemePreset) {
+    applyPreset(preset)
+    // Not preset.config directly - applyPreset() preserves the current brightness_percent rather
+    // than the preset's own neutral placeholder value, so the live state is what actually applied.
+    this.themeConfigChange.emit({ ...themeState })
   }
 
   render() {
@@ -54,14 +67,14 @@ export class ThemeSelector {
     return (
       <div class="theme-selector">
         <div class="theme-preset-grid">
-          {themePresets.map(preset => (
+          {selectablePresets.map(preset => (
             <button
               type="button"
               class={{
                 'theme-preset-card': true,
                 'theme-preset-card--active': activeName === preset.name,
               }}
-              onClick={() => this.applyPreset(preset)}
+              onClick={() => this.pickPreset(preset)}
             >
               <span
                 class="theme-preset-swatch"

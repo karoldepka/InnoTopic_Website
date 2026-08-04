@@ -5,6 +5,8 @@
  * It contains typing information for all components that exist in this project.
  */
 import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";
+import { ThemeConfigState } from "./engine/theme-config-state";
+export { ThemeConfigState } from "./engine/theme-config-state";
 export namespace Components {
     /**
      * Ports Angular's theme-config.component (the freeform "theme-configurator").
@@ -20,6 +22,10 @@ export namespace Components {
     interface ThemeSelector {
     }
 }
+export interface ThemeSelectorCustomEvent<T> extends CustomEvent<T> {
+    detail: T;
+    target: HTMLThemeSelectorElement;
+}
 declare global {
     /**
      * Ports Angular's theme-config.component (the freeform "theme-configurator").
@@ -30,6 +36,9 @@ declare global {
         prototype: HTMLThemeConfiguratorElement;
         new (): HTMLThemeConfiguratorElement;
     };
+    interface HTMLThemeSelectorElementEventMap {
+        "themeConfigChange": ThemeConfigState;
+    }
     /**
      * Ports Angular's theme-list.page (the preset grid / "theme-selector"). No longer talks to
      * NgRx - reads/writes
@@ -37,6 +46,14 @@ declare global {
      * source of truth (see the plan's "retire NgRx" decision).
      */
     interface HTMLThemeSelectorElement extends Components.ThemeSelector, HTMLStencilElement {
+        addEventListener<K extends keyof HTMLThemeSelectorElementEventMap>(type: K, listener: (this: HTMLThemeSelectorElement, ev: ThemeSelectorCustomEvent<HTMLThemeSelectorElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLThemeSelectorElementEventMap>(type: K, listener: (this: HTMLThemeSelectorElement, ev: ThemeSelectorCustomEvent<HTMLThemeSelectorElementEventMap[K]>) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions): void;
     }
     var HTMLThemeSelectorElement: {
         prototype: HTMLThemeSelectorElement;
@@ -60,6 +77,10 @@ declare namespace LocalJSX {
      * source of truth (see the plan's "retire NgRx" decision).
      */
     interface ThemeSelector {
+        /**
+          * Fires the full resulting config whenever a preset is picked - applyThemeConfig() (via setThemeConfig() below, through the store's own onChange->scheduleApply wiring) already re-themes the page as a side effect regardless of whether anyone listens to this; it exists so a host app can react too (e.g. persist the choice in its own settings model).
+         */
+        "onThemeConfigChange"?: (event: ThemeSelectorCustomEvent<ThemeConfigState>) => void;
     }
     interface IntrinsicElements {
         "theme-configurator": ThemeConfigurator;

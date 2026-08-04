@@ -18,6 +18,16 @@ export interface ThemeConfigState {
   corner_radius_bottom_left: string;
   icon_contrast: number;
   icon_brightness: number;
+  // Ported from LifeSuite's ThemeService/ThemeCalculator (theme-config/theme.service.ts) as part
+  // of unifying the two apps' previously-separate theming systems onto this one engine. Shades
+  // ion_background_color (and the derived ion_item_background) via shadeColor() in color-utils.ts
+  // - see applyThemeConfig() for the actual math. 75 is the *neutral* value for shadeColor's
+  // divide-by-decimal algorithm (decimal = brightness_percent / 75, so 75 => decimal 1 => no-op),
+  // deliberately chosen as the default so existing theme-ui presets stay visually unchanged for
+  // consumers that never touch this field. LifeSuite's own brightness slider defaults to 50
+  // (visibly brighter than a preset's raw background) - that's set explicitly at LifeSuite
+  // startup, not by changing this shared default.
+  brightness_percent: number;
 }
 
 export const defaultThemeConfig: ThemeConfigState = {
@@ -35,4 +45,5 @@ export const defaultThemeConfig: ThemeConfigState = {
   corner_radius_bottom_left: '7',
   icon_contrast: 1,
   icon_brightness: 0,
+  brightness_percent: 75,
 }

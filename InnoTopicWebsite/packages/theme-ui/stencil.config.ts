@@ -1,4 +1,5 @@
 import { Config } from '@stencil/core';
+import { angularOutputTarget } from '@stencil/angular-output-target';
 
 export const config: Config = {
   namespace: 'theme-ui',
@@ -6,6 +7,15 @@ export const config: Config = {
     { type: 'dist', esmLoaderPath: '../loader' },
     { type: 'dist-custom-elements' },
     { type: 'docs-readme' },
+    // Generates Angular wrapper components (typed @Input/@Output, no CUSTOM_ELEMENTS_SCHEMA
+    // needed) into the sibling theme-ui-angular package - see that package's own
+    // src/directives/index.ts for what actually gets exported/consumed.
+    angularOutputTarget({
+      componentCorePackage: '@innotopic/theme-ui',
+      outputType: 'standalone',
+      directivesProxyFile: '../theme-ui-angular/src/directives/proxies.ts',
+      directivesArrayFile: '../theme-ui-angular/src/directives/index.ts',
+    }),
   ],
   // Without this, Stencil's Rollup step inlines a *second* copy of @innotopic/topics-ui into
   // theme-configurator's own lazy-loaded chunk (it imports topics-ui for the live preview) -

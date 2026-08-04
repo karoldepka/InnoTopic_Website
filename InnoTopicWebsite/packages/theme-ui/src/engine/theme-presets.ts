@@ -1,9 +1,24 @@
 import { ThemeConfigState } from './theme-config-state'
+import { curatedThemes } from './curated-themes'
 
 export interface ThemePreset {
   name: string
   kind: 'light' | 'dark'
   config: ThemeConfigState
+  /** Ported from LifeSuite's Theme type (themes.data.ts) as part of unifying LifeSuite's curated
+   * theme list into this shared preset array. Not used by any of the hand-authored presets below -
+   * only by curatedThemes (see curated-themes.ts). */
+  comment?: string
+  /** Known-broken/superseded - excluded from picker UIs and from applyRandomTheme()/
+   * applyNextTheme() entirely, same semantics as LifeSuite's Theme.disabled. */
+  disabled?: boolean
+  /** Shown in picker UIs but never chosen by applyRandomTheme() - same semantics as LifeSuite's
+   * Theme.excludeFromRandom (e.g. a preset that's intentionally jarring/high-contrast on purpose,
+   * fine to pick deliberately but annoying to land on at random). */
+  excludeFromRandom?: boolean
+  /** Only shown when a consumer opts in (LifeSuite's own UI gates this behind
+   * environment.showExperimentalThemes) - same semantics as LifeSuite's Theme.experimental. */
+  experimental?: boolean
 }
 
 /** Shared shadow/corner settings for every preset below, unless a preset overrides them. */
@@ -40,7 +55,21 @@ function preset(
   colors: PresetColors,
   overrides: PresetOverrides = {},
 ): ThemePreset {
-  return { name, kind, config: { ...defaultShadow, ...defaultCorners, ...defaultIcon, ...colors, ...overrides } }
+  return {
+    name,
+    kind,
+    config: {
+      ...defaultShadow,
+      ...defaultCorners,
+      ...defaultIcon,
+      // Neutral placeholder, same reasoning as curated-themes.ts's curatedTheme(): preset
+      // application (applyPreset() in theme-cycling.ts) preserves the current brightness slider
+      // setting rather than using this value.
+      brightness_percent: 75,
+      ...colors,
+      ...overrides,
+    },
+  }
 }
 
 export const themePresets: ThemePreset[] = [
@@ -105,4 +134,8 @@ export const themePresets: ThemePreset[] = [
     corner_radius_bottom_right: '0',
     corner_radius_bottom_left: '0',
   }),
+  // LifeSuite's own curated, contrast-checked palette (see curated-themes.ts + the merged
+  // theme-contrast.spec.ts) - appended rather than interleaved so the hand-picked "modern" set
+  // above stays the first, most prominent page of any picker UI.
+  ...curatedThemes,
 ]

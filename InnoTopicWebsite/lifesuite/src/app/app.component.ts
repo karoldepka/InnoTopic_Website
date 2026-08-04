@@ -12,7 +12,8 @@ import {AuthService} from './auth/auth.service'
 import {OptionsService} from './apps/Learn/core/options.service'
 import {SyncPopoverComponent} from './libs/AppFedShared/odm/sync-status/sync-popover/sync-popover.component'
 import {OptionsComponent} from './libs/AppFedShared/options/options.component'
-import {ThemeService} from './libs/AppFedShared/theme-config/theme.service'
+import {ThemeUiService} from '@innotopic/theme-ui-angular'
+import {environment} from '../environments/environment'
 import {FeatureService} from './libs/AppFedShared/feature.service'
 import {OdmConflictToastService} from './libs/AppFedSharedBrowser/odm-browser/OdmConflictToastService'
 import {IndexedDbHealthToastService} from './libs/AppFedSharedBrowser/odm-browser/IndexedDbHealthToastService'
@@ -28,7 +29,7 @@ export class AppComponent {
   constructor(
     private platform: Platform,
     private featureService /* force the service to run */: FeatureService,
-    private ThemeService /* force the service to run */: ThemeService,
+    private themeUiService: ThemeUiService,
     private timerNotificationService /* force the service to run */: TimerNotificationsService /* FIXME commenting this out causes errors */,
     private authService  /* force the service to run */: AuthService,
     private odmConflictToastService /* force the service to run */: OdmConflictToastService,
@@ -45,6 +46,11 @@ export class AppComponent {
   // fakeExportToNotLookUnused = fakeExportToNotLookUnused + 'dummy' // causes `background.ts:7 Uncaught ReferenceError: firebase is not defined`
 
   initializeApp() {
+    // A fresh, non-repeating theme per visit (ported from ThemeService's old constructor, which
+    // called applyRandomTheme() unconditionally on construction) - theme-ui's own store otherwise
+    // just persists+restores the same theme across launches, which would silently drop this.
+    this.themeUiService.applyRandomTheme({ includeExperimental: environment.showExperimentalThemes })
+
     this.platform.ready().then(() => {
       if (Capacitor.isNativePlatform()) {
         StatusBar.setStyle({style: Style.Default});

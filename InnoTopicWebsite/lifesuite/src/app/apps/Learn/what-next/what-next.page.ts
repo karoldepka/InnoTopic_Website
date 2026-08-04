@@ -1,5 +1,6 @@
 import {Component, Injector, OnInit, ChangeDetectionStrategy} from '@angular/core';
-import {ThemeService} from '../../../libs/AppFedShared/theme-config/theme.service'
+import {ThemeUiService} from '@innotopic/theme-ui-angular'
+import {environment} from '../../../../environments/environment'
 import { Router } from '@angular/router'
 import {FeatureService} from '../../../libs/AppFedShared/feature.service'
 import {BaseComponent} from '../../../libs/AppFedShared/base/base.component'
@@ -100,7 +101,7 @@ export class WhatNextPage extends BaseComponent implements OnInit {
   ]
 
   constructor(
-    public themeService: ThemeService,
+    public themeUiService: ThemeUiService,
     public featureService: FeatureService,
     public router: Router,
     private slotUsageTrackerService: SlotUsageTrackerService,
@@ -144,7 +145,7 @@ export class WhatNextPage extends BaseComponent implements OnInit {
 
   async cravingFun() {
     // TODO: popup with fancy image of doing smth fun. Piorun, spread wings.
-    this.themeService.applyRandomTheme()
+    this.themeUiService.applyRandomTheme({ includeExperimental: environment.showExperimentalThemes })
     // GH issue #38: the fun-craving panic button - opens /learn's task/learn list pre-sorted by
     // fun descending, mental effort ascending, then most-recently-touched. Writes the preset
     // directly to the same localStorage key ListProcessing reads on construction (there's no

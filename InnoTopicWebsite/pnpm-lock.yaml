@@ -302,6 +302,9 @@ importers:
       '@huggingface/transformers':
         specifier: ^4.2.0
         version: 4.2.0
+      '@innotopic/theme-ui-angular':
+        specifier: workspace:*
+        version: link:../packages/theme-ui-angular
       '@ionic/angular':
         specifier: ^8.8.12
         version: 8.8.16(0bde29e8215f3b7e67cdd69981148a23)
@@ -576,9 +579,34 @@ importers:
         specifier: ^2.0.16
         version: 2.2.2(@stencil/core@4.43.5)
     devDependencies:
+      '@stencil/angular-output-target':
+        specifier: ^1.0.0
+        version: 1.4.1(@stencil/core@4.43.5)
       '@stencil/core':
         specifier: ^4.20.0
         version: 4.43.5
+
+  packages/theme-ui-angular:
+    dependencies:
+      '@innotopic/theme-ui':
+        specifier: workspace:*
+        version: link:../theme-ui
+      rxjs:
+        specifier: '*'
+        version: 7.8.2
+    devDependencies:
+      '@angular/compiler':
+        specifier: ^22.0.2
+        version: 22.1.0
+      '@angular/compiler-cli':
+        specifier: ^22.0.2
+        version: 22.1.0(@angular/compiler@22.1.0)(typescript@6.0.3)
+      '@angular/core':
+        specifier: ^22.0.2
+        version: 22.1.0(@angular/compiler@22.1.0)(rxjs@7.8.2)(zone.js@0.16.2)
+      typescript:
+        specifier: ~6.0.3
+        version: 6.0.3
 
   packages/topics-ui:
     dependencies:
@@ -4801,6 +4829,11 @@ packages:
 
   '@standard-schema/spec@1.1.0':
     resolution: {integrity: sha512-l2aFy5jALhniG5HgqrD6jXLi/rUWrKvqN/qJx6yoJsgKhblVd+iqqU4RCXavm/jPityDo5TCvKMnpjKnOriy0w==}
+
+  '@stencil/angular-output-target@1.4.1':
+    resolution: {integrity: sha512-sy+k9B5jcT6hpaVU9n+/ZUjz3qVr9PAdPgy2c3LFQouW1aFSa3Ng0O+Ia3wk7LMeL3vDetCn2X+p2ewdHGc1vA==}
+    peerDependencies:
+      '@stencil/core': '>=2.0.0 || >=3 || >=4.0.0 || ^5.0.0 || >=5.0.0-alpha.17 <5.0.0-next.0'
 
   '@stencil/core@4.43.5':
     resolution: {integrity: sha512-cgWD+GeuvJpTe1WQn40p02+BJ2j0j1YJ17GdkF2qKIQ23s2e3Zivq5yISXS3dcuV6oUJFN93jprdk+nk/sq99Q==}
@@ -17262,6 +17295,10 @@ snapshots:
   '@socket.io/component-emitter@3.1.2': {}
 
   '@standard-schema/spec@1.1.0': {}
+
+  '@stencil/angular-output-target@1.4.1(@stencil/core@4.43.5)':
+    dependencies:
+      '@stencil/core': 4.43.5
 
   '@stencil/core@4.43.5':
     optionalDependencies:

@@ -81,35 +81,15 @@ body.dark_off {
  */
 
 .ios body.dark {
-  --ion-background-color: #000000;
-  --ion-background-color-rgb: 0,0,0;
-
-  --ion-text-color: #ffffff;
-  --ion-text-color-rgb: 255,255,255;
-
-  --ion-color-step-50: #0d0d0d;
-  --ion-color-step-100: #1a1a1a;
-  --ion-color-step-150: #262626;
-  --ion-color-step-200: #333333;
-  --ion-color-step-250: #404040;
-  --ion-color-step-300: #4d4d4d;
-  --ion-color-step-350: #595959;
-  --ion-color-step-400: #666666;
-  --ion-color-step-450: #737373;
-  --ion-color-step-500: #808080;
-  --ion-color-step-550: #8c8c8c;
-  --ion-color-step-600: #999999;
-  --ion-color-step-650: #a6a6a6;
-  --ion-color-step-700: #b3b3b3;
-  --ion-color-step-750: #bfbfbf;
-  --ion-color-step-800: #cccccc;
-  --ion-color-step-850: #d9d9d9;
-  --ion-color-step-900: #e6e6e6;
-  --ion-color-step-950: #f2f2f2;
-
+  // background-color/text-color/color-steps/item-background were previously here as Ionic's
+  // stock dark-mode scaffold values, but were ALWAYS masked in practice by ThemeCalculator's own
+  // inline body style (set on every theme change, and inline always beats a class selector like
+  // this one for the same element) - i.e. no user has actually seen these specific values render.
+  // Removed rather than kept as a fallback: now that @innotopic/theme-ui's applyThemeConfig() sets
+  // the same variables on <html> instead of an inline body override, this class-scoped rule would
+  // start winning FOR REAL (body is the more specific/closer ancestor for its own descendants),
+  // silently overriding every theme's actual computed colors with these stale placeholder values.
   --ion-toolbar-background: #0d0d0d;
-
-  --ion-item-background: #1c1c1c;
   --ion-item-background-activated: #313131;
 }
 
@@ -120,36 +100,9 @@ body.dark_off {
  */
 
 .md body.dark {
-  --ion-background-color: #121212;
-  --ion-background-color-rgb: 18,18,18;
-
-  --ion-text-color: #ffffff;
-  --ion-text-color-rgb: 255,255,255;
-
-  --ion-border-color: #222222;
-
-  --ion-color-step-50: #1e1e1e;
-  --ion-color-step-100: #2a2a2a;
-  --ion-color-step-150: #363636;
-  --ion-color-step-200: #414141;
-  --ion-color-step-250: #4d4d4d;
-  --ion-color-step-300: #595959;
-  --ion-color-step-350: #656565;
-  --ion-color-step-400: #717171;
-  --ion-color-step-450: #7d7d7d;
-  --ion-color-step-500: #898989;
-  --ion-color-step-550: #949494;
-  --ion-color-step-600: #a0a0a0;
-  --ion-color-step-650: #acacac;
-  --ion-color-step-700: #b8b8b8;
-  --ion-color-step-750: #c4c4c4;
-  --ion-color-step-800: #d0d0d0;
-  --ion-color-step-850: #dbdbdb;
-  --ion-color-step-900: #e7e7e7;
-  --ion-color-step-950: #f3f3f3;
-
-  //--ion-item-background: #1A1B1E;
-  --ion-item-background: orange;
+  // See the .ios body.dark comment above - same reasoning, and this block's own
+  // --ion-item-background was left at a clearly-experimental "orange" placeholder that only ever
+  // shipped invisibly because of the same inline-style masking.
 }
 
 ion-item {
