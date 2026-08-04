@@ -110,7 +110,8 @@
           "builder": "@angular/build:dev-server",
           "options": {
             "buildTarget": "app:build",
-            "proxyConfig": "src/proxy.conf.json"
+            "proxyConfig": "src/proxy.conf.json",
+            "prebundle": false
           },
           "configurations": {
             "production": {

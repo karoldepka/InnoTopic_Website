@@ -108,7 +108,8 @@
           },
           "options": {
             "proxyConfig": "./src/proxy.conf.json",
-            "hmr": true
+            "hmr": true,
+            "prebundle": false
           },
           "defaultConfiguration": "development"
         },
