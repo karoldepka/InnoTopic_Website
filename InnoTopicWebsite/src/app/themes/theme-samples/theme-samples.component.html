@@ -1,10 +1,18 @@
 <div style="margin-bottom: 1rem">
-  @for (num of [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]; track num) {
+  @for (num of [1, 2, 3, 4, 5]; track num) {
     <app-chip
       style="display: inline-block;"
       [forceMouseOver]="true"
     >
       NEUMORPHIC CHIP
+    </app-chip>
+  }
+  @for (num of [1, 2, 3, 4, 5]; track num) {
+    <app-chip
+      style="display: inline-block;"
+      [forceMouseOver]="false"
+    >
+      CHIP - SHADOW ON HOVER
     </app-chip>
   }
 

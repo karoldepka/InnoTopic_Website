@@ -201,7 +201,12 @@
     //--ion-background-color-rgb: 18,18,18;
 
     //--ion-text-color: #ffffff;
-    --ion-text-color-rgb: 255,255,255;
+    // Was hardcoded to white regardless of theme - the one straggler among this block's already-
+    // disabled siblings (color-step-*, --ion-background-color, etc). @innotopic/theme-ui's
+    // applyThemeConfig() now sets --ion-text-color-rgb reactively on <html>, which this static
+    // .md body rule would otherwise win over for anything inside body (the closer ancestor) -
+    // same class of bug already fixed for --ion-color-medium elsewhere in this file.
+    //--ion-text-color-rgb: 255,255,255;
 
     --ion-border-color: #222222; /* FIXME */
 
