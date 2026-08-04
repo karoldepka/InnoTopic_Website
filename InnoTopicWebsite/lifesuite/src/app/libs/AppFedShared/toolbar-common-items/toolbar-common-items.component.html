@@ -5,7 +5,8 @@
 @if (voiceMemoService.isRecordingAnywhere$ | async) {
   <span
     class="recording-indicator"
-    title="Recording in progress somewhere in the app"
+    title="Recording in progress somewhere in the app - tap to go to it"
+    (click)="navigateToActiveRecording()"
   >
     <span class="recording-dot"></span>
     REC

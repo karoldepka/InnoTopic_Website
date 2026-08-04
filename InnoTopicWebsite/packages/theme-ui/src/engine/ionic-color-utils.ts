@@ -33,6 +33,10 @@ export function setIonicColorSteps(baseColor: string, step: number = 50, limit: 
 
 export function setIonicColorVarHexAndRgb(root: CSSStyleDeclaration, varName: string, colorValue: string) {
   root.setProperty(varName, colorValue)
-  // set in RGB format: https://ionicframework.com/docs/theming/advanced#the-alpha-problem
-  root.setProperty(`${varName}-rgb`, hexToRgb(colorValue))
+  // Ionic's own "-rgb" suffix convention (https://ionicframework.com/docs/theming/advanced#the-
+  // alpha-problem) is a BARE "r, g, b" triplet, meant to be used as rgba(var(--x-rgb), alpha) -
+  // hexToRgb() returns the wrapped "rgb(r, g, b)" CSS function string instead (a different,
+  // equally valid use), which breaks that pattern (rgba() can't take a nested rgb(...) as its
+  // first argument) - strip the "rgb(" / ")" wrapper hexToRgb() always produces.
+  root.setProperty(`${varName}-rgb`, hexToRgb(colorValue).slice(4, -1))
 }

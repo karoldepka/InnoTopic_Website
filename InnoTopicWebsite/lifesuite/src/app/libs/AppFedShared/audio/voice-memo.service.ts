@@ -14,6 +14,11 @@ export interface ActiveMicHolder {
   /** Stops any in-progress recording (waiting for the final chunk if needed) and releases the
    * held MediaStream's tracks. Safe to call on a holder that's already released. */
   releaseMicIfActive(): void
+
+  /** Where this holder's recording is attached - lets the global "recording in progress"
+   * indicator (GH #141) navigate to it. Optional/undefined-returning since not every holder has
+   * a real item yet (e.g. Learn's quick-add bar before `createItemIfMissing` has run). */
+  getRecordingLocation?(): {collection: string, itemId: string} | undefined
 }
 
 /** Duck-typed rather than `OdmItem$2` itself, so `VoiceMemoFieldComponent` also works against
@@ -107,6 +112,14 @@ export class VoiceMemoService {
    * field's own mic button started it, e.g. Journal's `general` field. */
   readonly isRecordingAnywhere$ = new CachedSubject<boolean>(false)
 
+  /** Where one of the currently-recording holders is attached (GH #141) - lets the toolbar's
+   * "recording in progress" indicator navigate to wherever it was started, the same way
+   * TimeTrackingToolbarComponent.navigateTo() does for time-tracked entries. Picks whichever
+   * holder happens to be first in the set when more than one is recording at once (rare) - there's
+   * no natural "primary" one to prefer. `undefined` while nothing is recording, or the sole
+   * recording holder can't identify its own item yet. */
+  readonly activeRecordingLocation$ = new CachedSubject<{collection: string, itemId: string} | undefined>(undefined)
+
   constructor(
     private blobSyncService: BlobSyncService,
   ) {}
@@ -121,6 +134,7 @@ export class VoiceMemoService {
     this.recordingHolders.delete(holder)
     this.hasActiveMic$.next(this.activeMicHolders.size > 0)
     this.isRecordingAnywhere$.next(this.recordingHolders.size > 0)
+    this.updateActiveRecordingLocation()
   }
 
   setRecording(holder: ActiveMicHolder, isRecording: boolean): void {
@@ -130,6 +144,12 @@ export class VoiceMemoService {
       this.recordingHolders.delete(holder)
     }
     this.isRecordingAnywhere$.next(this.recordingHolders.size > 0)
+    this.updateActiveRecordingLocation()
+  }
+
+  private updateActiveRecordingLocation(): void {
+    const anyRecordingHolder = this.recordingHolders.values().next().value as ActiveMicHolder | undefined
+    this.activeRecordingLocation$.next(anyRecordingHolder?.getRecordingLocation?.())
   }
 
   private playingHolders = new Set<object>()

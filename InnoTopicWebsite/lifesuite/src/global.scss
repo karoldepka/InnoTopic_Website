@@ -20,6 +20,24 @@
 
 :root {
   transition: all 2s; // FIXME test
+
+  // Overrides @ionic/angular/css/core.css's own static --ion-color-medium (imported above,
+  // #636469) - must live here rather than variables.scss since core.css loads after it and wins
+  // at equal specificity. Was never made theme-reactive by either the old ThemeCalculator or the
+  // new shared engine - invisible against LifeSuite's (almost entirely dark-background) original
+  // theme list, but ion-note/.voice-dictated's text becomes illegible against any
+  // bright-background theme (now easy to reach via the unified preset list).
+  // --ion-color-step-* is already computed reactively from the current text color
+  // (applyThemeConfig -> setIonicColorSteps) - step-650 reads as a legible "muted" text color
+  // against any background, light or dark, the same way --ion-color-step-150 is already this
+  // codebase's convention for a theme-aware *fill* (see CLAUDE.md).
+  --ion-color-medium: var(--ion-color-step-650);
+  // Bare-triplet companion (Ionic's "-rgb" convention, for rgba(var(--x-rgb), alpha) usages e.g.
+  // odm-tree-node.component.css's tree-node border) - --ion-color-medium above is an rgba()
+  // string now (not a hex), so it can't supply its own -rgb the normal way; --ion-text-color-rgb
+  // (set by applyThemeConfig, same underlying text color step-650 blends from) is the correct
+  // reactive bare triplet to reuse here.
+  --ion-color-medium-rgb: var(--ion-text-color-rgb);
 }
 
 .sc-ion-popover-ios-h {

@@ -28,6 +28,23 @@
 @import "@ionic/angular/css/flex-utils.css";
 //
 //
+:root {
+  // Overrides @ionic/angular/css/core.css's own static --ion-color-medium (imported above) -
+  // must live here rather than variables.scss since core.css loads after it and wins at equal
+  // specificity. --ion-color-medium was never made theme-reactive by @innotopic/theme-ui's
+  // applyThemeConfig() (only primary/secondary/background/text are, matching this app's own
+  // theme-configurator - medium/tertiary/success/warning/danger stay static/semantic by design,
+  // same as LifeSuite's --ion-color-light convention), which is invisible against a dark default
+  // theme but makes anything styled off "medium" (e.g. app.component.scss's nav labels)
+  // illegible against a bright-background preset. --ion-color-step-* is already computed
+  // reactively from the current text color (applyThemeConfig -> setIonicColorSteps) - step-650
+  // reads as a legible "muted" color against any background, light or dark.
+  --ion-color-medium: var(--ion-color-step-650);
+  --ion-color-medium-shade: var(--ion-color-step-550);
+  --ion-color-medium-tint: var(--ion-color-step-750);
+  --ion-color-medium-rgb: var(--ion-text-color-rgb);
+}
+
 html, body {
   overflow: auto !important;
   //height: 100% !important; /* this is causing no scroll on PDF print */

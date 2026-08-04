@@ -50,7 +50,7 @@
   </ng-container>
 
   <ng-container
-    *ngIf="(syncStatus$ | async)?.pendingUploadsCount let count; else allUploaded"
+    *ngIf="(syncStatus$ | async)?.pendingUploadsCount let count; else allUploadedCheck"
   >
     {{ 'SYNC.UPLOADING_NOW' | translate }} {{count}}
     <ul>
@@ -60,6 +60,18 @@
     </ul>
 
   </ng-container>
+
+  <!-- pendingUploadsCount above is in-memory/this-session only, and gets cleared even when a
+       save FAILS (not just when it succeeds) - so it alone reading 0 doesn't mean everything is
+       actually synced. durablePendingSyncItems$ (already listed above, GH #131 "Sync stuck for
+       LearnStatsHistory") is the accurate "still needs to sync" signal, same as
+       sync-status-icon.component.ts's own needsUpload$ already checks - mirrored here so this
+       text block can't contradict that list by claiming "All uploaded!" right underneath it. -->
+  <ng-template #allUploadedCheck>
+    <ng-container *ngIf="!(durablePendingSyncItems$ | async)?.length">
+      <ng-container *ngTemplateOutlet="allUploaded"></ng-container>
+    </ng-container>
+  </ng-template>
 
   <ng-container
     *ngIf="(syncStatus$ | async)?.pendingDownloadsCount let count; else allDownloaded"

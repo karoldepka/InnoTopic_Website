@@ -15,6 +15,16 @@ import {VoiceMemoFieldComponent} from '../audio/voice-memo-field/voice-memo-fiel
 import {VoiceAttachableItem, VoiceMemoService} from '../audio/voice-memo.service'
 import {OdmBackend} from '../odm/OdmBackend'
 import {TimeTrackingToolbarComponent} from '../../../apps/OrYoL/time-tracking/time-tracking-toolbar/time-tracking-toolbar.component'
+import {NavigationService} from '../../../apps/OrYoL/core/navigation.service'
+
+/** Per-collection route builder for a recording's item that isn't an OrYoL tree node - same
+ * pattern/route strings as TimeTrackingToolbarComponent's own COLLECTION_ROUTES (time-tracked
+ * entries and in-progress recordings are both "jump to what's ongoing" toolbar indicators). A
+ * collection with no entry here falls back to OrYoL's own tree-focus navigation below. */
+const COLLECTION_ROUTES: Record<string, (id: string) => string> = {
+  JournalEntry: id => `/journal/entry/${id}`,
+  LearnItem: id => `/learn/item/${id}`,
+}
 
 /** GH #92: the time-tracked-entry indicator and a quick-record mic, both meant to be visible
  * regardless of which page is open - mount this once in `AppComponent`'s shell
@@ -61,13 +71,31 @@ export class ToolbarCommonItemsComponent {
     // which field's own mic button (this toolbar's quick-record one, or any other field anywhere
     // in the app, e.g. Journal's `general`) is the one actually recording.
     public voiceMemoService: VoiceMemoService,
-    router: Router,
+    private navigationService: NavigationService,
+    private router: Router,
   ) {
     this.inQuiz$ = router.events.pipe(
       filter((e): e is NavigationEnd => e instanceof NavigationEnd),
       map(e => e.urlAfterRedirects.startsWith('/learn/quiz') || e.urlAfterRedirects.startsWith('/learn/bow-quiz')),
       startWith(router.url.startsWith('/learn/quiz') || router.url.startsWith('/learn/bow-quiz')),
     )
+  }
+
+  /** GH #141: navigates to wherever the currently-in-progress recording is attached, same
+   * per-collection routing TimeTrackingToolbarComponent.navigateTo() uses for time-tracked
+   * entries. No-ops if nothing is recording or its location isn't known yet (see
+   * VoiceMemoService.activeRecordingLocation$'s doc comment). */
+  navigateToActiveRecording() {
+    const location = this.voiceMemoService.activeRecordingLocation$.lastVal
+    if (!location) {
+      return
+    }
+    const buildRoute = COLLECTION_ROUTES[location.collection]
+    if (buildRoute) {
+      this.router.navigateByUrl(buildRoute(location.itemId))
+    } else {
+      this.navigationService.navigateToNodeByItemId(location.itemId)
+    }
   }
 
   // Every route this component is reachable from already requires auth (matches

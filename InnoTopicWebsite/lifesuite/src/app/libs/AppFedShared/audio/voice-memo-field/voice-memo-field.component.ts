@@ -435,6 +435,15 @@ export class VoiceMemoFieldComponent implements OnInit, OnDestroy, ActiveMicHold
     this.stopRecordingIfNeededAndReleaseMic()
   }
 
+  /** `ActiveMicHolder` interface, for the toolbar's global "recording in progress" indicator
+   * (GH #141) - undefined before item$ has an id (e.g. Learn's quick-add bar, or this same
+   * toolbar's own quick-record mic before createItemIfMissing has run). */
+  getRecordingLocation(): {collection: string, itemId: string} | undefined {
+    const itemId = this.item$?.id
+    const collection = this.voiceMemoService.resolveCollection(this.item$, this.collection)
+    return (itemId && collection) ? {collection, itemId} : undefined
+  }
+
   stopRecordingIfNeededAndReleaseMic() {
     const wasRecording = this.isRecording
     this.stopRecordingIfNeeded()

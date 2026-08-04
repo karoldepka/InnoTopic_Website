@@ -1,4 +1,4 @@
-import { getIonicTextColor, shadeColor } from './color-utils'
+import { getIonicTextColor, shadeColor, hexToRgb } from './color-utils'
 import { setIonicColorSteps, setIonicColorVarHexAndRgb } from './ionic-color-utils'
 import { adjustLuminance } from './adjust-luminance'
 import type { ThemeConfigState } from './theme-config-state'
@@ -20,6 +20,13 @@ import type { ThemeConfigState } from './theme-config-state'
  * brightness_percent (ported from LifeSuite's ThemeCalculator) shades ion_background_color before
  * anything derives from it below - see shadedBackground.
  */
+
+/** Ionic's own "-rgb" suffix convention (bare "r, g, b", for rgba(var(--x-rgb), alpha)) - see
+ * setIonicColorVarHexAndRgb's doc comment for why this isn't just hexToRgb() directly. */
+function bareRgbTriplet(hex: string): string {
+  return hexToRgb(hex).slice(4, -1)
+}
+
 export function applyThemeConfig(config: ThemeConfigState) {
   const root = document.documentElement.style
 
@@ -66,10 +73,45 @@ export function applyThemeConfig(config: ThemeConfigState) {
   const textFg = getIonicTextColor(shadedBackground, contrastValue)
   root.setProperty('--ion-text-color', textFg)
   root.setProperty('--color', textFg)
+  // Ionic's own "-rgb" companion for --ion-text-color, same convention as -primary-rgb/
+  // -secondary-rgb below - several components rely on this for a text-color-tinted translucent
+  // border/background (rgba(var(--ion-text-color-rgb, 255, 255, 255), alpha)) that reads fine on
+  // a dark theme's fallback (opaque white) but was invisible/wrong on any light theme before this
+  // was ever set.
+  root.setProperty('--ion-text-color-rgb', bareRgbTriplet(textFg))
   setIonicColorSteps(textFg)
 
   setIonicColorVarHexAndRgb(root, '--ion-color-primary-contrast', getIonicTextColor(config.ion_color_primary, contrastValue))
   setIonicColorVarHexAndRgb(root, '--ion-color-secondary-contrast', getIonicTextColor(config.ion_color_secondary, contrastValue))
+
+  // Ionic's own "-rgb" companion for the primary/secondary colors themselves (the generic loop
+  // above only sets the hex form) - needed by any rgba(var(--ion-color-primary-rgb), alpha) usage.
+  root.setProperty('--ion-color-primary-rgb', bareRgbTriplet(config.ion_color_primary))
+  root.setProperty('--ion-color-secondary-rgb', bareRgbTriplet(config.ion_color_secondary))
+
+  // Ported from LifeSuite's ThemeCalculator.setColorProps() - two bugs fixed while porting rather
+  // than reproduced (same "fix it properly" call as the shade/tint color-mix() paren bug above):
+  // the original's --ion-color-{name}-highlight was missing its closing paren (so, like shade/
+  // tint, never actually worked) AND was hardcoded to reference primary's own tint/shade
+  // regardless of `colorName` (so secondary's "highlight" would have pointed at primary's color,
+  // not its own, once the paren bug was fixed). isDarkTheme was likewise hardcoded `true` (never
+  // actually toggled) - kept as unconditional tint here, matching that always-true behavior.
+  root.setProperty('--ion-color-primary-highlight', 'var(--ion-color-primary-tint)')
+  root.setProperty('--ion-color-secondary-highlight', 'var(--ion-color-secondary-tint)')
+
+  // Ported from LifeSuite's ThemeCalculator.setColorProps() - "workaround for logo disappearing
+  // on page navigation" per its own comment (AppLogoComponent's gradient, and a handful of other
+  // translucent-accent usages like tree-node border colors). Derived from the same raw
+  // config.ion_color_primary/secondary the generic loop above sets as --ion-color-primary/
+  // -secondary (not a brightness-shaded "central" color like the original's - this engine doesn't
+  // shade primary/secondary by brightness at all, only background/item-background).
+  root.setProperty('--ion-color-primary-contrast-muted', config.ion_color_primary + '80')
+  root.setProperty('--ion-color-secondary-contrast-muted', config.ion_color_secondary + '80')
+
+  // NOT setting bare --primary/--secondary here (LifeSuite's ThemeCalculator did) - LifeSuite's
+  // own global.scss already aliases them to var(--ion-color-primary)/var(--ion-color-secondary),
+  // which this function already keeps reactive, so a JS-side setProperty here would just be a
+  // redundant second way of doing the same thing.
 
   root.setProperty('--chip-shadow-margin',
     Number(config.shadow_blur_radius) / 4 + Math.abs(Number(config.shadow_offset)) + 2 + 'px')

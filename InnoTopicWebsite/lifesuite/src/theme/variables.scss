@@ -74,6 +74,9 @@
   --ion-color-dark-tint: #383a3e;
 
   /** medium **/
+  // Overridden theme-reactively in global.scss's :root block (this declaration is inert -
+  // @ionic/angular/css/core.css, imported by global.scss which loads after this file, redeclares
+  // --ion-color-medium itself and wins at equal specificity; see global.scss for why).
   --ion-color-medium: #989aa2;
   --ion-color-medium-rgb: 152, 154, 162;
   --ion-color-medium-contrast: #ffffff;

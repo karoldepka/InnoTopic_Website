@@ -5,7 +5,7 @@
 <!--  >-->
   <ion-icon
      style="font-size: 35px; padding: 0.5rem; transform: rotate(-45deg)"
-     (click)="treeHost.navigateUp($event)"
+     (tap)="treeHost.navigateUp($event)"
      (window:keydown.meta.arrowup)="treeHost.navigateUp($event)"
      (press)="treeHost.navigateToRoot($event)"
      class="actionable"
