@@ -1,15 +1,19 @@
 <div class="quiz-groups">
 
   <div class="quiz-group" [class.quiz-group--collapsed]="!groupsExpanded.filters">
-    <div
+    <button
+      type="button"
       class="quiz-group__header"
       (click)="toggleGroup('filters')"
+      [attr.aria-expanded]="groupsExpanded.filters"
+      aria-controls="quiz-options-filters"
     >
       FILTERS
       <ion-icon [name]="groupsExpanded.filters ? 'chevron-up' : 'chevron-down'"></ion-icon>
-    </div>
+    </button>
 
     <section
+      id="quiz-options-filters"
       class="quiz-options-grid"
       *ngIf="groupsExpanded.filters"
     >
@@ -92,13 +96,6 @@
             AI-GENERATED ONLY
           </ion-checkbox>
 
-          <ion-checkbox
-            class="quiz-toggle-cell"
-            labelPlacement="end"
-            [formControl]="controls.textToSpeechEnabled"
-          >
-            READ ALOUD (TTS)
-          </ion-checkbox>
         </div>
       </div>
       <!--<ion-button (click)="controls.minFunLevel.setValue('aa')">set fun level</ion-button>-->
@@ -122,16 +119,59 @@
     </section>
   </div>
 
+  <div class="quiz-group" [class.quiz-group--collapsed]="!groupsExpanded.tts">
+    <button
+      type="button"
+      class="quiz-group__header"
+      (click)="toggleGroup('tts')"
+      [attr.aria-expanded]="groupsExpanded.tts"
+      aria-controls="quiz-options-tts"
+    >
+      TEXT TO SPEECH (TTS)
+      <ion-icon [name]="groupsExpanded.tts ? 'chevron-up' : 'chevron-down'"></ion-icon>
+    </button>
+
+    <section
+      id="quiz-options-tts"
+      class="quiz-options-grid"
+      *ngIf="groupsExpanded.tts"
+    >
+      <div class="quiz-option quiz-option--toggles">
+        <div class="quiz-toggle-grid">
+          <ion-checkbox
+            class="quiz-toggle-cell"
+            labelPlacement="end"
+            [formControl]="controls.textToSpeechEnabled"
+          >
+            READ QUESTIONS AND ANSWERS ALOUD
+          </ion-checkbox>
+
+          <ion-checkbox
+            class="quiz-toggle-cell"
+            labelPlacement="end"
+            [formControl]="controls.textToSpeechCategoriesEnabled"
+          >
+            READ CATEGORIES ALOUD
+          </ion-checkbox>
+        </div>
+      </div>
+    </section>
+  </div>
+
   <div class="quiz-group" [class.quiz-group--collapsed]="!groupsExpanded.scheduling">
-    <div
+    <button
+      type="button"
       class="quiz-group__header"
       (click)="toggleGroup('scheduling')"
+      [attr.aria-expanded]="groupsExpanded.scheduling"
+      aria-controls="quiz-options-scheduling"
     >
       SCHEDULING
       <ion-icon [name]="groupsExpanded.scheduling ? 'chevron-up' : 'chevron-down'"></ion-icon>
-    </div>
+    </button>
 
     <section
+      id="quiz-options-scheduling"
       class="quiz-options-grid"
       *ngIf="groupsExpanded.scheduling"
     >
@@ -156,15 +196,19 @@
   </div>
 
   <div class="quiz-group" [class.quiz-group--collapsed]="!groupsExpanded.stats">
-    <div
+    <button
+      type="button"
       class="quiz-group__header"
       (click)="toggleGroup('stats')"
+      [attr.aria-expanded]="groupsExpanded.stats"
+      aria-controls="quiz-options-stats"
     >
       STATS
       <ion-icon [name]="groupsExpanded.stats ? 'chevron-up' : 'chevron-down'"></ion-icon>
-    </div>
+    </button>
 
     <section
+      id="quiz-options-stats"
       class="quiz-options-grid"
       *ngIf="groupsExpanded.stats"
     >

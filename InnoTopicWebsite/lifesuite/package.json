@@ -11,7 +11,7 @@
     "prebuild": "node scripts/write-build-info.mjs",
     "prebuild:prod": "node scripts/write-build-info.mjs",
     "ng": "pnpm exec ng",
-    "start": "node scripts/build-copilotkit-react-embed.mjs && pnpm exec ng serve --port 4207 --live-reload false",
+    "start": "node scripts/build-copilotkit-react-embed.mjs && pnpm exec ng serve --port 4207",
     "startWithAutoReload": "node scripts/build-copilotkit-react-embed.mjs && pnpm exec ng serve --port 4207",
     "build": "node scripts/build-copilotkit-react-embed.mjs && pnpm exec ng build",
     "build:copilotkit-react": "node scripts/build-copilotkit-react-embed.mjs",

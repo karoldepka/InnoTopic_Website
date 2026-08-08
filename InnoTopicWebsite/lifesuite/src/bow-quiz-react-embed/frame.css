@@ -266,7 +266,10 @@ button {
   top: 12px;
   right: 12px;
   display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
   gap: 8px;
+  max-width: min(34rem, calc(100% - 24px));
 }
 
 .answer-control-button {
@@ -283,6 +286,26 @@ button {
 .answer-control-button:disabled {
   color: #9aa7b4;
   cursor: not-allowed;
+}
+
+.keyboard-answer {
+  min-width: 2.25rem;
+  font-weight: 700;
+}
+
+.next-button {
+  border-color: #285b75;
+  color: #fff;
+  background: #285b75;
+}
+
+:where(button, select, input):focus-visible {
+  outline: 3px solid #b84242;
+  outline-offset: 3px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .trajectory-dot { display: none; }
 }
 
 @media (max-width: 760px) {

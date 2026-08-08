@@ -120,7 +120,9 @@ async function handleCategoryTree(c: import('hono').Context) {
   const existingCategories = loadExistingCategories();
   const { system, messages } = buildCategoryTreeMessages(body, existingCategories, searchResults);
 
-  const { object } = await generateObject({
+  // AI SDK's model/schema generics exceed TypeScript's instantiation depth in this workspace.
+  // Keep that complexity at the SDK boundary; the response is still runtime-validated by Zod.
+  const { object } = await (generateObject as any)({
     model: llm,
     schema: categoryTreeResponseSchema,
     system,

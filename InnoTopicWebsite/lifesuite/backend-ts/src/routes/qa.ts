@@ -53,7 +53,9 @@ async function handleQA(c: import('hono').Context) {
   const searchResults = body.web_search ? await webSearch(query) : [];
   const { system, messages } = buildQAMessages(body, searchResults);
 
-  const { object } = await generateObject({
+  // AI SDK's model/schema generics exceed TypeScript's instantiation depth in this workspace.
+  // Keep that complexity at the SDK boundary; the response is still runtime-validated by Zod.
+  const { object } = await (generateObject as any)({
     model: llm,
     schema: questionAnswerResponseSchema,
     system,

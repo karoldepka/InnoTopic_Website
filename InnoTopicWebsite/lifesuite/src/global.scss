@@ -403,3 +403,18 @@ ion-app > ion-router-outlet {
     --width: 94vw;
   }
 }
+
+// GH #5: ion-select popovers default to Ionic's content-based auto width, which is too narrow
+// for options with longer text (e.g. the transcription mode/language pickers - option text like
+// "Browser (Web Speech API) - live, free, needs internet" was getting ellipsis-truncated both in
+// the trigger and in the popover list). Apply via
+// [interfaceOptions]="{cssClass: 'wide-select-popover'}" on any ion-select whose option text
+// needs more than the default width. Prefer this over widening every select by default, since
+// short-option selects (e.g. yes/no) look odd padded out to this width.
+.wide-select-popover {
+  --width: min(90vw, 480px);
+
+  @media (max-width: 480px) {
+    --width: 94vw;
+  }
+}

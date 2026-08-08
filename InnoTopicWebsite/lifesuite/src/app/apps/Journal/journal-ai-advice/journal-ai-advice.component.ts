@@ -2,7 +2,7 @@ import {Component, ChangeDetectionStrategy, OnInit, signal} from '@angular/core'
 import {NgIf, AsyncPipe, NgFor, DatePipe} from '@angular/common'
 import {IonicModule} from '@ionic/angular'
 import {UntypedFormControl, ReactiveFormsModule} from '@angular/forms'
-import {firstValueFrom, map} from 'rxjs'
+import {Subscription, map} from 'rxjs'
 import {JournalEntryItemsService} from '../core/journal-entries.service'
 import {JournalEntry} from '../models/JournalEntry'
 import {stripHtml} from '../../../libs/AppFedShared/utils/html-utils'
@@ -58,6 +58,12 @@ export class JournalAiAdviceComponent implements OnInit {
   adviceText = signal('')
   adviceError = signal('')
 
+  /** Held only while a request is in flight, so stopAdvice() can unsubscribe it - Angular's
+   * HttpClient cancels the underlying request (aborts the fetch/XHR) as soon as its Observable is
+   * unsubscribed, so this is the standard way to cancel an in-flight HttpClient call, no separate
+   * AbortController needed (unlike the raw-fetch AI generation flows elsewhere in the Ai app). */
+  private adviceSubscription?: Subscription
+
   private readonly settingsItem$ = this.settingsService.obtainItem$ById(JOURNAL_AI_ADVICE_SETTINGS_ID)
 
   /** GH #137 follow-up: advice is now persisted (local+server, via AiAdviceOdmService, same sync
@@ -105,7 +111,7 @@ export class JournalAiAdviceComponent implements OnInit {
     this.formControls.maxEntriesHistory.valueChanges.subscribe(value => this.onSettingChanged('maxEntriesHistory', value))
   }
 
-  async getAdvice() {
+  getAdvice() {
     if (this.adviceLoading()) return
     const maxDays = Number(this.formControls.maxDaysHistory.value) || DEFAULT_MAX_DAYS_HISTORY
     const maxEntries = Number(this.formControls.maxEntriesHistory.value) || DEFAULT_MAX_ENTRIES_HISTORY
@@ -120,26 +126,34 @@ export class JournalAiAdviceComponent implements OnInit {
     this.adviceLoading.set(true)
     this.adviceError.set('')
     this.adviceText.set('')
-    try {
-      const response = await firstValueFrom(
-        this.aiBackend.post<JournalAdviceResponse>('/journal-advice', {entries})
-      )
-      this.adviceText.set(response.advice)
-      this.aiAdviceService.add({
-        source: AI_ADVICE_SOURCE,
-        advice: response.advice,
-        modelName: response.modelName,
-        truncated: response.truncated,
-      })
-      if (response.truncated) {
-        this.adviceError.set('This advice may be cut off - try again if it looks incomplete.')
-      }
-    } catch (e) {
-      this.adviceError.set('Could not get AI advice - please try again.')
-      console.error('[journal-ai-advice] generation failed', e)
-    } finally {
-      this.adviceLoading.set(false)
-    }
+    this.adviceSubscription = this.aiBackend.post<JournalAdviceResponse>('/journal-advice', {entries}).subscribe({
+      next: response => {
+        this.adviceText.set(response.advice)
+        this.aiAdviceService.add({
+          source: AI_ADVICE_SOURCE,
+          advice: response.advice,
+          modelName: response.modelName,
+          truncated: response.truncated,
+        })
+        if (response.truncated) {
+          this.adviceError.set('This advice may be cut off - try again if it looks incomplete.')
+        }
+        this.adviceLoading.set(false)
+      },
+      error: e => {
+        this.adviceError.set('Could not get AI advice - please try again.')
+        console.error('[journal-ai-advice] generation failed', e)
+        this.adviceLoading.set(false)
+      },
+    })
+  }
+
+  /** Cancels an in-flight getAdvice() call - unsubscribing aborts the underlying HttpClient
+   * request, so the response (if the server ever finishes it) is simply discarded. */
+  stopAdvice() {
+    this.adviceSubscription?.unsubscribe()
+    this.adviceSubscription = undefined
+    this.adviceLoading.set(false)
   }
 
   private onSettingChanged(key: keyof JournalAiAdviceSettings, value: unknown) {

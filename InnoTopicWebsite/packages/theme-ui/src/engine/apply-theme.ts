@@ -48,6 +48,12 @@ export function applyThemeConfig(config: ThemeConfigState) {
   // field's default. Overrides the raw (unshaded) --ion-background-color the loop above just set.
   const shadedBackground = shadeColor(config.ion_background_color, config.brightness_percent / 75)
   root.setProperty('--ion-background-color', shadedBackground)
+  // Ionic's own "-rgb" companion for --ion-background-color, same convention as -text-color-rgb/
+  // -primary-rgb below - without it, any rgba(var(--ion-background-color-rgb), alpha) usage falls
+  // back to opaque white. That includes Ionic's own ios-mode translucent popover background (see
+  // popover.ios.css), which is why the "App & Sync Status" popover (ios mode, translucent: true)
+  // rendered as a light/white frosted panel instead of matching this app's dark theme.
+  root.setProperty('--ion-background-color-rgb', bareRgbTriplet(shadedBackground))
   // Ported from ThemeCalculator.updateColors()'s itemAndTextBg - a second, slightly lighter shade
   // for items/cards sitting on top of the background.
   root.setProperty('--ion-item-background', shadeColor(shadedBackground, config.brightness_percent / 85))

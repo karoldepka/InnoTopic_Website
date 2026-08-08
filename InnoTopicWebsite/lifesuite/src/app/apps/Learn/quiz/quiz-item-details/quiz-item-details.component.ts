@@ -86,7 +86,11 @@ export class QuizItemDetailsComponent implements OnInit, OnDestroy, AfterViewIni
         filter(itemVal => !! itemVal),
         take(1),
       ).subscribe(itemVal => {
-        this.quizSpeech.speak(itemVal ?. getQuestion() || itemVal ?. title)
+        const question = itemVal?.getQuestion() || itemVal?.title
+        const categories = this.quizService.options2$.val?.textToSpeechCategoriesEnabled
+          ? this.item$?.getEffectiveCategories().replace(/^,\s*/, '')
+          : ''
+        this.quizSpeech.speak([categories, question].filter(Boolean).join('. '))
       })
     }
   }

@@ -124,6 +124,18 @@ const routes: Routes = [
     path: 'life-overviews',
     loadChildren: () => import('./apps/Lifedvisor/life-overviews/life-overviews.module').then(m => m.LifeOverviewsPageModule)
   },
+  {
+    path: 'rationale',
+    loadChildren: () => import('./apps/Lifedvisor/rationale/rationale.module').then(m => m.RationalePageModule)
+  },
+  {
+    path: 'occupations',
+    loadChildren: () => import('./apps/Lifedvisor/occupations/occupations.module').then(m => m.OccupationsPageModule)
+  },
+  {
+    path: 'about-lifedvisor',
+    loadChildren: () => import('./apps/Lifedvisor/about/about.module').then(m => m.AboutPageModule)
+  },
 
   {
     path: 'experiments',

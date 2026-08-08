@@ -17,6 +17,12 @@
   padding-bottom: 0.6rem
 
 .quiz-group__header
+  width: 100%
+  padding: 0
+  border: 0
+  background: transparent
+  font: inherit
+  text-align: start
   display: flex
   align-items: center
   justify-content: space-between
@@ -29,6 +35,10 @@
   text-transform: uppercase
   letter-spacing: 0.02em
   color: var(--ion-color-light, var(--ion-text-color))
+
+.quiz-group__header:focus-visible
+  outline: 3px solid var(--ion-color-secondary)
+  outline-offset: 3px
 
 .quiz-group .quiz-options-grid
   margin-top: 0.6rem

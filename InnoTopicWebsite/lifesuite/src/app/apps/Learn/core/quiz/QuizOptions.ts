@@ -25,6 +25,8 @@ export class QuizOptions {
     public onlyAiGenerated: boolean = false,
     /** GH #128: reads the question/answer aloud via the browser's SpeechSynthesis API. */
     public textToSpeechEnabled: boolean = false,
+    /** When TTS is enabled, also reads the quiz item's categories before its question. */
+    public textToSpeechCategoriesEnabled: boolean = false,
     /** Interpret `categories`/`textFilter` above as a single regex pattern each (case-insensitive,
      * no comma-splitting) instead of the default comma-separated-substrings-OR'd-together
      * matching. */

@@ -221,6 +221,15 @@
         </ion-button>
         <ion-button
           fill="outline"
+          color="secondary"
+          [disabled]="gen.questionLoading() || !gen.questions().length"
+          (click)="startBowQuiz()"
+        >
+          <ion-icon name="locate-outline" slot="start"></ion-icon>
+          Play Bow Quiz
+        </ion-button>
+        <ion-button
+          fill="outline"
           color="tertiary"
           [disabled]="gen.questionLoading() || (!gen.tree().length && !gen.questions().length)"
           (click)="saveToLearn()"

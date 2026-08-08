@@ -47,6 +47,7 @@
   <ion-select
     label="{{ 'SETTINGS.VOICE_MEMO_TRANSCRIPTION_MODE' | translate }}"
     interface="popover"
+    [interfaceOptions]="{ cssClass: 'wide-select-popover' }"
     [value]="voiceMemoTranscriptionMode"
     (ionChange)="onChangeVoiceMemoTranscriptionMode($event)"
   >
@@ -60,6 +61,7 @@
   <ion-select
     label="{{ 'SETTINGS.VOICE_MEMO_TRANSCRIPTION_LANGUAGE' | translate }}"
     interface="popover"
+    [interfaceOptions]="{ cssClass: 'wide-select-popover' }"
     [value]="voiceMemoTranscriptionLanguage"
     (ionChange)="onChangeVoiceMemoTranscriptionLanguage($event)"
   >

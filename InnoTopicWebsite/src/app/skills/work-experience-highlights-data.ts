@@ -169,6 +169,7 @@ export const highlights = {
       // TODO: Frontend: Gridsome: {} /* A Jamstack framework for Vue.js */,
       Gatsby: {},
       Hono: {},
+      Fly: {},
       'Backbone.js': {},
       // 'Knockout.js': {},
       // TODO: Frontend: 'https://million.dev/': {},

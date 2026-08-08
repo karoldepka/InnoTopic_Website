@@ -29,13 +29,28 @@
 
 // ── Panels ────────────────────────────────────────────────────────────────────
 
+// Neumorphic "soft UI" panel: was a hardcoded near-black rgba() regardless of the active
+// theme (too dark against e.g. this app's lighter/bright curated themes, and just flatly wrong
+// once a user picks one). --ion-item-background is the theme engine's own reactive "surface
+// slightly lighter than the page background" token (apply-theme.ts), so this now tracks
+// whichever theme/brightness the user has picked. The dual light/dark offset shadow (soft UI's
+// signature "raised out of the background" look) is built from that same engine's
+// --shadow-light-color/--shadow-dark-color (luminance-shifted from the page background) and
+// --shadow-offset/--shadow-blur-radius - color-mix() dials their opacity down since those raw
+// tokens are fully opaque (fine for the chip component's small hover-only accents, too strong
+// as a permanent ambient shadow on a large panel).
 .panel {
   display: flex;
   flex-direction: column;
   min-width: 0;
-  border: 1px solid rgba(155, 169, 186, 0.28);
-  border-radius: 8px;
-  background: rgba(20, 24, 28, 0.72);
+  border: none;
+  border-radius: 16px;
+  background: var(--ion-item-background, #1c2126);
+  box-shadow:
+    var(--shadow-offset, 5px) var(--shadow-offset, 5px) var(--shadow-blur-radius, 10px)
+      color-mix(in srgb, var(--shadow-dark-color, #000) 55%, transparent),
+    calc(-1 * var(--shadow-offset, 5px)) calc(-1 * var(--shadow-offset, 5px)) var(--shadow-blur-radius, 10px)
+      color-mix(in srgb, var(--shadow-light-color, #fff) 18%, transparent);
 }
 
 .panel-head {
@@ -64,7 +79,10 @@
 
 .panel-foot {
   display: flex;
+  flex-wrap: wrap;
+  align-items: center;
   justify-content: flex-end;
+  gap: 10px;
   padding: 10px 12px;
   border-top: 1px solid rgba(155, 169, 186, 0.2);
   flex-shrink: 0;
@@ -179,7 +197,10 @@
     color: var(--ion-color-medium);
     border-bottom: 1px solid rgba(155, 169, 186, 0.2);
     text-align: left;
-    background: rgba(14, 18, 22, 0.96);
+    // Matches .panel's own (now theme-reactive) background exactly, opaquely - needs to be
+    // opaque to hide rows scrolling underneath it (position: sticky below), and matching the
+    // panel means it reads as "the panel's own header row" rather than a separate dark bar.
+    background: var(--ion-item-background, #1c2126);
     position: sticky;
     top: 0;
     z-index: 1;

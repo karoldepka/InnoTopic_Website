@@ -1,5 +1,6 @@
 packages:
   - lifesuite
+  - lifesuite/backend-ts
   - packages/*
   - ../svg-conversions
 

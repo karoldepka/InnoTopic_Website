@@ -5,13 +5,32 @@ import './frame.css';
 
 const { Engine, Bodies, Body, Composite, Events } = Matter;
 
-const ANSWERS = [
-  { id: 'mergeMap', text: 'mergeMap', correct: false },
-  { id: 'combineLatest', text: 'combineLatest', correct: true },
-  { id: 'debounceTime', text: 'debounceTime', correct: false },
-  { id: 'catchError', text: 'catchError', correct: false },
-  { id: 'takeUntil', text: 'takeUntil', correct: false },
-];
+const SESSION_KEY = 'LifeSuite.BowQuiz.questions';
+const DEFAULT_QUESTIONS = [{
+  question: 'Which RxJS operator combines the latest values from multiple streams?',
+  answers: [
+    { id: 'a', label: 'A', text: 'mergeMap', correct: false },
+    { id: 'b', label: 'B', text: 'combineLatest', correct: true },
+    { id: 'c', label: 'C', text: 'debounceTime', correct: false },
+    { id: 'd', label: 'D', text: 'catchError', correct: false },
+  ],
+}];
+
+function loadQuestions() {
+  try {
+    const parsed = JSON.parse(window.sessionStorage.getItem(SESSION_KEY) || 'null');
+    if (Array.isArray(parsed) && parsed.length && parsed.every(item =>
+      typeof item?.question === 'string'
+      && Array.isArray(item.answers)
+      && item.answers.length === 4
+      && item.answers.filter(answer => answer?.correct).length === 1)) {
+      return parsed;
+    }
+  } catch (error) {
+    console.warn('[bow-quiz] Could not load generated questions', error);
+  }
+  return DEFAULT_QUESTIONS;
+}
 
 const LOCALES = [
   { code: 'en', label: 'English' },
@@ -36,6 +55,8 @@ const TRANSLATIONS = {
     statusAway: 'Arrow away.',
     statusCorrect: 'Correct hit. Nice release.',
     statusWrong: (answer) => `Hit ${answer}. Try the correct answer.`,
+    progress: (current, total) => `Question ${current} of ${total}`,
+    next: 'Next question',
     reset: 'Reset',
     answerLabel: (index) => `Answer ${index}`,
     hint: 'Drag backward from the bowstring, aim toward an answer target, then release. More pull gives more arrow speed and a flatter shot.',
@@ -226,12 +247,12 @@ function toViewPoint(point, rect) {
   };
 }
 
-function getTargetLayout(index) {
-  const spacing = WORLD_HEIGHT / (ANSWERS.length + 1);
+function getTargetLayout(index, answerCount) {
+  const spacing = WORLD_HEIGHT / (answerCount + 1);
   return {
-    x: 800,
+    x: 700,
     y: spacing * (index + 1),
-    width: 250,
+    width: 280,
     height: 66,
   };
 }
@@ -314,12 +335,22 @@ function makeArrow(startPoint, aimVector, pullDistance) {
 
 function ArrowShape({ arrow }) {
   const angle = arrow.angle;
+  const toPoint = (localX, localY) => {
+    const p = rotatePoint(localX, localY, angle);
+    return `${arrow.position.x + p.x},${arrow.position.y + p.y}`;
+  };
+
   const tail = rotatePoint(-ARROW_LENGTH / 2, 0, angle);
   const head = rotatePoint(ARROW_LENGTH / 2, 0, angle);
-  const featherTop = rotatePoint(-ARROW_LENGTH / 2 + 10, -7, angle);
-  const featherBottom = rotatePoint(-ARROW_LENGTH / 2 + 10, 7, angle);
   const headTop = rotatePoint(ARROW_LENGTH / 2 - 10, -8, angle);
   const headBottom = rotatePoint(ARROW_LENGTH / 2 - 10, 8, angle);
+
+  // Fletching (feathers): two vanes flaring outward past the tail, each attached to the shaft
+  // well forward of the tail tip - NOT a single triangle converging to a point at the tail, which
+  // reads as a second arrowhead (GH: "arrow should have a point on only one end").
+  const vaneFront = -ARROW_LENGTH / 2 + 16;
+  const vaneBack = -ARROW_LENGTH / 2 + 4;
+  const vaneTip = -ARROW_LENGTH / 2 - 2;
 
   return React.createElement(
     'g',
@@ -341,17 +372,17 @@ function ArrowShape({ arrow }) {
     }),
     React.createElement('polygon', {
       className: 'fletching',
-      points: [
-        `${arrow.position.x + tail.x},${arrow.position.y + tail.y}`,
-        `${arrow.position.x + featherTop.x},${arrow.position.y + featherTop.y}`,
-        `${arrow.position.x + featherBottom.x},${arrow.position.y + featherBottom.y}`,
-      ].join(' '),
+      points: [toPoint(vaneFront, -1.5), toPoint(vaneBack, -1.5), toPoint(vaneTip, -9)].join(' '),
+    }),
+    React.createElement('polygon', {
+      className: 'fletching',
+      points: [toPoint(vaneFront, 1.5), toPoint(vaneBack, 1.5), toPoint(vaneTip, 9)].join(' '),
     }),
   );
 }
 
-function Target({ answer, copy, index, hitAnswerId, answersRevealed, hintLettersRevealed }) {
-  const layout = getTargetLayout(index);
+function Target({ answer, answerCount, copy, index, hitAnswerId, answersRevealed, hintLettersRevealed }) {
+  const layout = getTargetLayout(index, answerCount);
   const wasHit = hitAnswerId === answer.id;
   const displayedText = getDisplayedAnswerText(answer, { answersRevealed, hintLettersRevealed, wasHit });
   const className = [
@@ -393,7 +424,7 @@ function Target({ answer, copy, index, hitAnswerId, answersRevealed, hintLetters
       className: 'target-label',
       x: layout.x + 62,
       y: layout.y - 4,
-    }, displayedText),
+    }, `${answer.label}. ${displayedText}`),
     React.createElement('text', {
       className: 'target-sub-label',
       x: layout.x + 62,
@@ -405,10 +436,14 @@ function Target({ answer, copy, index, hitAnswerId, answersRevealed, hintLetters
 function Bow({ pullPoint, pullDistance }) {
   const stringPoint = pullPoint || BOW_ANCHOR;
   const bend = pullDistance * 0.27;
-  const topTip = { x: BOW_ANCHOR.x + 18, y: BOW_ANCHOR.y - 116 };
-  const bottomTip = { x: BOW_ANCHOR.x + 18, y: BOW_ANCHOR.y + 116 };
-  const upperControl = { x: BOW_ANCHOR.x - 42 - bend, y: BOW_ANCHOR.y - 60 };
-  const lowerControl = { x: BOW_ANCHOR.x - 42 - bend, y: BOW_ANCHOR.y + 60 };
+  // Targets sit to the right of the bow (getTargetLayout: x: 700, vs. BOW_ANCHOR.x: 148) - the
+  // wood limb (upperControl/lowerControl, the curve's bulge) needs to bulge toward that side (a
+  // bow's convex "back" faces the target, its concave "belly"/string faces the archer), so tips
+  // sit left of the anchor and the control points sit right of it.
+  const topTip = { x: BOW_ANCHOR.x - 18, y: BOW_ANCHOR.y - 116 };
+  const bottomTip = { x: BOW_ANCHOR.x - 18, y: BOW_ANCHOR.y + 116 };
+  const upperControl = { x: BOW_ANCHOR.x + 42 + bend, y: BOW_ANCHOR.y - 60 };
+  const lowerControl = { x: BOW_ANCHOR.x + 42 + bend, y: BOW_ANCHOR.y + 60 };
 
   return React.createElement(
     'g',
@@ -482,11 +517,16 @@ function BowQuizGame() {
   const svgRef = React.useRef(null);
   const engineRef = React.useRef(null);
   const targetBodiesRef = React.useRef(new Map());
+  const correctAwardedRef = React.useRef(false);
+  const [questions] = React.useState(loadQuestions);
+  const [questionIndex, setQuestionIndex] = React.useState(0);
+  const currentQuestion = questions[questionIndex];
+  const answers = currentQuestion.answers;
   const [locale, setLocale] = React.useState(getInitialLocale);
   const [showAimHint, setShowAimHint] = React.useState(
     () => window.localStorage.getItem('bowQuizShowAimHint') !== 'false',
   );
-  const [answersRevealed, setAnswersRevealed] = React.useState(false);
+  const [answersRevealed, setAnswersRevealed] = React.useState(true);
   const [hintLettersRevealed, setHintLettersRevealed] = React.useState(0);
   const [arrows, setArrows] = React.useState([]);
   const [pullPoint, setPullPoint] = React.useState(null);
@@ -510,8 +550,8 @@ function BowQuizGame() {
     Composite.add(engine.world, ground);
 
     const targetBodies = new Map();
-    ANSWERS.forEach((answer, index) => {
-      const layout = getTargetLayout(index);
+    answers.forEach((answer, index) => {
+      const layout = getTargetLayout(index, answers.length);
       const body = Bodies.rectangle(layout.x + layout.width / 2, layout.y, layout.width, layout.height, {
         isStatic: true,
         isSensor: true,
@@ -531,7 +571,7 @@ function BowQuizGame() {
         if (!arrow || !target || arrow.plugin?.stuck) {
           continue;
         }
-        const answer = ANSWERS.find((candidate) => candidate.id === target.plugin.answerId);
+        const answer = answers.find((candidate) => candidate.id === target.plugin.answerId);
         if (!answer) {
           continue;
         }
@@ -541,7 +581,8 @@ function BowQuizGame() {
         Body.setStatic(arrow, true);
         setHitAnswerId(answer.id);
         setStatus(answer.correct ? { type: 'correct' } : { type: 'wrong', answerText: answer.text });
-        if (answer.correct) {
+        if (answer.correct && !correctAwardedRef.current) {
+          correctAwardedRef.current = true;
           setScore((value) => value + 1);
         }
       }
@@ -571,7 +612,7 @@ function BowQuizGame() {
       Composite.clear(engine.world, false);
       engineRef.current = null;
     };
-  }, []);
+  }, [answers]);
 
   React.useEffect(() => {
     document.documentElement.lang = locale;
@@ -580,6 +621,7 @@ function BowQuizGame() {
   }, [copy.title, locale]);
 
   const pullDistance = pullPoint ? clamp(distance(pullPoint, BOW_ANCHOR), 0, MAX_PULL) : 0;
+  const questionComplete = Boolean(hitAnswerId && answers.find(answer => answer.id === hitAnswerId)?.correct);
 
   function getPointerWorldPoint(event) {
     const rect = svgRef.current.getBoundingClientRect();
@@ -610,6 +652,7 @@ function BowQuizGame() {
 
   function startPull(event) {
     event.preventDefault();
+    if (questionComplete) return;
     event.currentTarget.setPointerCapture?.(event.pointerId);
     setStatus({ type: 'aim' });
     updatePull(event);
@@ -646,8 +689,27 @@ function BowQuizGame() {
     setScore(0);
     setStatus({ type: 'idle' });
     setPullPoint(null);
-    setAnswersRevealed(false);
+    setAnswersRevealed(true);
     setHintLettersRevealed(0);
+    correctAwardedRef.current = false;
+    setQuestionIndex(0);
+  }
+
+  function nextQuestion() {
+    const engine = engineRef.current;
+    if (engine) {
+      Composite.allBodies(engine.world)
+        .filter((body) => body.label === 'arrow')
+        .forEach((body) => Composite.remove(engine.world, body));
+    }
+    setArrows([]);
+    setHitAnswerId('');
+    setStatus({ type: 'idle' });
+    setPullPoint(null);
+    setHintLettersRevealed(0);
+    setAnswersRevealed(true);
+    correctAwardedRef.current = false;
+    setQuestionIndex((value) => Math.min(value + 1, questions.length - 1));
   }
 
   function changeLocale(event) {
@@ -659,7 +721,7 @@ function BowQuizGame() {
   }
 
   function revealNextHintLetter() {
-    const correctAnswer = ANSWERS.find((answer) => answer.correct);
+    const correctAnswer = answers.find((answer) => answer.correct);
     if (!correctAnswer) {
       return;
     }
@@ -681,8 +743,8 @@ function BowQuizGame() {
       React.createElement(
         'div',
         { className: 'question-block' },
-        React.createElement('div', { className: 'question-kicker' }, copy.title),
-        React.createElement('div', { className: 'question-text' }, copy.question),
+        React.createElement('div', { className: 'question-kicker' }, `${copy.title} · ${(copy.progress || TRANSLATIONS.en.progress)(questionIndex + 1, questions.length)}`),
+        React.createElement('div', { className: 'question-text' }, currentQuestion.question),
       ),
       React.createElement('div', { className: 'score-pill' }, copy.score(score, shots || 0)),
       React.createElement('div', { className: `status-pill ${statusKind}` }, getStatusText(status, copy)),
@@ -731,9 +793,10 @@ function BowQuizGame() {
           onPointerCancel: () => setPullPoint(null),
         },
         React.createElement('rect', { x: 0, y: WORLD_HEIGHT - 52, width: WORLD_WIDTH, height: 52, fill: 'rgba(115, 157, 115, 0.22)' }),
-        ANSWERS.map((answer, index) => React.createElement(Target, {
+        answers.map((answer, index) => React.createElement(Target, {
           key: answer.id,
           answer,
+          answerCount: answers.length,
           copy,
           index,
           hitAnswerId,
@@ -771,6 +834,26 @@ function BowQuizGame() {
       React.createElement(
         'div',
         { className: 'answer-controls' },
+        answers.map((answer) => React.createElement(
+          'button',
+          {
+            key: answer.id,
+            type: 'button',
+            className: 'answer-control-button keyboard-answer',
+            disabled: questionComplete,
+            onClick: () => {
+              setShots((value) => value + 1);
+              setHitAnswerId(answer.id);
+              setStatus(answer.correct ? { type: 'correct' } : { type: 'wrong', answerText: answer.text });
+              if (answer.correct && !correctAwardedRef.current) {
+                correctAwardedRef.current = true;
+                setScore((value) => value + 1);
+              }
+            },
+            'aria-label': `${answer.label}. ${answer.text}`,
+          },
+          answer.label,
+        )),
         React.createElement(
           'button',
           { type: 'button', className: 'answer-control-button', onClick: toggleAnswersRevealed },
@@ -784,10 +867,13 @@ function BowQuizGame() {
             type: 'button',
             className: 'answer-control-button',
             onClick: revealNextHintLetter,
-            disabled: answersRevealed || hintLettersRevealed >= (ANSWERS.find((answer) => answer.correct)?.text.length ?? 0),
+            disabled: answersRevealed || hintLettersRevealed >= (answers.find((answer) => answer.correct)?.text.length ?? 0),
           },
           copy.hintButtonLabel || TRANSLATIONS.en.hintButtonLabel,
         ),
+        hitAnswerId && answers.find(answer => answer.id === hitAnswerId)?.correct && questionIndex < questions.length - 1
+          ? React.createElement('button', { type: 'button', className: 'answer-control-button next-button', onClick: nextQuestion }, copy.next || TRANSLATIONS.en.next)
+          : null,
       ),
     ),
   );

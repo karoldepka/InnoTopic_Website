@@ -1,10 +1,68 @@
 <ion-app
 > <!--   (window:beforeunload)="onBeforeUnload()"
- -->
-  <ion-header>
-    <ion-toolbar>
-      <app-toolbar-common-items></app-toolbar-common-items>
-    </ion-toolbar>
-  </ion-header>
-  <ion-router-outlet></ion-router-outlet>
+  -->
+  <ion-split-pane contentId="main-content">
+    <ion-menu contentId="main-content" type="overlay">
+      <ion-content>
+        <ion-list id="inbox-list">
+          <ion-list-header>Lifedvisor</ion-list-header>
+          <ion-note>Upgrade your life with Lifedvisor</ion-note>
+          @for (page of appPages; track page) {
+            <ion-menu-toggle auto-hide="false">
+              <ion-item
+                routerDirection="root"
+                [routerLink]="[page.url]"
+                lines="none"
+                detail="false"
+                routerLinkActive="selected"
+              >
+                <ion-icon
+                  aria-hidden="true"
+                  slot="start"
+                  [ios]="page.icon + '-outline'"
+                  [md]="page.icon + '-sharp'"
+                ></ion-icon>
+                <ion-label>{{ page.title }}</ion-label>
+              </ion-item>
+            </ion-menu-toggle>
+          }
+        </ion-list>
+
+        <ion-list id="labels-list">
+          <ion-list-header>More</ion-list-header>
+          @for (page of morePages; track page) {
+            <ion-menu-toggle auto-hide="false">
+              <ion-item
+                routerDirection="root"
+                [routerLink]="[page.url]"
+                lines="none"
+                detail="false"
+                routerLinkActive="selected"
+              >
+                <ion-icon
+                  aria-hidden="true"
+                  slot="start"
+                  [ios]="page.icon + '-outline'"
+                  [md]="page.icon + '-sharp'"
+                ></ion-icon>
+                <ion-label>{{ page.title }}</ion-label>
+              </ion-item>
+            </ion-menu-toggle>
+          }
+        </ion-list>
+      </ion-content>
+    </ion-menu>
+
+    <div class="ion-page" id="main-content">
+      <ion-header>
+        <ion-toolbar>
+          <ion-buttons slot="start">
+            <ion-menu-button></ion-menu-button>
+          </ion-buttons>
+          <app-toolbar-common-items></app-toolbar-common-items>
+        </ion-toolbar>
+      </ion-header>
+      <ion-router-outlet></ion-router-outlet>
+    </div>
+  </ion-split-pane>
 </ion-app>

@@ -23,9 +23,29 @@ import {IndexedDbHealthToastService} from './libs/AppFedSharedBrowser/odm-browse
   standalone: false,
   selector: 'app-root',
   changeDetection: ChangeDetectionStrategy.Eager,
-  templateUrl: 'app.component.html'
+  templateUrl: 'app.component.html',
+  styleUrls: ['app.component.scss'],
 })
 export class AppComponent {
+  /** LifeDvisor navigation, rendered by the official Ionic sidemenu-starter shell. */
+  public appPages = [
+    {title: 'Home', url: '/lifedvisor', icon: 'home'},
+    {title: 'Search', url: '/ask', icon: 'search'},
+    {title: 'Rating Log', url: '/ask/log', icon: 'star'},
+    {title: 'Rationale', url: '/rationale', icon: 'bulb'},
+    {title: 'Life Overviews', url: '/life-overviews', icon: 'bar-chart'},
+    {title: 'Occupations', url: '/occupations', icon: 'person'},
+    {title: 'About Lifedvisor', url: '/about-lifedvisor', icon: 'information-circle'},
+  ]
+
+  public morePages = [
+    {title: 'Success Probability', url: '/success-chance', icon: 'analytics'},
+    {title: 'Exponential Improvement', url: '/exponential-improvement', icon: 'trending-up'},
+    {title: 'What Next', url: '/what-next', icon: 'compass'},
+    {title: 'Mindfulness', url: '/mindfulness', icon: 'leaf'},
+    {title: 'Sleep', url: '/sleep', icon: 'moon'},
+  ]
+
   constructor(
     private platform: Platform,
     private featureService /* force the service to run */: FeatureService,

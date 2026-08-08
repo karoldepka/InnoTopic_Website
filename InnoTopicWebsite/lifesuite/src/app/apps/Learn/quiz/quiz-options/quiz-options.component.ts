@@ -44,13 +44,14 @@ export class QuizOptionsComponent implements OnInit {
 
   /** Top-level sections of the options panel - collapsed by default so the panel opens compact;
    * each is expanded independently by clicking its own header. */
-  groupsExpanded: {[group in 'filters' | 'scheduling' | 'stats']: boolean} = {
+  groupsExpanded: {[group in 'filters' | 'tts' | 'scheduling' | 'stats']: boolean} = {
     filters: false,
+    tts: false,
     scheduling: false,
     stats: false,
   }
 
-  toggleGroup(group: 'filters' | 'scheduling' | 'stats') {
+  toggleGroup(group: 'filters' | 'tts' | 'scheduling' | 'stats') {
     this.groupsExpanded[group] = !this.groupsExpanded[group]
   }
 
@@ -69,6 +70,7 @@ export class QuizOptionsComponent implements OnInit {
     skipAiGenerated: new UntypedFormControl(false),
     onlyAiGenerated: new UntypedFormControl(false),
     textToSpeechEnabled: new UntypedFormControl(false),
+    textToSpeechCategoriesEnabled: new UntypedFormControl(false),
     useRegexFilters: new UntypedFormControl(false),
   }
 

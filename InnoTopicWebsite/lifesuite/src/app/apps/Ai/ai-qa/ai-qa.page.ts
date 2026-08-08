@@ -36,6 +36,8 @@ import { LearnItem } from '../../Learn/models/LearnItem';
 import { LearnItem$ } from '../../Learn/models/LearnItem$';
 import { OdmBackend } from '../../../libs/AppFedShared/odm/OdmBackend';
 import { AppLogoComponent } from '../../Common/app-logo/app-logo.component';
+import { Router } from '@angular/router';
+import { BOW_QUIZ_SESSION_KEY, toBowQuizQuestion } from '../shared/abcd-answers.util';
 
 @Component({
   selector: 'app-ai-qa',
@@ -52,6 +54,7 @@ export class AiQaPage implements OnInit {
   private readonly alertCtrl = inject(AlertController);
   private readonly learnItems = inject(LearnItemItemsService);
   private readonly toastCtrl = inject(ToastController);
+  private readonly router = inject(Router);
 
   readonly topic = signal('Agentic AI & UI interview questions');
   /** GH #130: a picked local directory, mirrored here (rather than reading gen.fileTree()
@@ -196,6 +199,23 @@ export class AiQaPage implements OnInit {
   generateQuestions(): void {
     this.gen.generateQuestions('vercel-ai-sdk', this.webSearch(), this.abcdAnswers());
     this.expandedAnswerKeys.set(new Set<string>());
+  }
+
+  async startBowQuiz(): Promise<void> {
+    const questions = this.gen.questions()
+      .map(toBowQuizQuestion)
+      .filter(question => question !== null);
+    if (!questions.length) {
+      await presentDismissableToast(this.toastCtrl, {
+        message: 'Generate ABCD answers first. Each answer needs A-D choices and one ✓ correct choice.',
+        duration: 3500,
+        color: 'warning',
+        position: 'bottom',
+      });
+      return;
+    }
+    sessionStorage.setItem(BOW_QUIZ_SESSION_KEY, JSON.stringify(questions));
+    await this.router.navigateByUrl('/learn/bow-quiz');
   }
 
   async showMoreQADialog(): Promise<void> {
