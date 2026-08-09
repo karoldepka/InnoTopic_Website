@@ -30,7 +30,13 @@ export class Occupations {
   'Cooking' = {}
 }
 
-export const occupations = getDictionaryValuesAsArray(setIdsFromKeys(new Occupations() as any as Dict<{}>))
+interface OccupationItem {
+  id: string
+}
+
+export const occupations: OccupationItem[] = getDictionaryValuesAsArray(
+  setIdsFromKeys(new Occupations() as unknown as Dict<OccupationItem>),
+)
 
 @Component({
   standalone: true,
@@ -42,7 +48,7 @@ export const occupations = getDictionaryValuesAsArray(setIdsFromKeys(new Occupat
 })
 export class OccupationsPage implements OnInit {
 
-  occupations = occupations
+  occupations: OccupationItem[] = occupations
 
   constructor() { }
 
