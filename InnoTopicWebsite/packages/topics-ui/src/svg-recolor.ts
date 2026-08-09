@@ -1,4 +1,12 @@
-import { SvgWorkerPool } from 'svg-conversion'
+type SvgWorkerPoolLike = {
+  process(svg: string, options?: {
+    primaryColor?: string
+    secondaryColor?: string
+    contrast?: number
+    brightness?: number
+    outputMode?: 'rgb' | 'css_vars'
+  }): Promise<string>
+}
 
 export interface RecolorOptions {
   primaryColor: string
@@ -22,9 +30,20 @@ export function setWorkerBasePath(path: string) {
 
 // One shared worker pool for every <topic-logo> on the page - each instance is cheap to call
 // but the pool itself owns real Worker threads, so it's created lazily and only once.
-let pool: SvgWorkerPool | undefined
-function getPool(): SvgWorkerPool {
-  return pool ??= new SvgWorkerPool({ workerUrl: `${workerBasePath}svg-worker.js` })
+let poolPromise: Promise<SvgWorkerPoolLike | undefined> | undefined
+async function getPool(): Promise<SvgWorkerPoolLike | undefined> {
+  if (!poolPromise) {
+    poolPromise = (async () => {
+      try {
+        const dynamicImport = Function('m', 'return import(m)') as (moduleName: string) => Promise<any>
+        const svgConversion = await dynamicImport('svg-conversion')
+        return new svgConversion.SvgWorkerPool({ workerUrl: `${workerBasePath}svg-worker.js` }) as SvgWorkerPoolLike
+      } catch {
+        return undefined
+      }
+    })()
+  }
+  return poolPromise
 }
 
 // Recoloring re-fetches the same static icon file on every drag tick; caching the raw SVG text
@@ -47,7 +66,12 @@ function fetchSvgText(url: string): Promise<string> {
 /** Fetches the icon at `url` and recolors it via the Rust/Wasm worker pool. */
 export async function recolorSvg(url: string, options: RecolorOptions): Promise<string> {
   const svgText = await fetchSvgText(url)
-  return getPool().process(svgText, {
+  const workerPool = await getPool()
+  if (!workerPool) {
+    return svgText
+  }
+
+  return workerPool.process(svgText, {
     primaryColor: options.primaryColor,
     secondaryColor: options.secondaryColor,
     contrast: options.contrast,
