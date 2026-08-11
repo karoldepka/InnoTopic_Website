@@ -1,14 +1,14 @@
 <ion-app
 > <!--   (window:beforeunload)="onBeforeUnload()"
   -->
-  <ion-split-pane contentId="main-content">
-    <ion-menu contentId="main-content" type="overlay">
+  <ion-split-pane contentId="main-content" when="false">
+    <ion-menu contentId="main-content" type="overlay" [swipeGesture]="false">
       <ion-content>
         <ion-list id="inbox-list">
           <ion-list-header>Lifedvisor</ion-list-header>
           <ion-note>Upgrade your life with Lifedvisor</ion-note>
           @for (page of appPages; track page) {
-            <ion-menu-toggle auto-hide="false">
+            <ion-menu-toggle>
               <ion-item
                 routerDirection="root"
                 [routerLink]="[page.url]"
@@ -31,7 +31,7 @@
         <ion-list id="labels-list">
           <ion-list-header>More</ion-list-header>
           @for (page of morePages; track page) {
-            <ion-menu-toggle auto-hide="false">
+            <ion-menu-toggle>
               <ion-item
                 routerDirection="root"
                 [routerLink]="[page.url]"
@@ -58,8 +58,11 @@
         <ion-toolbar>
           <ion-buttons slot="start">
             <ion-menu-button></ion-menu-button>
+            <app-app-logo [withText]="false"></app-app-logo>
           </ion-buttons>
-          <app-toolbar-common-items></app-toolbar-common-items>
+          <ion-buttons slot="end">
+            <app-toolbar-common-items></app-toolbar-common-items>
+          </ion-buttons>
         </ion-toolbar>
       </ion-header>
       <ion-router-outlet></ion-router-outlet>

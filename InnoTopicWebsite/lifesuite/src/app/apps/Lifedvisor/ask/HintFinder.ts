@@ -12,6 +12,7 @@ import {LiHintImpl} from '../shared-with-testcafe/Hint';
 export class HintFinder {
 
   rootHint = rootHint
+  searchResultRoots: LiHintImpl[] = []
 
   static instance = new HintFinder()
 
@@ -28,8 +29,53 @@ export class HintFinder {
     // })
     // this.assignScoreRecursively(filter, this.rootHint)
     this.sortByScoreRecursively(filter, this.rootHint)
+    this.searchResultRoots = this.createSearchResultRoots(filter)
     // console.log(`this.rootHint.ifYesSortedByScoreFiltered`, this.rootHint.ifYesSortedByScoreFiltered)
     // TODO: recursively
+  }
+
+  private createSearchResultRoots(filter: Filter): LiHintImpl[] {
+    if (filter.wordsNormalized.length === 0) {
+      return []
+    }
+
+    const matches: LiHintImpl[] = []
+    const visited = new Set<LiHintImpl>()
+    const collectMatches = (hint: LiHintImpl) => {
+      if (visited.has(hint)) {
+        return
+      }
+      visited.add(hint)
+
+      if (hint !== this.rootHint && hint.matchesFilter(filter)) {
+        matches.push(hint)
+      }
+      hint.ifYes?.forEach(collectMatches)
+    }
+    collectMatches(this.rootHint)
+
+    return sortBy(matches, hint => -hint.getScoreForFilter(filter).score)
+      .map(hint => this.cloneTree(hint))
+  }
+
+  private cloneTree(source: LiHintImpl, clones = new Map<LiHintImpl, LiHintImpl>()): LiHintImpl {
+    const existingClone = clones.get(source)
+    if (existingClone) {
+      return existingClone
+    }
+
+    const clone = Object.assign(new LiHintImpl(), source)
+    clones.set(source, clone)
+    const clonedChildren = new Map(
+      (source.ifYes ?? []).map(child => [child, this.cloneTree(child, clones)])
+    )
+    clone.isAtRoot = false
+    clone.ifYes = Array.from(clonedChildren.values())
+    clone.ifYesSortedByScoreFiltered = source.ifYesSortedByScoreFiltered
+      .map(child => clonedChildren.get(child) ?? this.cloneTree(child, clones))
+    clone.memoized_searchScore = new Map(source.memoized_searchScore)
+    clone.memoized_isVisibleViaFilter = new Map(source.memoized_isVisibleViaFilter)
+    return clone
   }
 
   private sortByScoreRecursively(filter: Filter, hint: LiHintImpl) {

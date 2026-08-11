@@ -384,12 +384,17 @@ body {
 // ion-router-outlet, but Ionic's own ion-router-outlet CSS is `position: absolute; inset: 0`, so
 // every routed page fills the full viewport and overlaps this header instead of starting below
 // it. This is Ionic's own documented fix for a persistent header above the router outlet.
-// `> ion-router-outlet` (not a blanket rule) so tabs.page.html's own *nested* router-outlet,
-// which has nothing to do with this app-root header, is unaffected. The 56px offset matches
-// `md`-mode ion-toolbar's fixed height - ToolbarCommonItemsComponent is deliberately constrained
-// to a single non-wrapping row (see its own .sass) so this stays accurate regardless of how many
-// time-tracked entries are showing.
-ion-app > ion-router-outlet {
+// Scoped to `#main-content`'s own router-outlet (not a blanket rule) so tabs.page.html's own
+// *nested* router-outlet, which has nothing to do with this app-root header, is unaffected. Was
+// `ion-app > ion-router-outlet` until the side-menu/split-pane shell put `div.ion-page#main-content`
+// between them, breaking that direct-child match and silently un-hiding this exact overlap bug
+// (the header's icons visually disappeared under the routed page) - `#main-content` is a plain
+// HTML id (Ionic's own `contentId`/`ion-menu` wiring is a separate attribute, not this id), so
+// `#main-content > ion-router-outlet` still only reaches the outer router-outlet. The 56px offset
+// matches `md`-mode ion-toolbar's fixed height - ToolbarCommonItemsComponent is deliberately
+// constrained to a single non-wrapping row (see its own .sass) so this stays accurate regardless
+// of how many time-tracked entries are showing.
+#main-content > ion-router-outlet {
   top: 56px;
 }
 

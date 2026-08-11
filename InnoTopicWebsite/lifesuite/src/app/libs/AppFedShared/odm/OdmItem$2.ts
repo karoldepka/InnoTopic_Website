@@ -540,7 +540,6 @@ export class OdmItem$2<
       // This device has a local edit that hasn't been confirmed written yet - applying
       // incoming data now (e.g. a delayed server echo) would clobber it. Clock-independent:
       // no timestamp comparison needed, since we already know our own edit is unconfirmed.
-      debugLog('applyDataFromDbAndEmit: skipped, hasUnsyncedChanges', this.id, incomingConverted)
       return
     }
     const incomingMillis = odmTimestampToMillis((incomingConverted as any)?.whenLastModified)
@@ -548,7 +547,6 @@ export class OdmItem$2<
     if (currentMillis !== undefined && incomingMillis !== undefined && incomingMillis < currentMillis) {
       // Stale/out-of-order data (e.g. a late realtime echo overtaken by a newer read) -
       // never let it regress what's already shown.
-      debugLog('applyDataFromDbAndEmit: skipped, incoming older than current', this.id, incomingConverted)
       return
     }
     // Object.assign(this, incomingConverted) // TODO:

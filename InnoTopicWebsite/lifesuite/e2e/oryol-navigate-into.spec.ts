@@ -37,6 +37,32 @@ test('"Navigate Into" from the node menu makes that node the visual root, and th
   await popover.getByRole('button', {name: 'Navigate Into'}).click()
   await expect(page).toHaveURL(/\/tree\/.+/, {timeout: 10_000})
 
+  // GH #142 "visual root does not show": the URL changing is necessary but not sufficient - a
+  // past regression left the tree area completely blank after this exact navigation (URL updated
+  // fine, but the navigated-into node's own <app-node-content> never rendered). Root cause:
+  // TreeService.getRootTreeModel() constructed a brand new, initially-empty TreeModel (+ a fresh
+  // loadNodesTree() reload of the *entire* tree) every time Ionic's IonRouterOutlet created a new
+  // TreeHostComponent for its page stack - which happens on every /tree -> /tree/:rootNodeId
+  // navigation, since IonRouterOutlet gives each route match its own page even though Angular
+  // routes both to the same TreePageComponent. The freshly deep-linked node hadn't streamed into
+  // that new, empty model yet, so it was never found and the view fell back to the model's own
+  // (also-just-created, essentially empty) default root - asserting only the URL here would have
+  // missed that entirely, exactly as this suite in fact did the first time around.
+  //
+  // Scoped via :not(.ion-page-hidden *): Ionic's IonRouterOutlet keeps the previous /tree page
+  // parked in the DOM (class "ion-page-hidden", for its swipe-back stack) rather than destroying
+  // it, so an unscoped 'app-node-content' locator can resolve to that stale, invisible copy
+  // instead of the new page's - a plain .first() is not reliable here since DOM order (not
+  // visibility) decides which one it picks. Note this can't be ".ion-page:not(.ion-page-hidden)
+  // app-node-content" (a seemingly obvious fix): app.component.html's own div#main-content also
+  // carries the "ion-page" class and is never hidden, and it's an ancestor of *both* the old and
+  // new inner pages - so that selector matches every app-node-content via that always-visible
+  // outer page regardless of which inner page is actually showing. :not(.ion-page-hidden *)
+  // instead checks the element itself isn't a descendant of anything hidden, which is what's
+  // actually needed here - confirmed empirically both ways (0 matches with the bug reproduced,
+  // 1 visible match once TreeService.getRootTreeModel() is fixed to cache the model).
+  await expect(page.locator('app-node-content:not(.ion-page-hidden *)').first()).toBeVisible({timeout: 10_000})
+
   // visualRoot$ -> router sync (tree-host.component.ts) pushes a real history entry for the
   // node's URL, so the browser's own back navigation is a more robust way to verify the round
   // trip than clicking the toolbar's up-arrow icon (which renders as two ambiguous DOM copies -

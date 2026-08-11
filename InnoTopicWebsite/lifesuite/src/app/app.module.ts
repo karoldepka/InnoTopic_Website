@@ -28,6 +28,7 @@ import { provideTranslateService } from '@ngx-translate/core'
 import { provideTranslateHttpLoader } from '@ngx-translate/http-loader'
 import { DEFAULT_LANGUAGE, resolveInitialLanguage } from './libs/AppFedShared/i18n/supported-languages'
 import { ToolbarCommonItemsComponent } from './libs/AppFedShared/toolbar-common-items/toolbar-common-items.component'
+import { AppLogoComponent } from './apps/Common/app-logo/app-logo.component'
 
 const copilotQaAgentId = 'lifesuite-qa'
 
@@ -48,6 +49,7 @@ function copilotAgUiUrl(): string {
         SharedModule,
         CoreModule,
         ToolbarCommonItemsComponent,
+        AppLogoComponent,
         BrowserAnimationsModule,
         DbFirestoreModule,
         HttpClientModule /* Only for primeng tree demo */,

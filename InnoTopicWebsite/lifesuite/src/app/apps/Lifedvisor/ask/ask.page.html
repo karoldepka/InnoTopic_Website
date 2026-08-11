@@ -39,7 +39,7 @@
     [fullscreen]="true"
 >
 
-  <ng-container *ngFor="let problem of rootHint.ifYesSortedByScoreFiltered">
+  <ng-container *ngFor="let problem of displayedRoots">
 
     <app-hint
         *ngIf="isVisibleViaFilter(problem)"

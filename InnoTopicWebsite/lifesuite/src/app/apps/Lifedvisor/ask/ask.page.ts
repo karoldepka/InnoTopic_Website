@@ -36,6 +36,12 @@ export class AskPage implements OnInit {
 
   filter = Filter.NONE
 
+  get displayedRoots(): LiHintImpl[] {
+    return this.filter.wordsNormalized.length > 0
+      ? this.hintFinder.searchResultRoots
+      : this.rootHint.ifYesSortedByScoreFiltered
+  }
+
   get filteredProblems(): LiHintImpl[] {
     return sortBy(Object.values(questionsProblemsWishes), (hint: LiHintImpl) => - hint.getScoreForFilter(this.filter))
   }
