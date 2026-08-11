@@ -11,14 +11,33 @@
     <ion-input type="number" min="1" inputmode="numeric" [formControl]="formControls.maxEntriesHistory"></ion-input>
   </ion-item>
 
-  <ion-button *ngIf="!adviceLoading()" expand="block" (click)="getAdvice()">Get AI advice</ion-button>
+  <ion-button *ngIf="!adviceLoading()" expand="block" (click)="getAdvice()">
+    {{ messages().length ? 'Start over' : 'Get AI advice' }}
+  </ion-button>
   <ion-button *ngIf="adviceLoading()" expand="block" color="medium" (click)="stopAdvice()">
     <ion-spinner name="dots"></ion-spinner>
     &nbsp;Stop
   </ion-button>
 
   <p *ngIf="adviceError()" class="journal-ai-advice__error">{{ adviceError() }}</p>
-  <div *ngIf="adviceText()" class="journal-ai-advice__result">{{ adviceText() }}</div>
+
+  <div class="journal-ai-advice__thread" *ngIf="messages().length">
+    <div
+      *ngFor="let message of messages()"
+      class="journal-ai-advice__message"
+      [ngClass]="'journal-ai-advice__message--' + message.role"
+    >{{ message.content }}</div>
+  </div>
+
+  <ion-item lines="none" *ngIf="messages().length" class="journal-ai-advice__reply">
+    <ion-input
+      placeholder="Reply..."
+      [formControl]="replyControl"
+      [disabled]="adviceLoading()"
+      (keyup.enter)="sendReply()"
+    ></ion-input>
+    <ion-button slot="end" fill="clear" [disabled]="adviceLoading()" (click)="sendReply()">Send</ion-button>
+  </ion-item>
 
   <ng-container *ngIf="recentAdvice$ | async as recentAdvice">
     <h3 *ngIf="recentAdvice.length" class="journal-ai-advice__history-heading">Past advice</h3>

@@ -10,4 +10,9 @@ const provider = createOpenAI({
 
 export const MODEL_NAME = process.env['AI_MODEL'] ?? 'llama3.2';
 
-export const llm = provider(MODEL_NAME);
+// .chat(), not the bare provider(modelId) - since AI SDK 5, that shorthand calls the newer
+// Responses API by default (POSTs expecting a `{ output: [{ id, ... }] }` response). Ollama and
+// Anthropic-proxy setups (this file's two documented targets, see the comment above) only
+// implement the older Chat Completions API, so the SDK's response parsing failed validation at
+// output[0].id - confirmed live via the exact error every "Get AI advice" call was producing.
+export const llm = provider.chat(MODEL_NAME);

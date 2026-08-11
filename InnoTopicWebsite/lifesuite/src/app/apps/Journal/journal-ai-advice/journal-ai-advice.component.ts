@@ -1,5 +1,5 @@
 import {Component, ChangeDetectionStrategy, OnInit, signal} from '@angular/core'
-import {NgIf, AsyncPipe, NgFor, DatePipe} from '@angular/common'
+import {NgIf, NgClass, AsyncPipe, NgFor, DatePipe} from '@angular/common'
 import {IonicModule} from '@ionic/angular'
 import {UntypedFormControl, ReactiveFormsModule} from '@angular/forms'
 import {Subscription, map} from 'rxjs'
@@ -29,19 +29,27 @@ interface JournalAdviceResponse {
   truncated?: boolean
 }
 
+interface ConversationMessage {
+  role: 'user' | 'assistant'
+  content: string
+}
+
 const DEFAULT_MAX_DAYS_HISTORY = 30
 const DEFAULT_MAX_ENTRIES_HISTORY = 30
 const LOCAL_STORAGE_KEY = 'LifeSuite_JournalAiAdviceSettings'
 
 /** GH #137: "get AI advice" popover - lets the user pick how much journal history to send (both
  * settings synced local+server, see JournalAiAdviceSettingsOdmService), then asks the backend for
- * advice grounded in that history. */
+ * advice grounded in that history. Now an open-ended back-and-forth rather than one-shot: the
+ * model may ask a clarifying question instead of (or before) advising, and the user can keep
+ * replying - see `messages`/`sendReply()`. The backend itself stays stateless (see
+ * journal-advice.ts's own comment), so every request replays the full conversation so far. */
 @Component({
   selector: 'app-journal-ai-advice',
   templateUrl: './journal-ai-advice.component.html',
   changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./journal-ai-advice.component.sass'],
-  imports: [IonicModule, ReactiveFormsModule, NgIf, NgFor, AsyncPipe, DatePipe, OdmTimestampToDatePipe],
+  imports: [IonicModule, ReactiveFormsModule, NgIf, NgClass, NgFor, AsyncPipe, DatePipe, OdmTimestampToDatePipe],
 })
 export class JournalAiAdviceComponent implements OnInit {
 
@@ -55,8 +63,10 @@ export class JournalAiAdviceComponent implements OnInit {
   // dev-mode double-check window for the same CD cycle that already read the old value - signals
   // are safe against that class of ExpressionChangedAfterItHasBeenCheckedError by design.
   adviceLoading = signal(false)
-  adviceText = signal('')
+  messages = signal<ConversationMessage[]>([])
   adviceError = signal('')
+
+  replyControl = new UntypedFormControl('')
 
   /** Held only while a request is in flight, so stopAdvice() can unsubscribe it - Angular's
    * HttpClient cancels the underlying request (aborts the fetch/XHR) as soon as its Observable is
@@ -111,24 +121,53 @@ export class JournalAiAdviceComponent implements OnInit {
     this.formControls.maxEntriesHistory.valueChanges.subscribe(value => this.onSettingChanged('maxEntriesHistory', value))
   }
 
+  /** Starts a fresh conversation (clearing any previous one) grounded in the current history
+   * settings. Safe to call again mid-conversation - same "start over" action a fresh popover
+   * open would give, just without having to close and reopen it. */
   getAdvice() {
     if (this.adviceLoading()) return
-    const maxDays = Number(this.formControls.maxDaysHistory.value) || DEFAULT_MAX_DAYS_HISTORY
-    const maxEntries = Number(this.formControls.maxEntriesHistory.value) || DEFAULT_MAX_ENTRIES_HISTORY
-    const entries = this.buildHistoryEntries(maxDays, maxEntries)
-
+    const entries = this.currentHistoryEntries()
     if (!entries.length) {
       this.adviceError.set('No journal entries with text in that range yet.')
-      this.adviceText.set('')
+      this.messages.set([])
       return
     }
+    this.messages.set([])
+    this.sendToBackend(entries, [])
+  }
 
+  /** Continues the current conversation with the user's typed reply - e.g. answering a
+   * clarifying question the model asked, or just following up on its advice. */
+  sendReply() {
+    if (this.adviceLoading()) return
+    const replyText = ((this.replyControl.value as string) ?? '').trim()
+    if (!replyText) return
+    const entries = this.currentHistoryEntries()
+    if (!entries.length) {
+      this.adviceError.set('No journal entries with text in that range yet.')
+      return
+    }
+    this.replyControl.setValue('')
+    this.messages.update(messages => [...messages, {role: 'user', content: replyText}])
+    this.sendToBackend(entries, this.messages())
+  }
+
+  private currentHistoryEntries(): JournalAdviceHistoryEntry[] {
+    const maxDays = Number(this.formControls.maxDaysHistory.value) || DEFAULT_MAX_DAYS_HISTORY
+    const maxEntries = Number(this.formControls.maxEntriesHistory.value) || DEFAULT_MAX_ENTRIES_HISTORY
+    return this.buildHistoryEntries(maxDays, maxEntries)
+  }
+
+  /** Shared by getAdvice() (conversation: []) and sendReply() (conversation: messages so far,
+   * already including the just-appended user reply) - `entries` is sent on every call, not just
+   * the first, since journal-advice.ts's backend is stateless and rebuilds the conversation's
+   * first message from it each time (see that file's own comment). */
+  private sendToBackend(entries: JournalAdviceHistoryEntry[], conversation: ConversationMessage[]) {
     this.adviceLoading.set(true)
     this.adviceError.set('')
-    this.adviceText.set('')
-    this.adviceSubscription = this.aiBackend.post<JournalAdviceResponse>('/journal-advice', {entries}).subscribe({
+    this.adviceSubscription = this.aiBackend.post<JournalAdviceResponse>('/journal-advice', {entries, conversation}).subscribe({
       next: response => {
-        this.adviceText.set(response.advice)
+        this.messages.update(messages => [...messages, {role: 'assistant', content: response.advice}])
         this.aiAdviceService.add({
           source: AI_ADVICE_SOURCE,
           advice: response.advice,
@@ -148,8 +187,8 @@ export class JournalAiAdviceComponent implements OnInit {
     })
   }
 
-  /** Cancels an in-flight getAdvice() call - unsubscribing aborts the underlying HttpClient
-   * request, so the response (if the server ever finishes it) is simply discarded. */
+  /** Cancels an in-flight getAdvice()/sendReply() call - unsubscribing aborts the underlying
+   * HttpClient request, so the response (if the server ever finishes it) is simply discarded. */
   stopAdvice() {
     this.adviceSubscription?.unsubscribe()
     this.adviceSubscription = undefined
@@ -185,9 +224,24 @@ export class JournalAiAdviceComponent implements OnInit {
 
   private entryText(entry: JournalEntry): string {
     const textFieldValues = entry.getPresentTextFieldEntries().map(([, text]) => text)
-    return [entry.general, entry.text, ...textFieldValues]
+    const textPart = [entry.general, entry.text, ...textFieldValues]
       .filter((part): part is string => !!part)
       .map(part => stripHtml(part) ?? '')
+      .join('\n')
+      .trim()
+
+    // Numeric self-assessments (mood, anxiety, energy, etc. - see JournalNumericDescriptors'
+    // full catalog) weren't being sent at all before, so the AI's advice couldn't ground itself
+    // in any of the actual self-ratings, only whatever happened to be mentioned in free text.
+    const ratingsPart = entry.getPresentCompositeFieldEntries()
+      .map(([descriptor, numVal, comment]) => {
+        const rating = numVal !== undefined ? `${descriptor.title}: ${numVal}` : descriptor.title
+        return comment ? `${rating} (${comment})` : rating
+      })
+      .join(', ')
+
+    return [textPart, ratingsPart ? `Self-ratings: ${ratingsPart}` : undefined]
+      .filter((part): part is string => !!part)
       .join('\n')
       .trim()
   }
