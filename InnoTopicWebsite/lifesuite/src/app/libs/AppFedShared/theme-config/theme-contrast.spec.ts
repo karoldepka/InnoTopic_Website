@@ -1,8 +1,15 @@
 import {describe, it, expect} from 'vitest'
-import {curatedThemes, shadeColor, contrastRatio, colorDistance, MIN_UI_CONTRAST, MIN_COLOR_DISTANCE} from '@innotopic/theme-ui-angular'
+import {themePresets, shadeColor, contrastRatio, colorDistance, MIN_UI_CONTRAST, MIN_COLOR_DISTANCE} from '@innotopic/theme-ui-angular'
 
-/** Validates every non-disabled curated theme's primary/secondary actually stand out against its
- * own background, at the default brightness (50%) applyThemeConfig() computes it at - a color can
+/** GH: two hand-authored presets (Ocean Midnight/Ocean Light's old cyan-on-blue secondary, Yellow
+ * Midnight's old orange-on-yellow secondary) shipped with a primary/secondary that read as the
+ * same color at a glance - themePresets.ts's hand-authored entries were never covered by this
+ * file (only curatedThemes was), so nothing caught it. Iterating the full themePresets (hand-
+ * authored + curatedThemes, see theme-presets.ts) instead closes that gap for both checks below. */
+const presetsUnderTest = themePresets
+
+/** Validates every non-disabled theme's primary/secondary actually stand out against its own
+ * background, at the default brightness (50%) applyThemeConfig() computes it at - a color can
  * individually read fine against black/white text (getIonicTextColor's own per-color contrast
  * check) while still being too close to the *background* to be legible as a button/icon color
  * sitting on it. WCAG's 3:1 "UI component" threshold (not the stricter 4.5:1 body-text one - these
@@ -12,8 +19,8 @@ import {curatedThemes, shadeColor, contrastRatio, colorDistance, MIN_UI_CONTRAST
  * originated and where its own vitest setup already runs it (see vitest.config.ts) - the list
  * itself now lives in @innotopic/theme-ui/src/engine/curated-themes.ts, shared with
  * InnoTopicWebsite too. */
-describe('curated theme background/primary/secondary contrast', () => {
-  for (const theme of curatedThemes) {
+describe('theme preset background/primary/secondary contrast', () => {
+  for (const theme of presetsUnderTest) {
     if (theme.disabled) {
       continue // already known-broken and excluded from selection - not this test's concern
     }
@@ -38,9 +45,15 @@ describe('curated theme background/primary/secondary contrast', () => {
  * so e.g. pure red and pure blue at matched lightness can read as "high contrast" while looking
  * like two shades of the same color) - colorDistance()'s perceptual deltaE is what actually
  * matches "would a person glancing at these two buttons tell them apart". */
-describe('curated theme primary/secondary distinctness', () => {
-  for (const theme of curatedThemes) {
+describe('theme preset primary/secondary distinctness', () => {
+  for (const theme of presetsUnderTest) {
     if (theme.disabled) {
+      continue
+    }
+    // Neumorphism is deliberately a low-contrast, near-monochrome "everything pressed out of the
+    // same slab" look (see its own comment in theme-presets.ts) - unlike every other preset here,
+    // barely-distinguishable primary/secondary is the intended aesthetic, not a bug.
+    if (theme.name === 'Neumorphism') {
       continue
     }
 

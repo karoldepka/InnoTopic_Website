@@ -23,6 +23,7 @@ import { NgIf } from '@angular/common';
 import { PrimeNgTreeComponent } from '../../tree-primeng/prime-ng-tree/prime-ng-tree.component';
 import { NestedTreeComponent } from '../../tree-nested/nested-tree/nested-tree.component';
 import { IonicModule } from '@ionic/angular';
+import { date as toDate } from '../../time-tracking/time-tracking.service'
 
 
 @Component({
@@ -57,6 +58,12 @@ export class TreeHostComponent implements OnInit {
    * that replays its last-ever value to a brand new TreeHostComponent (e.g. a fresh page load),
    * so the target node may genuinely not have streamed in yet. */
   private pendingNavigationTargetItemId: string | undefined
+
+  /** See tryFocusMostRecentMissionStatement()'s own doc comment. */
+  private pendingFocusMostRecentMissionStatement = false
+
+  /** See reFocusLastFocused()'s own doc comment. */
+  private reFocusLastFocusedTimeoutId: ReturnType<typeof setTimeout> | undefined
 
   constructor(
     public treeService: TreeService,
@@ -104,9 +111,18 @@ export class TreeHostComponent implements OnInit {
 
   }
 
+  /** Bug: reordering nodes quickly (rapid Ctrl+ArrowUp/Down) lost focus, even though a single
+   * reorder never did - each reorder() call schedules its own uncoalesced setTimeout(0) here, so
+   * a quick burst left several overlapping ones in flight; an earlier one could still fire after
+   * a later reorder had already moved things again, re-focusing stale state instead of the final
+   * position. Cancelling any not-yet-fired timeout before scheduling a new one means only the
+   * most recent reorder's re-focus actually runs. indentIncrease()/indentDecrease() never hit
+   * this - they re-focus directly and synchronously from node-content.component.ts instead of
+   * going through this shared debounced path. */
   reFocusLastFocused() {
     debugLog('reFocusLastFocused')
-    setTimeout(() => {
+    clearTimeout(this.reFocusLastFocusedTimeoutId)
+    this.reFocusLastFocusedTimeoutId = setTimeout(() => {
       debugLog('reFocusLastFocused in setTimeout, ', this.treeModel.focus.lastFocusedNode, this.treeModel.focus.lastFocusedColumn)
       this.focus(this.treeModel.focus.lastFocusedCell)
     })
@@ -126,6 +142,9 @@ export class TreeHostComponent implements OnInit {
       }
       if (this.pendingNavigationTargetItemId) {
         this.tryNavigateToNodeId(this.pendingNavigationTargetItemId)
+      }
+      if (this.pendingFocusMostRecentMissionStatement) {
+        this.tryFocusMostRecentMissionStatement()
       }
     })
 
@@ -155,9 +174,39 @@ export class TreeHostComponent implements OnInit {
       }
     })
 
+    // "Why Bother?" (WhatNextPage) navigates straight to missionStatementsNodeId's own URL - once
+    // it's actually the visual root, focus+recursively-expand whichever child was created most
+    // recently, so re-reading your last mission statement is one click away instead of a manual
+    // scroll/expand. tryFocusMostRecentMissionStatement() itself handles the case where children
+    // haven't streamed in yet (retried below via onItemAddedOrModified$).
+    this.treeModel.navigation.visualRoot$.subscribe((visualRoot: RootTreeNode) => {
+      if (visualRoot.itemId === this.treeModel.missionStatementsNodeId) {
+        this.tryFocusMostRecentMissionStatement()
+      }
+    })
+
     setTimeout(() => {
       this.showTree = true
     }, 0 /*2000*/)
+  }
+
+  /** "Why Bother?" support - see the visualRoot$ subscription above and the retry hooked into
+   * onItemAddedOrModified$ below it. No-ops (clears the pending flag without focusing anything)
+   * once the node genuinely has zero children - nothing to focus on a first-ever visit before any
+   * mission statement has been written yet. */
+  private tryFocusMostRecentMissionStatement() {
+    const missionStatements = this.treeModel.getNodesByItemId(this.treeModel.missionStatementsNodeId)[0]
+    const mostRecent = missionStatements?.children
+      ?.slice()
+      ?.sort((a: any, b: any) => (toDate(b.content.itemData?.whenCreated)?.getTime() ?? 0) - (toDate(a.content.itemData?.whenCreated)?.getTime() ?? 0))
+      ?.[0]
+    if (!mostRecent) {
+      this.pendingFocusMostRecentMissionStatement = true
+      return
+    }
+    this.pendingFocusMostRecentMissionStatement = false
+    mostRecent.expansion.setExpanded(true, true)
+    this.focusNode(mostRecent)
   }
 
   private tryNavigateToNodeId(nodeId: string) {

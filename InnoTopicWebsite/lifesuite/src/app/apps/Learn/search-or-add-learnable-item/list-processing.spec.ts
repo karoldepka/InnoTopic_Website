@@ -110,37 +110,48 @@ describe('ListProcessing - funCravingPanic preset (GH issue #38)', () => {
     listProcessing.listOptions$P.patchThrottled({preset: 'funCravingPanic'})
   })
 
-  it('sorts by fun descending, then mental effort ascending, then most-recently-touched', () => {
+  it('sorts by fun descending, then ROI descending, then importance descending', () => {
     const items = [
+      // Low fun - sorts last regardless of its high ROI/importance, since fun dominates.
       makeItem$({
-        title: 'low fun, low effort, old',
+        title: 'low fun, high roi, high importance',
         funEstimate: {numeric: 1} as any,
-        mentalLevelEstimate: {numeric: 1} as any,
-        whenLastModified: {toMillis: () => 1000} as any,
-      }, 'a'),
+        importance: {numeric: 10} as any,
+        time_estimate: '1m',
+      }, 'low-fun'),
+      // High fun, but the lowest ROI among the high-fun items - sorts last among them regardless
+      // of importance.
       makeItem$({
-        title: 'high fun, high effort',
+        title: 'high fun, low roi',
         funEstimate: {numeric: 10} as any,
-        mentalLevelEstimate: {numeric: 10} as any,
-        whenLastModified: {toMillis: () => 2000} as any,
-      }, 'b'),
+        importance: {numeric: 1} as any,
+        time_estimate: '10m',
+      }, 'high-fun-low-roi'),
+      // High fun, ROI tied with the item below (same importance/time ratio) but lower importance
+      // - importance breaks the tie, so this comes after it.
       makeItem$({
-        title: 'high fun, low effort, newer',
+        title: 'high fun, roi tie, low importance',
         funEstimate: {numeric: 10} as any,
-        mentalLevelEstimate: {numeric: 1} as any,
-        whenLastModified: {toMillis: () => 4000} as any,
-      }, 'c'),
+        importance: {numeric: 2} as any,
+        time_estimate: '2m',
+      }, 'high-fun-roi-tie-low-importance'),
+      // High fun, same ROI ratio as above but higher importance - sorts first.
       makeItem$({
-        title: 'high fun, low effort, older',
+        title: 'high fun, roi tie, high importance',
         funEstimate: {numeric: 10} as any,
-        mentalLevelEstimate: {numeric: 1} as any,
-        whenLastModified: {toMillis: () => 3000} as any,
-      }, 'd'),
+        importance: {numeric: 4} as any,
+        time_estimate: '4m',
+      }, 'high-fun-roi-tie-high-importance'),
     ]
 
     listProcessing.setItemsAndSort(items)
 
-    expect(listProcessing.item$s.map(item => item.id)).toEqual(['c', 'd', 'b', 'a'])
+    expect(listProcessing.item$s.map(item => item.id)).toEqual([
+      'high-fun-roi-tie-high-importance',
+      'high-fun-roi-tie-low-importance',
+      'high-fun-low-roi',
+      'low-fun',
+    ])
   })
 
   it('includes both tasks and non-task learn items, unlike the tasks-only default preset', () => {

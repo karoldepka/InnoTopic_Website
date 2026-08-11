@@ -109,6 +109,13 @@ export class RootTreeNode<
     return this.content.dbItem.isEmptyOrWhitespace()
   }
 
+  /** Whether this node has no meaningful data at all (blank title AND nothing else set) -
+   * delegates to `OryItem$.isEmpty()`. Unlike `isEmptyOrWhitespace()` above, this is already the
+   * "safe to delete without confirmation" answer, not just "is the title blank". */
+  isEmpty(): boolean {
+    return this.content.dbItem.isEmpty()
+  }
+
   allDescendantsMatch(predicate: (node: RootTreeNode<any, any, any, any>) => boolean): boolean {
     return this.children.every(child =>
       predicate(child as any) && (child as any).allDescendantsMatch(predicate)

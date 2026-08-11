@@ -12,11 +12,12 @@
         <ion-list id="inbox-list">
           <ion-list-header>Lifedvisor</ion-list-header>
           <ion-note>Upgrade your life with Lifedvisor</ion-note>
-          @for (page of appPages; track page) {
+          @for (page of visiblePages(appPages); track page.title) {
             <ion-menu-toggle>
               <ion-item
                 routerDirection="root"
-                [routerLink]="[page.url]"
+                [routerLink]="page.url ? [page.url] : null"
+                (click)="go(page)"
                 lines="none"
                 detail="false"
                 routerLinkActive="selected"
@@ -35,11 +36,12 @@
 
         <ion-list id="labels-list">
           <ion-list-header>More</ion-list-header>
-          @for (page of morePages; track page) {
+          @for (page of visiblePages(morePages); track page.title) {
             <ion-menu-toggle>
               <ion-item
                 routerDirection="root"
-                [routerLink]="[page.url]"
+                [routerLink]="page.url ? [page.url] : null"
+                (click)="go(page)"
                 lines="none"
                 detail="false"
                 routerLinkActive="selected"

@@ -1,6 +1,4 @@
 import {Component, Injector, OnInit, ChangeDetectionStrategy} from '@angular/core';
-import {ThemeUiService} from '@innotopic/theme-ui-angular'
-import {environment} from '../../../../environments/environment'
 import { Router } from '@angular/router'
 import {FeatureService} from '../../../libs/AppFedShared/feature.service'
 import {BaseComponent} from '../../../libs/AppFedShared/base/base.component'
@@ -10,10 +8,9 @@ import { SyncStatusIconComponent } from '../../../libs/AppFedShared/odm/sync-sta
 import { NgIf, NgFor } from '@angular/common';
 import { QuizButtonComponent } from '../shared/quiz-button/quiz-button.component';
 import { EnergyGraphComponent } from '../energy-graph/energy-graph.component';
-import { LEARN_LIST_OPTIONS_LOCAL_STORAGE_KEY } from '../search-or-add-learnable-item/list-processing'
-import { ListOptionsData } from '../search-or-add-learnable-item/list-options'
 import {SlotUsageTrackerService} from '../../../libs/AppFedShared/tree/cells/slot-usage-tracker.service'
 import {rankDestinations, WhatNextDestination} from './what-next-destination-ranking'
+import {WhatNextActionsService} from './what-next-actions.service'
 
 @Component({
     selector: 'app-what-next',
@@ -53,14 +50,18 @@ export class WhatNextPage extends BaseComponent implements OnInit {
     {
       id: 'craving-fun',
       label: 'Craving fun Panic Button',
-      note: '(Quiz/Tasks)',
-      action: () => this.cravingFun(),
+      action: () => this.whatNextActions.cravingFun(),
     },
     {id: 'ai-qa', label: 'Generate questions, answers', route: '/ai/qa', size: 'big'},
     {id: 'ai-chat', label: 'AI Chat', route: '/learn/ai-chat'},
     {id: 'copilotkit', label: 'CopilotKit', route: '/copilotkit'},
     {id: 'bow-quiz', label: 'Bow Quiz', route: '/learn/bow-quiz'},
-    {id: 'why-bother', label: 'Why Bother?', note: 'Why am I doing all this?', route: '/tree'},
+    {
+      id: 'why-bother',
+      label: 'Why Bother?',
+      note: 'Why am I doing all this?',
+      action: () => this.whatNextActions.whyBother(),
+    },
     {id: 'lifedvisor-legacy', label: 'Lifedvisor', route: '/lifedvisor', visibleIf: () => this.feat.tutorial.unpolished},
     {id: 'ask', label: 'Lifedvisor', route: '/ask'},
     {id: 'plan', label: 'Plan', route: '/tree'},
@@ -101,10 +102,10 @@ export class WhatNextPage extends BaseComponent implements OnInit {
   ]
 
   constructor(
-    public themeUiService: ThemeUiService,
     public featureService: FeatureService,
     public router: Router,
     private slotUsageTrackerService: SlotUsageTrackerService,
+    private whatNextActions: WhatNextActionsService,
     injector: Injector,
   ) {
     super(injector)
@@ -143,16 +144,4 @@ export class WhatNextPage extends BaseComponent implements OnInit {
     }
   }
 
-  async cravingFun() {
-    // TODO: popup with fancy image of doing smth fun. Piorun, spread wings.
-    this.themeUiService.applyRandomTheme({ includeExperimental: environment.showExperimentalThemes })
-    // GH issue #38: the fun-craving panic button - opens /learn's task/learn list pre-sorted by
-    // fun descending, mental effort ascending, then most-recently-touched. Writes the preset
-    // directly to the same localStorage key ListProcessing reads on construction (there's no
-    // live instance of it here to patch - this page's ListProcessing doesn't exist until /learn
-    // itself is navigated to).
-    const optionsPatch: Partial<ListOptionsData> = { preset: 'funCravingPanic' }
-    localStorage.setItem(LEARN_LIST_OPTIONS_LOCAL_STORAGE_KEY, JSON.stringify(optionsPatch))
-    await this.router.navigateByUrl('/learn')
-  }
 }

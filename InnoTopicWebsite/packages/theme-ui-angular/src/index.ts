@@ -17,4 +17,5 @@ export {
   MIN_UI_CONTRAST,
   MIN_COLOR_DISTANCE,
   curatedThemes,
+  themePresets,
 } from '@innotopic/theme-ui';

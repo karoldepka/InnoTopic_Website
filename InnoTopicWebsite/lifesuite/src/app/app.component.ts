@@ -15,9 +15,24 @@ import {OptionsComponent} from './libs/AppFedShared/options/options.component'
 import {ThemeUiService} from '@innotopic/theme-ui-angular'
 import {environment} from '../environments/environment'
 import {FeatureService} from './libs/AppFedShared/feature.service'
+import {g} from './libs/AppFedShared/g'
 import {OdmConflictToastService} from './libs/AppFedSharedBrowser/odm-browser/OdmConflictToastService'
 import {IndexedDbHealthToastService} from './libs/AppFedSharedBrowser/odm-browser/IndexedDbHealthToastService'
+import {WhatNextActionsService} from './apps/Learn/what-next/what-next-actions.service'
 // import {fakeExportToNotLookUnused} from '../background/background'
+
+interface SideMenuPage {
+  title: string
+  icon: string
+  /** Either this (a plain routerLink)... */
+  url?: string
+  /** ...or this (an arbitrary action, e.g. the What Next shortcuts that prime some state before
+   * navigating rather than just linking straight to a route) - never both. */
+  action?: () => void
+  /** Mirrors WhatNextDestination's own gating (what-next-destination-ranking.ts) - evaluated
+   * fresh on every access (not cached), same reasoning as WhatNextPage.visibleDestinations. */
+  visibleIf?: () => boolean
+}
 
 @Component({
   standalone: false,
@@ -28,8 +43,9 @@ import {IndexedDbHealthToastService} from './libs/AppFedSharedBrowser/odm-browse
 })
 export class AppComponent {
   /** LifeDvisor navigation, rendered by the official Ionic sidemenu-starter shell. */
-  public appPages = [
+  public appPages: SideMenuPage[] = [
     {title: 'Home', url: '/lifedvisor', icon: 'home'},
+    {title: 'What Next', url: '/what-next', icon: 'compass'},
     {title: 'Search', url: '/ask', icon: 'search'},
     {title: 'Rating Log', url: '/ask/log', icon: 'star'},
     {title: 'Rationale', url: '/rationale', icon: 'bulb'},
@@ -38,12 +54,51 @@ export class AppComponent {
     {title: 'About Lifedvisor', url: '/about-lifedvisor', icon: 'information-circle'},
   ]
 
-  public morePages = [
+  /** Every other WhatNextPage destination (what-next.page.ts's own `destinations`), so the same
+   * shortcuts are reachable straight from the side menu too - kept in the same order as that
+   * page's own list. Skips the handful already covered above/below under a different label for
+   * the exact same route (Search=/ask, Mindfulness, Sleep, Success Probability, Exponential
+   * Improvement) rather than listing the same destination twice. `action`-based entries
+   * (craving-fun, why-bother) delegate to the same WhatNextActionsService WhatNextPage itself
+   * uses, so there's exactly one implementation of each to keep in sync. */
+  public morePages: SideMenuPage[] = [
     {title: 'Success Probability', url: '/success-chance', icon: 'analytics'},
     {title: 'Exponential Improvement', url: '/exponential-improvement', icon: 'trending-up'},
-    {title: 'What Next', url: '/what-next', icon: 'compass'},
     {title: 'Mindfulness', url: '/mindfulness', icon: 'leaf'},
     {title: 'Sleep', url: '/sleep', icon: 'moon'},
+    {
+      title: 'Affirmations',
+      url: '/learn/item/LearnItem__2022-05-26__17.33.46.061Z_',
+      icon: 'happy',
+      visibleIf: () => g.feat.showExperimental,
+    },
+    {title: 'Craving fun Panic Button', icon: 'flash', action: () => this.whatNextActions.cravingFun()},
+    {title: 'Generate questions, answers', url: '/ai/qa', icon: 'help-circle'},
+    {title: 'AI Chat', url: '/learn/ai-chat', icon: 'chatbubbles'},
+    {title: 'CopilotKit', url: '/copilotkit', icon: 'construct'},
+    {title: 'Bow Quiz', url: '/learn/bow-quiz', icon: 'ribbon'},
+    {title: 'Why Bother?', icon: 'heart', action: () => this.whatNextActions.whyBother()},
+    {title: 'Lifedvisor', url: '/lifedvisor', icon: 'navigate', visibleIf: () => g.feat.tutorial.unpolished},
+    {title: 'Plan', url: '/tree', icon: 'list'},
+    {title: 'LifeSuite App Tutorial', url: '/tutorial', icon: 'book', visibleIf: () => g.feat.tutorial.unpolished},
+    {title: 'Contemplate', url: '/contemplate-life', icon: 'infinite', visibleIf: () => g.feat.showExperimental},
+    {
+      title: 'Process Learn Items (& tasks)',
+      url: '/item-processing',
+      icon: 'file-tray-full',
+      visibleIf: () => g.feat.showExperimental,
+    },
+    {title: 'Categories', url: '/categories', icon: 'pricetags', visibleIf: () => g.feat.showExperimental},
+    {
+      title: 'Categories Stats',
+      url: '/categories-stats',
+      icon: 'stats-chart',
+      visibleIf: () => g.feat.showExperimental,
+    },
+    {title: 'Do tasks', url: '/learn', icon: 'checkbox'},
+    {title: 'Write Journal', url: '/journal/write', icon: 'create'},
+    {title: 'RETROSPECTIVE', url: '/journal', icon: 'time'},
+    {title: 'Check Your progress', url: '/learn/stats', icon: 'podium', visibleIf: () => g.feat.showExperimental},
   ]
 
   constructor(
@@ -55,6 +110,7 @@ export class AppComponent {
     private odmConflictToastService /* force the service to run */: OdmConflictToastService,
     private indexedDbHealthToastService /* force the service to run */: IndexedDbHealthToastService,
     // private learnStatsService  /* force the service to run */: LearnStatsService,
+    private whatNextActions: WhatNextActionsService,
     public syncStatusService: SyncStatusService,
     public optionsService: OptionsService,
     public popoverController: PopoverController,
@@ -81,6 +137,20 @@ export class AppComponent {
       this.setupOptionsHandler()
       console.log('initializeApp ...')
     });
+  }
+
+  /** Same reasoning as WhatNextPage.visibleDestinations - evaluated fresh on every access (not
+   * cached), so toggling a feature flag while the menu is open takes effect immediately. */
+  visiblePages(pages: SideMenuPage[]): SideMenuPage[] {
+    return pages.filter(page => !page.visibleIf || page.visibleIf())
+  }
+
+  /** `action`-based entries (ported from WhatNextPage's own destinations) have no route to link
+   * to directly - ion-menu-toggle still needs to close the menu either way, so this always runs
+   * (even for a plain `url` entry, where it's a no-op) rather than only wiring `(click)` on the
+   * action-only branch. */
+  go(page: SideMenuPage): void {
+    page.action?.()
   }
 
   private setupOptionsHandler() {

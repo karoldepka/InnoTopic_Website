@@ -160,13 +160,12 @@ export class ListProcessing {
         importanceGetterDescending,
       ])
     } else if ( preset === `funCravingPanic` ) {
-      /* GH issue #38: fun-craving panic button - fun descending, mental effort ascending, then
-         most-recently-touched first as a tie-breaker (arbitrary choice where the issue itself
-         was unsure of direction). */
+      /* GH issue #38: fun-craving panic button - fun descending, then ROI descending, then
+         importance descending. */
       this.item$s = sortBy(item$s, [
         funGetterDescending,
-        mentalGetterAscending,
-        whenLastTouchedDescending,
+        roiGetterDescending,
+        importanceGetterDescending,
       ])
     } else if ( preset === `funImportant` /*  importance -> ignoring ROI*/ ) {
       this.item$s = sortBy(item$s, [

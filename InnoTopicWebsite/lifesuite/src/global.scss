@@ -409,6 +409,21 @@ body {
   }
 }
 
+// The tree node's "..." menu popover (TreeNodeMenuPopoverComponent) was stuck at Ionic's
+// content-based auto width too - cramped for its actual content (title/class row, time-tracking
+// menu, several buttons, the full slot-cells field list, sharing section), all stacked in one
+// narrow column. Same idea as .sync-status-popover above: real room on desktop, nearly full
+// viewport on mobile. Also opts into a taller max-height, since this popover's content commonly
+// overflows a single screen's worth of vertical space.
+.tree-node-menu-popover {
+  --width: min(90vw, 640px);
+  --max-height: min(85vh, 720px);
+
+  @media (max-width: 480px) {
+    --width: 94vw;
+  }
+}
+
 // GH #5: ion-select popovers default to Ionic's content-based auto width, which is too narrow
 // for options with longer text (e.g. the transcription mode/language pickers - option text like
 // "Browser (Web Speech API) - live, free, needs internet" was getting ellipsis-truncated both in

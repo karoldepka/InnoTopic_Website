@@ -88,6 +88,21 @@ export class OryItem$<TData = any> implements HasPatchThrottled<TData> {
     return trimToUndefined(stripHtml(title) ?? undefined) === undefined
   }
 
+  /** Whether this item has no meaningful data at all, not just a blank title - also checks the
+   * other fields a node can carry data in (subTitle, estimatedTime, isDone, voice memos). Broader
+   * than isEmptyOrWhitespace() above, which only ever looked at the title - used by
+   * deleteOnBackspaceIfEmpty() to decide whether backspace-to-delete can skip the "are you sure?"
+   * confirmation (title blank AND nothing else set - genuinely nothing to lose) or must ask first
+   * (title blank but e.g. a voice memo is still attached). */
+  isEmpty(): boolean {
+    const data = this.itemData as any
+    return this.isEmptyOrWhitespace()
+      && trimToUndefined(data?.subTitle) === undefined
+      && trimToUndefined(data?.estimatedTime) === undefined
+      && ! data?.isDone
+      && ! data?.voiceMemos?.length
+  }
+
   patchThrottled(patch: any/*FIXME */) {
     this.realItem$.patchThrottled(patch)
     // Preserves OryItem$'s existing role as an adapter onto OrYoL's own event bus - e.g.

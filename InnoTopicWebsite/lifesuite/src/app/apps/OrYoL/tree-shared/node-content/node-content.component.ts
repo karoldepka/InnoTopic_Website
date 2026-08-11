@@ -34,9 +34,9 @@ import {
   Columns,
 } from './Columns'
 import {Config, ConfigService} from '../../core/config.service'
-import { TimeTrackingService } from '../../time-tracking/time-tracking.service'
+import { TimeTrackingService, date as toDate } from '../../time-tracking/time-tracking.service'
 import {getActiveElementCaretPos, getSelectionCursorState} from '../../../../libs/AppFedShared/utils/caret-utils'
-import {isNullish, trimToUndefined} from '../../../../libs/AppFedShared/utils/utils'
+import {isNullish} from '../../../../libs/AppFedShared/utils/utils'
 import {nullish} from '../../../../libs/AppFedShared/utils/type-utils'
 import {AlertController, PopoverController, ToastController} from '@ionic/angular'
 import {presentDismissableToast} from '../../../../libs/AppFedShared/utils/toast-utils'
@@ -375,6 +375,21 @@ export class NodeContentComponent implements OnInit, AfterViewInit, OnDestroy, I
     return '' + date.getHours() + ':' + padStart('' + date.getMinutes(), 2, '0')
   }
 
+  /** Day-plan nodes are conceptually "one per day" - shows which day this plan is actually for
+   * at a glance, rather than only whatever's typed into the free-text title. ISO 8601 date (not
+   * `.toISOString()`, which always converts to UTC - getFullYear()/getMonth()/getDate() read the
+   * *local* timezone instead, same construction TimePointComponent already uses) plus a
+   * locale-aware weekday name (undefined locale = the user's own browser/OS locale). */
+  getDayPlanDateLabel(): string | undefined {
+    const created = toDate(this.treeNode.content.itemData?.whenCreated)
+    if (!created || isNaN(created.getTime())) {
+      return undefined
+    }
+    const weekday = new Intl.DateTimeFormat(undefined, {weekday: 'long'}).format(created)
+    const isoLocalDate = `${created.getFullYear()}-${padStart('' + (created.getMonth() + 1), 2, '0')}-${padStart('' + created.getDate(), 2, '0')}`
+    return `${weekday}, ${isoLocalDate}`
+  }
+
   indentDecrease($event: Event) {
     $event.preventDefault()
     ;(this.treeNode as any as ApfNonRootTreeNode).indentDecrease()
@@ -416,13 +431,14 @@ export class NodeContentComponent implements OnInit, AfterViewInit, OnDestroy, I
    * to its children (TreeNode.deleteWithoutConfirmation() only ever touches the one item),
    * silently orphaning them; Archive (the tree-node menu's existing "remove a whole subtree"
    * action, which does recurse) is the right tool for that case, not backspace. Otherwise: a
-   * genuinely empty node (title blank, no other data) deletes immediately - nothing to lose. One
-   * with other data still set (e.g. an estimated time) confirms first - deleting removes that too. */
+   * genuinely empty node (title blank, nothing else set - treeNode.isEmpty()) deletes immediately,
+   * nothing to lose. One with other data still set (e.g. an estimated time or a voice memo)
+   * confirms first - deleting removes that too. */
   deleteOnBackspaceIfEmpty(): void {
     if ( this.treeNode.isVisualRoot || this.treeNode.hasChildren || ! this.treeNode.isEmptyOrWhitespace() ) {
       return
     }
-    if ( trimToUndefined(this.treeNode.content.itemData?.estimatedTime) === undefined ) {
+    if ( this.treeNode.isEmpty() ) {
       this.deleteNodeWithUndoToast()
     } else {
       this.confirmThenDeleteWithUndoToast()
@@ -518,6 +534,7 @@ export class NodeContentComponent implements OnInit, AfterViewInit, OnDestroy, I
       event: $event,
       translucent: true,
       mode: 'ios',
+      cssClass: 'tree-node-menu-popover',
     });
     return await popover.present();
   }

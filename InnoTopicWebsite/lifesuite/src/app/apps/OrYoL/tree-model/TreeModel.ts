@@ -1,4 +1,4 @@
-import {NodeAddEvent} from './TreeListener'
+import {NodeAddEvent, NodeInclusion} from './TreeListener'
 import {debugLog, errorAlert, traceLog} from '../utils/log'
 import {DbTreeService} from './db-tree-service'
 import {EventEmitter, Injectable, Injector} from '@angular/core'
@@ -29,6 +29,15 @@ import {ApfNonRootTreeNode, RootTreeNode} from './TreeNode'
 /** TODO: this should be delegated to database as it might have its own conventions/implementation (e.g. firebase push id) */
 export const generateNewInclusionId = function () {
   return 'inclusion_' + uuidv4()
+}
+
+/** Shared with WhatNextPage (the "Why Bother?" button), which needs this exact id *before*
+ * navigating to /tree - it only needs the current user's id (via its own AuthService injection),
+ * not a live TreeModel instance, to compute where to navigate. A plain exported function (not a
+ * TreeModel instance method) keeps the two in sync without either duplicating the format string
+ * or requiring WhatNextPage to construct/obtain a full TreeModel just for this. */
+export function missionStatementsNodeIdFor(userId: string | null | undefined): string {
+  return `user_${userId}_slot_MissionStatements`
 }
 
 
@@ -172,6 +181,13 @@ export class TreeModel<
     ) as any as TNodeContent
   ) as any as TRootNode
 
+  /** Deterministic, per-user id - not a real persisted item (see addVirtualChildOfRoot()'s doc
+   * comment) - "Why Bother?" (WhatNextPage) navigates into this id directly, same as any other
+   * well-known id (e.g. HARDCODED_ROOT_NODE_ITEM_ID), rather than searching the tree by title. */
+  get missionStatementsNodeId(): string {
+    return missionStatementsNodeIdFor(this.authService.userId)
+  }
+
   constructor(
     public injector: Injector,
     /* TODO Rename to dbTreeService */
@@ -183,6 +199,24 @@ export class TreeModel<
     this.addNodeToMapByItemId(this.root)
     this.permissionsManager = new PermissionsManager(this.authService.userId!)
     this.navigation.navigateToRoot()
+    this.addVirtualChildOfRoot(this.missionStatementsNodeId, 'Mission Statements')
+  }
+
+  /** A "slot"-style virtual node (same idea as the generic ODM system's bare slots, see
+   * BareSlotChildren.ts's doc comment, adapted to this older tree engine, which has no such
+   * concept yet) - always present, built-in, never itself persisted, so unlike a normal node it
+   * never needs an explicit "create" step. Synthesized fresh (same as `root` above) every time a
+   * TreeModel is constructed, synchronously before any streamed data arrives, so a *real* child
+   * added under it (a genuine user action, e.g. "Add Sub-Item" while it's the visual root) -
+   * which persists normally, with this virtual id as its own parentItemId - correctly re-attaches
+   * to it via TreeModel.onNodeAddedOrModified()'s directParentItemId lookup on every fresh load,
+   * with no dependency on the virtual node itself ever having a database row. */
+  private addVirtualChildOfRoot(virtualItemId: string, title: string): TBaseNode {
+    const content = new OryTreeTableNodeContent(this.injector, virtualItemId, {title} as any) as any as TNodeContent
+    const nodeInclusion = new NodeInclusion(virtualItemId, this.treeService.HARDCODED_ROOT_NODE_ITEM_ID, 0)
+    const node = this.root.createChildNode(nodeInclusion, content) as any as TBaseNode
+    ;(this.root as any)._appendChildAndSetThisAsParent(node, this.root.children.length)
+    return node
   }
 
   /* TODO: unify onNodeAdded, onNodeInclusionModified; from OryTreeNode: moveInclusionsHere, addAssociationsHere, addChild, _appendChildAndSetThisAsParent,

@@ -2,6 +2,14 @@ ion-menu ion-content {
   --background: var(--ion-item-background, var(--ion-background-color, #fff));
 }
 
+// Hamburger button's clickable area should reach the screen edge, for easier clicking/tapping
+// (Fitts's law - an edge-anchored target is easier to hit since the cursor/finger can't
+// overshoot past the screen boundary) - Ionic's own buttons-first-slot class puts a 4px margin
+// before the first toolbar button by default.
+#main-content > ion-header ion-buttons[slot="start"] {
+  margin-inline-start: 0;
+}
+
 ion-menu.md ion-content {
   --padding-start: 8px;
   --padding-end: 8px;

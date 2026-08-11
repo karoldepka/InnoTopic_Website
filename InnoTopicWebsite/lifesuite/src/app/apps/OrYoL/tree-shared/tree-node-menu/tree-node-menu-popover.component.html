@@ -84,6 +84,7 @@
   </ion-checkbox>
 
   <app-node-class-picker
+    [treeNode]="treeNode"
   ></app-node-class-picker>
 
   <div *ngIf="sharingAvailable" class="sharing-section" style="margin-top: .5em">
@@ -91,7 +92,7 @@
       Share this subtree...
     </ion-button>
 
-    <div *ngIf="sharesLoaded && shares.length">
+    <div *ngIf="sharesLoaded && shares.length > 0">
       <p>Shared with:</p>
       <div *ngFor="let share of shares" style="display: flex; align-items: center; gap: .5em">
         <span>{{share.granted_to_uid}} ({{share.permission}})</span>

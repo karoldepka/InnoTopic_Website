@@ -89,19 +89,29 @@ export const themePresets: ThemePreset[] = [
     ion_color_secondary: '#e63946',
     ion_background_color: '#ffe066',
   }),
+  // GH: primary/secondary used to both sit in the yellow-orange hue family (10deg apart, both
+  // fully saturated) - too close to tell apart at a glance despite passing colorDistance's own
+  // "not literally the same color" bar. Secondary moved to violet (same hue family as "midnight"
+  // dusk skies) - still clearly distinct at any lightness, unlike a same-hue swap.
   preset('Yellow Midnight', 'dark', {
     ion_color_primary: '#ffd60a',
-    ion_color_secondary: '#f4a300',
+    ion_color_secondary: '#9d4edd',
     ion_background_color: '#1c1a10',
   }),
+  // GH: secondary moved off cyan (11deg from primary's blue - same "ocean" hue family, hard to
+  // tell apart) onto the rust/burnt-orange already proven elsewhere in this file (Arctic Ice) as
+  // a high-contrast warm accent against a near-white background.
   preset('Ocean Light', 'light', {
     ion_color_primary: '#0077b6',
-    ion_color_secondary: '#00b4d8',
+    ion_color_secondary: '#c1440e',
     ion_background_color: '#eaf6fb',
   }),
+  // GH: primary and secondary used to be the exact same hue (190deg, just different
+  // lightness/saturation) - reads as one color at a glance. Secondary moved to coral, the same
+  // warm accent Ocean Breeze already pairs with a cool teal/cyan primary elsewhere in this file.
   preset('Ocean Midnight', 'dark', {
     ion_color_primary: '#48cae4',
-    ion_color_secondary: '#00b4d8',
+    ion_color_secondary: '#ff6f59',
     ion_background_color: '#0b1d26',
   }),
   // Soft UI: low-contrast gray-on-gray palette, large soft blur, low shadow opacity, uniformly

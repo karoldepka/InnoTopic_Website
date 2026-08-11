@@ -213,7 +213,6 @@ export class TreeNodeMenuPopoverComponent implements OnInit {
     return date(this.treeNode.content.itemData.whenCreated)
   }
 
-
   toggleDone() {
     this.treeNode.content.toggleDone()
   }

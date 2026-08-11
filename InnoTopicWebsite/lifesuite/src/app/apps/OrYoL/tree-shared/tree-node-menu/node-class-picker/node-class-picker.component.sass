@@ -1,0 +1,27 @@
+.node-class-picker
+  display: flex
+  flex-wrap: wrap
+  gap: var(--space-1)
+  margin-top: var(--space-2)
+
+// Box model (padding/border-radius/font/opacity) comes from the shared .slot-pill global class
+// (see global.scss) - only this component's own layout/color/interaction specifics stay local here.
+.node-class-option
+  display: inline-flex
+  align-items: center
+  gap: var(--space-0-5)
+  cursor: pointer
+  background: var(--ion-color-step-150)
+  color: var(--ion-text-color)
+  font-size: 0.75rem
+  white-space: nowrap
+
+  ion-icon
+    font-size: 1rem
+
+  &.selected
+    background: var(--ion-color-primary)
+    color: var(--ion-color-primary-contrast)
+
+.auto-option
+  opacity: 0.7

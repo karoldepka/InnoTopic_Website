@@ -420,6 +420,15 @@ export class JournalNumericDescriptors extends UiFieldDefs {
     isShortListed: true,
     specifyDuration,
   })
+  confusion = jnd({
+    lowerIsBetter: true,
+    antonym: [`clarity`, `clear thinking`],
+    searchTerms: [`bewilderment`, `disorientation`, `perplexity`],
+  })
+  'headless chicken' = jnd({
+    lowerIsBetter: true,
+    searchTerms: [`running around like a headless chicken`, `frantic`, `flustered`, `panic mode`],
+  })
   clarity = jnd({
     isShortListed: true,
   })
