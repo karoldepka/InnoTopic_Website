@@ -36,6 +36,13 @@ export interface CategoryTreeRequest {
   web_search?: boolean;
   match_existing?: boolean;
   fileTree?: FileTreeRequest;
+  /** True for chat-based refinement of the existing tree (rename/merge/split/etc.) as opposed to
+   * generating a new tree for `message` as a topic - set explicitly by the caller (which already
+   * knows unambiguously which one it's doing) rather than inferred from the message text, since
+   * asking the model to guess intent from phrasing proved unreliable in practice (it kept
+   * generating a whole new broad tree, and even put the edit instruction itself into a node
+   * title, despite prompt wording asking it not to - see buildCategoryTreeMessages). */
+  isRefinement?: boolean;
 }
 
 export interface QuestionAnswer {

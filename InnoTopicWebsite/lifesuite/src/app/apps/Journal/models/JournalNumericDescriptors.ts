@@ -203,6 +203,9 @@ export class JournalNumericDescriptors extends UiFieldDefs {
   procrastination = jnd({
     specifyDuration,
   })
+  'n-minute rule' = jnd({
+    searchTerms: ['2-minute rule', '5-minute rule', 'just start', 'getting started'],
+  })
   endorphins = jnd({
     searchTerms: [ `runner's high`, 'endorphin rush'],
   })

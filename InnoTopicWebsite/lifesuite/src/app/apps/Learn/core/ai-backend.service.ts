@@ -53,6 +53,10 @@ export interface CategoryTreeRequest {
   web_search?: boolean;
   match_existing?: boolean;
   fileTree?: FileTreeRequest;
+  /** True for chat-based refinement of the existing tree (rename/merge/split/etc.) rather than
+   * generating a new tree for `message` as a topic - see the backend's identical field for why
+   * this is an explicit flag rather than inferred from message text. */
+  isRefinement?: boolean;
 }
 
 export interface CategoryTreeResponse {

@@ -3,6 +3,11 @@
   -->
   <ion-split-pane contentId="main-content" when="false">
     <ion-menu contentId="main-content" type="overlay" [swipeGesture]="false">
+      <ion-header>
+        <ion-toolbar>
+          <app-app-logo [withText]="true"></app-app-logo>
+        </ion-toolbar>
+      </ion-header>
       <ion-content>
         <ion-list id="inbox-list">
           <ion-list-header>Lifedvisor</ion-list-header>

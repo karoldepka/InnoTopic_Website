@@ -201,6 +201,37 @@
         }
       </div>
 
+      <!-- ── Refine via chat: unlike "Generate Categories" above (which appends a fresh tree
+        alongside whatever's already there, for "also cover Y" style requests), each reply here
+        replaces the tree with the model's response - see gen.refineCategoriesViaChat()'s own
+        comment for why that's the correct behavior for edits like "merge X and Y". ──────────── -->
+      <div class="category-chat" *ngIf="gen.tree().length || gen.categoryChatMessages().length">
+        <div class="category-chat__thread" *ngIf="gen.categoryChatMessages().length">
+          <div
+            *ngFor="let message of gen.categoryChatMessages()"
+            class="category-chat__message"
+            [ngClass]="'category-chat__message--' + message.role"
+          >{{ message.content }}</div>
+        </div>
+        <div class="category-chat__input">
+          <ion-input
+            placeholder='Refine these categories… e.g. "merge Rust and Go"'
+            [value]="refineMessage()"
+            [disabled]="gen.categoryLoading()"
+            (ionInput)="refineMessage.set($any($event).detail.value || '')"
+            (keyup.enter)="sendCategoryChat()"
+          ></ion-input>
+          <ion-button
+            fill="clear"
+            size="small"
+            [disabled]="gen.categoryLoading() || !refineMessage().trim()"
+            (click)="sendCategoryChat()"
+          >
+            <ion-icon name="send-outline" slot="icon-only"></ion-icon>
+          </ion-button>
+        </div>
+      </div>
+
       <div class="panel-foot">
         <ion-checkbox
           labelPlacement="end"

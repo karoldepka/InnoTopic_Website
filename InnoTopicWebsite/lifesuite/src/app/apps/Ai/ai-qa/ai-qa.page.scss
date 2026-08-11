@@ -94,6 +94,50 @@
   gap: 4px;
 }
 
+// ── Category refinement chat ──────────────────────────────────────────────────
+
+.category-chat {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 10px 12px;
+  border-top: 1px solid rgba(155, 169, 186, 0.2);
+  flex-shrink: 0;
+}
+
+.category-chat__thread {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  max-height: 180px;
+  overflow-y: auto;
+}
+
+.category-chat__message {
+  white-space: pre-wrap;
+  padding: 6px 10px;
+  border-radius: 10px;
+  max-width: 90%;
+  font-size: 0.9rem;
+}
+
+.category-chat__message--assistant {
+  background: rgba(155, 169, 186, 0.15);
+  align-self: flex-start;
+}
+
+.category-chat__message--user {
+  background: var(--ion-color-primary);
+  color: var(--ion-color-primary-contrast);
+  align-self: flex-end;
+}
+
+.category-chat__input {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
 // ── Status / metrics ──────────────────────────────────────────────────────────
 
 .status-line {

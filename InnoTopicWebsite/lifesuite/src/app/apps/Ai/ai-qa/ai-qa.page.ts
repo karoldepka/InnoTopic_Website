@@ -57,6 +57,8 @@ export class AiQaPage implements OnInit {
   private readonly router = inject(Router);
 
   readonly topic = signal('Agentic AI & UI interview questions');
+  /** Reply box for the "refine categories via chat" thread - see gen.refineCategoriesViaChat(). */
+  readonly refineMessage = signal('');
   /** GH #130: a picked local directory, mirrored here (rather than reading gen.fileTree()
    * directly everywhere) just for the file/skipped counts the template shows once picked. */
   readonly pickedDirectoryFileCount = signal(0);
@@ -165,6 +167,13 @@ export class AiQaPage implements OnInit {
 
   generateCategories(): void {
     this.gen.generateCategories(this.topic(), 'vercel-ai-sdk', this.webSearch(), this.matchExisting());
+  }
+
+  sendCategoryChat(): void {
+    const message = this.refineMessage();
+    if (!message.trim() || this.gen.categoryLoading()) return;
+    this.refineMessage.set('');
+    void this.gen.refineCategoriesViaChat(message, 'vercel-ai-sdk', this.webSearch());
   }
 
   async sendRawPrompt(): Promise<void> {

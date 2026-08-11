@@ -32,6 +32,11 @@ import {errorAlert} from '../../../libs/AppFedShared/utils/log';
 
 export type QaIntegrationMode = 'vercel-ai-sdk' | 'copilotkit';
 
+export interface CategoryChatMessage {
+  role: 'user' | 'assistant';
+  content: string;
+}
+
 export const COPILOT_AGENT_ID = 'lifesuite-qa';
 
 // ---- Zod schemas --------------------------------------------------------
@@ -101,6 +106,10 @@ export class AiQaGeneratorService {
    * call that still needs the same file contents to write content-grounded questions. */
   readonly fileTree = signal<FileTreeRequest | undefined>(undefined);
   readonly tree = signal<CategoryNode[]>([]);
+  /** Chat-based refinement of `tree` (renaming/merging/splitting/adding via natural language) -
+   * see refineCategoriesViaChat()'s own comment for why this replaces the tree rather than
+   * appending to it like generateCategories() does. */
+  readonly categoryChatMessages = signal<CategoryChatMessage[]>([]);
   readonly questions = signal<QuestionAnswer[]>([]);
   readonly existingCategories = signal<ExistingCategory[]>([]);
   readonly modelName = signal('');
@@ -210,6 +219,60 @@ export class AiQaGeneratorService {
       this.categoryLoading.set(false);
       this.categoryAppendMode = false;
       this.preAppendTree = [];
+    }
+  }
+
+  /** Refines the *existing* tree via a natural-language instruction ("merge the Rust and Go
+   * categories", "make these more beginner-friendly", "drop anything about deployment") - unlike
+   * generateCategories() (topic -> brand new tree, or appended alongside an existing one for
+   * "also cover Y" style requests), this always replaces `tree` with the response. The backend
+   * prompt (buildCategoryTreeMessages in prompts.ts) already sends the current tree back to the
+   * model as context and is instructed to "preserve relevant nodes" while applying the new
+   * message, so its response *is* the intended new full state - appending here (like
+   * generateCategories() does) would just pile the edited tree up alongside the untouched
+   * original instead of actually applying the edit. `assistantMessage` (part of the response
+   * schema already) is shown back in the chat thread as the model's reply. */
+  async refineCategoriesViaChat(message: string, integration: QaIntegrationMode, webSearch: boolean): Promise<void> {
+    const trimmed = message.trim();
+    if (!trimmed || this.categoryLoading()) return;
+
+    this.categoryChatMessages.update(msgs => [...msgs, {role: 'user', content: trimmed}]);
+
+    this.categoryAbortController = new AbortController();
+    this.categoryLoading.set(true);
+    this.categoryError.set('');
+    this.categoryStatus.set('Refining categories…');
+
+    const request: CategoryTreeRequest = {
+      message: trimmed,
+      tree: cloneCategoryTree(this.tree()),
+      web_search: webSearch,
+      fileTree: this.fileTree(),
+      isRefinement: true,
+    };
+
+    try {
+      const response = integration === 'vercel-ai-sdk'
+        ? await this.generateCategoriesWithVercel(request)
+        : await this.generateCategoriesWithCopilot(request);
+      const now = Date.now();
+      this.tree.set(this.stampTreeDraftedAt(response.tree ?? [], now));
+      this.modelName.set(response.modelName || this.modelName());
+      const count = countCategoryNodes(this.tree());
+      this.categoryStatus.set(`${count} categories`);
+      this.categoryChatMessages.update(msgs => [
+        ...msgs,
+        {role: 'assistant', content: response.assistantMessage || `Updated - ${count} categories now.`},
+      ]);
+    } catch (error) {
+      if (this.categoryAbortController?.signal.aborted) return;
+      const msg = this.formatError(error);
+      this.categoryError.set(msg);
+      this.categoryStatus.set('Refinement failed');
+      this.categoryChatMessages.update(msgs => [...msgs, {role: 'assistant', content: `Could not apply that: ${msg}`}]);
+    } finally {
+      this.categoryAbortController = null;
+      this.categoryLoading.set(false);
     }
   }
 
@@ -429,6 +492,9 @@ export class AiQaGeneratorService {
   restoreFromDraft(tree: CategoryNode[], questions: QuestionAnswer[]): void {
     this.tree.set(tree);
     this.questions.set(questions);
+    // Chat isn't persisted in the draft (only its end result, `tree`, is) - clear it so a
+    // restored session doesn't show a thread referring to a tree that's since been replaced.
+    this.categoryChatMessages.set([]);
     const catCount = countCategoryNodes(tree);
     if (catCount) this.categoryStatus.set(`Restored — ${catCount} categories`);
     if (questions.length) this.questionStatus.set(`Restored — ${questions.length} Q&A`);
