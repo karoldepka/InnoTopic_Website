@@ -47,6 +47,16 @@ export class TimeTrackingToolbarComponent implements OnInit {
   }
 
   navigateTo(entry: TimeTrackedEntry) {
+    // Prefer the URL tracking was actually started from (TimeTrackedEntry.
+    // startOrResumeTrackingIfNeeded() captures it once, the first time an item starts tracking) -
+    // exact and works for any page, not just the two collections COLLECTION_ROUTES happens to
+    // know about. Entries tracked before that field existed have no createdAtUrl, so the old
+    // per-collection/tree-focus logic stays as the fallback for those.
+    const createdAtUrl = entry.val?.createdAtUrl
+    if (createdAtUrl) {
+      this.router.navigateByUrl(createdAtUrl)
+      return
+    }
     const timeTrackable = entry.timeTrackable
     const collectionName = timeTrackable.getCollectionName?.()
     const buildRoute = collectionName ? COLLECTION_ROUTES[collectionName] : undefined

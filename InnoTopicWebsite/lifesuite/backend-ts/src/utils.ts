@@ -75,6 +75,7 @@ export function extractAiErrorMessage(err: unknown): string {
 export async function textStreamResponse(
   gen: AsyncIterable<string>,
   c: import('hono').Context,
+  extraHeaders?: Record<string, string>,
 ): Promise<Response> {
   const encoder = new TextEncoder();
   const iter = gen[Symbol.asyncIterator]();
@@ -88,8 +89,10 @@ export async function textStreamResponse(
     return c.json({ error: msg }, 502);
   }
 
+  const headers = { 'Content-Type': 'text/plain; charset=utf-8', ...extraHeaders };
+
   if (first.done) {
-    return new Response('', { headers: { 'Content-Type': 'text/plain; charset=utf-8' } });
+    return new Response('', { headers });
   }
 
   const stream = new ReadableStream<Uint8Array>({
@@ -104,9 +107,7 @@ export async function textStreamResponse(
       }
     },
   });
-  return new Response(stream, {
-    headers: { 'Content-Type': 'text/plain; charset=utf-8' },
-  });
+  return new Response(stream, { headers });
 }
 
 /** Builds a Response for AG-UI Server-Sent Events. */

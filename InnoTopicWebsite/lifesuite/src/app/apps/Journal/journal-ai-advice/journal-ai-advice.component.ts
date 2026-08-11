@@ -2,7 +2,7 @@ import {Component, ChangeDetectionStrategy, OnInit, signal} from '@angular/core'
 import {NgIf, NgClass, AsyncPipe, NgFor, DatePipe} from '@angular/common'
 import {IonicModule} from '@ionic/angular'
 import {UntypedFormControl, ReactiveFormsModule} from '@angular/forms'
-import {Subscription, map} from 'rxjs'
+import {map} from 'rxjs'
 import {JournalEntryItemsService} from '../core/journal-entries.service'
 import {JournalEntry} from '../models/JournalEntry'
 import {stripHtml} from '../../../libs/AppFedShared/utils/html-utils'
@@ -21,12 +21,6 @@ const MAX_RECENT_ADVICE_SHOWN = 5
 interface JournalAdviceHistoryEntry {
   whenCreated: string
   text: string
-}
-
-interface JournalAdviceResponse {
-  advice: string
-  modelName?: string
-  truncated?: boolean
 }
 
 interface ConversationMessage {
@@ -68,11 +62,10 @@ export class JournalAiAdviceComponent implements OnInit {
 
   replyControl = new UntypedFormControl('')
 
-  /** Held only while a request is in flight, so stopAdvice() can unsubscribe it - Angular's
-   * HttpClient cancels the underlying request (aborts the fetch/XHR) as soon as its Observable is
-   * unsubscribed, so this is the standard way to cancel an in-flight HttpClient call, no separate
-   * AbortController needed (unlike the raw-fetch AI generation flows elsewhere in the Ai app). */
-  private adviceSubscription?: Subscription
+  /** Held only while a request is in flight, so stopAdvice() can abort it - a raw fetch() (see
+   * sendToBackend()'s own comment for why this isn't HttpClient) needs its own AbortController,
+   * unlike the old single-shot HttpClient .post() this replaced. */
+  private adviceAbortController?: AbortController
 
   private readonly settingsItem$ = this.settingsService.obtainItem$ById(JOURNAL_AI_ADVICE_SETTINGS_ID)
 
@@ -133,7 +126,7 @@ export class JournalAiAdviceComponent implements OnInit {
       return
     }
     this.messages.set([])
-    this.sendToBackend(entries, [])
+    void this.sendToBackend(entries, [])
   }
 
   /** Continues the current conversation with the user's typed reply - e.g. answering a
@@ -149,7 +142,7 @@ export class JournalAiAdviceComponent implements OnInit {
     }
     this.replyControl.setValue('')
     this.messages.update(messages => [...messages, {role: 'user', content: replyText}])
-    this.sendToBackend(entries, this.messages())
+    void this.sendToBackend(entries, this.messages())
   }
 
   private currentHistoryEntries(): JournalAdviceHistoryEntry[] {
@@ -161,37 +154,71 @@ export class JournalAiAdviceComponent implements OnInit {
   /** Shared by getAdvice() (conversation: []) and sendReply() (conversation: messages so far,
    * already including the just-appended user reply) - `entries` is sent on every call, not just
    * the first, since journal-advice.ts's backend is stateless and rebuilds the conversation's
-   * first message from it each time (see that file's own comment). */
-  private sendToBackend(entries: JournalAdviceHistoryEntry[], conversation: ConversationMessage[]) {
+   * first message from it each time (see that file's own comment).
+   *
+   * Raw fetch() + a streamed reader, not AiBackendService.post() (plain HttpClient, waits for the
+   * complete response) - journal advice can run to several paragraphs at the backend's
+   * maxOutputTokens: 4096, which is a long time to stare at a blank bubble. Same pattern
+   * ai-qa.page.ts's sendRawPrompt() already uses for its own streamed text. Appends an empty
+   * assistant message up front and rewrites its content as chunks arrive, rather than appending
+   * only once the full reply is in. */
+  private async sendToBackend(entries: JournalAdviceHistoryEntry[], conversation: ConversationMessage[]): Promise<void> {
     this.adviceLoading.set(true)
     this.adviceError.set('')
-    this.adviceSubscription = this.aiBackend.post<JournalAdviceResponse>('/journal-advice', {entries, conversation}).subscribe({
-      next: response => {
-        this.messages.update(messages => [...messages, {role: 'assistant', content: response.advice}])
-        this.aiAdviceService.add({
-          source: AI_ADVICE_SOURCE,
-          advice: response.advice,
-          modelName: response.modelName,
-          truncated: response.truncated,
-        })
-        if (response.truncated) {
-          this.adviceError.set('This advice may be cut off - try again if it looks incomplete.')
-        }
-        this.adviceLoading.set(false)
-      },
-      error: e => {
-        this.adviceError.set('Could not get AI advice - please try again.')
-        console.error('[journal-ai-advice] generation failed', e)
-        this.adviceLoading.set(false)
-      },
+    const abortController = new AbortController()
+    this.adviceAbortController = abortController
+    this.messages.update(messages => [...messages, {role: 'assistant', content: ''}])
+
+    try {
+      const res = await fetch(this.aiBackend.apiUrl('/journal-advice/stream'), {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({entries, conversation}),
+        signal: abortController.signal,
+      })
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}))
+        throw new Error(err?.error ?? res.statusText)
+      }
+      const modelName = res.headers.get('X-Model-Name') ?? undefined
+      const reader = res.body!.getReader()
+      const decoder = new TextDecoder()
+      let text = ''
+      while (true) {
+        const {done, value} = await reader.read()
+        if (done) break
+        text += decoder.decode(value, {stream: true})
+        this.setLastAssistantMessage(text)
+      }
+      text += decoder.decode()
+      this.setLastAssistantMessage(text)
+
+      this.aiAdviceService.add({source: AI_ADVICE_SOURCE, advice: text, modelName})
+    } catch (e: any) {
+      if (abortController.signal.aborted) return
+      this.adviceError.set('Could not get AI advice - please try again.')
+      console.error('[journal-ai-advice] generation failed', e)
+      // Drop the empty placeholder rather than leaving a blank bubble behind.
+      this.messages.update(messages => messages.slice(0, -1))
+    } finally {
+      this.adviceLoading.set(false)
+      this.adviceAbortController = undefined
+    }
+  }
+
+  private setLastAssistantMessage(content: string): void {
+    this.messages.update(messages => {
+      const updated = [...messages]
+      updated[updated.length - 1] = {role: 'assistant', content}
+      return updated
     })
   }
 
-  /** Cancels an in-flight getAdvice()/sendReply() call - unsubscribing aborts the underlying
-   * HttpClient request, so the response (if the server ever finishes it) is simply discarded. */
+  /** Cancels an in-flight getAdvice()/sendReply() call - aborts the underlying fetch(), so the
+   * response (if the server ever finishes it) is simply discarded. */
   stopAdvice() {
-    this.adviceSubscription?.unsubscribe()
-    this.adviceSubscription = undefined
+    this.adviceAbortController?.abort()
+    this.adviceAbortController = undefined
     this.adviceLoading.set(false)
   }
 

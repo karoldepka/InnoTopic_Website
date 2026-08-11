@@ -2,7 +2,7 @@ import {Component, Input, Output, EventEmitter, OnChanges, OnInit, OnDestroy, Ch
 import {Subscription} from 'rxjs'
 import {OdmTreeNode} from '../../OdmTreeNode'
 import {OdmCell} from '../../../cells/OdmCell'
-import {fieldVirtualNodeId, hasFieldValue, isSlotVisible, slotDescriptorMatchesSearch, SlotDescriptor} from '../../../cells/SlotDescriptor'
+import {fieldVirtualNodeId, hasFieldValue, isSlotVisible, slotDescriptorMatchesSearch, SlotDescriptor, SlotKind} from '../../../cells/SlotDescriptor'
 import {getBareSlotChildren$} from '../../../BareSlotChildren'
 import {IonicModule} from '@ionic/angular'
 import {MinMidMaxCellComponent} from '../../../cells/min-mid-max-cell/min-mid-max-cell.component'
@@ -82,7 +82,27 @@ export class TreeNodeCellsComponent implements OnChanges, OnInit, OnDestroy {
   @Input()
   alwaysVisibleDescriptorIds: string[] = []
 
+  /** Starting value for `showMostRecentlyUsed` (see that field's own doc comment for why it's
+   * opt-in by default) - applied once, at startup only (mirrors `autoExpandDescriptorId`'s own
+   * "sticky once applied" semantics), so the user's own later toggle isn't fought on every
+   * change-detection pass. Journal's write page sets this true: unlike browsing someone else's
+   * item, or your own well after the fact, "show me my usual fields" is exactly what's wanted
+   * while actively writing a fresh entry. */
+  @Input()
+  defaultShowMostRecentlyUsed = false
+
+  /** When set, `mruDescriptorIds` is built from each `SlotKind`'s own most-recently-used fields
+   * independently (this many per kind) instead of one shared pool capped at `MRU_LIMIT` - e.g.
+   * Journal's write page wants its 10 most-recently-used numeric self-ratings AND its
+   * 10 most-recently-used text fields to each get their own slice, rather than whichever kind
+   * happens to be used more often crowding the other out of one combined top-8. `undefined`
+   * (the default) preserves the original shared-pool behavior exactly, for every other caller. */
+  @Input()
+  mruLimitPerKind?: number
+
   private didAutoExpand = false
+
+  private appliedDefaultShowMostRecentlyUsed = false
 
   /** Mirrors `SlotPickerComponent`'s own search box - typing a field's name also reveals it here
    * if it's currently clutter-hidden, instead of only surfacing as a separate "add" chip above. */
@@ -145,6 +165,12 @@ export class TreeNodeCellsComponent implements OnChanges, OnInit, OnDestroy {
 
   private static readonly MRU_LIMIT = 8
 
+  /** Pool size fetched from `SlotUsageTrackerService` before splitting by kind (`mruLimitPerKind`)
+   * - generously larger than any realistic per-kind limit so a kind used less often than others
+   * (e.g. fewer text-field edits than numeric-rating taps) doesn't get crowded out of the shared
+   * recency-ordered pool before its own top-N are found. */
+  private static readonly MRU_POOL_SIZE_FOR_SPLIT = 200
+
   private valSubscription?: Subscription
 
   /** One `getBareSlotChildren$()` subscription per currently-visible bare slot, keyed by
@@ -175,6 +201,10 @@ export class TreeNodeCellsComponent implements OnChanges, OnInit, OnDestroy {
   }
 
   ngOnChanges(): void {
+    if (!this.appliedDefaultShowMostRecentlyUsed) {
+      this.appliedDefaultShowMostRecentlyUsed = true
+      this.showMostRecentlyUsed = this.defaultShowMostRecentlyUsed
+    }
     this.rebuildCells()
   }
 
@@ -185,21 +215,57 @@ export class TreeNodeCellsComponent implements OnChanges, OnInit, OnDestroy {
     }
   }
 
+  /** See `mruLimitPerKind`'s own doc comment. Unset: original shared-pool behavior (top
+   * `MRU_LIMIT` overall, any kind). Set: fetches one larger recency-ordered pool (cheap - it's
+   * already a plain in-memory object under `SlotUsageTrackerService`, not a fresh query), then
+   * walks it taking up to `mruLimitPerKind` ids per `SlotKind` independently, so e.g. numeric
+   * ratings being tapped far more often than text fields are filled in doesn't crowd text out of
+   * a shared top-N. An id whose descriptor no longer exists in this item class's registry (kind
+   * unknown) is skipped rather than counted against any kind's limit. */
+  private computeMruDescriptorIds(): Set<string> {
+    const namespace = this.treeNode.item$.getCollectionName()
+    if (!this.mruLimitPerKind) {
+      return new Set(this.slotUsageTrackerService.getMostRecentlyUsedIds(namespace, TreeNodeCellsComponent.MRU_LIMIT))
+    }
+    const kindById = new Map(this.descriptors.map(descriptor => [descriptor.id, descriptor.kind]))
+    const pool = this.slotUsageTrackerService.getMostRecentlyUsedIds(namespace, TreeNodeCellsComponent.MRU_POOL_SIZE_FOR_SPLIT)
+    const countByKind = new Map<SlotKind, number>()
+    const result = new Set<string>()
+    for (const id of pool) {
+      const kind = kindById.get(id)
+      if (!kind) continue
+      const countSoFar = countByKind.get(kind) ?? 0
+      if (countSoFar >= this.mruLimitPerKind) continue
+      countByKind.set(kind, countSoFar + 1)
+      result.add(id)
+    }
+    return result
+  }
+
   private rebuildCells(): void {
     // Rebuilt whenever the node/descriptors/item-value changes (not per-render) - an OdmCell is a
     // thin, cheap wrapper, but there's no reason to reconstruct it every change-detection pass.
     const itemVal = this.treeNode.item$.val
-    this.mruDescriptorIds = new Set(
-      this.slotUsageTrackerService.getMostRecentlyUsedIds(this.treeNode.item$.getCollectionName(), TreeNodeCellsComponent.MRU_LIMIT)
-    )
+    this.mruDescriptorIds = this.computeMruDescriptorIds()
     const trimmedSearch = this.searchTerm.trim()
     this.cells = this.descriptors
       // A search match reveals ANY matching descriptor here directly, not just already-visible/
       // shortlisted ones - matches SlotPickerComponent's own "once actively searching, the search
       // scope widens to every descriptor" behavior for its separate add-chip row, so typing a
       // field's name jumps straight to it wherever it conceptually belongs either way.
+      //
+      // The mruLimitPerKind arm below is deliberately scoped to that flag rather than a bare
+      // `showMostRecentlyUsed` check: isSlotVisible() itself has no notion of MRU at all (a
+      // never-filled, non-isShortListed descriptor never passes it, regardless of usage history -
+      // isClutteringUnfilledPill()'s own MRU exemption only ever "rescues" already-isShortListed
+      // fields, since it's a second filter that only runs on what already passed this first one).
+      // For Journal's write page, where most descriptors in its ~236-strong numeric
+      // catalog aren't isShortListed, that would make MRU a no-op for exactly the fields it's
+      // meant to surface. Gating on mruLimitPerKind keeps every other existing caller (which never
+      // sets it) byte-for-byte unchanged - MRU still only affects isShortListed fields for them.
       .filter(descriptor => isSlotVisible(descriptor, itemVal)
-        || (trimmedSearch && slotDescriptorMatchesSearch(descriptor, trimmedSearch)))
+        || (trimmedSearch && slotDescriptorMatchesSearch(descriptor, trimmedSearch))
+        || (!!this.mruLimitPerKind && this.showMostRecentlyUsed && this.mruDescriptorIds.has(descriptor.id)))
       .filter(descriptor => !this.isClutteringUnfilledPill(descriptor, itemVal))
       .map(descriptor => {
         const targetNodeId = fieldVirtualNodeId(this.treeNode.item$.id as string, descriptor.id)

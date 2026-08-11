@@ -4,6 +4,7 @@ import {date, TimeTrackable, TimeTrackableItemData, TimeTrackingService, TTPatch
 import {CachedSubject} from '../../../libs/AppFedShared/utils/cachedSubject2/CachedSubject2'
 import {TimeMsDuration} from '../../../libs/AppFedShared/time/TimeMsDuration'
 import {Injector} from '@angular/core'
+import {Router} from '@angular/router'
 import {TimeTrackingPersistentData} from './TimeTrackingPersistentData'
 
 export class TimeTrackingJsObjVal extends TimeTrackingPersistentData {
@@ -177,6 +178,10 @@ export class TimeTrackedEntry /* extends OverlayOdmItem$ */ {
       // dataItemPatch.whenFirstStarted = this.whenFirstStarted
       // dataItemPatch.whenFirstStarted = null
       dataItemPatch.whenCurrentPauseStarted = null as any as undefined /* FIXME */
+      // Captured once, here, alongside whenFirstStarted - so the toolbar's "jump to a tracked
+      // item" click (TimeTrackingToolbarComponent.navigateTo()) can return to wherever tracking
+      // was actually started from, not just guess a route from the item's collection.
+      dataItemPatch.createdAtUrl = this.injector.get(Router).url
     }
     // this.isTrackingNow = true
     if (this.val?.isPausedButWasTrackingBefore) {
