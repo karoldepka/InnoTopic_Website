@@ -1,0 +1,108 @@
+:host {
+  display: block;
+  height: 100%;
+  --doodle-border-radius: 12px;
+  --doodle-border-color: rgba(0, 0, 0, 0.12);
+  --doodle-stage-background: #f4f4f5;
+  --doodle-toolbar-gap: 10px;
+  --doodle-accent: #0a84ff;
+  font-family: inherit;
+}
+
+.doodle-root {
+  display: flex;
+  flex-direction: column;
+  gap: var(--doodle-toolbar-gap);
+  height: 100%;
+}
+
+.doodle-stage {
+  position: relative;
+  width: 100%;
+  /* flex: 1 (not height: 100%) - .doodle-root is a column flexbox, so this is what actually
+     lets the stage claim all space left over after the toolbar's own height. min-height is the
+     floor when the host has no explicit height of its own (host height: 100% then resolves
+     against nothing definite, same as any unsized block box). */
+  flex: 1 1 auto;
+  min-height: 240px;
+  overflow: hidden;
+  border-radius: var(--doodle-border-radius);
+  border: 1px solid var(--doodle-border-color);
+  background: var(--doodle-stage-background);
+}
+
+.doodle-bg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  pointer-events: none;
+}
+
+.doodle-draw {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  cursor: crosshair;
+  touch-action: none;
+}
+
+.doodle-draw.doodle-draw--disabled {
+  cursor: default;
+  pointer-events: none;
+}
+
+.doodle-toolbar {
+  display: flex;
+  align-items: center;
+  gap: var(--doodle-toolbar-gap);
+  flex-wrap: wrap;
+}
+
+.doodle-colors {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.doodle-swatch {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 1px solid var(--doodle-border-color);
+  padding: 0;
+  cursor: pointer;
+  box-sizing: border-box;
+}
+
+.doodle-swatch--active {
+  box-shadow: 0 0 0 2px var(--doodle-stage-background), 0 0 0 4px var(--doodle-accent);
+}
+
+.doodle-width {
+  flex: 1 1 100px;
+  min-width: 80px;
+  accent-color: var(--doodle-accent);
+}
+
+.doodle-actions {
+  display: flex;
+  gap: 6px;
+}
+
+.doodle-actions button {
+  border: 1px solid var(--doodle-border-color);
+  background: transparent;
+  border-radius: 8px;
+  padding: 4px 10px;
+  font: inherit;
+  cursor: pointer;
+}
+
+.doodle-actions button:disabled {
+  opacity: 0.4;
+  cursor: default;
+}

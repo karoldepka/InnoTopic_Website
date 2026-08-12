@@ -1,0 +1,49 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button mode="md" [defaultHref]="'/'"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Doodle Demo</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <div class="doodle-demo-page">
+    <h1>@innotopic/doodle-ui</h1>
+    <p class="intro">
+      <code>&lt;doodle-canvas&gt;</code> layers a transparent drawing canvas over an SVG or
+      bitmap image so you can freehand-doodle on top of it - pick a color and brush size, undo/
+      redo strokes, clear the layer, or export the result (with or without the background) as a
+      PNG data URL.
+    </p>
+
+    <section>
+      <h2>SVG background</h2>
+      <doodle-canvas
+        class="doodle-box"
+        [attr.image-src]="svgSrc"
+        fit="contain"
+        (doodleChange)="onDoodleChange($event)"
+        #svgCanvas
+      ></doodle-canvas>
+      <p class="hint" *ngIf="lastSnapshot">
+        {{ lastSnapshot.strokeCount }} stroke(s) - undo {{ lastSnapshot.canUndo ? 'available' : 'empty' }}
+      </p>
+      <ion-button size="small" fill="outline" (click)="onExport(svgCanvas)">Export PNG</ion-button>
+    </section>
+
+    <section>
+      <h2>Bitmap background, cover fit</h2>
+      <doodle-canvas
+        class="doodle-box"
+        [attr.image-src]="bitmapSrc"
+        fit="cover"
+      ></doodle-canvas>
+    </section>
+
+    <section *ngIf="exportedDataUrl">
+      <h2>Last export</h2>
+      <img class="export-preview" [src]="exportedDataUrl" alt="Exported doodle" />
+    </section>
+  </div>
+</ion-content>

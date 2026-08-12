@@ -32,6 +32,7 @@
     "@fortawesome/angular-fontawesome": "^5.0.0",
     "@fortawesome/fontawesome-svg-core": "^7.2.0",
     "@fortawesome/free-solid-svg-icons": "^7.2.0",
+    "@innotopic/doodle-ui": "workspace:*",
     "@innotopic/gradient-shadow-ui": "workspace:*",
     "@innotopic/plasma-ui": "workspace:*",
     "@innotopic/theme-ui": "workspace:*",
