@@ -12,6 +12,14 @@ export interface ThemeConfigState {
   shadow_offset: string;
   shadow_blur_radius: string;
   shadow_opacity: number;
+  // Inset counterpart to shadow_offset/shadow_blur_radius/shadow_opacity above - same geometry
+  // knobs, independently configurable, rendered as an `inset` box-shadow layer alongside (not
+  // instead of) the outer one. Lets a consumer combine "raised" (outer) and "pressed in" (inner)
+  // cues the way physical neumorphic UI usually does, rather than only ever offering one or the
+  // other. See applyThemeConfig() for how these become --inner-shadow-* CSS vars.
+  inner_shadow_offset: string;
+  inner_shadow_blur_radius: string;
+  inner_shadow_opacity: number;
   corner_radius_top_left: string;
   corner_radius_top_right: string;
   corner_radius_bottom_right: string;
@@ -37,6 +45,13 @@ export const defaultThemeConfig: ThemeConfigState = {
   shadow_offset: '5',
   shadow_blur_radius: '10',
   shadow_opacity: 50,
+  // Subtler than the outer shadow by default (smaller offset/blur/opacity) - an inset shadow
+  // reads as "pressed in" even at a much lower magnitude than an outer one needs to read as
+  // "raised", and a heavy default here would visually fight the outer shadow on every consumer
+  // that adopts both without deliberately tuning them against each other first.
+  inner_shadow_offset: '2',
+  inner_shadow_blur_radius: '4',
+  inner_shadow_opacity: 30,
   // Matches the neumorphic-chip's original hardcoded `border-radius: 20px 7px` exactly, so the
   // default theme is a visual no-op for existing chips until someone actually changes a preset.
   corner_radius_top_left: '20',

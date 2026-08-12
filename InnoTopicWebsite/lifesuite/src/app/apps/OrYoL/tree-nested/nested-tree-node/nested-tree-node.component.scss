@@ -20,6 +20,12 @@ $nested-tree-node-margin: 5px;
  * to the pre-theme-engine default preset's own values if the vars aren't set for some reason
  * (e.g. a consumer embedding this component tree without theme-ui's applyThemeConfig() having run).
  *
+ * The two `inset` layers are the independently-configurable inner-shadow counterpart
+ * (--inner-shadow-offset/--inner-shadow-blur-radius/--inner-shadow-light-color/
+ * --inner-shadow-dark-color) - stacked on top of the outer pair rather than replacing it, so a
+ * node can read as both "raised" (outer) and subtly "pressed in" (inner) at once, the way
+ * physical neumorphic UI usually combines both cues instead of only ever offering one.
+ *
  * border-radius is the same idea via --corner-radius (applyThemeConfig()'s own border-radius-
  * shorthand var, "<TL> <TR> <BR> <BL>") - Neubrutalism's all-zero corners and Neumorphism's
  * uniformly-rounded ones both now show up on tree rows too, not just chips/buttons. */
@@ -27,7 +33,9 @@ $nested-tree-node-margin: 5px;
   margin: 2px 0 2px $nested-tree-node-margin;
   box-shadow:
     calc(-1 * var(--shadow-offset, 5px)) calc(-1 * var(--shadow-offset, 5px)) var(--shadow-blur-radius, 10px) var(--shadow-light-color, rgba(255, 255, 255, 0.08)),
-    var(--shadow-offset, 5px) var(--shadow-offset, 5px) var(--shadow-blur-radius, 10px) var(--shadow-dark-color, rgba(0, 0, 0, 0.45));
+    var(--shadow-offset, 5px) var(--shadow-offset, 5px) var(--shadow-blur-radius, 10px) var(--shadow-dark-color, rgba(0, 0, 0, 0.45)),
+    inset calc(-1 * var(--inner-shadow-offset, 2px)) calc(-1 * var(--inner-shadow-offset, 2px)) var(--inner-shadow-blur-radius, 4px) var(--inner-shadow-light-color, rgba(255, 255, 255, 0.05)),
+    inset var(--inner-shadow-offset, 2px) var(--inner-shadow-offset, 2px) var(--inner-shadow-blur-radius, 4px) var(--inner-shadow-dark-color, rgba(0, 0, 0, 0.25));
   border-radius: var(--corner-radius, 3px);
   animation: nested-tree-node-animation 0.7s;
 }

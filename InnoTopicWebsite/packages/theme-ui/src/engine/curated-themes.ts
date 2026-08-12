@@ -10,6 +10,9 @@ const defaultShadow = {
   shadow_offset: '5',
   shadow_blur_radius: '10',
   shadow_opacity: 50,
+  inner_shadow_offset: '2',
+  inner_shadow_blur_radius: '4',
+  inner_shadow_opacity: 30,
 }
 
 const defaultCorners = {

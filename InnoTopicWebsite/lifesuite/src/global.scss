@@ -174,8 +174,9 @@ ion-fab[vertical="top"] {
   align-items: center;
   gap: var(--space-1);
   border-radius: 999px;
-  padding: var(--space-1) var(--space-2-5);
+  padding: var(--space-1-5) var(--space-2-5);
   font: inherit;
+  line-height: 1.2;
   opacity: 0.75;
   cursor: pointer;
 

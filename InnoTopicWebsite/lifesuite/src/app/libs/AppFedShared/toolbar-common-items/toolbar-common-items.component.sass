@@ -41,3 +41,9 @@
   flex-shrink: 0
   color: var(--ion-color-success, #2dd36f)
   font-size: 16px
+
+// Same --ion-text-color-doesn't-re-inherit-after-a-theme-change quirk as ion-menu-button (see
+// app.component.scss's own copy of this fix) - explicit --color sidesteps it rather than relying
+// on inheritance.
+.theme-button
+  --color: var(--ion-text-color)

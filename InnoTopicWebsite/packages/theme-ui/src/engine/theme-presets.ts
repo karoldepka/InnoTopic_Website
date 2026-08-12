@@ -26,6 +26,9 @@ const defaultShadow = {
   shadow_offset: '5',
   shadow_blur_radius: '10',
   shadow_opacity: 50,
+  inner_shadow_offset: '2',
+  inner_shadow_blur_radius: '4',
+  inner_shadow_opacity: 30,
 }
 
 /** Matches topic-chip's original hardcoded `border-radius: 20px 7px` look. */
@@ -45,6 +48,7 @@ const defaultIcon = {
 type PresetColors = Pick<ThemeConfigState, 'ion_color_primary' | 'ion_color_secondary' | 'ion_background_color'>
 type PresetOverrides = Partial<Pick<ThemeConfigState,
   | 'shadow_offset' | 'shadow_blur_radius' | 'shadow_opacity'
+  | 'inner_shadow_offset' | 'inner_shadow_blur_radius' | 'inner_shadow_opacity'
   | 'corner_radius_top_left' | 'corner_radius_top_right' | 'corner_radius_bottom_right' | 'corner_radius_bottom_left'
   | 'icon_contrast' | 'icon_brightness'
 >>

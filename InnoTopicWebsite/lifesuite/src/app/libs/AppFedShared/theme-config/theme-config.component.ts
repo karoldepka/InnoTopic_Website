@@ -14,6 +14,7 @@ import { TranslatePipe } from '@ngx-translate/core';
 import {
   ThemeUiService,
   ThemePreset,
+  ThemeConfigurator,
   shadeColor,
   contrastRatio,
   colorDistance,
@@ -42,6 +43,7 @@ export type ThemeContrastInfo = {
         NgStyle,
         DecimalPipe,
         TranslatePipe,
+        ThemeConfigurator,
     ],
 })
 export class ThemeConfigComponent extends BaseComponent implements OnInit {
@@ -53,6 +55,14 @@ export class ThemeConfigComponent extends BaseComponent implements OnInit {
   }
 
   themesVisible = false
+
+  /** <theme-configurator> (packages/theme-ui's Stencil component, wrapped by theme-ui-angular) -
+   * individual color pickers plus shadow/corner-radius sliders, as opposed to this component's
+   * own preset-only picker above. Takes no inputs/outputs of its own - it reads/writes theme-ui's
+   * shared themeState directly, so dropping it in needs no wiring. Visible by default (unlike
+   * themesVisible above) - the whole point of this section is to show the full theme config, not
+   * make it a second click away. The toggle button stays so it can still be collapsed. */
+  advancedEditorVisible = true
 
   constructor(
     public themeUiService: ThemeUiService,

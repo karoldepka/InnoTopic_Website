@@ -26,9 +26,15 @@
   align-items: center
   flex: 1 1 100%
   flex-wrap: wrap
-  border-bottom: 1px solid var(--ion-border-color, rgba(0, 0, 0, 0.1))
-  padding-bottom: var(--space-0-5)
-  margin-bottom: var(--space-1)
+
+  // Row-separator styling only - excluded when this is also .slot-pill (the compact variant just
+  // below) so it can't fight the shared class's own complete, symmetric padding (see CLAUDE.md's
+  // "shared box-model" note on this exact conflict) - .slot-cell--compact already owns every
+  // other visual difference for that variant (border, background, margin) directly.
+  &:not(.slot-pill)
+    border-bottom: 1px solid var(--ion-border-color, rgba(0, 0, 0, 0.1))
+    padding-bottom: var(--space-0-5)
+    margin-bottom: var(--space-1)
 
   // app-expand-toggle is `display: contents` (see that component's .sass) so its projected
   // app-comment-thread becomes a direct flex item of .slot-cell itself - force it onto its own
@@ -66,7 +72,6 @@
 .slot-cell--compact
   flex: 0 0 auto
   border: 1px solid var(--ion-border-color, rgba(0, 0, 0, 0.15))
-  margin-bottom: 0
   background: transparent
   color: inherit
 

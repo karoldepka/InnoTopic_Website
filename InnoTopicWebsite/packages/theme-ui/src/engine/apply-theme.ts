@@ -36,7 +36,7 @@ export function applyThemeConfig(config: ThemeConfigState) {
   for (const [key, value] of Object.entries(config)) {
     if (key === 'brightness_percent') continue
     const varName = `--${key.replace(/_/g, '-')}`
-    const needsPxSuffix = varName.startsWith('--shadow') || varName.startsWith('--corner-radius')
+    const needsPxSuffix = varName.startsWith('--shadow') || varName.startsWith('--inner-shadow') || varName.startsWith('--corner-radius')
     const val = needsPxSuffix ? `${value}px` : String(value)
     root.setProperty(varName, val)
     root.setProperty(`${varName}-shade`, `color-mix(in srgb, var(${varName}) 75%, black)`)
@@ -73,6 +73,13 @@ export function applyThemeConfig(config: ThemeConfigState) {
   const shadowLumAdjust = config.shadow_opacity / 100
   root.setProperty('--shadow-light-color', adjustLuminance(shadedBackground, shadowLumAdjust))
   root.setProperty('--shadow-dark-color', adjustLuminance(shadedBackground, -shadowLumAdjust))
+  // Same luminance-adjustment approach as the outer shadow pair above, just driven by its own
+  // independent inner_shadow_opacity - kept as separate light/dark vars (rather than reusing
+  // --shadow-light-color/--shadow-dark-color) so a consumer can tune the inner shadow's intensity
+  // without also having to change the outer one's.
+  const innerShadowLumAdjust = config.inner_shadow_opacity / 100
+  root.setProperty('--inner-shadow-light-color', adjustLuminance(shadedBackground, innerShadowLumAdjust))
+  root.setProperty('--inner-shadow-dark-color', adjustLuminance(shadedBackground, -innerShadowLumAdjust))
   root.setProperty('--ion-item-border-color', 'var(--ion-color-step-100)')
 
   const contrastValue = 'high'

@@ -10,6 +10,17 @@ ion-menu ion-content {
   margin-inline-start: 0;
 }
 
+// ion-menu-button's icon correctly picks up --ion-text-color on first page load (theme-ui's
+// applyThemeConfig() sets it on :root), but stops tracking it after any later theme change -
+// --ion-text-color is registered as an animatable custom property (@property, theme-ui's
+// tokens.ts) so it can transition smoothly, and that combination doesn't reliably re-inherit into
+// this specific shadow-DOM component past the first paint. Setting --color explicitly here
+// (Ionic's own per-component override hook, not the plain CSS `color` property) sidesteps
+// whatever inheritance quirk that is, rather than depending on it.
+#main-content > ion-header ion-menu-button {
+  --color: var(--ion-text-color);
+}
+
 ion-menu.md ion-content {
   --padding-start: 8px;
   --padding-end: 8px;

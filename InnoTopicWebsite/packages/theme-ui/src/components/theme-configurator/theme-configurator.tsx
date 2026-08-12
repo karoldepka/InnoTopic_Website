@@ -11,6 +11,7 @@ import '@innotopic/topics-ui'
 const ALL_KEYS: (keyof ThemeConfigState)[] = [
   'ion_color_primary', 'ion_color_secondary', 'ion_background_color',
   'shadow_offset', 'shadow_blur_radius', 'shadow_opacity',
+  'inner_shadow_offset', 'inner_shadow_blur_radius', 'inner_shadow_opacity',
   'corner_radius_top_left', 'corner_radius_top_right', 'corner_radius_bottom_right', 'corner_radius_bottom_left',
   'icon_contrast', 'icon_brightness',
 ]
@@ -55,9 +56,10 @@ export class ThemeConfigurator {
     setThemeConfig({ [field]: (event.target as HTMLInputElement).value } as Partial<ThemeConfigState>)
   }
 
-  private onRangeInput(field: 'shadow_offset' | 'shadow_blur_radius' | 'shadow_opacity', event: Event) {
+  private onRangeInput(field: 'shadow_offset' | 'shadow_blur_radius' | 'shadow_opacity' | 'inner_shadow_offset' | 'inner_shadow_blur_radius' | 'inner_shadow_opacity', event: Event) {
     const raw = (event.target as HTMLInputElement).value
-    setThemeConfig({ [field]: field === 'shadow_opacity' ? Number(raw) : raw } as Partial<ThemeConfigState>)
+    const isOpacityField = field === 'shadow_opacity' || field === 'inner_shadow_opacity'
+    setThemeConfig({ [field]: isOpacityField ? Number(raw) : raw } as Partial<ThemeConfigState>)
   }
 
   private onIconInput(field: 'icon_contrast' | 'icon_brightness', event: Event) {
@@ -128,6 +130,24 @@ export class ThemeConfigurator {
             <span class="field-label">Shadow opacity ({s.shadow_opacity}%)</span>
             <input type="range" min="0" max="100" value={String(s.shadow_opacity)}
                    onInput={e => this.onRangeInput('shadow_opacity', e)} />
+          </label>
+        </div>
+
+        <div class="field-row">
+          <label class="field">
+            <span class="field-label">Inner shadow offset ({s.inner_shadow_offset}px)</span>
+            <input type="range" min="-10" max="10" value={s.inner_shadow_offset}
+                   onInput={e => this.onRangeInput('inner_shadow_offset', e)} />
+          </label>
+          <label class="field">
+            <span class="field-label">Inner shadow blur ({s.inner_shadow_blur_radius}px)</span>
+            <input type="range" min="0" max="20" value={s.inner_shadow_blur_radius}
+                   onInput={e => this.onRangeInput('inner_shadow_blur_radius', e)} />
+          </label>
+          <label class="field">
+            <span class="field-label">Inner shadow opacity ({s.inner_shadow_opacity}%)</span>
+            <input type="range" min="0" max="100" value={String(s.inner_shadow_opacity)}
+                   onInput={e => this.onRangeInput('inner_shadow_opacity', e)} />
           </label>
         </div>
 

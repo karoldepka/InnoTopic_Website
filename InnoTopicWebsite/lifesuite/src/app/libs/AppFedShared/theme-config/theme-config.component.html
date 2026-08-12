@@ -30,6 +30,9 @@
 <ion-button size="small" (click)="applyRandomTheme()">{{ 'SETTINGS.RANDOM_THEME' | translate }}</ion-button>
 <ion-button size="small" fill="outline" (click)="applyNextTheme()">{{ 'SETTINGS.NEXT_THEME' | translate }}</ion-button>
 <ion-button size="small" fill="outline" (click)="themesVisible = ! themesVisible">{{ 'SETTINGS.THEMES' | translate }}</ion-button>
+<ion-button size="small" fill="outline" (click)="advancedEditorVisible = ! advancedEditorVisible">Advanced</ion-button>
+
+<theme-configurator *ngIf="advancedEditorVisible"></theme-configurator>
 <div *ngIf="themesVisible">
   <div *ngFor="let preset of themes"
        style="cursor: pointer; margin-bottom: 4px"
