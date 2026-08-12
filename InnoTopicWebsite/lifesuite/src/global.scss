@@ -438,3 +438,17 @@ body {
     --width: 94vw;
   }
 }
+
+// ThemeConfigComponent's own dedicated toolbar popover (ToolbarCommonItemsComponent.
+// openThemeConfig()) - same "content-based auto width is too cramped" reasoning as
+// .sync-status-popover above (theme list with per-preset contrast badges, brightness slider).
+// No backdrop is set on the popover itself (showBackdrop: false) so the page underneath stays
+// fully visible while picking a theme - the whole point of moving this out of a full page/modal.
+.theme-config-popover {
+  --width: min(90vw, 560px);
+  --max-height: min(85vh, 720px);
+
+  @media (max-width: 480px) {
+    --width: 94vw;
+  }
+}

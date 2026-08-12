@@ -8,7 +8,6 @@ import {CachedSubject} from '../../../utils/cachedSubject2/CachedSubject2'
 import { User } from 'firebase/auth'
 import { AboutAppComponent } from './about-app/about-app.component';
 import { FeatureConfigComponent } from '../../../feature-config/feature-config.component';
-import { ThemeConfigComponent } from '../../../theme-config/theme-config.component';
 import { LanguageSwitcherComponent } from '../../../i18n/language-switcher/language-switcher.component';
 import { NgIf, NgForOf, NgTemplateOutlet, AsyncPipe, JsonPipe } from '@angular/common';
 import { TranslatePipe } from '@ngx-translate/core';
@@ -29,7 +28,6 @@ import {TimeTrackingToolbarComponent} from '../../../../../apps/OrYoL/time-track
     imports: [
         AboutAppComponent,
         FeatureConfigComponent,
-        ThemeConfigComponent,
         LanguageSwitcherComponent,
         NgIf,
         NgForOf,

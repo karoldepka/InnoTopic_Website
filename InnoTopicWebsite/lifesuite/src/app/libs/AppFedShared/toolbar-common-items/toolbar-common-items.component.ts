@@ -1,6 +1,6 @@
 import {ChangeDetectionStrategy, Component, ViewChild} from '@angular/core'
 import {AsyncPipe} from '@angular/common'
-import {IonicModule} from '@ionic/angular'
+import {IonicModule, PopoverController} from '@ionic/angular'
 import {NavigationEnd, Router} from '@angular/router'
 import {Observable} from 'rxjs'
 import {filter, map, startWith} from 'rxjs/operators'
@@ -16,6 +16,7 @@ import {VoiceAttachableItem, VoiceMemoService} from '../audio/voice-memo.service
 import {OdmBackend} from '../odm/OdmBackend'
 import {TimeTrackingToolbarComponent} from '../../../apps/OrYoL/time-tracking/time-tracking-toolbar/time-tracking-toolbar.component'
 import {NavigationService} from '../../../apps/OrYoL/core/navigation.service'
+import {ThemeConfigComponent} from '../theme-config/theme-config.component'
 
 /** Per-collection route builder for a recording's item that isn't an OrYoL tree node - same
  * pattern/route strings as TimeTrackingToolbarComponent's own COLLECTION_ROUTES (time-tracked
@@ -73,12 +74,30 @@ export class ToolbarCommonItemsComponent {
     public voiceMemoService: VoiceMemoService,
     private navigationService: NavigationService,
     private router: Router,
+    private popoverController: PopoverController,
   ) {
     this.inQuiz$ = router.events.pipe(
       filter((e): e is NavigationEnd => e instanceof NavigationEnd),
       map(e => e.urlAfterRedirects.startsWith('/learn/quiz') || e.urlAfterRedirects.startsWith('/learn/bow-quiz')),
       startWith(router.url.startsWith('/learn/quiz') || router.url.startsWith('/learn/bow-quiz')),
     )
+  }
+
+  /** Dedicated top-toolbar entry point for ThemeConfigComponent (previously only reachable
+   * buried inside SyncPopoverComponent, alongside unrelated sync/language/about settings) - a
+   * popover rather than a routed page so picking a theme/preset stays visible against whatever
+   * page you're already on instead of navigating away from it. No backdrop, for the same reason:
+   * a dimmed backdrop would work against actually judging the live color change. */
+  async openThemeConfig(event: Event) {
+    const popover = await this.popoverController.create({
+      component: ThemeConfigComponent,
+      event,
+      translucent: true,
+      showBackdrop: false,
+      mode: 'ios',
+      cssClass: 'theme-config-popover',
+    })
+    await popover.present()
   }
 
   /** GH #141: navigates to wherever the currently-in-progress recording is attached, same

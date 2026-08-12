@@ -8,23 +8,28 @@
 
 $nested-tree-node-margin: 5px;
 
+/** GH #90: soft embossed dual light/dark shadow, driven by the active theme's own shadow_offset/
+ * shadow_blur_radius/shadow_opacity (applyThemeConfig() in @innotopic/theme-ui, --shadow-offset/
+ * --shadow-blur-radius/--shadow-light-color/--shadow-dark-color) instead of a hardcoded value or
+ * a separate, theme-independent "neumorphic shadows" toggle - picking the Neumorphism preset
+ * (large blur, low opacity) now makes tree rows read as soft/embossed the same way every other
+ * themed surface picks that preset up, and Neubrutalism (zero blur, full opacity) makes them read
+ * as hard-edged, with no extra per-feature setting to keep in sync. --shadow-light-color/
+ * --shadow-dark-color are already luminance-adjusted off the background (see apply-theme.ts), not
+ * plain white/black, so this reads reasonably across every theme's background color. Falls back
+ * to the pre-theme-engine default preset's own values if the vars aren't set for some reason
+ * (e.g. a consumer embedding this component tree without theme-ui's applyThemeConfig() having run).
+ *
+ * border-radius is the same idea via --corner-radius (applyThemeConfig()'s own border-radius-
+ * shorthand var, "<TL> <TR> <BR> <BL>") - Neubrutalism's all-zero corners and Neumorphism's
+ * uniformly-rounded ones both now show up on tree rows too, not just chips/buttons. */
 .nested-tree-node {
-  //border-left: 3px solid red;
-  //border-bottom: 2px solid #F8F8F8;
   margin: 2px 0 2px $nested-tree-node-margin;
-  box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.35);
-  //margin-bottom: 20px;
-  border-radius: 3px;
-  animation: nested-tree-node-animation 0.7s;
-}
-
-/** GH #90: soft embossed dual light/dark shadow instead of the plain single drop-shadow above -
- * semi-transparent white/black (rather than hardcoded colors) so it reads reasonably across this
- * app's many theme background colors instead of just the dark ones it was eyeballed against. */
-.nested-tree-node.neumorphic-tree-node {
   box-shadow:
-    -2px -2px 4px rgba(255, 255, 255, 0.08),
-    3px 3px 6px rgba(0, 0, 0, 0.45);
+    calc(-1 * var(--shadow-offset, 5px)) calc(-1 * var(--shadow-offset, 5px)) var(--shadow-blur-radius, 10px) var(--shadow-light-color, rgba(255, 255, 255, 0.08)),
+    var(--shadow-offset, 5px) var(--shadow-offset, 5px) var(--shadow-blur-radius, 10px) var(--shadow-dark-color, rgba(0, 0, 0, 0.45));
+  border-radius: var(--corner-radius, 3px);
+  animation: nested-tree-node-animation 0.7s;
 }
 
 .isDragOver {

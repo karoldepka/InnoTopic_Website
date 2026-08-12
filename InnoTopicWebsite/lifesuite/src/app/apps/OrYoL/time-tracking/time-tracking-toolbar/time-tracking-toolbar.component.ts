@@ -47,23 +47,49 @@ export class TimeTrackingToolbarComponent implements OnInit {
   }
 
   navigateTo(entry: TimeTrackedEntry) {
-    // Prefer the URL tracking was actually started from (TimeTrackedEntry.
-    // startOrResumeTrackingIfNeeded() captures it once, the first time an item starts tracking) -
-    // exact and works for any page, not just the two collections COLLECTION_ROUTES happens to
-    // know about. Entries tracked before that field existed have no createdAtUrl, so the old
-    // per-collection/tree-focus logic stays as the fallback for those.
-    const createdAtUrl = entry.val?.createdAtUrl
-    if (createdAtUrl) {
-      this.router.navigateByUrl(createdAtUrl)
-      return
-    }
     const timeTrackable = entry.timeTrackable
     const collectionName = timeTrackable.getCollectionName?.()
     const buildRoute = collectionName ? COLLECTION_ROUTES[collectionName] : undefined
-    if (buildRoute) {
-      this.router.navigateByUrl(buildRoute(timeTrackable.getId()))
-    } else {
+
+    if (!buildRoute) {
+      // OrYoL tree item - navigateToNodeByItemId() finds it anywhere in the tree and keyboard-
+      // focuses it once its DOM element exists (TreeHostComponent.tryNavigateToNodeId()) - more
+      // precise than createdAtUrl below, which only replays whatever view happened to be active
+      // when tracking started, with no notion of "and focus this specific node". navigation$ is a
+      // CachedSubject that replays its last value to a not-yet-mounted TreeHostComponent too, so
+      // it's safe to call this before routing to '/tree' when we're not already there - and
+      // skipping that extra navigation while already on '/tree' avoids a visible root-then-node
+      // flash from resetting to the bare route first.
+      const alreadyOnTree = this.router.url.startsWith('/tree')
       this.navigationService.navigateToNodeByItemId(timeTrackable.getId())
+      if (!alreadyOnTree) {
+        this.router.navigateByUrl('/tree')
+      }
+      return
     }
+
+    // Non-tree item (Journal/Learn) - prefer the URL tracking was actually started from
+    // (TimeTrackedEntry.startOrResumeTrackingIfNeeded() captures it once, the first time an item
+    // starts tracking), falling back to the generic per-collection route for entries tracked
+    // before that field existed.
+    const url = entry.val?.createdAtUrl ?? buildRoute(timeTrackable.getId())
+    this.router.navigateByUrl(url).then(() => this.focusMainFieldBestEffort())
+  }
+
+  /** No tree-node-precise focus mechanism exists for Journal/Learn item pages, so this is a
+   * best-effort fallback once routing settles: focus whatever looks like the page's primary
+   * editable field. Doesn't reach into TinyMCE's fields (rendered inside a same-origin iframe,
+   * not reachable via a plain document query) - only the plain-contenteditable/ion-input/
+   * ion-textarea cases. */
+  private focusMainFieldBestEffort(): void {
+    setTimeout(() => {
+      const contentEditable = document.querySelector('[contenteditable="true"]') as HTMLElement | null
+      if (contentEditable) {
+        contentEditable.focus()
+        return
+      }
+      const ionField = document.querySelector('ion-textarea, ion-input') as (HTMLElement & {setFocus?: () => Promise<void>}) | null
+      ionField?.setFocus?.()
+    }, 300)
   }
 }
