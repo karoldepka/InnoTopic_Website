@@ -30,7 +30,26 @@ $nested-tree-node-margin: 5px;
  * shorthand var, "<TL> <TR> <BR> <BL>") - Neubrutalism's all-zero corners and Neumorphism's
  * uniformly-rounded ones both now show up on tree rows too, not just chips/buttons. */
 .nested-tree-node {
-  margin: 2px 0 2px $nested-tree-node-margin;
+  // Vertical margin needs to comfortably clear the outer shadow's own reach (offset + blur, the
+  // light layer's negative offset is what can bleed *upward* into whatever sits above this node -
+  // e.g. the visual root's own title row, which isn't a .nested-tree-node itself and so has no
+  // matching shadow of its own to visually "absorb" the overlap) or the shadow visibly cuts into
+  // the row above instead of reading as this row's own depth. Scales with the active theme's
+  // --shadow-blur-radius (the dominant factor in how far a shadow reads as extending) plus a fixed
+  // buffer sized for the offset slider's own max magnitude (10px, theme-configurator.tsx), so this
+  // stays correct across every preset rather than a single value tuned for just one theme (2026-08
+  // incident: default-margin rows visibly overlapped the visual root's title text).
+  //
+  // Top only, not bottom too: siblings inside .node-children render as adjacent block-level divs
+  // *plus* nested-tree-node.component.html's own explicit 5px spacer div right after each one (see
+  // its comment - added because plain sibling margins were collapsing into one instead of adding
+  // up, which is the opposite of what's wanted between disjoint subtrees), so that spacer already
+  // prevents the usual margin-collapsing a bare `margin-bottom` here would otherwise get folded
+  // into - a bottom margin here just adds a second full shadow-clearance gap on top of the next
+  // node's own top margin, doubling the visible gap between every pair of siblings for no benefit
+  // (2026-08: this doubling - ~45px between rows at default shadow settings, vs ~25px with just
+  // the top margin - was reported as too much space for this app's otherwise compact tree rows).
+  margin: calc(10px + var(--shadow-blur-radius, 10px)) 0 0 $nested-tree-node-margin;
   box-shadow:
     calc(-1 * var(--shadow-offset, 5px)) calc(-1 * var(--shadow-offset, 5px)) var(--shadow-blur-radius, 10px) var(--shadow-light-color, rgba(255, 255, 255, 0.08)),
     var(--shadow-offset, 5px) var(--shadow-offset, 5px) var(--shadow-blur-radius, 10px) var(--shadow-dark-color, rgba(0, 0, 0, 0.45)),

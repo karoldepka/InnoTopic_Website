@@ -164,6 +164,14 @@ ion-fab[vertical="top"] {
   color: var(--ion-color-primary);
 }
 
+// Task/To Learn (ItemClassEditComponent/ItemClassToLearnEditComponent) share this class but no
+// shared stylesheet, so both were rendering at Ionic's zero-padding ion-checkbox default - cramped
+// right up against learn-item-details.page's flex-row edges. Shared here (not duplicated per
+// component) per this file's own "shared box-model" convention above.
+.class-toggle {
+  padding: var(--space-1) var(--space-2);
+}
+
 // Shared pill/chip box model for compact field affordances - used by both
 // TreeNodeCellsComponent's .slot-cell--compact (an empty/not-yet-filled field, rendered inline on
 // an item's own details) and SlotPickerComponent's .slot-picker__chip (the "Add a field…" search
@@ -397,6 +405,54 @@ body {
 // of how many time-tracked entries are showing.
 #main-content > ion-router-outlet {
   top: 56px;
+}
+
+// Default icon color is the theme's primary accent, not plain page text color - matches
+// .action-icon/.action-color's existing "tint me primary" convention (right below) but as the
+// app-wide *default* for any icon that hasn't opted into something else, rather than requiring
+// every icon to remember to add one of those classes. `--color` (Ionic's own per-component
+// override hook, what most ion-button/ion-menu-button/ion-back-button icons actually key off) AND
+// plain `color` are both set - an ion-button rendered as a link (routerLink with no [color] input,
+// e.g. ask.page.html's log-icon button) turned out to key its icon off inherited plain `color`
+// instead, so --color alone would silently miss it.
+//
+// `:not([color])` so a button/icon that deliberately opts into a named color
+// (color="primary"/"danger"/etc, which Ionic itself keeps theme-reactive) isn't overridden here.
+// `:not(.action-icon):not(.action-color)` too - this rule's own specificity (element + attribute)
+// otherwise beats those two classes' plain class selectors, so icons that deliberately opt into
+// either shared "tint me primary" class (bulb/filter/book on Journal's Timeline header via
+// .action-icon; checkmark/chevrons on OrYoL's tree-page header via .action-color) were silently
+// getting knocked back to the neutral text color instead (2026-08 incident, caught right after
+// landing an earlier version of this rule that targeted --ion-text-color instead of primary).
+//
+// The bare `ion-icon` line additionally excludes `ion-button *` - an icon sitting inside a button
+// (e.g. Learn's quick-add TASK/LEARN buttons' add-circle-outline) must keep inheriting *that
+// button's own* already-correctly-computed contrast color (its solid fill's
+// --ion-color-primary-contrast/-secondary-contrast, or - for a clear-fill button - the
+// `ion-button.button-clear` rule below) instead of being forced flat to primary here: a
+// primary-colored icon sitting on a primary-colored solid button background would be invisible.
+// `.button-clear` (not just `:not([color])`) on the ion-button line for the same reason from the
+// button's own side - Ionic reflects a button's *actual resolved* fill (whether from an explicit
+// `fill` input or its own default) as a `button-{fill}` host class, so this reliably distinguishes
+// a transparent/text-only button (no background of its own, should get the primary treatment) from
+// a default *solid*-fill button like a plain `<ion-button>TASK</ion-button>` with no
+// `[fill]`/`[color]` (which Ionic still gives a `--ion-color-primary` background by default, and
+// its own correctly-computed contrast text - forcing primary here would make solid-primary buttons'
+// text/icon disappear into their own background, and was also the source of a wrong-contrast
+// bug (2026-08 incident) back when this rule forced --ion-text-color instead).
+//
+// Not scoped to ion-header - this is a page-wide default, not header-specific (menu-button/
+// back-button structurally only ever appear in a header anyway, so scoping them here is harmless).
+ion-menu-button,
+ion-back-button,
+ion-icon:not([color]):not(.action-icon):not(.action-color):not(ion-button *) {
+  --color: var(--ion-color-primary);
+  color: var(--ion-color-primary);
+}
+
+ion-button.button-clear:not([color]):not(.action-icon):not(.action-color) {
+  --color: var(--ion-color-primary);
+  color: var(--ion-color-primary);
 }
 
 // GH #58: "App & Sync Status" popover was stuck at Ionic's content-based auto width (quite

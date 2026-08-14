@@ -8,3 +8,21 @@
   flex-wrap: wrap
   align-items: flex-start
   gap: 4px
+
+// The "Done" checkbox used to sit with no spacing at all above the DELETE/ARCHIVE/RESTORE row
+// (adjacent block-level elements with nothing declaring a gap between them) - own top/bottom
+// margin so it reads as its own row instead of crowding into the buttons right after it.
+.done-checkbox
+  display: block
+  margin: var(--space-2) 0
+
+// DELETE/ARCHIVE/RESTORE were bare adjacent ion-buttons with no gap/wrapping declared, so they
+// visually crowded together (and against .done-checkbox right above) on any viewport too narrow
+// to fit them on one line. flex-wrap so a narrow viewport wraps onto a new line instead of
+// overflowing, gap instead of per-button margin per this app's spacing convention (see CLAUDE.md).
+.item-actions-row
+  display: flex
+  flex-wrap: wrap
+  align-items: center
+  gap: var(--space-2)
+  margin-bottom: var(--space-2)

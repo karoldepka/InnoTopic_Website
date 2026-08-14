@@ -67,7 +67,22 @@ export function setThemeConfig(patch: Partial<ThemeConfigState>) {
   Object.assign(state, patch)
 }
 
-/** Applies the current (default or persisted) state immediately - call once on startup. */
+/** Applies the current (default, persisted, or already-live) state immediately - safe to call any
+ * number of times, not just once on startup. Re-reads localStorage first rather than trusting
+ * `state` as-is: consumers built as a separate bundle (e.g. <theme-configurator>'s
+ * dist-custom-elements build vs. this package's main dist, both compiled from this same source -
+ * see theme-ui-angular's ThemeUiService doc comment) get their own independent module-scoped copy
+ * of `state`, created whenever THAT bundle first evaluates - which can be well before anything
+ * else on the page has ever persisted a theme. Without re-reading here, a bundle whose `state` was
+ * born before the first persist would keep re-applying its own stale/default snapshot forever,
+ * every time one of its components (re)connects, even though localStorage - the one thing every
+ * bundle actually shares - has long since had the real, current theme (2026-08 incident: opening
+ * LifeSuite's theme popover, which mounts a fresh <theme-configurator>, visually reset the whole
+ * app to this engine's hardcoded defaults). */
 export function initThemeConfig() {
+  const persisted = loadPersistedThemeConfig()
+  if (persisted) {
+    Object.assign(state, persisted)
+  }
   applyThemeConfig(state)
 }

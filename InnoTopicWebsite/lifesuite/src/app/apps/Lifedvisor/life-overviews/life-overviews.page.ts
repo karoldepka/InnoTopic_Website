@@ -5,6 +5,7 @@ import { RadicalCandorComponent } from './radical-candor/radical-candor.componen
 import { EnergyComponent } from './energy/energy.component';
 import { FlowStateComponent } from './flow-state/flow-state.component';
 import { GrowthDiagramComponent } from './growth-diagram/growth-diagram.component';
+import { DoodleOverlayComponent } from './doodle-overlay/doodle-overlay.component';
 
 @Component({
     selector: 'app-life-overviews',
@@ -18,6 +19,7 @@ import { GrowthDiagramComponent } from './growth-diagram/growth-diagram.componen
         EnergyComponent,
         FlowStateComponent,
         GrowthDiagramComponent,
+        DoodleOverlayComponent,
     ],
 })
 export class LifeOverviewsPage implements OnInit {

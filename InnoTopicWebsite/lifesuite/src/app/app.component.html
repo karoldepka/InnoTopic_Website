@@ -9,54 +9,78 @@
         </ion-toolbar>
       </ion-header>
       <ion-content>
-        <ion-list id="inbox-list">
-          <ion-list-header>Lifedvisor</ion-list-header>
-          <ion-note>Upgrade your life with Lifedvisor</ion-note>
-          @for (page of visiblePages(appPages); track page.title) {
-            <ion-menu-toggle>
-              <ion-item
-                routerDirection="root"
-                [routerLink]="page.url ? [page.url] : null"
-                (click)="go(page)"
-                lines="none"
-                detail="false"
-                routerLinkActive="selected"
-              >
-                <ion-icon
-                  aria-hidden="true"
-                  slot="start"
-                  [ios]="page.icon + '-outline'"
-                  [md]="page.icon + '-sharp'"
-                ></ion-icon>
-                <ion-label>{{ page.title }}</ion-label>
-              </ion-item>
-            </ion-menu-toggle>
-          }
-        </ion-list>
+        <ion-searchbar
+          class="side-menu-search"
+          placeholder="Search menu…"
+          [debounce]="150"
+          showClearButton="always"
+          (ionInput)="onSearchChange($any($event).detail.value ?? '')"
+          (ionClear)="onSearchChange('')"
+        ></ion-searchbar>
 
-        <ion-list id="labels-list">
-          <ion-list-header>More</ion-list-header>
-          @for (page of visiblePages(morePages); track page.title) {
-            <ion-menu-toggle>
-              <ion-item
-                routerDirection="root"
-                [routerLink]="page.url ? [page.url] : null"
-                (click)="go(page)"
-                lines="none"
-                detail="false"
-                routerLinkActive="selected"
-              >
-                <ion-icon
-                  aria-hidden="true"
-                  slot="start"
-                  [ios]="page.icon + '-outline'"
-                  [md]="page.icon + '-sharp'"
-                ></ion-icon>
-                <ion-label>{{ page.title }}</ion-label>
-              </ion-item>
-            </ion-menu-toggle>
-          }
-        </ion-list>
+        @let filteredAppPages = filteredPages(appPages);
+        @let filteredMorePages = filteredPages(morePages);
+
+        @if (filteredAppPages.length) {
+          <ion-list id="inbox-list">
+            <ion-list-header>Lifedvisor</ion-list-header>
+            @if (!searchTerm.trim()) {
+              <ion-note>Upgrade your life with Lifedvisor</ion-note>
+            }
+            @for (page of filteredAppPages; track page.title) {
+              <ion-menu-toggle>
+                <ion-item
+                  routerDirection="root"
+                  [routerLink]="page.url ? [page.url] : null"
+                  (click)="go(page)"
+                  lines="none"
+                  detail="false"
+                  routerLinkActive="selected"
+                >
+                  <ion-icon
+                    aria-hidden="true"
+                    slot="start"
+                    [ios]="page.icon + '-outline'"
+                    [md]="page.icon + '-sharp'"
+                  ></ion-icon>
+                  <ion-label>{{ page.title }}</ion-label>
+                </ion-item>
+              </ion-menu-toggle>
+            }
+          </ion-list>
+        }
+
+        @if (filteredMorePages.length) {
+          <ion-list id="labels-list">
+            <ion-list-header>More</ion-list-header>
+            @for (page of filteredMorePages; track page.title) {
+              <ion-menu-toggle>
+                <ion-item
+                  routerDirection="root"
+                  [routerLink]="page.url ? [page.url] : null"
+                  (click)="go(page)"
+                  lines="none"
+                  detail="false"
+                  routerLinkActive="selected"
+                >
+                  <ion-icon
+                    aria-hidden="true"
+                    slot="start"
+                    [ios]="page.icon + '-outline'"
+                    [md]="page.icon + '-sharp'"
+                  ></ion-icon>
+                  <ion-label>{{ page.title }}</ion-label>
+                </ion-item>
+              </ion-menu-toggle>
+            }
+          </ion-list>
+        }
+
+        @if (searchTerm.trim() && !filteredAppPages.length && !filteredMorePages.length) {
+          <p class="no-results">
+            <ion-note>No matches for "{{ searchTerm }}"</ion-note>
+          </p>
+        }
       </ion-content>
     </ion-menu>
 

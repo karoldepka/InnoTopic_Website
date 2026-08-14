@@ -360,6 +360,11 @@ export class JournalNumericDescriptors extends UiFieldDefs {
   meaning = jnd()
   purpose = jnd()
   mission = jnd()
+  'feeling of futility' = jnd({
+    lowerIsBetter: true,
+    searchTerms: [`futility`, `pointlessness`, `hopelessness`, `meaninglessness`, `what's the point`],
+    antonym: [`hope`, `purpose`, `meaning`],
+  })
   cravings = jnd({
     lowerIsBetter: true,
   })

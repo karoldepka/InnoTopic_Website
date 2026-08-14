@@ -1,6 +1,11 @@
 \:host
   display: flex
   align-items: stretch
+  // node-content.component.html sets this host's own background-color (--apf-text-edit-background)
+  // via an inline style, so the rounding has to live here too, not on the inner [contenteditable] -
+  // that div paints no background of its own, so rounding just it would leave the host's background
+  // showing square corners underneath. Same theme-driven corner shape as .nested-tree-node.
+  border-radius: var(--corner-radius, 3px)
 
 [contenteditable]
   width: 100%

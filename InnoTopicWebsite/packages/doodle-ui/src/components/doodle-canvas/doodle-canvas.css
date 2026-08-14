@@ -4,9 +4,24 @@
   --doodle-border-radius: 12px;
   --doodle-border-color: rgba(0, 0, 0, 0.12);
   --doodle-stage-background: #f4f4f5;
+  /* Separate from --doodle-stage-background on purpose: a consumer overlaying doodle-canvas on
+     top of existing content (e.g. layering it over an SVG diagram) reasonably wants a
+     *transparent* stage so that content shows through, but the toolbar's mode/action buttons
+     still need a real, opaque surface of their own - their text color is a fixed light-mode
+     value (see --doodle-text-color below) that goes low-contrast-to-invisible against whatever
+     happens to be directly behind a transparent toolbar (a dark app theme, a dark region of the
+     overlaid content, etc). Giving the toolbar its own always-opaque background makes it read
+     the same regardless of what it's floating over. */
+  --doodle-toolbar-background: #f4f4f5;
   --doodle-toolbar-gap: 10px;
   --doodle-accent: #0a84ff;
+  --doodle-text-color: #1c1c1e;
   font-family: inherit;
+  /* Not left to inherit - the host page's own `color` (e.g. a light-on-dark theme) would
+     otherwise leak in here and make toolbar labels unreadable regardless of the page's actual
+     background right behind this component (same failure mode the swatch border fix addresses
+     below, just for text instead of borders). */
+  color: var(--doodle-text-color);
 }
 
 .doodle-root {
@@ -50,9 +65,43 @@
   touch-action: none;
 }
 
-.doodle-draw.doodle-draw--disabled {
+.doodle-draw.doodle-draw--inactive {
   cursor: default;
   pointer-events: none;
+}
+
+.doodle-text-layer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  touch-action: none;
+}
+
+.doodle-text-layer.doodle-text-layer--active {
+  pointer-events: auto;
+  cursor: text;
+}
+
+.doodle-text-item {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  white-space: pre;
+  line-height: 1.2;
+  user-select: none;
+  cursor: move;
+  pointer-events: auto;
+}
+
+.doodle-text-edit {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  white-space: pre;
+  line-height: 1.2;
+  min-width: 1ch;
+  outline: 1px dashed var(--doodle-accent);
+  outline-offset: 3px;
+  cursor: text;
+  pointer-events: auto;
 }
 
 .doodle-toolbar {
@@ -60,6 +109,13 @@
   align-items: center;
   gap: var(--doodle-toolbar-gap);
   flex-wrap: wrap;
+  /* Own opaque surface (see --doodle-toolbar-background's doc comment on :host) instead of
+     inheriting/relying on whatever's behind the component - a floating "chrome" bar rather than
+     a transparent row of controls, so it stays legible whether it's sitting over a light page, a
+     dark app theme, or a busy/dark region of overlaid content. */
+  background: var(--doodle-toolbar-background);
+  border-radius: var(--doodle-border-radius);
+  padding: 8px;
 }
 
 .doodle-colors {
@@ -72,7 +128,10 @@
   width: 22px;
   height: 22px;
   border-radius: 50%;
-  border: 1px solid var(--doodle-border-color);
+  /* Not --doodle-border-color (rgba(0,0,0,0.12)) - that's faint enough that the white swatch
+     nearly disappears against a white page. Swatches need to stay legible against any host
+     background regardless of their own fill color, so this gets a fixed higher-contrast ring. */
+  border: 1.5px solid rgba(0, 0, 0, 0.3);
   padding: 0;
   cursor: pointer;
   box-sizing: border-box;
@@ -82,7 +141,32 @@
   box-shadow: 0 0 0 2px var(--doodle-stage-background), 0 0 0 4px var(--doodle-accent);
 }
 
-.doodle-width {
+.doodle-modes {
+  display: flex;
+  gap: 6px;
+}
+
+.doodle-mode-btn {
+  border: 1px solid var(--doodle-border-color);
+  background: transparent;
+  border-radius: 8px;
+  padding: 4px 10px;
+  font: inherit;
+  cursor: pointer;
+  /* Buttons don't simply inherit `color` from :host - the UA stylesheet gives <button> its own
+     `color: ButtonText`, which wins over an ancestor's declared color regardless of specificity,
+     and ButtonText itself flips light/dark with the page's color-scheme. Setting color here
+     directly is what actually overrides it. */
+  color: var(--doodle-text-color);
+}
+
+.doodle-mode-btn--active {
+  background: var(--doodle-accent);
+  border-color: var(--doodle-accent);
+  color: #fff;
+}
+
+.doodle-range {
   flex: 1 1 100px;
   min-width: 80px;
   accent-color: var(--doodle-accent);
@@ -100,6 +184,7 @@
   padding: 4px 10px;
   font: inherit;
   cursor: pointer;
+  color: var(--doodle-text-color);
 }
 
 .doodle-actions button:disabled {

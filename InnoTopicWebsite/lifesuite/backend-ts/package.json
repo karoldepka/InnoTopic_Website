@@ -9,7 +9,7 @@
     "test": "vitest run"
   },
   "dependencies": {
-    "@ai-sdk/anthropic": "^4.0.0",
+    "@ai-sdk/anthropic": "^3.0.96",
     "@ai-sdk/openai": "^3.0.86",
     "@hono/node-server": "^1.13.7",
     "@opentelemetry/api-logs": "^0.219.0",

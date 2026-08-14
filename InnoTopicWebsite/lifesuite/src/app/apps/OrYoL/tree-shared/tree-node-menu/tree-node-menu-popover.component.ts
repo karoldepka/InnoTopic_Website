@@ -169,16 +169,43 @@ export class TreeNodeMenuPopoverComponent implements OnInit {
     }
   }
 
-  openDeleteConfirmationDialog() {
-    // this.popOver.close()
-    console.log('openDeleteConfirmationDialog()')
-    // this.dialogService.showDeleteDialog(() => {
-    //   // TODO: delete node inclusion and the node itself
-    //   this.dbService.delete(this.treeNode.itemId)
-    // })
-    // const modalRef = this.modalService.open(ConfirmDeleteTreeNodeComponent);
-    // const component = modalRef.componentInstance as ConfirmDeleteTreeNodeComponent
-    // component.treeNode = this.treeNode;
+  /** Recycle-bin delete (soft delete, same primitive NodeContentComponent's own backspace-to-
+   * delete/confirm-then-delete paths already use - see TreeNode.deleteWithoutConfirmation()'s doc
+   * comment there): every backend already treats a deleted item as excluded from fetches/listeners
+   * automatically (see OryNodeInclusionData.ts's comment on `when_deleted`), so unlike
+   * askArchiveItems() below, there's no separate "isDeleted" flag to also patch onto
+   * nodeInclusion$ - deleting the item alone is enough.
+   *
+   * Recurses across the whole subtree (like Archive, not like the backspace shortcut, which
+   * deliberately bails out on a node with children - see node-content.component.ts's
+   * deleteOnBackspaceIfEmpty() doc comment for why that quick shortcut doesn't cascade). This is
+   * the full menu's own explicit "delete this" action, so - same as Archive right below it -
+   * cascading is what a user picking it on a node with children would actually expect, rather
+   * than silently orphaning them under a now-deleted parent. */
+  async askDeleteItems() {
+    const count = this.treeNode.countSubItemsIncludingThis()
+
+    const alert = await this.alertController.create({
+      header: `Delete ${count} item(s)?`,
+      message: 'Moved to the recycle bin, not permanently removed - undo from here is not available yet, but nothing is destroyed.',
+      buttons: [
+        {
+          text: 'Cancel',
+          role: 'cancel',
+          cssClass: 'secondary',
+        }, {
+          text: 'DELETE',
+          role: 'destructive',
+          handler: async () => {
+            this.treeNode.callRecursivelyIncludingThisNode((node: OryNonRootTreeNode) => {
+              node.deleteWithoutConfirmation()
+            })
+            await this.popoverController.dismiss()
+          }
+        }
+      ]
+    })
+    await alert.present()
   }
 
   async addChild() {

@@ -1,0 +1,7 @@
+// Custom elements default to display:inline in the UA stylesheet, which leaves the inner <svg>
+// (viewBox only, no width/height attrs) with no definite containing block to size against once
+// this component sits inside app-doodle-overlay's shrink-to-fit wrapper - it collapses to 0x0
+// instead of falling back to a default replaced-element size.
+:host {
+  display: block;
+}

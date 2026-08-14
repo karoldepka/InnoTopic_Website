@@ -1,0 +1,25 @@
+{
+  "name": "@innotopic/doodle-ui-angular",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "build": "ngc -p tsconfig.json"
+  },
+  "dependencies": {
+    "@innotopic/doodle-ui": "workspace:*",
+    "rxjs": "*"
+  },
+  "peerDependencies": {
+    "@angular/core": ">=22.0.0"
+  },
+  "devDependencies": {
+    "@angular/compiler": "^22.0.2",
+    "@angular/compiler-cli": "^22.0.2",
+    "@angular/core": "^22.0.2",
+    "typescript": "~6.0.3"
+  }
+}

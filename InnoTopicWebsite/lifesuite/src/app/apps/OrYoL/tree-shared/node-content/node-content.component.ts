@@ -523,7 +523,30 @@ export class NodeContentComponent implements OnInit, AfterViewInit, OnDestroy, I
     this.focus(this.columns.allNotHiddenColumns[colIdx - 1])
   }
 
+  /** Ionic's automatic side-flipping for an event-anchored popover doesn't reliably pick whichever
+   * side actually has more room - a click anywhere in roughly the bottom half of the viewport can
+   * still get anchored "below" the click and clipped/shrunk to whatever sliver of space remains
+   * there, rather than flipping to use the much larger space above (only verified to flip on its
+   * own once the click was within a few dozen px of the very edge - 2026-08 incident:
+   * TreeNodeMenuPopoverComponent, whose content commonly needs its full --max-height, got clamped
+   * to ~200px for a click well above the actual bottom edge). Deciding the side ourselves from the
+   * click's own viewport position, AND capping --max-height to the real room on that side (rather
+   * than global.scss's blanket min(85vh, 720px), which is fine when the click is roughly centered
+   * but overflows off-screen on the *other* edge once the click sits far enough from center that
+   * even "the bigger side" has less than 85vh of room) gets the biggest popover the click position
+   * actually allows, without ever pushing content off-screen. */
   async onClickClassIcon($event: MouseEvent) {
+    // Ionic anchors an event-positioned popover to the *target element's* rect, not the raw click
+    // coordinate (a click near the top of a tall icon vs. near its bottom would otherwise get
+    // slightly different, inconsistent available-space numbers than what Ionic itself measures) -
+    // so the space calculation below has to use that same rect to actually match where Ionic ends
+    // up anchoring the popover's edge.
+    const iconRect = (($event.currentTarget ?? $event.target) as HTMLElement).getBoundingClientRect()
+    const spaceAbove = iconRect.top
+    const spaceBelow = window.innerHeight - iconRect.bottom
+    const side = spaceBelow >= spaceAbove ? 'bottom' : 'top'
+    const edgeMargin = 16
+    const availableSpace = Math.max(spaceAbove, spaceBelow) - edgeMargin
     const popover = await this.popoverController.create({
       component: TreeNodeMenuPopoverComponent,
       componentProps: {
@@ -532,10 +555,13 @@ export class NodeContentComponent implements OnInit, AfterViewInit, OnDestroy, I
         nodeContentComponent: this,
       },
       event: $event,
+      side,
+      alignment: 'center',
       translucent: true,
       mode: 'ios',
       cssClass: 'tree-node-menu-popover',
     });
+    popover.style.setProperty('--max-height', `${Math.max(200, availableSpace)}px`)
     return await popover.present();
   }
 }

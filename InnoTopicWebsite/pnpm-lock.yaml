@@ -59,6 +59,9 @@ importers:
       '@innotopic/doodle-ui':
         specifier: workspace:*
         version: link:packages/doodle-ui
+      '@innotopic/doodle-ui-angular':
+        specifier: workspace:*
+        version: link:packages/doodle-ui-angular
       '@innotopic/gradient-shadow-ui':
         specifier: workspace:*
         version: link:packages/gradient-shadow-ui
@@ -305,6 +308,9 @@ importers:
       '@huggingface/transformers':
         specifier: ^4.2.0
         version: 4.2.0
+      '@innotopic/doodle-ui':
+        specifier: workspace:*
+        version: link:../packages/doodle-ui
       '@innotopic/theme-ui-angular':
         specifier: workspace:*
         version: link:../packages/theme-ui-angular
@@ -556,8 +562,8 @@ importers:
   lifesuite/backend-ts:
     dependencies:
       '@ai-sdk/anthropic':
-        specifier: ^4.0.0
-        version: 4.0.27(zod@4.4.3)
+        specifier: ^3.0.96
+        version: 3.0.110(zod@4.4.3)
       '@ai-sdk/openai':
         specifier: ^3.0.86
         version: 3.0.90(zod@4.4.3)
@@ -601,9 +607,34 @@ importers:
 
   packages/doodle-ui:
     devDependencies:
+      '@stencil/angular-output-target':
+        specifier: ^1.0.0
+        version: 1.4.1(@stencil/core@4.43.5)
       '@stencil/core':
         specifier: ^4.20.0
         version: 4.43.5
+
+  packages/doodle-ui-angular:
+    dependencies:
+      '@innotopic/doodle-ui':
+        specifier: workspace:*
+        version: link:../doodle-ui
+      rxjs:
+        specifier: '*'
+        version: 7.8.2
+    devDependencies:
+      '@angular/compiler':
+        specifier: ^22.0.2
+        version: 22.1.0
+      '@angular/compiler-cli':
+        specifier: ^22.0.2
+        version: 22.1.0(@angular/compiler@22.1.0)(typescript@6.0.3)
+      '@angular/core':
+        specifier: ^22.0.2
+        version: 22.1.0(@angular/compiler@22.1.0)(rxjs@7.8.2)(zone.js@0.16.2)
+      typescript:
+        specifier: ~6.0.3
+        version: 6.0.3
 
   packages/gradient-shadow-ui:
     dependencies:
@@ -707,9 +738,9 @@ packages:
     peerDependencies:
       '@angular/core': '>=16.0.0'
 
-  '@ai-sdk/anthropic@4.0.27':
-    resolution: {integrity: sha512-ecrPWkYf+sHDLHErHAU/yjJfNevUzT0i6TuoQLb58oadnquSHcLQ5NMLLWjbr6d1rxYdzI7ftulIJ03VH9yM3w==}
-    engines: {node: '>=22'}
+  '@ai-sdk/anthropic@3.0.110':
+    resolution: {integrity: sha512-rNkamQCeAUOUGr5Npg5pXZyYFH4fS1U6Mbdy3dF/NNBEI3D2Chc/ruRrwNegP0gfpX3cllP3O4jSibGBbWPZ7A==}
+    engines: {node: '>=18'}
     peerDependencies:
       zod: ^3.25.76 || ^4.1.8
 
@@ -731,9 +762,9 @@ packages:
     peerDependencies:
       zod: ^3.25.76 || ^4.1.8
 
-  '@ai-sdk/provider-utils@5.0.18':
-    resolution: {integrity: sha512-UBNCrkxS5llgN2/RXLBRkjCFTIuL6YB1Goq5c+yRecnznhtX4XPjTwLHz2hrsTltTVZ0rqVegtnwFXdPBkjDHA==}
-    engines: {node: '>=22'}
+  '@ai-sdk/provider-utils@4.0.45':
+    resolution: {integrity: sha512-7u5B/E2uZmU65SlJhhQGFHZwRCN0xOz4HHtFc4sEGV9PHbX3fGiEiZBpc/SABay1dGeJgK3VD60rvLGoWdWPXA==}
+    engines: {node: '>=18'}
     peerDependencies:
       zod: ^3.25.76 || ^4.1.8
 
@@ -741,9 +772,9 @@ packages:
     resolution: {integrity: sha512-5X1k57JBJ4H7H1QjX7CnJYAB1I19r/trVZTMcSms7/kLNZ8RaU4Nt2agcwZzv82Hfx6Q7/TOLU7agAKeFfc8cA==}
     engines: {node: '>=18'}
 
-  '@ai-sdk/provider@4.0.4':
-    resolution: {integrity: sha512-tbHKNLirllUNF3ZlkCsXnwab2ZV1Sl4b1H/Cp9ruCce15IBmskE8Gwkk0yo9xDWY+jho2of7lVXtwSsyrq7cwQ==}
-    engines: {node: '>=22'}
+  '@ai-sdk/provider@3.0.15':
+    resolution: {integrity: sha512-XeZW1CcDF2GMbH4wejW6xBRI2QCOgnkVYUnxoeDadB1mf85riL2bMUeDoh+6gJ/r4mjNfzUPW8OjLjvwTP0u1Q==}
+    engines: {node: '>=18'}
 
   '@ampproject/remapping@2.3.0':
     resolution: {integrity: sha512-30iZtAPgz+LTIYoeivqYo853f02jBYSd5uGnGpkFV0M3xOt9aN73erkgYAmZU43x4VfqcnLxW9Kpg3R5LC4YYw==}
@@ -5607,9 +5638,6 @@ packages:
 
   '@webassemblyjs/wast-printer@1.14.1':
     resolution: {integrity: sha512-kPSSXE6De1XOR820C90RIo2ogvZG+c3KiHzqUoO/F34Y2shGzesfqv7o57xrxovZJH/MetF5UjroJ/R/3isoiw==}
-
-  '@workflow/serde@4.1.0':
-    resolution: {integrity: sha512-pav4F2BoirECWR7Nf1TKt+2eETcBj7jj4cBefQ8VXQCA6NPkaKeLfj/zMgi+3zYV5ZIBT4GuUiphsj0/b9hPQQ==}
 
   '@xmldom/xmldom@0.9.10':
     resolution: {integrity: sha512-A9gOqLdi6cV4ibazAjcQufGj0B1y/vDqYrcuP6d/6x8P27gRS8643Dj9o1dEKtB6O7fwxb2FgBmJS2mX7gpvdw==}
@@ -12329,10 +12357,10 @@ snapshots:
     transitivePeerDependencies:
       - zod
 
-  '@ai-sdk/anthropic@4.0.27(zod@4.4.3)':
+  '@ai-sdk/anthropic@3.0.110(zod@4.4.3)':
     dependencies:
-      '@ai-sdk/provider': 4.0.4
-      '@ai-sdk/provider-utils': 5.0.18(zod@4.4.3)
+      '@ai-sdk/provider': 3.0.15
+      '@ai-sdk/provider-utils': 4.0.45(zod@4.4.3)
       zod: 4.4.3
 
   '@ai-sdk/gateway@3.0.162(zod@3.25.76)':
@@ -12371,20 +12399,19 @@ snapshots:
       undici: 5.29.0
       zod: 4.4.3
 
-  '@ai-sdk/provider-utils@5.0.18(zod@4.4.3)':
+  '@ai-sdk/provider-utils@4.0.45(zod@4.4.3)':
     dependencies:
-      '@ai-sdk/provider': 4.0.4
+      '@ai-sdk/provider': 3.0.15
       '@standard-schema/spec': 1.1.0
-      '@workflow/serde': 4.1.0
       eventsource-parser: 3.1.0
-      undici: 7.29.0
+      undici: 5.29.0
       zod: 4.4.3
 
   '@ai-sdk/provider@3.0.14':
     dependencies:
       json-schema: 0.4.0
 
-  '@ai-sdk/provider@4.0.4':
+  '@ai-sdk/provider@3.0.15':
     dependencies:
       json-schema: 0.4.0
 
@@ -18411,8 +18438,6 @@ snapshots:
     dependencies:
       '@webassemblyjs/ast': 1.14.1
       '@xtuc/long': 4.2.2
-
-  '@workflow/serde@4.1.0': {}
 
   '@xmldom/xmldom@0.9.10': {}
 

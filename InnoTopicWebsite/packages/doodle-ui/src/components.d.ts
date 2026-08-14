@@ -9,10 +9,13 @@ import { StrokeSnapshot } from "./components/doodle-canvas/doodle-canvas";
 export { StrokeSnapshot } from "./components/doodle-canvas/doodle-canvas";
 export namespace Components {
     /**
-     * Freehand doodling overlay for an SVG or bitmap image. The background is a plain <img> (CSS
-     * object-fit handles contain/cover), and doodle strokes are <path> elements in an <svg> layered
-     * on top - each stroke is stored as its own list of points, so undo/redo/clear are just array
-     * operations on `strokes`, not pixel manipulation.
+     * Freehand doodling + text overlay for an SVG or bitmap image. The background is a plain <img>
+     * (CSS object-fit handles contain/cover); pen strokes are <path> elements in an <svg> layer;
+     * placed text is a separate absolutely-positioned HTML layer (SVG <text> can't hold a constant
+     * on-screen font size under the svg's own non-uniform viewBox stretch the way
+     * vector-effect="non-scaling-stroke" does for line width, so text gets its own layer instead).
+     * Both layers write into the same `elements` list, so undo/redo/clear are just array operations,
+     * not pixel manipulation.
      */
     interface DoodleCanvas {
         "clear": () => Promise<void>;
@@ -29,18 +32,22 @@ export namespace Components {
          */
         "disabled": boolean;
         /**
-          * Rasterizes the same markup exportSvg() would produce (background + strokes) at the stage's current on-screen size, and returns it as a PNG data URL.
+          * Rasterizes the doodle at the stage's current on-screen size and returns it as a PNG data URL. Draws the background straight from the live <img> (not through exportSvg()'s <image href>) - that href is only reliably resolved when the SVG lives in a real document, not when it's rasterized standalone via a data: URI, which is exactly what happens here.
          */
-        "exportPng": (opts?: { includeBackground?: boolean; }) => Promise<string>;
+        "exportPng": (opts?: ExportOptions) => Promise<string>;
         /**
-          * Serializes the doodle layer - plus the background image as an <image> if one is set - into standalone, resolution-independent SVG markup.
+          * Serializes the doodle - background image, strokes, and text - into standalone SVG markup. Strokes are nested in their own nested <svg> carrying the 0-100 viewBox stretch; text is placed directly in the outer, unscaled pixel space so glyphs never get stretched.
          */
-        "exportSvg": () => Promise<string>;
+        "exportSvg": (opts?: ExportOptions) => Promise<string>;
         /**
           * Mirrors CSS object-fit for how imageSrc is scaled into the stage.
           * @default 'contain'
          */
         "fit": 'contain' | 'cover';
+        /**
+          * @default 20
+         */
+        "fontSize": number;
         "getSnapshot": () => Promise<StrokeSnapshot>;
         /**
           * @default ''
@@ -51,9 +58,17 @@ export namespace Components {
          */
         "imageSrc"?: string;
         /**
+          * @default 48
+         */
+        "maxFontSize": number;
+        /**
           * @default 28
          */
         "maxStrokeWidth": number;
+        /**
+          * @default 12
+         */
+        "minFontSize": number;
         /**
           * @default 2
          */
@@ -83,10 +98,13 @@ declare global {
         "doodleChange": StrokeSnapshot;
     }
     /**
-     * Freehand doodling overlay for an SVG or bitmap image. The background is a plain <img> (CSS
-     * object-fit handles contain/cover), and doodle strokes are <path> elements in an <svg> layered
-     * on top - each stroke is stored as its own list of points, so undo/redo/clear are just array
-     * operations on `strokes`, not pixel manipulation.
+     * Freehand doodling + text overlay for an SVG or bitmap image. The background is a plain <img>
+     * (CSS object-fit handles contain/cover); pen strokes are <path> elements in an <svg> layer;
+     * placed text is a separate absolutely-positioned HTML layer (SVG <text> can't hold a constant
+     * on-screen font size under the svg's own non-uniform viewBox stretch the way
+     * vector-effect="non-scaling-stroke" does for line width, so text gets its own layer instead).
+     * Both layers write into the same `elements` list, so undo/redo/clear are just array operations,
+     * not pixel manipulation.
      */
     interface HTMLDoodleCanvasElement extends Components.DoodleCanvas, HTMLStencilElement {
         addEventListener<K extends keyof HTMLDoodleCanvasElementEventMap>(type: K, listener: (this: HTMLDoodleCanvasElement, ev: DoodleCanvasCustomEvent<HTMLDoodleCanvasElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;
@@ -108,10 +126,13 @@ declare global {
 }
 declare namespace LocalJSX {
     /**
-     * Freehand doodling overlay for an SVG or bitmap image. The background is a plain <img> (CSS
-     * object-fit handles contain/cover), and doodle strokes are <path> elements in an <svg> layered
-     * on top - each stroke is stored as its own list of points, so undo/redo/clear are just array
-     * operations on `strokes`, not pixel manipulation.
+     * Freehand doodling + text overlay for an SVG or bitmap image. The background is a plain <img>
+     * (CSS object-fit handles contain/cover); pen strokes are <path> elements in an <svg> layer;
+     * placed text is a separate absolutely-positioned HTML layer (SVG <text> can't hold a constant
+     * on-screen font size under the svg's own non-uniform viewBox stretch the way
+     * vector-effect="non-scaling-stroke" does for line width, so text gets its own layer instead).
+     * Both layers write into the same `elements` list, so undo/redo/clear are just array operations,
+     * not pixel manipulation.
      */
     interface DoodleCanvas {
         /**
@@ -132,6 +153,10 @@ declare namespace LocalJSX {
          */
         "fit"?: 'contain' | 'cover';
         /**
+          * @default 20
+         */
+        "fontSize"?: number;
+        /**
           * @default ''
          */
         "imageAlt"?: string;
@@ -140,15 +165,23 @@ declare namespace LocalJSX {
          */
         "imageSrc"?: string;
         /**
+          * @default 48
+         */
+        "maxFontSize"?: number;
+        /**
           * @default 28
          */
         "maxStrokeWidth"?: number;
+        /**
+          * @default 12
+         */
+        "minFontSize"?: number;
         /**
           * @default 2
          */
         "minStrokeWidth"?: number;
         /**
-          * Fires after any mutation (stroke finished, clear, undo, redo) so a host can drive its own save/undo button state without polling getSnapshot().
+          * Fires after any mutation (stroke or text committed, clear, undo, redo, text moved) so a host can drive its own save/undo button state without polling getSnapshot().
          */
         "onDoodleChange"?: (event: DoodleCanvasCustomEvent<StrokeSnapshot>) => void;
         /**
@@ -174,6 +207,9 @@ declare namespace LocalJSX {
         "strokeWidth": number;
         "minStrokeWidth": number;
         "maxStrokeWidth": number;
+        "fontSize": number;
+        "minFontSize": number;
+        "maxFontSize": number;
         "showToolbar": boolean;
         "disabled": boolean;
     }
@@ -187,10 +223,13 @@ declare module "@stencil/core" {
     export namespace JSX {
         interface IntrinsicElements {
             /**
-             * Freehand doodling overlay for an SVG or bitmap image. The background is a plain <img> (CSS
-             * object-fit handles contain/cover), and doodle strokes are <path> elements in an <svg> layered
-             * on top - each stroke is stored as its own list of points, so undo/redo/clear are just array
-             * operations on `strokes`, not pixel manipulation.
+             * Freehand doodling + text overlay for an SVG or bitmap image. The background is a plain <img>
+             * (CSS object-fit handles contain/cover); pen strokes are <path> elements in an <svg> layer;
+             * placed text is a separate absolutely-positioned HTML layer (SVG <text> can't hold a constant
+             * on-screen font size under the svg's own non-uniform viewBox stretch the way
+             * vector-effect="non-scaling-stroke" does for line width, so text gets its own layer instead).
+             * Both layers write into the same `elements` list, so undo/redo/clear are just array operations,
+             * not pixel manipulation.
              */
             "doodle-canvas": LocalJSX.IntrinsicElements["doodle-canvas"] & JSXBase.HTMLAttributes<HTMLDoodleCanvasElement>;
         }

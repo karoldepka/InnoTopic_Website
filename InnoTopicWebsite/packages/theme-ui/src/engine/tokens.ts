@@ -1,12 +1,26 @@
 const STYLE_ELEMENT_ID = 'innotopic-theme-ui-tokens'
 
 /**
- * Registers the core color tokens via the CSS Properties and Values API (`@property`) so
- * changing their value - as applyThemeConfig() does - actually interpolates instead of
- * snapping instantly, then declares the `transition` that makes that interpolation visible.
- * No `@property`/transition existed anywhere in the original Angular app for this; realtime
- * updates come for free from plain CSS custom properties, but *animated* realtime updates
- * needed this registration step, which is new work rather than a port of existing behavior.
+ * Declares the `transition` that makes color changes - as applyThemeConfig() does - interpolate
+ * smoothly instead of snapping instantly. No `@property`/transition existed anywhere in the
+ * original Angular app for this; realtime updates come for free from plain CSS custom properties,
+ * but *animated* realtime updates needed this transition rule, which is new work rather than a
+ * port of existing behavior.
+ *
+ * Previously also `@property`-registered --ion-color-primary/-secondary/--ion-background-color/
+ * --ion-text-color/--color (`syntax: '<color>'`) - that turned out to be unnecessary for this
+ * goal (the actual animated targets below are the *standard* color/background-color/etc.
+ * properties, which already transition smoothly off any newly-resolved var() value with no typing
+ * needed on the custom property feeding them) and actively harmful: a `@property`-registered
+ * custom property with `inherits: true` doesn't reliably re-inherit into elements - especially
+ * across Shadow DOM, which every Ionic component uses internally - once its value changes after
+ * that element's first paint, so it silently falls back to the registration's own initial-value
+ * instead (2026-08 incident: --color's initial-value of #000000 meant icons and text across the
+ * app - toolbar icons, ion-title, the side-menu's ion-item/ion-label, page headers - all rendered
+ * correctly on first load, the one moment nothing had changed yet, then went black-on-dark after
+ * any *later* theme change, everywhere at once, exactly matching that failure mode. Removing the
+ * registration makes these plain, untyped custom properties again, which inherit through Shadow
+ * DOM reliably per ordinary CSS custom-property cascade rules with no such quirk).
  *
  * Injected once into the real document (not a component's shadow root) since these tokens are
  * read globally, by elements across many different shadow trees, not just one component.
@@ -20,12 +34,6 @@ export function injectThemeTokens(doc: Document = document) {
   const style = doc.createElement('style')
   style.id = STYLE_ELEMENT_ID
   style.textContent = `
-    @property --ion-color-primary { syntax: '<color>'; inherits: true; initial-value: #007bff; }
-    @property --ion-color-secondary { syntax: '<color>'; inherits: true; initial-value: #6c757d; }
-    @property --ion-background-color { syntax: '<color>'; inherits: true; initial-value: #ffffff; }
-    @property --ion-text-color { syntax: '<color>'; inherits: true; initial-value: #000000; }
-    @property --color { syntax: '<color>'; inherits: true; initial-value: #000000; }
-
     *, *::before, *::after {
       transition:
         background-color 0.25s ease,

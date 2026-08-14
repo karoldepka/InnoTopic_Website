@@ -38,6 +38,7 @@
     "dev": "stencil build --dev --watch --serve"
   },
   "devDependencies": {
+    "@stencil/angular-output-target": "^1.0.0",
     "@stencil/core": "^4.20.0"
   }
 }

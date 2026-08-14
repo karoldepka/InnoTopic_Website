@@ -1,17 +1,8 @@
-
-@keyframes text_anim
-  //from {fill: #007000;}
-  //to {fill: #00A000;}
-  0%
-    fill: #000000
-
-  50%
-    fill: #8080FF
-
-  100%
-    fill: #000000
-
-
-#Ikigai_Text
-  animation: text_anim 2s linear infinite
-
+// Custom elements default to display:inline in the UA stylesheet, which makes the host's own
+// width:300px (set inline in life-overviews.page.html) a no-op (width doesn't apply to
+// non-replaced inline boxes) and, worse, leaves the inner <svg> (viewBox only, no width/height
+// attrs) with no definite containing block to size against once this component sits inside
+// app-doodle-overlay's shrink-to-fit wrapper - it collapses to 0x0 instead of falling back to a
+// default replaced-element size.
+\:host
+  display: block

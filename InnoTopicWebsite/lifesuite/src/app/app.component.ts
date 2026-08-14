@@ -1,4 +1,5 @@
 import {Component, HostListener, ChangeDetectionStrategy} from '@angular/core';
+import Fuse from 'fuse.js'
 
 import {Platform, PopoverController} from '@ionic/angular';
 import {Router} from '@angular/router';
@@ -139,10 +140,32 @@ export class AppComponent {
     });
   }
 
+  /** Side-menu search box (title-only, no MRU ranking - unlike WhatNextPage's own
+   * rankDestinations(), this menu has no usage-tracking to rank by, just plain filtering). */
+  searchTerm = ''
+
+  onSearchChange(term: string): void {
+    this.searchTerm = term
+  }
+
   /** Same reasoning as WhatNextPage.visibleDestinations - evaluated fresh on every access (not
    * cached), so toggling a feature flag while the menu is open takes effect immediately. */
   visiblePages(pages: SideMenuPage[]): SideMenuPage[] {
     return pages.filter(page => !page.visibleIf || page.visibleIf())
+  }
+
+  /** visiblePages() + search-term filtering, in that order - a page hidden behind a feature flag
+   * should never resurface just because its title happens to match what was typed. Same
+   * fuzzy-match approach (Fuse.js, same threshold) as WhatNextPage's rankDestinations() for a
+   * consistent search feel across the app, just without that one's MRU ranking. */
+  filteredPages(pages: SideMenuPage[]): SideMenuPage[] {
+    const visible = this.visiblePages(pages)
+    const trimmed = this.searchTerm.trim()
+    if (!trimmed) {
+      return visible
+    }
+    const fuse = new Fuse(visible, {keys: ['title'], threshold: 0.2, ignoreLocation: true})
+    return fuse.search(trimmed).map(result => result.item)
   }
 
   /** `action`-based entries (ported from WhatNextPage's own destinations) have no route to link

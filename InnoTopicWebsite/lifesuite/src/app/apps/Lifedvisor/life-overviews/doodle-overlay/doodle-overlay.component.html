@@ -1,0 +1,14 @@
+<div class="doodle-overlay">
+  <div class="doodle-overlay__content">
+    <ng-content></ng-content>
+  </div>
+
+  <!-- imageSrc deliberately unset - the diagram itself is the projected content behind this
+       layer, not something doodle-canvas loads/rasterizes itself. --doodle-stage-background is
+       doodle-canvas's own theming hook for the stage's fill, overridden to transparent so the
+       projected diagram shows through instead of doodle-canvas's opaque default. -->
+  <doodle-canvas
+    class="doodle-overlay__canvas"
+    style="--doodle-stage-background: transparent"
+  ></doodle-canvas>
+</div>
