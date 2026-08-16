@@ -16,19 +16,74 @@ const DEFAULT_QUESTIONS = [{
   ],
 }];
 
-function loadQuestions() {
+function isValidQuestion(item) {
+  return typeof item?.question === 'string'
+    && Array.isArray(item.answers)
+    && item.answers.length === 4
+    && item.answers.filter(answer => answer?.correct).length === 1;
+}
+
+function validateQuestions(arr) {
+  return Array.isArray(arr) && arr.length && arr.every(isValidQuestion);
+}
+
+async function loadQuestionsFromDatabase() {
+  try {
+    const params = new URLSearchParams(window.location.search);
+    const categoryId = params.get('categoryId');
+    const owner = params.get('owner');
+    
+    // Determine the API base URL
+    const apiBase = window.location.origin.includes('localhost')
+      ? 'http://localhost:8000'
+      : '/ai-api';
+    
+    const queryParams = new URLSearchParams();
+    if (categoryId) queryParams.append('categoryId', categoryId);
+    if (owner) queryParams.append('owner', owner);
+    queryParams.append('limit', '100');
+    
+    const response = await fetch(`${apiBase}/abcd-questions/fetch?${queryParams}`, {
+      method: 'GET',
+      headers: { 'Content-Type': 'application/json' },
+    });
+    
+    if (!response.ok) {
+      console.warn('[bow-quiz] Database fetch failed:', response.status);
+      return null;
+    }
+    
+    const data = await response.json();
+    if (data.items && validateQuestions(data.items)) {
+      console.log('[bow-quiz] Loaded', data.items.length, 'questions from database');
+      return data.items;
+    }
+  } catch (error) {
+    console.warn('[bow-quiz] Could not load questions from database', error);
+  }
+  return null;
+}
+
+async function loadQuestions() {
+  // First, try session storage (for backward compatibility with AI QA page flow)
   try {
     const parsed = JSON.parse(window.sessionStorage.getItem(SESSION_KEY) || 'null');
-    if (Array.isArray(parsed) && parsed.length && parsed.every(item =>
-      typeof item?.question === 'string'
-      && Array.isArray(item.answers)
-      && item.answers.length === 4
-      && item.answers.filter(answer => answer?.correct).length === 1)) {
+    if (validateQuestions(parsed)) {
+      console.log('[bow-quiz] Loaded questions from session storage');
       return parsed;
     }
   } catch (error) {
-    console.warn('[bow-quiz] Could not load generated questions', error);
+    console.warn('[bow-quiz] Could not load from session storage', error);
   }
+  
+  // Second, try fetching from database
+  const dbQuestions = await loadQuestionsFromDatabase();
+  if (dbQuestions) {
+    return dbQuestions;
+  }
+  
+  // Fall back to default questions
+  console.log('[bow-quiz] Using default questions');
   return DEFAULT_QUESTIONS;
 }
 
@@ -518,7 +573,8 @@ function BowQuizGame() {
   const engineRef = React.useRef(null);
   const targetBodiesRef = React.useRef(new Map());
   const correctAwardedRef = React.useRef(false);
-  const [questions] = React.useState(loadQuestions);
+  const [questions, setQuestions] = React.useState(DEFAULT_QUESTIONS);
+  const [loading, setLoading] = React.useState(true);
   const [questionIndex, setQuestionIndex] = React.useState(0);
   const currentQuestion = questions[questionIndex];
   const answers = currentQuestion.answers;
@@ -537,7 +593,17 @@ function BowQuizGame() {
   const copy = TRANSLATIONS[locale] || TRANSLATIONS.en;
   const statusKind = getStatusKind(status);
 
+  // Load questions asynchronously
   React.useEffect(() => {
+    (async () => {
+      const loaded = await loadQuestions();
+      setQuestions(loaded || DEFAULT_QUESTIONS);
+      setLoading(false);
+    })();
+  }, []);
+
+  React.useEffect(() => {
+    if (loading) return;
     const engine = Engine.create({
       gravity: { x: 0, y: 0.45, scale: 0.001 },
     });
