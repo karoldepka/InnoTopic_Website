@@ -223,7 +223,19 @@ export class AiQaPage implements OnInit {
       });
       return;
     }
+    
+    // Store in session storage for backward compatibility
     sessionStorage.setItem(BOW_QUIZ_SESSION_KEY, JSON.stringify(questions));
+    
+    // Also save to database
+    try {
+      await this.aiBackend.saveAbcdQuestions({ questions }).toPromise();
+      console.log('[bow-quiz] Questions saved to database');
+    } catch (error) {
+      console.warn('[bow-quiz] Failed to save questions to database', error);
+      // Continue anyway - session storage is the fallback
+    }
+    
     await this.router.navigateByUrl('/learn/bow-quiz');
   }
 

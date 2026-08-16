@@ -212,4 +212,31 @@ export class AiBackendService {
       return () => abortController.abort()
     })
   }
+
+  // ─── ABCD Questions Database Storage ──────────────────────────────────
+
+  /** Save ABCD format questions to the database. Questions should have the BowQuizQuestion format. */
+  saveAbcdQuestions(request: { 
+    questions: Array<{ 
+      categoryId: string; 
+      categoryPath: string; 
+      question: string; 
+      answers: Array<{ id: string; label: string; text: string; correct: boolean }>;
+    }>;
+    owner?: string;
+  }): Observable<any> {
+    return this.http.post<any>(this.apiUrl('/abcd-questions/save'), request);
+  }
+
+  /** Fetch ABCD questions from the database. Optionally filter by categoryId or owner. */
+  fetchAbcdQuestions(filters?: { categoryId?: string; owner?: string; limit?: number }): Observable<any> {
+    let params = new URLSearchParams();
+    if (filters?.categoryId) params.append('categoryId', filters.categoryId);
+    if (filters?.owner) params.append('owner', filters.owner);
+    if (filters?.limit) params.append('limit', filters.limit.toString());
+    
+    const queryString = params.toString();
+    const url = queryString ? `${this.apiUrl('/abcd-questions/fetch')}?${queryString}` : this.apiUrl('/abcd-questions/fetch');
+    return this.http.get<any>(url);
+  }
 }
