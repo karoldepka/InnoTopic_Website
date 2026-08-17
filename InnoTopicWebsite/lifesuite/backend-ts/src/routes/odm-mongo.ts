@@ -12,6 +12,10 @@ dns.setServers(['8.8.8.8', '1.1.1.1']);
 export const odmMongoRouter = new Hono();
 
 interface OdmMongoDoc {
+  /** Deterministic (collection, id) composite - see idForItem() - so an upsert is a true upsert:
+   * MongoDB's own primary key already guarantees no two documents can ever share one, with no
+   * separate unique index (and the creation-order race that comes with one) required. */
+  _id: string;
   collection: string;
   id: string;
   owner: string;
@@ -20,6 +24,13 @@ interface OdmMongoDoc {
   ancestor_ids: string[];
   when_last_modified: Date;
   when_deleted: Date | null;
+}
+
+/** Same composite-key idea as odm-surreal.ts's recordIdPart() - deliberately keeping the two
+ * peers' natural-key formats independent (each is an internal implementation detail of its own
+ * store, never compared to the other), just reusing the same "table:id" `::` convention. */
+function idForItem(collection: string, itemId: string): string {
+  return `${collection}::${itemId}`;
 }
 
 interface OdmMongoHistoryDoc {
@@ -57,12 +68,16 @@ function historyCollection(): Collection<OdmMongoHistoryDoc> {
 
 async function ensureIndexes(): Promise<void> {
   if (!_indexesEnsured) {
+    // No unique index on (collection, id) here - _id itself is that composite key now (see
+    // idForItem()), so uniqueness is enforced by MongoDB's own primary key with no separate index
+    // to create (and no window between "server starts accepting writes" and "that index finishes
+    // building" where a race could still slip a duplicate through).
     _indexesEnsured = (async () => {
-      await itemsCollection().createIndex({ collection: 1, id: 1 }, { unique: true });
       await itemsCollection().createIndex({ owner: 1, collection: 1, when_last_modified: -1 });
       await itemsCollection().createIndex({ collection: 1, parent_ids: 1 });
       await itemsCollection().createIndex({ collection: 1, ancestor_ids: 1 });
     })();
+    _indexesEnsured.catch(() => { _indexesEnsured = null; });
   }
   return _indexesEnsured;
 }
@@ -124,9 +139,11 @@ odmMongoRouter.put('/api/odm-mongo/items/:collection/:item_id', async c => {
   }
 
   await itemsCollection().updateOne(
-    { collection, id: item_id },
+    { _id: idForItem(collection, item_id) },
     {
       $set: {
+        collection,
+        id: item_id,
         owner: body.owner,
         data: body.data,
         parent_ids: body.parentIds,
@@ -149,7 +166,7 @@ odmMongoRouter.post('/api/odm-mongo/items/:collection/:item_id/delete', async c 
   await ensureIndexes();
 
   await itemsCollection().updateOne(
-    { collection, id: item_id, owner: body.owner },
+    { _id: idForItem(collection, item_id), owner: body.owner },
     { $set: { when_deleted: new Date(), when_last_modified: new Date() } },
   );
 
