@@ -4,14 +4,13 @@ import {HtmlString} from '../../../apps/Learn/models/LearnItem'
 import {stripHtml} from '../utils/html-utils'
 import {LearnItemItemsService} from '../../../apps/Learn/core/learn-item-items.service'
 import { IonicModule } from '@ionic/angular';
-import { AppLogoComponent } from '../../../apps/Common/app-logo/app-logo.component';
 
 @Component({
     selector: 'app-categories-stats-page',
     templateUrl: './categories-stats-page.page.html',
     changeDetection: ChangeDetectionStrategy.Eager,
     styleUrls: ['./categories-stats-page.page.sass'],
-    imports: [IonicModule, AppLogoComponent],
+    imports: [IonicModule],
 })
 export class CategoriesStatsPagePage implements OnInit {
 

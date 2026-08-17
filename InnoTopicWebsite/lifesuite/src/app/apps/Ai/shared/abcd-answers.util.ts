@@ -3,6 +3,8 @@ import { QuestionAnswer } from '../../Learn/core/ai-backend.service';
 export const BOW_QUIZ_SESSION_KEY = 'LifeSuite.BowQuiz.questions';
 
 export interface BowQuizQuestion {
+  categoryId: string;
+  categoryPath: string;
   question: string;
   answers: Array<{ id: string; label: string; text: string; correct: boolean }>;
 }
@@ -29,5 +31,5 @@ export function toBowQuizQuestion(item: QuestionAnswer): BowQuizQuestion | null 
   const parsed = choices as BowQuizQuestion['answers'];
   if (new Set(parsed.map(choice => choice.label)).size !== 4) return null;
   if (parsed.filter(choice => choice.correct).length !== 1) return null;
-  return { question: item.question, answers: parsed };
+  return { categoryId: item.categoryId, categoryPath: item.categoryPath, question: item.question, answers: parsed };
 }

@@ -1,7 +1,6 @@
 import {ChangeDetectorRef, Component, OnInit, ChangeDetectionStrategy} from '@angular/core'
 import {IonicModule} from '@ionic/angular'
 import {NgFor, NgIf} from '@angular/common'
-import {AppLogoComponent} from '../../../Common/app-logo/app-logo.component'
 import {SelfRatingHistoryService} from '../../self-rating-history/self-rating-history.service'
 import {SelfRatingHistoryItem} from '../../self-rating-history/SelfRatingHistoryItem'
 import {HintFinder} from '../HintFinder'
@@ -14,7 +13,7 @@ import {odmTimestampToMillis} from '../../../../libs/AppFedShared/odm/utils'
   selector: 'app-ask-log-page',
   templateUrl: './ask-log.page.html',
   changeDetection: ChangeDetectionStrategy.Eager,
-  imports: [IonicModule, NgFor, NgIf, AppLogoComponent, TimePointComponent],
+  imports: [IonicModule, NgFor, NgIf, TimePointComponent],
 })
 export class AskLogPage implements OnInit {
 
