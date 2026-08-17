@@ -2,7 +2,6 @@ import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import {ItemProcessingService} from '../core/item-processing.service'
 import {importanceDescriptorsArray, importanceDescriptorsArrayFromHighestNumeric} from '../models/fields/importance.model'
 import { IonicModule } from '@ionic/angular';
-import { AppLogoComponent } from '../../Common/app-logo/app-logo.component';
 import { ProcessButtonComponent } from '../shared/process-button/process-button.component';
 import { NgIf, NgFor, AsyncPipe, JsonPipe } from '@angular/common';
 
@@ -13,7 +12,6 @@ import { NgIf, NgFor, AsyncPipe, JsonPipe } from '@angular/common';
     styleUrls: ['./item-processing.page.sass'],
     imports: [
         IonicModule,
-        AppLogoComponent,
         ProcessButtonComponent,
         NgIf,
         NgFor,

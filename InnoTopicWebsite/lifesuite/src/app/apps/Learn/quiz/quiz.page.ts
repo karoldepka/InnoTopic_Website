@@ -12,7 +12,6 @@ import {nullish} from '../../../libs/AppFedShared/utils/type-utils'
 import {isNullish} from '../../../libs/AppFedShared/utils/utils'
 import {BaseComponent} from '../../../libs/AppFedShared/base/base.component'
 import {QuizStatus} from '../core/quiz/QuizStatus'
-import { AppLogoComponent } from '../../Common/app-logo/app-logo.component';
 import { NgIf, NgFor, AsyncPipe } from '@angular/common';
 import { TimePassingComponent } from '../../../libs/AppFedShared/time/time-passing/time-passing.component';
 import { SyncStatusIconComponent } from '../../../libs/AppFedShared/odm/sync-status/sync-status-icon.component';
@@ -31,7 +30,6 @@ import { ShowAnswerAndRateComponent } from './show-answer-and-rate/show-answer-a
     styleUrls: ['./quiz.page.sass'],
     imports: [
         IonicModule,
-        AppLogoComponent,
         NgIf,
         TimePassingComponent,
         SyncStatusIconComponent,

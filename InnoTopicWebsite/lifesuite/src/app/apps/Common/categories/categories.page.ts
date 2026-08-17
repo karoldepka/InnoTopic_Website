@@ -1,6 +1,5 @@
 import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { IonicModule } from '@ionic/angular';
-import { AppLogoComponent } from '../app-logo/app-logo.component';
 import { SyncStatusIconComponent } from '../../../libs/AppFedShared/odm/sync-status/sync-status-icon.component';
 import { CategoriesComponent } from '../../../shared/categories/categories.component';
 
@@ -11,7 +10,6 @@ import { CategoriesComponent } from '../../../shared/categories/categories.compo
     styleUrls: ['./categories.page.sass'],
     imports: [
         IonicModule,
-        AppLogoComponent,
         SyncStatusIconComponent,
         CategoriesComponent,
     ],

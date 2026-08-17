@@ -1,6 +1,5 @@
 import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { IonicModule } from '@ionic/angular';
-import { AppLogoComponent } from '../../Common/app-logo/app-logo.component';
 import { NgFor } from '@angular/common';
 
 @Component({
@@ -10,7 +9,6 @@ import { NgFor } from '@angular/common';
     styleUrls: ['./exponential-improvement.page.sass'],
     imports: [
         IonicModule,
-        AppLogoComponent,
         NgFor,
     ],
 })

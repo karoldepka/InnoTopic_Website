@@ -7,7 +7,7 @@ import {
 import { TreeHostComponent } from '../../tree-host/tree-host/tree-host.component'
 import { debugLog } from '../../utils/log'
 import {ApfBaseTreeNode, OryBaseTreeNode, OryNonRootTreeNode} from '../../tree-model/TreeModel'
-import { NgClass, NgIf, NgFor, AsyncPipe } from '@angular/common';
+import { NgClass, NgIf, NgFor } from '@angular/common';
 import { NodeContentComponent } from '../../tree-shared/node-content/node-content.component';
 import { ConfigService } from '../../core/config.service'
 
@@ -16,7 +16,7 @@ import { ConfigService } from '../../core/config.service'
     templateUrl: './nested-tree-node.component.html',
     changeDetection: ChangeDetectionStrategy.Eager,
     styleUrls: ['./nested-tree-node.component.scss'],
-    imports: [NgClass, NgIf, NodeContentComponent, NgFor, AsyncPipe]
+    imports: [NgClass, NgIf, NodeContentComponent, NgFor]
 })
 export class NestedTreeNodeComponent implements OnInit {
 

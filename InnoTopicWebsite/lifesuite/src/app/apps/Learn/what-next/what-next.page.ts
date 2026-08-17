@@ -3,7 +3,6 @@ import { Router } from '@angular/router'
 import {FeatureService} from '../../../libs/AppFedShared/feature.service'
 import {BaseComponent} from '../../../libs/AppFedShared/base/base.component'
 import { IonicModule } from '@ionic/angular';
-import { AppLogoComponent } from '../../Common/app-logo/app-logo.component';
 import { SyncStatusIconComponent } from '../../../libs/AppFedShared/odm/sync-status/sync-status-icon.component';
 import { NgIf, NgFor } from '@angular/common';
 import { QuizButtonComponent } from '../shared/quiz-button/quiz-button.component';
@@ -19,7 +18,6 @@ import {WhatNextActionsService} from './what-next-actions.service'
     styleUrls: ['./what-next.page.scss'],
     imports: [
         IonicModule,
-        AppLogoComponent,
         SyncStatusIconComponent,
         NgIf,
         NgFor,

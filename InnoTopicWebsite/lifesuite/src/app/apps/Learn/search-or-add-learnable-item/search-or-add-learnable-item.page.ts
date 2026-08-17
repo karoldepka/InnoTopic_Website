@@ -29,7 +29,6 @@ import {LearnStatsService} from '../core/learn-stats.service'
 
 import {AiBackendService} from '../core/ai-backend.service'
 import {ItemProcessingService} from '../core/item-processing.service'
-import { AppLogoComponent } from '../../Common/app-logo/app-logo.component';
 import { WhatNextButtonComponent } from '../../../shared/what-next-button/what-next-button.component';
 import { SyncStatusIconComponent } from '../../../libs/AppFedShared/odm/sync-status/sync-status-icon.component';
 import { NgIf, AsyncPipe } from '@angular/common';
@@ -52,7 +51,6 @@ import { TranslatePipe } from '@ngx-translate/core';
     styleUrls: ['./search-or-add-learnable-item.page.scss'],
     imports: [
         IonicModule,
-        AppLogoComponent,
         RouterLink,
         WhatNextButtonComponent,
         SyncStatusIconComponent,

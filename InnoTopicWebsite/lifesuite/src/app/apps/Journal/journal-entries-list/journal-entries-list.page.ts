@@ -17,7 +17,6 @@ import {TimelineListOptionsComponent} from './timeline-list-options/timeline-lis
 import {JournalAiAdviceComponent} from '../journal-ai-advice/journal-ai-advice.component'
 import {BaseComponent} from '../../../libs/AppFedShared/base/base.component'
 import { RouterLink } from '@angular/router';
-import { AppLogoComponent } from '../../Common/app-logo/app-logo.component';
 import { NgIf, NgFor, AsyncPipe } from '@angular/common';
 import { SyncStatusIconComponent } from '../../../libs/AppFedShared/odm/sync-status/sync-status-icon.component';
 import { CdkVirtualScrollViewport, CdkVirtualForOf } from '@angular/cdk/scrolling';
@@ -38,7 +37,6 @@ export class TimelineListOptionsData {
     imports: [
         IonicModule,
         RouterLink,
-        AppLogoComponent,
         NgIf,
         SyncStatusIconComponent,
         CdkVirtualScrollViewport,

@@ -21,7 +21,6 @@ import {getVisibleLearnSlotDescriptors} from '../models/LearnSlotDescriptors'
 import {SlotDescriptor} from '../../../libs/AppFedShared/tree/cells/SlotDescriptor'
 import {OdmTreeNode} from '../../../libs/AppFedShared/tree/tree-node/OdmTreeNode'
 import {OdmBackend} from '../../../libs/AppFedShared/odm/OdmBackend'
-import { AppLogoComponent } from '../../Common/app-logo/app-logo.component';
 import { NgIf, AsyncPipe } from '@angular/common';
 import { TimePassingComponent } from '../../../libs/AppFedShared/time/time-passing/time-passing.component';
 import { SyncStatusIconComponent } from '../../../libs/AppFedShared/odm/sync-status/sync-status-icon.component';
@@ -45,7 +44,6 @@ import { OdmTimestampToDatePipe } from '../../../libs/AppFedShared/odm/odm-times
     styleUrls: ['./learn-item-details.page.sass'],
     imports: [
         IonicModule,
-        AppLogoComponent,
         NgIf,
         TimePassingComponent,
         SyncStatusIconComponent,

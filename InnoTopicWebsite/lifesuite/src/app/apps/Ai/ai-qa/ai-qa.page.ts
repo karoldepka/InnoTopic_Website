@@ -35,7 +35,6 @@ import { LearnItemItemsService } from '../../Learn/core/learn-item-items.service
 import { LearnItem } from '../../Learn/models/LearnItem';
 import { LearnItem$ } from '../../Learn/models/LearnItem$';
 import { OdmBackend } from '../../../libs/AppFedShared/odm/OdmBackend';
-import { AppLogoComponent } from '../../Common/app-logo/app-logo.component';
 import { Router } from '@angular/router';
 import { BOW_QUIZ_SESSION_KEY, toBowQuizQuestion } from '../shared/abcd-answers.util';
 
@@ -44,7 +43,7 @@ import { BOW_QUIZ_SESSION_KEY, toBowQuizQuestion } from '../shared/abcd-answers.
   templateUrl: './ai-qa.page.html',
   styleUrls: ['./ai-qa.page.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, FormsModule, IonicModule, AppLogoComponent],
+  imports: [CommonModule, FormsModule, IonicModule],
   providers: [AiQaGeneratorService],
 })
 export class AiQaPage implements OnInit {

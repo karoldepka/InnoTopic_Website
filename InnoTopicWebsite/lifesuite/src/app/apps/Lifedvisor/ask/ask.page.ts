@@ -13,7 +13,6 @@ import {LiHintImpl} from '../shared-with-testcafe/Hint';
 import {Filter} from '../shared-with-testcafe/text_search/Filter';
 import {sortBy} from 'lodash-es';
 import { IonicModule } from '@ionic/angular';
-import { AppLogoComponent } from '../../Common/app-logo/app-logo.component';
 import { SyncStatusIconComponent } from '../../../libs/AppFedShared/odm/sync-status/sync-status-icon.component';
 import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { NgFor, NgIf, NgClass } from '@angular/common';
@@ -25,7 +24,7 @@ import { HintComponent } from './hint/hint.component';
     templateUrl: './ask.page.html',
     changeDetection: ChangeDetectionStrategy.Eager,
     styleUrls: ['./ask.page.scss'],
-    imports: [IonicModule, AppLogoComponent, SyncStatusIconComponent, ReactiveFormsModule, FormsModule, NgFor, NgIf, HintComponent, NgClass, RouterLink]
+    imports: [IonicModule, SyncStatusIconComponent, ReactiveFormsModule, FormsModule, NgFor, NgIf, HintComponent, NgClass, RouterLink]
 })
 export class AskPage implements OnInit {
 

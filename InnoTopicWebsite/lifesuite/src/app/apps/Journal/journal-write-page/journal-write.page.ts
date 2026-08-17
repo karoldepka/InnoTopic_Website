@@ -8,7 +8,6 @@ import { ActivatedRoute, Router, RouterLink } from '@angular/router'
 import {CachedSubject} from '../../../libs/AppFedShared/utils/cachedSubject2/CachedSubject2'
 import {BaseComponent} from '../../../libs/AppFedShared/base/base.component'
 import { IonicModule, PopoverController } from '@ionic/angular';
-import { AppLogoComponent } from '../../Common/app-logo/app-logo.component';
 import { NgIf, NgFor } from '@angular/common';
 import { TimePassingComponent } from '../../../libs/AppFedShared/time/time-passing/time-passing.component';
 import { SyncStatusIconComponent } from '../../../libs/AppFedShared/odm/sync-status/sync-status-icon.component';
@@ -24,7 +23,6 @@ import { TranslatePipe } from '@ngx-translate/core';
     imports: [
         IonicModule,
         RouterLink,
-        AppLogoComponent,
         NgIf,
         TimePassingComponent,
         SyncStatusIconComponent,
