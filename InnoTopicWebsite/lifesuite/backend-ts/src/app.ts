@@ -8,6 +8,7 @@ import { quizRouter } from './routes/quiz.js';
 import { copilotRouter } from './routes/copilotkit.js';
 import { odmRouter } from './routes/odm.js';
 import { odmMongoRouter } from './routes/odm-mongo.js';
+import { odmSurrealRouter } from './routes/odm-surreal.js';
 import { transcribeRouter } from './routes/transcribe.js';
 import { journalAdviceRouter } from './routes/journal-advice.js';
 import { MODEL_NAME } from './llm.js';
@@ -28,6 +29,7 @@ app.route('/', quizRouter);
 app.route('/', copilotRouter);
 app.route('/', odmRouter);
 app.route('/', odmMongoRouter);
+app.route('/', odmSurrealRouter);
 app.route('/', transcribeRouter);
 app.route('/', journalAdviceRouter);
 

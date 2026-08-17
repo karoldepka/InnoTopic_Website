@@ -9,7 +9,7 @@ export const environmentBase = {
   collectionNameSuffix: '',
   // collectionNameSuffix: '_DEBUG',
 
-  odmBackend: 'fanout', // 'fanout' races Supabase+Neon+Mongo as equal peers; or 'firestore'/'supabase'/'neon' alone
+  odmBackend: 'fanout', // 'fanout' races Supabase+Neon+Mongo+Surreal as equal peers; or 'firestore'/'supabase'/'neon' alone
   authBackend: 'firebase',
 
   // OrYoL (/tree) has been migrated off its standalone Firestore-only data layer onto the
@@ -35,6 +35,12 @@ export const environmentBase = {
   mongo: {
     enabled: true, // Atlas cluster0free - see backend-ts/.env MONGODB_URI
     odmApiUrl: 'http://localhost:8000/api/odm-mongo',
+    pollIntervalMs: 5000,
+  },
+
+  surreal: {
+    enabled: true, // local Docker only so far (container `lifesuite-surrealdb`) - not deployed anywhere reachable outside this machine yet
+    odmApiUrl: 'http://localhost:8000/api/odm-surreal',
     pollIntervalMs: 5000,
   },
 

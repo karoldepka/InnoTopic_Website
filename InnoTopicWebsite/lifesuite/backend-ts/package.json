@@ -19,7 +19,8 @@
     "dotenv": "^16.4.7",
     "hono": "^4.7.10",
     "mongodb": "^7.5.0",
-    "postgres": "^3.4.5"
+    "postgres": "^3.4.5",
+    "surrealdb": "^2.0.8"
   },
   "devDependencies": {
     "@types/node": "^22.10.5",

@@ -15,4 +15,13 @@ export const environment = {
     ...environmentBase.mongo,
     odmApiUrl: 'https://life-suite-backend.vercel.app/api/odm-mongo',
   },
+  // SurrealDB only exists as a local Docker container so far (see backend-ts/.env) - there's no
+  // hosted instance a real deployed build could reach yet. Since FanoutOdmCollectionBackend's
+  // saveNowToDb() blocks on every enabled peer confirming, leaving this enabled here would break
+  // every save for real users the moment this build actually deployed. Flip to true (and add a
+  // real odmApiUrl override above, matching neon/mongo) once a real SurrealDB instance exists.
+  surreal: {
+    ...environmentBase.surreal,
+    enabled: false,
+  },
 };
