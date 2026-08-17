@@ -7,15 +7,15 @@ import {FanoutOdmBackend} from './FanoutOdmBackend'
 export class FanoutOdmCollectionBackend<TRaw> extends OdmCollectionBackend<TRaw> {
   public collectionName = this.className
 
-  /** Reads happen only against this one; it's also the one whose promise/errors callers see. */
-  private primary: OdmCollectionBackend<TRaw>
-  /** Written to on every save/delete, and backfilled with everything read from `primary`. */
-  private secondaries: OdmCollectionBackend<TRaw>[]
+  /** Supabase, Neon, and Mongo - all equal, no distinguished "source of truth". */
+  private peers: OdmCollectionBackend<TRaw>[]
 
-  // A full-collection load can stream thousands of items in one burst - without a cap,
-  // one fetch() per secondary per item exhausts the browser's connection pool
+  // A full-collection load / backfill replication can burst many writes at once - without a cap,
+  // one fetch() per peer per item exhausts the browser's connection pool
   // (net::ERR_INSUFFICIENT_RESOURCES) and writes past that point just fail.
   private replicationLimiter = new ConcurrencyLimiter(6)
+
+  private backfillSource: OdmCollectionBackend<TRaw>
 
   constructor(
     injector: Injector,
@@ -24,26 +24,72 @@ export class FanoutOdmCollectionBackend<TRaw> extends OdmCollectionBackend<TRaw>
     public readonly opts: { dontStoreVersionHistory: boolean },
   ) {
     super(injector, className, fanoutBackend)
-    this.primary = fanoutBackend.primaryBackend.createCollectionBackend<TRaw>(injector, className, opts)
-    // Secondaries are best-effort mirrors - Firestore staying the primary is what the user's
-    // save actually depends on, so a Supabase/Neon hiccup shouldn't pop a window.alert().
-    const secondaryOpts = {...opts, silentErrors: true}
-    this.secondaries = fanoutBackend.secondaryBackends.map(backend =>
-      backend.createCollectionBackend<TRaw>(injector, className, secondaryOpts)
+    // A single peer's own failure shouldn't pop a window.alert() for the user - saveNowToDb()
+    // below already aggregates all three into one promise/error the caller does see.
+    const peerOpts = {...opts, silentErrors: true}
+    this.peers = fanoutBackend.peerBackends.map(backend =>
+      backend.createCollectionBackend<TRaw>(injector, className, peerOpts)
     )
+    this.backfillSource = fanoutBackend.backfillSourceBackend.createCollectionBackend<TRaw>(injector, className, peerOpts)
+    this.backfillFromSupabase()
   }
 
+  /** One-time historical backfill: pages through every existing item this collection already has
+   * in Supabase (the pre-fanout source of truth) and writes each one straight into the other
+   * peers, so Neon/Mongo start out equivalent to Supabase instead of empty. Runs automatically
+   * the first time this collection is constructed (mirrors how OdmService2 already auto-loads a
+   * collection's data on construction) and is a no-op on every run after the first, tracked via a
+   * localStorage flag per collection - there's a single user (this app has no multi-tenancy), so
+   * one browser completing this once is enough to cover all the data that will ever need it. */
+  private async backfillFromSupabase(): Promise<void> {
+    if (typeof localStorage === 'undefined') return
+    const flagKey = `fanoutBackfilled_${this.collectionName}`
+    if (localStorage.getItem(flagKey) === 'true') return
+
+    try {
+      await this.waitUntilReady()
+      const targets = this.peers.filter(peer => peer !== this.backfillSource)
+      const pageSize = 1000
+      for (let offset = 0; ; offset += pageSize) {
+        const page = await this.fetchBackfillPage(offset, pageSize)
+        for (const {id, data} of page) {
+          for (const target of targets) {
+            this.replicationLimiter.run(() => target.saveNowToDb(data, id as ItemId)).catch(() => undefined)
+          }
+        }
+        if (page.length < pageSize) break
+      }
+      localStorage.setItem(flagKey, 'true')
+    } catch (error) {
+      console.error('[Fanout ODM] backfillFromSupabase failed', 'collectionName', this.collectionName, error)
+    }
+  }
+
+  private fetchBackfillPage(offset: number, limit: number): Promise<Array<{id: OdmItemId<TRaw>, data: TRaw}>> {
+    return new Promise(resolve => {
+      const items: Array<{id: OdmItemId<TRaw>, data: TRaw}> = []
+      this.backfillSource.setListener(
+        {
+          onAdded: (id, data) => items.push({id, data}),
+          onModified: (id, data) => items.push({id, data}),
+          onRemoved: () => undefined,
+          onFinishedProcessingChangeSet: () => resolve(items),
+        },
+        {comments: 'fanout backfill page', limit, offset, fromLocalCache: false, oneTimeGet: true},
+        () => undefined,
+      )
+    })
+  }
+
+  /** Waits for every peer to confirm before resolving - a save is only "done" once Supabase,
+   * Neon, and Mongo have all persisted it. Slower than racing, but no peer can silently miss a
+   * write the others accepted. */
   saveNowToDb(item: TRaw, id: ItemId, parentIds?: ItemId[], ancestorIds?: ItemId[], changedFieldsOnly?: Partial<TRaw>): Promise<any> {
-    this.replicateToSecondaries(item, id, parentIds, ancestorIds, changedFieldsOnly)
-    return this.primary.saveNowToDb(item, id, parentIds, ancestorIds, changedFieldsOnly)
+    return Promise.all(this.peers.map(peer => peer.saveNowToDb(item, id, parentIds, ancestorIds, changedFieldsOnly)))
   }
 
   deleteWithoutConfirmation(itemId: OdmItemId): Promise<any> {
-    for (const secondary of this.secondaries) {
-      // Secondaries already log their own failures (silentErrors) - nothing more to do here.
-      this.replicationLimiter.run(() => secondary.deleteWithoutConfirmation(itemId)).catch(() => undefined)
-    }
-    return this.primary.deleteWithoutConfirmation(itemId)
+    return Promise.all(this.peers.map(peer => peer.deleteWithoutConfirmation(itemId)))
   }
 
   override setListener(
@@ -52,48 +98,85 @@ export class FanoutOdmCollectionBackend<TRaw> extends OdmCollectionBackend<TRaw>
     callback: () => void,
   ): void {
     super.setListener(listener, queryOpts, callback)
-    this.primary.setListener(this.wrapListenerWithReplication(listener), queryOpts, callback)
+    this.raceQuery(listener, (peer, wrapped) => peer.setListener(wrapped, queryOpts, callback))
   }
 
   loadChildrenOf(parentId: ItemId, listener: OdmCollectionBackendListener<TRaw>): void {
-    this.primary.loadChildrenOf(parentId, this.wrapListenerWithReplication(listener))
+    this.raceQuery(listener, (peer, wrapped) => peer.loadChildrenOf(parentId, wrapped))
   }
 
   loadTreeDescendantsOf(ancestorId: ItemId, listener: OdmCollectionBackendListener<TRaw>): void {
-    this.primary.loadTreeDescendantsOf(ancestorId, this.wrapListenerWithReplication(listener))
+    this.raceQuery(listener, (peer, wrapped) => peer.loadTreeDescendantsOf(ancestorId, wrapped))
   }
 
-  /** Mirrors every item read from `primary` into the secondary backends, so historical data
-   * gets backfilled into Postgres just by being loaded, on top of the write-time fanout. */
-  private wrapListenerWithReplication(
+  /** Queries every peer at once. Whichever peer's change-set finishes first "wins" the race for
+   * this query - its items are forwarded to the real listener (and backfilled into the other
+   * peers, catching any drift). Peers that lose the race keep running (their own polling, if any,
+   * isn't cancelled - the interfaces here don't expose a way to stop mid-flight), but their data is
+   * never forwarded to the caller, since a fast-but-partial response from a peer still catching up
+   * must never shadow a slower-but-complete one.
+   *
+   * The one case that invariant alone doesn't cover: a peer that responds fast because it's
+   * *empty* (e.g. Neon/Mongo before their one-time backfillFromSupabase() finishes) rather than
+   * because it's genuinely caught up. A literal first-response-wins race would let that empty
+   * result "win" and shadow Supabase's real data arriving moments later. So an empty change-set
+   * only wins once *every* peer has independently reported empty - real data from any peer always
+   * preempts that, no matter how many peers already finished empty-handed. */
+  private raceQuery(
     listener: OdmCollectionBackendListener<TRaw, OdmItemId<TRaw>>,
-  ): OdmCollectionBackendListener<TRaw, OdmItemId<TRaw>> {
-    return {
-      onAdded: (id, data) => {
-        this.replicateToSecondaries(data, id)
-        listener.onAdded(id, data)
-      },
-      onModified: (id, data) => {
-        this.replicateToSecondaries(data, id)
-        listener.onModified(id, data)
-      },
-      onRemoved: id => listener.onRemoved(id),
-      onFinishedProcessingChangeSet: () => listener.onFinishedProcessingChangeSet(),
+    attach: (peer: OdmCollectionBackend<TRaw>, wrapped: OdmCollectionBackendListener<TRaw, OdmItemId<TRaw>>) => void,
+  ): void {
+    let winner: OdmCollectionBackend<TRaw> | null = null
+    const emptyFinishers = new Set<OdmCollectionBackend<TRaw>>()
+
+    const declareEmptyWinnerIfUnanimous = () => {
+      if (winner === null && emptyFinishers.size === this.peers.length) {
+        winner = this.peers[0] // arbitrary - every peer agrees there's nothing to show
+        listener.onFinishedProcessingChangeSet()
+      }
+    }
+
+    for (const peer of this.peers) {
+      const wrapped: OdmCollectionBackendListener<TRaw, OdmItemId<TRaw>> = {
+        onAdded: (id, data) => {
+          winner ??= peer
+          if (winner !== peer) return
+          this.replicateToOtherPeers(peer, data, id)
+          listener.onAdded(id, data)
+        },
+        onModified: (id, data) => {
+          winner ??= peer
+          if (winner !== peer) return
+          this.replicateToOtherPeers(peer, data, id)
+          listener.onModified(id, data)
+        },
+        onRemoved: id => {
+          if (winner !== peer) return
+          listener.onRemoved(id)
+        },
+        onFinishedProcessingChangeSet: () => {
+          if (winner === peer) {
+            listener.onFinishedProcessingChangeSet()
+            return
+          }
+          if (winner !== null) return // another peer already won with real data
+          emptyFinishers.add(peer)
+          declareEmptyWinnerIfUnanimous()
+        },
+      }
+      attach(peer, wrapped)
     }
   }
 
-  private replicateToSecondaries(
+  private replicateToOtherPeers(
+    winnerPeer: OdmCollectionBackend<TRaw>,
     item: TRaw,
     id: ItemId | OdmItemId<TRaw>,
-    parentIds?: ItemId[],
-    ancestorIds?: ItemId[],
-    changedFieldsOnly?: Partial<TRaw>,
   ): void {
-    for (const secondary of this.secondaries) {
-      // Secondaries already log their own failures (silentErrors) - nothing more to do here.
-      this.replicationLimiter
-        .run(() => secondary.saveNowToDb(item, id as ItemId, parentIds, ancestorIds, changedFieldsOnly))
-        .catch(() => undefined)
+    for (const peer of this.peers) {
+      if (peer === winnerPeer) continue
+      // Other peers already log their own failures (silentErrors) - nothing more to do here.
+      this.replicationLimiter.run(() => peer.saveNowToDb(item, id as ItemId)).catch(() => undefined)
     }
   }
 }

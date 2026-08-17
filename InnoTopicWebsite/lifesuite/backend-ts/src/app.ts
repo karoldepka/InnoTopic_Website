@@ -7,6 +7,7 @@ import { qaImageRouter } from './routes/qa-image.js';
 import { quizRouter } from './routes/quiz.js';
 import { copilotRouter } from './routes/copilotkit.js';
 import { odmRouter } from './routes/odm.js';
+import { odmMongoRouter } from './routes/odm-mongo.js';
 import { transcribeRouter } from './routes/transcribe.js';
 import { journalAdviceRouter } from './routes/journal-advice.js';
 import { MODEL_NAME } from './llm.js';
@@ -26,9 +27,18 @@ app.route('/', qaImageRouter);
 app.route('/', quizRouter);
 app.route('/', copilotRouter);
 app.route('/', odmRouter);
+app.route('/', odmMongoRouter);
 app.route('/', transcribeRouter);
 app.route('/', journalAdviceRouter);
 
 app.get('/health', c => c.json({ status: 'ok' }));
 app.get('/ai-api/health', c => c.json({ status: 'ok' }));
 app.get('/ai-api/model', c => c.json({ model: MODEL_NAME }));
+
+/** Vercel's zero-config Hono support (docs: vercel.com/docs/frameworks/backend/hono) looks for a
+ * default export of the app itself at src/app.ts (among other conventional paths) and turns it
+ * into a Vercel Function directly - no hono/vercel handle() adapter needed. That adapter is what
+ * api/index.ts used to use, and it's incompatible with Vercel's current Node runtime request shape
+ * (throws `this.raw.headers.get is not a function`), so api/index.ts has been removed in favor of
+ * this. */
+export default app;

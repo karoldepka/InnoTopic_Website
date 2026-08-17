@@ -75,4 +75,14 @@
     <ion-select-option value="fr">Français</ion-select-option>
   </ion-select>
 </ion-item>
+<ion-item lines="none">
+  <ion-button
+    slot="start"
+    [disabled]="syncAllDataTriggered"
+    (click)="onSyncAllDataNow()"
+  >Sync all data now (Supabase → Neon + Mongo)</ion-button>
+  @if (syncAllDataTriggered) {
+    <ion-note slot="end">Started - runs in the background</ion-note>
+  }
+</ion-item>
 <!--Version {{version}}-->

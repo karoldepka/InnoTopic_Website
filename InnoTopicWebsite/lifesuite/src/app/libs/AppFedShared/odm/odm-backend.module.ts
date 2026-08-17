@@ -8,6 +8,7 @@ import {FirestoreOdmBackend} from '../../AppFedSharedFirebase/odm-firestore/fire
 import {SupabaseOdmBackend} from '../../AppFedSharedSupabase/odm-supabase/supabase-odm-backend.service'
 import {SupabaseOdmClientService} from '../../AppFedSharedSupabase/odm-supabase/supabase-odm-client.service'
 import {NeonOdmBackend} from '../../AppFedSharedNeon/odm-neon/neon-odm-backend.service'
+import {MongoOdmBackend} from '../../AppFedSharedMongo/odm-mongo/mongo-odm-backend.service'
 import {FanoutOdmBackend} from '../../AppFedSharedFanout/odm-fanout/FanoutOdmBackend'
 import {CachingOdmBackend} from '../../AppFedSharedFanout/odm-fanout/CachingOdmBackend'
 import {BrowserOdmBackend} from '../../AppFedSharedBrowser/odm-browser/BrowserOdmBackend'
@@ -63,6 +64,7 @@ function resolvePrimaryBackend(injector: Injector, backendName: string): OdmBack
     SupabaseOdmClientService,
     SupabaseOdmBackend,
     NeonOdmBackend,
+    MongoOdmBackend,
     FanoutOdmBackend,
     BrowserOdmBackend,
     {

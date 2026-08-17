@@ -9,7 +9,7 @@ export const environmentBase = {
   collectionNameSuffix: '',
   // collectionNameSuffix: '_DEBUG',
 
-  odmBackend: 'supabase', // 'firestore' reads, mirrored to Supabase+Neon via 'fanout'; or 'firestore'/'supabase'/'neon' alone
+  odmBackend: 'fanout', // 'fanout' races Supabase+Neon+Mongo as equal peers; or 'firestore'/'supabase'/'neon' alone
   authBackend: 'firebase',
 
   // OrYoL (/tree) has been migrated off its standalone Firestore-only data layer onto the
@@ -27,8 +27,14 @@ export const environmentBase = {
   },
 
   neon: {
-    enabled: false, // no server / NEON_DATABASE_URL configured yet; flip on once it is
+    enabled: true, // Neon provisioned via Vercel Marketplace (project purple-tooth-99583291)
     odmApiUrl: 'http://localhost:8000/api/odm',
+    pollIntervalMs: 5000,
+  },
+
+  mongo: {
+    enabled: true, // Atlas cluster0free - see backend-ts/.env MONGODB_URI
+    odmApiUrl: 'http://localhost:8000/api/odm-mongo',
     pollIntervalMs: 5000,
   },
 

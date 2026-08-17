@@ -18,6 +18,7 @@
     "ai": "^6.0.202",
     "dotenv": "^16.4.7",
     "hono": "^4.7.10",
+    "mongodb": "^7.5.0",
     "postgres": "^3.4.5"
   },
   "devDependencies": {

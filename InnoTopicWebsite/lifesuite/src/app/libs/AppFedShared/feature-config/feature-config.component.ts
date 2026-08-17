@@ -1,6 +1,7 @@
 import {Component, Injector, OnInit, ChangeDetectionStrategy} from '@angular/core';
 import {BaseComponent} from '../base/base.component'
 import {FeatureService} from '../feature.service'
+import {OdmFullSyncService} from '../odm/odm-full-sync.service'
 import { IonicModule } from '@ionic/angular';
 import { TranslatePipe } from '@ngx-translate/core';
 // import packageJson from '../../../../package.json'
@@ -14,16 +15,22 @@ import { TranslatePipe } from '@ngx-translate/core';
 })
 export class FeatureConfigComponent extends BaseComponent implements OnInit {
 
-
+  syncAllDataTriggered = false
 
   constructor(
     public featureConfigService: FeatureService,
+    private odmFullSyncService: OdmFullSyncService,
     injector: Injector,
   ) {
     super(injector)
   }
 
   ngOnInit() {}
+
+  onSyncAllDataNow() {
+    this.odmFullSyncService.syncAllKnownCollectionsNow()
+    this.syncAllDataTriggered = true
+  }
 
   get enableAll(): boolean {
     return this.featureConfigService.enableAll
