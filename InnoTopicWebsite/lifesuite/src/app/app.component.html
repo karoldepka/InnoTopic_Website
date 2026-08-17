@@ -2,7 +2,14 @@
 > <!--   (window:beforeunload)="onBeforeUnload()"
   -->
   <ion-split-pane contentId="main-content" when="false">
-    <ion-menu contentId="main-content" type="overlay" [swipeGesture]="false">
+    <ion-menu
+      contentId="main-content"
+      type="overlay"
+      [swipeGesture]="false"
+      (ionWillOpen)="onSideMenuWillOpen()"
+      (ionDidOpen)="sideMenuSearchbar.setFocus()"
+      (ionDidClose)="onSideMenuDidClose()"
+    >
       <ion-header>
         <ion-toolbar>
           <app-app-logo [withText]="true"></app-app-logo>
@@ -10,12 +17,14 @@
       </ion-header>
       <ion-content>
         <ion-searchbar
+          #sideMenuSearchbar
           class="side-menu-search"
           placeholder="Search menu…"
           [debounce]="150"
           showClearButton="always"
           (ionInput)="onSearchChange($any($event).detail.value ?? '')"
           (ionClear)="onSearchChange('')"
+          (keydown.enter)="onSearchEnter()"
         ></ion-searchbar>
 
         @let filteredAppPages = filteredPages(appPages);

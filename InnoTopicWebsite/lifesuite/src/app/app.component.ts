@@ -1,7 +1,7 @@
 import {Component, HostListener, ChangeDetectionStrategy} from '@angular/core';
 import Fuse from 'fuse.js'
 
-import {Platform, PopoverController} from '@ionic/angular';
+import {MenuController, Platform, PopoverController} from '@ionic/angular';
 import {Router} from '@angular/router';
 import { Capacitor } from '@capacitor/core';
 import { SplashScreen } from '@capacitor/splash-screen';
@@ -96,7 +96,7 @@ export class AppComponent {
       icon: 'stats-chart',
       visibleIf: () => g.feat.showExperimental,
     },
-    {title: 'Do tasks', url: '/learn', icon: 'checkbox'},
+    {title: 'Learn & Do', url: '/learn', icon: 'school'},
     {title: 'Write Journal', url: '/journal/write', icon: 'create'},
     {title: 'RETROSPECTIVE', url: '/journal', icon: 'time'},
     {title: 'Check Your progress', url: '/learn/stats', icon: 'podium', visibleIf: () => g.feat.showExperimental},
@@ -116,6 +116,7 @@ export class AppComponent {
     public optionsService: OptionsService,
     public popoverController: PopoverController,
     private router: Router,
+    private menuCtrl: MenuController,
   ) {
     this.initializeApp();
   }
@@ -138,6 +139,21 @@ export class AppComponent {
       this.setupOptionsHandler()
       console.log('initializeApp ...')
     });
+  }
+
+  /** Whatever had focus right before the side menu opened (e.g. a page's own input/button) -
+   * restored on close so opening the menu, searching, and dismissing it without picking anything
+   * doesn't strand focus on a now-hidden search field. Captured on ionWillOpen (before Ionic moves
+   * focus into the menu itself) rather than ionDidOpen. */
+  private elementFocusedBeforeSideMenuOpened: HTMLElement | null = null
+
+  onSideMenuWillOpen(): void {
+    this.elementFocusedBeforeSideMenuOpened = document.activeElement instanceof HTMLElement ? document.activeElement : null
+  }
+
+  onSideMenuDidClose(): void {
+    this.elementFocusedBeforeSideMenuOpened?.focus()
+    this.elementFocusedBeforeSideMenuOpened = null
   }
 
   /** Side-menu search box (title-only, no MRU ranking - unlike WhatNextPage's own
@@ -174,6 +190,23 @@ export class AppComponent {
    * action-only branch. */
   go(page: SideMenuPage): void {
     page.action?.()
+  }
+
+  /** Enter in the search box jumps straight to the top result (appPages ranked before morePages,
+   * same top-to-bottom order they're rendered in) - same "just hit enter" convenience as a
+   * command palette, instead of having to reach for the mouse once the list is down to one match.
+   * Bypasses ion-menu-toggle's click-based close (Enter never fires a click on the item), so the
+   * menu is closed here explicitly instead. */
+  onSearchEnter(): void {
+    const first = this.filteredPages(this.appPages)[0] ?? this.filteredPages(this.morePages)[0]
+    if (!first) {
+      return
+    }
+    this.go(first)
+    if (first.url) {
+      this.router.navigateByUrl(first.url)
+    }
+    this.menuCtrl.close()
   }
 
   private setupOptionsHandler() {
