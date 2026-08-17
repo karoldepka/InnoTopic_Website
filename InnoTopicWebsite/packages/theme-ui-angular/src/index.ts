@@ -16,6 +16,10 @@ export {
   colorDistance,
   MIN_UI_CONTRAST,
   MIN_COLOR_DISTANCE,
+  hueDistanceDegrees,
+  simulateColorBlindness,
+  hasSimilarHue,
+  MIN_HUE_DISTANCE_DEGREES,
   curatedThemes,
   themePresets,
 } from '@innotopic/theme-ui';

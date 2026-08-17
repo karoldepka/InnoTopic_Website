@@ -1,3 +1,5 @@
+import {toHsl, toRgb} from './adjust-luminance';
+
 // Ported verbatim from the Angular app's src/app/utils/colors/colorUtils.ts (already zero
 // framework dependency there).
 export function hexToRgb(hex: string): string {
@@ -151,5 +153,100 @@ export function colorDistance(hexA: string, hexB: string): number {
     Math.pow(labA[0] - labB[0], 2) +
     Math.pow(labA[1] - labB[1], 2) +
     Math.pow(labA[2] - labB[2], 2)
+  );
+}
+
+/** Below near-zero saturation a color reads as a neutral gray/muted tone, not "some hue" - its
+ * computed hue angle is numerically arbitrary noise (toHsl() falls back to 0/red whenever
+ * max===min) rather than anything a viewer actually perceives. hasSimilarHue() treats a color
+ * this desaturated as automatically hue-distinct from everything, since a gray-vs-saturated pair
+ * (e.g. curated-themes.ts's muted '#6c757d' secondaries) is already visually obvious without
+ * comparing hue angles at all. */
+const NEAR_GRAY_SATURATION = 0.15;
+
+function hueDegrees(hex: string): number | null {
+  const [h, s] = toHsl(toRgb(hex));
+  return s < NEAR_GRAY_SATURATION ? null : h * 360;
+}
+
+/** Circular distance between two hues in degrees (0 = identical hue, 180 = opposite hue) -
+ * ignores saturation/lightness entirely, unlike colorDistance()'s full perceptual deltaE. Null if
+ * either color is a near-gray with no meaningful hue (see NEAR_GRAY_SATURATION). */
+export function hueDistanceDegrees(hexA: string, hexB: string): number | null {
+  const hueA = hueDegrees(hexA);
+  const hueB = hueDegrees(hexB);
+  if (hueA === null || hueB === null) {
+    return null;
+  }
+  const diff = Math.abs(hueA - hueB) % 360;
+  return diff > 180 ? 360 - diff : diff;
+}
+
+export type ColorBlindnessType = 'protanopia' | 'deuteranopia' | 'tritanopia';
+
+/** Simplified whole-population simulation matrices (the same approximation used by widely-used
+ * colorblindness-simulation tools/browser extensions) for the three common dichromacy types -
+ * protanopia/deuteranopia (the ~8% of men with red-green colorblindness) and the much rarer
+ * tritanopia (blue-yellow). Applied directly in sRGB space rather than full LMS cone space: good
+ * enough to answer "would these two theme colors still look different to this viewer", not
+ * intended as a scientifically exact rendering. */
+const COLOR_BLINDNESS_MATRICES: Record<ColorBlindnessType, [RGB, RGB, RGB]> = {
+  protanopia: [
+    [0.567, 0.433, 0],
+    [0.558, 0.442, 0],
+    [0, 0.242, 0.758],
+  ],
+  deuteranopia: [
+    [0.625, 0.375, 0],
+    [0.7, 0.3, 0],
+    [0, 0.3, 0.7],
+  ],
+  tritanopia: [
+    [0.95, 0.05, 0],
+    [0, 0.433, 0.567],
+    [0, 0.475, 0.525],
+  ],
+};
+
+export function simulateColorBlindness(hex: string, type: ColorBlindnessType): string {
+  const [r, g, b] = getRgbColorFromHex(hex);
+  const matrix = COLOR_BLINDNESS_MATRICES[type];
+  const clampToHex = (v: number) => Math.max(0, Math.min(255, Math.round(v))).toString(16).padStart(2, '0');
+  const [rr, gg, bb] = matrix.map(([mr, mg, mb]) => mr * r + mg * g + mb * b);
+  return `#${clampToHex(rr)}${clampToHex(gg)}${clampToHex(bb)}`;
+}
+
+const COLOR_BLINDNESS_TYPES: ColorBlindnessType[] = ['protanopia', 'deuteranopia', 'tritanopia'];
+
+/** Hue pairs closer than this read as "the same hue" at a glance - analogous colors (e.g.
+ * orange/red) rather than genuinely distinct ones. Deliberately independent of MIN_COLOR_DISTANCE
+ * above: two colors can fail this while easily passing colorDistance() (same hue, very different
+ * lightness still reads as "the same color family" even though the deltaE is large), and two
+ * colors can pass this while nominally failing colorDistance() (very different hue at matched
+ * lightness/saturation - a real design choice, not a bug). */
+export const MIN_HUE_DISTANCE_DEGREES = 30;
+
+/** True if primary/secondary would read as the same hue to someone with ordinary color vision, or
+ * as the same overall color to someone with any of the three common forms of color blindness.
+ * Saturation and lightness are deliberately not factored into the *ordinary-vision* half of this
+ * (colorDistance()/contrastRatio() above already cover those) - a pair can share both and still be
+ * fine there, as long as the hue itself is distinguishable. A near-gray color (see
+ * NEAR_GRAY_SATURATION) is never "similar hue" to anything under ordinary vision, since it's
+ * already visually distinguishable by its grayness alone.
+ *
+ * The *simulated-vision* half can't reuse that same hue-only logic, though: colorblind simulation
+ * works by desaturating certain hues toward each other, so two genuinely different source colors
+ * (e.g. a red and a green) commonly both collapse toward the *same* dull, low-saturation
+ * brownish-gray - which is precisely the classic red-green confusion, not a pair that happens to
+ * both be exempt near-grays. colorDistance()'s full perceptual deltaE catches that correctly
+ * (it scores two colors that both faded to a similar dull tone as close, regardless of whether
+ * either individually reads as "gray"), so that's what's used per-simulation instead. */
+export function hasSimilarHue(hexA: string, hexB: string, minDegrees = MIN_HUE_DISTANCE_DEGREES): boolean {
+  const rawDistance = hueDistanceDegrees(hexA, hexB);
+  if (rawDistance !== null && rawDistance < minDegrees) {
+    return true;
+  }
+  return COLOR_BLINDNESS_TYPES.some(type =>
+    colorDistance(simulateColorBlindness(hexA, type), simulateColorBlindness(hexB, type)) < MIN_COLOR_DISTANCE
   );
 }

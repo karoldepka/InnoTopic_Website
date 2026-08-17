@@ -1,5 +1,5 @@
 import {describe, it, expect} from 'vitest'
-import {themePresets, shadeColor, contrastRatio, colorDistance, MIN_UI_CONTRAST, MIN_COLOR_DISTANCE} from '@innotopic/theme-ui-angular'
+import {themePresets, shadeColor, contrastRatio, colorDistance, hasSimilarHue, MIN_UI_CONTRAST, MIN_COLOR_DISTANCE} from '@innotopic/theme-ui-angular'
 
 /** GH: two hand-authored presets (Ocean Midnight/Ocean Light's old cyan-on-blue secondary, Yellow
  * Midnight's old orange-on-yellow secondary) shipped with a primary/secondary that read as the
@@ -59,6 +59,31 @@ describe('theme preset primary/secondary distinctness', () => {
 
     it(`"${theme.name}": primary and secondary are visually distinct from each other`, () => {
       expect(colorDistance(theme.config.ion_color_primary, theme.config.ion_color_secondary)).toBeGreaterThanOrEqual(MIN_COLOR_DISTANCE)
+    })
+  }
+})
+
+/** "the themes cannot have a similar primary&secondary color, taking into account color-
+ * blindness - same saturation and lightness are ok" - a stricter, narrower check than
+ * colorDistance() above: two colors can share saturation/lightness entirely and still pass here,
+ * as long as their hue is far enough apart, from both ordinary vision and each of the three common
+ * forms of color blindness (hasSimilarHue() checks all four). colorDistance() alone doesn't catch
+ * this - a same-hue pair at very different lightness (e.g. a dark red primary next to a light pink
+ * secondary) can score a large deltaE while still reading as "the same color family", which is
+ * exactly the case a colorblind viewer is least able to tell apart by lightness alone. */
+describe('theme preset primary/secondary hue distinctness (colorblind-aware)', () => {
+  for (const theme of presetsUnderTest) {
+    if (theme.disabled) {
+      continue
+    }
+    // Same reasoning/precedent as the distinctness describe() above - deliberately near-
+    // monochrome by design, not a bug.
+    if (theme.name === 'Neumorphism') {
+      continue
+    }
+
+    it(`"${theme.name}": primary and secondary are not a similar hue`, () => {
+      expect(hasSimilarHue(theme.config.ion_color_primary, theme.config.ion_color_secondary)).toBe(false)
     })
   }
 })

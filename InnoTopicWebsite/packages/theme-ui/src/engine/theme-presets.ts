@@ -85,7 +85,7 @@ export const themePresets: ThemePreset[] = [
   }),
   preset('Classic Dark', 'dark', {
     ion_color_primary: '#4dabf7',
-    ion_color_secondary: '#adb5bd',
+    ion_color_secondary: '#bdadbb',
     ion_background_color: '#1a1a1a',
   }),
   preset('Sunny Yellow', 'light', {

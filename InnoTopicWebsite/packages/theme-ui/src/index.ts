@@ -26,5 +26,9 @@ export {
   colorDistance,
   MIN_UI_CONTRAST,
   MIN_COLOR_DISTANCE,
+  hueDistanceDegrees,
+  simulateColorBlindness,
+  hasSimilarHue,
+  MIN_HUE_DISTANCE_DEGREES,
 } from './engine/color-utils'
-export type { RGB } from './engine/color-utils'
+export type { RGB, ColorBlindnessType } from './engine/color-utils'

@@ -78,13 +78,13 @@ export const curatedThemes: ThemePreset[] = [
     comment: 'Jellies',
     background: '#180808',
     primary: '#c72323',
-    secondary: '#b68001',
+    secondary: '#01b622',
   }),
   curatedTheme('Forest and black', {
     comment: 'Greens and browns',
     background: '#543c1c',
     primary: '#000000',
-    secondary: '#00d501',
+    secondary: '#78d500',
     experimental: true,
     excludeFromRandom: true,
   }),
@@ -104,7 +104,7 @@ export const curatedThemes: ThemePreset[] = [
   curatedTheme('Forest, strawberries, lemons', {
     background: '#2a1e0e',
     primary: '#ff161e',
-    secondary: '#878300',
+    secondary: '#008783',
   }),
   curatedTheme('Forest, strawberries, blueberries', {
     background: '#2a1e0e',
@@ -115,7 +115,7 @@ export const curatedThemes: ThemePreset[] = [
     comment: 'Jellies',
     background: '#000080',
     primary: '#47973f',
-    secondary: '#b68001',
+    secondary: '#b68301',
   }),
   curatedTheme('Dark Green Bg, Agrest', {
     comment: 'Jellies',
@@ -127,16 +127,16 @@ export const curatedThemes: ThemePreset[] = [
     comment: 'Jellies',
     experimental: true,
     primary: '#ffff00',
-    secondary: '#ffa500',
+    secondary: '#52ff00',
   }),
   curatedTheme('Gray Green', {
     comment: 'Jellies',
     primary: '#6e6e6e',
-    secondary: '#007e00',
+    secondary: '#7e6d00',
   }),
   curatedTheme('Dark Gray and yellow', {
     primary: '#686868',
-    secondary: '#65b600',
+    secondary: '#b6b500',
   }),
   curatedTheme('Dark Gray and blue', {
     primary: '#686868',
@@ -145,19 +145,19 @@ export const curatedThemes: ThemePreset[] = [
   curatedTheme('Dark Gray and purplish', {
     comment: 'Beetroot',
     primary: '#686868',
-    secondary: '#c50077',
+    secondary: '#c53700',
   }),
   curatedTheme('Salmon-Green', {
     primary: '#FA8072',
-    secondary: '#007e00',
+    secondary: '#007e02',
   }),
   curatedTheme('RosyBrown-Green', {
     primary: '#BC8F8F',
-    secondary: '#007e00',
+    secondary: '#007e02',
   }),
   curatedTheme('Fire', {
     primary: '#e8303a',
-    secondary: '#e1b74d',
+    secondary: '#e14dba',
   }),
   curatedTheme('Sunny Yellow', {
     comment: 'Bright background',
@@ -170,7 +170,7 @@ export const curatedThemes: ThemePreset[] = [
     comment: 'Bright background',
     background: '#f7c6d9',
     primary: '#7a1f3d',
-    secondary: '#3f7d20',
+    secondary: '#207d74',
     experimental: true,
   }),
   curatedTheme('Arctic Ice', {
@@ -193,7 +193,7 @@ export const curatedThemes: ThemePreset[] = [
   curatedTheme('Autumn Maple', {
     background: '#3b2412',
     primary: '#dd651b',
-    secondary: '#e8b923',
+    secondary: '#23e82c',
   }),
   curatedTheme('Mint Chocolate', {
     background: '#241a14',
@@ -203,7 +203,7 @@ export const curatedThemes: ThemePreset[] = [
   curatedTheme('Midnight Rose', {
     background: '#1a0d14',
     primary: '#e0218a',
-    secondary: '#d4af37',
+    secondary: '#37d4a5',
   }),
   curatedTheme('Volcanic', {
     background: '#1c1c1c',
@@ -213,7 +213,7 @@ export const curatedThemes: ThemePreset[] = [
   curatedTheme('Citrus Grove', {
     background: '#2b3a1e',
     primary: '#9acd32',
-    secondary: '#ff8c00',
+    secondary: '#00ff33',
   }),
   curatedTheme('Peach Sorbet', {
     comment: 'Bright background',
@@ -247,7 +247,7 @@ export const curatedThemes: ThemePreset[] = [
     comment: 'Bright background',
     background: '#f6dfe6',
     primary: '#7a123f',
-    secondary: '#1d5c1d',
+    secondary: '#1d3b5c',
     experimental: true,
   }),
   curatedTheme('Sky Linen', {
@@ -261,7 +261,7 @@ export const curatedThemes: ThemePreset[] = [
     comment: 'Bright background',
     background: '#e2f2d9',
     primary: '#274d0e',
-    secondary: '#7a1050',
+    secondary: '#10777a',
     experimental: true,
   }),
   curatedTheme('Coral Sands', {
@@ -296,7 +296,7 @@ export const curatedThemes: ThemePreset[] = [
     comment: 'Bright background',
     background: '#dff2e9',
     primary: '#0d4d2f',
-    secondary: '#5c0d4d',
+    secondary: '#5c270d',
     experimental: true,
   }),
   curatedTheme('Deep Sea', {
@@ -307,7 +307,7 @@ export const curatedThemes: ThemePreset[] = [
   curatedTheme('Plum Ember', {
     background: '#241016',
     primary: '#e0507a',
-    secondary: '#e8b923',
+    secondary: '#23e87e',
   }),
   curatedTheme('Slate Storm', {
     background: '#1c2229',
@@ -316,7 +316,7 @@ export const curatedThemes: ThemePreset[] = [
   }),
   curatedTheme('Charcoal Lime', {
     primary: '#7ed321',
-    secondary: '#e0217a',
+    secondary: '#2164e0',
   }),
   curatedTheme('Rustic Copper', {
     background: '#2b1a10',
@@ -331,7 +331,7 @@ export const curatedThemes: ThemePreset[] = [
   curatedTheme('Blackberry Fizz', {
     background: '#1a0f22',
     primary: '#a239ca',
-    secondary: '#3ad6b0',
+    secondary: '#d6843a',
   }),
   curatedTheme('Graphite Amber', {
     primary: '#e0a010',
