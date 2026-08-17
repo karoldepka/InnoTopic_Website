@@ -490,7 +490,18 @@ export class RichTextEditComponent extends AbstractCellComponent implements OnIn
       entity_encoding: `raw`,
       /** https://www.tiny.cloud/docs/configure/content-filtering/#valid_classes */
       valid_classes: richTextEditCommon.valid_classes,
-      content_style: 'img[data-original-blob-id] { cursor: zoom-in; } '
+      // CRITICAL: `inline: true` (see rich-text-edit.component.html) means this editor sits
+      // directly on the surrounding page's own background, not inside its own iframe/chrome - but
+      // the 'oxide-dark' skin above still ships a hardcoded light/white default text+caret color
+      // for its content area, sized for a dark editor chrome. Since this app randomizes between
+      // light and dark themes on every visit (app.component.ts's applyRandomTheme()), that default
+      // goes invisible - white text and a white cursor on whatever light theme happened to be
+      // picked. Forcing both onto the same --ion-text-color the rest of the app already keeps
+      // correctly contrasted against the live background (see apply-theme.ts's getIonicTextColor())
+      // fixes it for every theme, light or dark, without needing to sync TinyMCE's skin choice to
+      // the current theme at all.
+      content_style: 'img[data-original-blob-id] { cursor: zoom-in; } ' +
+        '[contenteditable] { color: var(--ion-text-color); caret-color: var(--ion-text-color); } '
       // '[contenteditable] { padding-left: 5px; } ' +
       // // '[contenteditable] ul { padding-inline-start: 1rem; } ' +
       // // '[contenteditable] li { padding-top: 6px; } ' +

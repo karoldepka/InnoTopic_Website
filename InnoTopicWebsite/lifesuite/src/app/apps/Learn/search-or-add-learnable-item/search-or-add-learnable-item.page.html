@@ -194,7 +194,7 @@
         <!-- GH #66: authUser$ starts unemitted (neither a user nor confirmed-logged-out) until
           the first real auth signal arrives - showing the login prompt during that gap wrongly
           implied the user was logged out before auth was even checked. -->
-        <p *ngIf="! authService.authUser$.hasEmitted">{{ 'AUTH.AUTHENTICATING' | translate }}</p>
+        <p class="auth-loading" *ngIf="! authService.authUser$.hasEmitted">{{ 'AUTH.AUTHENTICATING' | translate }}</p>
 
         <ng-container *ngIf="authService.authUser$.hasEmitted">
           <div class="login-prompt">

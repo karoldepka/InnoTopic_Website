@@ -67,6 +67,10 @@
   white-space: nowrap;
 }
 
+.auth-loading {
+  padding: var(--space-2-5);
+}
+
 .login-prompt {
   display: flex;
   align-items: center;
