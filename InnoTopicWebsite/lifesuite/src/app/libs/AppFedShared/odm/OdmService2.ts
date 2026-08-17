@@ -204,9 +204,11 @@ export abstract class OdmService2<
   }
 
   deleteWithoutConfirmationById(itemId: TItemId) {
+    const destination = this.odmBackendFactory.describeSaveDestination()
+    const destinationSuffix = destination ? ` → ${destination}` : ''
     this.syncStatusService.handleSavingPromise(
       this.odmCollectionBackend.deleteWithoutConfirmation(itemId),
-      `Deleting ${this.className} "${itemId}"`,
+      `Deleting ${this.className} "${itemId}"${destinationSuffix}`,
     )
   }
 
@@ -231,7 +233,13 @@ export abstract class OdmService2<
       )
       promise.then(() => itemToSave.onDbWriteResolved(pendingSnapshot), () => {})
       const title = (itemToSave.val as any)?.title ?? (itemToSave.val as any)?.name ?? itemToSave.id
-      this.syncStatusService.handleSavingPromise(promise, `Saving ${this.className} "${title}"`)
+      // '' for a single-destination backend (Supabase alone, say) - naming the one destination
+      // would be redundant noise. Non-empty for fanout ("Supabase, Neon, Mongo, Surreal"), so the
+      // sync popover's "Saving..." entry actually shows which databases this save is waiting on,
+      // instead of one opaque line that gives no hint several backends are involved.
+      const destination = this.odmBackendFactory.describeSaveDestination()
+      const destinationSuffix = destination ? ` → ${destination}` : ''
+      this.syncStatusService.handleSavingPromise(promise, `Saving ${this.className} "${title}"${destinationSuffix}`)
     // }, 10000)
   }
 

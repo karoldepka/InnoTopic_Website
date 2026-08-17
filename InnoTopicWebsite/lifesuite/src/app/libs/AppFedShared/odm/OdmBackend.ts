@@ -30,6 +30,15 @@ export abstract class OdmBackend {
     opts: {dontStoreVersionHistory: boolean}
   ): OdmCollectionBackend<TRaw>
 
+  /** Human-readable list of where a save actually goes (e.g. "Supabase, Neon, Mongo, Surreal" for
+   * the fanout backend) - '' for a single-destination backend, where naming it would be redundant
+   * with the "Saving X" text it's appended to. Lets the sync-status popover show which databases a
+   * pending upload is actually waiting on, instead of one opaque "Saving..." entry that gives no
+   * indication several backends are involved (see FanoutOdmBackend's override). */
+  describeSaveDestination(): string {
+    return ''
+  }
+
   static nowTimestamp() {
     return Timestamp.now()
   }

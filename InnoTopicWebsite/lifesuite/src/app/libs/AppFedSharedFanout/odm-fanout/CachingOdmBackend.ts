@@ -27,4 +27,8 @@ export class CachingOdmBackend extends OdmBackend {
   ): CachingOdmCollectionBackend<any> {
     return new CachingOdmCollectionBackend<T>(injector, className, this, opts)
   }
+
+  override describeSaveDestination(): string {
+    return this.primaryBackend.describeSaveDestination()
+  }
 }

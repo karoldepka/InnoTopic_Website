@@ -32,6 +32,10 @@ import {environment} from '../../../../environments/environment'
 @Injectable()
 export class FanoutOdmBackend extends OdmBackend {
   readonly peerBackends: OdmBackend[]
+  /** Parallel to peerBackends - human-readable names for describeSaveDestination() below, since
+   * OdmBackend itself carries no display name. Built from the same enabled-flag conditionals so
+   * the two arrays can never drift out of sync with each other. */
+  private readonly peerNames: string[]
   /** Supabase - already holds the full history, so it's the one-time backfill source for every
    * other peer. Kept as an explicit reference rather than relying on peerBackends[0]'s order. */
   readonly backfillSourceBackend: OdmBackend
@@ -45,12 +49,14 @@ export class FanoutOdmBackend extends OdmBackend {
   ) {
     super(injector)
     const env = environment as any
-    this.peerBackends = [
-      supabaseOdmBackend,
-      ...(env.neon?.enabled ?? true ? [neonOdmBackend] : []),
-      ...(env.mongo?.enabled ?? true ? [mongoOdmBackend] : []),
-      ...(env.surreal?.enabled ?? true ? [surrealOdmBackend] : []),
+    const enabledPeers: Array<readonly [OdmBackend, string]> = [
+      [supabaseOdmBackend, 'Supabase'],
+      ...(env.neon?.enabled ?? true ? [[neonOdmBackend, 'Neon']] as const : []),
+      ...(env.mongo?.enabled ?? true ? [[mongoOdmBackend, 'Mongo']] as const : []),
+      ...(env.surreal?.enabled ?? true ? [[surrealOdmBackend, 'Surreal']] as const : []),
     ]
+    this.peerBackends = enabledPeers.map(([backend]) => backend)
+    this.peerNames = enabledPeers.map(([, name]) => name)
     this.backfillSourceBackend = supabaseOdmBackend
     this.initDb()
   }
@@ -61,6 +67,10 @@ export class FanoutOdmBackend extends OdmBackend {
     opts: { dontStoreVersionHistory: boolean },
   ): FanoutOdmCollectionBackend<any> {
     return new FanoutOdmCollectionBackend<T>(injector, className, this, opts)
+  }
+
+  override describeSaveDestination(): string {
+    return this.peerNames.join(', ')
   }
 
   protected initDb() {
