@@ -42,6 +42,7 @@
     <button
       type="button"
       class="slot-cell slot-cell--compact slot-pill"
+      [class.slot-cell--exiting]="exitingCompactSlotIds.has(entry.descriptor.id)"
       [attr.data-descriptor-id]="entry.descriptor.id"
       (click)="expandCompactCell(entry.descriptor.id)"
     >

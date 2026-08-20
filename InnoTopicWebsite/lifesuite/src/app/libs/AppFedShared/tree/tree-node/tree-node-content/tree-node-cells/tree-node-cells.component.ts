@@ -135,6 +135,12 @@ export class TreeNodeCellsComponent implements OnChanges, OnInit, OnDestroy {
    * mid-edit would be jarring. Reset naturally next time the popover/page reopens. */
   manuallyExpandedSlotIds = new Set<string>()
 
+  /** Compact pills stay mounted briefly after being picked so their dismissal animation can play
+   * before Angular replaces them with the full field editor. */
+  exitingCompactSlotIds = new Set<string>()
+
+  private static readonly COMPACT_PILL_EXIT_DURATION_MS = 150
+
   /** GH #85/#101: once an item has at least one real filled-in field, its *other*, never-filled
    * shortlisted fields (e.g. Journal's ~46 "always shown" metrics) stop rendering as compact pills
    * at all - on a real entry these are pure clutter (confirmed live: 45 pills on one item), not the
@@ -388,7 +394,22 @@ export class TreeNodeCellsComponent implements OnChanges, OnInit, OnDestroy {
   }
 
   expandCompactCell(descriptorId: string): void {
+    if (this.exitingCompactSlotIds.has(descriptorId)) {
+      return
+    }
+    const entry = this.cells.find(cellEntry => cellEntry.descriptor.id === descriptorId)
+    if (entry && this.isCompact(entry.descriptor)) {
+      this.exitingCompactSlotIds.add(descriptorId)
+      this.changeDetectorRef.markForCheck()
+      setTimeout(() => this.finishExpandingCompactCell(descriptorId), this.shouldReduceMotion() ? 0 : TreeNodeCellsComponent.COMPACT_PILL_EXIT_DURATION_MS)
+      return
+    }
+    this.finishExpandingCompactCell(descriptorId)
+  }
+
+  private finishExpandingCompactCell(descriptorId: string): void {
     this.manuallyExpandedSlotIds.add(descriptorId)
+    this.exitingCompactSlotIds.delete(descriptorId)
     this.slotUsageTrackerService.recordUsage(this.treeNode.item$.getCollectionName(), descriptorId)
     // GH #85/#101: this descriptor may have been filtered out of `cells` entirely (never-filled,
     // not-yet-MRU shortlisted field on an otherwise-filled-in item) - re-run the filter now that
@@ -399,6 +420,10 @@ export class TreeNodeCellsComponent implements OnChanges, OnInit, OnDestroy {
     // Angular hasn't swapped the compact button for the real cell yet at this point in the same
     // tick - defer to let that render first, same reasoning as onFieldPicked()'s scrollIntoView.
     setTimeout(() => this.focusExpandedCell(descriptorId))
+  }
+
+  private shouldReduceMotion(): boolean {
+    return typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches
   }
 
   /** GH #101's "show all" checkbox - `cells` itself depends on `showAllFields` now

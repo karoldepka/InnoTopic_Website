@@ -26,6 +26,7 @@
   align-items: center
   flex: 1 1 100%
   flex-wrap: wrap
+  animation: slot-cell-reveal 180ms cubic-bezier(.2, .8, .2, 1) both
 
   // Row-separator styling only - excluded when this is also .slot-pill (the compact variant just
   // below) so it can't fight the shared class's own complete, symmetric padding (see CLAUDE.md's
@@ -75,8 +76,29 @@
   background: transparent
   color: inherit
 
+  &.slot-cell--exiting
+    animation: slot-cell-dismiss 150ms ease-in both
+    pointer-events: none
+
   &:hover
     // --ion-color-light is a fixed near-white (#f4f5f8) regardless of theme - on this always-dark
     // UI that put near-white background under the inherited white text, making the label
     // unreadable. --ion-color-step-150 is the theme's own dark-mode-aware subtle-highlight token.
     background: var(--ion-color-step-150, rgba(255, 255, 255, 0.08))
+
+@keyframes slot-cell-reveal
+  from
+    opacity: 0
+    transform: translateY(-0.35rem)
+  to
+    opacity: 1
+    transform: translateY(0)
+
+@keyframes slot-cell-dismiss
+  to
+    opacity: 0
+    transform: scale(.94)
+
+@media (prefers-reduced-motion: reduce)
+  .slot-cell
+    animation: none
