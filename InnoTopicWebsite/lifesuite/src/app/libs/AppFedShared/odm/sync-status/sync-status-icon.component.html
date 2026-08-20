@@ -24,10 +24,16 @@
   ></ion-icon>
 </ion-button>
 
-<div style="position: relative; height: 25px; display: flex; align-items: center"
-     class="action-icon"
-     (click)="onClick($event)"
+<ion-button
+  fill="clear"
+  size="small"
+  class="action-icon"
+  style="--padding-start: 4px; --padding-end: 4px; position: relative; height: 25px"
+  (click)="onClick($event)"
+  aria-label="Open sync status"
+  title="Open sync status"
 >
+  <span aria-hidden="true" style="position: relative; height: 25px; display: flex; align-items: center">
 <!--  as-->
 <!--  <img-->
 <!--    [ngClass]="{'action-icon': true }"-->
@@ -130,7 +136,8 @@
   </div>
 
 
-</div>
+  </span>
+</ion-button>
 <!--bb-->
 <!--  <span-->
 <!--    style="display: inline-flex; align-items: center; cursor: pointer"-->
