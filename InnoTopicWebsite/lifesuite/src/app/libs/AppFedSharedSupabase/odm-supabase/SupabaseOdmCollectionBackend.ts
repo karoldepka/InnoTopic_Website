@@ -36,6 +36,9 @@ export class SupabaseOdmCollectionBackend<TRaw> extends OdmCollectionBackend<TRa
   private historyTableName = (environment as any).supabase?.odmHistoryTable ?? 'lifesuite_odm_item_history'
   private schema = (environment as any).supabase?.schema ?? 'public'
   private channelNameCounter = 0
+  /** Shared by the browser's `online` event and Supabase's `SUBSCRIBED` callback, which often
+   * arrive together after a brief outage. */
+  private reconnectCatchUpPromise?: Promise<void>
 
   public collectionName = this.className
 
@@ -376,6 +379,20 @@ export class SupabaseOdmCollectionBackend<TRaw> extends OdmCollectionBackend<TRa
    * another full channel disconnect/reconnect cycle happens (which may never happen again). Retry
    * a few times with a short backoff before giving up and surfacing an error. */
   private async catchUpAfterReconnect(
+    queryOpts: QueryOpts,
+    listener: OdmCollectionBackendListener<TRaw, OdmItemId<TRaw>>,
+    callback: () => void,
+  ): Promise<void> {
+    if (!this.reconnectCatchUpPromise) {
+      this.reconnectCatchUpPromise = this.performReconnectCatchUp(queryOpts, listener, callback)
+        .finally(() => {
+          this.reconnectCatchUpPromise = undefined
+        })
+    }
+    return this.reconnectCatchUpPromise
+  }
+
+  private async performReconnectCatchUp(
     queryOpts: QueryOpts,
     listener: OdmCollectionBackendListener<TRaw, OdmItemId<TRaw>>,
     callback: () => void,
