@@ -22,6 +22,9 @@ export class ExpandToggleComponent {
   @Output() isOpenChange = new EventEmitter<boolean>()
 
   @Input() icon = 'chatbubble-ellipses-outline'
+  /** Required for icon-only uses; text-labelled toggles remain understandable even with the
+   * default. */
+  @Input() ariaLabel = 'Show or hide details'
   /** Omit both to get an icon-only button (e.g. the comment-thread toggle). */
   @Input() openLabel = ''
   @Input() closedLabel = ''

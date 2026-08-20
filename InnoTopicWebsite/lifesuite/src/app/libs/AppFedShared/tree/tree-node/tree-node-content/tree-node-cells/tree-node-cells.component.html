@@ -104,6 +104,7 @@
     <app-expand-toggle
       [isOpen]="openCommentsForDescriptorId === entry.descriptor.id"
       (isOpenChange)="onCommentsIsOpenChange(entry.descriptor.id, $event)"
+      [ariaLabel]="'Show or hide comments for ' + entry.descriptor.label"
     >
       <app-comment-thread [targetNodeId]="entry.targetNodeId"></app-comment-thread>
     </app-expand-toggle>

@@ -3,6 +3,8 @@
   class="expand-toggle"
   (click)="toggle()"
   [class.expand-toggle--active]="isOpen || hasContent"
+  [attr.aria-label]="ariaLabel"
+  [attr.aria-expanded]="isOpen"
 >
   <ion-icon [name]="icon"></ion-icon>
   @if (closedLabel || openLabel) {
