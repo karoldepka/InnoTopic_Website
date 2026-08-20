@@ -5,10 +5,14 @@
     (touchstart)="onMicClick($event)"
     (click)="onMicClick()"
     [color]="isRecording ? 'danger' : 'primary'"
+    [title]="isRecording ? 'Stop recording' : 'Start recording'"
+    [attr.aria-label]="isRecording ? 'Stop recording' : 'Start recording'"
+    [attr.aria-pressed]="isRecording"
   >
     <ion-icon
       slot="icon-only"
       [name]="isRecording ? 'stop' : 'mic'"
+      aria-hidden="true"
      />
     <app-audio-visualizer
       [stream]="stream"
@@ -52,10 +56,13 @@
       size="small"
       fill="clear"
       (click)="playOrStopMemo(memo)"
+      [title]="playingBlobId === memo.blobId ? 'Stop playback' : 'Play recording'"
+      [attr.aria-label]="playingBlobId === memo.blobId ? 'Stop playback' : 'Play recording'"
     >
       <ion-icon
         slot="icon-only"
         [name]="playingBlobId === memo.blobId ? 'stop' : 'play'"
+        aria-hidden="true"
        />
     </ion-button>
 
@@ -77,6 +84,7 @@
         [max]="durationSec || 1"
         [value]="currentTimeSec"
         (ionChange)="onSeek($event)"
+        aria-label="Playback position"
        />
       <span class="voice-memo-time">{{ formatTime(durationSec) }}</span>
     </div>
@@ -87,8 +95,9 @@
       fill="clear"
       (click)="deleteMemo(memo, $event)"
       title="Delete this recording"
+      aria-label="Delete this recording"
     >
-      <ion-icon slot="icon-only" name="trash-outline" />
+      <ion-icon slot="icon-only" name="trash-outline" aria-hidden="true" />
     </ion-button>
   </div>
 </div>
