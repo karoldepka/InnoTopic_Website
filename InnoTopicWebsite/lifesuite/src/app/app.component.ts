@@ -207,7 +207,7 @@ export class AppComponent {
     }
     // Close the overlay before routing. Navigating first can replace the page underneath while
     // Ionic is still animating the menu, leaving the side menu visibly open on the destination.
-    await this.menuCtrl.close()
+    await this.menuCtrl.close('app-side-menu')
     this.go(first)
     if (first.url) {
       await this.router.navigateByUrl(first.url)
