@@ -290,7 +290,10 @@ export abstract class OdmService2<
 
     // !!!! FIXME: start listener when someone subscribes to items$, e.g. chart QuizHistory
 
-    const listener = this.createBackendListener()
+    // This is the unscoped collection listener, so a removal means the item was actually
+    // deleted. Scoped/paginated fetches keep the default below: a row can simply stop matching
+    // their query without having been deleted globally.
+    const listener = this.createBackendListener(true)
 
     // const nDaysOldModified = 1
     // const opts1_pre: QueryOpts = {
@@ -335,7 +338,7 @@ export abstract class OdmService2<
   /** public so per-item listeners (e.g. OdmItem$2.requestLoadTreeDescendants) can reuse the
    * same "discovered items join the general item pool" wiring this service already uses for
    * its own collection-wide listener. */
-  public createBackendListener() {
+  public createBackendListener(honorRemovals = false) {
     const service = this
     return {
       onAdded(addedItemId: TItemId, addedItemRawData: TRawData) {
@@ -372,10 +375,16 @@ export abstract class OdmService2<
         // service.emitLocalItems() -- now handled by onFinishedProcessingChangeSet
       },
       onRemoved(removedItemId: TItemId) {
-        console.log('onRemoved; ignoring because of `limit` trickery to save firestore reads cost. We could do this ignoring ONLY when there was a `limit` clause; could do the ignoring at FirestoreOdmCollectionBackend level.', removedItemId)
-        // service.localItems$.lastVal = service.localItems$ !.lastVal !.filter(item => item.id !== removedItemId)
-
-        // TODO: remove from map? but keep in mind this could be based on query result. Maybe better to have a weak map and do NOT remove manually
+        if (!honorRemovals) {
+          return
+        }
+        const existingItem = service.mapIdToItem$.get(removedItemId)
+        // Keep any open editor/detail view consistent as well as removing the row from lists.
+        // `applyDataFromDbAndEmit` accepts a nullable ODM value at runtime; the cast keeps the
+        // older generic signature intact until nullability is widened across the hierarchy.
+        existingItem?.applyDataFromDbAndEmit(null as any)
+        service.mapIdToItem$.delete(removedItemId)
+        service.localItems$.lastVal = service.localItems$.lastVal?.filter(item => item.id !== removedItemId) ?? []
         // service.emitLocalItems() -- now handled by onFinishedProcessingChangeSet
       },
       onFinishedProcessingChangeSet() {
