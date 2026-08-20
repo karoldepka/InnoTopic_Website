@@ -473,6 +473,10 @@ export class DoodleCanvas {
     this.currentFontSize = Number((ev.target as HTMLInputElement).value)
   }
 
+  private onColorInput = (ev: Event) => {
+    this.currentColor = (ev.target as HTMLInputElement).value
+  }
+
   private pathData(stroke: DraftStroke): string {
     const [first, ...rest] = stroke.points
     if (!first) return ''
@@ -569,7 +573,7 @@ export class DoodleCanvas {
               <button type="button" class={{ 'doodle-mode-btn': true, 'doodle-mode-btn--active': this.mode === 'draw' }} onClick={() => this.setMode('draw')}>Draw</button>
               <button type="button" class={{ 'doodle-mode-btn': true, 'doodle-mode-btn--active': this.mode === 'text' }} onClick={() => this.setMode('text')}>Text</button>
             </div>
-            <div class="doodle-colors" role="radiogroup" aria-label="Color">
+            <div class="doodle-colors" aria-label="Color">
               {this.colors.map(color => (
                 <button
                   type="button"
@@ -584,6 +588,14 @@ export class DoodleCanvas {
                   onClick={() => (this.currentColor = color)}
                 ></button>
               ))}
+              <input
+                class="doodle-color-picker"
+                type="color"
+                value={this.currentColor}
+                onInput={this.onColorInput}
+                aria-label="Choose custom color"
+                title="Choose custom color"
+              />
             </div>
             {this.mode === 'draw' && (
               <input

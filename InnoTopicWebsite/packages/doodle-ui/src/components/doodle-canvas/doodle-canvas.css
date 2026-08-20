@@ -141,6 +141,19 @@
   box-shadow: 0 0 0 2px var(--doodle-stage-background), 0 0 0 4px var(--doodle-accent);
 }
 
+/* Native picker supplies the complete RGB spectrum (including keyboard and platform accessibility
+   behavior) while the circular swatches above remain useful shortcuts for common ink colors. */
+.doodle-color-picker {
+  width: 28px;
+  height: 28px;
+  box-sizing: border-box;
+  padding: 2px;
+  border: 1.5px solid var(--doodle-border-color);
+  border-radius: 50%;
+  background: transparent;
+  cursor: pointer;
+}
+
 .doodle-modes {
   display: flex;
   gap: 6px;
