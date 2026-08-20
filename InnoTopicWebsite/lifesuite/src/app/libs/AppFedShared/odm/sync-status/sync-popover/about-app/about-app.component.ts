@@ -10,7 +10,10 @@ import { TranslatePipe } from '@ngx-translate/core';
     imports: [TranslatePipe],
 })
 export class AboutAppComponent implements OnInit {
-  readonly buildInfo = environment.buildInfo
+  readonly buildInfo: typeof environment.buildInfo & {
+    commitAuthor?: string
+    commitMessage?: string
+  } = environment.buildInfo
 
   constructor() { }
 
