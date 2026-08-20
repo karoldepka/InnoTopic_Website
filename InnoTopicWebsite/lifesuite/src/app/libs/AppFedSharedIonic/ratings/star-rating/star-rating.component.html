@@ -1,12 +1,14 @@
-<button
-  type="button"
-  class="star-rating__star"
-  *ngFor="let starIndex of starIndexes"
-  (click)="onStarClick(starIndex)"
-  [attr.aria-label]="'Rate ' + starIndex + ' stars'"
->
-  <ion-icon name="star-outline" class="star-rating__bg"></ion-icon>
-  <span class="star-rating__fill" [style.width.em]="fillFractionFor(starIndex)">
-    <ion-icon name="star"></ion-icon>
-  </span>
-</button>
+<div class="star-rating" role="group" [attr.aria-label]="ratingAriaLabel">
+  <button
+    type="button"
+    class="star-rating__star"
+    *ngFor="let starIndex of starIndexes"
+    (click)="onStarClick(starIndex)"
+    [attr.aria-label]="starAriaLabel(starIndex)"
+  >
+    <ion-icon name="star-outline" class="star-rating__bg"></ion-icon>
+    <span class="star-rating__fill" [style.width.em]="fillFractionFor(starIndex)">
+      <ion-icon name="star"></ion-icon>
+    </span>
+  </button>
+</div>

@@ -49,6 +49,14 @@ export class StarRatingComponent extends CustomFormControl<StarRatingVal> {
     return Array.from({length: this.maxStars}, (_, i) => i + 1)
   }
 
+  get ratingAriaLabel(): string {
+    return `Rating: ${this.currentValue} of ${this.maxStars} stars`
+  }
+
+  starAriaLabel(starIndex: number): string {
+    return `Set rating to ${starIndex} of ${this.maxStars} stars`
+  }
+
   override writeValue(value: StarRatingVal): void {
     super.writeValue(value)
     this.currentValue = value ?? 0
