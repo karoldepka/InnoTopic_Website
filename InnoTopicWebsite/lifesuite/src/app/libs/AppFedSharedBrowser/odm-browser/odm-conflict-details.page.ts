@@ -1,13 +1,15 @@
-import {JsonPipe, NgFor, NgIf} from '@angular/common'
+import {NgFor, NgIf} from '@angular/common'
 import {ChangeDetectionStrategy, Component, OnInit} from '@angular/core'
 import {ActivatedRoute} from '@angular/router'
 import {IonicModule} from '@ionic/angular'
+import diff, {Difference} from 'microdiff'
 import {BrowserOdmRow, BrowserOdmStorage} from './BrowserOdmStorage'
 
 interface ConflictDiffEntry {
   path: string
   archivedValue: unknown
   currentValue: unknown
+  type: Difference['type']
 }
 
 /** Shows both locally retained versions of a resolved ODM conflict. The archived version stays
@@ -15,7 +17,7 @@ interface ConflictDiffEntry {
  * a normal synced item. */
 @Component({
   standalone: true,
-  imports: [IonicModule, JsonPipe, NgFor, NgIf],
+  imports: [IonicModule, NgFor, NgIf],
   selector: 'app-odm-conflict-details',
   template: `
     <ion-header>
@@ -42,15 +44,15 @@ interface ConflictDiffEntry {
 
             <p *ngIf="!diffEntries.length">The two saved versions have the same field values.</p>
             <section *ngFor="let entry of diffEntries" class="conflict-diff" [attr.aria-label]="'Changed field ' + entry.path">
-              <h2>{{ entry.path }}</h2>
+              <h2>{{ entry.path }} <ion-note>({{ entry.type.toLowerCase() }})</ion-note></h2>
               <div class="conflict-diff__values">
                 <div class="conflict-diff__value conflict-diff__value--archived">
                   <h3>Archived</h3>
-                  <pre>{{ entry.archivedValue | json }}</pre>
+                  <pre>{{ formatValue(entry.archivedValue) }}</pre>
                 </div>
                 <div class="conflict-diff__value conflict-diff__value--current">
                   <h3>Current</h3>
-                  <pre>{{ entry.currentValue | json }}</pre>
+                  <pre>{{ formatValue(entry.currentValue) }}</pre>
                 </div>
               </div>
             </section>
@@ -107,22 +109,28 @@ export class OdmConflictDetailsPage implements OnInit {
     this.loaded = true
   }
 
-  private buildDiff(archivedValue: unknown, currentValue: unknown, path = ''): ConflictDiffEntry[] {
-    if (Object.is(archivedValue, currentValue)) {
-      return []
+  formatValue(value: unknown): string {
+    if (value === undefined) {
+      return '(not set)'
     }
-    if (this.isRecord(archivedValue) && this.isRecord(currentValue)) {
-      const keys = new Set([...Object.keys(archivedValue), ...Object.keys(currentValue)])
-      return [...keys].sort().flatMap(key => this.buildDiff(
-        archivedValue[key],
-        currentValue[key],
-        path ? `${path}.${key}` : key,
-      ))
-    }
-    return [{path: path || '(whole item)', archivedValue, currentValue}]
+    return JSON.stringify(value, null, 2)
   }
 
-  private isRecord(value: unknown): value is Record<string, unknown> {
-    return value !== null && typeof value === 'object' && !Array.isArray(value)
+  private buildDiff(archivedValue: unknown, currentValue: unknown): ConflictDiffEntry[] {
+    return diff(
+      this.toDiffableObject(archivedValue),
+      this.toDiffableObject(currentValue),
+    ).map(change => ({
+      path: change.path.map(String).join('.') || '(whole item)',
+      archivedValue: change.type === 'CREATE' ? undefined : change.oldValue,
+      currentValue: change.type === 'REMOVE' ? undefined : change.value,
+      type: change.type,
+    }))
+  }
+
+  private toDiffableObject(value: unknown): Record<string, any> | any[] {
+    return value !== null && typeof value === 'object'
+      ? value as Record<string, any>
+      : {value}
   }
 }
