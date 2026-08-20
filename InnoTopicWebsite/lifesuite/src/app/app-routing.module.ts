@@ -146,14 +146,12 @@ const routes: Routes = [
     path: 'experiments',
     loadComponent: () => import('./experiments/experiments.page').then(m => m.ExperimentsPage),
   },
-
-  { path: '**', redirectTo: '' },
   {
     path: 'audio',
-    loadChildren: () => import('./apps/Learn/audio/audio.module').then( m => m.AudioPageModule)
+    loadChildren: () => import('./apps/Learn/audio/audio.module').then(m => m.AudioPageModule)
   },
 
-
+  { path: '**', redirectTo: '' },
 ];
 
 @NgModule({
