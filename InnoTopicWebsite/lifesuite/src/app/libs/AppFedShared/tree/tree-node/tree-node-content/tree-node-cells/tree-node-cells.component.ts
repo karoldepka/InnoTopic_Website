@@ -1,4 +1,4 @@
-import {Component, Input, Output, EventEmitter, OnChanges, OnInit, OnDestroy, ChangeDetectionStrategy, ChangeDetectorRef, ElementRef} from '@angular/core';
+import {Component, Input, Output, EventEmitter, OnChanges, OnInit, OnDestroy, ChangeDetectionStrategy, ChangeDetectorRef, ElementRef, HostBinding} from '@angular/core';
 import {Subscription} from 'rxjs'
 import {OdmTreeNode} from '../../OdmTreeNode'
 import {OdmCell} from '../../../cells/OdmCell'
@@ -40,6 +40,16 @@ import {SlotUsageTrackerService} from '../../../cells/slot-usage-tracker.service
     imports: [IonicModule, MinMidMaxCellComponent, RichTextEditCellComponent, IntensityCellComponent, BareSlotCellComponent, CommentThreadComponent, ExpandToggleComponent, SlotIconComponent, TimeTrackedItemCellComponent, SlotPickerComponent],
 })
 export class TreeNodeCellsComponent implements OnChanges, OnInit, OnDestroy {
+
+  /** Entry animation duration. Journal and Learn opt into a more deliberate reveal; `/tree`
+   * retains the compact default. */
+  @Input()
+  revealAnimationDurationMs = 180
+
+  @HostBinding('style.--slot-cell-reveal-duration')
+  get revealAnimationDuration(): string {
+    return `${this.revealAnimationDurationMs}ms`
+  }
 
   @Input()
   treeNode !: OdmTreeNode
