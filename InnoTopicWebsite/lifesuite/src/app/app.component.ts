@@ -198,16 +198,20 @@ export class AppComponent {
    * command palette, instead of having to reach for the mouse once the list is down to one match.
    * Bypasses ion-menu-toggle's click-based close (Enter never fires a click on the item), so the
    * menu is closed here explicitly instead. */
-  onSearchEnter(): void {
+  async onSearchEnter(event?: KeyboardEvent): Promise<void> {
+    event?.preventDefault()
+    event?.stopPropagation()
     const first = this.filteredPages(this.appPages)[0] ?? this.filteredPages(this.morePages)[0]
     if (!first) {
       return
     }
+    // Close the overlay before routing. Navigating first can replace the page underneath while
+    // Ionic is still animating the menu, leaving the side menu visibly open on the destination.
+    await this.menuCtrl.close()
     this.go(first)
     if (first.url) {
-      this.router.navigateByUrl(first.url)
+      await this.router.navigateByUrl(first.url)
     }
-    this.menuCtrl.close()
   }
 
   private setupOptionsHandler() {
