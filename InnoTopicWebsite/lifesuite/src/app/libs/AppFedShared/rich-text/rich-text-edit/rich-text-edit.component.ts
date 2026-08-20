@@ -642,7 +642,9 @@ export class RichTextEditComponent extends AbstractCellComponent implements OnIn
             // which can lag behind same-keystroke edits) - only intercept when there's genuinely
             // nothing left to delete, so a normal backspace-deletes-a-character keystroke is
             // never swallowed.
-            if ( editor.getContent({format: 'text'}).trim() === '' ) {
+            // TinyMCE can leave zero-width caret markers after the last visible character is
+            // deleted. They are not user content, but `.trim()` intentionally keeps them.
+            if ( editor.getContent({format: 'text'}).replace(/[\u200B\uFEFF]/g, '').trim() === '' ) {
               event.preventDefault()
               event.stopPropagation()
               this.backspaceOnEmptyIntercepted.emit(event)

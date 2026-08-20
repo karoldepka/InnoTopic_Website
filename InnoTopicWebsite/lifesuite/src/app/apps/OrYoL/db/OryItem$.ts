@@ -85,7 +85,9 @@ export class OryItem$<TData = any> implements HasPatchThrottled<TData> {
    * even though its raw HTML string isn't itself an empty string. */
   isEmptyOrWhitespace(): boolean {
     const title = (this.itemData as any)?.title
-    return trimToUndefined(stripHtml(title) ?? undefined) === undefined
+    // Match TinyMCE's empty-editor handling: zero-width caret markers may remain in the stored
+    // HTML after the final visible character is removed, but do not make a tree node meaningful.
+    return trimToUndefined((stripHtml(title) ?? undefined)?.replace(/[\u200B\uFEFF]/g, '')) === undefined
   }
 
   /** Whether this item has no meaningful data at all, not just a blank title - also checks the
