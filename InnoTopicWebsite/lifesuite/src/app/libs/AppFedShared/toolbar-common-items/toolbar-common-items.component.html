@@ -3,22 +3,27 @@
 ></app-time-tracking-toolbar>
 
 @if (voiceMemoService.isRecordingAnywhere$ | async) {
-  <span
+  <ion-button
+    fill="clear"
+    size="small"
     class="recording-indicator"
     title="Recording in progress somewhere in the app - tap to go to it"
     (click)="navigateToActiveRecording()"
+    aria-label="Recording in progress. Open active recording"
   >
-    <span class="recording-dot"></span>
+    <span class="recording-dot" aria-hidden="true"></span>
     REC
-  </span>
+  </ion-button>
 }
 
 @if (voiceMemoService.isPlayingAnywhere$ | async) {
   <span
     class="playing-indicator"
     title="A voice memo is playing somewhere in the app"
+    role="status"
+    aria-label="A voice memo is playing"
   >
-    <ion-icon name="play"></ion-icon>
+    <ion-icon name="play" aria-hidden="true"></ion-icon>
   </span>
 }
 
