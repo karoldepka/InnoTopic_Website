@@ -16,10 +16,12 @@
   size="small"
   (click)="fullscreenService.toggle()"
   [title]="(fullscreenService.isFullscreen$ | async) ? 'Exit fullscreen' : 'Enter fullscreen'"
+  [attr.aria-label]="(fullscreenService.isFullscreen$ | async) ? 'Exit fullscreen' : 'Enter fullscreen'"
   style="--padding-start: 4px; --padding-end: 4px"
 >
   <ion-icon
     [name]="(fullscreenService.isFullscreen$ | async) ? 'contract-outline' : 'expand-outline'"
+    aria-hidden="true"
     style="color: var(--ion-color-primary); font-size: 22px"
   ></ion-icon>
 </ion-button>
