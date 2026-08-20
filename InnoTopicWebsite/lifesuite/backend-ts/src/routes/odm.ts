@@ -26,8 +26,9 @@ odmRouter.post('/api/embeddings/batch', handleEmbeddingBatch);
 odmRouter.post('/ai-api/embeddings/batch', handleEmbeddingBatch);
 
 let _sql: ReturnType<typeof postgres> | null = null;
+let ensureTablesPromise: Promise<void> | null = null;
 
-function getSql(): ReturnType<typeof postgres> {
+export function getSql(): ReturnType<typeof postgres> {
   if (!_sql) {
     const url = process.env['ODM_DATABASE_URL'] ?? process.env['DATABASE_URL'];
     if (!url) throw new Error('ODM_DATABASE_URL not configured');
@@ -36,47 +37,53 @@ function getSql(): ReturnType<typeof postgres> {
   return _sql;
 }
 
-async function ensureTables() {
+export async function ensureTables() {
   if (!process.env['ODM_ENSURE_TABLES']) return;
-  const sql = getSql();
-  await sql`
-    create table if not exists public.odm_items (
-      collection text not null,
-      id text not null,
-      owner text not null,
-      data jsonb not null default '{}'::jsonb,
-      parent_ids text[] not null default '{}',
-      ancestor_ids text[] not null default '{}',
-      when_last_modified timestamptz not null default now(),
-      when_deleted timestamptz,
-      primary key (collection, id)
-    )
-  `;
-  await sql`
-    create index if not exists odm_items_owner_idx
-      on public.odm_items (owner, collection, when_last_modified desc)
-  `;
-  await sql`create extension if not exists vector`;
-  await sql`alter table public.odm_items add column if not exists embedding vector(768)`;
-  await sql`alter table public.odm_items add column if not exists embedding_text text`;
-  await sql`alter table public.odm_items add column if not exists embedding_model text`;
-  await sql`
-    create index if not exists odm_items_embedding_hnsw_idx
-      on public.odm_items using hnsw (embedding vector_cosine_ops)
-      where embedding is not null and when_deleted is null
-  `;
-  await sql`
-    create table if not exists public.odm_item_history (
-      history_id text primary key,
-      collection text not null,
-      item_id text not null,
-      owner text not null,
-      data jsonb not null default '{}'::jsonb,
-      parent_ids text[] not null default '{}',
-      ancestor_ids text[] not null default '{}',
-      snapshot_at timestamptz not null default now()
-    )
-  `;
+  if (ensureTablesPromise) return ensureTablesPromise;
+
+  ensureTablesPromise = (async () => {
+    const sql = getSql();
+    await sql`
+      create table if not exists public.odm_items (
+        collection text not null,
+        id text not null,
+        owner text not null,
+        data jsonb not null default '{}'::jsonb,
+        parent_ids text[] not null default '{}',
+        ancestor_ids text[] not null default '{}',
+        when_last_modified timestamptz not null default now(),
+        when_deleted timestamptz,
+        primary key (collection, id)
+      )
+    `;
+    await sql`
+      create index if not exists odm_items_owner_idx
+        on public.odm_items (owner, collection, when_last_modified desc)
+    `;
+    await sql`create extension if not exists vector`;
+    await sql`alter table public.odm_items add column if not exists embedding vector(768)`;
+    await sql`alter table public.odm_items add column if not exists embedding_text text`;
+    await sql`alter table public.odm_items add column if not exists embedding_model text`;
+    await sql`
+      create index if not exists odm_items_embedding_hnsw_idx
+        on public.odm_items using hnsw (embedding vector_cosine_ops)
+        where embedding is not null and when_deleted is null
+    `;
+    await sql`
+      create table if not exists public.odm_item_history (
+        history_id text primary key,
+        collection text not null,
+        item_id text not null,
+        owner text not null,
+        data jsonb not null default '{}'::jsonb,
+        parent_ids text[] not null default '{}',
+        ancestor_ids text[] not null default '{}',
+        snapshot_at timestamptz not null default now()
+      )
+    `;
+  })();
+
+  return ensureTablesPromise;
 }
 
 odmRouter.get('/api/odm/items', async c => {

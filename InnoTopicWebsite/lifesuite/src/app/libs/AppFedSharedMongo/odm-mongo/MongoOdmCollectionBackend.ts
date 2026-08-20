@@ -13,7 +13,31 @@ import {environment} from '../../../../environments/environment'
 
 interface MongoOdmItemsResponse<TRaw> {
   items: PostgresOdmRow<TRaw>[]
+  hasMore: boolean
 }
+
+interface MongoPendingSave<TRaw> {
+  type: 'save'
+  id: string
+  data: TRaw
+  parentIds: ItemId[]
+  ancestorIds: ItemId[]
+  storeVersionHistory: boolean
+  resolve: () => void
+  reject: (error: unknown) => void
+}
+
+interface MongoPendingDelete {
+  type: 'delete'
+  id: string
+  resolve: () => void
+  reject: (error: unknown) => void
+}
+
+type MongoPendingMutation<TRaw> = MongoPendingSave<TRaw> | MongoPendingDelete
+
+const ODM_BATCH_SIZE = 200
+const ODM_BATCH_DELAY_MS = 25
 
 /** Mirrors NeonOdmCollectionBackend - same HTTP-through-backend shape, since the raw `mongodb`
  * driver speaks a binary wire protocol and can't be used from a browser (and MongoDB shut down
@@ -24,6 +48,8 @@ export class MongoOdmCollectionBackend<TRaw> extends OdmCollectionBackend<TRaw> 
   private apiUrl = ((environment as any).mongo?.odmApiUrl ?? `${environment.aiBackendUrl}/api/odm-mongo`).replace(/\/$/, '')
   private pollIntervalMs = (environment as any).mongo?.pollIntervalMs ?? 5000
   private pollingHandles: number[] = []
+  private pendingMutations = new Map<string, MongoPendingMutation<TRaw>[]>()
+  private batchFlushTimer: number | undefined
 
   public collectionName = this.className
 
@@ -38,22 +64,26 @@ export class MongoOdmCollectionBackend<TRaw> extends OdmCollectionBackend<TRaw> 
 
   deleteWithoutConfirmation(itemId: OdmItemId): Promise<any> {
     const owner = this.requireUserId()
-    return this.http
-      .post(`${this.apiUrl}/items/${encodeURIComponent(this.collectionName)}/${encodeURIComponent(itemId as string)}/delete`, {owner})
-      .toPromise()
+    return this.queueMutation(itemId as string, {
+      type: 'delete',
+      id: itemId as string,
+      resolve: () => undefined,
+      reject: () => undefined,
+    }, owner)
   }
 
   saveNowToDb(item: TRaw, id: string, parentIds?: ItemId[], ancestorIds?: ItemId[]): Promise<any> {
     const owner = this.requireUserId()
-    return this.http
-      .put(`${this.apiUrl}/items/${encodeURIComponent(this.collectionName)}/${encodeURIComponent(id)}`, {
-        owner,
-        data: item,
-        parentIds: parentIds ?? (item as any)?.parentIds ?? [],
-        ancestorIds: ancestorIds ?? (item as any)?.ancestorIds ?? [],
-        storeVersionHistory: !this.opts.dontStoreVersionHistory,
-      })
-      .toPromise()
+    return this.queueMutation(id, {
+      type: 'save',
+      id,
+      data: item,
+      parentIds: parentIds ?? (item as any)?.parentIds ?? [],
+      ancestorIds: ancestorIds ?? (item as any)?.ancestorIds ?? [],
+      storeVersionHistory: !this.opts.dontStoreVersionHistory,
+      resolve: () => undefined,
+      reject: () => undefined,
+    }, owner)
   }
 
   override setListener(
@@ -110,9 +140,6 @@ export class MongoOdmCollectionBackend<TRaw> extends OdmCollectionBackend<TRaw> 
       .set('collection', this.collectionName)
       .set('owner', owner)
 
-    if (queryOpts.limit) {
-      params = params.set('limit', String(queryOpts.limit))
-    }
     if (queryOpts.parentId) {
       params = params.set('parentId', queryOpts.parentId)
     }
@@ -120,10 +147,68 @@ export class MongoOdmCollectionBackend<TRaw> extends OdmCollectionBackend<TRaw> 
       params = params.set('ancestorId', queryOpts.ancestorId)
     }
 
-    const response = await this.http
-      .get<MongoOdmItemsResponse<TRaw>>(`${this.apiUrl}/items`, {params})
-      .toPromise()
-    return response?.items ?? []
+    const rows: PostgresOdmRow<TRaw>[] = []
+    const maxItems = queryOpts.limit ?? Number.POSITIVE_INFINITY
+    let offset = 0
+    let hasMore = true
+    while (hasMore && rows.length < maxItems) {
+      const limit = Math.min(ODM_BATCH_SIZE, maxItems - rows.length)
+      const response = await this.http
+        .get<MongoOdmItemsResponse<TRaw>>(`${this.apiUrl}/items`, {
+          params: params.set('limit', String(limit)).set('offset', String(offset)),
+        })
+        .toPromise()
+      const batch = response?.items ?? []
+      rows.push(...batch)
+      offset += batch.length
+      hasMore = response?.hasMore === true && batch.length > 0
+    }
+    return rows
+  }
+
+  private queueMutation(id: string, mutation: MongoPendingMutation<TRaw>, owner: string): Promise<void> {
+    return new Promise((resolve, reject) => {
+      mutation.resolve = resolve
+      mutation.reject = reject
+      const pending = this.pendingMutations.get(id) ?? []
+      pending.push(mutation)
+      this.pendingMutations.set(id, pending)
+      if (this.batchFlushTimer === undefined) {
+        this.batchFlushTimer = window.setTimeout(() => this.flushMutations(owner), ODM_BATCH_DELAY_MS)
+      }
+    })
+  }
+
+  private async flushMutations(owner: string): Promise<void> {
+    this.batchFlushTimer = undefined
+    const entries = Array.from(this.pendingMutations.entries()).slice(0, ODM_BATCH_SIZE)
+    for (const [id] of entries) this.pendingMutations.delete(id)
+
+    // Only the final mutation for an item needs to reach Mongo; every caller waiting on an older
+    // mutation is resolved with that final request, preserving the order seen by the UI.
+    const latest = entries.map(([, mutations]) => mutations.at(-1)!).filter(Boolean)
+    const saves = latest.filter((mutation): mutation is MongoPendingSave<TRaw> => mutation.type === 'save')
+    const deletes = latest.filter((mutation): mutation is MongoPendingDelete => mutation.type === 'delete')
+    try {
+      await this.http.post(`${this.apiUrl}/items/${encodeURIComponent(this.collectionName)}/batch`, {
+        owner,
+        items: saves.map(save => ({
+          item_id: save.id,
+          data: save.data,
+          parentIds: save.parentIds,
+          ancestorIds: save.ancestorIds,
+          storeVersionHistory: save.storeVersionHistory,
+        })),
+        deleteItemIds: deletes.map(deletion => deletion.id),
+      }).toPromise()
+      entries.flatMap(([, mutations]) => mutations).forEach(mutation => mutation.resolve())
+    } catch (error) {
+      entries.flatMap(([, mutations]) => mutations).forEach(mutation => mutation.reject(error))
+    }
+
+    if (this.pendingMutations.size && this.batchFlushTimer === undefined) {
+      this.batchFlushTimer = window.setTimeout(() => this.flushMutations(owner), 0)
+    }
   }
 
   private emitRows(

@@ -157,6 +157,11 @@ ion-fab[vertical="top"] {
   top: calc(10px + var(--ion-safe-area-top, 0px));
 }
 
+ion-fab-button {
+  --color: var(--ion-color-primary-contrast);
+  color: var(--ion-color-primary-contrast);
+}
+
 .action-icon {
   cursor: pointer;
   user-select: none;
@@ -445,7 +450,7 @@ body {
 // back-button structurally only ever appear in a header anyway, so scoping them here is harmless).
 ion-menu-button,
 ion-back-button,
-ion-icon:not([color]):not(.action-icon):not(.action-color):not(ion-button *) {
+ion-icon:not([color]):not(.action-icon):not(.action-color):not(ion-button *):not(ion-fab-button *) {
   --color: var(--ion-color-primary);
   color: var(--ion-color-primary);
 }

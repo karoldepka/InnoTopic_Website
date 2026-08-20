@@ -100,6 +100,14 @@ export interface OdmDeleteRequest {
   owner: string;
 }
 
+/** A bounded group of ODM mutations for one collection.  The caller may send both upserts and
+ * tombstones together so a sync pass costs one request and one MongoDB bulk operation. */
+export interface OdmBatchRequest {
+  owner: string;
+  items?: Array<OdmSaveRequest & { item_id: string }>;
+  deleteItemIds?: string[];
+}
+
 export interface OdmSearchRequest {
   owner: string;
   query: string;

@@ -1,7 +1,7 @@
 import { Hono } from 'hono';
 import dns from 'node:dns';
 import { MongoClient, type Collection, type Db } from 'mongodb';
-import type { OdmSaveRequest, OdmDeleteRequest } from '../types.js';
+import type { OdmSaveRequest, OdmDeleteRequest, OdmBatchRequest } from '../types.js';
 
 // mongodb+srv:// needs a DNS SRV/TXT lookup before it can connect - Node's c-ares resolver can't
 // complete that against whatever DNS server this host is configured to use (fails with
@@ -10,6 +10,9 @@ import type { OdmSaveRequest, OdmDeleteRequest } from '../types.js';
 dns.setServers(['8.8.8.8', '1.1.1.1']);
 
 export const odmMongoRouter = new Hono();
+
+/** Keeps an individual HTTP payload and MongoDB bulk operation comfortably bounded. */
+const ODM_BATCH_SIZE = 200;
 
 interface OdmMongoDoc {
   /** Deterministic (collection, id) composite - see idForItem() - so an upsert is a true upsert:
@@ -95,13 +98,56 @@ function toItemJson(doc: OdmMongoDoc) {
   };
 }
 
+async function saveItems(
+  collection: string,
+  owner: string,
+  items: Array<OdmSaveRequest & { item_id: string }>,
+): Promise<void> {
+  const now = new Date();
+  const history = items
+    .filter(item => item.storeVersionHistory)
+    .map(item => ({
+      history_id: `${item.item_id}_${crypto.randomUUID()}`,
+      collection,
+      item_id: item.item_id,
+      owner,
+      data: item.data,
+      parent_ids: item.parentIds,
+      ancestor_ids: item.ancestorIds,
+      snapshot_at: now,
+    }));
+
+  if (history.length) await historyCollection().insertMany(history);
+
+  if (!items.length) return;
+  await itemsCollection().bulkWrite(items.map(item => ({
+    updateOne: {
+      filter: { _id: idForItem(collection, item.item_id) },
+      update: {
+        $set: {
+          collection,
+          id: item.item_id,
+          owner,
+          data: item.data,
+          parent_ids: item.parentIds,
+          ancestor_ids: item.ancestorIds,
+          when_last_modified: now,
+          when_deleted: null,
+        },
+      },
+      upsert: true,
+    },
+  })));
+}
+
 odmMongoRouter.get('/api/odm-mongo/items', async c => {
   const collection = c.req.query('collection') ?? '';
   const owner = c.req.query('owner') ?? '';
   const parentId = c.req.query('parentId');
   const ancestorId = c.req.query('ancestorId');
   const limitStr = c.req.query('limit');
-  const limit = limitStr ? Math.min(parseInt(limitStr, 10), 1000) : null;
+  const requestedLimit = limitStr ? Math.min(Math.max(parseInt(limitStr, 10) || ODM_BATCH_SIZE, 1), ODM_BATCH_SIZE) : ODM_BATCH_SIZE;
+  const offset = Math.max(parseInt(c.req.query('offset') ?? '0', 10) || 0, 0);
 
   if (!collection || !owner) return c.json({ error: 'collection and owner required' }, 400);
 
@@ -111,11 +157,42 @@ odmMongoRouter.get('/api/odm-mongo/items', async c => {
   if (parentId) query['parent_ids'] = parentId;
   if (ancestorId) query['ancestor_ids'] = ancestorId;
 
-  let cursor = itemsCollection().find(query).sort({ when_last_modified: -1 });
-  if (limit !== null) cursor = cursor.limit(limit);
-  const docs = await cursor.toArray();
+  // Fetch one extra document so callers can page without an additional count query.
+  const docs = await itemsCollection()
+    .find(query)
+    .sort({ when_last_modified: -1, _id: 1 })
+    .skip(offset)
+    .limit(requestedLimit + 1)
+    .toArray();
 
-  return c.json({ items: docs.map(toItemJson) });
+  const hasMore = docs.length > requestedLimit;
+  return c.json({ items: docs.slice(0, requestedLimit).map(toItemJson), hasMore });
+});
+
+odmMongoRouter.post('/api/odm-mongo/items/:collection/batch', async c => {
+  const collection = c.req.param('collection');
+  const body = await c.req.json<OdmBatchRequest>();
+  const items = body.items ?? [];
+  const deleteItemIds = body.deleteItemIds ?? [];
+
+  if (!body.owner || (!items.length && !deleteItemIds.length)) {
+    return c.json({ error: 'owner and at least one item mutation are required' }, 400);
+  }
+  if (items.length + deleteItemIds.length > ODM_BATCH_SIZE) {
+    return c.json({ error: `at most ${ODM_BATCH_SIZE} item mutations per batch` }, 413);
+  }
+
+  await ensureIndexes();
+  await saveItems(collection, body.owner, items);
+  if (deleteItemIds.length) {
+    const now = new Date();
+    await itemsCollection().updateMany(
+      { _id: { $in: deleteItemIds.map(itemId => idForItem(collection, itemId)) }, owner: body.owner },
+      { $set: { when_deleted: now, when_last_modified: now } },
+    );
+  }
+
+  return c.json({ ok: true, saved: items.length, deleted: deleteItemIds.length });
 });
 
 odmMongoRouter.put('/api/odm-mongo/items/:collection/:item_id', async c => {
@@ -125,35 +202,7 @@ odmMongoRouter.put('/api/odm-mongo/items/:collection/:item_id', async c => {
 
   await ensureIndexes();
 
-  if (body.storeVersionHistory) {
-    await historyCollection().insertOne({
-      history_id: `${item_id}_${crypto.randomUUID()}`,
-      collection,
-      item_id,
-      owner: body.owner,
-      data: body.data,
-      parent_ids: body.parentIds,
-      ancestor_ids: body.ancestorIds,
-      snapshot_at: new Date(),
-    });
-  }
-
-  await itemsCollection().updateOne(
-    { _id: idForItem(collection, item_id) },
-    {
-      $set: {
-        collection,
-        id: item_id,
-        owner: body.owner,
-        data: body.data,
-        parent_ids: body.parentIds,
-        ancestor_ids: body.ancestorIds,
-        when_last_modified: new Date(),
-        when_deleted: null,
-      },
-    },
-    { upsert: true },
-  );
+  await saveItems(collection, body.owner, [{ ...body, item_id }]);
 
   return c.json({ ok: true });
 });

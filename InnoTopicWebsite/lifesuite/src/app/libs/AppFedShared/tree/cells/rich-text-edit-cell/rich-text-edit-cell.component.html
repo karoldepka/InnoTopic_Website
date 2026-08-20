@@ -15,12 +15,12 @@
       fill="clear"
       [disabled]="aiFillLoading"
       (click)="aiFillRequested.emit()"
-      title="Fill with AI"
+      title="AI Answer"
     >
       @if (aiFillLoading) {
         <ion-spinner name="dots"></ion-spinner>
       } @else {
-        <span style="font-size: 1.2rem">✨</span>
+        <span style="font-size: 1.2rem">✨ AI Answer</span>
       }
     </ion-button>
   }

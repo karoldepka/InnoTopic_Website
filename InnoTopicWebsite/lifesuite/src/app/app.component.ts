@@ -97,6 +97,7 @@ export class AppComponent {
       visibleIf: () => g.feat.showExperimental,
     },
     {title: 'Learn & Do', url: '/learn', icon: 'school'},
+    {title: 'Quiz', url: '/learn/quiz', icon: 'help-circle'},
     {title: 'Write Journal', url: '/journal/write', icon: 'create'},
     {title: 'RETROSPECTIVE', url: '/journal', icon: 'time'},
     {title: 'Check Your progress', url: '/learn/stats', icon: 'podium', visibleIf: () => g.feat.showExperimental},
