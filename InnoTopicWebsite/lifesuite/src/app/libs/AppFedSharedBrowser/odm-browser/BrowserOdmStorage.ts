@@ -11,6 +11,13 @@ export interface OdmConflict {
   loserWhenModified: string | null | undefined
 }
 
+/** A remote sync snapshot is reconciliation, not an attempted local edit. A stale replica may
+ * legitimately arrive after a newer locally cached version during reload, so it must never open a
+ * user-visible recovery conflict. */
+export interface BrowserOdmPutOptions {
+  detectConflict?: boolean
+}
+
 /** Local-cache envelope around a `PostgresOdmRow` - same collection/id/owner/data/parent_ids/
  * ancestor_ids shape already used for Postgres, plus this device's own cache bookkeeping. */
 export interface BrowserOdmRow<TRaw> extends PostgresOdmRow<TRaw> {
@@ -356,7 +363,10 @@ export class BrowserOdmStorage {
    * New writes also carry a stable per-browser-install marker, so a same-device echo remains
    * identifiable after its timestamp naturally ages out of the bounded history. If either marker
    * identifies the stale write as ours, it is skipped entirely (no archive row, no toast). */
-  async put<TRaw>(row: PostgresOdmRow<TRaw> & Partial<Pick<BrowserOdmRow<TRaw>, 'key' | 'whenFirstStoredLocally' | 'whenLastStoredLocally'>>): Promise<BrowserOdmRow<TRaw>> {
+  async put<TRaw>(
+    row: PostgresOdmRow<TRaw> & Partial<Pick<BrowserOdmRow<TRaw>, 'key' | 'whenFirstStoredLocally' | 'whenLastStoredLocally'>>,
+    options: BrowserOdmPutOptions = {},
+  ): Promise<BrowserOdmRow<TRaw>> {
     return this.withDb(async db => {
       const key = rowKey(row.collection, row.item_id)
       const tx = db.transaction(STORE, 'readwrite')
@@ -372,7 +382,7 @@ export class BrowserOdmStorage {
         const ownHistory: unknown = (existing.data as any)?.whenLastModifiedHistory
         const isKnownOwnEcho = isKnownOwnEdit(ownHistory, row.when_last_modified, row.data)
 
-        if (!isKnownOwnEcho && JSON.stringify(row.data) !== JSON.stringify(existing.data)) {
+        if (options.detectConflict !== false && !isKnownOwnEcho && JSON.stringify(row.data) !== JSON.stringify(existing.data)) {
           const loserId = `${row.item_id}_conflict_${(row.when_last_modified ?? now).replace(/[:.]/g, '-')}`
           const loserRow: BrowserOdmRow<TRaw> = {
             ...row,

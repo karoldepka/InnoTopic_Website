@@ -75,11 +75,11 @@ export class CachingOdmCollectionBackend<TRaw> extends OdmCollectionBackend<TRaw
   ): OdmCollectionBackendListener<TRaw, OdmItemId<TRaw>> {
     return {
       onAdded: (id, data) => {
-        this.mirrorToCache(data, id as ItemId)
+        this.mirrorRemoteToCache(data, id as ItemId)
         listener.onAdded(id, data)
       },
       onModified: (id, data) => {
-        this.mirrorToCache(data, id as ItemId)
+        this.mirrorRemoteToCache(data, id as ItemId)
         listener.onModified(id, data)
       },
       onRemoved: id => {
@@ -93,5 +93,17 @@ export class CachingOdmCollectionBackend<TRaw> extends OdmCollectionBackend<TRaw
 
   private mirrorToCache(item: TRaw, id: ItemId, parentIds?: ItemId[], ancestorIds?: ItemId[]): void {
     this.mirrorLimiter.run(() => this.cache.saveNowToDb(item, id, parentIds, ancestorIds)).catch(() => undefined)
+  }
+
+  /** Remote listener snapshots reconcile the cache, rather than represent a locally initiated
+   * write. BrowserOdmCollectionBackend exposes this optional path so a stale fanout replica on
+   * app reload cannot be turned into a spurious conflict popup. Other cache implementations keep
+   * the normal save behavior unchanged. */
+  private mirrorRemoteToCache(item: TRaw, id: ItemId, parentIds?: ItemId[], ancestorIds?: ItemId[]): void {
+    const remoteMirror = this.cache as OdmCollectionBackend<TRaw> & {
+      saveRemoteCopy?: (item: TRaw, id: ItemId, parentIds?: ItemId[], ancestorIds?: ItemId[]) => Promise<any>
+    }
+    this.mirrorLimiter.run(() => remoteMirror.saveRemoteCopy?.(item, id, parentIds, ancestorIds)
+      ?? this.cache.saveNowToDb(item, id, parentIds, ancestorIds)).catch(() => undefined)
   }
 }

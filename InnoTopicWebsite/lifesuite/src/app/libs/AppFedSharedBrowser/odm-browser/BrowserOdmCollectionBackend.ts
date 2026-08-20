@@ -24,11 +24,22 @@ export class BrowserOdmCollectionBackend<TRaw> extends OdmCollectionBackend<TRaw
   }
 
   async saveNowToDb(item: TRaw, id: string, parentIds?: ItemId[], ancestorIds?: ItemId[]): Promise<any> {
+    return this.storeItem(item, id, parentIds, ancestorIds, true)
+  }
+
+  /** Mirrors an item received from a remote listener into IndexedDB. During startup/reconnect a
+   * slower fanout replica can deliver an older snapshot after the cache already has a newer one;
+   * preserve the newer row but do not claim that normal reconciliation is a user edit conflict. */
+  async saveRemoteCopy(item: TRaw, id: string, parentIds?: ItemId[], ancestorIds?: ItemId[]): Promise<any> {
+    return this.storeItem(item, id, parentIds, ancestorIds, false)
+  }
+
+  private async storeItem(item: TRaw, id: string, parentIds: ItemId[] | undefined, ancestorIds: ItemId[] | undefined, detectConflict: boolean): Promise<void> {
     await this.waitUntilReady()
     const owner = this.requireUserId()
     const row = createPostgresOdmRow(this.collectionName, id, owner, item, parentIds, ancestorIds)
     try {
-      await this.storage.put(row)
+      await this.storage.put(row, {detectConflict})
     } catch (error) {
       this.errorAlert('saveNowToDb IndexedDB put error', error, item, id)
     }

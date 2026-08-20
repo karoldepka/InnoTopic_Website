@@ -219,6 +219,24 @@ describe('BrowserOdmStorage', () => {
       expect((await storage.getConflictedItemIds(collection)).size).toBe(0)
     })
 
+    it('silently discards a stale remote reconciliation snapshot instead of creating a conflict', async () => {
+      const collection = uniqueCollection()
+      const conflicts: any[] = []
+      storage.conflictDetected$.subscribe(c => conflicts.push(c))
+
+      const newer = createPostgresOdmRow<SutItem>(collection, 'item1', 'owner1', {title: 'newer cached version'})
+      newer.when_last_modified = '2024-01-02T00:00:00.000Z'
+      await storage.put(newer)
+
+      const staleRemote = createPostgresOdmRow<SutItem>(collection, 'item1', 'owner1', {title: 'older replica version'})
+      staleRemote.when_last_modified = '2024-01-01T00:00:00.000Z'
+      const result = await storage.put(staleRemote, {detectConflict: false})
+
+      expect(result.data.title).toBe('newer cached version')
+      expect(conflicts).toEqual([])
+      expect((await storage.getConflictedItemIds(collection)).size).toBe(0)
+    })
+
     it('recognizes a known self-echo when IndexedDB has structured-cloned its timestamp history', async () => {
       const collection = uniqueCollection()
       const conflicts: any[] = []
