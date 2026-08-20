@@ -56,6 +56,10 @@ export class SupabaseTreeService extends DbTreeService {
   private lastDeliveredWhenLastModifiedMsByChildId = new Map<string, number | undefined>()
   private listener?: DbTreeListener
   private loadStarted = false
+  /** A full reachability pass is O(number of loaded tree items). Debouncing turns a burst of
+   * keystroke-driven ODM emits into one pass after typing settles, keeping the editor responsive. */
+  private pendingFlushTimer?: ReturnType<typeof setTimeout>
+  private static readonly FLUSH_DEBOUNCE_MS = 150
 
   /** `NodeInclusion.nodeInclusionId` needs to be stable across a plain reorder/no-op redelivery
    * (so it's found again the next pass) but distinguishable per (child, parent) pair once a child
@@ -73,11 +77,21 @@ export class SupabaseTreeService extends DbTreeService {
   loadNodesTree(listener: DbTreeListener): void {
     this.listener = listener
     if (this.loadStarted) {
-      this.flushDeliverable()
+      this.scheduleFlushDeliverable()
       return
     }
     this.loadStarted = true
-    this.oryItemsService.localItems$.subscribe(() => this.flushDeliverable())
+    this.oryItemsService.localItems$.subscribe(() => this.scheduleFlushDeliverable())
+  }
+
+  private scheduleFlushDeliverable(): void {
+    if (this.pendingFlushTimer !== undefined) {
+      clearTimeout(this.pendingFlushTimer)
+    }
+    this.pendingFlushTimer = setTimeout(() => {
+      this.pendingFlushTimer = undefined
+      this.flushDeliverable()
+    }, SupabaseTreeService.FLUSH_DEBOUNCE_MS)
   }
 
   override loadSubtreeFast(itemId: string): void {

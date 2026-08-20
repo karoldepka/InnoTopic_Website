@@ -370,10 +370,8 @@ export class RootTreeNode<
 
     this.treeModel.permissionsManager.onAfterCreated(newNode as any as OryBaseTreeNode)
 
-    // GH #111: register the optimistic local node (below) BEFORE persisting it - unlike Firestore's
-    // always-async writes, SupabaseTreeService.addChildNode()'s save can synchronously re-enter
-    // TreeModel.onNodeAddedOrModified() within this very call (via localItems$'s synchronous
-    // subscriber -> flushDeliverable()), and that only recognizes an already-registered node
+    // GH #111: register the optimistic local node (below) BEFORE persisting it. A later
+    // SupabaseTreeService delivery recognizes an already-registered node
     // (mapNodeInclusionIdToNodes, keyed by nodeInclusionId) as a dedup instead of creating a
     // second one. Registering first means that reentrant call always finds this node already
     // there, regardless of which backend is wired up.
