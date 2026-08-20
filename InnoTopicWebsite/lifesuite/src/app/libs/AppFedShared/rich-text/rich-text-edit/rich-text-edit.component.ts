@@ -671,7 +671,7 @@ export class RichTextEditComponent extends AbstractCellComponent implements OnIn
             // https://www.tiny.cloud/docs/advanced/keyboard-shortcuts/
             this.highlightSelected(editor)
           });
-        editor.addShortcut('ctrl+b', 'Bullet points style', function(){
+        editor.addShortcut('ctrl+8', 'Bullet points style', function(){
           editor.execCommand('InsertUnorderedList');
         });
         editor.addShortcut('ctrl+shift+b', 'Numbered Bullet points style', function(){
