@@ -5,11 +5,11 @@
 <div
   #contentEditableEl
   contenteditable
+  (keydown.backspace)="nodeContentComponent.onKeyDownBackspaceOnTitle()"
   (keyup.backspace)="onKeyUpBackspace()"
 >
   <!--
      [ngClass]="{'done-title': isDone}"
-  (keydown.backspace)="onKeyDownBackspaceOnTitle()"
    -->
 
 </div>

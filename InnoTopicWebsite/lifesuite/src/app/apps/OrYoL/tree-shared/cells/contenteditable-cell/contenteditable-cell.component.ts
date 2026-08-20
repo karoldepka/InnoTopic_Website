@@ -79,9 +79,8 @@ export class ContenteditableCellComponent extends CellComponent implements OnIni
   }
 
   onKeyUpBackspace() {
-    console.log('onKeyUpBackspace this.treeNode.content.dbItem.itemData', this.treeNode.content.dbItem.itemData)
-    if (  this.treeNode.content.dbItem.itemData.title === ''  ) {
-      console.log('will ask delete !!!')
-    }
+    // The actual empty-node check runs on keydown through NodeContentComponent, before a
+    // Backspace can navigate away from this just-created empty node. Keep this hook for the
+    // legacy component's event shape without emitting debug logs on every keystroke.
   }
 }
