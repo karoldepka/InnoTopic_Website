@@ -65,7 +65,7 @@ export class MongoOdmCollectionBackend<TRaw> extends OdmCollectionBackend<TRaw> 
 
     this.collectionBackendReady$.subscribe(() => {
       this.fetchAndEmit(queryOpts, listener, callback, new Map())
-      if (!queryOpts.oneTimeGet) {
+      if (!queryOpts.oneTimeGet && this.pollIntervalMs > 0) {
         const seenRows = new Map<string, string>()
         const handle = window.setInterval(() => {
           this.fetchAndEmit(queryOpts, listener, callback, seenRows, true)
