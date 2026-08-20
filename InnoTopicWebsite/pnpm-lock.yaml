@@ -594,6 +594,9 @@ importers:
       postgres:
         specifier: ^3.4.5
         version: 3.4.9
+      surrealdb:
+        specifier: ^2.0.8
+        version: 2.0.8(tslib@2.8.1)(typescript@5.9.3)
     devDependencies:
       '@types/node':
         specifier: ^22.10.5
@@ -5037,6 +5040,16 @@ packages:
   '@supabase/supabase-js@2.111.0':
     resolution: {integrity: sha512-9q0/AULthQnWeiDh1vGyjoJZbSY04bu6qHcWit70pqEYn5Kv/dkCPY62Ja1123jEnJbB9Vd2pjY7Kvk/lK3peA==}
     engines: {node: '>=22.0.0'}
+
+  '@surrealdb/cbor@2.0.0-alpha.4':
+    resolution: {integrity: sha512-l/hNZ3ZCOJq8rzwx1y5ZV/8b2bYCWdhGqRVY33Pu50NAHyAW5qLsMn3ZBkZow77mAKwNCsbDsRGnyYEuU95mjw==}
+    engines: {node: '>=18.0.0'}
+
+  '@surrealdb/sqon@0.1.0':
+    resolution: {integrity: sha512-pooKLZ0W6mN8XHzJQavGOdfZOZksycmIjhwFwvG0kdCAt4I5U6KKPHcXQwFkTDNKFKFKdufczLRnzHapPIslQw==}
+    peerDependencies:
+      tslib: ^2.6.3
+      typescript: ^5.0.0
 
   '@tanstack/angular-table@8.21.4':
     resolution: {integrity: sha512-djyuJFvIB/pBuBIqny8b7+5ozeXJSElaxYRZyyKLpYrXn4xQSysBT//X51eDT/mi3kS0spcjIHhoObjk3iCjcQ==}
@@ -11267,6 +11280,12 @@ packages:
     resolution: {integrity: sha512-ot0WnXS9fgdkgIcePe6RHNk1WA8+muPa6cSjeR3V8K27q9BB1rTE3R1p7Hv0z1ZyAc8s6Vvv8DIyWf681MAt0w==}
     engines: {node: '>= 0.4'}
 
+  surrealdb@2.0.8:
+    resolution: {integrity: sha512-nkoTAdnfJYc0EvB2Hut0MET/UiWTOT6+TJODoubHzoC952gJvjEbHMx5TLrecUYo1vIN3/qBgwMIcLKK0WC7zQ==}
+    peerDependencies:
+      tslib: ^2.6.3
+      typescript: ^5.0.0 || ^6.0.0
+
   symbol-tree@3.2.4:
     resolution: {integrity: sha512-9QNk5KwDF+Bvz+PyObkmSYjI5ksVUYtjW7AU22r2NKcfLJcXp96hkDWU3+XndOsUb+AQ9QhfzfCT2O+CNWT5Tw==}
 
@@ -11837,6 +11856,10 @@ packages:
   uuid@9.0.1:
     resolution: {integrity: sha512-b+1eJOlsR9K8HJpow9Ok3fiWOWSIcIzXodvv0rQjVoOVNpWMpxf1wZNpt4y9h10odCNrqnYp1OBzRktckBe3sA==}
     deprecated: uuid@10 and below is no longer supported.  For ESM codebases, update to uuid@latest.  For CommonJS codebases, use uuid@11 (but be aware this version will likely be deprecated in 2028).
+    hasBin: true
+
+  uuidv7@1.2.1:
+    resolution: {integrity: sha512-4kPkK3/XTQW9Hbm4CaqfICn+kY9LJtDVEOfgsRRra/+n2Ofg4NqzRFceAkxvQ/Ud/6BpHOPzj8cirqM7TzTN5Q==}
     hasBin: true
 
   uvu@0.5.6:
@@ -17726,6 +17749,15 @@ snapshots:
       '@supabase/postgrest-js': 2.111.0
       '@supabase/realtime-js': 2.111.0
       '@supabase/storage-js': 2.111.0
+
+  '@surrealdb/cbor@2.0.0-alpha.4': {}
+
+  '@surrealdb/sqon@0.1.0(tslib@2.8.1)(typescript@5.9.3)':
+    dependencies:
+      '@surrealdb/cbor': 2.0.0-alpha.4
+      tslib: 2.8.1
+      typescript: 5.9.3
+      uuidv7: 1.2.1
 
   '@tanstack/angular-table@8.21.4(@angular/core@22.1.0(@angular/compiler@22.1.0)(rxjs@7.8.2)(zone.js@0.16.2))':
     dependencies:
@@ -25667,6 +25699,12 @@ snapshots:
 
   supports-preserve-symlinks-flag@1.0.0: {}
 
+  surrealdb@2.0.8(tslib@2.8.1)(typescript@5.9.3):
+    dependencies:
+      '@surrealdb/sqon': 0.1.0(tslib@2.8.1)(typescript@5.9.3)
+      tslib: 2.8.1
+      typescript: 5.9.3
+
   symbol-tree@3.2.4: {}
 
   tailwind-merge@2.6.1: {}
@@ -26254,6 +26292,8 @@ snapshots:
   uuid@8.3.2: {}
 
   uuid@9.0.1: {}
+
+  uuidv7@1.2.1: {}
 
   uvu@0.5.6:
     dependencies:
