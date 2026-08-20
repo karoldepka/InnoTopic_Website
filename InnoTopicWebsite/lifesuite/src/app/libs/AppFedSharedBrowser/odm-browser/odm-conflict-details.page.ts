@@ -1,15 +1,21 @@
-import {JsonPipe, NgIf} from '@angular/common'
+import {JsonPipe, NgFor, NgIf} from '@angular/common'
 import {ChangeDetectionStrategy, Component, OnInit} from '@angular/core'
 import {ActivatedRoute} from '@angular/router'
 import {IonicModule} from '@ionic/angular'
 import {BrowserOdmRow, BrowserOdmStorage} from './BrowserOdmStorage'
+
+interface ConflictDiffEntry {
+  path: string
+  archivedValue: unknown
+  currentValue: unknown
+}
 
 /** Shows both locally retained versions of a resolved ODM conflict. The archived version stays
  * local-only by design, so this page reads it from BrowserOdmStorage rather than treating it as
  * a normal synced item. */
 @Component({
   standalone: true,
-  imports: [IonicModule, JsonPipe, NgIf],
+  imports: [IonicModule, JsonPipe, NgFor, NgIf],
   selector: 'app-odm-conflict-details',
   template: `
     <ion-header>
@@ -23,37 +29,53 @@ import {BrowserOdmRow, BrowserOdmStorage} from './BrowserOdmStorage'
       <ng-container *ngIf="loaded; else loading">
         <ion-note color="warning">The most recent version remains active. The older version is retained locally for recovery.</ion-note>
 
-        <ion-card>
+        <ion-card *ngIf="winner && loser; else incompleteConflict">
           <ion-card-header>
-            <ion-card-title>Current version</ion-card-title>
-            <ion-card-subtitle>{{ winner?.when_last_modified || 'No modification time recorded' }}</ion-card-subtitle>
+            <ion-card-title>Changed fields</ion-card-title>
+            <ion-card-subtitle>Archived version → current version</ion-card-subtitle>
           </ion-card-header>
           <ion-card-content>
-            <p><code>{{ winnerId }}</code></p>
-            <pre *ngIf="winner; else missingWinner">{{ winner.data | json }}</pre>
-          </ion-card-content>
-        </ion-card>
+            <p class="conflict-version-ids">
+              <span>Archived: <code>{{ loserId }}</code></span>
+              <span>Current: <code>{{ winnerId }}</code></span>
+            </p>
 
-        <ion-card>
-          <ion-card-header>
-            <ion-card-title>Archived conflicting version</ion-card-title>
-            <ion-card-subtitle>{{ loser?.when_last_modified || 'No modification time recorded' }}</ion-card-subtitle>
-          </ion-card-header>
-          <ion-card-content>
-            <p><code>{{ loserId }}</code></p>
-            <pre *ngIf="loser; else missingLoser">{{ loser.data | json }}</pre>
+            <p *ngIf="!diffEntries.length">The two saved versions have the same field values.</p>
+            <section *ngFor="let entry of diffEntries" class="conflict-diff" [attr.aria-label]="'Changed field ' + entry.path">
+              <h2>{{ entry.path }}</h2>
+              <div class="conflict-diff__values">
+                <div class="conflict-diff__value conflict-diff__value--archived">
+                  <h3>Archived</h3>
+                  <pre>{{ entry.archivedValue | json }}</pre>
+                </div>
+                <div class="conflict-diff__value conflict-diff__value--current">
+                  <h3>Current</h3>
+                  <pre>{{ entry.currentValue | json }}</pre>
+                </div>
+              </div>
+            </section>
           </ion-card-content>
         </ion-card>
       </ng-container>
 
       <ng-template #loading><p>Loading conflict details…</p></ng-template>
-      <ng-template #missingWinner><p>The current version is no longer available in this local cache.</p></ng-template>
-      <ng-template #missingLoser><p>The archived version is no longer available in this local cache.</p></ng-template>
+      <ng-template #incompleteConflict>
+        <p *ngIf="!winner">The current version is no longer available in this local cache.</p>
+        <p *ngIf="!loser">The archived version is no longer available in this local cache.</p>
+      </ng-template>
     </ion-content>
   `,
   styles: [`
-    pre { white-space: pre-wrap; overflow-wrap: anywhere; font-size: .8rem; }
+    pre { white-space: pre-wrap; overflow-wrap: anywhere; font-size: .8rem; margin: 0; }
     code { overflow-wrap: anywhere; }
+    .conflict-version-ids { display: grid; gap: .35rem; }
+    .conflict-diff { border-top: 1px solid var(--ion-border-color); padding: .8rem 0; }
+    .conflict-diff h2 { font-size: 1rem; margin: 0 0 .6rem; overflow-wrap: anywhere; }
+    .conflict-diff h3 { font-size: .8rem; margin: 0 0 .35rem; }
+    .conflict-diff__values { display: grid; grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr)); gap: .75rem; }
+    .conflict-diff__value { border-radius: .4rem; padding: .6rem; }
+    .conflict-diff__value--archived { background: rgba(255, 196, 9, .12); }
+    .conflict-diff__value--current { background: rgba(45, 211, 111, .12); }
   `],
   changeDetection: ChangeDetectionStrategy.Eager,
 })
@@ -63,6 +85,7 @@ export class OdmConflictDetailsPage implements OnInit {
   loserId = ''
   winner?: BrowserOdmRow<unknown>
   loser?: BrowserOdmRow<unknown>
+  diffEntries: ConflictDiffEntry[] = []
   loaded = false
 
   constructor(
@@ -78,6 +101,28 @@ export class OdmConflictDetailsPage implements OnInit {
       this.browserOdmStorage.get<unknown>(this.collection, this.winnerId),
       this.browserOdmStorage.get<unknown>(this.collection, this.loserId),
     ])
+    this.diffEntries = this.winner && this.loser
+      ? this.buildDiff(this.loser.data, this.winner.data)
+      : []
     this.loaded = true
+  }
+
+  private buildDiff(archivedValue: unknown, currentValue: unknown, path = ''): ConflictDiffEntry[] {
+    if (Object.is(archivedValue, currentValue)) {
+      return []
+    }
+    if (this.isRecord(archivedValue) && this.isRecord(currentValue)) {
+      const keys = new Set([...Object.keys(archivedValue), ...Object.keys(currentValue)])
+      return [...keys].sort().flatMap(key => this.buildDiff(
+        archivedValue[key],
+        currentValue[key],
+        path ? `${path}.${key}` : key,
+      ))
+    }
+    return [{path: path || '(whole item)', archivedValue, currentValue}]
+  }
+
+  private isRecord(value: unknown): value is Record<string, unknown> {
+    return value !== null && typeof value === 'object' && !Array.isArray(value)
   }
 }
