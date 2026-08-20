@@ -29,19 +29,21 @@ export const environmentBase = {
   neon: {
     enabled: true, // Neon provisioned via Vercel Marketplace (project purple-tooth-99583291)
     odmApiUrl: 'http://localhost:8000/api/odm',
-    pollIntervalMs: 5000,
+    // Disabled temporarily: every active ODM collection otherwise polls each replica every 5s.
+    // Set a positive interval to opt back in once incremental/server-push sync is available.
+    pollIntervalMs: 0,
   },
 
   mongo: {
     enabled: true, // Atlas cluster0free - see backend-ts/.env MONGODB_URI
     odmApiUrl: 'http://localhost:8000/api/odm-mongo',
-    pollIntervalMs: 5000,
+    pollIntervalMs: 0,
   },
 
   surreal: {
     enabled: true, // local Docker only so far (container `lifesuite-surrealdb`) - not deployed anywhere reachable outside this machine yet
     odmApiUrl: 'http://localhost:8000/api/odm-surreal',
-    pollIntervalMs: 5000,
+    pollIntervalMs: 0,
   },
 
   showExperimentalThemes: true,
