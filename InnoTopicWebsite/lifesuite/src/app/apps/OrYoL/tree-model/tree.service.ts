@@ -51,6 +51,9 @@ export class TreeService {
       onNodeInclusionModified(nodeInclusionId, nodeInclusionData, newParentItemId: string) {
         // TODO: entry point for moving node to different parent?
         treeModel.onNodeInclusionModified(nodeInclusionId, nodeInclusionData, newParentItemId)
+      },
+      onNodeRemoved(itemId: string) {
+        treeModel.onNodeRemoved(itemId)
       }
     })
     this.rootTreeModel = treeModel

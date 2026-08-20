@@ -112,6 +112,20 @@ export class SupabaseTreeService extends DbTreeService {
     if (!this.listener) {
       return
     }
+    const loadedItemIds = new Set(this.oryItemsService.mapIdToItem$.keys() as Iterable<string>)
+    const removedItemIds = [...this.deliveredParentIdsByChildId.keys()]
+      .filter(itemId => !loadedItemIds.has(itemId))
+    if (removedItemIds.length) {
+      for (const itemId of removedItemIds) {
+        this.listener.onNodeRemoved(itemId)
+      }
+      // A removed parent can leave otherwise-live rows unreachable. Start the next pass from the
+      // root and redeliver only the rows that still form a connected tree.
+      this.deliveredParentIdsByChildId.clear()
+      this.lastDeliveredWhenLastModifiedMsByChildId.clear()
+      this.reachableItemIds = new Set<string>([this.HARDCODED_ROOT_NODE_ITEM_ID])
+      this.ancestorChainByItemId = new Map<string, string[]>([[this.HARDCODED_ROOT_NODE_ITEM_ID, [this.HARDCODED_ROOT_NODE_ITEM_ID]]])
+    }
     let reachableSizeBeforePass: number
     do {
       reachableSizeBeforePass = this.reachableItemIds.size

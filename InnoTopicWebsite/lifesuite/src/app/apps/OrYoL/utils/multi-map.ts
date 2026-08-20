@@ -28,6 +28,19 @@ export class MultiMap<K, V> {
     return this.map.get(key) || EMPTY_ARRAY
   }
 
+  remove(key: K, val: V) {
+    const coll = this.map.get(key)
+    if (!coll) {
+      return
+    }
+    const remaining = coll.filter(existing => existing !== val)
+    if (remaining.length) {
+      this.map.set(key, remaining)
+    } else {
+      this.map.delete(key)
+    }
+  }
+
   get keyCount() {
     return this.map.size
   }

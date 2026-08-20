@@ -319,6 +319,29 @@ export class TreeModel<
     // }
   }
 
+  /** Removes every rendered inclusion of an item. Descendants are removed from the visual tree
+   * too: they may still exist as rows, but are unreachable until a later sync delivers them under
+   * a surviving parent. */
+  onNodeRemoved(itemId: ItemId) {
+    for (const node of [...this.getNodesByItemId(itemId)]) {
+      if (!node.isRoot) {
+        this.removeNodeAndDescendants(node)
+      }
+    }
+  }
+
+  private removeNodeAndDescendants(node: TBaseNode) {
+    for (const child of [...(node.children ?? [])]) {
+      this.removeNodeAndDescendants(child as unknown as TBaseNode)
+    }
+    const nonRootNode = node as unknown as TNonRootNode
+    nonRootNode.parent2?._removeChild(nonRootNode)
+    if (nonRootNode.nodeInclusion) {
+      this.mapNodeInclusionIdToNodes.remove(nonRootNode.nodeInclusion.nodeInclusionId, nonRootNode)
+    }
+    this.mapItemIdToNodes.remove(node.itemId, node)
+  }
+
   registerNode(nodeToRegister: TNonRootNode) {
     this.mapNodeInclusionIdToNodes.add(nodeToRegister.nodeInclusion!.nodeInclusionId, nodeToRegister)
     this.addNodeToMapByItemId(nodeToRegister)
