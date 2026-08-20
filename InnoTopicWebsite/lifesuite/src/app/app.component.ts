@@ -1,7 +1,7 @@
-import {Component, HostListener, ChangeDetectionStrategy} from '@angular/core';
+import {Component, ElementRef, HostListener, ViewChild, ChangeDetectionStrategy} from '@angular/core';
 import Fuse from 'fuse.js'
 
-import {MenuController, Platform, PopoverController} from '@ionic/angular';
+import {Platform, PopoverController} from '@ionic/angular';
 import {Router} from '@angular/router';
 import { Capacitor } from '@capacitor/core';
 import { SplashScreen } from '@capacitor/splash-screen';
@@ -43,6 +43,8 @@ interface SideMenuPage {
   styleUrls: ['app.component.scss'],
 })
 export class AppComponent {
+  @ViewChild('sideMenu', {read: ElementRef}) private readonly sideMenuElement!: ElementRef<HTMLIonMenuElement>
+
   /** LifeDvisor navigation, rendered by the official Ionic sidemenu-starter shell. */
   public appPages: SideMenuPage[] = [
     {title: 'Home', url: '/lifedvisor', icon: 'home'},
@@ -117,7 +119,6 @@ export class AppComponent {
     public optionsService: OptionsService,
     public popoverController: PopoverController,
     private router: Router,
-    private menuCtrl: MenuController,
   ) {
     this.initializeApp();
   }
@@ -207,7 +208,7 @@ export class AppComponent {
     }
     // Close the overlay before routing. Navigating first can replace the page underneath while
     // Ionic is still animating the menu, leaving the side menu visibly open on the destination.
-    await this.menuCtrl.close('app-side-menu')
+    await this.sideMenuElement.nativeElement.close()
     this.go(first)
     if (first.url) {
       await this.router.navigateByUrl(first.url)
