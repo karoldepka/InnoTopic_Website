@@ -34,10 +34,6 @@ const routes: Routes = [
     loadChildren: () => import('./apps/TopicFriends/topic-friends.module').then(m => m.TopicFriendsModule) },
   { path: 'auth',
     loadChildren: () => import('./auth/auth.module').then(m => m.AuthPageModule) },
-  { path: 'learn',
-    loadChildren: () => import('./apps/Learn/search-or-add-learnable-item/search-or-add-learnable-item.module').then(m => m.SearchOrAddLearnableItemPageModule),
-    data: { shouldReuse: true },
-  },
   { path: 'learn/item',
     loadChildren: async () => (await import('./apps/Learn/learn-item-details/learn-item-details.module')).LearnItemDetailsPageModule
   },
@@ -54,6 +50,10 @@ const routes: Routes = [
   {
     path: 'learn/ai-chat',
     loadComponent: () => import('./apps/Learn/learn-ai-chat/learn-ai-chat.page').then(m => m.LearnAiChatPage),
+  },
+  { path: 'learn',
+    loadChildren: () => import('./apps/Learn/search-or-add-learnable-item/search-or-add-learnable-item.module').then(m => m.SearchOrAddLearnableItemPageModule),
+    data: { shouldReuse: true },
   },
   {
     path: 'what-next',
@@ -105,16 +105,16 @@ const routes: Routes = [
     loadChildren: () => import('./apps/Lifedvisor/ask/ask.module').then(m => m.AskPageModule)
   },
   {
-    path: 'ai',
-    loadComponent: () => import('./apps/Ai/ai-hub/ai-hub.page').then(m => m.AiHubPage),
-  },
-  {
     path: 'ai/qa',
     loadComponent: () => import('./apps/Ai/ai-qa/ai-qa.page').then(m => m.AiQaPage),
   },
   {
     path: 'ai-generate-q-and-a/copilotkit',
     loadComponent: () => import('./apps/Ai/ai-generate-q-and-a/copilotkit/copilotkit-qa.page').then(m => m.CopilotkitQaPage),
+  },
+  {
+    path: 'ai',
+    loadComponent: () => import('./apps/Ai/ai-hub/ai-hub.page').then(m => m.AiHubPage),
   },
   {
     path: 'copilotkit',
