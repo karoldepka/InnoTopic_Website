@@ -1,16 +1,33 @@
 \:host
   display: block
 
-// inline-block (not block) so this wraps tight to the projected diagram's own natural size -
-// .doodle-overlay__canvas is absolutely positioned, so it doesn't itself contribute to that
-// sizing, only .doodle-overlay__content (the diagram, in normal flow) does.
+// inline-block (not block) so this wraps tight to the projected diagram's own natural size.
+// The canvas itself is absolutely positioned, so reserve room in normal flow for its toolbar;
+// otherwise the toolbar spills over the next diagram when an overlay is followed by another one.
 .doodle-overlay
   position: relative
   display: inline-block
   max-width: 100%
+  box-sizing: border-box
+  padding-block-end: 112px
+  vertical-align: top
 
 .doodle-overlay__canvas
   position: absolute
   inset: 0
   width: 100%
   height: 100%
+  // The Stencil component's shadow DOM consumes these public theme tokens. Keeping the stage
+  // transparent preserves the projected diagram below it; the toolbar uses the app's actual
+  // dark/light surface and text colors rather than the package's fixed light-gray defaults.
+  --doodle-stage-background: transparent
+  --doodle-toolbar-background: var(--ion-item-background, var(--ion-background-color, #171717))
+  --doodle-text-color: var(--ion-text-color, #f4f5f8)
+  --doodle-border-color: color-mix(in srgb, var(--ion-text-color, #f4f5f8) 24%, transparent)
+  --doodle-accent: var(--ion-color-primary, #0a84ff)
+
+// On a full-width overlay the controls fit on one row. The smaller reserve keeps the visible gap
+// compact while still keeping that toolbar out of the following content's hit area.
+@media (min-width: 520px)
+  .doodle-overlay
+    padding-block-end: 64px
