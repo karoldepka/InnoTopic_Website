@@ -198,7 +198,7 @@ export class AppComponent {
    * command palette, instead of having to reach for the mouse once the list is down to one match.
    * Bypasses ion-menu-toggle's click-based close (Enter never fires a click on the item), so the
    * menu is closed here explicitly instead. */
-  async onSearchEnter(event?: KeyboardEvent): Promise<void> {
+  async onSearchEnter(event?: Event): Promise<void> {
     event?.preventDefault()
     event?.stopPropagation()
     const first = this.filteredPages(this.appPages)[0] ?? this.filteredPages(this.morePages)[0]
