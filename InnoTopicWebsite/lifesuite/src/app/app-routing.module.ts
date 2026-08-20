@@ -9,6 +9,11 @@ const routes: Routes = [
   },
 
   {
+    path: 'conflicts/:collection/:winnerId/:loserId',
+    loadComponent: () => import('./libs/AppFedSharedBrowser/odm-browser/odm-conflict-details.page').then(m => m.OdmConflictDetailsPage),
+  },
+
+  {
     path: 'timers',
     loadChildren: () => import('./timers/timers.module').then(m => m.TimersPageModule)
   },

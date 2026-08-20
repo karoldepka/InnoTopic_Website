@@ -1,7 +1,7 @@
 import {Injectable} from '@angular/core'
 import {Router} from '@angular/router'
 import {ToastController} from '@ionic/angular'
-import {BrowserOdmStorage} from './BrowserOdmStorage'
+import {BrowserOdmStorage, OdmConflict} from './BrowserOdmStorage'
 import {presentDismissableToast} from '../../AppFedShared/utils/toast-utils'
 
 /** Per-collection "open the winning item" URL builders. Not a generic cross-collection routing
@@ -24,20 +24,21 @@ export class OdmConflictToastService {
     private router: Router,
   ) {
     this.browserOdmStorage.conflictDetected$.subscribe(conflict => {
-      this.presentConflictToast(conflict.collection, conflict.winnerId)
+      this.presentConflictToast(conflict)
     })
   }
 
-  private async presentConflictToast(collection: string, winnerId: string): Promise<void> {
+  private async presentConflictToast({collection, winnerId, loserConflictId}: OdmConflict): Promise<void> {
     const buildUrl = COLLECTION_ROUTES[collection]
     await presentDismissableToast(this.toastController, {
-      message: `A conflicting edit was found in ${collection}. Kept the most recent version - the other is saved for recovery.`,
+      message: `A conflicting edit was found in ${collection}. Kept the most recent version - the other is saved for recovery. Click to see details.`,
       duration: 8000,
       color: 'warning',
       position: 'bottom',
-      buttons: buildUrl
-        ? [{text: 'Open', handler: () => this.router.navigateByUrl(buildUrl(winnerId))}]
-        : [],
+      buttons: [
+        {text: 'View details', handler: () => this.router.navigate(['/conflicts', collection, winnerId, loserConflictId])},
+        ...(buildUrl ? [{text: 'Open item', handler: () => this.router.navigateByUrl(buildUrl(winnerId))}] : []),
+      ],
     })
   }
 }
