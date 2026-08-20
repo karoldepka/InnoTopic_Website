@@ -9,7 +9,7 @@ import {presentDismissableToast} from '../../AppFedShared/utils/toast-utils'
  * toast, just without an "Open" button. */
 const COLLECTION_ROUTES: Record<string, (id: string) => string> = {
   LearnItem: id => `/learn/item/${id}`,
-  JournalEntry: id => `/journal/write/${id}`,
+  JournalEntry: id => `/journal/entry/${id}`,
   OryItem: id => `/tree/${id}`,
 }
 
