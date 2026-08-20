@@ -204,14 +204,22 @@ export class SupabaseOdmCollectionBackend<TRaw> extends OdmCollectionBackend<TRa
     })
   }
 
-  private buildFetchQuery(queryOpts: QueryOpts & {parentId?: ItemId, ancestorId?: ItemId}, owner: string, cursor: string | undefined) {
+  private buildFetchQuery(
+    queryOpts: QueryOpts & {parentId?: ItemId, ancestorId?: ItemId},
+    owner: string,
+    cursor: string | undefined,
+    includeDeleted = false,
+  ) {
     let query = this.supabase
       .from(this.tableName)
       .select('*')
       .eq('collection', this.collectionName)
       .eq('owner', owner)
-      .is('when_deleted', null)
       .order('when_last_modified', {ascending: false})
+
+    if (!includeDeleted) {
+      query = query.is('when_deleted', null)
+    }
 
     if (queryOpts.parentId) {
       query = query.contains('parent_ids', [queryOpts.parentId])
@@ -226,7 +234,10 @@ export class SupabaseOdmCollectionBackend<TRaw> extends OdmCollectionBackend<TRa
     return query
   }
 
-  private async fetchRows(queryOpts: QueryOpts & {parentId?: ItemId, ancestorId?: ItemId}): Promise<PostgresOdmRow<TRaw>[]> {
+  private async fetchRows(
+    queryOpts: QueryOpts & {parentId?: ItemId, ancestorId?: ItemId},
+    includeDeleted = false,
+  ): Promise<PostgresOdmRow<TRaw>[]> {
     const owner = this.requireUserId()
     // The sync cursor only makes sense for the general/unscoped query - loadChildrenOf/
     // loadTreeDescendantsOf need completeness for their scoped query, not just recent changes.
@@ -237,7 +248,7 @@ export class SupabaseOdmCollectionBackend<TRaw> extends OdmCollectionBackend<TRa
     let rows: any[]
     if (queryOpts.limit) {
       const offset = queryOpts.offset ?? 0
-      let query = this.buildFetchQuery(queryOpts, owner, cursor)
+      let query = this.buildFetchQuery(queryOpts, owner, cursor, includeDeleted)
       query = offset > 0 ? query.range(offset, offset + queryOpts.limit - 1) : query.limit(queryOpts.limit)
       const {data, error} = await query
       if (error) {
@@ -251,7 +262,7 @@ export class SupabaseOdmCollectionBackend<TRaw> extends OdmCollectionBackend<TRa
       const pageSize = 1000
       rows = []
       for (let from = 0; ; from += pageSize) {
-        const {data, error} = await this.buildFetchQuery(queryOpts, owner, cursor).range(from, from + pageSize - 1)
+        const {data, error} = await this.buildFetchQuery(queryOpts, owner, cursor, includeDeleted).range(from, from + pageSize - 1)
         if (error) {
           throw error
         }
@@ -372,8 +383,11 @@ export class SupabaseOdmCollectionBackend<TRaw> extends OdmCollectionBackend<TRa
     const maxAttempts = 3
     for (let attempt = 1; attempt <= maxAttempts; attempt++) {
       try {
-        const rows = await this.fetchRows(queryOpts)
-        this.emitRowsAsAdded(rows, listener)
+        // Include soft-deleted rows too: Realtime cannot replay deletes that happened while the
+        // WebSocket was disconnected, so the incremental server fetch must turn those tombstones
+        // into local removes as well as upserting changed live rows.
+        const rows = await this.fetchRows(queryOpts, true)
+        this.emitRowsAsChanges(rows, listener)
         callback?.()
         return
       } catch (error) {
@@ -389,6 +403,20 @@ export class SupabaseOdmCollectionBackend<TRaw> extends OdmCollectionBackend<TRa
   private emitRowsAsAdded(rows: PostgresOdmRow<TRaw>[], listener: OdmCollectionBackendListener<TRaw>): void {
     for (const row of rows) {
       listener.onAdded(row.item_id as OdmItemId<TRaw>, rawFromPostgresOdmRow(row))
+    }
+    listener.onFinishedProcessingChangeSet()
+  }
+
+  private emitRowsAsChanges(rows: PostgresOdmRow<TRaw>[], listener: OdmCollectionBackendListener<TRaw>): void {
+    for (const row of rows) {
+      const itemId = row.item_id as OdmItemId<TRaw>
+      if ((row as any).when_deleted) {
+        listener.onRemoved(itemId)
+      } else {
+        // `onAdded` is deliberately an upsert in OdmService2, so it covers both a new server row
+        // and a modification to one that was already in the local cache.
+        listener.onAdded(itemId, rawFromPostgresOdmRow(row))
+      }
     }
     listener.onFinishedProcessingChangeSet()
   }
