@@ -8,7 +8,8 @@ import { ActivatedRoute, Router, RouterLink } from '@angular/router'
 import {CachedSubject} from '../../../libs/AppFedShared/utils/cachedSubject2/CachedSubject2'
 import {BaseComponent} from '../../../libs/AppFedShared/base/base.component'
 import { IonicModule, PopoverController } from '@ionic/angular';
-import { NgIf, NgFor } from '@angular/common';
+import { Location, NgIf, NgFor } from '@angular/common';
+import { Subscription } from 'rxjs';
 import { TimePassingComponent } from '../../../libs/AppFedShared/time/time-passing/time-passing.component';
 import { SyncStatusIconComponent } from '../../../libs/AppFedShared/odm/sync-status/sync-status-icon.component';
 import { JournalItemEditComponent } from './journal-item-edit/journal-item-edit.component';
@@ -44,6 +45,9 @@ export class JournalWritePage extends BaseComponent implements OnInit, OnDestroy
 
   private readonly onWindowBeforeUnload = () => this.flushPendingEdits()
 
+  /** Watches just a brand-new entry until its first edit assigns a durable ODM id. */
+  private createdEntryIdSubscription?: Subscription
+
   /** Mobile Safari/WKWebView (the realistic runtime for this app backgrounded via home button,
    * app-switch, or screen lock) doesn't reliably fire `beforeunload` - `visibilitychange` going
    * `hidden` is the standard, reliable signal for "the app is about to be suspended/killed" on
@@ -59,6 +63,7 @@ export class JournalWritePage extends BaseComponent implements OnInit, OnDestroy
     public geoLocationService: ApfGeoLocationService,
     public activatedRoute: ActivatedRoute,
     public router: Router,
+    private location: Location,
     public popoverController: PopoverController,
     injector: Injector,
   ) {
@@ -81,6 +86,7 @@ export class JournalWritePage extends BaseComponent implements OnInit, OnDestroy
     // Covers in-app navigation away from this page (back button, tapping some other link) that
     // doesn't go through newItem()/onBackClicked() below.
     this.flushPendingEdits()
+    this.createdEntryIdSubscription?.unsubscribe()
     window.removeEventListener('beforeunload', this.onWindowBeforeUnload)
     document.removeEventListener('visibilitychange', this.onVisibilityChange)
   }
@@ -153,13 +159,28 @@ export class JournalWritePage extends BaseComponent implements OnInit, OnDestroy
     this.flushPendingEdits()
     // this.item$Replacable
     this.router.navigateByUrl(`/journal/write/new`).then(() => {
+      this.itemId = 'new'
       this.setItem$(new JournalEntry$(this.journalEntriesService, undefined, new JournalEntry()))
     })
   }
 
   private setItem$(item$: JournalEntry$) {
     this.flushPendingEdits()
+    this.createdEntryIdSubscription?.unsubscribe()
     this.item$ = item$
     this.item$FakeArray = [ this.item$ ]
+
+    if (this.itemId === 'new' && !item$.id) {
+      this.createdEntryIdSubscription = item$.val$.subscribe(() => {
+        if (item$.id) {
+          this.itemId = item$.id
+          // Keep this editor instance alive (and its focused field intact), while turning the
+          // temporary /journal/write/new address into the entry's permanent, shareable URL.
+          this.location.replaceState(`/journal/entry/${encodeURIComponent(item$.id)}`)
+          this.createdEntryIdSubscription?.unsubscribe()
+          this.createdEntryIdSubscription = undefined
+        }
+      })
+    }
   }
 }
