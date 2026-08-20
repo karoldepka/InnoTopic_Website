@@ -26,7 +26,6 @@
           showClearButton="always"
           (ionInput)="onSearchChange($any($event).detail.value ?? '')"
           (ionClear)="onSearchChange('')"
-          (keydown.enter)="onSearchEnter($event)"
         ></ion-searchbar>
 
         @let filteredAppPages = filteredPages(appPages);

@@ -1,7 +1,7 @@
 import {Component, ElementRef, HostListener, ViewChild, ChangeDetectionStrategy} from '@angular/core';
 import Fuse from 'fuse.js'
 
-import {Platform, PopoverController} from '@ionic/angular';
+import {IonSearchbar, Platform, PopoverController} from '@ionic/angular';
 import {Router} from '@angular/router';
 import { Capacitor } from '@capacitor/core';
 import { SplashScreen } from '@capacitor/splash-screen';
@@ -44,6 +44,18 @@ interface SideMenuPage {
 })
 export class AppComponent {
   @ViewChild('sideMenu', {read: ElementRef}) private readonly sideMenuElement!: ElementRef<HTMLIonMenuElement>
+  @ViewChild('sideMenuSearchbar') private readonly sideMenuSearchbar!: IonSearchbar
+
+  private sideMenuSearchKeydownBound = false
+  private readonly onSideMenuSearchKeydown = (event: KeyboardEvent): void => {
+    if (event.key !== 'Enter') {
+      return
+    }
+    // ion-searchbar debounces ionInput, so read the native input directly before choosing the
+    // result - pressing Enter immediately after the final character must not use the prior query.
+    this.onSearchChange((event.currentTarget as HTMLInputElement).value)
+    void this.onSearchEnter(event)
+  }
 
   /** LifeDvisor navigation, rendered by the official Ionic sidemenu-starter shell. */
   public appPages: SideMenuPage[] = [
@@ -151,6 +163,21 @@ export class AppComponent {
 
   onSideMenuWillOpen(): void {
     this.elementFocusedBeforeSideMenuOpened = document.activeElement instanceof HTMLElement ? document.activeElement : null
+    this.bindSideMenuSearchEnter()
+  }
+
+  private async bindSideMenuSearchEnter(): Promise<void> {
+    if (this.sideMenuSearchKeydownBound) {
+      return
+    }
+    this.sideMenuSearchKeydownBound = true
+    try {
+      const input = await this.sideMenuSearchbar.getInputElement()
+      input.addEventListener('keydown', this.onSideMenuSearchKeydown)
+    } catch {
+      // Retry on the next open if Ionic has not created the inner input yet.
+      this.sideMenuSearchKeydownBound = false
+    }
   }
 
   onSideMenuDidClose(): void {
