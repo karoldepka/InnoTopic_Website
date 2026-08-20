@@ -11,6 +11,7 @@ import {
   BLOB_CACHE_STORE,
 } from './BrowserOdmStorage'
 import {createPostgresOdmRow} from '../../AppFedSharedPostgres/odm-postgres/PostgresOdmRow'
+import {getOdmModificationDeviceId} from '../../AppFedShared/odm/odm-modification-device'
 
 interface SutItem {
   title: string
@@ -236,6 +237,26 @@ describe('BrowserOdmStorage', () => {
       const editAEcho = createPostgresOdmRow<SutItem>(collection, 'item1', 'owner1', {title: 'edit A (older)'})
       editAEcho.when_last_modified = editATimestamp
       await storage.put(editAEcho)
+
+      expect(conflicts).toEqual([])
+      expect((await storage.getConflictedItemIds(collection)).size).toBe(0)
+    })
+
+    it('recognizes a delayed same-device echo after its timestamp has aged out of write history', async () => {
+      const collection = uniqueCollection()
+      const conflicts: any[] = []
+      storage.conflictDetected$.subscribe(c => conflicts.push(c))
+
+      const winner = createPostgresOdmRow<SutItem>(collection, 'item1', 'owner1', {title: 'current'} as any)
+      winner.when_last_modified = '2024-03-01T00:00:00.000Z'
+      await storage.put(winner)
+
+      const delayedOwnEcho = createPostgresOdmRow<SutItem>(collection, 'item1', 'owner1', {
+        title: 'much older local value',
+        whenLastModifiedDeviceId: getOdmModificationDeviceId(),
+      } as any)
+      delayedOwnEcho.when_last_modified = '2024-01-01T00:00:00.000Z'
+      await storage.put(delayedOwnEcho)
 
       expect(conflicts).toEqual([])
       expect((await storage.getConflictedItemIds(collection)).size).toBe(0)

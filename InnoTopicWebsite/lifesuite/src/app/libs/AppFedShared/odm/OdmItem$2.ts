@@ -13,13 +13,14 @@ import {BehaviorSubject} from 'rxjs'
 import {debugLog} from '../utils/log'
 import {Injector} from '@angular/core'
 import {NodeOrderer, ORDER_STEP} from './NodeOrderer'
+import {getOdmModificationDeviceId} from './odm-modification-device'
 
 export type UserId = string
 
 /** How many of an item's own past `whenLastModified` values to remember (see
  * `OdmInMemItem.whenLastModifiedHistory`) - just enough to cover a realistically delayed realtime
  * echo, not a full history. */
-const OWN_WHEN_LAST_MODIFIED_HISTORY_LIMIT = 8
+const OWN_WHEN_LAST_MODIFIED_HISTORY_LIMIT = 64
 
 /** Constructor shape for a "domain item" - a companion object overlaying an `OdmItem$2` with
  * type-specific behaviour (e.g. OrYoL's `TimeTrackedEntry`) without the base item itself needing
@@ -74,6 +75,9 @@ export class OdmInMemItem extends OdmInMemItemWriteOnce {
    * rewritten item (e.g. OrYoL's `_mindfulness` anchor, patched on every time-track pause/resume)
    * is exactly where this race was most reproducible ("happens all the time" per #125/#126). */
   public whenLastModifiedHistory?: string[]
+  /** Browser-install marker of the device that made the current version. This is not an account
+   * identity: it exists solely to recognize delayed self-echoes in the local cache. */
+  public whenLastModifiedDeviceId?: string
   /** GH #89's "whenDescendantLastModified" rollup - server-maintained (see the
    * `trg_bump_when_descendant_last_modified` DB trigger, migration
    * `add_when_descendant_last_modified_rollup`), never written directly by the client except for
@@ -494,6 +498,7 @@ export class OdmItem$2<
     // console.trace(`setWhenLastModified`, this)
     const ts = OdmBackend.nowTimestamp()
     this.currentVal ! . whenLastModified = ts
+    this.currentVal ! . whenLastModifiedDeviceId = getOdmModificationDeviceId()
     const history = this.currentVal ! . whenLastModifiedHistory ?? []
     history.push(ts.toDate().toISOString())
     this.currentVal ! . whenLastModifiedHistory = history.slice(-OWN_WHEN_LAST_MODIFIED_HISTORY_LIMIT)

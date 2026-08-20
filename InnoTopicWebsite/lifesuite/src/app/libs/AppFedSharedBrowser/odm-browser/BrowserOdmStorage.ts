@@ -1,6 +1,7 @@
 import {Injectable} from '@angular/core'
 import {Subject} from 'rxjs'
 import {PostgresOdmRow, timestampLikeToIsoString} from '../../AppFedSharedPostgres/odm-postgres/PostgresOdmRow'
+import {getOdmModificationDeviceId} from '../../AppFedShared/odm/odm-modification-device'
 
 export interface OdmConflict {
   collection: string
@@ -99,7 +100,10 @@ function isStrictlyOlder(a: string | null | undefined, b: string | null | undefi
 /** History is written locally as Firebase Timestamps, but may reach IndexedDB as a structured-
  * cloned `{seconds, nanoseconds}` object. Compare normalized instants so an old echo of our own
  * write is not mistaken for a cross-device conflict merely because its representation changed. */
-function isKnownOwnEdit(history: unknown, staleWhenModified: string | null | undefined): boolean {
+function isKnownOwnEdit(history: unknown, staleWhenModified: string | null | undefined, staleData: unknown): boolean {
+  if ((staleData as any)?.whenLastModifiedDeviceId === getOdmModificationDeviceId()) {
+    return true
+  }
   if (!staleWhenModified || !Array.isArray(history)) {
     return false
   }
@@ -349,9 +353,9 @@ export class BrowserOdmStorage {
    * `_mindfulness` anchor, patched on every time-track pause/resume). The winning (currently
    * cached) row's own `whenLastModifiedHistory` (`OdmItem$2.setWhenLastModified()`) is checked
    * first - with both string and structured-cloned Firebase Timestamp representations accepted.
-   * If it already contains this stale write's instant, it's unambiguously an echo of a write this
-   * same logical item already knows about, not a conflict, and is skipped entirely (no archive
-   * row, no toast). */
+   * New writes also carry a stable per-browser-install marker, so a same-device echo remains
+   * identifiable after its timestamp naturally ages out of the bounded history. If either marker
+   * identifies the stale write as ours, it is skipped entirely (no archive row, no toast). */
   async put<TRaw>(row: PostgresOdmRow<TRaw> & Partial<Pick<BrowserOdmRow<TRaw>, 'key' | 'whenFirstStoredLocally' | 'whenLastStoredLocally'>>): Promise<BrowserOdmRow<TRaw>> {
     return this.withDb(async db => {
       const key = rowKey(row.collection, row.item_id)
@@ -366,7 +370,7 @@ export class BrowserOdmStorage {
         await requestToPromise(store.put(refreshed))
 
         const ownHistory: unknown = (existing.data as any)?.whenLastModifiedHistory
-        const isKnownOwnEcho = isKnownOwnEdit(ownHistory, row.when_last_modified)
+        const isKnownOwnEcho = isKnownOwnEdit(ownHistory, row.when_last_modified, row.data)
 
         if (!isKnownOwnEcho && JSON.stringify(row.data) !== JSON.stringify(existing.data)) {
           const loserId = `${row.item_id}_conflict_${(row.when_last_modified ?? now).replace(/[:.]/g, '-')}`
