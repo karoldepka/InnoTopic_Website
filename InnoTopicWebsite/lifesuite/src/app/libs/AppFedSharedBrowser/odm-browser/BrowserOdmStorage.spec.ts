@@ -217,6 +217,29 @@ describe('BrowserOdmStorage', () => {
       expect(allRows.length).toBe(1)
       expect((await storage.getConflictedItemIds(collection)).size).toBe(0)
     })
+
+    it('recognizes a known self-echo when IndexedDB has structured-cloned its timestamp history', async () => {
+      const collection = uniqueCollection()
+      const conflicts: any[] = []
+      storage.conflictDetected$.subscribe(c => conflicts.push(c))
+
+      const editATimestamp = '2024-01-01T00:00:00.000Z'
+      const editBTimestamp = '2024-01-02T00:00:00.000Z'
+      const editB = createPostgresOdmRow<SutItem>(collection, 'item1', 'owner1', {
+        title: 'edit B (newer)',
+        // Firebase Timestamp values are structured-cloned by IndexedDB into this shape.
+        whenLastModifiedHistory: [{seconds: 1704067200, nanoseconds: 0}],
+      } as any)
+      editB.when_last_modified = editBTimestamp
+      await storage.put(editB)
+
+      const editAEcho = createPostgresOdmRow<SutItem>(collection, 'item1', 'owner1', {title: 'edit A (older)'})
+      editAEcho.when_last_modified = editATimestamp
+      await storage.put(editAEcho)
+
+      expect(conflicts).toEqual([])
+      expect((await storage.getConflictedItemIds(collection)).size).toBe(0)
+    })
   })
 
   describe('sync cursor', () => {

@@ -1,6 +1,6 @@
 import {Injectable} from '@angular/core'
 import {Subject} from 'rxjs'
-import {PostgresOdmRow} from '../../AppFedSharedPostgres/odm-postgres/PostgresOdmRow'
+import {PostgresOdmRow, timestampLikeToIsoString} from '../../AppFedSharedPostgres/odm-postgres/PostgresOdmRow'
 
 export interface OdmConflict {
   collection: string
@@ -94,6 +94,27 @@ function isStrictlyOlder(a: string | null | undefined, b: string | null | undefi
     return false
   }
   return new Date(a).getTime() < new Date(b).getTime()
+}
+
+/** History is written locally as Firebase Timestamps, but may reach IndexedDB as a structured-
+ * cloned `{seconds, nanoseconds}` object. Compare normalized instants so an old echo of our own
+ * write is not mistaken for a cross-device conflict merely because its representation changed. */
+function isKnownOwnEdit(history: unknown, staleWhenModified: string | null | undefined): boolean {
+  if (!staleWhenModified || !Array.isArray(history)) {
+    return false
+  }
+  const staleTime = new Date(staleWhenModified).getTime()
+  return history.some(value => {
+    const historyWhenModified = timestampLikeToIsoString(value)
+    if (!historyWhenModified) {
+      return false
+    }
+    if (historyWhenModified === staleWhenModified) {
+      return true
+    }
+    const historyTime = new Date(historyWhenModified).getTime()
+    return Number.isFinite(staleTime) && Number.isFinite(historyTime) && historyTime === staleTime
+  })
 }
 
 function requestToPromise<T>(req: IDBRequest<T>): Promise<T> {
@@ -327,9 +348,10 @@ export class BrowserOdmStorage {
    * another device/session, and was firing constantly on frequently-rewritten items (OrYoL's
    * `_mindfulness` anchor, patched on every time-track pause/resume). The winning (currently
    * cached) row's own `whenLastModifiedHistory` (`OdmItem$2.setWhenLastModified()`) is checked
-   * first - if it already contains this exact stale write's timestamp, it's unambiguously an
-   * echo of a write this same logical item already knows about, not a conflict, and is skipped
-   * entirely (no archive row, no toast). */
+   * first - with both string and structured-cloned Firebase Timestamp representations accepted.
+   * If it already contains this stale write's instant, it's unambiguously an echo of a write this
+   * same logical item already knows about, not a conflict, and is skipped entirely (no archive
+   * row, no toast). */
   async put<TRaw>(row: PostgresOdmRow<TRaw> & Partial<Pick<BrowserOdmRow<TRaw>, 'key' | 'whenFirstStoredLocally' | 'whenLastStoredLocally'>>): Promise<BrowserOdmRow<TRaw>> {
     return this.withDb(async db => {
       const key = rowKey(row.collection, row.item_id)
@@ -343,8 +365,8 @@ export class BrowserOdmStorage {
         const refreshed: BrowserOdmRow<TRaw> = {...existing, whenLastStoredLocally: now}
         await requestToPromise(store.put(refreshed))
 
-        const ownHistory: string[] | undefined = (existing.data as any)?.whenLastModifiedHistory
-        const isKnownOwnEcho = !!row.when_last_modified && !!ownHistory?.includes(row.when_last_modified)
+        const ownHistory: unknown = (existing.data as any)?.whenLastModifiedHistory
+        const isKnownOwnEcho = isKnownOwnEdit(ownHistory, row.when_last_modified)
 
         if (!isKnownOwnEcho && JSON.stringify(row.data) !== JSON.stringify(existing.data)) {
           const loserId = `${row.item_id}_conflict_${(row.when_last_modified ?? now).replace(/[:.]/g, '-')}`
