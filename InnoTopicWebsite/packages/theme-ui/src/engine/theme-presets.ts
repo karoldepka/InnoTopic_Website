@@ -23,20 +23,20 @@ export interface ThemePreset {
 
 /** Shared shadow/corner settings for every preset below, unless a preset overrides them. */
 const defaultShadow = {
-  shadow_offset: '5',
-  shadow_blur_radius: '10',
-  shadow_opacity: 50,
-  inner_shadow_offset: '2',
+  shadow_offset: '1',
+  shadow_blur_radius: '3',
+  shadow_opacity: 16,
+  inner_shadow_offset: '-6',
   inner_shadow_blur_radius: '4',
-  inner_shadow_opacity: 30,
+  inner_shadow_opacity: 0,
 }
 
-/** Matches topic-chip's original hardcoded `border-radius: 20px 7px` look. */
+/** The standard rounded-corner treatment. */
 const defaultCorners = {
-  corner_radius_top_left: '20',
-  corner_radius_top_right: '7',
-  corner_radius_bottom_right: '20',
-  corner_radius_bottom_left: '7',
+  corner_radius_top_left: '12',
+  corner_radius_top_right: '12',
+  corner_radius_bottom_right: '12',
+  corner_radius_bottom_left: '12',
 }
 
 /** Neutral icon recolor settings (see theme-config-state.ts) - most presets leave these alone. */

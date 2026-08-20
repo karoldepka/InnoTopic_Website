@@ -42,22 +42,18 @@ export const defaultThemeConfig: ThemeConfigState = {
   ion_color_primary: '#007bff',
   ion_color_secondary: '#6c757d',
   ion_background_color: '#ffffff',
-  shadow_offset: '5',
-  shadow_blur_radius: '10',
-  shadow_opacity: 50,
-  // Subtler than the outer shadow by default (smaller offset/blur/opacity) - an inset shadow
-  // reads as "pressed in" even at a much lower magnitude than an outer one needs to read as
-  // "raised", and a heavy default here would visually fight the outer shadow on every consumer
-  // that adopts both without deliberately tuning them against each other first.
-  inner_shadow_offset: '2',
+  shadow_offset: '1',
+  shadow_blur_radius: '3',
+  shadow_opacity: 16,
+  // The standard surface keeps its inset layer disabled, while retaining the tuned geometry so
+  // enabling it later starts from the same balanced direction and blur.
+  inner_shadow_offset: '-6',
   inner_shadow_blur_radius: '4',
-  inner_shadow_opacity: 30,
-  // Matches the neumorphic-chip's original hardcoded `border-radius: 20px 7px` exactly, so the
-  // default theme is a visual no-op for existing chips until someone actually changes a preset.
-  corner_radius_top_left: '20',
-  corner_radius_top_right: '7',
-  corner_radius_bottom_right: '20',
-  corner_radius_bottom_left: '7',
+  inner_shadow_opacity: 0,
+  corner_radius_top_left: '12',
+  corner_radius_top_right: '12',
+  corner_radius_bottom_right: '12',
+  corner_radius_bottom_left: '12',
   icon_contrast: 1,
   icon_brightness: 0,
   brightness_percent: 75,
