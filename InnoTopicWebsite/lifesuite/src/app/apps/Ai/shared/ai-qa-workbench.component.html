@@ -32,12 +32,6 @@
       (ionInput)="setTopic($any($event).detail.value)"
     ></ion-textarea>
 
-    <div class="example-row" aria-label="Topic examples">
-      <ion-button fill="clear" size="small" (click)="setExampleTopic('Rust interview questions')">Rust</ion-button>
-      <ion-button fill="clear" size="small" (click)="setExampleTopic('Angular signals and RxJS')">Angular</ion-button>
-      <ion-button fill="clear" size="small" (click)="setExampleTopic('Postgres performance interview questions')">Postgres</ion-button>
-    </div>
-
     <div class="action-row">
       <ion-toggle
         labelPlacement="end"
@@ -70,7 +64,7 @@
     </div>
 
     <div class="metrics-row">
-      <span>{{ gen.categoryCount() }} categories</span>
+      <span>{{ gen.categoryLoading() ? 'Generating categories…' : gen.categoryCount() + ' categories' }}</span>
       <span>{{ requestedQuestionCount() }} requested Q&A</span>
       <span>{{ gen.existingCategories().length }} existing</span>
       <span *ngIf="gen.modelName()">{{ gen.modelName() }}</span>

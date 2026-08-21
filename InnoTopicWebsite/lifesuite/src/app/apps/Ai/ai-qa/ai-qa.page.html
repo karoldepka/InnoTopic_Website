@@ -23,12 +23,6 @@
           (ionInput)="setTopic($any($event).detail.value)"
         ></ion-textarea>
 
-        <div class="examples" *ngIf="!gen.fileTree()">
-          <ion-button fill="clear" size="small" (click)="topic.set('Rust interview questions')">Rust</ion-button>
-          <ion-button fill="clear" size="small" (click)="topic.set('Angular signals and RxJS')">Angular</ion-button>
-          <ion-button fill="clear" size="small" (click)="topic.set('Postgres performance')">Postgres</ion-button>
-        </div>
-
         <!-- ── GH #130: generate from a local directory instead of/alongside a text topic ──── -->
         <div class="directory-picker" *ngIf="directoryPickerSupported">
           <ion-button *ngIf="!gen.fileTree()" fill="outline" size="small" (click)="pickDirectory()">
@@ -85,7 +79,7 @@
         </div>
 
         <div class="metrics">
-          <span>{{ gen.categoryCount() }} categories</span>
+          <span>{{ gen.categoryLoading() ? 'Generating categories…' : gen.categoryCount() + ' categories' }}</span>
           <span>{{ totalQCount() }} Q&amp;A requested</span>
           <span>{{ gen.existingCategories().length }} existing</span>
           <span *ngIf="gen.modelName()">{{ gen.modelName() }}</span>
@@ -254,7 +248,7 @@
           [disabled]="gen.questionLoading() || !gen.questions().length"
           (click)="startBowQuiz()"
         >
-          <ion-icon name="locate-outline" slot="start"></ion-icon>
+          <ion-icon name="locate" slot="start"></ion-icon>
           Play Bow Quiz
         </ion-button>
         <ion-button
@@ -263,7 +257,7 @@
           [disabled]="gen.questionLoading() || (!gen.tree().length && !gen.questions().length)"
           (click)="saveToLearn()"
         >
-          <ion-icon name="save-outline" slot="start"></ion-icon>
+          <ion-icon name="save" slot="start"></ion-icon>
           Save to Learn
         </ion-button>
       </div>

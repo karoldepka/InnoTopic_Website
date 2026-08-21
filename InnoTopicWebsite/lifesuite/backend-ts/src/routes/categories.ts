@@ -17,6 +17,42 @@ function resolveSearchQuery(body: CategoryTreeRequest): string {
   return body.fileTree ? (body.message?.trim() || body.fileTree.rootName) : body.message;
 }
 
+function categoryRequestLogDetails(body: CategoryTreeRequest) {
+  return {
+    topicLength: body.message?.length ?? 0,
+    existingRootCount: body.tree?.length ?? 0,
+    webSearch: Boolean(body.web_search),
+    matchExisting: Boolean(body.match_existing),
+    isRefinement: Boolean(body.isRefinement),
+    fileTreeEntryCount: body.fileTree?.entries.length ?? 0,
+    model: MODEL_NAME,
+  };
+}
+
+async function* logCategoryStream(stream: ReadableStream<string>, startedAt: number): AsyncGenerator<string> {
+  let chunkCount = 0;
+  let characterCount = 0;
+  try {
+    for await (const chunk of stripJsonFences(stream)) {
+      chunkCount++;
+      characterCount += chunk.length;
+      if (chunkCount === 1) {
+        console.info('[category-tree] First stream chunk', { durationMs: Date.now() - startedAt });
+      }
+      yield chunk;
+    }
+  } catch (error) {
+    console.error('[category-tree] Stream failed', { durationMs: Date.now() - startedAt, error });
+    throw error;
+  } finally {
+    console.info('[category-tree] Stream completed', {
+      durationMs: Date.now() - startedAt,
+      chunkCount,
+      characterCount,
+    });
+  }
+}
+
 // ─── Debug: return raw prompt without calling the model ───────────────────────
 
 categoriesRouter.post('/category-tree/debug-prompt', async (c) => {
@@ -65,7 +101,13 @@ categoriesRouter.get('/ai-api/categories/existing', handleExistingCategories);
 
 async function handleCategoryTreeStream(c: import('hono').Context) {
   const body = await c.req.json<CategoryTreeRequest>();
+  const startedAt = Date.now();
+  console.info('[category-tree] Stream request received', categoryRequestLogDetails(body));
   const searchResults = body.web_search ? await webSearch(resolveSearchQuery(body)) : [];
+  console.info('[category-tree] Search enrichment resolved', {
+    durationMs: Date.now() - startedAt,
+    resultCount: searchResults.length,
+  });
   const existingCategories = loadExistingCategories();
   const { system, messages } = buildCategoryTreeMessages(body, existingCategories, searchResults);
 
@@ -76,7 +118,7 @@ async function handleCategoryTreeStream(c: import('hono').Context) {
     maxRetries: 0,
     experimental_telemetry: { isEnabled: true, functionId: 'category-tree-stream' },
   });
-  return textStreamResponse(stripJsonFences(textStream), c);
+  return textStreamResponse(logCategoryStream(textStream, startedAt), c);
 }
 
 categoriesRouter.post('/category-tree/stream-json', handleCategoryTreeStream);
@@ -116,6 +158,8 @@ categoriesRouter.post('/ai-api/category-tree-stream', handleCategoryTreeStreamSS
 
 async function handleCategoryTree(c: import('hono').Context) {
   const body = await c.req.json<CategoryTreeRequest>();
+  const startedAt = Date.now();
+  console.info('[category-tree] Fallback request received', categoryRequestLogDetails(body));
   const searchResults = body.web_search ? await webSearch(resolveSearchQuery(body)) : [];
   const existingCategories = loadExistingCategories();
   const { system, messages } = buildCategoryTreeMessages(body, existingCategories, searchResults);
@@ -130,6 +174,10 @@ async function handleCategoryTree(c: import('hono').Context) {
     experimental_telemetry: { isEnabled: true, functionId: 'category-tree' },
   });
 
+  console.info('[category-tree] Fallback request completed', {
+    durationMs: Date.now() - startedAt,
+    generatedRootCount: object.tree?.length ?? 0,
+  });
   return c.json({ ...object, modelName: MODEL_NAME });
 }
 

@@ -89,7 +89,6 @@ export class AiQaWorkbenchComponent implements OnInit {
   // ---- Topic & options --------------------------------------------------
 
   setTopic(value: string | null | undefined): void { this.topic.set(value || ''); }
-  setExampleTopic(topic: string): void { this.topic.set(topic); }
   setWebSearch(value: boolean): void { this.webSearch.set(value); }
 
   // ---- Generation -------------------------------------------------------
