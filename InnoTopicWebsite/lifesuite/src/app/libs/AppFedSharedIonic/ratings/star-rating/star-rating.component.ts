@@ -82,7 +82,9 @@ export class StarRatingComponent extends CustomFormControl<StarRatingVal> {
     const newValue = this.isActiveStar(starIndex)
       ? this.nextSameStarValue(starIndex)
       : starIndex
-    this.continueFirstStarCycleAfterClear = false
+    // nextSameStarValue() marks the `1 → 0` transition so the following click can continue
+    // into the fractional sequence. Do not immediately clear that marker here.
+    if (newValue !== 0 || starIndex !== 1) this.continueFirstStarCycleAfterClear = false
     this.setValue(newValue)
   }
 
