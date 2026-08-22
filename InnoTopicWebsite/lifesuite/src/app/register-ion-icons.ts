@@ -1,4 +1,5 @@
 import {addIcons} from 'ionicons'
+import * as iconDefinitions from 'ionicons/icons'
 import {
   addCircle,
   addCircleOutline,
@@ -281,4 +282,19 @@ export function registerIonIcons() {
     trendingUpOutline,
     trendingUpSharp,
   })
+
+  // Keep existing `*-outline` names compatible while rendering their filled variants.
+  // This applies to icons supplied from templates and dynamically stored icon names alike.
+  const icons = iconDefinitions as Record<string, string>
+  addIcons(
+    Object.fromEntries(
+      Object.entries(icons)
+        .filter(([name]) => name.endsWith('Outline') && icons[name.slice(0, -'Outline'.length)])
+        .map(([name]) => [toKebabCase(name), icons[name.slice(0, -'Outline'.length)]]),
+    ),
+  )
+}
+
+function toKebabCase(name: string): string {
+  return name.replace(/[A-Z]/g, letter => `-${letter.toLowerCase()}`)
 }

@@ -3,7 +3,7 @@ import {NG_VALUE_ACCESSOR} from '@angular/forms'
 import {NgFor} from '@angular/common'
 import {IonicModule} from '@ionic/angular'
 import {addIcons} from 'ionicons'
-import {star, starOutline} from 'ionicons/icons'
+import {star} from 'ionicons/icons'
 import {CustomFormControl} from '../../../AppFedShared/utils/angular/custom-form-control'
 
 export type StarRatingVal = number
@@ -41,7 +41,7 @@ export class StarRatingComponent extends CustomFormControl<StarRatingVal> {
 
   constructor(private changeDetectorRef: ChangeDetectorRef) {
     super()
-    addIcons({star, 'star-outline': starOutline})
+    addIcons({star, 'star-outline': star})
   }
 
   get starIndexes(): number[] {

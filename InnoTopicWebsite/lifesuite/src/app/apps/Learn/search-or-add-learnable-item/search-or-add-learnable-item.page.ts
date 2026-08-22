@@ -40,7 +40,7 @@ import { VoiceAttachableItem } from '../../../libs/AppFedShared/audio/voice-memo
 import { OdmBackend } from '../../../libs/AppFedShared/odm/OdmBackend';
 import { ItemListComponent } from './item-list/item-list.component';
 import { addIcons } from 'ionicons';
-import { logoGoogle, logoFacebook, mailOutline } from 'ionicons/icons';
+import { logoGoogle, logoFacebook, mail } from 'ionicons/icons';
 import { TranslatePipe } from '@ngx-translate/core';
 
 /** TODO: rename to smth simpler more standard like LearnDoItemsPage (search-or-add is kinda implied, especially search) */
@@ -105,7 +105,7 @@ export class SearchOrAddLearnableItemPageComponent extends BaseComponent impleme
     injector: Injector,
   ) {
     super(injector)
-    addIcons({ logoGoogle, logoFacebook, mailOutline })
+    addIcons({ logoGoogle, logoFacebook, 'mail-outline': mail })
   }
 
   ngOnInit() {
