@@ -66,19 +66,13 @@ export class MinMidMaxCellComponent extends AbstractCellComponent {
 
   onStarValueChanged(starValue: StarRatingVal) {
     if (starValue === 0) {
-      this.clearNumericValue()
+      // Keep an explicit zero: clearing to null made the next render indistinguishable from an
+      // unset rating and broke the leftmost star's toggle-off behaviour.
+      this.cell.patchThrottled({...this.val, numVal: 0})
       return
     }
     const numVal = starValue * (MinMidMaxCellComponent.maxStoredRatingValue / this.maxStars)
     this.cell.patchThrottled({...this.val, numVal})
-  }
-
-  private clearNumericValue() {
-    const {numVal, ...withoutNumVal} = this.val
-    const hasRemainingValue = Object.values(withoutNumVal).some(
-      value => value !== undefined && value !== null && value !== ''
-    )
-    this.cell.patchThrottled(hasRemainingValue ? {...withoutNumVal, numVal: null} : null)
   }
 
   onCommentOpenChange(isOpen: boolean) {
