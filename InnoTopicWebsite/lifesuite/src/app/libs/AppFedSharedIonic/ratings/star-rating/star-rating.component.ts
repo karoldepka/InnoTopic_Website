@@ -11,7 +11,7 @@ export type StarRatingVal = number
 /**
  * A tap-to-rate star widget. Clicking a star sets the rating to that star's full value;
  * clicking the same active star again cycles its partial fill through .5, .25, .75,
- * then back to full. With allowZero, clicking the active first star clears the rating.
+ * then back to full. Clicking the active first star clears the rating to numeric zero.
  */
 @Component({
   selector: 'apf-star-rating',
@@ -31,7 +31,7 @@ export class StarRatingComponent extends CustomFormControl<StarRatingVal> {
 
   @Input() maxStars = 5
 
-  @Input() allowZero = false
+  @Input() allowZero = true
 
   private readonly sameStarFractions = [0.5, 0.25, 0.75, 1]
 
