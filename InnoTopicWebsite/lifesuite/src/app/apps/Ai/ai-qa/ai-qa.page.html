@@ -23,26 +23,20 @@
           (ionInput)="setTopic($any($event).detail.value)"
         ></ion-textarea>
 
-        <div class="examples" *ngIf="!gen.fileTree()">
-          <ion-button fill="clear" size="small" (click)="topic.set('Rust interview questions')">Rust</ion-button>
-          <ion-button fill="clear" size="small" (click)="topic.set('Angular signals and RxJS')">Angular</ion-button>
-          <ion-button fill="clear" size="small" (click)="topic.set('Postgres performance')">Postgres</ion-button>
-        </div>
-
         <!-- ── GH #130: generate from a local directory instead of/alongside a text topic ──── -->
         <div class="directory-picker" *ngIf="directoryPickerSupported">
           <ion-button *ngIf="!gen.fileTree()" fill="outline" size="small" (click)="pickDirectory()">
-            <ion-icon name="folder-outline" slot="start"></ion-icon>
+            <ion-icon name="folder" slot="start"></ion-icon>
             Pick folder…
           </ion-button>
           <div class="picked-directory" *ngIf="gen.fileTree() as pickedTree">
-            <ion-icon name="folder-outline"></ion-icon>
+            <ion-icon name="folder"></ion-icon>
             <span>
               {{ pickedTree.rootName }} — {{ pickedDirectoryFileCount() }} file{{ pickedDirectoryFileCount() === 1 ? '' : 's' }}
               <ng-container *ngIf="pickedDirectorySkippedCount()">, {{ pickedDirectorySkippedCount() }} skipped</ng-container>
             </span>
             <ion-button fill="clear" size="small" (click)="clearDirectory()" aria-label="Clear picked folder">
-              <ion-icon name="close-outline" slot="icon-only"></ion-icon>
+              <ion-icon name="close" slot="icon-only"></ion-icon>
             </ion-button>
           </div>
         </div>
@@ -73,7 +67,7 @@
             (click)="gen.categoryLoading() ? gen.stopCategories() : (rawPromptMode() ? sendRawPrompt() : generateCategories())"
           >
             <ion-icon
-              [name]="gen.categoryLoading() ? 'stop-circle-outline' : 'sparkles-outline'"
+              [name]="gen.categoryLoading() ? 'stop-circle' : 'sparkles'"
               slot="start"
             ></ion-icon>
             {{ gen.categoryLoading() ? 'Stop' : 'Generate Categories' }}
@@ -85,7 +79,7 @@
         </div>
 
         <div class="metrics">
-          <span>{{ gen.categoryCount() }} categories</span>
+          <span>{{ gen.categoryLoading() ? 'Generating categories…' : gen.categoryCount() + ' categories' }}</span>
           <span>{{ totalQCount() }} Q&amp;A requested</span>
           <span>{{ gen.existingCategories().length }} existing</span>
           <span *ngIf="gen.modelName()">{{ gen.modelName() }}</span>
@@ -107,10 +101,10 @@
             color="warning"
             (click)="undoDelete()"
           >
-            <ion-icon name="arrow-undo-outline" slot="start"></ion-icon>Undo
+            <ion-icon name="arrow-undo" slot="start"></ion-icon>Undo
           </ion-button>
           <ion-button fill="clear" size="small" (click)="addRootCategory()">
-            <ion-icon name="add-outline" slot="icon-only"></ion-icon>
+            <ion-icon name="add" slot="icon-only"></ion-icon>
           </ion-button>
         </div>
       </div>
@@ -139,7 +133,7 @@
                         [attr.aria-label]="row.getIsExpanded() ? 'Collapse' : 'Expand'"
                         (click)="row.toggleExpanded()"
                       >
-                        <ion-icon [name]="row.getIsExpanded() ? 'chevron-down-outline' : 'chevron-forward-outline'"></ion-icon>
+                        <ion-icon [name]="row.getIsExpanded() ? 'chevron-down' : 'chevron-forward'"></ion-icon>
                       </button>
                     } @else {
                       <span class="cat-toggler-spacer"></span>
@@ -171,7 +165,7 @@
                   </td>
                   <td class="col-btn">
                     <ion-button fill="clear" size="small" [attr.aria-label]="'Add child to ' + row.original.title" (click)="addChild(row.original.id)">
-                      <ion-icon name="add-outline" slot="icon-only"></ion-icon>
+                      <ion-icon name="add" slot="icon-only"></ion-icon>
                     </ion-button>
                   </td>
                   <td class="col-btn">
@@ -182,12 +176,12 @@
                       [attr.aria-label]="'Generate subcategories for ' + row.original.title"
                       (click)="showMoreSubcategoriesDialog(row.original)"
                     >
-                      <ion-icon name="sparkles-outline" slot="icon-only"></ion-icon>
+                      <ion-icon name="sparkles" slot="icon-only"></ion-icon>
                     </ion-button>
                   </td>
                   <td class="col-btn">
                     <ion-button fill="clear" size="small" color="danger" [attr.aria-label]="'Delete ' + row.original.title" (click)="deleteCategory(row.original.id)">
-                      <ion-icon name="trash-outline" slot="icon-only"></ion-icon>
+                      <ion-icon name="trash" slot="icon-only"></ion-icon>
                     </ion-button>
                   </td>
                 </tr>
@@ -225,7 +219,7 @@
             [disabled]="gen.categoryLoading() || !refineMessage().trim()"
             (click)="sendCategoryChat()"
           >
-            <ion-icon name="send-outline" slot="icon-only"></ion-icon>
+            <ion-icon name="send" slot="icon-only"></ion-icon>
           </ion-button>
         </div>
       </div>
@@ -243,7 +237,7 @@
           (click)="gen.questionLoading() ? gen.stopQuestions() : generateQuestions()"
         >
           <ion-icon
-            [name]="gen.questionLoading() ? 'stop-circle-outline' : 'checkmark-outline'"
+            [name]="gen.questionLoading() ? 'stop-circle' : 'checkmark'"
             slot="start"
           ></ion-icon>
           {{ gen.questionLoading() ? 'Stop' : 'Generate Q&A' }}
@@ -254,7 +248,7 @@
           [disabled]="gen.questionLoading() || !gen.questions().length"
           (click)="startBowQuiz()"
         >
-          <ion-icon name="locate-outline" slot="start"></ion-icon>
+          <ion-icon name="locate" slot="start"></ion-icon>
           Play Bow Quiz
         </ion-button>
         <ion-button
@@ -263,7 +257,7 @@
           [disabled]="gen.questionLoading() || (!gen.tree().length && !gen.questions().length)"
           (click)="saveToLearn()"
         >
-          <ion-icon name="save-outline" slot="start"></ion-icon>
+          <ion-icon name="save" slot="start"></ion-icon>
           Save to Learn
         </ion-button>
       </div>
@@ -290,10 +284,10 @@
             (ionChange)="showAnswers.set($any($event).detail.checked)"
           >Show answers</ion-toggle>
           <ion-button fill="clear" size="small" [disabled]="!gen.questions().length" (click)="copyQuestions()">
-            <ion-icon name="copy-outline" slot="icon-only"></ion-icon>
+            <ion-icon name="copy" slot="icon-only"></ion-icon>
           </ion-button>
           <ion-button fill="clear" size="small" [disabled]="!gen.questions().length" (click)="exportJson()">
-            <ion-icon name="download-outline" slot="icon-only"></ion-icon>
+            <ion-icon name="download" slot="icon-only"></ion-icon>
           </ion-button>
         </div>
       </div>
@@ -322,7 +316,7 @@
                   (click)="toggleAnswer(item, i)"
                 >
                   <ion-icon
-                    [name]="answerVisible(item, i) ? 'eye-off-outline' : 'eye-outline'"
+                    [name]="answerVisible(item, i) ? 'eye-off' : 'eye'"
                     slot="icon-only"
                   ></ion-icon>
                 </ion-button>
@@ -343,7 +337,7 @@
                   @if (gen.questionImageLoadingIndices().has(i)) {
                     <ion-spinner name="dots" slot="start"></ion-spinner>
                   } @else {
-                    <ion-icon name="image-outline" slot="start"></ion-icon>
+                    <ion-icon name="image" slot="start"></ion-icon>
                   }
                   {{ item.imageDataUrl ? 'Regenerate image' : 'Generate image' }}
                 </ion-button>
@@ -363,7 +357,7 @@
               color="danger"
               (click)="gen.stopQuestions()"
             >
-              <ion-icon name="stop-circle-outline" slot="start"></ion-icon>
+              <ion-icon name="stop-circle" slot="start"></ion-icon>
               Stop
             </ion-button>
           }
@@ -373,7 +367,7 @@
             [disabled]="!selectedQIndices().size"
             (click)="approveSelected()"
           >
-            <ion-icon name="checkmark-outline" slot="start"></ion-icon>
+            <ion-icon name="checkmark" slot="start"></ion-icon>
             Approve ({{ selectedQIndices().size }})
           </ion-button>
           <ion-button
@@ -382,7 +376,7 @@
             [disabled]="!selectedQIndices().size"
             (click)="rejectSelected()"
           >
-            <ion-icon name="close-outline" slot="start"></ion-icon>
+            <ion-icon name="close" slot="start"></ion-icon>
             Reject ({{ selectedQIndices().size }})
           </ion-button>
           <ion-button
@@ -391,7 +385,7 @@
             [disabled]="gen.questionLoading()"
             (click)="showMoreQADialog()"
           >
-            <ion-icon name="add-outline" slot="start"></ion-icon>
+            <ion-icon name="add" slot="start"></ion-icon>
             More Q&amp;A…
           </ion-button>
         </div>

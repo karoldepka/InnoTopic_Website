@@ -1,5 +1,7 @@
 export const buildInfo = {
   branch: "local",
   commit: "local",
-  builtAt: "2026-08-20T11:24:41.372Z",
+  commitAuthor: "Karol Depka Pradzinski The First",
+  commitMessage: "Use solid Ionicons everywhere",
+  builtAt: "2026-08-22T16:13:17.172Z",
 };

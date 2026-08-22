@@ -2,10 +2,10 @@
   <div class="category-node__row">
     <ion-icon
       class="category-node__toggle"
-      [name]="treeNode.isExpanded ? 'chevron-down-outline' : 'chevron-forward-outline'"
+      [name]="treeNode.isExpanded ? 'chevron-down' : 'chevron-forward'"
       (click)="toggleExpanded()"
     ></ion-icon>
-    <ion-icon class="category-node__folder-icon" name="folder-outline"></ion-icon>
+    <ion-icon class="category-node__folder-icon" name="folder"></ion-icon>
     <app-rich-text-edit-cell
       class="category-node__title"
       [cell]="titleCell"
@@ -26,7 +26,7 @@
           (keydown.enter)="addChild()"
         ></ion-input>
         <ion-button fill="clear" size="small" (click)="addChild()" [disabled]="!newChildTitle.trim()">
-          <ion-icon name="add-outline" slot="icon-only"></ion-icon>
+          <ion-icon name="add" slot="icon-only"></ion-icon>
         </ion-button>
       </div>
     </div>

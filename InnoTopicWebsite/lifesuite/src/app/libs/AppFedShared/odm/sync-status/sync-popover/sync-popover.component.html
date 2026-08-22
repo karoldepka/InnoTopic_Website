@@ -95,7 +95,7 @@
 <ng-template
   #notLoggedIn
 >
-  {{ 'SYNC.NOT_LOGGED_IN' | translate }}
+  <div class="not-logged-in">{{ 'SYNC.NOT_LOGGED_IN' | translate }}</div>
 </ng-template>
 
 <div class="actions">
@@ -110,7 +110,7 @@
     color="warning"
     (click)="releaseMic()"
   >
-    <ion-icon slot="start" name="mic-off-outline"></ion-icon>
+    <ion-icon slot="start" name="mic-off"></ion-icon>
     {{ 'SYNC.RELEASE_MIC' | translate }}
   </ion-button>
 </div>

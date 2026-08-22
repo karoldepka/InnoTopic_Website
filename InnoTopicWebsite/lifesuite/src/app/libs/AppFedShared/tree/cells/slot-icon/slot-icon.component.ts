@@ -10,10 +10,10 @@ import {SlotDescriptor, SlotKind} from '../SlotDescriptor'
  * coupled to that component's `OryBaseTreeNode` input - this one only needs a `SlotDescriptor`,
  * so it works for a real scalar field, a bare slot, or (once ported) an OrYoL node alike. */
 const DEFAULT_ICON_BY_KIND: Record<SlotKind, string> = {
-  numeric: 'star-outline',
-  text: 'document-text-outline',
-  slot: 'folder-outline',
-  intensity: 'speedometer-outline',
+  numeric: 'star',
+  text: 'document-text',
+  slot: 'folder',
+  intensity: 'speedometer',
 }
 
 @Component({

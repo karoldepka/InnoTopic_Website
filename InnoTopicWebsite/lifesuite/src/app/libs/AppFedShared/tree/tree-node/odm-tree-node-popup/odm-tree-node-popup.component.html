@@ -74,7 +74,7 @@
       />
       <ion-icon
         *ngIf="! isAddingChild"
-        name="add-circle-outline"
+        name="add-circle"
         slot="start"
       />
       Add
@@ -88,7 +88,7 @@
       (click)="clearNewChild()"
     >
       <ion-icon
-        name="close-outline"
+        name="close"
         slot="start"
       />
       Clear
@@ -100,7 +100,7 @@
       [routerLink]="item$ . getRouterLinkUrl()"
     >
       <ion-icon
-        name="open-outline"
+        name="open"
         slot="start"
       />
       Open
@@ -113,7 +113,7 @@
       (click)="deleteWithConfirmation()"
     >
       <ion-icon
-        name="trash-outline"
+        name="trash"
         slot="start"
       />
       Delete
@@ -133,9 +133,9 @@
       size="small"
       (click)="showTemplates = !showTemplates"
     >
-      <ion-icon name="layers-outline" slot="start" />
+      <ion-icon name="layers" slot="start" />
       Apply Template
-      <ion-icon [name]="showTemplates ? 'chevron-up-outline' : 'chevron-down-outline'" slot="end" />
+      <ion-icon [name]="showTemplates ? 'chevron-up' : 'chevron-down'" slot="end" />
     </ion-button>
 
     <div *ngIf="showTemplates" class="templates-list">

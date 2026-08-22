@@ -33,7 +33,7 @@ export const DAY_PLAN_TEMPLATES: DayPlanTemplate[] = [
 {
     id: 'default_day_plan',
     label: 'Default Day Plan',
-    icon: 'calendar-outline',
+    icon: 'calendar',
     description: 'Balanced plan for work, focus, admin and recovery.',
     nodes: [
       { id: 'plan', title: 'Plan', templateNodeClass: 'task' },
@@ -43,11 +43,11 @@ export const DAY_PLAN_TEMPLATES: DayPlanTemplate[] = [
       { id: 'mantras', title: 'Mantras', templateNodeClass: 'dayplan_review' },
       { id: 'strategic_goals', title: 'Strategic Goals', templateNodeClass: 'dayplan_review' },
     ],
-  },    
+  },
   {
     id: 'default_day_plan2',
     label: 'Default Day Plan',
-    icon: 'calendar-outline',
+    icon: 'calendar',
     description: 'Balanced plan for work, focus, admin and recovery.',
     nodes: [
       { id: 'morning_boot', title: 'Morning boot sequence', templateNodeClass: 'dayplan_routine' },
@@ -61,7 +61,7 @@ export const DAY_PLAN_TEMPLATES: DayPlanTemplate[] = [
   {
     id: 'maker_day',
     label: 'Maker Day',
-    icon: 'construct-outline',
+    icon: 'construct',
     description: 'Long focus blocks, minimal context switching.',
     nodes: [
       { id: 'maker_prime', title: 'Prime context and goals', templateNodeClass: 'dayplan_routine' },
@@ -74,7 +74,7 @@ export const DAY_PLAN_TEMPLATES: DayPlanTemplate[] = [
   {
     id: 'meeting_day',
     label: 'Meeting Day',
-    icon: 'people-outline',
+    icon: 'people',
     description: 'Communication-heavy day with prep and follow-ups.',
     nodes: [
       { id: 'meeting_prep', title: 'Meeting prep batch', templateNodeClass: 'dayplan_ops', isTask: true },

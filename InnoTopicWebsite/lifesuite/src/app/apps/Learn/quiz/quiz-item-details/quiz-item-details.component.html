@@ -17,7 +17,7 @@
   <div
     #answers
     style="border: 3px var(--answerBorderColor) solid; border-radius: 6px; padding: 6px"
-    *ngIf="(showHint$ | async) || (showAnswer$ | async)"
+    *ngIf="(showHint$ | async) || (showChoices$ | async) || (showAnswer$ | async)"
   >
     <ng-container
       *ngIf="(showHint$ | async)"
@@ -31,7 +31,23 @@
        />
     </ng-container>
 
-    <ng-container *ngFor="let answerSide of (itemVal$ | async) ?. getSidesWithAnswers()">
+    <div
+      *ngIf="(itemVal$ | async)?.multipleChoiceAnswers?.length && ((showChoices$ | async) || (showAnswer$ | async))"
+      style="display: grid; gap: 0.4rem"
+    >
+      <div
+        *ngFor="let choice of (itemVal$ | async)?.multipleChoiceAnswers"
+        style="padding: 0.45rem 0.6rem; border: 1px solid var(--ion-color-medium-tint); border-radius: 4px"
+        [style.border-color]="(showAnswer$ | async) && choice.correct ? 'var(--ion-color-success)' : null"
+        [style.color]="(showAnswer$ | async) && choice.correct ? 'var(--ion-color-success-shade)' : null"
+      >
+        <strong>{{ choice.label }}.</strong> {{ choice.text }}
+        <span *ngIf="(showAnswer$ | async) && choice.correct"> — Correct answer</span>
+      </div>
+    </div>
+
+    <ng-container *ngIf="showAnswer$ | async">
+      <ng-container *ngFor="let answerSide of (itemVal$ | async) ?. getSidesWithAnswers()">
       <!--      <hr>-->
 <!--      <app-side-label-->
 <!--        *ngIf="(showHint$ | async) && ! (showAnswer$ | async)"-->
@@ -46,6 +62,7 @@
         [showAiFillButton]="false"
        />
 
+      </ng-container>
     </ng-container>
   </div>
 

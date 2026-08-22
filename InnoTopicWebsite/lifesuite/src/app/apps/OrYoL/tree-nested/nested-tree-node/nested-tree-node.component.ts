@@ -20,8 +20,6 @@ import { ConfigService } from '../../core/config.service'
 })
 export class NestedTreeNodeComponent implements OnInit {
 
-  alwaysExpanded = false
-
   isVisualRoot: boolean = false
 
   @Input()
@@ -51,7 +49,13 @@ export class NestedTreeNodeComponent implements OnInit {
       this.treeNode = this.treeNodeWrapperHack.wrapperHack
     }
     this.isVisualRoot = this.treeNode.isVisualRoot
-    this.alwaysExpanded = this.isVisualRoot
+    // A visual root starts open so navigation still reveals its children immediately, but its
+    // normal `expanded` state remains authoritative afterward. Previously `alwaysExpanded`
+    // forced this subtree open forever, so the expansion icon's recursive long-press correctly
+    // collapsed the model but the visual root continued rendering all of its children.
+    if (this.isVisualRoot) {
+      this.treeNode.expansion.setExpanded(true, {recursive: false})
+    }
     debugLog('NestedTreeNodeComponent treeNode', this.treeNode, this.treeNode.treeModel.root, this.treeNode.treeModel.navigation.visualRoot)
   }
 

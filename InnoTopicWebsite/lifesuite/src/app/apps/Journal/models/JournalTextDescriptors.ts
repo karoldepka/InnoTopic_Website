@@ -47,10 +47,10 @@ export class JournalTextDescriptors {
   categories = d()
 
   positive = d({
-    icon: `thumbs-up-outline`
+    icon: `thumbs-up`
   })
   negative = d({
-    icon: `thumbs-down-outline`
+    icon: `thumbs-down`
   })
 
   // group the should*-s ?
@@ -61,16 +61,16 @@ export class JournalTextDescriptors {
   should = d()
 
   should_do_more = d({
-    icon: `arrow-up-circle-outline`
+    icon: `arrow-up-circle`
   })
   /** Add psychology hints:  start step by step, don't get overwhelmed */
-  should_start_doing = d({icon: `play-outline`})
+  should_start_doing = d({icon: `play`})
   should_do_less = d({
-    icon: `arrow-down-circle-outline`
+    icon: `arrow-down-circle`
   })
   /** Add psychology hints: be careful, because often people take extreme vows, like stop drinking whereas moderation might be better */
   should_stop_doing = d({
-    icon: `stop-circle-outline`
+    icon: `stop-circle`
   })
   should_continue_doing = d()
 

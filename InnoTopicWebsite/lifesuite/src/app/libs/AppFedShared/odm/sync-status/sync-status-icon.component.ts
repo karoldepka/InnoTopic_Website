@@ -9,7 +9,7 @@ import { NgClass, AsyncPipe } from '@angular/common';
 import {FullscreenService} from '../../fullscreen/fullscreen.service'
 import {IonicModule} from '@ionic/angular'
 import { addIcons } from 'ionicons'
-import { expandOutline, contractOutline } from 'ionicons/icons'
+import { expand, contract } from 'ionicons/icons'
 
 @Component({
     selector: 'odm-sync-status-icon',
@@ -76,7 +76,7 @@ export class SyncStatusIconComponent implements OnInit {
     public popoverController: PopoverController,
     public fullscreenService: FullscreenService,
   ) {
-    addIcons({ expandOutline, contractOutline })
+    addIcons({expand, contract})
   }
 
   ngOnInit() {}

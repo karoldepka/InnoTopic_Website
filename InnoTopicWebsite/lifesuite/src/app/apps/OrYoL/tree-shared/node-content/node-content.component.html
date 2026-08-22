@@ -95,7 +95,7 @@
   <div *ngIf="treeNode.content.isDayPlan"
        style="margin-left: 4px; margin-right: 2px; user-select: none; vertical-align: middle; display: table-cell; align-self: center"
   >
-    <span class="faded" *ngIf="getDayPlanDateLabel() as dayPlanDateLabel">{{ dayPlanDateLabel }}</span>
+    <span class="faded" *ngIf="getDayPlanDateLabel() as dayPlanDateLabel">{{ dayPlanDateLabel }}&nbsp;</span>
     <span class="faded">End {{formatEndTime(columnDefs.estimatedTime)}}</span>
     <!--Sum: {{treeNode.timeLeftSumText()}}-->
   </div>

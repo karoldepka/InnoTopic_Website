@@ -36,12 +36,6 @@ export class QuizOptionsComponent implements OnInit {
   funButtonsDesc = buttonsDesc
   importanceButtonsDesc = importanceButtonsDesc
 
-  categoriesExpanded = false
-
-  toggleCategories() {
-    this.categoriesExpanded = !this.categoriesExpanded
-  }
-
   /** Top-level sections of the options panel - collapsed by default so the panel opens compact;
    * each is expanded independently by clicking its own header. */
   groupsExpanded: {[group in 'filters' | 'tts' | 'scheduling' | 'stats']: boolean} = {

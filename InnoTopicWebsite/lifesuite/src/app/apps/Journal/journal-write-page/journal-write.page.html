@@ -5,7 +5,7 @@
       <ion-icon
         [routerLink]="'/journal'"
         (click)="onBackClicked()"
-        name="arrow-back-outline"
+        name="arrow-back"
         class="action-icon"
         slot="start"
        />
@@ -30,7 +30,7 @@
         name="bulb"
         (click)="onClickAiAdvice($event)"
        />
-      <ion-icon *ngIf="feat.beforeProductization" style="margin-right: 7px;" class="action-icon" name="book-outline" slot="end" [routerLink]="['/learn']" />
+      <ion-icon *ngIf="feat.beforeProductization" style="margin-right: 7px;" class="action-icon" name="book" slot="end" [routerLink]="['/learn']" />
       <odm-sync-status-icon></odm-sync-status-icon>
 
     </ion-buttons>
@@ -65,7 +65,7 @@
     <!--&lt;!&ndash;      <ion-icon name="add-circle" />&ndash;&gt;-->
     <!--    </ion-fab-button>-->
     <ion-fab-button id='fabNewItem' (click)="newItem()">
-      <ion-icon name="add-outline" />
+      <ion-icon name="add" />
       <!--      <img src="assets/icon/CloudTime_Logo.svg" height="25rem">-->
       <!--      +-->
       <!--      <ion-icon name="add-circle" />-->

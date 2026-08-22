@@ -3,7 +3,7 @@ import { StructuredObject } from '@ai-sdk/angular';
 import { CopilotKit, injectAgentStore } from '@copilotkit/angular';
 import { Message, randomUUID } from '@ag-ui/client';
 import { z } from 'zod';
-import { firstValueFrom } from 'rxjs';
+import { firstValueFrom, Subject, takeUntil, timeout } from 'rxjs';
 
 import {
   AiBackendService,
@@ -38,6 +38,7 @@ export interface CategoryChatMessage {
 }
 
 export const COPILOT_AGENT_ID = 'lifesuite-qa';
+const CATEGORY_GENERATION_TIMEOUT_MS = 90_000;
 
 // ---- Zod schemas --------------------------------------------------------
 
@@ -80,16 +81,6 @@ export class AiQaGeneratorService {
   private readonly copilotStore = injectAgentStore(COPILOT_AGENT_ID);
   private readonly duplicateDetector = inject(QaDuplicateDetectorService);
 
-  private readonly categoryObject = new StructuredObject<
-    typeof categoryTreeResponseSchema,
-    CategoryTreeResponse,
-    CategoryTreeRequest
-  >({
-    api: this.aiBackend.apiUrl('/category-tree/stream-json'),
-    schema: categoryTreeResponseSchema,
-    ...({ streamProtocol: 'text' } as object),
-  });
-
   private readonly questionObject = new StructuredObject<
     typeof questionAnswerResponseSchema,
     QuestionAnswerResponse,
@@ -127,6 +118,7 @@ export class AiQaGeneratorService {
   readonly categoryCount = computed(() => countCategoryNodes(this.tree()));
 
   private categoryAbortController: AbortController | null = null;
+  private categoryCancel$ = new Subject<void>();
   private questionAbortController: AbortController | null = null;
 
   private appendMode = false;
@@ -135,25 +127,6 @@ export class AiQaGeneratorService {
   private preAppendTree: CategoryNode[] = [];
 
   constructor() {
-    // Live-update tree from streaming partial JSON
-    effect(() => {
-      if (!this.categoryLoading()) return;
-      const partial = this.categoryObject.object as any;
-      const nodes: any[] = Array.isArray(partial?.tree) ? partial.tree : [];
-      const validNodes = nodes
-        .filter(n => n?.id && n?.title)
-        .map(n => this.makePartialCategoryNode(n));
-      if (validNodes.length > 0) {
-        const all = this.categoryAppendMode
-          ? [...this.preAppendTree, ...validNodes]
-          : validNodes;
-        this.tree.set(all);
-        this.categoryStatus.set(
-          `${this.categoryAppendMode ? 'Adding' : 'Streaming'}… ${validNodes.length} categories`,
-        );
-      }
-    });
-
     // Live-update questions from streaming partial JSON
     effect(() => {
       if (!this.questionLoading()) return;
@@ -192,6 +165,7 @@ export class AiQaGeneratorService {
     this.preAppendTree = this.categoryAppendMode ? cloneCategoryTree(existing) : [];
 
     this.categoryAbortController = new AbortController();
+    this.categoryCancel$ = new Subject<void>();
     this.categoryLoading.set(true);
     this.categoryError.set('');
     this.categoryStatus.set(fileTree ? `Generating categories for "${fileTree.rootName}"…` : 'Generating categories…');
@@ -204,14 +178,36 @@ export class AiQaGeneratorService {
       match_existing: matchExisting,
       fileTree,
     };
+    const startedAt = Date.now();
+    console.info('[ai-qa] Category generation started', {
+      integration,
+      topicLength: request.message.length,
+      existingRootCount: request.tree.length,
+      webSearch,
+      matchExisting,
+      fileTreeEntryCount: fileTree?.entries.length ?? 0,
+    });
 
     try {
       const response = integration === 'vercel-ai-sdk'
         ? await this.generateCategoriesWithVercel(request)
         : await this.generateCategoriesWithCopilot(request);
+      if (!response.tree?.length) {
+        throw new Error('Category generation returned no categories. Please try again.');
+      }
       this.applyCategoryResponse(response);
+      console.info('[ai-qa] Category generation completed', {
+        durationMs: Date.now() - startedAt,
+        generatedRootCount: response.tree.length,
+        generatedCategoryCount: countCategoryNodes(response.tree),
+        modelName: response.modelName,
+      });
     } catch (error) {
       if (this.categoryAbortController?.signal.aborted) return;
+      console.error('[ai-qa] Category generation failed', {
+        durationMs: Date.now() - startedAt,
+        error: this.formatError(error),
+      });
       this.categoryError.set(this.formatError(error));
       this.categoryStatus.set('Category generation failed');
     } finally {
@@ -320,9 +316,9 @@ export class AiQaGeneratorService {
   }
 
   stopCategories(): void {
-    this.categoryObject.stop();
     this.categoryAbortController?.abort();
-    this.categoryAbortController = null;
+    this.categoryCancel$.next();
+    this.categoryCancel$.complete();
     this.categoryLoading.set(false);
     this.categoryStatus.set('Cancelled');
   }
@@ -339,7 +335,7 @@ export class AiQaGeneratorService {
     const now = Date.now();
     const kept = this.questions()
       .filter((_, i) => keep.has(i))
-      .map(q => ({ ...q, approvedAt: now, lastModifiedAt: now }));
+      .map(q => ({ ...q, approvedAt: now, draftedAt: undefined, lastModifiedAt: now }));
     this.questions.set(kept);
     this.questionStatus.set(`Kept ${kept.length} Q&A`);
   }
@@ -502,27 +498,29 @@ export class AiQaGeneratorService {
 
   // ---- Private helpers --------------------------------------------------
 
-  private makePartialCategoryNode(n: any): CategoryNode {
-    return {
-      id: n.id,
-      title: n.title,
-      questionCount: Number(n.questionCount) || 3,
-      children: Array.isArray(n.children)
-        ? n.children.filter((c: any) => c?.id && c?.title).map((c: any) => this.makePartialCategoryNode(c))
-        : [],
-      matchedExistingCategoryId: n.matchedExistingCategoryId ?? null,
-      matchedExistingCategoryTitle: n.matchedExistingCategoryTitle ?? null,
-      isExistingCategory: Boolean(n.isExistingCategory),
-    };
-  }
-
   private async generateCategoriesWithVercel(request: CategoryTreeRequest): Promise<CategoryTreeResponse> {
-    await this.categoryObject.submit(request);
-    if (this.categoryObject.error) throw this.categoryObject.error;
-    const response = this.categoryObject.object as CategoryTreeResponse;
-    const truncatedTitle = flattenCategoryTree(response?.tree ?? []).find(row => isTruncatedText(row.node.title));
-    if (truncatedTitle) throw new Error(`Generation produced cut-off text ("${truncatedTitle.node.title}") - please try again`);
-    return response;
+    try {
+      console.info(`[ai-qa] Sending category request via HttpClient to ${this.aiBackend.apiUrl('/category-tree')}`);
+      const response = await firstValueFrom(
+        this.aiBackend.generateCategoryTree(request).pipe(
+          takeUntil(this.categoryCancel$),
+          timeout(CATEGORY_GENERATION_TIMEOUT_MS),
+        ),
+      );
+      if (!response.tree?.length) {
+        throw new Error('Category generation returned no categories. Please try again.');
+      }
+      const truncatedTitle = flattenCategoryTree(response.tree).find(row => isTruncatedText(row.node.title));
+      if (truncatedTitle) {
+        throw new Error(`Generation produced cut-off text ("${truncatedTitle.node.title}") - please try again`);
+      }
+      return response;
+    } catch (error) {
+      if ((error as {name?: string}).name === 'TimeoutError') {
+        throw new Error('Category generation timed out. Please try again.');
+      }
+      throw error;
+    }
   }
 
   private async generateQuestionsWithVercel(request: QuestionAnswerRequest): Promise<QuestionAnswerResponse> {

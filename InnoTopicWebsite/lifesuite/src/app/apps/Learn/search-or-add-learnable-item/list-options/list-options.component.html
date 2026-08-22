@@ -3,11 +3,11 @@
     [disabled]="itemsService.loadingAllItemsFromServerInitiated"
     (press)="loadAll()"
     (click)="loadAll()"
-  ><ion-icon slot="start" name="download-outline" />Load All</ion-button>
+  ><ion-icon slot="start" name="download" />Load All</ion-button>
   <ion-button
     *ngIf="itemsService.hasMoreItemsOnServer"
     (click)="loadMore()"
-  ><ion-icon slot="start" name="chevron-down-outline" />Load More</ion-button>
+  ><ion-icon slot="start" name="chevron-down" />Load More</ion-button>
 
   <ion-checkbox
     labelPlacement="end"

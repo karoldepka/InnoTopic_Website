@@ -36,7 +36,7 @@ import { LearnItem } from '../../Learn/models/LearnItem';
 import { LearnItem$ } from '../../Learn/models/LearnItem$';
 import { OdmBackend } from '../../../libs/AppFedShared/odm/OdmBackend';
 import { Router } from '@angular/router';
-import { BOW_QUIZ_SESSION_KEY, toBowQuizQuestion } from '../shared/abcd-answers.util';
+import { BOW_QUIZ_SESSION_KEY, stripAbcdCorrectnessMarkers, toAbcdAnswerChoices, toBowQuizQuestion } from '../shared/abcd-answers.util';
 
 @Component({
   selector: 'app-ai-qa',
@@ -294,29 +294,31 @@ export class AiQaPage implements OnInit {
     const selected = this.selectedQIndices();
     const approved = this.gen.questions().filter((_, i) => selected.has(i));
     if (!approved.length) return;
-    this.persistQuestionsAsDrafts(approved);
-    // The approved Q&A are now saved as Learn drafts — remove them from the pending list.
+    this.persistQuestionsAsBulkAiItems(approved);
+    // The approved Q&A are now saved as completed bulk AI items — remove them from the pending list.
     this.gen.questions.set(this.gen.questions().filter((_, i) => !selected.has(i)));
     this.selectedQIndices.set(new Set<number>());
     await presentDismissableToast(this.toastCtrl, {
-      message: `Approved ${approved.length} Q&A → saved to Learn as AI drafts.`,
+      message: `Approved ${approved.length} Q&A → saved to Learn as AI Bulk.`,
       duration: 2500,
       position: 'bottom',
       color: 'success',
     });
   }
 
-  /** Persist Q&A into the Learn store as AI-created drafts (whenGeneratedByAi + draftedAt),
+  /** Persist approved Q&A into the Learn store as bulk AI items (not drafts),
    * using LearnItem$ and tagging each with its category path. */
-  private persistQuestionsAsDrafts(questions: QuestionAnswer[]): void {
+  private persistQuestionsAsBulkAiItems(questions: QuestionAnswer[]): void {
     const now = OdmBackend.nowTimestamp();
     for (const qa of questions) {
       const data: Partial<LearnItem> = {
         title: qa.question,
         answer: this.answerHtmlWithImage(qa),
+        multipleChoiceAnswers: toAbcdAnswerChoices(qa.answer) ?? undefined,
         categories: qa.categoryPath || qa.categoryId,
         whenGeneratedByAi: now,
-        draftedAt: now,
+        whenBulkGeneratedByAi: now,
+        draftedAt: undefined,
       };
       this.learnItems.add(Object.assign(new LearnItem(), data));
     }
@@ -328,7 +330,7 @@ export class AiQaPage implements OnInit {
    * already knows how to offload an inline `data:` image to proper blob storage the next time
    * this item is opened for editing, so this doesn't need its own upload step here. */
   private answerHtmlWithImage(qa: QuestionAnswer): string {
-    const answer = qa.answer ?? '';
+    const answer = stripAbcdCorrectnessMarkers(qa.answer ?? '');
     return qa.imageDataUrl ? `${answer}<p><img src="${qa.imageDataUrl}" alt=""></p>` : answer;
   }
 
@@ -337,10 +339,10 @@ export class AiQaPage implements OnInit {
     this.selectedQIndices.set(new Set<number>());
   }
 
-  /** Persist the generated categories + Q&A into the Learn store as AI drafts,
+  /** Persist the generated categories + Q&A into the Learn store as bulk AI items,
    * using the unified OdmItem$2 tree model (createChild => parentIds + orderNum + save).
    * Categories are saved with isCategory=true so they show in /learn but are excluded
-   * from the quiz; every saved item is stamped draftedByAIAt + draftedAt. */
+   * from the quiz; every saved item is stamped with AI-generation metadata. */
   async saveToLearn(): Promise<void> {
     const now = OdmBackend.nowTimestamp();
     const categoryIdToItem = new Map<string, LearnItem$>();
@@ -350,7 +352,8 @@ export class AiQaPage implements OnInit {
         title: node.title,
         isCategory: true,
         whenGeneratedByAi: now,
-        draftedAt: now,
+        whenBulkGeneratedByAi: now,
+        draftedAt: undefined,
       };
       const item = parentItem
         ? parentItem.createChild(data)
@@ -369,8 +372,10 @@ export class AiQaPage implements OnInit {
       const data: Partial<LearnItem> = {
         title: qa.question,
         answer: this.answerHtmlWithImage(qa),
+        multipleChoiceAnswers: toAbcdAnswerChoices(qa.answer) ?? undefined,
         whenGeneratedByAi: now,
-        draftedAt: now,
+        whenBulkGeneratedByAi: now,
+        draftedAt: undefined,
       };
       const categoryItem = categoryIdToItem.get(qa.categoryId);
       if (categoryItem) {
@@ -382,7 +387,7 @@ export class AiQaPage implements OnInit {
     }
 
     await presentDismissableToast(this.toastCtrl, {
-      message: `Saved ${categoryIdToItem.size} categories and ${qaCount} Q&A to Learn (as AI drafts).`,
+      message: `Saved ${categoryIdToItem.size} categories and ${qaCount} Q&A to Learn as AI Bulk.`,
       duration: 2500,
       position: 'bottom',
       color: 'success',

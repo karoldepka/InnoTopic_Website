@@ -112,6 +112,11 @@ export class NodeContentComponent implements OnInit, AfterViewInit, OnDestroy, I
 
   isDestroyed = false
 
+  /** `patchThrottled()` emits the item's data stream synchronously. Without this guard, typing
+   * in a title immediately makes this component re-run all of its cells and `detectChanges()`;
+   * the editor already owns the just-entered DOM value, so that echo is redundant. */
+  private isApplyingLocalInput = false
+
   public get isFocusAtRightmostColumn() { return this.focusedColumn === this.columns.lastColumn }
 
   public get isFocusAtLeftmostColumn() { return this.focusedColumn === this.columns.leftMostColumn }
@@ -163,7 +168,11 @@ export class NodeContentComponent implements OnInit, AfterViewInit, OnDestroy, I
         this.applyItemDataValuesToViews(false)
       }
     }
-    this.treeNode.content.dbItem.data$.subscribe(onChangeItemDataOrChildHandler)
+    this.treeNode.content.dbItem.data$.subscribe(() => {
+      if (!this.isApplyingLocalInput) {
+        onChangeItemDataOrChildHandler()
+      }
+    })
     this.treeNode.onChangeItemDataOfChild.subscribe(() => {
       if ( ! this.isDestroyed ) {
         this.changeDetectorRef.detectChanges()
@@ -346,10 +355,21 @@ export class NodeContentComponent implements OnInit, AfterViewInit, OnDestroy, I
     debugLog('onInputChanged, cell', cell, event, component)
     const column = cell.column
     // here start moving responsibilities from component viewSyncer to
-    this.treeNode.content.onInputChangedByUser(cell, inputNewValue)
-    column.setValueOnItemData(this.treeNode.content.itemData, inputNewValue) /* FIXME this was changed on `develop`; + patchThrottled considerations */
-    // note: the applying from UI to model&events could be throttleTime()-d to e.g. 100-200ms to not overwhelm when typing fast
-    this.treeNode.fireOnChangeItemDataOfChildOnParents()
+    this.isApplyingLocalInput = true
+    try {
+      this.treeNode.content.onInputChangedByUser(cell, inputNewValue)
+      column.setValueOnItemData(this.treeNode.content.itemData, inputNewValue) /* FIXME this was changed on `develop`; + patchThrottled considerations */
+    } finally {
+      this.isApplyingLocalInput = false
+    }
+
+    // Only these fields contribute to parent-derived values (remaining time and completion).
+    // Broadcasting title edits used to refresh every visible ancestor on every keystroke, which
+    // made a deep/large /tree feel like the whole tree was being checked while typing.
+    if (column === this.columnDefs.estimatedTime || column === this.columnDefs.isDone) {
+      this.treeNode.fireOnChangeItemDataOfChildOnParents()
+      this.changeDetectorRef.detectChanges()
+    }
     // this.treeNode.onChangeItemData.emit()
     // TODO: investigating time recalculation
   }

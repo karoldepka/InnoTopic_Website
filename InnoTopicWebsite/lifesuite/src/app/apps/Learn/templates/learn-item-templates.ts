@@ -19,22 +19,22 @@ export interface TemplateDef {
 
 /** Maps templateNodeClass -> Ionic icon name */
 export const TEMPLATE_NODE_CLASS_ICONS: Record<string, string> = {
-  goal:        'flag-outline',
-  milestone:   'checkmark-circle-outline',
-  research:    'search-outline',
-  planning:    'map-outline',
-  execution:   'hammer-outline',
-  review:      'telescope-outline',
-  motivation:  'heart-outline',
-  obstacle:    'warning-outline',
-  action:      'flash-outline',
-  notes:       'document-text-outline',
-  practice:    'barbell-outline',
-  flashcard:   'school-outline',
-  habit:       'repeat-outline',
-  trigger:     'notifications-outline',
-  reward:      'trophy-outline',
-  default:     'layers-outline',
+  goal:        'flag',
+  milestone:   'checkmark-circle',
+  research:    'search',
+  planning:    'map',
+  execution:   'hammer',
+  review:      'telescope',
+  motivation:  'heart',
+  obstacle:    'warning',
+  action:      'flash',
+  notes:       'document-text',
+  practice:    'barbell',
+  flashcard:   'school',
+  habit:       'repeat',
+  trigger:     'notifications',
+  reward:      'trophy',
+  default:     'layers',
 }
 
 export function getTemplateNodeClassIcon(templateNodeClass: string): string {
@@ -45,7 +45,7 @@ export const HARDCODED_TEMPLATES: TemplateDef[] = [
   {
     id: 'project',
     label: 'Project',
-    icon: 'briefcase-outline',
+    icon: 'briefcase',
     description: 'Structured project with phases',
     children: [
       { id: 'research',  title: 'Research',  templateNodeClass: 'research',  isTask: true },
@@ -57,7 +57,7 @@ export const HARDCODED_TEMPLATES: TemplateDef[] = [
   {
     id: 'goal',
     label: 'Goal',
-    icon: 'flag-outline',
+    icon: 'flag',
     description: 'Goal with motivation, milestones and concrete actions',
     children: [
       { id: 'motivation', title: 'Motivation (why)',  templateNodeClass: 'motivation' },
@@ -69,7 +69,7 @@ export const HARDCODED_TEMPLATES: TemplateDef[] = [
   {
     id: 'study_topic',
     label: 'Study Topic',
-    icon: 'school-outline',
+    icon: 'school',
     description: 'Structured learning with notes, practice and flashcards',
     children: [
       { id: 'notes',      title: 'Notes',      templateNodeClass: 'notes' },
@@ -80,7 +80,7 @@ export const HARDCODED_TEMPLATES: TemplateDef[] = [
   {
     id: 'habit',
     label: 'Habit',
-    icon: 'repeat-outline',
+    icon: 'repeat',
     description: 'Habit loop: trigger, routine and reward',
     children: [
       { id: 'trigger', title: 'Trigger (cue)',    templateNodeClass: 'trigger' },

@@ -30,18 +30,18 @@
               *ngIf="feat.userActivityCountDownTimer"
               class="action-icon" slot="end" size="50"
                     (click)="onClickTimer($event)"
-                    name="timer-outline"
+                    name="timer"
            />
 
           <ion-button (click)="showOptions = ! showOptions" size="large">
 
-            <ion-icon class="action-icon" slot="icon-only" name="settings-outline"
+            <ion-icon class="action-icon" slot="icon-only" name="settings"
 
              /> <!-- HERE-->
           </ion-button>
 
 <!--          <ion-button>-->
-<!--            <ion-icon class="action-icon" slot="icon-only" name="bar-chart-outline" [routerLink]="['/learn/stats']"  />-->
+<!--            <ion-icon class="action-icon" slot="icon-only" name="bar-chart" [routerLink]="['/learn/stats']"  />-->
 <!--          </ion-button>-->
           <odm-sync-status-icon style="padding-right: 0.5rem" />
         </ion-buttons>
@@ -81,7 +81,7 @@
       </div>
     </ng-container>
 
-    <div *ngIf="( status$ | async ) ?. itemsLeft === 0">
+    <div class="ion-padding" *ngIf="( status$ | async ) ?. itemsLeft === 0">
       <app-quiz-finished
        />
     </div>

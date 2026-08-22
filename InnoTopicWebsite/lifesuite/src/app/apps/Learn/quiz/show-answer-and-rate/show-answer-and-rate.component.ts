@@ -50,6 +50,12 @@ export class ShowAnswerAndRateComponent extends BaseComponent implements OnInit 
 
   get showHint$() { return this.quizService.showHint$ }
 
+  get showChoices$() { return this.quizService.showChoices$ }
+
+  get hasMultipleChoiceAnswers(): boolean {
+    return !!this.item$?.currentVal?.multipleChoiceAnswers?.length
+  }
+
   get quizStatus$() { return this.quizService.quizStatus$ }
 
   quizSelector$ = this.store.select(store => {
@@ -81,6 +87,10 @@ export class ShowAnswerAndRateComponent extends BaseComponent implements OnInit 
     // this.scrollToBottom()
     // window.scrollTo(0,document.body.scrollHeight);
     // window.scrollTo(0,document.querySelector(".scrollingContainer").scrollHeight);
+  }
+
+  showChoices() {
+    this.quizService.showChoices()
   }
 
   showHint() {

@@ -5,7 +5,7 @@ import { IonicModule, ModalController } from '@ionic/angular';
 import { CommonModule } from '@angular/common';
 import { Subject } from 'rxjs';
 import { addIcons } from 'ionicons';
-import { logoGoogle, logoFacebook, mailOutline } from 'ionicons/icons';
+import { logoGoogle, logoFacebook, mail } from 'ionicons/icons';
 import { errorAlert } from '../../libs/AppFedShared/utils/log';
 import { TranslatePipe } from '@ngx-translate/core';
 
@@ -41,7 +41,7 @@ export class SignupEmailPasswordComponent implements OnInit, OnDestroy {
     private AuthService: AuthService,
     private modalController: ModalController
   ) {
-    addIcons({ logoGoogle, logoFacebook, mailOutline })
+    addIcons({ logoGoogle, logoFacebook, mail })
   }
 
   ngOnInit() {}
