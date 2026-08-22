@@ -34,6 +34,7 @@ export class StarRatingComponent extends CustomFormControl<StarRatingVal> {
   @Input() allowZero = true
 
   private readonly sameStarFractions = [0.5, 0.25, 0.75, 1]
+  private continueFirstStarCycleAfterClear = false
 
   currentValue: StarRatingVal = 0
 
@@ -72,9 +73,16 @@ export class StarRatingComponent extends CustomFormControl<StarRatingVal> {
   }
 
   onStarClick(starIndex: number) {
+    if (starIndex === 1 && this.currentValue === 0 && this.continueFirstStarCycleAfterClear) {
+      this.continueFirstStarCycleAfterClear = false
+      this.setValue(0.5)
+      return
+    }
+
     const newValue = this.isActiveStar(starIndex)
       ? this.nextSameStarValue(starIndex)
       : starIndex
+    this.continueFirstStarCycleAfterClear = false
     this.setValue(newValue)
   }
 
@@ -83,7 +91,10 @@ export class StarRatingComponent extends CustomFormControl<StarRatingVal> {
   }
 
   private nextSameStarValue(starIndex: number): StarRatingVal {
-    if (this.allowZero && starIndex === 1) return 0
+    if (this.allowZero && starIndex === 1 && this.currentValue === 1) {
+      this.continueFirstStarCycleAfterClear = true
+      return 0
+    }
 
     const currentFraction = this.currentValue - (starIndex - 1)
     const currentFractionIndex = this.sameStarFractions.findIndex(
