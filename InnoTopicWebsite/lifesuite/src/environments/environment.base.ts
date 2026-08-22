@@ -9,7 +9,7 @@ export const environmentBase = {
   collectionNameSuffix: '',
   // collectionNameSuffix: '_DEBUG',
 
-  odmBackend: 'fanout', // 'fanout' races Supabase+Neon+Mongo+Surreal as equal peers; or 'firestore'/'supabase'/'neon' alone
+  odmBackend: 'fanout', // 'fanout' races Supabase+Neon+Mongo peers; or 'firestore'/'supabase'/'neon' alone
   authBackend: 'firebase',
 
   // OrYoL (/tree) has been migrated off its standalone Firestore-only data layer onto the
@@ -41,7 +41,7 @@ export const environmentBase = {
   },
 
   surreal: {
-    enabled: true, // local Docker only so far (container `lifesuite-surrealdb`) - not deployed anywhere reachable outside this machine yet
+    enabled: false, // Disabled for now; local Docker only (container `lifesuite-surrealdb`) and not deployed anywhere reachable outside this machine.
     odmApiUrl: 'http://localhost:8000/api/odm-surreal',
     pollIntervalMs: 0,
   },
