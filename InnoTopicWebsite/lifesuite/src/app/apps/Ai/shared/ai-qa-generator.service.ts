@@ -335,7 +335,7 @@ export class AiQaGeneratorService {
     const now = Date.now();
     const kept = this.questions()
       .filter((_, i) => keep.has(i))
-      .map(q => ({ ...q, approvedAt: now, lastModifiedAt: now }));
+      .map(q => ({ ...q, approvedAt: now, draftedAt: undefined, lastModifiedAt: now }));
     this.questions.set(kept);
     this.questionStatus.set(`Kept ${kept.length} Q&A`);
   }

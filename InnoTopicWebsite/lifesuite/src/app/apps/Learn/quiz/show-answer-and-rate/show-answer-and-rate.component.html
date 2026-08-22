@@ -9,7 +9,14 @@
 
     <ion-button
       class="stretch-btn"
+      (click)="showChoices()"
+      [disabled]="!hasMultipleChoiceAnswers"
+    >Show answers</ion-button>
+
+    <ion-button
+      class="stretch-btn"
       (click)="showAnswer()"
+      [disabled]="hasMultipleChoiceAnswers && !(showChoices$ | async)"
     >Show answer</ion-button>
 
     <ion-button

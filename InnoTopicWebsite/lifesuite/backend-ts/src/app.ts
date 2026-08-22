@@ -19,7 +19,13 @@ import { MODEL_NAME } from './llm.js';
  * can't drift between the two ways this backend actually runs. */
 export const app = new Hono();
 
-app.use('*', cors({ origin: '*' }));
+app.use('*', cors({
+  origin: '*',
+  allowMethods: ['GET', 'HEAD', 'PUT', 'POST', 'DELETE', 'PATCH', 'OPTIONS'],
+  allowHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
+  exposeHeaders: ['Content-Length', 'Content-Type'],
+  maxAge: 86_400,
+}));
 app.use('*', logger());
 
 app.route('/', categoriesRouter);

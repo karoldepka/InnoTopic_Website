@@ -61,16 +61,13 @@ describe('StarRatingComponent', () => {
     expect(markForCheckCallCount).toBe(2)
   })
 
-  it('can cycle the first star back to zero when clearing is allowed', () => {
+  it('clears the first star on its second click when clearing is allowed', () => {
     component.allowZero = true
 
     component.onStarClick(1)
     component.onStarClick(1)
-    component.onStarClick(1)
-    component.onStarClick(1)
-    component.onStarClick(1)
 
-    expect(emittedValues).toEqual([1, 0.5, 0.25, 0.75, 0])
+    expect(emittedValues).toEqual([1, 0])
     expect(component.currentValue).toBe(0)
   })
 })

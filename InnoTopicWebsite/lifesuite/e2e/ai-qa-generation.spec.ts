@@ -66,7 +66,7 @@ test('generates a category tree, generates Q&A for it, and approving saves an AI
   await expect(qCards.filter({hasText: uniqueQuestion})).toBeVisible()
   await expect(qCards.filter({hasText: 'What is a Future in Rust?'})).toBeVisible()
 
-  // ---- Approve both -> persisted into Learn as AI drafts ----
+  // ---- Approve both -> persisted into Learn as bulk AI items ----
   // Newly-generated questions are auto-selected as they appear (see AiQaPage's constructor
   // effect), so both are already checked here - no need to touch "Select all questions" first.
   await page.getByRole('button', {name: 'Approve (2)'}).click()
@@ -81,12 +81,12 @@ test('generates a category tree, generates Q&A for it, and approving saves an AI
   // Supabase. Navigating too early reproducibly hit net::ERR_ABORTED here.
   await expect(toast).toBeHidden({timeout: 5_000})
 
-  // ---- Verify one of the approved Q&A landed in Learn, tagged as AI-generated ----
+  // ---- Verify one of the approved Q&A landed in Learn, tagged as bulk AI-generated ----
   // waitUntil: 'commit' (not the default 'load') - same reasoning as fixtures.ts's post-login
   // navigation: this is a client-side SPA route change once bootstrapped, and waiting on a
   // real 'load' event here is flaky.
   await page.goto('/learn', {waitUntil: 'commit'})
   const learnItem = page.locator('.learn-list-item', {hasText: uniqueQuestion})
   await expect(learnItem).toBeVisible({timeout: 10_000})
-  await expect(learnItem.locator('ion-badge', {hasText: 'AI'})).toBeVisible()
+  await expect(learnItem.locator('ion-badge', {hasText: 'AI Bulk'})).toBeVisible()
 })

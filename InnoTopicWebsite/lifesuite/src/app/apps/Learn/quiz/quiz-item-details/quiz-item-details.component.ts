@@ -62,6 +62,8 @@ export class QuizItemDetailsComponent implements OnInit, OnDestroy, AfterViewIni
 
   get showHint$() { return this.quizService.showHint$ }
 
+  get showChoices$() { return this.quizService.showChoices$ }
+
   getVisibleHintSides(itemVal: LearnItem | undefined | null, hintLevel: number | undefined | null): Side[] {
     return (itemVal?.getSidesWithHints() ?? []).slice(0, hintLevel ?? 0)
   }

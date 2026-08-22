@@ -52,6 +52,9 @@ export class QuizService {
 
   showAnswer$ = new CachedSubject<boolean>(false)
 
+  /** Reveals multiple-choice options without exposing which one is correct. */
+  showChoices$ = new CachedSubject<boolean>(false)
+
   /** 0 = hidden; N = the first N hint sides (in sidesDefsHintsArray order) are revealed */
   showHint$ = new CachedSubject<number>(0)
 
@@ -248,6 +251,10 @@ export class QuizService {
     this.showHint$.next(0)
   }
 
+  showChoices() {
+    this.showChoices$.next(true)
+  }
+
   toggleShowHint() {
     const nextLevel = (this.showHint$.lastVal ?? 0) + 1
     this.showHint$.next(nextLevel > sidesDefsHintsArray.length ? 0 : nextLevel)
@@ -255,6 +262,7 @@ export class QuizService {
 
   onNewQuestion() {
     this.showAnswer$.next(false)
+    this.showChoices$.next(false)
     this.showHint$.next(0)
   }
 

@@ -81,7 +81,7 @@
       </div>
     </ng-container>
 
-    <div *ngIf="( status$ | async ) ?. itemsLeft === 0">
+    <div class="ion-padding" *ngIf="( status$ | async ) ?. itemsLeft === 0">
       <app-quiz-finished
        />
     </div>

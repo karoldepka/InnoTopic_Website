@@ -11,7 +11,7 @@ export type StarRatingVal = number
 /**
  * A tap-to-rate star widget. Clicking a star sets the rating to that star's full value;
  * clicking the same active star again cycles its partial fill through .5, .25, .75,
- * then back to full. With allowZero, the first star can also cycle to 0.
+ * then back to full. With allowZero, clicking the active first star clears the rating.
  */
 @Component({
   selector: 'apf-star-rating',
@@ -34,7 +34,6 @@ export class StarRatingComponent extends CustomFormControl<StarRatingVal> {
   @Input() allowZero = false
 
   private readonly sameStarFractions = [0.5, 0.25, 0.75, 1]
-  private readonly firstStarFractionsWithZero = [0.5, 0.25, 0.75, 0]
 
   currentValue: StarRatingVal = 0
 
@@ -84,18 +83,17 @@ export class StarRatingComponent extends CustomFormControl<StarRatingVal> {
   }
 
   private nextSameStarValue(starIndex: number): StarRatingVal {
+    if (this.allowZero && starIndex === 1) return 0
+
     const currentFraction = this.currentValue - (starIndex - 1)
-    const fractions = this.allowZero && starIndex === 1
-      ? this.firstStarFractionsWithZero
-      : this.sameStarFractions
-    const currentFractionIndex = fractions.findIndex(
+    const currentFractionIndex = this.sameStarFractions.findIndex(
       fraction => Math.abs(fraction - currentFraction) < 0.001
     )
     const nextFractionIndex = currentFractionIndex === -1
       ? 0
-      : (currentFractionIndex + 1) % fractions.length
+      : (currentFractionIndex + 1) % this.sameStarFractions.length
 
-    return starIndex - 1 + fractions[nextFractionIndex]
+    return starIndex - 1 + this.sameStarFractions[nextFractionIndex]
   }
 
   private setValue(newValue: StarRatingVal) {

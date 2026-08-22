@@ -19,13 +19,14 @@ describe('LearnItem — AI / draft markers', () => {
     expect(item.isDraft()).toBe(true)
   })
 
-  it('AI-generated draft category is flagged on all three axes', () => {
+  it('bulk AI-generated category is not a draft', () => {
     const item = new LearnItem()
     item.whenGeneratedByAi = aTimestamp
-    item.draftedAt = aTimestamp
+    item.whenBulkGeneratedByAi = aTimestamp
     item.isCategory = true
     expect(item.isAiGenerated()).toBe(true)
-    expect(item.isDraft()).toBe(true)
+    expect(item.isAiBulkGenerated()).toBe(true)
+    expect(item.isDraft()).toBe(false)
     expect(!!item.isCategory).toBe(true)
   })
 })

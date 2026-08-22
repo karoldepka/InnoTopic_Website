@@ -19,7 +19,8 @@
   </span>
 
   <ion-badge *ngIf="item.val?.isCategory" color="medium" style="margin-right: 5px">CATEGORY</ion-badge>
-  <ion-badge *ngIf="item.val?.isAiGenerated()" color="tertiary" style="margin-right: 5px">AI</ion-badge>
+  <ion-badge *ngIf="item.val?.isAiBulkGenerated()" color="tertiary" style="margin-right: 5px">AI Bulk</ion-badge>
+  <ion-badge *ngIf="item.val?.isAiGenerated() && !item.val?.isAiBulkGenerated()" color="tertiary" style="margin-right: 5px">AI</ion-badge>
   <ion-badge *ngIf="item.val?.isDraft()" color="warning" style="margin-right: 5px">DRAFT</ion-badge>
   <ion-badge *ngIf="item.isArchived()" color="medium" style="margin-right: 5px">ARCHIVED</ion-badge>
   <ion-badge
