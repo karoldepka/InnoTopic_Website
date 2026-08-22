@@ -14,7 +14,9 @@
 
 .star-rating__bg
   display: block
-  color: var(--ion-color-medium, #bbb)
+  // Keep unselected stars clearly distinct even though every icon uses the solid glyph.
+  color: var(--ion-color-step-500)
+  opacity: .35
 
 .star-rating__fill
   position: absolute
