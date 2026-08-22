@@ -41,7 +41,7 @@ export class SignupEmailPasswordComponent implements OnInit, OnDestroy {
     private AuthService: AuthService,
     private modalController: ModalController
   ) {
-    addIcons({ logoGoogle, logoFacebook, 'mail-outline': mail })
+    addIcons({ logoGoogle, logoFacebook, mail })
   }
 
   ngOnInit() {}

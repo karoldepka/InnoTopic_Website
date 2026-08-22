@@ -79,7 +79,7 @@ export class SidesDefs {
   })
   benefits = side({
     ask: false,
-    icon: 'thumbs-up-outline',
+    icon: 'thumbs-up',
   })
   categories = side({
     ask: false,
@@ -126,7 +126,7 @@ export class SidesDefs {
   })
   time_estimate = side({
     /* TODO: make sure user does not confuse with time-of-day */
-    icon: `stopwatch-outline`,
+    icon: `stopwatch`,
     _title: `~time`,
     ask: false,
     searchTerms: [`estimated time duration `],
@@ -153,12 +153,12 @@ export class SidesDefs {
     * whereas CurrentFocus is a kinda of ambient focus without specified deadline.
     * */
     ask: false,
-    icon: `calendar-outline`,
+    icon: `calendar`,
     searchTerms: [`deadline`],
   })
   finish_after = side({
     ask: false,
-    icon: `calendar-outline`,
+    icon: `calendar`,
     searchTerms: [`finish no earlier than`],
   })
   sub_tasks = side({

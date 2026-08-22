@@ -19,7 +19,7 @@
   >
     <ion-icon
       slot="icon-only"
-      [name]="treeNode.isExpanded ? 'chevron-down-outline' : 'chevron-forward-outline'"
+      [name]="treeNode.isExpanded ? 'chevron-down' : 'chevron-forward'"
     />
   </ion-button>
 
@@ -31,7 +31,7 @@
     aria-label="Move up"
     (click)="reorderUp($event)"
   >
-    <ion-icon slot="icon-only" name="arrow-up-outline" />
+    <ion-icon slot="icon-only" name="arrow-up" />
   </ion-button>
 
   <ion-button
@@ -42,7 +42,7 @@
     aria-label="Move down"
     (click)="reorderDown($event)"
   >
-    <ion-icon slot="icon-only" name="arrow-down-outline" />
+    <ion-icon slot="icon-only" name="arrow-down" />
   </ion-button>
 
   <ion-button
@@ -53,7 +53,7 @@
     aria-label="Indent"
     (click)="indentIncrease($event)"
   >
-    <ion-icon slot="icon-only" name="arrow-forward-outline" />
+    <ion-icon slot="icon-only" name="arrow-forward" />
   </ion-button>
 
   <ion-button
@@ -64,7 +64,7 @@
     aria-label="Outdent"
     (click)="indentDecrease($event)"
   >
-    <ion-icon slot="icon-only" name="arrow-back-outline" />
+    <ion-icon slot="icon-only" name="arrow-back" />
   </ion-button>
 
   <ion-button
@@ -78,7 +78,7 @@
   >
     <ion-icon
       slot="icon-only"
-      name="ellipsis-horizontal-circle-outline"
+      name="ellipsis-horizontal-circle"
     />
   </ion-button>
 
@@ -94,7 +94,7 @@
   >
     <ion-icon
       slot="icon-only"
-      name="chatbubble-ellipses-outline"
+      name="chatbubble-ellipses"
     />
   </ion-button>
   <!--  (public)-->

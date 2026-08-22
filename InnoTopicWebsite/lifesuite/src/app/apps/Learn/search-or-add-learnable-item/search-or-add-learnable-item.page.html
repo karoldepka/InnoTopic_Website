@@ -82,7 +82,7 @@
           title="Clear draft"
           aria-label="Clear draft"
           (click)="clearInput()"
-        ><ion-icon name="close-outline" /></ion-button>
+        ><ion-icon name="close" /></ion-button>
       </div>
 
       <!--
@@ -101,13 +101,13 @@
             (press)="addTask(true)"
             (click)="addTask()"
             [disabled]="isAddingWithAI"
-          ><ion-icon name="add-circle-outline" />&nbsp;TASK</ion-button>
+          ><ion-icon name="add-circle" />&nbsp;TASK</ion-button>
 
           <ion-button
             (press)="addToLearn(true)"
             (click)="addToLearn()"
             [disabled]="isAddingWithAI"
-          ><ion-icon name="add-circle-outline" />&nbsp;LEARN</ion-button>
+          ><ion-icon name="add-circle" />&nbsp;LEARN</ion-button>
 
           <ion-button
             *ngIf="!isAddingWithAI"
@@ -126,7 +126,7 @@
             title="Stop AI"
             size="small"
           >
-            <ion-icon slot="start" name="stop-circle-outline"></ion-icon>
+            <ion-icon slot="start" name="stop-circle"></ion-icon>
             Stop
           </ion-button>
         </div>
@@ -162,7 +162,7 @@
         *ngIf="feat.showExperimental"
         [routerLink]="['/journal/write/new']"
         (click)="addToJournal()"
-      ><ion-icon name="add-circle-outline" />&nbsp;JOURNAL</ion-button>
+      ><ion-icon name="add-circle" />&nbsp;JOURNAL</ion-button>
     </div>
     <app-voice-memo-field
       style="display: flex; align-items: stretch; padding-bottom: 8px;"
@@ -213,7 +213,7 @@
               Continue with Facebook
             </ion-button>
             <ion-button fill="outline" (click)="openPasswordLogin()">
-              <ion-icon slot="start" name="mail-outline"></ion-icon>
+              <ion-icon slot="start" name="mail"></ion-icon>
               Login + password
             </ion-button>
           </div>

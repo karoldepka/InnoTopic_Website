@@ -41,7 +41,7 @@ export class StarRatingComponent extends CustomFormControl<StarRatingVal> {
 
   constructor(private changeDetectorRef: ChangeDetectorRef) {
     super()
-    addIcons({star, 'star-outline': star})
+    addIcons({star})
   }
 
   get starIndexes(): number[] {

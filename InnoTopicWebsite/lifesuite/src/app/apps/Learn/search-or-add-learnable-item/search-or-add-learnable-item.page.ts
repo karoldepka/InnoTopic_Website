@@ -105,7 +105,7 @@ export class SearchOrAddLearnableItemPageComponent extends BaseComponent impleme
     injector: Injector,
   ) {
     super(injector)
-    addIcons({ logoGoogle, logoFacebook, 'mail-outline': mail })
+    addIcons({ logoGoogle, logoFacebook, mail })
   }
 
   ngOnInit() {

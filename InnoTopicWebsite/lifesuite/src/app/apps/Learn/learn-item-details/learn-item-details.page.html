@@ -3,10 +3,10 @@
     <ion-buttons slot="start">
       <ion-back-button [defaultHref]="'/learn'" />
       <ion-button (click)="navigationService.navigateToPrevious()">
-        <ion-icon slot="icon-only" name="chevron-back-outline" />
+        <ion-icon slot="icon-only" name="chevron-back" />
       </ion-button>
       <ion-button (click)="navigationService.navigateToNext()">
-        <ion-icon slot="icon-only" name="chevron-forward-outline" />
+        <ion-icon slot="icon-only" name="chevron-forward" />
       </ion-button>
     </ion-buttons>
     <div style="display: inline-flex; align-items: center; width: 100%">
@@ -128,11 +128,11 @@
       <ion-button (click)="askDelete()">DELETE</ion-button>
 
       <ion-button *ngIf="!item$.isArchived()" (click)="askArchive()">
-        <ion-icon slot="start" name="archive-outline"></ion-icon>
+        <ion-icon slot="start" name="archive"></ion-icon>
         Archive
       </ion-button>
       <ion-button *ngIf="item$.isArchived()" (click)="restore()">
-        <ion-icon slot="start" name="arrow-undo-outline"></ion-icon>
+        <ion-icon slot="start" name="arrow-undo"></ion-icon>
         Restore
       </ion-button>
     </div>

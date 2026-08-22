@@ -45,11 +45,11 @@
     <ng-template>
       <ion-list lines="none">
         <ion-item *ngIf="!item.isArchived()" button="true" (click)="archive($event)">
-          <ion-icon slot="start" name="archive-outline"></ion-icon>
+          <ion-icon slot="start" name="archive"></ion-icon>
           <ion-label>Archive</ion-label>
         </ion-item>
         <ion-item *ngIf="item.isArchived()" button="true" (click)="restore($event)">
-          <ion-icon slot="start" name="arrow-undo-outline"></ion-icon>
+          <ion-icon slot="start" name="arrow-undo"></ion-icon>
           <ion-label>Restore</ion-label>
         </ion-item>
       </ion-list>
@@ -65,13 +65,13 @@
               (click)="addToToday($event)"
   >
     <!-- should be dot dot dot menu anyway -->
-    <ion-icon slot="icon-only"name="today-outline" />
+    <ion-icon slot="icon-only"name="today" />
      <!-- TODO: checkbox if already included -->
     <!-- TODO: later: this week / month / quarter / year -->
   </ion-button>
   <!--  <ion-note *ngIf="item.val?.isEffectivelyToLearn()">LEARN</ion-note>-->
   <!--  <ion-note *ngIf="item.val?.isEffectivelyToLearn()">-->
-  <ion-icon style="margin-right: 7px; font-size: 25px; vertical-align: middle" color="secondary" name="book-outline" />
+  <ion-icon style="margin-right: 7px; font-size: 25px; vertical-align: middle" color="secondary" name="book" />
 
   <ion-note *ngIf="item.val?.isTask">
     <span *ngIf="item.val?.isTask && item.val?.isEffectivelyToLearn()">, &nbsp;</span>

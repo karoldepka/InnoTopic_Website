@@ -76,7 +76,7 @@ export class SyncStatusIconComponent implements OnInit {
     public popoverController: PopoverController,
     public fullscreenService: FullscreenService,
   ) {
-    addIcons({'expand-outline': expand, 'contract-outline': contract})
+    addIcons({expand, contract})
   }
 
   ngOnInit() {}

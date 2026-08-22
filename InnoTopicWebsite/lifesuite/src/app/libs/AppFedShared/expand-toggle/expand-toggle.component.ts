@@ -21,7 +21,7 @@ export class ExpandToggleComponent {
   @Input() isOpen = false
   @Output() isOpenChange = new EventEmitter<boolean>()
 
-  @Input() icon = 'chatbubble-ellipses-outline'
+  @Input() icon = 'chatbubble-ellipses'
   /** Required for icon-only uses; text-labelled toggles remain understandable even with the
    * default. */
   @Input() ariaLabel = 'Show or hide details'
