@@ -38,7 +38,7 @@ export class MindfulnessPage extends BaseComponent implements OnInit, OnDestroy 
     { label: '30m', durationSeconds: 30 * 60 },
   ]
 
-  selectedDurationSeconds = 5 * 60
+  selectedDurationSeconds = 10
 
   remainingSeconds = this.selectedDurationSeconds
 
