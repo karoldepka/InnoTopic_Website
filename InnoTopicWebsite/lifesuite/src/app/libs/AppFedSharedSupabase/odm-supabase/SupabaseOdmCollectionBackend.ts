@@ -245,7 +245,9 @@ export class SupabaseOdmCollectionBackend<TRaw> extends OdmCollectionBackend<TRa
     // The sync cursor only makes sense for the general/unscoped query - loadChildrenOf/
     // loadTreeDescendantsOf need completeness for their scoped query, not just recent changes.
     const isScoped = !!(queryOpts.parentId || queryOpts.ancestorId)
-    const cursor = isScoped ? undefined : await this.browserOdmStorage.getSyncCursor(this.collectionName)
+    const cursor = isScoped || queryOpts.ignoreSyncCursor
+      ? undefined
+      : await this.browserOdmStorage.getSyncCursor(this.collectionName)
     console.log(`[ODM query started] dbType=supabase collection=${this.collectionName}`, {...queryOpts, cursor})
 
     let rows: any[]

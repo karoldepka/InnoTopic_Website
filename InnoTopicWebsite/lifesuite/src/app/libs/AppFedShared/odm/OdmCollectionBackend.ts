@@ -12,6 +12,8 @@ export type QueryOpts = {
   limit?: number,
   offset?: number,
   fromLocalCache?: boolean,
+  /** Fetch the complete remote collection rather than applying its incremental sync cursor. */
+  ignoreSyncCursor?: boolean,
   oneTimeGet: boolean,
 }
 

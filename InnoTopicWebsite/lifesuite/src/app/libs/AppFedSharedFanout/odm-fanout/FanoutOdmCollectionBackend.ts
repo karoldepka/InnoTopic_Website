@@ -95,7 +95,14 @@ export class FanoutOdmCollectionBackend<TRaw> extends OdmCollectionBackend<TRaw>
           onRemoved: () => undefined,
           onFinishedProcessingChangeSet: () => resolve(items),
         },
-        {comments: 'fanout backfill page', limit, offset, fromLocalCache: false, oneTimeGet: true},
+        {
+          comments: 'fanout backfill page',
+          limit,
+          offset,
+          fromLocalCache: false,
+          ignoreSyncCursor: true,
+          oneTimeGet: true,
+        },
         () => undefined,
       )
     })
