@@ -1,0 +1,8 @@
+# Local secrets belong in Vercel's encrypted environment-variable store.
+.env
+.env.*
+
+# Generated and test-only files are not Vercel function sources.
+dist
+node_modules
+src/**/*.test.ts

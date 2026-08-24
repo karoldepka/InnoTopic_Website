@@ -2,16 +2,21 @@ import {
   Component,
   ChangeDetectionStrategy
 } from '@angular/core';
+import { environment } from '../../../../environments/environment';
 
 @Component({
     selector: 'app-copilotkit-react-host',
     template: `
     <iframe
       title="React Category Builder"
-      src="assets/copilotkit-react-embed/index.html?v=lifesuite-category-builder-4"
+      [src]="embedUrl"
     ></iframe>
   `,
     changeDetection: ChangeDetectionStrategy.Eager,
     styleUrls: ['./copilotkit-react-host.component.scss'],
 })
-export class CopilotKitReactHostComponent {}
+export class CopilotKitReactHostComponent {
+  readonly embedUrl = `assets/copilotkit-react-embed/index.html?apiBase=${encodeURIComponent(
+    environment.aiBackendUrl ? `${environment.aiBackendUrl}/ai-api` : '/ai-api',
+  )}&v=lifesuite-category-builder-5`;
+}

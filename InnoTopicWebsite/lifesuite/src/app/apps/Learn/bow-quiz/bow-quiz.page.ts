@@ -1,5 +1,6 @@
 import { Component, ChangeDetectionStrategy } from '@angular/core';
 import { IonicModule } from '@ionic/angular';
+import { environment } from '../../../../environments/environment';
 
 @Component({
     selector: 'app-bow-quiz-page',
@@ -8,4 +9,8 @@ import { IonicModule } from '@ionic/angular';
     styleUrls: ['./bow-quiz.page.scss'],
     imports: [IonicModule],
 })
-export class BowQuizPage {}
+export class BowQuizPage {
+  readonly embedUrl = `assets/bow-quiz-react-embed/index.html?apiBase=${encodeURIComponent(
+    environment.aiBackendUrl ? `${environment.aiBackendUrl}/ai-api` : '/ai-api',
+  )}&v=bow-quiz-3`;
+}

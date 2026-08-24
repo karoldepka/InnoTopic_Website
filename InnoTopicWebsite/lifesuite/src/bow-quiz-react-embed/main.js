@@ -33,10 +33,9 @@ async function loadQuestionsFromDatabase() {
     const categoryId = params.get('categoryId');
     const owner = params.get('owner');
     
-    // Determine the API base URL
-    const apiBase = window.location.origin.includes('localhost')
-      ? 'http://localhost:8000'
-      : '/ai-api';
+    // The Angular host passes the deployed backend URL in production. The fallback preserves
+    // the same-origin Angular development proxy when this embed is opened standalone.
+    const apiBase = params.get('apiBase') || '/ai-api';
     
     const queryParams = new URLSearchParams();
     if (categoryId) queryParams.append('categoryId', categoryId);

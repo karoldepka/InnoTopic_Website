@@ -1,6 +1,7 @@
 import { Component, OnDestroy, ChangeDetectionStrategy, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { IonicModule } from '@ionic/angular';
 import 'deep-chat';
+import { environment } from '../../../../environments/environment';
 
 @Component({
     selector: 'app-copilotkit-compare-page',
@@ -13,7 +14,9 @@ import 'deep-chat';
     ],
 })
 export class CopilotKitComparePage implements OnDestroy {
-  private readonly endpointUrl = '/ai-api/copilotkit-agui';
+  private readonly endpointUrl = environment.aiBackendUrl
+    ? `${environment.aiBackendUrl}/ai-api/copilotkit-agui`
+    : '/ai-api/copilotkit-agui';
   private readonly threadId = this.makeId('thread');
   private activeAbortController?: AbortController;
 

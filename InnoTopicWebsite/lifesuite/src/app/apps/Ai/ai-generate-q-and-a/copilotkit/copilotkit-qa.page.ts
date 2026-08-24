@@ -1,10 +1,13 @@
 import { ChangeDetectionStrategy, Component, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { IonicModule } from '@ionic/angular';
 import 'deep-chat';
+import { environment } from '../../../../../environments/environment';
 
 import { AiQaWorkbenchComponent } from '../../shared/ai-qa-workbench.component';
 
-const COPILOT_AGUI_URL = '/ai-api/copilotkit-agui';
+const COPILOT_AGUI_URL = environment.aiBackendUrl
+  ? `${environment.aiBackendUrl}/ai-api/copilotkit-agui`
+  : '/ai-api/copilotkit-agui';
 
 @Component({
   selector: 'app-copilotkit-qa-page',
