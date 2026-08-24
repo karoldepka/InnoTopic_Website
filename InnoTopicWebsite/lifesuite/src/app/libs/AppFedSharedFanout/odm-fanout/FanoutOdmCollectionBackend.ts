@@ -52,7 +52,10 @@ export class FanoutOdmCollectionBackend<TRaw> extends OdmCollectionBackend<TRaw>
 
   private async backfillFromSupabase(force = false): Promise<void> {
     if (typeof localStorage === 'undefined') return
-    const flagKey = `fanoutBackfilled_${this.collectionName}`
+    // Mongo v2 stores each ODM subclass in its own Mongo collection. Version the marker so the
+    // existing Supabase data is copied into those new collections once, even on browsers whose
+    // old shared-collection backfill had already completed.
+    const flagKey = `fanoutBackfilled_mongoCollectionsV2_${this.collectionName}`
     if (!force && localStorage.getItem(flagKey) === 'true') {
       this.backfillProgress.start(this.collectionName)
       this.backfillProgress.finish(this.collectionName)

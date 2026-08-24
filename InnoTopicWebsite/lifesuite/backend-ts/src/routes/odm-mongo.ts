@@ -15,9 +15,7 @@ export const odmMongoRouter = new Hono();
 const ODM_BATCH_SIZE = 200;
 
 interface OdmMongoDoc {
-  /** Deterministic (collection, id) composite - see idForItem() - so an upsert is a true upsert:
-   * MongoDB's own primary key already guarantees no two documents can ever share one, with no
-   * separate unique index (and the creation-order race that comes with one) required. */
+  /** The ODM item id is unique within this OdmItem$ subclass's Mongo collection. */
   _id: string;
   collection: string;
   id: string;
@@ -27,13 +25,6 @@ interface OdmMongoDoc {
   ancestor_ids: string[];
   when_last_modified: Date;
   when_deleted: Date | null;
-}
-
-/** Same composite-key idea as odm-surreal.ts's recordIdPart() - deliberately keeping the two
- * peers' natural-key formats independent (each is an internal implementation detail of its own
- * store, never compared to the other), just reusing the same "table:id" `::` convention. */
-function idForItem(collection: string, itemId: string): string {
-  return `${collection}::${itemId}`;
 }
 
 interface OdmMongoHistoryDoc {
@@ -49,7 +40,7 @@ interface OdmMongoHistoryDoc {
 
 let _client: MongoClient | null = null;
 let _db: Db | null = null;
-let _indexesEnsured: Promise<void> | null = null;
+const indexesEnsuredByCollection = new Map<string, Promise<void>>();
 
 function getDb(): Db {
   if (!_db) {
@@ -61,28 +52,29 @@ function getDb(): Db {
   return _db;
 }
 
-function itemsCollection(): Collection<OdmMongoDoc> {
-  return getDb().collection<OdmMongoDoc>('odm_items');
+/** Each OdmItem$ subclass is isolated in its own Mongo collection, named after its ODM class
+ * (for example `JournalEntry`, `LearnItem`, or `OryItem`). */
+function itemsCollection(collection: string): Collection<OdmMongoDoc> {
+  return getDb().collection<OdmMongoDoc>(collection);
 }
 
-function historyCollection(): Collection<OdmMongoHistoryDoc> {
-  return getDb().collection<OdmMongoHistoryDoc>('odm_item_history');
+function historyCollection(collection: string): Collection<OdmMongoHistoryDoc> {
+  return getDb().collection<OdmMongoHistoryDoc>(`${collection}_history`);
 }
 
-async function ensureIndexes(): Promise<void> {
-  if (!_indexesEnsured) {
-    // No unique index on (collection, id) here - _id itself is that composite key now (see
-    // idForItem()), so uniqueness is enforced by MongoDB's own primary key with no separate index
-    // to create (and no window between "server starts accepting writes" and "that index finishes
-    // building" where a race could still slip a duplicate through).
-    _indexesEnsured = (async () => {
-      await itemsCollection().createIndex({ owner: 1, collection: 1, when_last_modified: -1 });
-      await itemsCollection().createIndex({ collection: 1, parent_ids: 1 });
-      await itemsCollection().createIndex({ collection: 1, ancestor_ids: 1 });
+async function ensureIndexes(collection: string): Promise<void> {
+  let indexesEnsured = indexesEnsuredByCollection.get(collection);
+  if (!indexesEnsured) {
+    indexesEnsured = (async () => {
+      const items = itemsCollection(collection);
+      await items.createIndex({ owner: 1, when_last_modified: -1 });
+      await items.createIndex({ owner: 1, parent_ids: 1 });
+      await items.createIndex({ owner: 1, ancestor_ids: 1 });
     })();
-    _indexesEnsured.catch(() => { _indexesEnsured = null; });
+    indexesEnsuredByCollection.set(collection, indexesEnsured);
+    indexesEnsured.catch(() => { indexesEnsuredByCollection.delete(collection); });
   }
-  return _indexesEnsured;
+  return indexesEnsured;
 }
 
 function toItemJson(doc: OdmMongoDoc) {
@@ -117,12 +109,12 @@ async function saveItems(
       snapshot_at: now,
     }));
 
-  if (history.length) await historyCollection().insertMany(history);
+  if (history.length) await historyCollection(collection).insertMany(history);
 
   if (!items.length) return;
-  await itemsCollection().bulkWrite(items.map(item => ({
+  await itemsCollection(collection).bulkWrite(items.map(item => ({
     updateOne: {
-      filter: { _id: idForItem(collection, item.item_id) },
+      filter: { _id: item.item_id },
       update: {
         $set: {
           collection,
@@ -151,14 +143,14 @@ odmMongoRouter.get('/api/odm-mongo/items', async c => {
 
   if (!collection || !owner) return c.json({ error: 'collection and owner required' }, 400);
 
-  await ensureIndexes();
+  await ensureIndexes(collection);
 
-  const query: Record<string, unknown> = { collection, owner, when_deleted: null };
+  const query: Record<string, unknown> = { owner, when_deleted: null };
   if (parentId) query['parent_ids'] = parentId;
   if (ancestorId) query['ancestor_ids'] = ancestorId;
 
   // Fetch one extra document so callers can page without an additional count query.
-  const docs = await itemsCollection()
+  const docs = await itemsCollection(collection)
     .find(query)
     .sort({ when_last_modified: -1, _id: 1 })
     .skip(offset)
@@ -182,12 +174,12 @@ odmMongoRouter.post('/api/odm-mongo/items/:collection/batch', async c => {
     return c.json({ error: `at most ${ODM_BATCH_SIZE} item mutations per batch` }, 413);
   }
 
-  await ensureIndexes();
+  await ensureIndexes(collection);
   await saveItems(collection, body.owner, items);
   if (deleteItemIds.length) {
     const now = new Date();
-    await itemsCollection().updateMany(
-      { _id: { $in: deleteItemIds.map(itemId => idForItem(collection, itemId)) }, owner: body.owner },
+    await itemsCollection(collection).updateMany(
+      { _id: { $in: deleteItemIds }, owner: body.owner },
       { $set: { when_deleted: now, when_last_modified: now } },
     );
   }
@@ -200,7 +192,7 @@ odmMongoRouter.put('/api/odm-mongo/items/:collection/:item_id', async c => {
   const item_id = c.req.param('item_id');
   const body = await c.req.json<OdmSaveRequest>();
 
-  await ensureIndexes();
+  await ensureIndexes(collection);
 
   await saveItems(collection, body.owner, [{ ...body, item_id }]);
 
@@ -212,10 +204,10 @@ odmMongoRouter.post('/api/odm-mongo/items/:collection/:item_id/delete', async c 
   const item_id = c.req.param('item_id');
   const body = await c.req.json<OdmDeleteRequest>();
 
-  await ensureIndexes();
+  await ensureIndexes(collection);
 
-  await itemsCollection().updateOne(
-    { _id: idForItem(collection, item_id), owner: body.owner },
+  await itemsCollection(collection).updateOne(
+    { _id: item_id, owner: body.owner },
     { $set: { when_deleted: new Date(), when_last_modified: new Date() } },
   );
 
