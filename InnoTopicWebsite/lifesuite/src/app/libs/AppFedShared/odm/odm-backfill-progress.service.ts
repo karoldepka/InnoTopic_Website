@@ -1,5 +1,7 @@
 import {Injectable, signal} from '@angular/core'
 
+const STORAGE_KEY = 'odmBackfillProgress'
+
 export interface OdmBackfillProgress {
   collectionName: string
   done: number
@@ -10,7 +12,7 @@ export interface OdmBackfillProgress {
 /** Shared, live progress for the explicit Supabase-to-peer ODM backfill. */
 @Injectable({providedIn: 'root'})
 export class OdmBackfillProgressService {
-  readonly collections = signal<OdmBackfillProgress[]>([])
+  readonly collections = signal<OdmBackfillProgress[]>(this.restore())
 
   start(collectionName: string): void {
     this.update({collectionName, done: 0, total: 0, state: 'running'})
@@ -40,9 +42,29 @@ export class OdmBackfillProgressService {
   }
 
   private update(next: OdmBackfillProgress): void {
-    this.collections.update(collections => [
-      ...collections.filter(progress => progress.collectionName !== next.collectionName),
+    const collections = [
+      ...this.collections().filter(progress => progress.collectionName !== next.collectionName),
       next,
-    ].sort((a, b) => a.collectionName.localeCompare(b.collectionName)))
+    ].sort((a, b) => a.collectionName.localeCompare(b.collectionName))
+    this.collections.set(collections)
+    if (typeof localStorage !== 'undefined') {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(collections))
+    }
+  }
+
+  private restore(): OdmBackfillProgress[] {
+    if (typeof localStorage === 'undefined') return []
+    try {
+      const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) ?? '[]')
+      return Array.isArray(saved)
+        ? saved.filter((progress): progress is OdmBackfillProgress =>
+          typeof progress?.collectionName === 'string'
+          && typeof progress.done === 'number'
+          && typeof progress.total === 'number'
+          && ['running', 'done', 'failed'].includes(progress.state))
+        : []
+    } catch {
+      return []
+    }
   }
 }

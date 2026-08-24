@@ -81,7 +81,7 @@
     [disabled]="syncAllDataTriggered"
     (click)="onSyncAllDataNow()"
   >Sync all data now (Supabase → Neon + Mongo)</ion-button>
-  @if (syncAllDataTriggered) {
+  @if (syncProgress.length) {
     <ion-note slot="end" class="sync-progress">
       @for (progress of syncProgress; track progress.collectionName) {
         <span>

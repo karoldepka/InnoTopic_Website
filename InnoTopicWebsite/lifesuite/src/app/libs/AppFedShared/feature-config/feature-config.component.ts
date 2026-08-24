@@ -15,8 +15,6 @@ import { TranslatePipe } from '@ngx-translate/core';
 })
 export class FeatureConfigComponent extends BaseComponent implements OnInit {
 
-  syncAllDataTriggered = false
-
   constructor(
     public featureConfigService: FeatureService,
     private odmFullSyncService: OdmFullSyncService,
@@ -29,11 +27,14 @@ export class FeatureConfigComponent extends BaseComponent implements OnInit {
 
   onSyncAllDataNow() {
     this.odmFullSyncService.syncAllKnownCollectionsNow()
-    this.syncAllDataTriggered = true
   }
 
   get syncProgress() {
     return this.odmFullSyncService.backfillProgress.collections()
+  }
+
+  get syncAllDataTriggered(): boolean {
+    return this.syncProgress.some(progress => progress.state === 'running')
   }
 
   get enableAll(): boolean {
