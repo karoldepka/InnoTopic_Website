@@ -44,10 +44,16 @@ export class FanoutOdmCollectionBackend<TRaw> extends OdmCollectionBackend<TRaw>
    * collection's data on construction) and is a no-op on every run after the first, tracked via a
    * localStorage flag per collection - there's a single user (this app has no multi-tenancy), so
    * one browser completing this once is enough to cover all the data that will ever need it. */
-  private async backfillFromSupabase(): Promise<void> {
+  /** Explicitly reruns a collection's historical replication for the Sync menu, even when the
+   * one-time automatic backfill has already completed. */
+  syncFromSupabaseNow(): Promise<void> {
+    return this.backfillFromSupabase(true)
+  }
+
+  private async backfillFromSupabase(force = false): Promise<void> {
     if (typeof localStorage === 'undefined') return
     const flagKey = `fanoutBackfilled_${this.collectionName}`
-    if (localStorage.getItem(flagKey) === 'true') {
+    if (!force && localStorage.getItem(flagKey) === 'true') {
       this.backfillProgress.start(this.collectionName)
       this.backfillProgress.finish(this.collectionName)
       return

@@ -12,6 +12,7 @@ import {AiAdviceOdmService} from '../ai-advice/ai-advice-odm.service'
 import {GenericItemsService} from '../tree/generic-items.service'
 import {LearnItemItemsService} from '../../../apps/Learn/core/learn-item-items.service'
 import {OdmBackfillProgressService} from './odm-backfill-progress.service'
+import {FanoutOdmCollectionBackend} from '../../AppFedSharedFanout/odm-fanout/FanoutOdmCollectionBackend'
 
 /** Every currently-known OdmService2 subclass with a static (not per-call-site-parameterized)
  * className. There's no registry these services self-report into, so this list has to be kept in
@@ -45,16 +46,18 @@ export class OdmFullSyncService {
   ) {
   }
 
-  /** Constructing each service (even without using it further) is enough - OdmService2's own
-   * constructor already sets up its FanoutOdmCollectionBackend, which kicks off the backfill on
-   * its own. A no-op when environment.odmBackend isn't 'fanout', since there's nothing to
-   * backfill into in that case. */
+  /** Starts a fresh Supabase-to-peer replication for every known collection, including ones whose
+   * automatic one-time backfill was previously marked complete. */
   syncAllKnownCollectionsNow(): void {
     if ((environment as any).odmBackend !== 'fanout') {
       return
     }
     for (const ServiceClass of KNOWN_ODM_SERVICES) {
-      this.injector.get(ServiceClass)
+      const service = this.injector.get(ServiceClass) as {odmCollectionBackend?: unknown}
+      const backend = service.odmCollectionBackend
+      if (backend instanceof FanoutOdmCollectionBackend) {
+        void backend.syncFromSupabaseNow()
+      }
     }
   }
 }
