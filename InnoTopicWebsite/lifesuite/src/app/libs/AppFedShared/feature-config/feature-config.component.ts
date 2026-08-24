@@ -32,6 +32,10 @@ export class FeatureConfigComponent extends BaseComponent implements OnInit {
     this.syncAllDataTriggered = true
   }
 
+  get syncProgress() {
+    return this.odmFullSyncService.backfillProgress.collections()
+  }
+
   get enableAll(): boolean {
     return this.featureConfigService.enableAll
   }

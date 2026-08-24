@@ -3,6 +3,7 @@ import {ItemId, OdmCollectionBackend, OdmCollectionBackendListener, QueryOpts} f
 import {OdmItemId} from '../../AppFedShared/odm/OdmItemId'
 import {ConcurrencyLimiter} from '../../AppFedShared/utils/promiseUtils'
 import {FanoutOdmBackend} from './FanoutOdmBackend'
+import {OdmBackfillProgressService} from '../../AppFedShared/odm/odm-backfill-progress.service'
 
 export class FanoutOdmCollectionBackend<TRaw> extends OdmCollectionBackend<TRaw> {
   public collectionName = this.className
@@ -16,6 +17,7 @@ export class FanoutOdmCollectionBackend<TRaw> extends OdmCollectionBackend<TRaw>
   private replicationLimiter = new ConcurrencyLimiter(6)
 
   private backfillSource: OdmCollectionBackend<TRaw>
+  private backfillProgress: OdmBackfillProgressService
 
   constructor(
     injector: Injector,
@@ -31,6 +33,7 @@ export class FanoutOdmCollectionBackend<TRaw> extends OdmCollectionBackend<TRaw>
       backend.createCollectionBackend<TRaw>(injector, className, peerOpts)
     )
     this.backfillSource = fanoutBackend.backfillSourceBackend.createCollectionBackend<TRaw>(injector, className, peerOpts)
+    this.backfillProgress = injector.get(OdmBackfillProgressService)
     this.backfillFromSupabase()
   }
 
@@ -44,23 +47,34 @@ export class FanoutOdmCollectionBackend<TRaw> extends OdmCollectionBackend<TRaw>
   private async backfillFromSupabase(): Promise<void> {
     if (typeof localStorage === 'undefined') return
     const flagKey = `fanoutBackfilled_${this.collectionName}`
-    if (localStorage.getItem(flagKey) === 'true') return
+    if (localStorage.getItem(flagKey) === 'true') {
+      this.backfillProgress.start(this.collectionName)
+      this.backfillProgress.finish(this.collectionName)
+      return
+    }
 
     try {
+      this.backfillProgress.start(this.collectionName)
       await this.waitUntilReady()
       const targets = this.peers.filter(peer => peer !== this.backfillSource)
       const pageSize = 1000
+      const items: Array<{id: OdmItemId<TRaw>, data: TRaw}> = []
       for (let offset = 0; ; offset += pageSize) {
         const page = await this.fetchBackfillPage(offset, pageSize)
-        for (const {id, data} of page) {
-          for (const target of targets) {
-            this.replicationLimiter.run(() => target.saveNowToDb(data, id as ItemId)).catch(() => undefined)
-          }
-        }
+        items.push(...page)
         if (page.length < pageSize) break
       }
+      this.backfillProgress.setTotal(this.collectionName, items.length)
+      await Promise.all(items.map(async ({id, data}) => {
+        await Promise.all(targets.map(target =>
+          this.replicationLimiter.run(() => target.saveNowToDb(data, id as ItemId)).catch(() => undefined)
+        ))
+        this.backfillProgress.incrementDone(this.collectionName)
+      }))
       localStorage.setItem(flagKey, 'true')
+      this.backfillProgress.finish(this.collectionName)
     } catch (error) {
+      this.backfillProgress.fail(this.collectionName)
       console.error('[Fanout ODM] backfillFromSupabase failed', 'collectionName', this.collectionName, error)
     }
   }

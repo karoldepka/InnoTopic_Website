@@ -11,6 +11,7 @@ import {JournalAiAdviceSettingsOdmService} from '../../../apps/Journal/journal-a
 import {AiAdviceOdmService} from '../ai-advice/ai-advice-odm.service'
 import {GenericItemsService} from '../tree/generic-items.service'
 import {LearnItemItemsService} from '../../../apps/Learn/core/learn-item-items.service'
+import {OdmBackfillProgressService} from './odm-backfill-progress.service'
 
 /** Every currently-known OdmService2 subclass with a static (not per-call-site-parameterized)
  * className. There's no registry these services self-report into, so this list has to be kept in
@@ -38,7 +39,10 @@ const KNOWN_ODM_SERVICES: Type<unknown>[] = [
   providedIn: 'root',
 })
 export class OdmFullSyncService {
-  constructor(private injector: Injector) {
+  constructor(
+    private injector: Injector,
+    readonly backfillProgress: OdmBackfillProgressService,
+  ) {
   }
 
   /** Constructing each service (even without using it further) is enough - OdmService2's own
