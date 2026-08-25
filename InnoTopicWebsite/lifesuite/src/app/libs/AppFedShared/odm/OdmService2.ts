@@ -159,6 +159,9 @@ export abstract class OdmService2<
    * - the browser regaining connectivity (`online` event) - the case a write failed while
    *   offline and nothing else would otherwise re-trigger it. */
   private isResumingPendingEdits = false
+  private pendingEditsRetryTimeout: ReturnType<typeof setTimeout> | undefined
+  private pendingEditsRetryDelayMs = 5_000
+  private readonly pendingEditsRetryMaxDelayMs = 60_000
 
   private resumePendingEdits() {
     this.authService.authUser$.subscribe(() => this.resumePendingEditsNow())
@@ -171,6 +174,9 @@ export abstract class OdmService2<
     if (this.isResumingPendingEdits || !this.authService.authUser$.lastVal) {
       return
     }
+    if (typeof navigator !== 'undefined' && !navigator.onLine) {
+      return
+    }
     this.isResumingPendingEdits = true
     try {
       const pendingEdits = await this.browserOdmStorage.getAllPendingEdits(this.className)
@@ -181,6 +187,41 @@ export abstract class OdmService2<
     } finally {
       this.isResumingPendingEdits = false
     }
+  }
+
+  private schedulePendingEditsRetry() {
+    if (this.pendingEditsRetryTimeout || !this.authService.authUser$.lastVal) {
+      return
+    }
+    if (typeof navigator !== 'undefined' && !navigator.onLine) {
+      return
+    }
+    const delayMs = this.pendingEditsRetryDelayMs
+    this.pendingEditsRetryTimeout = setTimeout(() => {
+      this.pendingEditsRetryTimeout = undefined
+      this.resumePendingEditsNow()
+    }, delayMs)
+    this.pendingEditsRetryDelayMs = Math.min(delayMs * 2, this.pendingEditsRetryMaxDelayMs)
+  }
+
+  private resetPendingEditsRetry() {
+    this.pendingEditsRetryDelayMs = 5_000
+    if (this.pendingEditsRetryTimeout) {
+      clearTimeout(this.pendingEditsRetryTimeout)
+      this.pendingEditsRetryTimeout = undefined
+    }
+  }
+
+  private refreshPendingEditsRetryState() {
+    setTimeout(() => {
+      this.browserOdmStorage.getAllPendingEdits(this.className)
+        .then(pendingEdits => {
+          if (!pendingEdits.length) {
+            this.resetPendingEditsRetry()
+          }
+        })
+        .catch(error => debugLog('refreshPendingEditsRetryState failed', this.className, error))
+    })
   }
 
   _ensureItemAdded(item$: TOdmItem$) {
@@ -231,7 +272,13 @@ export abstract class OdmService2<
         itemToSave.getAncestorIds() as ItemId[],
         changedFieldsOnly as any,
       )
-      promise.then(() => itemToSave.onDbWriteResolved(pendingSnapshot), () => {})
+      promise.then(
+        () => {
+          itemToSave.onDbWriteResolved(pendingSnapshot)
+          this.refreshPendingEditsRetryState()
+        },
+        () => this.schedulePendingEditsRetry(),
+      )
       const title = (itemToSave.val as any)?.title ?? (itemToSave.val as any)?.name ?? itemToSave.id
       // '' for a single-destination backend (Supabase alone, say) - naming the one destination
       // would be redundant noise. Non-empty for fanout ("Supabase, Neon, Mongo, Surreal"), so the

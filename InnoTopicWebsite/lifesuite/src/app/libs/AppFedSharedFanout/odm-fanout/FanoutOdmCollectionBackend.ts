@@ -8,8 +8,9 @@ import {OdmBackfillProgressService} from '../../AppFedShared/odm/odm-backfill-pr
 export class FanoutOdmCollectionBackend<TRaw> extends OdmCollectionBackend<TRaw> {
   public collectionName = this.className
 
-  /** Supabase, Neon, and Mongo - all equal, no distinguished "source of truth". */
   private peers: OdmCollectionBackend<TRaw>[]
+  private requiredPeers = new Set<OdmCollectionBackend<TRaw>>()
+  private peerNames = new Map<OdmCollectionBackend<TRaw>, string>()
 
   // A full-collection load / backfill replication can burst many writes at once - without a cap,
   // one fetch() per peer per item exhausts the browser's connection pool
@@ -29,9 +30,14 @@ export class FanoutOdmCollectionBackend<TRaw> extends OdmCollectionBackend<TRaw>
     // A single peer's own failure shouldn't pop a window.alert() for the user - saveNowToDb()
     // below already aggregates all three into one promise/error the caller does see.
     const peerOpts = {...opts, silentErrors: true}
-    this.peers = fanoutBackend.peerBackends.map(backend =>
-      backend.createCollectionBackend<TRaw>(injector, className, peerOpts)
-    )
+    this.peers = fanoutBackend.peerConfigs.map(config => {
+      const peer = config.backend.createCollectionBackend<TRaw>(injector, className, peerOpts)
+      this.peerNames.set(peer, config.name)
+      if (config.required) {
+        this.requiredPeers.add(peer)
+      }
+      return peer
+    })
     this.backfillSource = fanoutBackend.backfillSourceBackend.createCollectionBackend<TRaw>(injector, className, peerOpts)
     this.backfillProgress = injector.get(OdmBackfillProgressService)
     this.backfillFromSupabase()
@@ -111,15 +117,44 @@ export class FanoutOdmCollectionBackend<TRaw> extends OdmCollectionBackend<TRaw>
     })
   }
 
-  /** Waits for every peer to confirm before resolving - a save is only "done" once Supabase,
-   * Neon, and Mongo have all persisted it. Slower than racing, but no peer can silently miss a
-   * write the others accepted. */
-  saveNowToDb(item: TRaw, id: ItemId, parentIds?: ItemId[], ancestorIds?: ItemId[], changedFieldsOnly?: Partial<TRaw>): Promise<any> {
-    return Promise.all(this.peers.map(peer => peer.saveNowToDb(item, id, parentIds, ancestorIds, changedFieldsOnly)))
+  /** Attempts every enabled peer. Required peers (Supabase) still gate success; optional replicas
+   * (local Neon/Mongo in dev) log failures but do not keep the user's durable queue stuck once the
+   * required write has landed. */
+  async saveNowToDb(item: TRaw, id: ItemId, parentIds?: ItemId[], ancestorIds?: ItemId[], changedFieldsOnly?: Partial<TRaw>): Promise<any> {
+    const results = await Promise.allSettled(this.peers.map(peer => peer.saveNowToDb(item, id, parentIds, ancestorIds, changedFieldsOnly)))
+    this.throwIfRequiredPeersFailed('saveNowToDb', results)
+    return results
   }
 
-  deleteWithoutConfirmation(itemId: OdmItemId): Promise<any> {
-    return Promise.all(this.peers.map(peer => peer.deleteWithoutConfirmation(itemId)))
+  async deleteWithoutConfirmation(itemId: OdmItemId): Promise<any> {
+    const results = await Promise.allSettled(this.peers.map(peer => peer.deleteWithoutConfirmation(itemId)))
+    this.throwIfRequiredPeersFailed('deleteWithoutConfirmation', results)
+    return results
+  }
+
+  private throwIfRequiredPeersFailed(operation: string, results: PromiseSettledResult<any>[]): void {
+    const failures = results
+      .map((result, index) => ({result, peer: this.peers[index]}))
+      .filter((entry): entry is {result: PromiseRejectedResult, peer: OdmCollectionBackend<TRaw>} => entry.result.status === 'rejected')
+    for (const failure of failures) {
+      console.error(
+        '[Fanout ODM] peer write failed',
+        operation,
+        'collectionName',
+        this.collectionName,
+        'peer',
+        this.peerNames.get(failure.peer) ?? 'unknown',
+        failure.result.reason,
+      )
+    }
+    const requiredFailures = failures.filter(failure => this.requiredPeers.has(failure.peer))
+    const successCount = results.filter(result => result.status === 'fulfilled').length
+    if (requiredFailures.length || successCount === 0) {
+      throw new Error(
+        `[Fanout ODM] ${operation} failed for required peer(s): ` +
+        requiredFailures.map(failure => this.peerNames.get(failure.peer) ?? 'unknown').join(', '),
+      )
+    }
   }
 
   override setListener(

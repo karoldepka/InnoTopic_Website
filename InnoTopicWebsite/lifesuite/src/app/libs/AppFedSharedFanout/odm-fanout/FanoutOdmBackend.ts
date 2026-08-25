@@ -8,13 +8,21 @@ import {SurrealOdmBackend} from '../../AppFedSharedSurreal/odm-surreal/surreal-o
 import {FanoutOdmCollectionBackend} from './FanoutOdmCollectionBackend'
 import {environment} from '../../../../environments/environment'
 
+export interface FanoutPeerConfig {
+  backend: OdmBackend
+  name: string
+  required: boolean
+}
+
 /**
- * Supabase, Neon, Mongo, and SurrealDB are treated as equal peers, not a primary + mirrors: every
- * write goes to all enabled peers and only resolves once all of them confirm (durability over
- * latency), and every read races all enabled peers, forwarding whichever responds first with real
- * data and backfilling the others from that response (see FanoutOdmCollectionBackend.raceQuery -
- * an empty response never preempts a real one still in flight, so a not-yet-backfilled peer can't
- * shadow Supabase's actual data even before the one-time backfill below finishes).
+ * Supabase is the required peer; Neon/Mongo/Surreal are enabled replicas. Every write is attempted
+ * against every enabled peer, but a secondary replica being offline (common in local dev when
+ * backend-ts on localhost:8000 is not running) must not keep the user's durable pending-edit
+ * journal stuck after Supabase has accepted the write. Reads still race all enabled peers,
+ * forwarding whichever responds first with real data and backfilling the others from that response
+ * (see FanoutOdmCollectionBackend.raceQuery - an empty response never preempts a real one still in
+ * flight, so a not-yet-backfilled peer can't shadow Supabase's actual data even before the
+ * one-time backfill below finishes).
  *
  * On top of that per-query safety net, each FanoutOdmCollectionBackend backfills itself once, the
  * first time it's constructed (see its `backfillFromSupabase()`), pulling every existing item
@@ -32,6 +40,7 @@ import {environment} from '../../../../environments/environment'
 @Injectable()
 export class FanoutOdmBackend extends OdmBackend {
   readonly peerBackends: OdmBackend[]
+  readonly peerConfigs: FanoutPeerConfig[]
   /** Parallel to peerBackends - human-readable names for describeSaveDestination() below, since
    * OdmBackend itself carries no display name. Built from the same enabled-flag conditionals so
    * the two arrays can never drift out of sync with each other. */
@@ -49,14 +58,14 @@ export class FanoutOdmBackend extends OdmBackend {
   ) {
     super(injector)
     const env = environment as any
-    const enabledPeers: Array<readonly [OdmBackend, string]> = [
-      [supabaseOdmBackend, 'Supabase'],
-      ...(env.neon?.enabled ?? true ? [[neonOdmBackend, 'Neon']] as const : []),
-      ...(env.mongo?.enabled ?? true ? [[mongoOdmBackend, 'Mongo']] as const : []),
-      ...(env.surreal?.enabled ?? true ? [[surrealOdmBackend, 'Surreal']] as const : []),
+    this.peerConfigs = [
+      {backend: supabaseOdmBackend, name: 'Supabase', required: true},
+      ...(env.neon?.enabled ?? true ? [{backend: neonOdmBackend, name: 'Neon', required: env.neon?.required ?? false}] : []),
+      ...(env.mongo?.enabled ?? true ? [{backend: mongoOdmBackend, name: 'Mongo', required: env.mongo?.required ?? false}] : []),
+      ...(env.surreal?.enabled ?? true ? [{backend: surrealOdmBackend, name: 'Surreal', required: env.surreal?.required ?? false}] : []),
     ]
-    this.peerBackends = enabledPeers.map(([backend]) => backend)
-    this.peerNames = enabledPeers.map(([, name]) => name)
+    this.peerBackends = this.peerConfigs.map(({backend}) => backend)
+    this.peerNames = this.peerConfigs.map(({name, required}) => required ? name : `${name} optional`)
     this.backfillSourceBackend = supabaseOdmBackend
     this.initDb()
   }
