@@ -14,6 +14,7 @@ import {isNotNullish} from '../utils/utils'
 import {ItemId, QueryOpts} from './OdmCollectionBackend'
 import {environment} from '../../../../environments/environment'
 import {BrowserOdmStorage} from '../../AppFedSharedBrowser/odm-browser/BrowserOdmStorage'
+import {appGlobals} from '../g'
 
 export class OdmServiceOpts {
   dontLoadAllAutomatically = false
@@ -135,7 +136,7 @@ export abstract class OdmService2<
     public className: string,
     public opts : OdmServiceOpts = new OdmServiceOpts(),
   ) {
-    console.log('OdmService2 service constructor for className: ', className)
+    this.debugLog('OdmService2 service constructor for className: ', className)
     // this.className += '_DEBUG'
     this.setBackendListenerIfNecessary()
     this.resumePendingEdits()
@@ -470,18 +471,18 @@ export abstract class OdmService2<
   deleteAll(toDelete: Set<TItemId>) {
     // TODO: delete audio too
     for ( let idToDelete of toDelete) {
-      console.log(`!!! idToDelete`, idToDelete)
+      this.debugLog(`!!! idToDelete`, idToDelete)
       this.deleteWithoutConfirmationById(idToDelete)
     }
   }
 
   patchThrottledById(id: TItemId, patch: TMemPatch) {
-    console.log(`patchThrottledById, `, id, patch)
+    this.debugLog(`patchThrottledById, `, id, patch)
     // TODO: reverse and implement here to not have to acquire OdmItem$ in case updating massive number of items
     const item$ById = this.obtainItem$ById(id)
     const subHack: {subscription?: any} = {}
     subHack.subscription = item$ById.val$.subscribe((val) => {
-      console.log(`patchThrottledById, item$ById.val$.subscribe`, id, patch, val)
+      this.debugLog(`patchThrottledById, item$ById.val$.subscribe`, id, patch, val)
       if ( isNotNullish(val) ) {
         setTimeout /* ensure subscription */(() => {
           subHack.subscription.unsubscribe()
@@ -517,6 +518,12 @@ export abstract class OdmService2<
 
   loadNextPageFromServer() {
     this._fetchPageFromServer(this.serverLoadOffset)
+  }
+
+  private debugLog(...args: any[]) {
+    if (appGlobals.feat?.showDebug) {
+      console.log(...args)
+    }
   }
 
   private _fetchPageFromServer(offset: number) {

@@ -8,6 +8,7 @@ import {
   rawFromPostgresOdmRow,
 } from '../../AppFedSharedPostgres/odm-postgres/PostgresOdmRow'
 import {BrowserOdmRow, BrowserOdmStorage} from './BrowserOdmStorage'
+import {appGlobals} from '../../AppFedShared/g'
 
 export class BrowserOdmCollectionBackend<TRaw> extends OdmCollectionBackend<TRaw> {
   private storage = this.injector.get(BrowserOdmStorage)
@@ -95,14 +96,14 @@ export class BrowserOdmCollectionBackend<TRaw> extends OdmCollectionBackend<TRaw
    * Nothing reads from this backend as a primary source today; it's kept fully functional so
    * it's a real, usable OdmCollectionBackend if it's ever wired in as a fallback/recovery source. */
   private async fetchRows(): Promise<BrowserOdmRow<TRaw>[]> {
-    console.log(`[ODM query started] dbType=indexeddb collection=${this.collectionName}`)
+    this.debugLog(`[ODM query started] dbType=indexeddb collection=${this.collectionName}`)
     const owner = this.requireUserId()
     const rows = await this.storage.getAllForCollection<TRaw>(this.collectionName)
     // Conflict-archival rows (see BrowserOdmStorage.put()) are recovery-only bookkeeping under a
     // synthetic id, not real items - surfacing them here duplicated the winning item as a second,
     // near-identical entry with garbage metadata (GH #73).
     const filtered = rows.filter(row => row.owner === owner && !row.when_deleted && !row.isConflictArchive)
-    console.log(`[ODM query ended] dbType=indexeddb collection=${this.collectionName}`, 'yielded', filtered.length, 'rows')
+    this.debugLog(`[ODM query ended] dbType=indexeddb collection=${this.collectionName}`, 'yielded', filtered.length, 'rows')
     return filtered
   }
 
@@ -136,5 +137,11 @@ export class BrowserOdmCollectionBackend<TRaw> extends OdmCollectionBackend<TRaw
     this.errorAlert(...args)
     const cause = args.find(a => a && typeof a === 'object' && typeof a.message === 'string')
     throw new Error(['collectionName', this.collectionName, ...args].map(String).join(' '), cause ? {cause} : undefined)
+  }
+
+  private debugLog(...args: any[]) {
+    if (appGlobals.feat?.showDebug) {
+      console.log(...args)
+    }
   }
 }

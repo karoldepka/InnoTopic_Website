@@ -14,6 +14,7 @@ import {SupabaseOdmClientService} from './supabase-odm-client.service'
 import {environment} from '../../../../environments/environment'
 import {BrowserOdmStorage} from '../../AppFedSharedBrowser/odm-browser/BrowserOdmStorage'
 import {stripHtml} from '../../AppFedShared/utils/html-utils'
+import {appGlobals} from '../../AppFedShared/g'
 
 interface EmbeddingResponse {
   embedding: number[]
@@ -29,6 +30,8 @@ interface EmbeddingResponse {
 const SYNC_CURSOR_BUFFER_MS = 10 * 60 * 1000
 
 export class SupabaseOdmCollectionBackend<TRaw> extends OdmCollectionBackend<TRaw> {
+  private static realtimeChannelErrorCollectionsLogged = new Set<string>()
+
   private supabase = this.injector.get(SupabaseOdmClientService).getClient()
   private http = this.injector.get(HttpClient)
   private browserOdmStorage = this.injector.get(BrowserOdmStorage)
@@ -65,11 +68,11 @@ export class SupabaseOdmCollectionBackend<TRaw> extends OdmCollectionBackend<TRa
     }
   }
 
-  async saveNowToDb(item: TRaw, id: string, parentIds?: ItemId[], ancestorIds?: ItemId[]): Promise<any> {
+  async saveNowToDb(item: TRaw, id: string, parentIds?: ItemId[], ancestorIds?: ItemId[], changedFieldsOnly?: Partial<TRaw>): Promise<any> {
     await this.waitUntilReady()
     const owner = this.requireUserId()
     const row = createPostgresOdmRow(this.collectionName, id, owner, item, parentIds, ancestorIds)
-    console.log(`[Supabase ODM] -> ${this.collectionName}/${id}`)
+    this.debugSave(item, id, parentIds, ancestorIds, changedFieldsOnly)
 
     // odm_items' primary key column is `id` (not `item_id` like odm_item_history) - rename on the way out.
     const {item_id, ...rowWithoutItemId} = row as any
@@ -248,7 +251,7 @@ export class SupabaseOdmCollectionBackend<TRaw> extends OdmCollectionBackend<TRa
     const cursor = isScoped || queryOpts.ignoreSyncCursor
       ? undefined
       : await this.browserOdmStorage.getSyncCursor(this.collectionName)
-    console.log(`[ODM query started] dbType=supabase collection=${this.collectionName}`, {...queryOpts, cursor})
+    this.debugLog(`[ODM query started] dbType=supabase collection=${this.collectionName}`, {...queryOpts, cursor})
 
     let rows: any[]
     if (queryOpts.limit) {
@@ -291,7 +294,7 @@ export class SupabaseOdmCollectionBackend<TRaw> extends OdmCollectionBackend<TRa
         .catch(error => this.errorAlert('updateSyncCursor error', error))
     }
 
-    console.log(`[ODM query ended] dbType=supabase collection=${this.collectionName}`, {...queryOpts, cursor}, 'yielded', rows.length, 'rows')
+    this.debugLog(`[ODM query ended] dbType=supabase collection=${this.collectionName}`, {...queryOpts, cursor}, 'yielded', rows.length, 'rows')
     return rows.map(row => this.fromOdmItemsRow(row))
   }
 
@@ -341,8 +344,8 @@ export class SupabaseOdmCollectionBackend<TRaw> extends OdmCollectionBackend<TRa
       .subscribe((status: string) => {
         if (status === 'CHANNEL_ERROR') {
           // Realtime is a live-update enhancement; the initial fetch already loaded data.
-          // A channel error is non-fatal, so log only rather than showing a blocking alert.
-          console.error('[Supabase ODM] Realtime channel error', 'collectionName', this.collectionName)
+          // A channel error is non-fatal, so keep it out of the normal console stream.
+          this.debugRealtimeChannelError()
         } else if (status === 'SUBSCRIBED') {
           if (hasConnectedBefore) {
             // Reconnecting after a drop (network hiccup, tab backgrounded and throttled, etc.).
@@ -471,5 +474,49 @@ export class SupabaseOdmCollectionBackend<TRaw> extends OdmCollectionBackend<TRa
     // further up (SyncStatusService's network-error detection) can still see it.
     const cause = args.find(a => a && typeof a === 'object' && typeof a.message === 'string')
     throw new Error(['collectionName', this.collectionName, ...args].map(String).join(' '), cause ? {cause} : undefined)
+  }
+
+  private debugLog(...args: any[]) {
+    if (appGlobals.feat?.showDebug) {
+      console.log(...args)
+    }
+  }
+
+  private debugSave(
+    item: TRaw,
+    id: string,
+    parentIds?: ItemId[],
+    ancestorIds?: ItemId[],
+    changedFieldsOnly?: Partial<TRaw>,
+  ) {
+    if (!appGlobals.feat?.showDebug) {
+      return
+    }
+    const changedFieldNames = changedFieldsOnly ? Object.keys(changedFieldsOnly as object) : undefined
+    const fieldNames = Object.keys((changedFieldsOnly ?? item ?? {}) as object)
+    const fieldsSummary = fieldNames.length
+      ? `${fieldNames.slice(0, 12).join(', ')}${fieldNames.length > 12 ? `, +${fieldNames.length - 12} more` : ''}`
+      : '(no enumerable fields)'
+    console.log(
+      `[Supabase ODM] saveNowToDb: full-row upsert for ${this.collectionName}/${id}`,
+      {
+        what: `Writing ${this.collectionName}/${id} to Supabase table ${this.tableName}.`,
+        why: 'OdmService2 is flushing a local item change to the remote sync backend; any durable pending edit for this item can be cleared after the write succeeds.',
+        requestedBy: changedFieldNames
+          ? 'incremental local patch path (Supabase backend still stores a full row snapshot)'
+          : 'full document save path (new item or explicit full save)',
+        fields: fieldsSummary,
+        parentIdsCount: parentIds?.length ?? 0,
+        ancestorIdsCount: ancestorIds?.length ?? 0,
+      },
+    )
+  }
+
+  private debugRealtimeChannelError() {
+    if (!appGlobals.feat?.showDebug || SupabaseOdmCollectionBackend.realtimeChannelErrorCollectionsLogged.has(this.collectionName)) {
+      return
+    }
+    SupabaseOdmCollectionBackend.realtimeChannelErrorCollectionsLogged.add(this.collectionName)
+    console.warn('[Supabase ODM] Realtime channel error', 'collectionName', this.collectionName)
   }
 }

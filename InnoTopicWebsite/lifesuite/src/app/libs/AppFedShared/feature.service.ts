@@ -15,7 +15,6 @@ export class FeatureService {
   private static readonly featuresPropsKey = 'featuresProps'
 
   constructor() {
-    console.log('FeatureService ctor')
     // g.feat = this // DX FTW!
     const featuresConfig = new FeaturesConfig(this.loadPersistedProps())
     g.feat = featuresConfig

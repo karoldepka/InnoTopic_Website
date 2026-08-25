@@ -68,7 +68,9 @@ export class SyncStatusService extends BaseService {
     injector: Injector,
   ) {
     super(injector)
-    console.log('SyncStatusService service constructor')
+    if (appGlobals.feat?.showDebug) {
+      console.log('SyncStatusService service constructor')
+    }
     this.refreshDurablePendingSyncItems()
     this.browserOdmStorage.pendingEditsChanged$.subscribe(() => this.refreshDurablePendingSyncItems())
     this.refreshDurablePendingBlobUploads()

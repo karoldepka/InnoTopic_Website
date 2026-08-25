@@ -568,7 +568,7 @@ export class OdmItem$2<
 
   /** Note: saveThrottled does not exist, because we prefer to use patch, for incremental saves of only the fields that have changed */
   saveNowToDb(modificationOpts?: ModificationOpts) {
-    console.log(`saveNowToDb`)
+    this.debugLog(`saveNowToDb`)
     this.setIdAndWhenCreatedIfNecessary()
     this.setLastModifiedIfNecessary(modificationOpts)
     // Unlike patchNow/patchThrottled (incremental edits to an already-loaded item), this is the
@@ -656,7 +656,7 @@ export class OdmItem$2<
   }
 
   public onChildrenAddedLocally(children: TSelf[]) {
-    console.log('onChildrenAddedLocally', children)
+    this.debugLog('onChildrenAddedLocally', children)
     this.childrenList$.nextWithCache([
       ... (this.childrenList$.lastVal ?? []),
       ... children,
@@ -667,7 +667,7 @@ export class OdmItem$2<
     if ( this.childrenListener || ! this.id ) {
       return
     }
-    console.log('requestLoadChildren', this.id)
+    this.debugLog('requestLoadChildren', this.id)
     /* FIXME: this is copy-paste from entire-collection loading */
     /* TODO: encapsulate into OdmCollection object ?
       children$, allItems$
@@ -680,7 +680,7 @@ export class OdmItem$2<
         let existingItem: TSelf | undefined = service.mapIdToItem$.get(addedItemId)
         // debugLog('setBackendListenerIfNecessary onAdded', service, ...arguments, 'service.itemsCount()', service.itemsCount())
 
-        console.log(`requestLoadChildren, onAdded addedItemId parent: `, thisItem$.id, addedItemId, `existingItem?.val$?.hasEmitted`, existingItem?.val$?.hasEmitted)
+        thisItem$.debugLog(`requestLoadChildren, onAdded addedItemId parent: `, thisItem$.id, addedItemId, `existingItem?.val$?.hasEmitted`, existingItem?.val$?.hasEmitted)
 
         // service.obtainOdmItem$(addedItemId) TODO
         // if ( ! existingItem ) {
@@ -696,7 +696,7 @@ export class OdmItem$2<
 
           existingItem!.applyDataFromDbAndEmit(service.convertFromDbFormat(addedItemRawData) !) /* emits here, screwing this `! emitted` condition */
           // FIXME: set parent(s)
-          console.log(`requestLoadChildren, thisItem$.childrenList$.lastVal.push`, thisItem$.id, addedItemId)
+          thisItem$.debugLog(`requestLoadChildren, thisItem$.childrenList$.lastVal.push`, thisItem$.id, addedItemId)
 
           items!.push(existingItem)
         } // else: it was added locally as lag compensation, don't do anything, to not destroy potential local changes
@@ -743,7 +743,7 @@ export class OdmItem$2<
   }
 
   public requestLoadTreeDescendants() {
-    console.log('requestLoadTreeDescendants', this.id)
+    this.debugLog('requestLoadTreeDescendants', this.id)
     // A brand-new, not-yet-saved item has no id yet (only assigned on its first save/patch -
     // see setIdAndWhenCreatedIfNecessary()) - matches the same guard requestLoadChildren() above
     // already has. Without it, OdmTreeNode.requestLoadChildren() (called unconditionally by
@@ -1146,5 +1146,11 @@ export class OdmItem$2<
     this.parents = [newParent as unknown as TParent]
     this.patchThrottled({orderNum} as TMemPatch)
     newParent.onChildrenAddedLocally([this as unknown as TSelf])
+  }
+
+  private debugLog(...args: any[]) {
+    if (appGlobals.feat?.showDebug) {
+      console.log(...args)
+    }
   }
 }

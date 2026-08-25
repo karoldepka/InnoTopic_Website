@@ -13,6 +13,7 @@ import {GenericItemsService} from '../tree/generic-items.service'
 import {LearnItemItemsService} from '../../../apps/Learn/core/learn-item-items.service'
 import {OdmBackfillProgressService} from './odm-backfill-progress.service'
 import {FanoutOdmCollectionBackend} from '../../AppFedSharedFanout/odm-fanout/FanoutOdmCollectionBackend'
+import {BrowserOdmStorage} from '../../AppFedSharedBrowser/odm-browser/BrowserOdmStorage'
 
 /** Every currently-known OdmService2 subclass with a static (not per-call-site-parameterized)
  * className. There's no registry these services self-report into, so this list has to be kept in
@@ -31,6 +32,20 @@ const KNOWN_ODM_SERVICES: Type<unknown>[] = [
   LearnItemItemsService,
 ]
 
+const KNOWN_ODM_SERVICE_BY_COLLECTION = new Map<string, Type<unknown>>([
+  ['JournalEntry', JournalEntryItemsService],
+  ['VirtualSlotState', VirtualSlotStatesOdmService],
+  ['SelfRatingHistoryItem', SelfRatingHistoryOdmService],
+  ['OryItem', OryOdmItemsService],
+  ['OryNodeInclusion', OryNodeInclusionsOdmService],
+  ['TimeTrackingPeriod', TimeTrackingPeriodsOdmService],
+  ['FieldComment', FieldCommentsOdmService],
+  ['JournalAiAdviceSettings', JournalAiAdviceSettingsOdmService],
+  ['AiAdvice', AiAdviceOdmService],
+  ['GenericItem', GenericItemsService],
+  ['LearnItem', LearnItemItemsService],
+])
+
 /** Normally each collection's one-time Supabase -> Neon+Mongo backfill (see
  * FanoutOdmCollectionBackend.backfillFromSupabase) only runs once you happen to open the app
  * section that uses it, since Angular only constructs a `providedIn: 'root'` service the first
@@ -43,7 +58,10 @@ export class OdmFullSyncService {
   constructor(
     private injector: Injector,
     readonly backfillProgress: OdmBackfillProgressService,
+    private browserOdmStorage: BrowserOdmStorage,
   ) {
+    this.ensureServicesForCurrentPendingEdits()
+    this.browserOdmStorage.pendingEditsChanged$.subscribe(() => this.ensureServicesForCurrentPendingEdits())
   }
 
   /** Starts a fresh Supabase-to-peer replication for every known collection, including ones whose
@@ -58,6 +76,26 @@ export class OdmFullSyncService {
       if (backend instanceof FanoutOdmCollectionBackend) {
         void backend.syncFromSupabaseNow()
       }
+    }
+  }
+
+  private ensureServicesForCurrentPendingEdits(): void {
+    this.browserOdmStorage.getAllPendingEditsEverywhere()
+      .then(edits => this.ensureServicesForCollections(new Set(edits.map(edit => edit.collection))))
+      .catch(error => console.error('ensureServicesForCurrentPendingEdits failed', error))
+  }
+
+  /** Constructs only the services whose collections have durable pending edits. That lets their
+   * OdmService2.resumePendingEdits() logic retry after reload even if the user is currently on a
+   * different screen and Angular has not otherwise needed that collection's service yet. */
+  private ensureServicesForCollections(collections: Iterable<string>): void {
+    for (const collection of collections) {
+      const ServiceClass = KNOWN_ODM_SERVICE_BY_COLLECTION.get(collection)
+      if (!ServiceClass) {
+        console.warn('No known ODM service for pending collection', collection)
+        continue
+      }
+      this.injector.get(ServiceClass)
     }
   }
 }

@@ -6,6 +6,7 @@ import {TimersService} from "./timers.service";
 import {NotificationsService} from "../libs/AppFedSharedIonic/notifications/notifications.service";
 import {NotificationsModule} from "../libs/AppFedSharedIonic/notifications/notifications.module";
 import {TimersPageModule} from "../timers/timers.module";
+import {OdmFullSyncService} from '../libs/AppFedShared/odm/odm-full-sync.service'
 
 @NgModule({
   declarations: [],
@@ -21,4 +22,9 @@ import {TimersPageModule} from "../timers/timers.module";
     TimersService,
   ]
 })
-export class CoreModule { }
+export class CoreModule {
+  constructor(
+    _odmFullSyncService: OdmFullSyncService,
+  ) {
+  }
+}
