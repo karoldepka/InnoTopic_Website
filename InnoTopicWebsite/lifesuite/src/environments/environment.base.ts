@@ -65,6 +65,7 @@ export const environmentBase = {
   production: false,
   // Development requests use Angular's same-origin /ai-api proxy.
   backendUrl: '',
+  aiBackendUrl: '',
 };
 
 /*

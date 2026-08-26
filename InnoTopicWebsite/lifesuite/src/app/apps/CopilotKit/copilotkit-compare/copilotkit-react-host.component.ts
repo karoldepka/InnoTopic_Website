@@ -17,6 +17,6 @@ import { environment } from '../../../../environments/environment';
 })
 export class CopilotKitReactHostComponent {
   readonly embedUrl = `assets/copilotkit-react-embed/index.html?apiBase=${encodeURIComponent(
-    environment.backendUrl ? `${environment.backendUrl}/ai-api` : '/ai-api',
+    environment.aiBackendUrl ? `${environment.aiBackendUrl}/ai-api` : '/ai-api',
   )}&v=lifesuite-category-builder-5`;
 }

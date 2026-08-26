@@ -5,6 +5,8 @@ export const environment = {
   collectionNameSuffix: '' /* NOTE: never put debug suffix here, coz wanna deploy to vercel to use it */,
   production: true,
   backendUrl: 'https://life-suite-backend.vercel.app',
+  // Keeps AI generation on the user's locally running backend even when the UI is deployed.
+  aiBackendUrl: 'http://localhost:8000',
   // environmentBase's neon/mongo odmApiUrl default to localhost:8000 (dev-only) - backend-ts is
   // now deployed at life-suite-backend.vercel.app (see lifesuite/backend-ts), so the fanout ODM
   // backend can actually reach Neon/Mongo from a real browser instead of only in local dev.

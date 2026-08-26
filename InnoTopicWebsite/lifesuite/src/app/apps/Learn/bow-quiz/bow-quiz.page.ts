@@ -11,6 +11,6 @@ import { environment } from '../../../../environments/environment';
 })
 export class BowQuizPage {
   readonly embedUrl = `assets/bow-quiz-react-embed/index.html?apiBase=${encodeURIComponent(
-    environment.backendUrl ? `${environment.backendUrl}/ai-api` : '/ai-api',
+    environment.aiBackendUrl ? `${environment.aiBackendUrl}/ai-api` : '/ai-api',
   )}&v=bow-quiz-3`;
 }

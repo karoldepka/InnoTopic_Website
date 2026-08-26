@@ -19,7 +19,7 @@ interface ServerTranscribeResponse {
 @Injectable({providedIn: 'root'})
 export class VoiceTranscriptionService {
 
-  private baseUrl = environment.backendUrl ? `${environment.backendUrl}/ai-api` : '/ai-api'
+  private baseUrl = environment.aiBackendUrl ? `${environment.aiBackendUrl}/ai-api` : '/ai-api'
 
   private whisperPipelinePromise?: Promise<any>
 
