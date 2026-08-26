@@ -10,6 +10,11 @@ export const environmentBase = {
   // collectionNameSuffix: '_DEBUG',
 
   odmBackend: 'fanout', // 'fanout' races Supabase+Neon+Mongo peers; or 'firestore'/'supabase'/'neon' alone
+  fanout: {
+    // Replicas stay active for writes/backfill, but Supabase is the only read source until a
+    // replica has been independently verified as complete.
+    readFromReplicas: false,
+  },
   authBackend: 'firebase',
 
   // OrYoL (/tree) has been migrated off its standalone Firestore-only data layer onto the

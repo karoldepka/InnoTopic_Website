@@ -163,14 +163,26 @@ export class FanoutOdmCollectionBackend<TRaw> extends OdmCollectionBackend<TRaw>
     callback: () => void,
   ): void {
     super.setListener(listener, queryOpts, callback)
+    if (!this.fanoutBackend.readFromReplicas) {
+      this.backfillSource.setListener(listener, queryOpts, callback)
+      return
+    }
     this.raceQuery(listener, (peer, wrapped) => peer.setListener(wrapped, queryOpts, callback))
   }
 
   loadChildrenOf(parentId: ItemId, listener: OdmCollectionBackendListener<TRaw>): void {
+    if (!this.fanoutBackend.readFromReplicas) {
+      this.backfillSource.loadChildrenOf(parentId, listener)
+      return
+    }
     this.raceQuery(listener, (peer, wrapped) => peer.loadChildrenOf(parentId, wrapped))
   }
 
   loadTreeDescendantsOf(ancestorId: ItemId, listener: OdmCollectionBackendListener<TRaw>): void {
+    if (!this.fanoutBackend.readFromReplicas) {
+      this.backfillSource.loadTreeDescendantsOf(ancestorId, listener)
+      return
+    }
     this.raceQuery(listener, (peer, wrapped) => peer.loadTreeDescendantsOf(ancestorId, wrapped))
   }
 

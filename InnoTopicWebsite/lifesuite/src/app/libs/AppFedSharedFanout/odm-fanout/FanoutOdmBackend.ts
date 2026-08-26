@@ -14,6 +14,10 @@ export interface FanoutPeerConfig {
   required: boolean
 }
 
+type FanoutReadEnv = {
+  readFromReplicas?: boolean
+}
+
 type FanoutReplicaEnv = {
   enabled?: boolean
   odmApiUrl?: string
@@ -101,6 +105,8 @@ export class FanoutOdmBackend extends OdmBackend {
   /** Supabase - already holds the full history, so it's the one-time backfill source for every
    * other peer. Kept as an explicit reference rather than relying on peerBackends[0]'s order. */
   readonly backfillSourceBackend: OdmBackend
+  /** When false, reads stay on the authoritative Supabase source while writes still fan out. */
+  readonly readFromReplicas: boolean
 
   constructor(
     injector: Injector,
@@ -111,6 +117,7 @@ export class FanoutOdmBackend extends OdmBackend {
   ) {
     super(injector)
     const env = environment as any
+    this.readFromReplicas = (env.fanout as FanoutReadEnv | undefined)?.readFromReplicas === true
     this.peerConfigs = [
       {backend: supabaseOdmBackend, name: 'Supabase', required: true},
       ...(shouldEnableFanoutReplica(env.neon) ? [{backend: neonOdmBackend, name: 'Neon', required: env.neon?.required ?? false}] : []),
