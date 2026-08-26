@@ -15,7 +15,7 @@
     "startWithAutoReload": "node scripts/build-copilotkit-react-embed.mjs && pnpm exec ng serve --port 4207",
     "build": "node scripts/build-copilotkit-react-embed.mjs && pnpm exec ng build",
     "build:copilotkit-react": "node scripts/build-copilotkit-react-embed.mjs",
-    "build:prod": "pnpm exec ionic build --prod --aot",
+    "build:prod": "node scripts/build-copilotkit-react-embed.mjs && pnpm exec ng build --configuration production",
     "record:browser:install": "pnpm exec playwright-core install chromium ffmpeg",
     "record:browser": "node scripts/browser-recorder.mjs",
     "record:browser:local": "node scripts/browser-recorder.mjs --url http://localhost:4207 --headed",
