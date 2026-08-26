@@ -9,6 +9,8 @@ export class FanoutOdmCollectionBackend<TRaw> extends OdmCollectionBackend<TRaw>
   public collectionName = this.className
 
   private peers: OdmCollectionBackend<TRaw>[]
+  /** Replica collections only - never write a Supabase backfill back into Supabase itself. */
+  private backfillTargets: OdmCollectionBackend<TRaw>[]
   private requiredPeers = new Set<OdmCollectionBackend<TRaw>>()
   private peerNames = new Map<OdmCollectionBackend<TRaw>, string>()
 
@@ -38,6 +40,9 @@ export class FanoutOdmCollectionBackend<TRaw> extends OdmCollectionBackend<TRaw>
       }
       return peer
     })
+    this.backfillTargets = this.peers.filter((_, index) =>
+      fanoutBackend.peerConfigs[index].backend !== fanoutBackend.backfillSourceBackend,
+    )
     this.backfillSource = fanoutBackend.backfillSourceBackend.createCollectionBackend<TRaw>(injector, className, peerOpts)
     this.backfillProgress = injector.get(OdmBackfillProgressService)
     this.backfillFromSupabase()
@@ -71,7 +76,6 @@ export class FanoutOdmCollectionBackend<TRaw> extends OdmCollectionBackend<TRaw>
     try {
       this.backfillProgress.start(this.collectionName)
       await this.waitUntilReady()
-      const targets = this.peers.filter(peer => peer !== this.backfillSource)
       const pageSize = 1000
       const items: Array<{id: OdmItemId<TRaw>, data: TRaw}> = []
       for (let offset = 0; ; offset += pageSize) {
@@ -81,7 +85,7 @@ export class FanoutOdmCollectionBackend<TRaw> extends OdmCollectionBackend<TRaw>
       }
       this.backfillProgress.setTotal(this.collectionName, items.length)
       await Promise.all(items.map(async ({id, data}) => {
-        await Promise.all(targets.map(target =>
+        await Promise.all(this.backfillTargets.map(target =>
           this.replicationLimiter.run(() => target.saveNowToDb(data, id as ItemId)).catch(() => undefined)
         ))
         this.backfillProgress.incrementDone(this.collectionName)
