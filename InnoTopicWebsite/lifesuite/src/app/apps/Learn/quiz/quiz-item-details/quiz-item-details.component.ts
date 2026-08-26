@@ -68,6 +68,12 @@ export class QuizItemDetailsComponent implements OnInit, OnDestroy, AfterViewIni
 
   get showChoices$() { return this.quizService.showChoices$ }
 
+  private get shouldReadCategories(): boolean {
+    // Strictly require the checkbox's boolean true value. This also protects users whose
+    // persisted options may contain the legacy string value "false".
+    return this.quizService.options2$.val?.textToSpeechCategoriesEnabled === true
+  }
+
   /** Keeps an answer order stable while this question is on screen, but randomizes it for every new question. */
   getMultipleChoiceAnswers(itemVal: LearnItem | undefined | null): MultipleChoiceAnswer[] {
     const choices = itemVal?.multipleChoiceAnswers
@@ -104,7 +110,7 @@ export class QuizItemDetailsComponent implements OnInit, OnDestroy, AfterViewIni
         take(1),
       ).subscribe(itemVal => {
         const question = itemVal?.getQuestion() || itemVal?.title
-        const categories = this.quizService.options2$.val?.textToSpeechCategoriesEnabled
+        const categories = this.shouldReadCategories
           ? this.item$?.getEffectiveCategories().replace(/^,\s*/, '')
           : ''
         this.quizSpeech.speak([categories, question].filter(Boolean).join('. '))
@@ -133,6 +139,7 @@ export class QuizItemDetailsComponent implements OnInit, OnDestroy, AfterViewIni
           const itemVal = this.item$?.currentVal
           const answerText = itemVal
             ?.getSidesWithAnswers()
+            .filter(side => this.shouldReadCategories || side.id !== 'categories')
             .map(side => itemVal.getSideVal(side))
             .filter(val => !! val)
             .join('. ')
