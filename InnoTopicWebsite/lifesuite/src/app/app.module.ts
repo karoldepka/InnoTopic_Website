@@ -33,8 +33,8 @@ import { AppLogoComponent } from './apps/Common/app-logo/app-logo.component'
 const copilotQaAgentId = 'lifesuite-qa'
 
 function copilotAgUiUrl(): string {
-  return environment.aiBackendUrl
-    ? `${environment.aiBackendUrl}/ai-api/copilotkit-agui`
+  return environment.backendUrl
+    ? `${environment.backendUrl}/ai-api/copilotkit-agui`
     : '/ai-api/copilotkit-agui'
 }
 

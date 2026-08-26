@@ -61,7 +61,7 @@ export class SyncPopoverComponent extends BaseComponent implements OnInit {
 
   /** Kept with the developer-only feature options to avoid exposing deployment details in the
    * normal sync menu. */
-  readonly backendUrl = environment.aiBackendUrl || '/ai-api (local development proxy)'
+  readonly backendUrl = environment.backendUrl || '/ai-api (local development proxy)'
 
   constructor(
     public authService: AuthService,

@@ -21,7 +21,7 @@ interface SurrealOdmItemsResponse<TRaw> {
  * SURREALDB_URL/SURREALDB_USER/SURREALDB_PASS and does the actual read/write. */
 export class SurrealOdmCollectionBackend<TRaw> extends OdmCollectionBackend<TRaw> {
   private http = this.injector.get(HttpClient)
-  private apiUrl = ((environment as any).surreal?.odmApiUrl ?? `${environment.aiBackendUrl}/api/odm-surreal`).replace(/\/$/, '')
+  private apiUrl = ((environment as any).surreal?.odmApiUrl ?? `${environment.backendUrl}/api/odm-surreal`).replace(/\/$/, '')
   private pollIntervalMs = (environment as any).surreal?.pollIntervalMs ?? 5000
   private pollingHandles: number[] = []
 

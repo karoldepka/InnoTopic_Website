@@ -45,7 +45,7 @@ const ODM_BATCH_DELAY_MS = 25
  * MONGODB_URI and does the actual read/write. */
 export class MongoOdmCollectionBackend<TRaw> extends OdmCollectionBackend<TRaw> {
   private http = this.injector.get(HttpClient)
-  private apiUrl = ((environment as any).mongo?.odmApiUrl ?? `${environment.aiBackendUrl}/api/odm-mongo`).replace(/\/$/, '')
+  private apiUrl = ((environment as any).mongo?.odmApiUrl ?? `${environment.backendUrl}/api/odm-mongo`).replace(/\/$/, '')
   private pollIntervalMs = (environment as any).mongo?.pollIntervalMs ?? 5000
   private pollingHandles: number[] = []
   private pendingMutations = new Map<string, MongoPendingMutation<TRaw>[]>()

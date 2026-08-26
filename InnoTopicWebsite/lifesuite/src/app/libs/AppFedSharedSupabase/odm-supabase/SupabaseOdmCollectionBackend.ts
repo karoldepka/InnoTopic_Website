@@ -130,7 +130,7 @@ export class SupabaseOdmCollectionBackend<TRaw> extends OdmCollectionBackend<TRa
       if (current?.embedding_text === question && current?.embedding_model === embeddingModel) return
 
       const response = await this.http
-        .post<EmbeddingResponse>(`${environment.aiBackendUrl}/api/embeddings`, {text: question})
+        .post<EmbeddingResponse>(`${environment.backendUrl}/api/embeddings`, {text: question})
         .toPromise()
       if (!response?.embedding?.length) throw new Error('Embedding API returned no vector')
 

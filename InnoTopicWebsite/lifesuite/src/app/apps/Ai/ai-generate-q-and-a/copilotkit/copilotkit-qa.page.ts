@@ -5,8 +5,8 @@ import { environment } from '../../../../../environments/environment';
 
 import { AiQaWorkbenchComponent } from '../../shared/ai-qa-workbench.component';
 
-const COPILOT_AGUI_URL = environment.aiBackendUrl
-  ? `${environment.aiBackendUrl}/ai-api/copilotkit-agui`
+const COPILOT_AGUI_URL = environment.backendUrl
+  ? `${environment.backendUrl}/ai-api/copilotkit-agui`
   : '/ai-api/copilotkit-agui';
 
 @Component({
