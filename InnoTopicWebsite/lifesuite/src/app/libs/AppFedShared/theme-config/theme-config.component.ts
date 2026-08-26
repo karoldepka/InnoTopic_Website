@@ -77,6 +77,10 @@ export class ThemeConfigComponent extends BaseComponent implements OnInit {
     this.themeUiService.setBrightnessPercent(100 - $event.detail.value)
   }
 
+  onFontSizeChange($event: any) {
+    this.themeUiService.setFontSizePercent($event.detail.value)
+  }
+
   pickTheme(preset: ThemePreset) {
     this.themeUiService.setPreset(preset)
   }

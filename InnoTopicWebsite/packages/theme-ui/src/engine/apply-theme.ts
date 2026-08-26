@@ -29,12 +29,16 @@ function bareRgbTriplet(hex: string): string {
 
 export function applyThemeConfig(config: ThemeConfigState) {
   const root = document.documentElement.style
+  // A percentage keeps the setting relative to the browser/user-agent default, so browser zoom
+  // and accessibility defaults still compose correctly. Clamp persisted/manual values to the
+  // range offered by LifeSuite's theme popover.
+  const fontSizePercent = Math.min(140, Math.max(80, Number(config.font_size_percent) || 100))
+  root.fontSize = `${fontSizePercent}%`
 
-  // brightness_percent is a control input, not itself a themed color/size token - skip it here so
-  // it doesn't get a nonsensical `--brightness-percent` var (plus -shade/-tint color-mix() of a
-  // bare number, which is invalid CSS the browser silently drops).
+  // brightness_percent/font_size_percent are control inputs, not themed color tokens - skip them
+  // here so they do not become nonsensical custom properties or color-mix() inputs.
   for (const [key, value] of Object.entries(config)) {
-    if (key === 'brightness_percent') continue
+    if (key === 'brightness_percent' || key === 'font_size_percent') continue
     const varName = `--${key.replace(/_/g, '-')}`
     const needsPxSuffix = varName.startsWith('--shadow') || varName.startsWith('--inner-shadow') || varName.startsWith('--corner-radius')
     const val = needsPxSuffix ? `${value}px` : String(value)

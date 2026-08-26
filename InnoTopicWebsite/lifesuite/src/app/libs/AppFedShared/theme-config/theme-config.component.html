@@ -20,6 +20,18 @@
   [step]="0.2"
   (ionChange)="onSliderChange($event)"
 ></ion-range>
+<div class="font-size-control">
+  <label for="theme-font-size">Font size <strong>{{ themeUiService.fontSizePercent }}%</strong></label>
+  <ion-range
+    id="theme-font-size"
+    aria-label="Font size"
+    [min]="80"
+    [max]="140"
+    [step]="5"
+    [value]="themeUiService.fontSizePercent"
+    (ionChange)="onFontSizeChange($event)"
+  ></ion-range>
+</div>
 <div class="theme-id">{{ activePresetName }}</div>
 <div class="contrast-summary" title="Contrast of primary/secondary against background (WCAG UI minimum 3:1), and perceptual distance between primary and secondary (minimum 35)">
   <span class="contrast-badge" [class.contrast-fail]="!currentThemeContrastInfo.primaryOk">P {{ currentThemeContrastInfo.primaryContrast | number:'1.1-1' }}</span>

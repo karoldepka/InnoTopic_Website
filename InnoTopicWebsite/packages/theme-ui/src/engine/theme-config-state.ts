@@ -36,6 +36,8 @@ export interface ThemeConfigState {
   // (visibly brighter than a preset's raw background) - that's set explicitly at LifeSuite
   // startup, not by changing this shared default.
   brightness_percent: number;
+  /** Root text size as a percentage of the browser's default, shared by all theme consumers. */
+  font_size_percent: number;
 }
 
 export const defaultThemeConfig: ThemeConfigState = {
@@ -57,4 +59,5 @@ export const defaultThemeConfig: ThemeConfigState = {
   icon_contrast: 1,
   icon_brightness: 0,
   brightness_percent: 75,
+  font_size_percent: 100,
 }

@@ -39,12 +39,15 @@ export function findActivePreset(presets: ThemePreset[] = themePresets): ThemePr
   )
 }
 
-/** Applies a preset's colors/shadow/corners/icon while preserving the current brightness slider
- * setting - see curated-themes.ts's curatedTheme() for why brightness isn't baked into preset
- * configs. This is the one place "pick this preset" should go through, rather than calling
+/** Applies a preset's colors/shadow/corners/icon while preserving global brightness and font-size
+ * controls. This is the one place "pick this preset" should go through, rather than calling
  * setThemeConfig(preset.config) directly. */
 export function applyPreset(preset: ThemePreset) {
-  setThemeConfig({ ...preset.config, brightness_percent: themeState.brightness_percent })
+  setThemeConfig({
+    ...preset.config,
+    brightness_percent: themeState.brightness_percent,
+    font_size_percent: themeState.font_size_percent,
+  })
 }
 
 function pickRandomFrom(presets: ThemePreset[]): ThemePreset {
