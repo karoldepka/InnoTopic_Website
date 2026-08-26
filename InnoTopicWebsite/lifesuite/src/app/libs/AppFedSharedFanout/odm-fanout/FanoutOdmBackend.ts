@@ -14,6 +14,59 @@ export interface FanoutPeerConfig {
   required: boolean
 }
 
+type FanoutReplicaEnv = {
+  enabled?: boolean
+  odmApiUrl?: string
+}
+
+export function shouldEnableFanoutReplica(peerEnv: FanoutReplicaEnv | undefined): boolean {
+  if (peerEnv?.enabled === false) {
+    return false
+  }
+  return !isLoopbackApiUrlUnreachableFromThisBrowser(peerEnv?.odmApiUrl)
+}
+
+function isLoopbackApiUrlUnreachableFromThisBrowser(apiUrl: string | undefined): boolean {
+  if (!apiUrl || typeof window === 'undefined') {
+    return false
+  }
+  return isLoopbackApiUrlUnreachableFromBrowser(
+    apiUrl,
+    window.location.href,
+    window.location.hostname,
+    typeof navigator === 'undefined' ? '' : navigator.userAgent,
+  )
+}
+
+export function isLoopbackApiUrlUnreachableFromBrowser(
+  apiUrl: string,
+  browserLocationHref: string,
+  browserHostname: string,
+  userAgent: string,
+): boolean {
+  let parsed: URL
+  try {
+    parsed = new URL(apiUrl, browserLocationHref)
+  } catch {
+    return false
+  }
+  if (!isLoopbackHost(parsed.hostname)) {
+    return false
+  }
+  // `localhost` inside a real phone/tablet browser or WebView is that device, not the dev
+  // machine running backend-ts. The same is true when the app is served from a LAN hostname/IP.
+  return isLikelyMobileBrowser(userAgent) || !isLoopbackHost(browserHostname)
+}
+
+function isLoopbackHost(hostname: string | undefined): boolean {
+  const host = hostname?.toLowerCase()
+  return host === 'localhost' || host === '127.0.0.1' || host === '::1' || host === '[::1]'
+}
+
+function isLikelyMobileBrowser(userAgent: string): boolean {
+  return /android|iphone|ipad|ipod|mobile/i.test(userAgent)
+}
+
 /**
  * Supabase is the required peer; Neon/Mongo/Surreal are enabled replicas. Every write is attempted
  * against every enabled peer, but a secondary replica being offline (common in local dev when
@@ -60,9 +113,9 @@ export class FanoutOdmBackend extends OdmBackend {
     const env = environment as any
     this.peerConfigs = [
       {backend: supabaseOdmBackend, name: 'Supabase', required: true},
-      ...(env.neon?.enabled ?? true ? [{backend: neonOdmBackend, name: 'Neon', required: env.neon?.required ?? false}] : []),
-      ...(env.mongo?.enabled ?? true ? [{backend: mongoOdmBackend, name: 'Mongo', required: env.mongo?.required ?? false}] : []),
-      ...(env.surreal?.enabled ?? true ? [{backend: surrealOdmBackend, name: 'Surreal', required: env.surreal?.required ?? false}] : []),
+      ...(shouldEnableFanoutReplica(env.neon) ? [{backend: neonOdmBackend, name: 'Neon', required: env.neon?.required ?? false}] : []),
+      ...(shouldEnableFanoutReplica(env.mongo) ? [{backend: mongoOdmBackend, name: 'Mongo', required: env.mongo?.required ?? false}] : []),
+      ...(shouldEnableFanoutReplica(env.surreal) ? [{backend: surrealOdmBackend, name: 'Surreal', required: env.surreal?.required ?? false}] : []),
     ]
     this.peerBackends = this.peerConfigs.map(({backend}) => backend)
     this.peerNames = this.peerConfigs.map(({name, required}) => required ? name : `${name} optional`)

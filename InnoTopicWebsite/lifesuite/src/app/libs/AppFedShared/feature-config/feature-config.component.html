@@ -75,14 +75,14 @@
     <ion-select-option value="fr">Français</ion-select-option>
   </ion-select>
 </ion-item>
-<ion-item lines="none">
+<section class="sync-backfill">
   <ion-button
-    slot="start"
+    size="small"
     [disabled]="syncAllDataTriggered"
     (click)="onSyncAllDataNow()"
   >Sync all data now (Supabase → Neon + Mongo)</ion-button>
   @if (syncProgress.length) {
-    <ion-note slot="end" class="sync-progress">
+    <ion-note class="sync-progress">
       @for (progress of syncProgress; track progress.collectionName) {
         <span>
           {{ progress.collectionName }}: {{ progress.done }} / {{ progress.total }}
@@ -91,5 +91,5 @@
       }
     </ion-note>
   }
-</ion-item>
+</section>
 <!--Version {{version}}-->

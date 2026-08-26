@@ -1,6 +1,6 @@
 {
   "installCommand": "pnpm --dir .. install --frozen-lockfile",
-  "buildCommand": "pnpm --dir .. --filter LifeSuite... build",
+  "buildCommand": "pnpm --dir .. --filter LifeSuite... build:prod",
   "outputDirectory": "www",
   "rewrites": [
     {

@@ -19,6 +19,7 @@ import {VoiceMemoService} from '../../../audio/voice-memo.service'
 import {summarizePatch} from '../../OdmItem$2'
 import {TimeTrackingService} from '../../../../../apps/OrYoL/time-tracking/time-tracking.service'
 import {TimeTrackingToolbarComponent} from '../../../../../apps/OrYoL/time-tracking/time-tracking-toolbar/time-tracking-toolbar.component'
+import {environment} from '../../../../../../environments/environment'
 
 @Component({
     selector: 'app-sync-popover',
@@ -57,6 +58,10 @@ export class SyncPopoverComponent extends BaseComponent implements OnInit {
   private aboutAppClickCount = 0
 
   showFeatureConfig = false
+
+  /** Kept with the developer-only feature options to avoid exposing deployment details in the
+   * normal sync menu. */
+  readonly backendUrl = environment.aiBackendUrl || '/ai-api (local development proxy)'
 
   constructor(
     public authService: AuthService,

@@ -20,7 +20,13 @@
   <app-about-app *ngIf="aboutAppExpanded"></app-about-app>
 </div>
 <!-- Revealed after 5 clicks on "About App" above, like Android's developer-options gesture. -->
-<app-feature-config *ngIf="showFeatureConfig"></app-feature-config>
+<ng-container *ngIf="showFeatureConfig">
+  <app-feature-config></app-feature-config>
+  <ion-item class="backend-url" lines="none">
+    <ion-label>Backend URL</ion-label>
+    <ion-note slot="end">{{ backendUrl }}</ion-note>
+  </ion-item>
+</ng-container>
 <app-language-switcher></app-language-switcher>
 
 <p
