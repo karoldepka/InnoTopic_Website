@@ -9,7 +9,7 @@
     "prestart": "node scripts/write-build-info.mjs",
     "prestartWithAutoReload": "node scripts/write-build-info.mjs",
     "prebuild": "node scripts/write-build-info.mjs",
-    "prebuild:prod": "node scripts/write-build-info.mjs",
+    "prebuild:prod": "node scripts/write-build-info.mjs && pnpm --filter @innotopic/topics-ui build && pnpm --filter @innotopic/theme-ui build && pnpm --filter @innotopic/doodle-ui build && pnpm --filter @innotopic/theme-ui-angular build",
     "ng": "pnpm exec ng",
     "start": "node scripts/build-copilotkit-react-embed.mjs && pnpm exec ng serve --port 4207",
     "startWithAutoReload": "node scripts/build-copilotkit-react-embed.mjs && pnpm exec ng serve --port 4207",

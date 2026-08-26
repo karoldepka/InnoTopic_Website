@@ -2,6 +2,6 @@ export const buildInfo = {
   branch: "local",
   commit: "local",
   commitAuthor: "Karol Depka Pradzinski The First",
-  commitMessage: "Configure production backend URL",
-  builtAt: "2026-08-26T12:15:21.089Z",
+  commitMessage: "Fix LifeSuite Vercel production build",
+  builtAt: "2026-08-26T12:22:47.333Z",
 };
