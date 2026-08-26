@@ -50,21 +50,18 @@ app.use('*', cors({
 app.use('*', async (c, next) => {
   const startedAt = Date.now();
   const url = new URL(c.req.url);
-  const caller = {
-    callerHostname: callerHostname(c),
-    callerIp: callerIp(c),
-  };
-
   await next();
 
-  console.info('[http]', {
-    ...caller,
-    method: c.req.method,
-    path: url.pathname,
-    requestHost: c.req.header('host') ?? url.host,
-    status: c.res.status,
-    durationMs: Date.now() - startedAt,
-  });
+  // [caller hostname, caller IP, method, path, request host, status, duration ms]
+  console.info('[http]', [
+    callerHostname(c),
+    callerIp(c),
+    c.req.method,
+    url.pathname,
+    c.req.header('host') ?? url.host,
+    c.res.status,
+    Date.now() - startedAt,
+  ]);
 });
 
 app.route('/', categoriesRouter);
