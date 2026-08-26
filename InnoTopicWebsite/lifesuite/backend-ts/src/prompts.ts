@@ -206,7 +206,13 @@ const QA_ABCD_RULES = `
 MULTIPLE-CHOICE MODE:
 - Format every answer as exactly four choices, one per line, labelled "A.", "B.", "C.", and "D.".
 - Exactly one choice must be correct. Mark only that choice with "✓" after its label (for example, "B. ✓ Correct choice").
-- Make all distractors plausible and keep the choices concise. Do not add an explanation outside the four choices.`;
+- Make distractors genuinely tricky: use credible near-misses from the same domain and of the same
+  answer type as the correct choice (for example, related people, libraries, standards, concepts,
+  dates, or similarly named alternatives). Prefer common misconceptions or adjacent concepts that
+  differ by one meaningful property.
+- Never use obviously unrelated filler, absurd answers, or generic objects merely to fill a slot
+  (for example, "developer monitor size" for a question about a person or technology).
+- Keep every choice concise and do not add an explanation outside the four choices.`;
 
 export function buildQAMessages(
   req: QuestionAnswerRequest,
