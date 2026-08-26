@@ -11,7 +11,8 @@
       class="stretch-btn"
       (click)="showChoices()"
       [disabled]="!hasMultipleChoiceAnswers"
-    >Show answers</ion-button>
+      [attr.aria-pressed]="showChoices$ | async"
+    >{{ (showChoices$ | async) ? 'Hide answers' : 'Show answers' }}</ion-button>
 
     <ion-button
       class="stretch-btn"

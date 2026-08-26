@@ -251,8 +251,8 @@ export class QuizService {
     this.showHint$.next(0)
   }
 
-  showChoices() {
-    this.showChoices$.next(true)
+  toggleShowChoices() {
+    this.showChoices$.next(!this.showChoices$.lastVal)
   }
 
   toggleShowHint() {

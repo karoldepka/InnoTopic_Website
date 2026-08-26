@@ -90,7 +90,7 @@ export class ShowAnswerAndRateComponent extends BaseComponent implements OnInit 
   }
 
   showChoices() {
-    this.quizService.showChoices()
+    this.quizService.toggleShowChoices()
   }
 
   showHint() {
