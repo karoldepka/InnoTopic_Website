@@ -37,7 +37,8 @@
     >
       <div
         *ngFor="let choice of getMultipleChoiceAnswers(itemVal$ | async)"
-        style="padding: 0.45rem 0.6rem; border: 1px solid var(--ion-color-medium-tint); border-radius: 4px"
+        class="abcd-answer"
+        [class.abcd-answer--incorrect-revealed]="(showAnswer$ | async) && !choice.correct"
         [style.border-color]="(showAnswer$ | async) && choice.correct ? 'var(--ion-color-success)' : null"
       >
         <strong>{{ choice.label }}.</strong> {{ choice.text }}
