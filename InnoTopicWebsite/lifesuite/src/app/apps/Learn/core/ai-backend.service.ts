@@ -115,7 +115,7 @@ export interface ExistingCategoriesResponse {
   providedIn: 'root'
 })
 export class AiBackendService {
-  private baseUrl = environment.aiBackendUrl ? `${environment.aiBackendUrl}/ai-api` : '/ai-api';
+  private baseUrl = environment.aiBackendUrl || '/ai-api';
 
   constructor(private http: HttpClient) { }
 

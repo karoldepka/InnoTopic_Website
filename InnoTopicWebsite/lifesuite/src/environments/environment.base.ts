@@ -63,7 +63,8 @@ export const environmentBase = {
   },
   // production: true
   production: false,
-  // Development requests use Angular's same-origin /ai-api proxy.
+  // In development, empty values use Angular's same-origin /api and /ai-api proxies.
+  // Non-empty values include their route prefix: e.g. https://host/api and http://host/ai-api.
   backendUrl: '',
   aiBackendUrl: '',
 };

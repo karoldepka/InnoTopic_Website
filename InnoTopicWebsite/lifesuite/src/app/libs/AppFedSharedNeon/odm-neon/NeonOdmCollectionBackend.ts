@@ -17,7 +17,7 @@ interface NeonOdmItemsResponse<TRaw> {
 
 export class NeonOdmCollectionBackend<TRaw> extends OdmCollectionBackend<TRaw> {
   private http = this.injector.get(HttpClient)
-  private apiUrl = ((environment as any).neon?.odmApiUrl ?? `${environment.backendUrl}/api/odm`).replace(/\/$/, '')
+  private apiUrl = ((environment as any).neon?.odmApiUrl ?? (environment.backendUrl ? `${environment.backendUrl}/odm` : '/api/odm')).replace(/\/$/, '')
   private pollIntervalMs = (environment as any).neon?.pollIntervalMs ?? 5000
   private pollingHandles: number[] = []
 

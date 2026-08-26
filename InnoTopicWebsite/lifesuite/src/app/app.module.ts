@@ -34,7 +34,7 @@ const copilotQaAgentId = 'lifesuite-qa'
 
 function copilotAgUiUrl(): string {
   return environment.aiBackendUrl
-    ? `${environment.aiBackendUrl}/ai-api/copilotkit-agui`
+    ? `${environment.aiBackendUrl}/copilotkit-agui`
     : '/ai-api/copilotkit-agui'
 }
 

@@ -15,7 +15,7 @@ import { environment } from '../../../../environments/environment';
 })
 export class CopilotKitComparePage implements OnDestroy {
   private readonly endpointUrl = environment.aiBackendUrl
-    ? `${environment.aiBackendUrl}/ai-api/copilotkit-agui`
+    ? `${environment.aiBackendUrl}/copilotkit-agui`
     : '/ai-api/copilotkit-agui';
   private readonly threadId = this.makeId('thread');
   private activeAbortController?: AbortController;
