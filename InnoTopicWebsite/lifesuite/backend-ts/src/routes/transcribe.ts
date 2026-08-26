@@ -1,6 +1,7 @@
 import { Hono } from 'hono';
 import { createOpenAI } from '@ai-sdk/openai';
 import { experimental_transcribe as transcribe } from 'ai';
+import { logTranscriptionCost } from '../ai-cost.js';
 
 export const transcribeRouter = new Hono();
 
@@ -39,6 +40,7 @@ async function handleTranscribe(c: import('hono').Context) {
       audio: bytes,
       providerOptions: language ? { openai: { language: String(language) } } : undefined,
     });
+    logTranscriptionCost('transcribe', MODEL_ID, result.durationInSeconds);
     return c.json({
       text: result.text,
       language: result.language ?? null,

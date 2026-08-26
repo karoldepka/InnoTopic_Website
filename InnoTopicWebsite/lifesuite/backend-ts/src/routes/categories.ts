@@ -6,6 +6,7 @@ import { webSearch } from '../web-search.js';
 import { loadExistingCategories } from '../existing-categories.js';
 import { buildCategoryTreeMessages, buildMoreSubcategoriesMessages } from '../prompts.js';
 import { textStreamResponse, sseData, sseStreamResponse, stripJsonFences } from '../utils.js';
+import { logLanguageModelCost, logStreamLanguageModelCost } from '../ai-cost.js';
 import type { CategoryTreeRequest, MoreSubcategoriesRequest } from '../types.js';
 
 export const categoriesRouter = new Hono();
@@ -111,14 +112,15 @@ async function handleCategoryTreeStream(c: import('hono').Context) {
   const existingCategories = loadExistingCategories();
   const { system, messages } = buildCategoryTreeMessages(body, existingCategories, searchResults);
 
-  const { textStream } = streamText({
+  const result = streamText({
     model: llm,
     system,
     messages,
     maxRetries: 0,
     experimental_telemetry: { isEnabled: true, functionId: 'category-tree-stream' },
   });
-  return textStreamResponse(logCategoryStream(textStream, startedAt), c);
+  logStreamLanguageModelCost('category-tree-stream', MODEL_NAME, result.usage);
+  return textStreamResponse(logCategoryStream(result.textStream, startedAt), c);
 }
 
 categoriesRouter.post('/category-tree/stream-json', handleCategoryTreeStream);
@@ -134,16 +136,17 @@ async function handleCategoryTreeStreamSSE(c: import('hono').Context) {
   const existingCategories = loadExistingCategories();
   const { system, messages } = buildCategoryTreeMessages(body, existingCategories, searchResults);
 
-  const { textStream } = streamText({
+  const result = streamText({
     model: llm,
     system,
     messages,
     maxRetries: 0,
     experimental_telemetry: { isEnabled: true, functionId: 'category-tree-stream' },
   });
+  logStreamLanguageModelCost('category-tree-stream-sse', MODEL_NAME, result.usage);
 
   async function* gen() {
-    for await (const chunk of stripJsonFences(textStream)) {
+    for await (const chunk of stripJsonFences(result.textStream)) {
       yield sseData({ type: 'delta', delta: chunk });
     }
   }
@@ -166,19 +169,20 @@ async function handleCategoryTree(c: import('hono').Context) {
 
   // AI SDK's model/schema generics exceed TypeScript's instantiation depth in this workspace.
   // Keep that complexity at the SDK boundary; the response is still runtime-validated by Zod.
-  const { object } = await (generateObject as any)({
+  const result = await (generateObject as any)({
     model: llm,
     schema: categoryTreeResponseSchema,
     system,
     messages,
     experimental_telemetry: { isEnabled: true, functionId: 'category-tree' },
   });
+  logLanguageModelCost('category-tree', MODEL_NAME, result.usage);
 
   console.info('[category-tree] Fallback request completed', {
     durationMs: Date.now() - startedAt,
-    generatedRootCount: object.tree?.length ?? 0,
+    generatedRootCount: result.object.tree?.length ?? 0,
   });
-  return c.json({ ...object, modelName: MODEL_NAME });
+  return c.json({ ...result.object, modelName: MODEL_NAME });
 }
 
 categoriesRouter.post('/category-tree', handleCategoryTree);
@@ -191,14 +195,15 @@ async function handleMoreSubcategories(c: import('hono').Context) {
   const searchResults = body.web_search ? await webSearch(body.topic) : [];
   const { system, messages } = buildMoreSubcategoriesMessages(body, searchResults);
 
-  const { textStream } = streamText({
+  const result = streamText({
     model: llm,
     system,
     messages,
     maxRetries: 0,
     experimental_telemetry: { isEnabled: true, functionId: 'more-subcategories' },
   });
-  return textStreamResponse(stripJsonFences(textStream), c);
+  logStreamLanguageModelCost('more-subcategories', MODEL_NAME, result.usage);
+  return textStreamResponse(stripJsonFences(result.textStream), c);
 }
 
 categoriesRouter.post('/category-tree/more-children', handleMoreSubcategories);

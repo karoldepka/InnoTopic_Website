@@ -6,6 +6,7 @@ import { llm, MODEL_NAME } from '../llm.js';
 import { webSearch } from '../web-search.js';
 import { buildQAMessages } from '../prompts.js';
 import { textStreamResponse, stripJsonFences } from '../utils.js';
+import { logLanguageModelCost, logStreamLanguageModelCost } from '../ai-cost.js';
 import type { QuestionAnswerRequest } from '../types.js';
 
 export const qaRouter = new Hono();
@@ -73,7 +74,7 @@ async function handleQAStream(c: import('hono').Context) {
   const searchResults = body.web_search ? await webSearch(query) : [];
   const { system, messages } = buildQAMessages(body, searchResults);
 
-  const { textStream } = streamText({
+  const result = streamText({
     model: llm,
     system,
     messages,
@@ -81,7 +82,8 @@ async function handleQAStream(c: import('hono').Context) {
     experimental_telemetry: { isEnabled: true, functionId: 'qa-stream' },
     onFinish: ({ text }) => console.log('[qa] raw model output (first 500):', text.slice(0, 500)),
   });
-  return textStreamResponse(stripJsonFences(textStream), c);
+  logStreamLanguageModelCost('qa-stream', MODEL_NAME, result.usage);
+  return textStreamResponse(stripJsonFences(result.textStream), c);
 }
 
 qaRouter.post('/category-tree/questions/stream-json', handleQAStream);
@@ -97,15 +99,16 @@ async function handleQA(c: import('hono').Context) {
 
   // AI SDK's model/schema generics exceed TypeScript's instantiation depth in this workspace.
   // Keep that complexity at the SDK boundary; the response is still runtime-validated by Zod.
-  const { object } = await (generateObject as any)({
+  const result = await (generateObject as any)({
     model: llm,
     schema: questionAnswerResponseSchema,
     system,
     messages,
     experimental_telemetry: { isEnabled: true, functionId: 'qa' },
   });
+  logLanguageModelCost('qa', MODEL_NAME, result.usage);
 
-  return c.json({ ...object, modelName: MODEL_NAME });
+  return c.json({ ...result.object, modelName: MODEL_NAME });
 }
 
 qaRouter.post('/category-tree/questions', handleQA);

@@ -2,6 +2,7 @@ import { Hono } from 'hono';
 import { generateText, streamText } from 'ai';
 import { llm, MODEL_NAME } from '../llm.js';
 import { textStreamResponse } from '../utils.js';
+import { logLanguageModelCost, logStreamLanguageModelCost } from '../ai-cost.js';
 
 export const journalAdviceRouter = new Hono();
 
@@ -59,7 +60,7 @@ async function handleJournalAdvice(c: import('hono').Context) {
   }
   const conversation = Array.isArray(body.conversation) ? body.conversation : [];
 
-  const { text, finishReason } = await generateText({
+  const result = await generateText({
     model: llm,
     system: SYSTEM_PROMPT,
     messages: buildJournalAdviceMessages(entries, conversation),
@@ -68,8 +69,9 @@ async function handleJournalAdvice(c: import('hono').Context) {
     maxOutputTokens: 4096,
     experimental_telemetry: { isEnabled: true, functionId: 'journal-advice' },
   });
+  logLanguageModelCost('journal-advice', MODEL_NAME, result.usage);
 
-  return c.json({ advice: text, modelName: MODEL_NAME, truncated: finishReason === 'length' });
+  return c.json({ advice: result.text, modelName: MODEL_NAME, truncated: result.finishReason === 'length' });
 }
 
 journalAdviceRouter.post('/journal-advice', handleJournalAdvice);
@@ -91,7 +93,7 @@ async function handleJournalAdviceStream(c: import('hono').Context) {
   }
   const conversation = Array.isArray(body.conversation) ? body.conversation : [];
 
-  const { textStream } = streamText({
+  const result = streamText({
     model: llm,
     system: SYSTEM_PROMPT,
     messages: buildJournalAdviceMessages(entries, conversation),
@@ -99,8 +101,9 @@ async function handleJournalAdviceStream(c: import('hono').Context) {
     maxRetries: 0,
     experimental_telemetry: { isEnabled: true, functionId: 'journal-advice-stream' },
   });
+  logStreamLanguageModelCost('journal-advice-stream', MODEL_NAME, result.usage);
 
-  return textStreamResponse(textStream, c, { 'X-Model-Name': MODEL_NAME });
+  return textStreamResponse(result.textStream, c, { 'X-Model-Name': MODEL_NAME });
 }
 
 journalAdviceRouter.post('/journal-advice/stream', handleJournalAdviceStream);

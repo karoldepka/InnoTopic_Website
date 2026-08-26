@@ -4,6 +4,7 @@ import { llm, MODEL_NAME } from '../llm.js';
 import { webSearch } from '../web-search.js';
 import { buildAnswerMessages } from '../prompts.js';
 import { textStreamResponse } from '../utils.js';
+import { logLanguageModelCost, logStreamLanguageModelCost } from '../ai-cost.js';
 
 export const quizRouter = new Hono();
 
@@ -18,7 +19,7 @@ async function handleGenerateAnswer(c: import('hono').Context) {
   const searchResults = body.web_search ? await webSearch(body.question) : [];
   const { system, messages } = buildAnswerMessages(body.question, body.context ?? '', searchResults);
 
-  const { text, finishReason } = await generateText({
+  const result = await generateText({
     model: llm,
     system,
     messages,
@@ -30,7 +31,8 @@ async function handleGenerateAnswer(c: import('hono').Context) {
     maxOutputTokens: 4096,
     experimental_telemetry: { isEnabled: true, functionId: 'generate-answer' },
   });
-  return c.json({ answer: text, modelName: MODEL_NAME, searchResults, truncated: finishReason === 'length' });
+  logLanguageModelCost('generate-answer', MODEL_NAME, result.usage);
+  return c.json({ answer: result.text, modelName: MODEL_NAME, searchResults, truncated: result.finishReason === 'length' });
 }
 
 async function handleGenerateAnswerStream(c: import('hono').Context) {
@@ -38,15 +40,16 @@ async function handleGenerateAnswerStream(c: import('hono').Context) {
   const searchResults = body.web_search ? await webSearch(body.question) : [];
   const { system, messages } = buildAnswerMessages(body.question, body.context ?? '', searchResults);
 
-  const { textStream } = streamText({
+  const result = streamText({
     model: llm,
     system,
     messages,
     experimental_telemetry: { isEnabled: true, functionId: 'generate-answer-stream' },
   });
+  logStreamLanguageModelCost('generate-answer-stream', MODEL_NAME, result.usage);
 
   async function* passthrough() {
-    for await (const chunk of textStream as AsyncIterable<string>) {
+    for await (const chunk of result.textStream as AsyncIterable<string>) {
       yield chunk;
     }
   }
@@ -65,22 +68,24 @@ quizRouter.post('/ai-api/generate-answer-stream', handleGenerateAnswerStream);
 
 async function handleRawPrompt(c: import('hono').Context) {
   const { prompt } = await c.req.json<{ prompt: string }>();
-  const { text } = await generateText({
+  const result = await generateText({
     model: llm,
     prompt,
     maxRetries: 0,
   });
-  return c.json({ response: text, model: MODEL_NAME });
+  logLanguageModelCost('raw-prompt', MODEL_NAME, result.usage);
+  return c.json({ response: result.text, model: MODEL_NAME });
 }
 
 async function handleRawPromptStream(c: import('hono').Context) {
   const { prompt } = await c.req.json<{ prompt: string }>();
-  const { textStream } = streamText({
+  const result = streamText({
     model: llm,
     prompt,
     maxRetries: 0,
   });
-  return textStreamResponse(textStream as AsyncIterable<string>, c);
+  logStreamLanguageModelCost('raw-prompt-stream', MODEL_NAME, result.usage);
+  return textStreamResponse(result.textStream as AsyncIterable<string>, c);
 }
 
 quizRouter.post('/ai-api/raw-prompt', handleRawPrompt);

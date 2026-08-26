@@ -30,6 +30,7 @@ async function embedWithOllama(texts: string[]): Promise<number[][]> {
       );
     }
   }
+  logEmbeddingCost('embedding', EMBEDDING_MODEL, texts);
   return result.embeddings;
 }
 
@@ -52,3 +53,4 @@ export async function createEmbeddings(values: string[]): Promise<number[][]> {
 export function toPgVector(value: number[]): string {
   return `[${value.join(',')}]`;
 }
+import { logEmbeddingCost } from './ai-cost.js';

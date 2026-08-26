@@ -1,6 +1,7 @@
 import { Hono } from 'hono';
 import { createOpenAI } from '@ai-sdk/openai';
 import { generateImage } from 'ai';
+import { logImageGenerationCost } from '../ai-cost.js';
 
 export const qaImageRouter = new Hono();
 
@@ -45,6 +46,7 @@ async function handleGenerateQuestionImage(c: import('hono').Context) {
       prompt,
       size: '1024x1024',
     });
+    logImageGenerationCost('qa-image', MODEL_ID, '1024x1024', result.images.length);
     return c.json({
       imageDataUrl: `data:${result.image.mediaType};base64,${result.image.base64}`,
     });
