@@ -32,11 +32,11 @@
     </ng-container>
 
     <div
-      *ngIf="(itemVal$ | async)?.multipleChoiceAnswers?.length && ((showChoices$ | async) || (showAnswer$ | async))"
+      *ngIf="getMultipleChoiceAnswers(itemVal$ | async).length && ((showChoices$ | async) || (showAnswer$ | async))"
       style="display: grid; gap: 0.4rem"
     >
       <div
-        *ngFor="let choice of (itemVal$ | async)?.multipleChoiceAnswers"
+        *ngFor="let choice of getMultipleChoiceAnswers(itemVal$ | async)"
         style="padding: 0.45rem 0.6rem; border: 1px solid var(--ion-color-medium-tint); border-radius: 4px"
         [style.border-color]="(showAnswer$ | async) && choice.correct ? 'var(--ion-color-success)' : null"
         [style.color]="(showAnswer$ | async) && choice.correct ? 'var(--ion-color-success-shade)' : null"

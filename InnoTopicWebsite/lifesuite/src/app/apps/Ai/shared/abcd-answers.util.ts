@@ -11,6 +11,27 @@ export interface BowQuizQuestion {
 
 export type AbcdAnswerChoice = BowQuizQuestion['answers'][number];
 
+/**
+ * Returns a new set of choices in a random display order. Labels describe the
+ * displayed position, so they are reassigned after shuffling while the correct
+ * metadata and stable choice IDs remain unchanged.
+ */
+export function shuffleAbcdAnswerChoices<TChoice extends { label: string }>(
+  choices: readonly TChoice[],
+  random: () => number = Math.random,
+): TChoice[] {
+  const shuffled = [...choices];
+  for (let index = shuffled.length - 1; index > 0; index--) {
+    const swapIndex = Math.floor(random() * (index + 1));
+    [shuffled[index], shuffled[swapIndex]] = [shuffled[swapIndex], shuffled[index]];
+  }
+
+  return shuffled.map((choice, index) => ({
+    ...choice,
+    label: String.fromCharCode('A'.charCodeAt(0) + index),
+  }) as TChoice);
+}
+
 /** Removes correctness markers from ABCD choice text before it is saved as regular Learn Q&A. */
 export function stripAbcdCorrectnessMarkers(answer: string): string {
   return answer

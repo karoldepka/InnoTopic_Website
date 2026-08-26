@@ -15,6 +15,8 @@ import { OdmTreeComponent } from '../../../../libs/AppFedShared/tree/tree/odm-tr
 import {IonicModule} from '@ionic/angular'
 import {funLevels} from '../../models/fields/fun-level.model'
 import {importanceDescriptors} from '../../models/fields/importance.model'
+import {MultipleChoiceAnswer} from '../../models/LearnItem'
+import {shuffleAbcdAnswerChoices} from '../../../Ai/shared/abcd-answers.util'
 
 @Component({
     selector: 'app-quiz-item-details',
@@ -44,6 +46,8 @@ export class QuizItemDetailsComponent implements OnInit, OnDestroy, AfterViewIni
   }
 
   private _item$ ? : LearnItem$ | null
+  private choiceSource?: MultipleChoiceAnswer[]
+  private shuffledChoices: MultipleChoiceAnswer[] = []
 
   @Input()
   quizLoaded = false
@@ -63,6 +67,17 @@ export class QuizItemDetailsComponent implements OnInit, OnDestroy, AfterViewIni
   get showHint$() { return this.quizService.showHint$ }
 
   get showChoices$() { return this.quizService.showChoices$ }
+
+  /** Keeps an answer order stable while this question is on screen, but randomizes it for every new question. */
+  getMultipleChoiceAnswers(itemVal: LearnItem | undefined | null): MultipleChoiceAnswer[] {
+    const choices = itemVal?.multipleChoiceAnswers
+    if (!choices?.length) return []
+    if (choices !== this.choiceSource) {
+      this.choiceSource = choices
+      this.shuffledChoices = shuffleAbcdAnswerChoices(choices)
+    }
+    return this.shuffledChoices
+  }
 
   getVisibleHintSides(itemVal: LearnItem | undefined | null, hintLevel: number | undefined | null): Side[] {
     return (itemVal?.getSidesWithHints() ?? []).slice(0, hintLevel ?? 0)
