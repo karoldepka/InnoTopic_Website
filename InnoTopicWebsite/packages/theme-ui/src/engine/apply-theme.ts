@@ -32,7 +32,7 @@ export function applyThemeConfig(config: ThemeConfigState) {
   // A percentage keeps the setting relative to the browser/user-agent default, so browser zoom
   // and accessibility defaults still compose correctly. Clamp persisted/manual values to the
   // range offered by LifeSuite's theme popover.
-  const fontSizePercent = Math.min(140, Math.max(80, Number(config.font_size_percent) || 100))
+  const fontSizePercent = Math.min(300, Math.max(80, Number(config.font_size_percent) || 100))
   root.fontSize = `${fontSizePercent}%`
 
   // brightness_percent/font_size_percent are control inputs, not themed color tokens - skip them
