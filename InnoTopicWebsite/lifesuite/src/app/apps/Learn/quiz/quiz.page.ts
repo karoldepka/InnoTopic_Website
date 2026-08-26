@@ -1,4 +1,4 @@
-import {AfterViewInit, Component, Injector, OnInit, ChangeDetectionStrategy} from '@angular/core';
+import {AfterViewInit, Component, Injector, OnDestroy, OnInit, ChangeDetectionStrategy} from '@angular/core';
 import {QuizService} from '../core/quiz/quiz.service'
 import {Observable} from 'rxjs'
 import { PopoverController, IonicModule } from '@ionic/angular'
@@ -21,6 +21,7 @@ import { QuizItemsLeftComponent } from './quiz-items-left/quiz-items-left.compon
 import { QuizFinishedComponent } from './quiz-finished/quiz-finished.component';
 import { QuizItemDetailsComponent } from './quiz-item-details/quiz-item-details.component';
 import { ShowAnswerAndRateComponent } from './show-answer-and-rate/show-answer-and-rate.component';
+import {QuizTrackingService} from './quiz-tracking.service'
 
 
 @Component({
@@ -43,7 +44,7 @@ import { ShowAnswerAndRateComponent } from './show-answer-and-rate/show-answer-a
         AsyncPipe,
     ],
 })
-export class QuizPage extends BaseComponent implements OnInit, AfterViewInit  {
+export class QuizPage extends BaseComponent implements OnInit, AfterViewInit, OnDestroy  {
 
   item$: LearnItem$ | undefined
 
@@ -59,12 +60,25 @@ export class QuizPage extends BaseComponent implements OnInit, AfterViewInit  {
     public quizService: QuizService,
     public popoverController: PopoverController,
     public editorService: EditorService,
+    private quizTrackingService: QuizTrackingService,
     injector: Injector,
   ) {
     super(injector)
   }
 
   ngOnInit() {
+  }
+
+  ionViewWillEnter() {
+    this.quizTrackingService.startTracking().catch(error => console.error('Quiz time tracking failed to start', error))
+  }
+
+  ionViewWillLeave() {
+    this.quizTrackingService.stopTrackingIfNeeded()
+  }
+
+  ngOnDestroy() {
+    this.quizTrackingService.stopTrackingIfNeeded()
   }
 
   ngAfterViewInit(): void {
