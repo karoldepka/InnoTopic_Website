@@ -19,7 +19,7 @@
 @include meta.load-css('global_oryol2');
 
 :root {
-  transition: all 2s; // FIXME test
+  transition: font-size 0.5s ease;
 
   // Overrides @ionic/angular/css/core.css's own static --ion-color-medium (imported above,
   // #636469) - must live here rather than variables.scss since core.css loads after it and wins
