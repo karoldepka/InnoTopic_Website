@@ -65,7 +65,7 @@ export class AiQaPage implements OnInit {
   readonly pickedDirectorySkippedCount = signal(0);
   readonly directoryPickerSupported = isDirectoryPickerSupported();
   readonly webSearch = signal(true);
-  readonly abcdAnswers = signal(false);
+  readonly abcdAnswers = signal(true);
   readonly matchExisting = signal(false);
   readonly rawPromptMode = signal(false);
   readonly rawResponse = signal('');

@@ -272,7 +272,7 @@ export class AiQaGeneratorService {
     }
   }
 
-  async generateQuestions(integration: QaIntegrationMode, webSearch: boolean, abcdAnswers = false): Promise<void> {
+  async generateQuestions(integration: QaIntegrationMode, webSearch: boolean, abcdAnswers = true): Promise<void> {
     if (!this.tree().length || this.questionLoading()) return;
 
     // If questions already exist, append rather than replace.
@@ -350,7 +350,7 @@ export class AiQaGeneratorService {
     integration: QaIntegrationMode,
     webSearch: boolean,
     additionalCount: number,
-    abcdAnswers = false,
+    abcdAnswers = true,
   ): Promise<void> {
     if (this.questionLoading()) return;
 
