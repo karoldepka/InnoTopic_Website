@@ -39,9 +39,9 @@
         <ion-button
           *ngFor="let preset of timerPresets"
           class="timer-preset"
-          [class.is-selected]="selectedDurationSeconds === preset.durationSeconds"
           size="small"
-          fill="clear"
+          color="secondary"
+          [fill]="selectedDurationSeconds === preset.durationSeconds ? 'solid' : 'clear'"
           (click)="selectTimerDuration(preset.durationSeconds)"
         >
           {{ preset.label }}
