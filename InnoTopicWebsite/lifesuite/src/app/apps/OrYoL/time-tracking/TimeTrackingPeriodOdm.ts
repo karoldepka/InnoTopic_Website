@@ -11,4 +11,7 @@ export class TimeTrackingPeriodOdm extends OdmInMemItem {
   start?: OdmTimestamp
   /** null (not just missing) while still running, so it's distinguishable from "not yet set". */
   end?: OdmTimestamp | null
+  /** Quiz-only aggregate for completed Q&As during this tracked period. */
+  quizAnswerCount?: number
+  quizAnswerDurationMs?: number
 }

@@ -21,7 +21,7 @@ import { QuizItemsLeftComponent } from './quiz-items-left/quiz-items-left.compon
 import { QuizFinishedComponent } from './quiz-finished/quiz-finished.component';
 import { QuizItemDetailsComponent } from './quiz-item-details/quiz-item-details.component';
 import { ShowAnswerAndRateComponent } from './show-answer-and-rate/show-answer-and-rate.component';
-import {QuizDailyTrackingTotal, QuizTrackingService} from './quiz-tracking.service'
+import {QuizAnswerDurationAverage, QuizDailyTrackingTotal, QuizTrackingService} from './quiz-tracking.service'
 
 
 @Component({
@@ -54,6 +54,7 @@ export class QuizPage extends BaseComponent implements OnInit, AfterViewInit, On
   showTimeTrackingStats = false
   isLoadingTimeTrackingStats = false
   dailyTimeTrackingTotals: QuizDailyTrackingTotal[] = []
+  answerDurationAverage: QuizAnswerDurationAverage | null = null
 
   status$ = this.quizService.quizStatus$
 
@@ -92,7 +93,12 @@ export class QuizPage extends BaseComponent implements OnInit, AfterViewInit, On
     }
     this.isLoadingTimeTrackingStats = true
     try {
-      this.dailyTimeTrackingTotals = await this.quizTrackingService.getDailyTotals()
+      const [dailyTimeTrackingTotals, answerDurationAverage] = await Promise.all([
+        this.quizTrackingService.getDailyTotals(),
+        this.quizTrackingService.getAnswerDurationAverage(),
+      ])
+      this.dailyTimeTrackingTotals = dailyTimeTrackingTotals
+      this.answerDurationAverage = answerDurationAverage
     } catch (error) {
       console.error('Quiz time tracking stats failed to load', error)
     } finally {
@@ -106,6 +112,13 @@ export class QuizPage extends BaseComponent implements OnInit, AfterViewInit, On
     const hours = Math.floor(totalMinutes / 60)
     const minutes = totalMinutes % 60
     return hours > 0 ? `${hours}h ${minutes}m` : `${minutes}m`
+  }
+
+  formatAverageAnswerDuration(durationMs: number): string {
+    const totalSeconds = Math.round(durationMs / 1_000)
+    const minutes = Math.floor(totalSeconds / 60)
+    const seconds = totalSeconds % 60
+    return minutes > 0 ? `${minutes}m ${seconds}s` : `${seconds}s`
   }
 
   ngAfterViewInit(): void {

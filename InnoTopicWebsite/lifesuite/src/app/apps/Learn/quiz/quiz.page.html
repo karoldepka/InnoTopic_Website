@@ -74,6 +74,11 @@
 
         <div *ngIf="showTimeTrackingStats" id="quiz-time-tracking-stats" class="quiz-time-tracking__stats">
           <ion-spinner *ngIf="isLoadingTimeTrackingStats" aria-label="Loading time tracking totals" />
+          <p *ngIf="!isLoadingTimeTrackingStats && answerDurationAverage">
+            Average per Q&amp;A:
+            <strong>{{ formatAverageAnswerDuration(answerDurationAverage.durationMs) }}</strong>
+            <span>({{ answerDurationAverage.answerCount }} answered)</span>
+          </p>
           <p *ngIf="!isLoadingTimeTrackingStats && !dailyTimeTrackingTotals.length">No Quiz time has been tracked yet.</p>
           <dl *ngIf="!isLoadingTimeTrackingStats && dailyTimeTrackingTotals.length">
             <div *ngFor="let total of dailyTimeTrackingTotals">

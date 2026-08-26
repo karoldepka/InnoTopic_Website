@@ -16,6 +16,11 @@ export interface QuizDailyTrackingTotal {
   durationMs: number
 }
 
+export interface QuizAnswerDurationAverage {
+  answerCount: number
+  durationMs: number
+}
+
 /** Persists Quiz sessions in the shared time-tracking history without interrupting another task. */
 @Injectable({providedIn: 'root'})
 export class QuizTrackingService {
@@ -46,6 +51,38 @@ export class QuizTrackingService {
 
   stopTrackingIfNeeded(): void {
     this.entry?.pauseOrNoop()
+  }
+
+  /** Records the elapsed time for one completed Q&A on the currently tracked Quiz period. */
+  recordCompletedAnswer(durationMs: number): void {
+    const period = this.entry?.currentPeriod
+    if (!period || !Number.isFinite(durationMs) || durationMs < 0) {
+      return
+    }
+
+    const current = period.odmItem$.val
+    period.odmItem$.patchNow({
+      quizAnswerCount: (current?.quizAnswerCount ?? 0) + 1,
+      quizAnswerDurationMs: (current?.quizAnswerDurationMs ?? 0) + durationMs,
+    })
+  }
+
+  /** Weighted average from every tracked Quiz period that contains completed Q&As. */
+  async getAnswerDurationAverage(): Promise<QuizAnswerDurationAverage | null> {
+    const periods = await this.timeTrackingPeriodsService.getPeriodsForItem(quizItemId(this.authService.userId as string))
+    const totals = periods.reduce((result, period) => {
+      const answerCount = period.quizAnswerCount ?? 0
+      const answerDurationMs = period.quizAnswerDurationMs ?? 0
+      if (answerCount > 0 && answerDurationMs >= 0) {
+        result.answerCount += answerCount
+        result.durationMs += answerDurationMs
+      }
+      return result
+    }, {answerCount: 0, durationMs: 0})
+
+    return totals.answerCount > 0
+      ? {answerCount: totals.answerCount, durationMs: totals.durationMs / totals.answerCount}
+      : null
   }
 
   /** Returns totals for the most recent calendar days, including an in-progress Quiz session. */

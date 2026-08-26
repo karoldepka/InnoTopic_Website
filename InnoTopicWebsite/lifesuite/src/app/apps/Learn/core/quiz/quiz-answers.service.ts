@@ -7,6 +7,7 @@ import {NumericPickerVal} from '../../../../libs/AppFedSharedIonic/ratings/numer
 import {LearnItem$} from '../../models/LearnItem$'
 import {SelfRating} from '../../models/fields/self-rating.model'
 import {WhatNextService} from '../../../../shared/scheduler/what-next.service'
+import {QuizTrackingService} from '../../quiz/quiz-tracking.service'
 
 
 @Injectable({
@@ -23,6 +24,7 @@ export class QuizAnswersService {
     private quizService: QuizService,
     private quizHistoryService: QuizHistoryService,
     private whatNextService: WhatNextService,
+    private quizTrackingService: QuizTrackingService,
   ) {
     this.quizService.quizStatus$.subscribe(status => {
       if ( status ?. nextItem$ ) {
@@ -69,6 +71,7 @@ export class QuizAnswersService {
       this.answer !.quizOptions = Object.assign({}, this.quizService.options$.lastVal !)
       this.answer !.msToApplyAndNext = this.getMsSinceQuestionShowed()
       this.answer !.selfRating = selfRating as SelfRating
+      this.quizTrackingService.recordCompletedAnswer(this.answer !.msToApplyAndNext)
 
       this.quizHistoryService.onAnswer(
         this.answer !,
