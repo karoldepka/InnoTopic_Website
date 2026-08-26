@@ -59,6 +59,30 @@
     <div>
       <app-quiz-options *ngIf="showOptions">
       </app-quiz-options>
+
+      <section *ngIf="showOptions" class="quiz-time-tracking" aria-label="Quiz time tracking">
+        <ion-button
+          fill="clear"
+          class="quiz-time-tracking__toggle"
+          [attr.aria-expanded]="showTimeTrackingStats"
+          aria-controls="quiz-time-tracking-stats"
+          (click)="toggleTimeTrackingStats()"
+        >
+          Time tracking
+          <ion-icon [name]="showTimeTrackingStats ? 'chevron-up' : 'chevron-down'" slot="end" />
+        </ion-button>
+
+        <div *ngIf="showTimeTrackingStats" id="quiz-time-tracking-stats" class="quiz-time-tracking__stats">
+          <ion-spinner *ngIf="isLoadingTimeTrackingStats" aria-label="Loading time tracking totals" />
+          <p *ngIf="!isLoadingTimeTrackingStats && !dailyTimeTrackingTotals.length">No Quiz time has been tracked yet.</p>
+          <dl *ngIf="!isLoadingTimeTrackingStats && dailyTimeTrackingTotals.length">
+            <div *ngFor="let total of dailyTimeTrackingTotals">
+              <dt>{{ total.dateLabel }}</dt>
+              <dd>{{ formatTrackingDuration(total.durationMs) }}</dd>
+            </div>
+          </dl>
+        </div>
+      </section>
     </div>
 
 <!--    <app-quiz-tips-->

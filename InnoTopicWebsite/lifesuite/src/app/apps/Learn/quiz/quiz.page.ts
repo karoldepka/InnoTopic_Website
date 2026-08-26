@@ -1,4 +1,4 @@
-import {AfterViewInit, Component, Injector, OnDestroy, OnInit, ChangeDetectionStrategy} from '@angular/core';
+import {AfterViewInit, ChangeDetectorRef, Component, Injector, OnDestroy, OnInit, ChangeDetectionStrategy} from '@angular/core';
 import {QuizService} from '../core/quiz/quiz.service'
 import {Observable} from 'rxjs'
 import { PopoverController, IonicModule } from '@ionic/angular'
@@ -21,7 +21,7 @@ import { QuizItemsLeftComponent } from './quiz-items-left/quiz-items-left.compon
 import { QuizFinishedComponent } from './quiz-finished/quiz-finished.component';
 import { QuizItemDetailsComponent } from './quiz-item-details/quiz-item-details.component';
 import { ShowAnswerAndRateComponent } from './show-answer-and-rate/show-answer-and-rate.component';
-import {QuizTrackingService} from './quiz-tracking.service'
+import {QuizDailyTrackingTotal, QuizTrackingService} from './quiz-tracking.service'
 
 
 @Component({
@@ -51,6 +51,9 @@ export class QuizPage extends BaseComponent implements OnInit, AfterViewInit, On
 
   // showOptions = true
   showOptions = false
+  showTimeTrackingStats = false
+  isLoadingTimeTrackingStats = false
+  dailyTimeTrackingTotals: QuizDailyTrackingTotal[] = []
 
   status$ = this.quizService.quizStatus$
 
@@ -61,6 +64,7 @@ export class QuizPage extends BaseComponent implements OnInit, AfterViewInit, On
     public popoverController: PopoverController,
     public editorService: EditorService,
     private quizTrackingService: QuizTrackingService,
+    private changeDetectorRef: ChangeDetectorRef,
     injector: Injector,
   ) {
     super(injector)
@@ -79,6 +83,29 @@ export class QuizPage extends BaseComponent implements OnInit, AfterViewInit, On
 
   ngOnDestroy() {
     this.quizTrackingService.stopTrackingIfNeeded()
+  }
+
+  async toggleTimeTrackingStats(): Promise<void> {
+    this.showTimeTrackingStats = !this.showTimeTrackingStats
+    if (!this.showTimeTrackingStats || this.isLoadingTimeTrackingStats) {
+      return
+    }
+    this.isLoadingTimeTrackingStats = true
+    try {
+      this.dailyTimeTrackingTotals = await this.quizTrackingService.getDailyTotals()
+    } catch (error) {
+      console.error('Quiz time tracking stats failed to load', error)
+    } finally {
+      this.isLoadingTimeTrackingStats = false
+      this.changeDetectorRef.detectChanges()
+    }
+  }
+
+  formatTrackingDuration(durationMs: number): string {
+    const totalMinutes = Math.floor(durationMs / 60_000)
+    const hours = Math.floor(totalMinutes / 60)
+    const minutes = totalMinutes % 60
+    return hours > 0 ? `${hours}h ${minutes}m` : `${minutes}m`
   }
 
   ngAfterViewInit(): void {
