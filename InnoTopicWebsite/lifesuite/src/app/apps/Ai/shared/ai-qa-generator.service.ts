@@ -734,13 +734,37 @@ export class AiQaGeneratorService {
   }
 
   private formatError(error: unknown): string {
-    const msg = error instanceof Error ? error.message : String(error || 'Unknown AI error');
-    // Backend returns 502 JSON like {"error":"Insufficient account balance"}
-    // The StructuredObject may surface the raw JSON string as the error message
-    try {
-      const parsed = JSON.parse(msg);
-      if (typeof parsed?.error === 'string') return parsed.error;
-    } catch { /* not JSON */ }
-    return msg;
+    const format = (value: unknown, depth = 0): string | undefined => {
+      if (depth > 3 || value === null || value === undefined) {
+        return undefined;
+      }
+      if (typeof value === 'string') {
+        const text = value.trim();
+        if (!text) return undefined;
+        // Backend errors can arrive as a JSON string, e.g. {"error":"Insufficient balance"}.
+        try {
+          const parsed = JSON.parse(text);
+          if (parsed !== text) {
+            return format(parsed, depth + 1) ?? text;
+          }
+        } catch { /* Plain text error. */ }
+        return text;
+      }
+      if (value instanceof Error) {
+        return format(value.message, depth + 1);
+      }
+      if (typeof value === 'object') {
+        const record = value as Record<string, unknown>;
+        // HttpErrorResponse commonly puts the backend body in `.error`; try its meaningful fields
+        // before the generic status text so users never see "[object Object]".
+        for (const key of ['error', 'message', 'detail', 'description']) {
+          const message = format(record[key], depth + 1);
+          if (message) return message;
+        }
+      }
+      return undefined;
+    };
+
+    return format(error) ?? 'Unknown AI error';
   }
 }
