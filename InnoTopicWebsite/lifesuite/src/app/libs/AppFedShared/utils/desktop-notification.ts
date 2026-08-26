@@ -18,3 +18,11 @@ export async function showDesktopNotification(title: string, options?: Notificat
   }
   new Notification(title, options)
 }
+
+/** Call from a user gesture before a long-running task, when browsers allow permission prompts. */
+export function requestDesktopNotificationPermission(): void {
+  if (typeof window === 'undefined' || !('Notification' in window) || Notification.permission !== 'default') {
+    return
+  }
+  void Notification.requestPermission()
+}

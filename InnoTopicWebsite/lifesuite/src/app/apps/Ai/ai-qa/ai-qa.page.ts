@@ -37,6 +37,7 @@ import { LearnItem$ } from '../../Learn/models/LearnItem$';
 import { OdmBackend } from '../../../libs/AppFedShared/odm/OdmBackend';
 import { Router } from '@angular/router';
 import { BOW_QUIZ_SESSION_KEY, stripAbcdCorrectnessMarkers, toAbcdAnswerChoices, toBowQuizQuestion } from '../shared/abcd-answers.util';
+import {requestDesktopNotificationPermission} from '../../../libs/AppFedShared/utils/desktop-notification';
 
 @Component({
   selector: 'app-ai-qa',
@@ -205,6 +206,7 @@ export class AiQaPage implements OnInit {
   }
 
   generateQuestions(): void {
+    requestDesktopNotificationPermission();
     this.gen.generateQuestions('vercel-ai-sdk', this.webSearch(), this.abcdAnswers());
     this.expandedAnswerKeys.set(new Set<string>());
   }
@@ -250,6 +252,7 @@ export class AiQaPage implements OnInit {
           text: 'Generate',
           handler: (data) => {
             const n = Math.max(1, Math.min(200, parseInt(data.count) || 10));
+            requestDesktopNotificationPermission();
             this.gen.generateMoreQuestions('vercel-ai-sdk', this.webSearch(), n, this.abcdAnswers());
           },
         },

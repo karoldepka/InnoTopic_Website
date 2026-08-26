@@ -708,7 +708,7 @@ export class AiQaGeneratorService {
       // Every branch above (clean finish, gave-up-after-replacement-rounds, or duplicate-check
       // unavailable) already stamped a final, human-readable questionStatus() - reuse it here
       // rather than re-deriving a separate message per branch.
-      this.notifyGenerationFinished('Q&A generated', this.questionStatus());
+      this.notifyGenerationFinished('Q&A generated', this.questionStatus(), true);
     }
   }
 
@@ -723,11 +723,10 @@ export class AiQaGeneratorService {
     }));
   }
 
-  /** Only bothers the user with a desktop notification if they've actually navigated away/
-   * switched tabs while this (slow, LLM-backed) generation was running - if the tab is still
-   * focused they can already see the result land live via the streaming signals above. */
-  private notifyGenerationFinished(title: string, body: string): void {
-    if (typeof document !== 'undefined' && document.hasFocus()) {
+  /** Q&A completion is explicitly opted in to an always-visible notification; category generation
+   * keeps the quieter background-only behavior. */
+  private notifyGenerationFinished(title: string, body: string, notifyWhileFocused = false): void {
+    if (!notifyWhileFocused && typeof document !== 'undefined' && document.hasFocus()) {
       return;
     }
     void showDesktopNotification(title, {body});
