@@ -10,3 +10,37 @@
   //height: 100%
   height: 4.5rem
   //margin-bottom: 120px
+
+.quiz-answer-actions
+  display: flex
+  flex-direction: column
+  align-items: center
+  order: 0
+  transform-origin: bottom center
+
+.quiz-answer-actions--enter
+  animation: quiz-answer-actions-enter 220ms cubic-bezier(0.2, 0.8, 0.2, 1) both
+
+.quiz-answer-actions--leave
+  animation: quiz-answer-actions-leave 160ms ease-in both
+
+@keyframes quiz-answer-actions-enter
+  from
+    opacity: 0
+    transform: translateY(0.75rem) scale(0.98)
+  to
+    opacity: 1
+    transform: translateY(0) scale(1)
+
+@keyframes quiz-answer-actions-leave
+  from
+    opacity: 1
+    transform: translateY(0) scale(1)
+  to
+    opacity: 0
+    transform: translateY(0.5rem) scale(0.98)
+
+@media (prefers-reduced-motion: reduce)
+  .quiz-answer-actions--enter,
+  .quiz-answer-actions--leave
+    animation-duration: 1ms

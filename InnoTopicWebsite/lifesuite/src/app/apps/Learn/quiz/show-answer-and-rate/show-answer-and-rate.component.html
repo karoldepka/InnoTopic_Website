@@ -40,29 +40,25 @@
 
 
 <div
-  *ngIf="(showAnswer$ | async) || (showHint$ | async)"
-  style="display: flex; flex-direction: column; align-items: center; order: 0"
-  [hidden]="hide"
+  *ngIf="(showAnswer$ | async) && !hide"
+  class="quiz-answer-actions"
+  animate.enter="quiz-answer-actions--enter"
+  animate.leave="quiz-answer-actions--leave"
 >
-  <ng-container
-    *ngIf="(showAnswer$ | async)"
+  <app-self-rating
+    [autoSave]="false"
+    [item$]="$safeNavigationMigration((quizStatus$ | async) ?. nextItem$) !"
+    (numericValue)="selfRating = $event; quizAnswersService.onSelfRate()"
+   />
+
+  <ion-button
+    (click)="applyAndNext()"
+    style="width: 100%; height: 3rem"
   >
-    <app-self-rating
-      [autoSave]="false"
-      [item$]="$safeNavigationMigration((quizStatus$ | async) ?. nextItem$) !"
-      (numericValue)="selfRating = $event; quizAnswersService.onSelfRate()"
-     />
-
-    <ion-button
-      (click)="applyAndNext()"
-      style="width: 100%; height: 3rem"
-    >
-      APPLY & NEXT
-      <ion-icon slot="end" style="color: var(--ion-color-secondary)" name="chevron-forward" />
+    APPLY & NEXT
+    <ion-icon slot="end" style="color: var(--ion-color-secondary)" name="chevron-forward" />
 <!--      {{(quizSelector$ | async)}}-->
-    </ion-button>
-
-  </ng-container>
+  </ion-button>
 
   <!-- TODO down-arrow to hide it, in case in case I want to edit.
     OR: auto-hide in such a way, that it's not changing layout when text selected (maybe transparent click-through bottom bar?)

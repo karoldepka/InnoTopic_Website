@@ -76,7 +76,9 @@ export class ShowAnswerAndRateComponent extends BaseComponent implements OnInit 
 
   ngOnInit() {
     this.showAnswer$.subscribe(showAnswer => {
-      this.hide = ! showAnswer
+      if ( showAnswer ) {
+        this.hide = false
+      }
     })
   }
 
