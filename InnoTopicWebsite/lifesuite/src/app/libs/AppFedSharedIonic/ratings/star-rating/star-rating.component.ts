@@ -3,7 +3,7 @@ import {NG_VALUE_ACCESSOR} from '@angular/forms'
 import {NgFor} from '@angular/common'
 import {IonicModule} from '@ionic/angular'
 import {addIcons} from 'ionicons'
-import {star} from 'ionicons/icons'
+import {star, starOutline} from 'ionicons/icons'
 import {CustomFormControl} from '../../../AppFedShared/utils/angular/custom-form-control'
 
 export type StarRatingVal = number
@@ -42,7 +42,9 @@ export class StarRatingComponent extends CustomFormControl<StarRatingVal> {
 
   constructor(private changeDetectorRef: ChangeDetectorRef) {
     super()
-    addIcons({star})
+    // Intentional exception to LifeSuite's solid-icon convention: outline stars are the
+    // unselected rating placeholders; selected/fractional values render a solid star above them.
+    addIcons({star, starOutline})
   }
 
   get starIndexes(): number[] {
