@@ -29,6 +29,9 @@ export class QuizTrackingService {
 
   private entry?: TimeTrackedEntry
   private inactivityPauseTimer?: ReturnType<typeof setTimeout>
+  /** Prevents async startup or late QuizStatus emissions from resuming tracking after the page's
+   * leave hook has fired. Ionic may cache the page, so component destruction alone is too late. */
+  private quizRouteActive = false
 
   constructor(
     private injector: Injector,
@@ -40,6 +43,7 @@ export class QuizTrackingService {
   }
 
   async startTracking(): Promise<void> {
+    this.quizRouteActive = true
     if (!this.entry) {
       const itemId = quizItemId(this.authService.userId as string)
       await this.dbTreeService.upsertItemIfMissing(itemId, {
@@ -49,17 +53,25 @@ export class QuizTrackingService {
       await this.dbTreeService.upsertRootInclusionIfMissing(itemId)
       this.entry = this.timeTrackingService.obtainEntryForItem(new OryItem$(this.injector, itemId))
     }
+    // Navigation may have completed while the item/root setup above was awaiting persistence.
+    if (!this.quizRouteActive) {
+      return
+    }
     this.entry.startOrResumeTrackingIfNeeded({inParallel: true})
     this.resetInactivityPauseTimer()
   }
 
   stopTrackingIfNeeded(): void {
+    this.quizRouteActive = false
     this.clearInactivityPauseTimer()
     this.entry?.pauseOrNoop()
   }
 
   /** Counts as active Quiz work and resumes a session that was paused for inactivity. */
   recordQuizActivity(): void {
+    if (!this.quizRouteActive) {
+      return
+    }
     if (!this.entry) {
       void this.startTracking().catch(error => console.error('Quiz time tracking failed to resume', error))
       return
@@ -71,6 +83,9 @@ export class QuizTrackingService {
 
   /** Records a completed Q&A both in the aggregate Quiz session and on its actual Learn item. */
   recordCompletedAnswer(itemId: string, durationMs: number): void {
+    if (!this.quizRouteActive) {
+      return
+    }
     this.recordQuizActivity()
     if (!Number.isFinite(durationMs) || durationMs < 0) {
       return
