@@ -1,0 +1,40 @@
+.recent-commits {
+  margin: 0 16px 10px;
+  font-size: 0.85em;
+}
+
+.recent-commits summary {
+  padding: 6px 0;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.recent-commits ol {
+  margin: 4px 0 0;
+  padding-inline-start: 1.75rem;
+}
+
+.recent-commits li {
+  padding: 5px 0;
+}
+
+.commit-heading {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-2);
+}
+
+.commit-heading code {
+  flex: 0 0 auto;
+  color: var(--ion-color-primary);
+}
+
+.commit-heading span {
+  overflow-wrap: anywhere;
+}
+
+.recent-commits small {
+  display: block;
+  margin-top: 2px;
+  color: var(--ion-color-step-650);
+}

@@ -7,3 +7,16 @@
   <br />
   {{ 'SYNC.BUILT' | translate }}: {{ buildInfo.builtAt }}
 </p>
+
+<details class="recent-commits">
+  <summary>Recent commits ({{ buildInfo.recentCommits.length }})</summary>
+  <ol>
+    <li *ngFor="let commit of buildInfo.recentCommits">
+      <div class="commit-heading">
+        <code>{{ commit.shortHash }}</code>
+        <span>{{ commit.message }}</span>
+      </div>
+      <small>{{ commit.author }} · {{ commit.committedAt | date:'medium' }}</small>
+    </li>
+  </ol>
+</details>
