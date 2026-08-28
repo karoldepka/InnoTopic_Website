@@ -1,5 +1,5 @@
 import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
-import { NgIf } from '@angular/common'
+import { AsyncPipe, NgIf } from '@angular/common'
 import { Form, UntypedFormControl, UntypedFormGroup, ReactiveFormsModule } from '@angular/forms'
 import {QuizService} from '../../core/quiz/quiz.service'
 import {ViewSyncer} from '../../../../libs/AppFedShared/odm/ui/ViewSyncer'
@@ -22,6 +22,7 @@ import { QuizFocusLevelComponent } from './quiz-focus-level/quiz-focus-level.com
     styleUrls: ['./quiz-options.component.sass'],
     imports: [
         NgIf,
+        AsyncPipe,
         IonicModule,
         ReactiveFormsModule,
         NumericPickerComponent,

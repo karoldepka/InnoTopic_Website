@@ -8,6 +8,12 @@ export class QuizStatus {
   public itemsLeftByImportanceAtLeast: any = QuizStatus.countsAtLeastImportance(this.itemsLeftByImportance)
   public itemsCountByImportanceAtLeast: any = QuizStatus.countsAtLeastImportance(this.itemsCountByImportance)
 
+  /** All quiz items that match the current option filters, whether pending now or scheduled later. */
+  get itemsMatchingFiltersCount(): number {
+    return Object.values(this.itemsCountByImportance ?? {})
+      .reduce((total: number, count) => total + (typeof count === 'number' ? count : 0), 0)
+  }
+
   constructor(
     public itemsLeft: number,
     public nextItem$?: LearnItem$,

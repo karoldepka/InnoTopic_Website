@@ -1,4 +1,12 @@
 <div class="quiz-groups">
+  <div
+    *ngIf="quizService.quizStatus$ | async as quizStatus"
+    class="quiz-filter-count"
+    aria-live="polite"
+  >
+    <strong>{{ quizStatus.itemsLeft }} / {{ quizStatus.itemsMatchingFiltersCount }}</strong>
+    <span>remaining / matching current filters</span>
+  </div>
 
   <div class="quiz-group" [class.quiz-group--collapsed]="!groupsExpanded.filters">
     <button
