@@ -143,6 +143,11 @@ html {
   --space-5: 1.25rem;     /* 20px */
   --space-6: 1.5rem;      /* 24px */
   --space-8: 2rem;        /* 32px */
+
+  // Ionic Material gives every toolbar title 20px of start padding. That sits directly
+  // beside the back-button touch target, making navigation titles look detached. Keep this
+  // as an app token so compact toolbars can share an 8px gap without shrinking that target.
+  --app-toolbar-title-start-padding: var(--space-2);
 }
 
 // Ionic's own fab-vertical-bottom/-top CSS is a flat 10px with no safe-area term at all
