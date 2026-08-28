@@ -143,7 +143,11 @@ export class QuizItemDetailsComponent implements OnInit, OnDestroy, AfterViewIni
     this.subscriptionToShowAnswer = this.quizService.showAnswer$.subscribe(showAnswer => {
       if ( showAnswer ) {
         setTimeout(() => {
-          this.answersChild?.nativeElement?.scrollIntoView()
+          const prefersReducedMotion = globalThis.matchMedia?.('(prefers-reduced-motion: reduce)').matches
+          this.answersChild?.nativeElement?.scrollIntoView({
+            behavior: prefersReducedMotion ? 'auto' : 'smooth',
+            block: 'start',
+          })
         }, 200)
         if (this.quizService.options2$.val?.textToSpeechEnabled) {
           const itemVal = this.item$?.currentVal
