@@ -41,8 +41,8 @@
         class="abcd-answer"
         (click)="onAbcdChoiceClick()"
         [attr.aria-pressed]="showAnswer$ | async"
+        [class.abcd-answer--correct-revealed]="(showAnswer$ | async) && choice.correct"
         [class.abcd-answer--incorrect-revealed]="(showAnswer$ | async) && !choice.correct"
-        [style.border-color]="(showAnswer$ | async) && choice.correct ? 'var(--ion-color-success)' : null"
       >
         <strong>{{ choice.label }}.</strong> {{ choice.text }}
       </button>
