@@ -66,7 +66,8 @@ export class QuizOptionsComponent implements OnInit {
     onlyAiGenerated: new UntypedFormControl(false),
     textToSpeechEnabled: new UntypedFormControl(false),
     textToSpeechCategoriesEnabled: new UntypedFormControl(false),
-    useRegexFilters: new UntypedFormControl(false),
+    useRegexCategories: new UntypedFormControl(false),
+    useRegexTextFilter: new UntypedFormControl(false),
   }
 
   formGroup = new UntypedFormGroup(this.controls)

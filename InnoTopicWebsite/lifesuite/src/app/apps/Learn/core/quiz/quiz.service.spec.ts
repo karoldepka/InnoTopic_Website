@@ -180,6 +180,45 @@ describe('QuizService — quizStatus$', () => {
     sub.unsubscribe()
   })
 
+  it('applies regex mode independently to categories and text', () => {
+    const exactCategory = makeItem$(fakeLearnDoService, {categories: 'work', title: 'Beta topic'}, 'exact-category')
+    const partialCategory = makeItem$(fakeLearnDoService, {categories: 'artwork', title: 'Beta topic'}, 'partial-category')
+    const categoryRegexOptions = Object.assign(new QuizOptions(false, false), {
+      categories: '(?:^|,\\s*)work(?:,|$)',
+      textFilter: 'alpha,beta',
+      useRegexCategories: true,
+      useRegexTextFilter: false,
+    })
+
+    expect((quizService as any).filterByOptions(categoryRegexOptions, [exactCategory, partialCategory]))
+      .toEqual([exactCategory])
+
+    const textRegexMatch = makeItem$(fakeLearnDoService, {categories: 'study', title: 'Question 42'}, 'text-match')
+    const textRegexMiss = makeItem$(fakeLearnDoService, {categories: 'study', title: 'Question number'}, 'text-miss')
+    const textRegexOptions = Object.assign(new QuizOptions(false, false), {
+      categories: 'work,study',
+      textFilter: '^Question \\d+$',
+      useRegexCategories: false,
+      useRegexTextFilter: true,
+    })
+
+    expect((quizService as any).filterByOptions(textRegexOptions, [textRegexMatch, textRegexMiss]))
+      .toEqual([textRegexMatch])
+  })
+
+  it('migrates the legacy combined regex preference to both per-field options', () => {
+    localStorage.setItem('QuizOptions', JSON.stringify({
+      dePrioritizeNewMaterial: false,
+      onlyWithQA: true,
+      useRegexFilters: true,
+    }))
+
+    const migratedService = new QuizService(makeFakeLearnDoService() as any, {} as any)
+
+    expect(migratedService.options2$.val.useRegexCategories).toBe(true)
+    expect(migratedService.options2$.val.useRegexTextFilter).toBe(true)
+  })
+
   it('does not throw and reports no next item when nothing is pending', async () => {
     quizService.setOptions(new QuizOptions(false, true))
     // localItems$ keeps its initial empty array (constructor default), but the load has

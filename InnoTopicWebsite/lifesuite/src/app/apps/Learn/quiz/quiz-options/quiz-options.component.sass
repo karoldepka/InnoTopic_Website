@@ -88,10 +88,6 @@
 .quiz-option--toggles
   grid-column: 1 / -1
 
-.quiz-option--regex
-  grid-column: 1 / -1
-  min-width: 0
-
 .quiz-option--fun
   grid-column: span 4
 
@@ -110,8 +106,17 @@
   border: 1px solid rgba(var(--ion-text-color-rgb, 255, 255, 255), 0.14)
   border-radius: 4px
   --background: rgba(var(--ion-text-color-rgb, 255, 255, 255), 0.05)
+  --color: var(--ion-text-color)
+  color: var(--ion-text-color)
   --padding-start: 0.5rem
   --padding-end: 0.5rem
+
+.quiz-option__input::part(native)
+  color: var(--ion-text-color)
+  caret-color: var(--ion-text-color)
+
+.quiz-option__regex
+  font-size: 0.78rem
 
 ion-checkbox
   min-width: 0

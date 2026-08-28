@@ -33,6 +33,13 @@
           [clearInput]="true"
           [debounce]="300"
          />
+        <ion-checkbox
+          class="quiz-option__regex"
+          labelPlacement="end"
+          [formControl]="controls.useRegexCategories"
+        >
+          TREAT CATEGORIES AS REGEX
+        </ion-checkbox>
       </div>
 
       <div class="quiz-option quiz-option--input">
@@ -43,15 +50,12 @@
           [clearInput]="true"
           [debounce]="300"
          />
-      </div>
-
-      <div class="quiz-option--regex">
         <ion-checkbox
-          class="quiz-toggle-cell"
+          class="quiz-option__regex"
           labelPlacement="end"
-          [formControl]="controls.useRegexFilters"
+          [formControl]="controls.useRegexTextFilter"
         >
-          TREAT CATEGORIES / TEXT FILTER AS REGEX
+          TREAT TEXT FILTER AS REGEX
         </ion-checkbox>
       </div>
 

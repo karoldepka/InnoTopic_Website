@@ -27,10 +27,10 @@ export class QuizOptions {
     public textToSpeechEnabled: boolean = false,
     /** When TTS is enabled, also reads the quiz item's categories before its question. */
     public textToSpeechCategoriesEnabled: boolean = false,
-    /** Interpret `categories`/`textFilter` above as a single regex pattern each (case-insensitive,
-     * no comma-splitting) instead of the default comma-separated-substrings-OR'd-together
-     * matching. */
-    public useRegexFilters: boolean = false,
+    /** Interpret `categories` as one case-insensitive regex instead of comma-separated substrings. */
+    public useRegexCategories: boolean = false,
+    /** Interpret `textFilter` as one case-insensitive regex instead of comma-separated substrings. */
+    public useRegexTextFilter: boolean = false,
     // TODO: priorityByImportances: 0 .. 1 -- 0 - ignore importances, 1 - items of highest importance go first
     // in-between - probabilities
   ) {
