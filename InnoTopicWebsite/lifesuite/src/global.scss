@@ -144,6 +144,10 @@ html {
   --space-6: 1.5rem;      /* 24px */
   --space-8: 2rem;        /* 32px */
 
+  // Shared Material toolbar row height. The persistent app toolbar owns the device safe-area;
+  // routed page toolbars use this row height below it instead of adding the top inset again.
+  --app-toolbar-height: 56px;
+
   // Ionic Material gives every toolbar title 20px of start padding. That sits directly
   // beside the back-button touch target, making navigation titles look detached. Keep this
   // as an app token so compact toolbars can share an 8px gap without shrinking that target.
@@ -409,12 +413,20 @@ body {
 // between them, breaking that direct-child match and silently un-hiding this exact overlap bug
 // (the header's icons visually disappeared under the routed page) - `#main-content` is a plain
 // HTML id (Ionic's own `contentId`/`ion-menu` wiring is a separate attribute, not this id), so
-// `#main-content > ion-router-outlet` still only reaches the outer router-outlet. The 56px offset
-// matches `md`-mode ion-toolbar's fixed height - ToolbarCommonItemsComponent is deliberately
+// `#main-content > ion-router-outlet` still only reaches the outer router-outlet. The offset
+// matches `md`-mode ion-toolbar's fixed height plus the device safe-area owned by that upper
+// toolbar - ToolbarCommonItemsComponent is deliberately
 // constrained to a single non-wrapping row (see its own .sass) so this stays accurate regardless
 // of how many time-tracked entries are showing.
 #main-content > ion-router-outlet {
-  top: 56px;
+  top: calc(var(--app-toolbar-height) + var(--ion-safe-area-top, 0px));
+}
+
+// Routed headers are already positioned below AppComponent's persistent header. Ionic normally
+// gives every page's first toolbar the top safe-area inset, which duplicates that inset here and
+// makes the two stacked toolbar rows overlap/mis-center relative to one another.
+#main-content > ion-router-outlet > .ion-page > ion-header ion-toolbar:first-of-type {
+  padding-top: 0;
 }
 
 // Default icon color is the theme's primary accent, not plain page text color - matches
