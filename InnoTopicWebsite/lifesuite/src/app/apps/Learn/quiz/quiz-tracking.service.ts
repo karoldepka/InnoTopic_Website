@@ -11,6 +11,8 @@ function quizItemId(userId: string): string {
   return `_quiz_${userId}`
 }
 
+const QUIZ_INACTIVITY_PAUSE_MS = 2 * 60_000
+
 export interface QuizDailyTrackingTotal {
   dateLabel: string
   durationMs: number
@@ -26,6 +28,7 @@ export interface QuizAnswerDurationAverage {
 export class QuizTrackingService {
 
   private entry?: TimeTrackedEntry
+  private inactivityPauseTimer?: ReturnType<typeof setTimeout>
 
   constructor(
     private injector: Injector,
@@ -47,14 +50,28 @@ export class QuizTrackingService {
       this.entry = this.timeTrackingService.obtainEntryForItem(new OryItem$(this.injector, itemId))
     }
     this.entry.startOrResumeTrackingIfNeeded({inParallel: true})
+    this.resetInactivityPauseTimer()
   }
 
   stopTrackingIfNeeded(): void {
+    this.clearInactivityPauseTimer()
     this.entry?.pauseOrNoop()
+  }
+
+  /** Counts as active Quiz work and resumes a session that was paused for inactivity. */
+  recordQuizActivity(): void {
+    if (!this.entry) {
+      void this.startTracking().catch(error => console.error('Quiz time tracking failed to resume', error))
+      return
+    }
+
+    this.entry.startOrResumeTrackingIfNeeded({inParallel: true})
+    this.resetInactivityPauseTimer()
   }
 
   /** Records the elapsed time for one completed Q&A on the currently tracked Quiz period. */
   recordCompletedAnswer(durationMs: number): void {
+    this.recordQuizActivity()
     const period = this.entry?.currentPeriod
     if (!period || !Number.isFinite(durationMs) || durationMs < 0) {
       return
@@ -83,6 +100,21 @@ export class QuizTrackingService {
     return totals.answerCount > 0
       ? {answerCount: totals.answerCount, durationMs: totals.durationMs / totals.answerCount}
       : null
+  }
+
+  private resetInactivityPauseTimer(): void {
+    this.clearInactivityPauseTimer()
+    this.inactivityPauseTimer = setTimeout(() => {
+      this.inactivityPauseTimer = undefined
+      this.entry?.pauseOrNoop()
+    }, QUIZ_INACTIVITY_PAUSE_MS)
+  }
+
+  private clearInactivityPauseTimer(): void {
+    if (this.inactivityPauseTimer) {
+      clearTimeout(this.inactivityPauseTimer)
+      this.inactivityPauseTimer = undefined
+    }
   }
 
   /** Returns totals for the most recent calendar days, including an in-progress Quiz session. */

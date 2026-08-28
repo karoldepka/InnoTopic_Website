@@ -32,21 +32,25 @@ export class QuizAnswersService {
         this.answer.itemId = status.nextItem$ !. id !
         this.answer.userAgent = navigator.userAgent
         this.whenQuestionShowed = new Date()
+        this.quizTrackingService.recordQuizActivity()
         // FIXME: finish
       }
     })
   }
 
   onShowAnswer() {
+    this.quizTrackingService.recordQuizActivity()
     this.answer !. msToShowAnswer = this.getMsSinceQuestionShowed()
     debugLog(`onShowAnswer`, this.answer)
   }
 
   onShowHint() {
+    this.quizTrackingService.recordQuizActivity()
     this.answer !. msToShowHint = this.getMsSinceQuestionShowed()
   }
 
   onSelfRate() {
+    this.quizTrackingService.recordQuizActivity()
     this.answer !. msToSelfRate = this.getMsSinceQuestionShowed()
   }
 
