@@ -81,8 +81,7 @@ export class ShowAnswerAndRateComponent extends BaseComponent implements OnInit 
   }
 
   showAnswer() {
-    this.quizService.toggleShowAnswer()
-    this.quizAnswersService.onShowAnswer() // TODO maybe move to quizService. ...
+    this.quizAnswersService.toggleShowAnswer()
     // https://www.w3schools.com/jsref/met_element_scrollintoview.asp
     // this.scrollToBottom()
     // window.scrollTo(0,document.body.scrollHeight);

@@ -44,6 +44,12 @@ export class QuizAnswersService {
     debugLog(`onShowAnswer`, this.answer)
   }
 
+  /** Single interaction path for the toolbar button and direct ABCD-option clicks. */
+  toggleShowAnswer(): void {
+    this.quizService.toggleShowAnswer()
+    this.onShowAnswer()
+  }
+
   onShowHint() {
     this.quizTrackingService.recordQuizActivity()
     this.answer !. msToShowHint = this.getMsSinceQuestionShowed()

@@ -17,6 +17,7 @@ import {funLevels} from '../../models/fields/fun-level.model'
 import {importanceDescriptors} from '../../models/fields/importance.model'
 import {MultipleChoiceAnswer} from '../../models/LearnItem'
 import {shuffleAbcdAnswerChoices} from '../../../Ai/shared/abcd-answers.util'
+import {QuizAnswersService} from '../../core/quiz/quiz-answers.service'
 
 @Component({
     selector: 'app-quiz-item-details',
@@ -95,8 +96,13 @@ export class QuizItemDetailsComponent implements OnInit, OnDestroy, AfterViewIni
   constructor(
     public quizService: QuizService,
     private quizSpeech: QuizSpeechService,
+    private quizAnswersService: QuizAnswersService,
   ) {
     // debugLog('QuizItemDetailsComponent ctor')
+  }
+
+  onAbcdChoiceClick(): void {
+    this.quizAnswersService.toggleShowAnswer()
   }
 
   ngOnInit() {
