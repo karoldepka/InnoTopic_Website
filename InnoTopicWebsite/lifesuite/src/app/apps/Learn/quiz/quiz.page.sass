@@ -4,6 +4,32 @@ pre
 \:host
   scroll-behavior: smooth
 
+.quiz-toolbar-content
+  display: flex
+  align-items: center
+  min-inline-size: 0
+
+.quiz-toolbar-title
+  display: flex
+  flex: 1 1 auto
+  align-items: center
+  min-inline-size: 0
+  gap: var(--space-2)
+
+.quiz-toolbar-title__label
+  flex: 1 1 auto
+
+.quiz-toolbar-title__remaining
+  display: flex
+  flex: 0 0 auto
+  flex-direction: column
+  align-items: center
+  justify-content: center
+  color: var(--ion-color-step-650)
+  font-size: 0.75rem
+  line-height: 1.05
+  text-align: center
+
 .quiz-time-tracking
   margin: 0 0.75rem 0.75rem
   border: 1px solid rgba(var(--ion-text-color-rgb), 0.16)
