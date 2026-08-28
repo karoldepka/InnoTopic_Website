@@ -74,4 +74,13 @@ describe('StarRatingComponent', () => {
     expect(component.currentValue).not.toBeNull()
     expect(component.currentValue).not.toBeUndefined()
   })
+
+  it('distinguishes an explicit zero from a not-yet-rated value', () => {
+    component.writeValue(undefined)
+    expect(component.isExplicitZeroMarker(1)).toBe(false)
+
+    component.writeValue(0)
+    expect(component.isExplicitZeroMarker(1)).toBe(true)
+    expect(component.isExplicitZeroMarker(2)).toBe(false)
+  })
 })

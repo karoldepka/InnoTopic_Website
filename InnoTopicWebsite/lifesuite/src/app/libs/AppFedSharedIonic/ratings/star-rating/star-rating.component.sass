@@ -14,9 +14,13 @@
 
 .star-rating__bg
   display: block
-  // Keep unselected stars clearly distinct even though every icon uses the solid glyph.
+  // Keep unselected outline placeholders muted beneath selected/fractional solid stars.
   color: var(--ion-color-step-500)
   opacity: .35
+
+.star-rating__bg--explicit-zero
+  color: var(--ion-color-secondary, #3dc2ff)
+  opacity: 1
 
 .star-rating__fill
   position: absolute

@@ -37,6 +37,7 @@ export class StarRatingComponent extends CustomFormControl<StarRatingVal> {
   private continueFirstStarCycleAfterClear = false
 
   currentValue: StarRatingVal = 0
+  hasExplicitRating = false
 
   @Output() numericValue = new EventEmitter<StarRatingVal>()
 
@@ -59,8 +60,9 @@ export class StarRatingComponent extends CustomFormControl<StarRatingVal> {
     return `Set rating to ${starIndex} of ${this.maxStars} stars`
   }
 
-  override writeValue(value: StarRatingVal): void {
-    super.writeValue(value)
+  override writeValue(value: StarRatingVal | null | undefined): void {
+    super.writeValue(value ?? 0)
+    this.hasExplicitRating = value !== null && value !== undefined
     this.currentValue = value ?? 0
     // OnPush + ControlValueAccessor gotcha: writeValue() can be called by Angular's forms
     // machinery (e.g. a [ngModel] binding on a parent that re-evaluates every change-detection
@@ -72,6 +74,10 @@ export class StarRatingComponent extends CustomFormControl<StarRatingVal> {
 
   fillFractionFor(starIndex: number): number {
     return Math.max(0, Math.min(1, this.currentValue - (starIndex - 1)))
+  }
+
+  isExplicitZeroMarker(starIndex: number): boolean {
+    return this.hasExplicitRating && this.currentValue === 0 && starIndex === 1
   }
 
   onStarClick(starIndex: number) {
@@ -112,6 +118,7 @@ export class StarRatingComponent extends CustomFormControl<StarRatingVal> {
   }
 
   private setValue(newValue: StarRatingVal) {
+    this.hasExplicitRating = true
     this.currentValue = newValue
     this.numericValue.emit(newValue)
     this.fireOnChange(newValue)

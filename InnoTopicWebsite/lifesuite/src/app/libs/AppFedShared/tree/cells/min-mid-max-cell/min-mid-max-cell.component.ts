@@ -45,8 +45,11 @@ export class MinMidMaxCellComponent extends AbstractCellComponent {
     return this.cell.patchableObservable.locallyVisibleChanges$.lastVal ?? {}
   }
 
-  get starValue(): StarRatingVal {
-    const numericValue = this.val.numVal ?? 0
+  get starValue(): StarRatingVal | null {
+    const numericValue = this.val.numVal
+    if (numericValue === null || numericValue === undefined) {
+      return null
+    }
     return numericValue * (this.maxStars / MinMidMaxCellComponent.maxStoredRatingValue)
   }
 
