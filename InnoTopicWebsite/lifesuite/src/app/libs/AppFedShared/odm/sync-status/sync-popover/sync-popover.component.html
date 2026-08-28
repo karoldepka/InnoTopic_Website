@@ -5,6 +5,19 @@
   {{ 'SYNC.APP_AND_SYNC_STATUS' | translate }}
 </h4>
 
+<div class="font-size-control">
+  <label for="sync-popover-font-size">Font size <strong>{{ themeUiService.fontSizePercent }}%</strong></label>
+  <ion-range
+    id="sync-popover-font-size"
+    aria-label="Font size"
+    [min]="80"
+    [max]="300"
+    [step]="5"
+    [value]="themeUiService.fontSizePercent"
+    (ionChange)="onFontSizeChange($event)"
+  ></ion-range>
+</div>
+
 <!-- GH #78: same toolbarEntries$ the app-root toolbar's own time-tracking bar shows. -->
 <div
   *ngIf="(timeTrackingService.toolbarEntries$ | async)?.length"
@@ -28,19 +41,6 @@
   </ion-item>
 </ng-container>
 <app-language-switcher></app-language-switcher>
-
-<div class="font-size-control">
-  <label for="sync-popover-font-size">Font size <strong>{{ themeUiService.fontSizePercent }}%</strong></label>
-  <ion-range
-    id="sync-popover-font-size"
-    aria-label="Font size"
-    [min]="80"
-    [max]="300"
-    [step]="5"
-    [value]="themeUiService.fontSizePercent"
-    (ionChange)="onFontSizeChange($event)"
-  ></ion-range>
-</div>
 
 <p
   *ngIf="(authUser$ | async)?.email as email"
