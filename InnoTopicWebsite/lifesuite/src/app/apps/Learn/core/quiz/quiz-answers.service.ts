@@ -75,7 +75,7 @@ export class QuizAnswersService {
       this.answer !.quizOptions = Object.assign({}, this.quizService.options$.lastVal !)
       this.answer !.msToApplyAndNext = this.getMsSinceQuestionShowed()
       this.answer !.selfRating = selfRating as SelfRating
-      this.quizTrackingService.recordCompletedAnswer(this.answer !.msToApplyAndNext)
+      this.quizTrackingService.recordCompletedAnswer(this.answer !.itemId, this.answer !.msToApplyAndNext)
 
       this.quizHistoryService.onAnswer(
         this.answer !,

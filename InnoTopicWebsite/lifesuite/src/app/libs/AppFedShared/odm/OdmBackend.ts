@@ -43,4 +43,8 @@ export abstract class OdmBackend {
     return Timestamp.now()
   }
 
+  static timestampFromMillis(milliseconds: number): OdmTimestamp {
+    return Timestamp.fromMillis(milliseconds)
+  }
+
 }

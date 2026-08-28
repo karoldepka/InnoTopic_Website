@@ -91,6 +91,22 @@ export class TimeTrackingPeriodsService extends BaseService {
     return new TimeTrackingPeriod(item$.id as string, itemId, start, null, item$)
   }
 
+  /** Stores one already-finished interval against an item. This is for discrete work such as a
+   * completed quiz Q&A, where opening a separate live timer would only create UI noise. */
+  recordCompletedPeriodForItem(itemId: ItemId, durationMs: number): void {
+    if (!Number.isFinite(durationMs) || durationMs < 0) {
+      return
+    }
+
+    const end = OdmBackend.nowTimestamp()
+    const start = OdmBackend.timestampFromMillis(end.toMillis() - durationMs)
+    this.periodsOdmService.add(Object.assign(new TimeTrackingPeriodOdm(), {
+      itemId,
+      start,
+      end,
+    }))
+  }
+
   /** All stored periods for a given itemId - client-side filtered from the already-loaded
    * collection (same reasoning as before this was ODM-backed: a single-field equality lookup
    * doesn't need a composite index/server-side query, fine at the volume a personal time-tracking

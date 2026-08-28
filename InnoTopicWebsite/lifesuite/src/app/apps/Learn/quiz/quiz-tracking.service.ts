@@ -69,19 +69,27 @@ export class QuizTrackingService {
     this.resetInactivityPauseTimer()
   }
 
-  /** Records the elapsed time for one completed Q&A on the currently tracked Quiz period. */
-  recordCompletedAnswer(durationMs: number): void {
+  /** Records a completed Q&A both in the aggregate Quiz session and on its actual Learn item. */
+  recordCompletedAnswer(itemId: string, durationMs: number): void {
     this.recordQuizActivity()
-    const period = this.entry?.currentPeriod
-    if (!period || !Number.isFinite(durationMs) || durationMs < 0) {
+    if (!Number.isFinite(durationMs) || durationMs < 0) {
       return
     }
 
-    const current = period.odmItem$.val
-    period.odmItem$.patchNow({
-      quizAnswerCount: (current?.quizAnswerCount ?? 0) + 1,
-      quizAnswerDurationMs: (current?.quizAnswerDurationMs ?? 0) + durationMs,
-    })
+    // The aggregate Quiz tracker pauses after this long without an action. A later answer
+    // resumes it, so do not attribute the unattended portion to either this item or the Q&A
+    // average.
+    const activeDurationMs = Math.min(durationMs, QUIZ_INACTIVITY_PAUSE_MS)
+
+    const period = this.entry?.currentPeriod
+    if (period) {
+      const current = period.odmItem$.val
+      period.odmItem$.patchNow({
+        quizAnswerCount: (current?.quizAnswerCount ?? 0) + 1,
+        quizAnswerDurationMs: (current?.quizAnswerDurationMs ?? 0) + activeDurationMs,
+      })
+    }
+    this.timeTrackingPeriodsService.recordCompletedPeriodForItem(itemId, activeDurationMs)
   }
 
   /** Weighted average from every tracked Quiz period that contains completed Q&As. */
