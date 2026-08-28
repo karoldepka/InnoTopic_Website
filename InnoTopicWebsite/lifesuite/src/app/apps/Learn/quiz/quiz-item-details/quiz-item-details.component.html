@@ -42,7 +42,6 @@
         [style.border-color]="(showAnswer$ | async) && choice.correct ? 'var(--ion-color-success)' : null"
       >
         <strong>{{ choice.label }}.</strong> {{ choice.text }}
-        <span *ngIf="(showAnswer$ | async) && choice.correct"> — Correct answer</span>
       </div>
     </div>
 
