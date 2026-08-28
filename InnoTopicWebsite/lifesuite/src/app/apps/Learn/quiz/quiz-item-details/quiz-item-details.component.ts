@@ -86,6 +86,10 @@ export class QuizItemDetailsComponent implements OnInit, OnDestroy, AfterViewIni
     return this.shuffledChoices
   }
 
+  hasDedicatedMultipleChoiceAnswers(itemVal: LearnItem | undefined | null): boolean {
+    return !!itemVal?.multipleChoiceAnswers?.length
+  }
+
   getVisibleHintSides(itemVal: LearnItem | undefined | null, hintLevel: number | undefined | null): Side[] {
     return (itemVal?.getSidesWithHints() ?? []).slice(0, hintLevel ?? 0)
   }

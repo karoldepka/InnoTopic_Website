@@ -48,7 +48,9 @@
       </button>
     </div>
 
-    <ng-container *ngIf="showAnswer$ | async">
+    <ng-container
+      *ngIf="(showAnswer$ | async) && !hasDedicatedMultipleChoiceAnswers(itemVal$ | async)"
+    >
       <ng-container *ngFor="let answerSide of (itemVal$ | async) ?. getSidesWithAnswers()">
       <!--      <hr>-->
 <!--      <app-side-label-->
