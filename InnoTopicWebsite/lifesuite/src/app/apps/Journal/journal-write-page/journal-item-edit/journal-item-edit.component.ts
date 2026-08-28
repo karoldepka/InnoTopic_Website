@@ -56,8 +56,8 @@ export class JournalItemEditComponent extends BaseComponent implements OnChanges
   @Input()
   public item$P ! : JournalEntry$
 
-  /** See `TreeNodeCellsComponent.autoExpandDescriptorId`'s doc comment - passed through from
-   * `JournalWritePage` (GH #104), only set for a brand-new entry. */
+  /** See `TreeNodeCellsComponent.autoExpandDescriptorId`'s doc comment - Journal passes `general`
+   * for every opened entry so its primary text field is immediately ready for writing. */
   @Input()
   public autoExpandDescriptorId?: string
 

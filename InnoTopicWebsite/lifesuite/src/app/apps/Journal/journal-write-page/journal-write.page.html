@@ -48,7 +48,7 @@
     <app-journal-item-edit
       *ngFor="let item$ of item$FakeArray"
       [item$P]="item$"
-      [autoExpandDescriptorId]="itemId === 'new' ? 'general' : undefined"
+      autoExpandDescriptorId="general"
     ></app-journal-item-edit>
 
   <ion-fab *ngIf=showFab vertical="bottom" horizontal="end" slot="fixed">
