@@ -7,13 +7,16 @@
 <!--    </ion-title>-->
 
     <div class="quiz-toolbar-content">
-      <ion-title class="quiz-toolbar-title">
-        <span class="quiz-toolbar-title__label">QUIZ</span>
-        <span *ngIf="status$ | async as quizStatus" class="quiz-toolbar-title__remaining">
-          <span>{{ quizStatus.itemsLeft }}</span>
-          <span>left</span>
-        </span>
-      </ion-title>
+      <ion-title class="quiz-toolbar-title">QUIZ</ion-title>
+      <span
+        *ngIf="status$ | async as quizStatus"
+        class="quiz-toolbar-remaining"
+        role="status"
+        [attr.aria-label]="quizStatus.itemsLeft + ' quiz items left'"
+      >
+        <span>{{ quizStatus.itemsLeft }}</span>
+        <span>left</span>
+      </span>
 
       <!--      <ion-button (click)="window.history.back()"><</ion-button>-->
 <!--        <ion-button routerLink="/learn"><</ion-button>-->
