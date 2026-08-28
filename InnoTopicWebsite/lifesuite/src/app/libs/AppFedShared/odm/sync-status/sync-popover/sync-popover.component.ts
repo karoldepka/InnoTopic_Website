@@ -20,6 +20,7 @@ import {summarizePatch} from '../../OdmItem$2'
 import {TimeTrackingService} from '../../../../../apps/OrYoL/time-tracking/time-tracking.service'
 import {TimeTrackingToolbarComponent} from '../../../../../apps/OrYoL/time-tracking/time-tracking-toolbar/time-tracking-toolbar.component'
 import {environment} from '../../../../../../environments/environment'
+import {ThemeUiService} from '@innotopic/theme-ui-angular'
 
 @Component({
     selector: 'app-sync-popover',
@@ -77,12 +78,17 @@ export class SyncPopoverComponent extends BaseComponent implements OnInit {
     // already shows, so this popover's "currently tracking" section stays in sync with it for
     // free instead of re-deriving its own view of what's being tracked.
     public timeTrackingService: TimeTrackingService,
+    public themeUiService: ThemeUiService,
     injector: Injector,
   ) {
     super(injector)
   }
 
   ngOnInit() {}
+
+  onFontSizeChange(event: any): void {
+    this.themeUiService.setFontSizePercent(event.detail.value)
+  }
 
   onClickAboutAppToggle() {
     this.aboutAppExpanded = ! this.aboutAppExpanded
