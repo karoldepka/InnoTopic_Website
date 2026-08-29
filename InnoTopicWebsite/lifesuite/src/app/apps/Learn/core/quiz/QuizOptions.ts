@@ -1,6 +1,7 @@
 import {funLevels, FunLevelVal} from '../../models/fields/fun-level.model'
 import {importanceDescriptors} from '../../models/fields/importance.model'
 import {ImportanceVal} from '../../models/LearnItem'
+import type {ExperimentalQuizSchedulerMode} from './experimental-quiz-scheduler'
 
 /** FIXME: keep in mind that if options existed, they will not be overridden, and will be missing fields; so should {...defaultOptions, ...options}*/
 export class QuizOptions {
@@ -33,6 +34,10 @@ export class QuizOptions {
     public useRegexTextFilter: boolean = false,
     /** Maximum number of simultaneously active items in the experimental working-set scheduler. */
     public experimentalWorkingSetSize: number = 20,
+    /** Visible-star rating every item must reach before the experimental scheduler opens a new batch. */
+    public experimentalMasteryStars: number = 2,
+    /** Whether mastered items are replaced immediately or only after the whole batch is mastered. */
+    public experimentalSchedulerMode: ExperimentalQuizSchedulerMode = 'strict-batches',
     // TODO: priorityByImportances: 0 .. 1 -- 0 - ignore importances, 1 - items of highest importance go first
     // in-between - probabilities
   ) {

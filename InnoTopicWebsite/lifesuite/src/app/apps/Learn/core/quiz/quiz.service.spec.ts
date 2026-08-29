@@ -280,7 +280,9 @@ describe('QuizService — quizStatus$', () => {
 
     expect(lastStatus.itemsLeft).toBe(30)
     expect(lastStatus.experimentalScheduler).toMatchObject({
-      activeCount: 20,
+      mode: 'strict-batches',
+      batchSize: 20,
+      unmasteredCount: 20,
       backlogCount: 10,
       targetSize: 20,
     })

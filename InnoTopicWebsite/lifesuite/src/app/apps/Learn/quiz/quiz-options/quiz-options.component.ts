@@ -70,6 +70,8 @@ export class QuizOptionsComponent implements OnInit {
     useRegexCategories: new UntypedFormControl(false),
     useRegexTextFilter: new UntypedFormControl(false),
     experimentalWorkingSetSize: new UntypedFormControl(20),
+    experimentalMasteryStars: new UntypedFormControl(2),
+    experimentalSchedulerMode: new UntypedFormControl('strict-batches'),
   }
 
   formGroup = new UntypedFormGroup(this.controls)

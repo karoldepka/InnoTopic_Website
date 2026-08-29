@@ -137,6 +137,8 @@ export class QuizService {
           item$s,
           pendingItems,
           quizOptions.experimentalWorkingSetSize,
+          quizOptions.experimentalMasteryStars,
+          quizOptions.experimentalSchedulerMode,
           this.experimentalSchedulerContextKey(quizOptions),
         )
         chooserItems = selection.candidateItems

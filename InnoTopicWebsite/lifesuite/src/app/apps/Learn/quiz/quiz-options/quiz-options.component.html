@@ -203,25 +203,47 @@
         class="quiz-option quiz-option--working-set"
       >
         <div class="quiz-option__label">EXPERIMENTAL WORKING SET</div>
+        <ion-select
+          label="Scheduler mode"
+          labelPlacement="stacked"
+          interface="popover"
+          [formControl]="controls.experimentalSchedulerMode"
+        >
+          <ion-select-option value="strict-batches">Strict batches</ion-select-option>
+          <ion-select-option value="rolling">Rolling working set</ion-select-option>
+        </ion-select>
         <ion-input
           type="number"
-          label="Items to master"
+          label="Items per batch"
           labelPlacement="stacked"
           [min]="1"
           [max]="100"
           [step]="1"
           [formControl]="controls.experimentalWorkingSetSize"
         />
+        <ion-input
+          type="number"
+          label="Minimum rating to master (stars)"
+          labelPlacement="stacked"
+          [min]="0"
+          [max]="5"
+          [step]="0.5"
+          [formControl]="controls.experimentalMasteryStars"
+        />
         <ion-note>
-          Keeps this many items in rotation. A rating of 4+ stars masters an item and admits the next due item.
+          Strict batches wait until every item reaches X. Rolling mode replaces each item as soon as it reaches X. Batch-size changes apply to the next or reset strict batch.
         </ion-note>
         <ng-container *ngIf="quizService.quizStatus$ | async as quizStatus">
           <ion-note *ngIf="quizStatus.experimentalScheduler as scheduler">
-            {{ scheduler.activeCount }} active · {{ scheduler.backlogCount }} waiting · {{ scheduler.remainingCount }} total
+            {{ scheduler.mode === 'strict-batches' ? 'Strict batch' : 'Rolling set' }} ·
+            <ng-container *ngIf="scheduler.mode === 'strict-batches'">
+              {{ scheduler.masteredCount }} / {{ scheduler.batchSize }} mastered ·
+            </ng-container>
+            {{ scheduler.unmasteredCount }} active at {{ scheduler.masteryStars }}+ stars · {{ scheduler.backlogCount }} waiting
           </ion-note>
         </ng-container>
         <ion-button size="small" fill="outline" (click)="resetExperimentalWorkingSet()">
-          Reset working set
+          Reset batch
         </ion-button>
       </div>
     </section>
