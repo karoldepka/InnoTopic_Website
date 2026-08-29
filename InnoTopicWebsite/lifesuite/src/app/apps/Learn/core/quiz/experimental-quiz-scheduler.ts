@@ -5,19 +5,22 @@ export const DEFAULT_EXPERIMENTAL_WORKING_SET_SIZE = 20
 export const MAX_EXPERIMENTAL_WORKING_SET_SIZE = 100
 export const DEFAULT_EXPERIMENTAL_MASTERY_STARS = 2
 export const MAX_EXPERIMENTAL_MASTERY_STARS = 5
+/** Prevent an item from being selected again immediately after it was shown. */
+export const DEFAULT_SAME_ITEM_MIN_DELAY_SECONDS = 60
 export const EXPERIMENTAL_SCHEDULER_MODES = ['strict-batches', 'rolling'] as const
 export type ExperimentalQuizSchedulerMode = typeof EXPERIMENTAL_SCHEDULER_MODES[number]
 export const DEFAULT_EXPERIMENTAL_SCHEDULER_MODE: ExperimentalQuizSchedulerMode = 'strict-batches'
 const INTERNAL_RATING_PER_STAR = 2.75 / 5
 
 interface PersistedWorkingSet {
-  schemaVersion: 2
+  schemaVersion: 3
   contextKey: string
   mode: ExperimentalQuizSchedulerMode
   batchTargetSize: number
   batchItemIds: string[]
   ratingsByItemId: Record<string, number>
   completedBatchItemIds: string[]
+  lastPresentedAtByItemId: Record<string, number>
 }
 
 export interface ExperimentalQuizSchedulerStatus {
@@ -30,10 +33,14 @@ export interface ExperimentalQuizSchedulerStatus {
   backlogCount: number
   remainingCount: number
   masteryStars: number
+  coolingDownCount: number
 }
 
 export interface ExperimentalQuizSchedulerSelection {
+  /** All active, unmastered batch items, including any temporarily cooling down. */
   candidateItems: LearnItem$[]
+  /** Active items that may be selected right now. */
+  eligibleCandidateItems: LearnItem$[]
   remainingItems: LearnItem$[]
   status: ExperimentalQuizSchedulerStatus
 }
@@ -53,6 +60,14 @@ export function normalizeExperimentalMasteryStars(value: unknown): number {
   }
   const clamped = Math.min(MAX_EXPERIMENTAL_MASTERY_STARS, Math.max(0, numericValue))
   return Math.round(clamped * 2) / 2
+}
+
+export function normalizeSameItemMinDelaySeconds(value: unknown): number {
+  const numericValue = Number(value)
+  if (!Number.isFinite(numericValue)) {
+    return DEFAULT_SAME_ITEM_MIN_DELAY_SECONDS
+  }
+  return Math.max(0, Math.round(numericValue))
 }
 
 export function normalizeExperimentalSchedulerMode(value: unknown): ExperimentalQuizSchedulerMode {
@@ -81,6 +96,7 @@ export class ExperimentalQuizScheduler {
   private ratingsByItemId: Record<string, number> = {}
   /** Prevents a completed batch from being immediately re-admitted while rating patches settle. */
   private completedBatchItemIds: string[] = []
+  private lastPresentedAtByItemId: Record<string, number> = {}
 
   selectWorkingSet(
     matchingItems: LearnItem$[],
@@ -89,11 +105,14 @@ export class ExperimentalQuizScheduler {
     requestedMasteryStars: unknown,
     requestedMode: unknown,
     contextKey: string,
+    requestedSameItemMinDelaySeconds: unknown = DEFAULT_SAME_ITEM_MIN_DELAY_SECONDS,
+    nowMs = Date.now(),
   ): ExperimentalQuizSchedulerSelection {
     this.hydrate()
     const configuredSize = normalizeExperimentalWorkingSetSize(requestedSize)
     const masteryStars = normalizeExperimentalMasteryStars(requestedMasteryStars)
     const mode = normalizeExperimentalSchedulerMode(requestedMode)
+    const sameItemMinDelayMs = normalizeSameItemMinDelaySeconds(requestedSameItemMinDelaySeconds) * 1000
     const masteryRating = masteryStars * INTERNAL_RATING_PER_STAR
     if (this.contextKey !== contextKey || this.mode !== mode) {
       this.contextKey = contextKey
@@ -101,6 +120,11 @@ export class ExperimentalQuizScheduler {
       this.clearBatch()
       this.completedBatchItemIds = []
     }
+
+    this.lastPresentedAtByItemId = Object.fromEntries(
+      Object.entries(this.lastPresentedAtByItemId).filter(([id, presentedAt]) =>
+        matchingItems.some(item => item.id === id) && nowMs - presentedAt < sameItemMinDelayMs),
+    )
 
     const matchingById = new Map(
       matchingItems
@@ -125,6 +149,8 @@ export class ExperimentalQuizScheduler {
         configuredSize,
         masteryStars,
         masteryRating,
+        sameItemMinDelayMs,
+        nowMs,
       )
     }
 
@@ -154,12 +180,14 @@ export class ExperimentalQuizScheduler {
       .filter(id => !masteredIds.has(id))
       .map(id => matchingById.get(id))
       .filter((item): item is LearnItem$ => !!item)
+    const eligibleCandidateItems = this.eligibleItems(candidateItems, sameItemMinDelayMs, nowMs)
     const backlogItems = dueItems.filter(item =>
       !!item.id && !batchIds.has(item.id as string) && !completedIds.has(item.id as string))
     this.persist()
 
     return {
       candidateItems,
+      eligibleCandidateItems,
       remainingItems: [...candidateItems, ...backlogItems],
       status: {
         mode,
@@ -171,6 +199,7 @@ export class ExperimentalQuizScheduler {
         backlogCount: backlogItems.length,
         remainingCount: candidateItems.length + backlogItems.length,
         masteryStars,
+        coolingDownCount: candidateItems.length - eligibleCandidateItems.length,
       },
     }
   }
@@ -181,6 +210,8 @@ export class ExperimentalQuizScheduler {
     configuredSize: number,
     masteryStars: number,
     masteryRating: number,
+    sameItemMinDelayMs: number,
+    nowMs: number,
   ): ExperimentalQuizSchedulerSelection {
     const masteredIds = this.masteredIds(masteryRating)
     if (masteredIds.size) {
@@ -216,12 +247,14 @@ export class ExperimentalQuizScheduler {
     const candidateItems = this.batchItemIds
       .map(id => matchingById.get(id))
       .filter((item): item is LearnItem$ => !!item)
+    const eligibleCandidateItems = this.eligibleItems(candidateItems, sameItemMinDelayMs, nowMs)
     const backlogItems = dueItems.filter(item =>
       !!item.id && !batchIds.has(item.id as string) && !completedIds.has(item.id as string))
     this.persist()
 
     return {
       candidateItems,
+      eligibleCandidateItems,
       remainingItems: [...candidateItems, ...backlogItems],
       status: {
         mode: 'rolling',
@@ -233,6 +266,7 @@ export class ExperimentalQuizScheduler {
         backlogCount: backlogItems.length,
         remainingCount: candidateItems.length + backlogItems.length,
         masteryStars,
+        coolingDownCount: candidateItems.length - eligibleCandidateItems.length,
       },
     }
   }
@@ -245,9 +279,18 @@ export class ExperimentalQuizScheduler {
     this.persist()
   }
 
+  recordItemPresented(itemId: string | undefined, nowMs = Date.now()): void {
+    if (!itemId || !Number.isFinite(nowMs)) {
+      return
+    }
+    this.lastPresentedAtByItemId[itemId] = nowMs
+    this.persist()
+  }
+
   reset(): void {
     this.clearBatch()
     this.completedBatchItemIds = []
+    this.lastPresentedAtByItemId = {}
     this.persist()
   }
 
@@ -261,6 +304,13 @@ export class ExperimentalQuizScheduler {
     this.ratingsByItemId = {}
   }
 
+  private eligibleItems(items: LearnItem$[], sameItemMinDelayMs: number, nowMs: number): LearnItem$[] {
+    return items.filter(item => {
+      const presentedAt = item.id ? this.lastPresentedAtByItemId[item.id] : undefined
+      return !Number.isFinite(presentedAt) || nowMs - (presentedAt as number) >= sameItemMinDelayMs
+    })
+  }
+
   private hydrate(): void {
     if (this.hydrated) {
       return
@@ -271,9 +321,11 @@ export class ExperimentalQuizScheduler {
       if (!stored) {
         return
       }
-      const parsed = JSON.parse(stored) as Partial<PersistedWorkingSet>
+      const parsed = JSON.parse(stored) as Omit<Partial<PersistedWorkingSet>, 'schemaVersion'> & {
+        schemaVersion?: number
+      }
       // Version 1 used rolling replacement, so its state cannot represent a strict batch.
-      if (parsed.schemaVersion !== 2) {
+      if (parsed.schemaVersion !== 2 && parsed.schemaVersion !== 3) {
         return
       }
       this.contextKey = typeof parsed.contextKey === 'string' ? parsed.contextKey : ''
@@ -289,6 +341,10 @@ export class ExperimentalQuizScheduler {
       this.completedBatchItemIds = Array.isArray(parsed.completedBatchItemIds)
         ? parsed.completedBatchItemIds.filter((id): id is string => typeof id === 'string')
         : []
+      this.lastPresentedAtByItemId = parsed.lastPresentedAtByItemId && typeof parsed.lastPresentedAtByItemId === 'object'
+        ? Object.fromEntries(Object.entries(parsed.lastPresentedAtByItemId)
+          .filter((entry): entry is [string, number] => typeof entry[1] === 'number' && Number.isFinite(entry[1])))
+        : {}
     } catch (error) {
       console.error('ExperimentalQuizScheduler: failed to load working set', error)
       this.contextKey = ''
@@ -296,19 +352,21 @@ export class ExperimentalQuizScheduler {
       this.batchTargetSize = DEFAULT_EXPERIMENTAL_WORKING_SET_SIZE
       this.clearBatch()
       this.completedBatchItemIds = []
+      this.lastPresentedAtByItemId = {}
     }
   }
 
   private persist(): void {
     try {
       globalThis.localStorage?.setItem(ExperimentalQuizScheduler.storageKey, JSON.stringify({
-        schemaVersion: 2,
+        schemaVersion: 3,
         contextKey: this.contextKey,
         mode: this.mode,
         batchTargetSize: this.batchTargetSize,
         batchItemIds: this.batchItemIds,
         ratingsByItemId: this.ratingsByItemId,
         completedBatchItemIds: this.completedBatchItemIds,
+        lastPresentedAtByItemId: this.lastPresentedAtByItemId,
       } satisfies PersistedWorkingSet))
     } catch (error) {
       console.error('ExperimentalQuizScheduler: failed to persist working set', error)

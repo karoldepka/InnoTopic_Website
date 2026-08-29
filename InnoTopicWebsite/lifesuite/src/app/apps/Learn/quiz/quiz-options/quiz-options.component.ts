@@ -72,6 +72,7 @@ export class QuizOptionsComponent implements OnInit {
     experimentalWorkingSetSize: new UntypedFormControl(20),
     experimentalMasteryStars: new UntypedFormControl(2),
     experimentalSchedulerMode: new UntypedFormControl('strict-batches'),
+    sameItemMinDelaySeconds: new UntypedFormControl(60),
   }
 
   formGroup = new UntypedFormGroup(this.controls)

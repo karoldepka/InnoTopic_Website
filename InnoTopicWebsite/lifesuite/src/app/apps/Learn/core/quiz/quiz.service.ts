@@ -25,7 +25,7 @@ import {QuizStatus} from './QuizStatus'
 import {QuizOptions} from './QuizOptions'
 import {sidesDefsHintsArray} from '../sidesDefs'
 import {FeatureService} from '../../../../libs/AppFedShared/feature.service'
-import {ExperimentalQuizScheduler, ExperimentalQuizSchedulerStatus} from './experimental-quiz-scheduler'
+import {ExperimentalQuizScheduler, ExperimentalQuizSchedulerStatus, normalizeSameItemMinDelaySeconds} from './experimental-quiz-scheduler'
 
 /* TODO units; rename to DurationMs or TimeDurationMs;
 *   !!! actually this is used as hours, confusingly! WARNING! */
@@ -140,8 +140,9 @@ export class QuizService {
           quizOptions.experimentalMasteryStars,
           quizOptions.experimentalSchedulerMode,
           this.experimentalSchedulerContextKey(quizOptions),
+          quizOptions.sameItemMinDelaySeconds,
         )
-        chooserItems = selection.candidateItems
+        chooserItems = selection.eligibleCandidateItems
         remainingItems = selection.remainingItems
         experimentalSchedulerStatus = selection.status
       }
@@ -242,8 +243,19 @@ export class QuizService {
   nextItem$WhenRequested: Observable<LearnItem$ | nullish> = this.quizStatus$.pipe(
     map(status => status?.nextItem$),
     filter((item) => !! item && this.isNextItemRequested /* hack (via external field) ? */),
-    tap(() => {
+    tap(item => {
+      if (!item) {
+        return
+      }
       debugLog(`nextItem$WhenRequested ver2`)
+      if (this.featureService.experimentalQuizSchedulerEnabled) {
+        this.experimentalQuizScheduler.recordItemPresented(item.id)
+        // Re-evaluate as soon as a cooldown expires; the regular minute timer is a fallback.
+        globalThis.setTimeout(
+          () => this.nextItemRequests$.next(),
+          secondsAsMs(normalizeSameItemMinDelaySeconds(this.options$.lastVal?.sameItemMinDelaySeconds)),
+        )
+      }
       this.isNextItemRequested = false
     }),
     shareReplay(1),

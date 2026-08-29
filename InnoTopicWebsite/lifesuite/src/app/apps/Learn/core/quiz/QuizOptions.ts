@@ -38,6 +38,8 @@ export class QuizOptions {
     public experimentalMasteryStars: number = 2,
     /** Whether mastered items are replaced immediately or only after the whole batch is mastered. */
     public experimentalSchedulerMode: ExperimentalQuizSchedulerMode = 'strict-batches',
+    /** Minimum time before an item shown in the experimental scheduler can be selected again. */
+    public sameItemMinDelaySeconds: number = 60,
     // TODO: priorityByImportances: 0 .. 1 -- 0 - ignore importances, 1 - items of highest importance go first
     // in-between - probabilities
   ) {

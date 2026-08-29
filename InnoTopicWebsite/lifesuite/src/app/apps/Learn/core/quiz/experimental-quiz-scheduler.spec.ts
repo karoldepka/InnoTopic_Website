@@ -3,9 +3,11 @@ import {
   DEFAULT_EXPERIMENTAL_MASTERY_STARS,
   DEFAULT_EXPERIMENTAL_WORKING_SET_SIZE,
   ExperimentalQuizScheduler,
+  DEFAULT_SAME_ITEM_MIN_DELAY_SECONDS,
   normalizeExperimentalMasteryStars,
   normalizeExperimentalSchedulerMode,
   normalizeExperimentalWorkingSetSize,
+  normalizeSameItemMinDelaySeconds,
 } from './experimental-quiz-scheduler'
 import type {LearnItem$} from '../../models/LearnItem$'
 
@@ -75,6 +77,22 @@ describe('ExperimentalQuizScheduler', () => {
     expect(selection.status).toMatchObject({mode: 'rolling', batchSize: 3, backlogCount: 4})
   })
 
+  it('does not make a recently shown item eligible for its own immediate repeat', () => {
+    const scheduler = new ExperimentalQuizScheduler()
+    const allItems = items(2)
+    const nowMs = 1_000_000
+    scheduler.selectWorkingSet(allItems, allItems, 2, 2, 'strict-batches', 'filters-a', 60, nowMs)
+    scheduler.recordItemPresented('item-1', nowMs)
+
+    const duringCooldown = scheduler.selectWorkingSet(allItems, allItems, 2, 2, 'strict-batches', 'filters-a', 60, nowMs + 59_999)
+    expect(duringCooldown.candidateItems.map(item => item.id)).toEqual(['item-1', 'item-2'])
+    expect(duringCooldown.eligibleCandidateItems.map(item => item.id)).toEqual(['item-2'])
+    expect(duringCooldown.status.coolingDownCount).toBe(1)
+
+    const afterCooldown = scheduler.selectWorkingSet(allItems, allItems, 2, 2, 'strict-batches', 'filters-a', 60, nowMs + 60_000)
+    expect(afterCooldown.eligibleCandidateItems.map(item => item.id)).toEqual(['item-1', 'item-2'])
+  })
+
   it('starts a fresh set when the scheduler mode changes', () => {
     const scheduler = new ExperimentalQuizScheduler()
     const allItems = items(8)
@@ -117,5 +135,7 @@ describe('ExperimentalQuizScheduler', () => {
     expect(normalizeExperimentalMasteryStars(99)).toBe(5)
     expect(normalizeExperimentalSchedulerMode('rolling')).toBe('rolling')
     expect(normalizeExperimentalSchedulerMode('invalid')).toBe('strict-batches')
+    expect(normalizeSameItemMinDelaySeconds(undefined)).toBe(DEFAULT_SAME_ITEM_MIN_DELAY_SECONDS)
+    expect(normalizeSameItemMinDelaySeconds(-1)).toBe(0)
   })
 })
