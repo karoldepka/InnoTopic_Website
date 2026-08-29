@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core';
 import {QuizAnswerForHistory, QuizHistoryService} from './quiz-history.service'
 import {QuizService} from './quiz.service'
-import {msElapsedTillNowSince} from '../../../../libs/AppFedShared/utils/time/date-time-utils'
 import {catchReportDontRethrow, debugLog} from '../../../../libs/AppFedShared/utils/log'
 import {NumericPickerVal} from '../../../../libs/AppFedSharedIonic/ratings/numeric-picker/numeric-picker.component'
 import {LearnItem$} from '../../models/LearnItem$'
@@ -32,6 +31,7 @@ export class QuizAnswersService {
         this.answer.itemId = status.nextItem$ !. id !
         this.answer.userAgent = navigator.userAgent
         this.whenQuestionShowed = new Date()
+        this.quizTrackingService.startQuestionTiming()
         this.quizTrackingService.recordQuizActivity()
         // FIXME: finish
       }
@@ -62,11 +62,9 @@ export class QuizAnswersService {
 
 
   private getMsSinceQuestionShowed() {
-    if ( this.whenQuestionShowed ) {
-      return msElapsedTillNowSince(this.whenQuestionShowed !)
-    } else {
-      return 0
-    }
+    return this.whenQuestionShowed
+      ? this.quizTrackingService.getCurrentQuestionActiveDurationMs()
+      : 0
   }
 
   onApplyAndNext(item$: LearnItem$, selfRating: NumericPickerVal) {

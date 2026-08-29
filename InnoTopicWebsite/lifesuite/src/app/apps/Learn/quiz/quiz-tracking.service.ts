@@ -1,4 +1,4 @@
-import {Injectable, Injector} from '@angular/core'
+import {Injectable, Injector, OnDestroy} from '@angular/core'
 import {AuthService} from '../../../auth/auth.service'
 import {OryItem$} from '../../OrYoL/db/OryItem$'
 import {DbTreeService} from '../../OrYoL/tree-model/db-tree-service'
@@ -25,13 +25,28 @@ export interface QuizAnswerDurationAverage {
 
 /** Persists Quiz sessions in the shared time-tracking history without interrupting another task. */
 @Injectable({providedIn: 'root'})
-export class QuizTrackingService {
+export class QuizTrackingService implements OnDestroy {
 
   private entry?: TimeTrackedEntry
   private inactivityPauseTimer?: ReturnType<typeof setTimeout>
+  private hasCurrentQuestion = false
+  private questionActiveDurationMs = 0
+  private questionActiveSegmentStartedAtMs?: number
   /** Prevents async startup or late QuizStatus emissions from resuming tracking after the page's
    * leave hook has fired. Ionic may cache the page, so component destruction alone is too late. */
   private quizRouteActive = false
+
+  private readonly onVisibilityChange = () => {
+    if (document.hidden) {
+      this.pauseTrackingSession()
+    } else if (this.quizRouteActive) {
+      if (this.entry) {
+        this.resumeTrackingSession()
+      } else {
+        void this.startTracking().catch(error => console.error('Quiz time tracking failed to resume after visibility change', error))
+      }
+    }
+  }
 
   constructor(
     private injector: Injector,
@@ -40,6 +55,12 @@ export class QuizTrackingService {
     private timeTrackingPeriodsService: TimeTrackingPeriodsService,
     private authService: AuthService,
   ) {
+    document.addEventListener('visibilitychange', this.onVisibilityChange)
+  }
+
+  ngOnDestroy(): void {
+    document.removeEventListener('visibilitychange', this.onVisibilityChange)
+    this.pauseTrackingSession()
   }
 
   async startTracking(): Promise<void> {
@@ -54,22 +75,20 @@ export class QuizTrackingService {
       this.entry = this.timeTrackingService.obtainEntryForItem(new OryItem$(this.injector, itemId))
     }
     // Navigation may have completed while the item/root setup above was awaiting persistence.
-    if (!this.quizRouteActive) {
+    if (!this.quizRouteActive || document.hidden) {
       return
     }
-    this.entry.startOrResumeTrackingIfNeeded({inParallel: true})
-    this.resetInactivityPauseTimer()
+    this.resumeTrackingSession()
   }
 
   stopTrackingIfNeeded(): void {
     this.quizRouteActive = false
-    this.clearInactivityPauseTimer()
-    this.entry?.pauseOrNoop()
+    this.pauseTrackingSession()
   }
 
   /** Counts as active Quiz work and resumes a session that was paused for inactivity. */
   recordQuizActivity(): void {
-    if (!this.quizRouteActive) {
+    if (!this.quizRouteActive || document.hidden) {
       return
     }
     if (!this.entry) {
@@ -77,13 +96,29 @@ export class QuizTrackingService {
       return
     }
 
-    this.entry.startOrResumeTrackingIfNeeded({inParallel: true})
-    this.resetInactivityPauseTimer()
+    this.resumeTrackingSession()
+  }
+
+  /** Starts a fresh per-item clock. Only intervals during which aggregate Quiz tracking is
+   * actually active are accumulated, so hidden tabs, route absence, and inactivity are excluded. */
+  startQuestionTiming(): void {
+    this.hasCurrentQuestion = true
+    this.questionActiveDurationMs = 0
+    this.questionActiveSegmentStartedAtMs = undefined
+    if (this.quizRouteActive && !document.hidden) {
+      this.resumeQuestionTiming()
+    }
+  }
+
+  getCurrentQuestionActiveDurationMs(): number {
+    return this.questionActiveDurationMs + (this.questionActiveSegmentStartedAtMs === undefined
+      ? 0
+      : Math.max(0, Date.now() - this.questionActiveSegmentStartedAtMs))
   }
 
   /** Records a completed Q&A both in the aggregate Quiz session and on its actual Learn item. */
   recordCompletedAnswer(itemId: string, durationMs: number): void {
-    if (!this.quizRouteActive) {
+    if (!this.quizRouteActive || document.hidden) {
       return
     }
     this.recordQuizActivity()
@@ -105,6 +140,7 @@ export class QuizTrackingService {
       })
     }
     this.timeTrackingPeriodsService.recordCompletedPeriodForItem(itemId, activeDurationMs)
+    this.finishQuestionTiming()
   }
 
   /** Weighted average from every tracked Quiz period that contains completed Q&As. */
@@ -129,8 +165,42 @@ export class QuizTrackingService {
     this.clearInactivityPauseTimer()
     this.inactivityPauseTimer = setTimeout(() => {
       this.inactivityPauseTimer = undefined
-      this.entry?.pauseOrNoop()
+      this.pauseTrackingSession()
     }, QUIZ_INACTIVITY_PAUSE_MS)
+  }
+
+  private resumeTrackingSession(): void {
+    if (!this.quizRouteActive || document.hidden) {
+      return
+    }
+    this.entry?.startOrResumeTrackingIfNeeded({inParallel: true})
+    this.resumeQuestionTiming()
+    this.resetInactivityPauseTimer()
+  }
+
+  private pauseTrackingSession(): void {
+    this.clearInactivityPauseTimer()
+    this.pauseQuestionTiming()
+    this.entry?.pauseOrNoop()
+  }
+
+  private resumeQuestionTiming(): void {
+    if (this.hasCurrentQuestion && this.questionActiveSegmentStartedAtMs === undefined) {
+      this.questionActiveSegmentStartedAtMs = Date.now()
+    }
+  }
+
+  private pauseQuestionTiming(): void {
+    if (this.questionActiveSegmentStartedAtMs === undefined) {
+      return
+    }
+    this.questionActiveDurationMs += Math.max(0, Date.now() - this.questionActiveSegmentStartedAtMs)
+    this.questionActiveSegmentStartedAtMs = undefined
+  }
+
+  private finishQuestionTiming(): void {
+    this.pauseQuestionTiming()
+    this.hasCurrentQuestion = false
   }
 
   private clearInactivityPauseTimer(): void {

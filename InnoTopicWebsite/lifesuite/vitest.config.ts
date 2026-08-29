@@ -19,6 +19,7 @@ export default defineConfig({
       'src/app/apps/OrYoL/db-supabase/**/*.spec.ts',
       'src/app/apps/Learn/search-or-add-learnable-item/mic/mic.component.spec.ts',
       'src/app/apps/Learn/core/quiz/quiz-hint-reveal.spec.ts',
+      'src/app/apps/Learn/quiz/quiz-tracking.service.spec.ts',
       'src/app/apps/Learn/quiz/quiz-item-details/quiz-answer-revealer/quiz-answer-revealer.component.spec.ts',
       'src/app/apps/Learn/what-next/what-next-destination-ranking.spec.ts',
       'src/app/libs/AppFedShared/theme-config/theme-contrast.spec.ts',
