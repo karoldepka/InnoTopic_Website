@@ -2,9 +2,93 @@ export const buildInfo = {
   branch: "local",
   commit: "local",
   commitAuthor: "Karol Depka Pradzinski The First",
-  commitMessage: "Center stacked quiz toolbar",
-  builtAt: "2026-08-28T12:33:31.765Z",
+  commitMessage: "Show-latest-100-commits",
+  builtAt: "2026-08-29T10:57:08.843Z",
   recentCommits: [
+  {
+    "hash": "231eb10758ae4f7c9bb6c0d23a93c2dd9e0f8971",
+    "shortHash": "231eb1075",
+    "author": "Karol Depka Pradzinski The First",
+    "committedAt": "2026-08-29T12:54:17+02:00",
+    "message": "Show-latest-100-commits"
+  },
+  {
+    "hash": "e8d4b8a1c3b01d2946304d9d297c2f0ea0f4196e",
+    "shortHash": "e8d4b8a1c",
+    "author": "Karol Depka Pradzinski The First",
+    "committedAt": "2026-08-29T11:19:13+02:00",
+    "message": "Pause-quiz-tracking-when-hidden"
+  },
+  {
+    "hash": "7c0a5c6f75add82a22c68e0d33ba2f881abb8092",
+    "shortHash": "7c0a5c6f7",
+    "author": "Karol Depka Pradzinski The First",
+    "committedAt": "2026-08-29T10:16:41+02:00",
+    "message": "Prevent Q&A forward leakage"
+  },
+  {
+    "hash": "c22abc2018c2945464b2fe745329173837074f9b",
+    "shortHash": "c22abc201",
+    "author": "Karol Depka Pradzinski The First",
+    "committedAt": "2026-08-29T09:32:00+02:00",
+    "message": "Highlight wrong ABCD selection"
+  },
+  {
+    "hash": "7ed57be94b7356fa5107b5a2534d1cca47fa5435",
+    "shortHash": "7ed57be94",
+    "author": "Karol Depka Pradzinski The First",
+    "committedAt": "2026-08-28T18:22:55+02:00",
+    "message": "Focus journal general field"
+  },
+  {
+    "hash": "7948a5b2390683eb81d801e689c20df26aec13d9",
+    "shortHash": "7948a5b23",
+    "author": "Karol Depka Pradzinski The First",
+    "committedAt": "2026-08-28T16:23:12+02:00",
+    "message": "Animate quiz rating actions"
+  },
+  {
+    "hash": "95ba5cead072b26f51a16afef71f9db39442fd9e",
+    "shortHash": "95ba5cead",
+    "author": "Karol Depka Pradzinski The First",
+    "committedAt": "2026-08-28T15:47:01+02:00",
+    "message": "Smooth quiz answer scrolling"
+  },
+  {
+    "hash": "ca852391dac91df1654707ee8d04f1715acc3c4d",
+    "shortHash": "ca852391d",
+    "author": "Karol Depka Pradzinski The First",
+    "committedAt": "2026-08-28T15:41:31+02:00",
+    "message": "Thicken correct answer border"
+  },
+  {
+    "hash": "01aaabb1f428f65b91e3b33d4e4e001763333a76",
+    "shortHash": "01aaabb1f",
+    "author": "Karol Depka Pradzinski The First",
+    "committedAt": "2026-08-28T15:39:54+02:00",
+    "message": "Split quiz regex filters"
+  },
+  {
+    "hash": "c3f8ed4023cc7b5390cbe7c67069d8b70e0e71a3",
+    "shortHash": "c3f8ed402",
+    "author": "Karol Depka Pradzinski The First",
+    "committedAt": "2026-08-28T15:00:49+02:00",
+    "message": "Hide duplicate ABCD answer field"
+  },
+  {
+    "hash": "83fc3ebf835a9bafefbb22fb4201d60fb63c41cd",
+    "shortHash": "83fc3ebf8",
+    "author": "Karol Depka Pradzinski The First",
+    "committedAt": "2026-08-28T14:36:39+02:00",
+    "message": "Reveal answers from ABCD options"
+  },
+  {
+    "hash": "e50bd70945f71942dc3f2de2ca735faa64aae90e",
+    "shortHash": "e50bd7094",
+    "author": "Karol Depka Pradzinski The First",
+    "committedAt": "2026-08-28T14:34:27+02:00",
+    "message": "Show recent commits in about app"
+  },
   {
     "hash": "0c30df0ed331377efdc3f4b2e45dc406ec705b3a",
     "shortHash": "0c30df0ed",
@@ -354,6 +438,272 @@ export const buildInfo = {
     "author": "Karol Depka Pradzinski The First",
     "committedAt": "2026-08-24T09:40:07+02:00",
     "message": "Refresh sync totals for all collections"
+  },
+  {
+    "hash": "90ead3c1a0110766c4aa690c1b9c102338e02530",
+    "shortHash": "90ead3c1a",
+    "author": "Karol Depka Pradzinski The First",
+    "committedAt": "2026-08-24T09:20:59+02:00",
+    "message": "Persist sync progress statistics"
+  },
+  {
+    "hash": "dc18c36d01d5f1e72bb382bdef578e06b5900177",
+    "shortHash": "dc18c36d0",
+    "author": "Karol Depka Pradzinski The First",
+    "committedAt": "2026-08-24T09:11:14+02:00",
+    "message": "Show per-collection sync progress"
+  },
+  {
+    "hash": "77ffe425d488222b5811799ed05b4c90fdbe2814",
+    "shortHash": "77ffe425d",
+    "author": "Karol Depka Pradzinski The First",
+    "committedAt": "2026-08-23T10:12:21+02:00",
+    "message": "Default mindfulness timer to ten seconds"
+  },
+  {
+    "hash": "7930a2f6059966db90f6fe47517981e1c8bef390",
+    "shortHash": "7930a2f60",
+    "author": "Karol Depka Pradzinski The First",
+    "committedAt": "2026-08-22T19:05:16+02:00",
+    "message": "Retain star rating cycle after zero"
+  },
+  {
+    "hash": "598b25691be2b4643ebeaa7ea25c4e5924d951a5",
+    "shortHash": "598b25691",
+    "author": "Karol Depka Pradzinski The First",
+    "committedAt": "2026-08-22T19:03:36+02:00",
+    "message": "Preserve fractional star rating cycle"
+  },
+  {
+    "hash": "a84272cc033dba38dcc4081ab5ba8b9bdaa13c65",
+    "shortHash": "a84272cc0",
+    "author": "Karol Depka Pradzinski The First",
+    "committedAt": "2026-08-22T19:02:10+02:00",
+    "message": "Enable zero toggle for all star ratings"
+  },
+  {
+    "hash": "34f8350db91c4c36b1b670b07f75ae16bb6bd923",
+    "shortHash": "34f8350db",
+    "author": "Karol Depka Pradzinski The First",
+    "committedAt": "2026-08-22T18:47:22+02:00",
+    "message": "Update build information"
+  },
+  {
+    "hash": "21bd27d94072c5327f071998a1b1bf9a5e107c68",
+    "shortHash": "21bd27d94",
+    "author": "Karol Depka Pradzinski The First",
+    "committedAt": "2026-08-22T18:47:09+02:00",
+    "message": "Persist zero star ratings"
+  },
+  {
+    "hash": "c1909982159dd584d4ccaf86e3f403c33b78605f",
+    "shortHash": "c19099821",
+    "author": "Karol Depka Pradzinski The First",
+    "committedAt": "2026-08-22T18:42:54+02:00",
+    "message": "Clarify unselected star rating state"
+  },
+  {
+    "hash": "3f01287953db577413a0b36fc0bfbe327f995f5a",
+    "shortHash": "3f0128795",
+    "author": "Karol Depka Pradzinski The First",
+    "committedAt": "2026-08-22T18:38:49+02:00",
+    "message": "Disable SurrealDB backend"
+  },
+  {
+    "hash": "1027886a4fd8d9eaa96c8f39a3ad8190cf665f82",
+    "shortHash": "1027886a4",
+    "author": "Karol Depka Pradzinski The First",
+    "committedAt": "2026-08-22T18:31:08+02:00",
+    "message": "Record solid icon preference"
+  },
+  {
+    "hash": "ca6b34ea2c08c9633229c25917d7e0f6768b0431",
+    "shortHash": "ca6b34ea2",
+    "author": "Karol Depka Pradzinski The First",
+    "committedAt": "2026-08-22T18:22:25+02:00",
+    "message": "Merge solid icon and quiz updates"
+  },
+  {
+    "hash": "1d73f40cc0b5e2cc9fcc613ff525c4efb02e3037",
+    "shortHash": "1d73f40cc",
+    "author": "Karol Depka Pradzinski The First",
+    "committedAt": "2026-08-22T18:15:16+02:00",
+    "message": "Replace outline icons with solid variants"
+  },
+  {
+    "hash": "8c5efe08db17f2b8006f6834c13ccfe2885b29e4",
+    "shortHash": "8c5efe08d",
+    "author": "Karol Depka Pradzinski The First",
+    "committedAt": "2026-08-22T17:59:04+02:00",
+    "message": "Use solid Ionicons everywhere"
+  },
+  {
+    "hash": "adabe1dc1f2677f2e19e171b2ea5211e7ac6f3d3",
+    "shortHash": "adabe1dc1",
+    "author": "Karol Depka Pradzinski The First",
+    "committedAt": "2026-08-22T17:55:39+02:00",
+    "message": "Improve quiz interaction and AI QA flow"
+  },
+  {
+    "hash": "073ccb9afbe74474c65707241d799f25f100a1fd",
+    "shortHash": "073ccb9af",
+    "author": "Karol Depka Pradzinski The First",
+    "committedAt": "2026-08-21T12:40:38+02:00",
+    "message": "Fix AI category generation requests"
+  },
+  {
+    "hash": "0eb0ef0b577f434f7de638aec18d40f89388d077",
+    "shortHash": "0eb0ef0b5",
+    "author": "Karol Depka Pradzinski The First",
+    "committedAt": "2026-08-20T18:12:58+02:00",
+    "message": "Set tuned theme defaults"
+  },
+  {
+    "hash": "0fcbe9638c123a6d5491597b294bf68e73979fdb",
+    "shortHash": "0fcbe9638",
+    "author": "Karol Depka Pradzinski The First",
+    "committedAt": "2026-08-20T17:46:27+02:00",
+    "message": "Improve signup form submission"
+  },
+  {
+    "hash": "3185e0c8f19585e7685bd25f80f63f645284d88b",
+    "shortHash": "3185e0c8f",
+    "author": "Karol Depka Pradzinski The First",
+    "committedAt": "2026-08-20T17:45:28+02:00",
+    "message": "Prioritize specific app routes"
+  },
+  {
+    "hash": "cb3cc395dc357eaa47210829820cdf41284029b9",
+    "shortHash": "cb3cc395d",
+    "author": "Karol Depka Pradzinski The First",
+    "committedAt": "2026-08-20T17:43:30+02:00",
+    "message": "Restore reachable audio route"
+  },
+  {
+    "hash": "2ba9c033c9ef4089bd6562d91b5bf33a46916376",
+    "shortHash": "2ba9c033c",
+    "author": "Karol Depka Pradzinski The First",
+    "committedAt": "2026-08-20T17:42:32+02:00",
+    "message": "Use canonical Journal conflict route"
+  },
+  {
+    "hash": "f118aa3746448c4cf7699b7e2a9938a998451411",
+    "shortHash": "f118aa374",
+    "author": "Karol Depka Pradzinski The First",
+    "committedAt": "2026-08-20T17:41:42+02:00",
+    "message": "Label voice memo controls"
+  },
+  {
+    "hash": "af6e46567a4d0be4e98665724118a1ab62e83c58",
+    "shortHash": "af6e46567",
+    "author": "Karol Depka Pradzinski The First",
+    "committedAt": "2026-08-20T17:21:25+02:00",
+    "message": "Label icon-only toolbar actions"
+  },
+  {
+    "hash": "bca8173c501a9b265f1b4ceb2850761c91e7cb99",
+    "shortHash": "bca8173c5",
+    "author": "Karol Depka Pradzinski The First",
+    "committedAt": "2026-08-20T17:20:15+02:00",
+    "message": "Improve toolbar recording accessibility"
+  },
+  {
+    "hash": "49e4e23b9f6085317924549901ebd8888e3fcfca",
+    "shortHash": "49e4e23b9",
+    "author": "Karol Depka Pradzinski The First",
+    "committedAt": "2026-08-20T17:19:16+02:00",
+    "message": "Announce star rating state"
+  },
+  {
+    "hash": "60e1ca16461578f6179495dc00edeabb02607ef9",
+    "shortHash": "60e1ca164",
+    "author": "Karol Depka Pradzinski The First",
+    "committedAt": "2026-08-20T17:17:48+02:00",
+    "message": "Label field comment toggles"
+  },
+  {
+    "hash": "efa0c1f4bda4466cf48a70cb15faa8f16c60a0c5",
+    "shortHash": "efa0c1f4b",
+    "author": "Karol Depka Pradzinski The First",
+    "committedAt": "2026-08-20T17:02:46+02:00",
+    "message": "Improve side menu search enter"
+  },
+  {
+    "hash": "0982a8614f1ad71a30f3698c95ebf80d21b4a00c",
+    "shortHash": "0982a8614",
+    "author": "Karol Depka Pradzinski The First",
+    "committedAt": "2026-08-20T16:57:51+02:00",
+    "message": "Make sync status control accessible"
+  },
+  {
+    "hash": "46d981703ef3cd61e741d7330d8e732c6654cc39",
+    "shortHash": "46d981703",
+    "author": "Karol Depka Pradzinski The First",
+    "committedAt": "2026-08-20T16:55:00+02:00",
+    "message": "Silence stale reload reconciliation conflicts"
+  },
+  {
+    "hash": "b768ea593dedd7e4f1e65c7bee4b375b36869369",
+    "shortHash": "b768ea593",
+    "author": "Karol Depka Pradzinski The First",
+    "committedAt": "2026-08-20T16:52:29+02:00",
+    "message": "Move bullet shortcut to Ctrl 8"
+  },
+  {
+    "hash": "e76a6153fa56938b472f7e257f5485eb78ebcf16",
+    "shortHash": "e76a6153f",
+    "author": "Karol Depka Pradzinski The First",
+    "committedAt": "2026-08-20T16:33:26+02:00",
+    "message": "Identify same-device sync echoes"
+  },
+  {
+    "hash": "6f97a58380dab0fe75aed79683a5c8628caf9086",
+    "shortHash": "6f97a5838",
+    "author": "Karol Depka Pradzinski The First",
+    "committedAt": "2026-08-20T16:30:23+02:00",
+    "message": "Close rendered side menu on enter"
+  },
+  {
+    "hash": "ef8a77bfa60e5f1e136d275305e22711fffcb3d6",
+    "shortHash": "ef8a77bfa",
+    "author": "Karol Depka Pradzinski The First",
+    "committedAt": "2026-08-20T16:27:37+02:00",
+    "message": "Close side menu on search enter"
+  },
+  {
+    "hash": "1238963599e6929b6a95aa59cc1df4e034af8c7e",
+    "shortHash": "123896359",
+    "author": "Karol Depka Pradzinski The First",
+    "committedAt": "2026-08-20T16:20:08+02:00",
+    "message": "Fix search enter event typing"
+  },
+  {
+    "hash": "cbde108015c14f806d276f4315ed736468640eea",
+    "shortHash": "cbde10801",
+    "author": "Karol Depka Pradzinski The First",
+    "committedAt": "2026-08-20T16:18:52+02:00",
+    "message": "Add doodle color picker"
+  },
+  {
+    "hash": "5f341b823cc10aacecb940fed7b6e74878db52ad",
+    "shortHash": "5f341b823",
+    "author": "Karol Depka Pradzinski The First",
+    "committedAt": "2026-08-20T16:16:44+02:00",
+    "message": "Fix doodle overlay toolbar layout"
+  },
+  {
+    "hash": "cb0f8d7f3e1787b2432a2d68db234655c451338a",
+    "shortHash": "cb0f8d7f3",
+    "author": "Karol Depka Pradzinski The First",
+    "committedAt": "2026-08-20T16:13:32+02:00",
+    "message": "Prevent self-echo conflict popups"
+  },
+  {
+    "hash": "48b1ef285c9bc8b999aee30726bc4693e5e752de",
+    "shortHash": "48b1ef285",
+    "author": "Karol Depka Pradzinski The First",
+    "committedAt": "2026-08-20T16:09:01+02:00",
+    "message": "Dismiss menu before search navigation"
   }
 ],
 };
