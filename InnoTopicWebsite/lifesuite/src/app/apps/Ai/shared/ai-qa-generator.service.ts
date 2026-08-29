@@ -3,7 +3,7 @@ import { StructuredObject } from '@ai-sdk/angular';
 import { CopilotKit, injectAgentStore } from '@copilotkit/angular';
 import { Message, randomUUID } from '@ag-ui/client';
 import { z } from 'zod';
-import { firstValueFrom, Subject, takeUntil, timeout } from 'rxjs';
+import { firstValueFrom } from 'rxjs';
 
 import {
   AiBackendService,
@@ -38,7 +38,6 @@ export interface CategoryChatMessage {
 }
 
 export const COPILOT_AGENT_ID = 'lifesuite-qa';
-const CATEGORY_GENERATION_TIMEOUT_MS = 90_000;
 
 // ---- Zod schemas --------------------------------------------------------
 
@@ -81,6 +80,16 @@ export class AiQaGeneratorService {
   private readonly copilotStore = injectAgentStore(COPILOT_AGENT_ID);
   private readonly duplicateDetector = inject(QaDuplicateDetectorService);
 
+  private readonly categoryObject = new StructuredObject<
+    typeof categoryTreeResponseSchema,
+    CategoryTreeResponse,
+    CategoryTreeRequest
+  >({
+    api: this.aiBackend.apiUrl('/category-tree/stream-json'),
+    schema: categoryTreeResponseSchema,
+    ...({ streamProtocol: 'text' } as object),
+  });
+
   private readonly questionObject = new StructuredObject<
     typeof questionAnswerResponseSchema,
     QuestionAnswerResponse,
@@ -118,7 +127,6 @@ export class AiQaGeneratorService {
   readonly categoryCount = computed(() => countCategoryNodes(this.tree()));
 
   private categoryAbortController: AbortController | null = null;
-  private categoryCancel$ = new Subject<void>();
   private questionAbortController: AbortController | null = null;
 
   private appendMode = false;
@@ -127,6 +135,27 @@ export class AiQaGeneratorService {
   private preAppendTree: CategoryNode[] = [];
 
   constructor() {
+    // Live-update the tree as the backend streams partial JSON.
+    effect(() => {
+      if (!this.categoryLoading()) return;
+      const partial = this.categoryObject.object as any;
+      const nodes: any[] = Array.isArray(partial?.tree) ? partial.tree : [];
+      const validNodes = nodes
+        .filter(n => n?.id && n?.title)
+        .map(n => this.makePartialCategoryNode(n));
+      if (validNodes.length > 0) {
+        const generatedCount = countCategoryNodes(validNodes);
+        this.tree.set(
+          this.categoryAppendMode
+            ? [...this.preAppendTree, ...validNodes]
+            : validNodes,
+        );
+        this.categoryStatus.set(
+          `${this.categoryAppendMode ? 'Adding' : 'Streaming'}… ${generatedCount} categories`,
+        );
+      }
+    });
+
     // Live-update questions from streaming partial JSON
     effect(() => {
       if (!this.questionLoading()) return;
@@ -165,7 +194,6 @@ export class AiQaGeneratorService {
     this.preAppendTree = this.categoryAppendMode ? cloneCategoryTree(existing) : [];
 
     this.categoryAbortController = new AbortController();
-    this.categoryCancel$ = new Subject<void>();
     this.categoryLoading.set(true);
     this.categoryError.set('');
     this.categoryStatus.set(fileTree ? `Generating categories for "${fileTree.rootName}"…` : 'Generating categories…');
@@ -316,9 +344,8 @@ export class AiQaGeneratorService {
   }
 
   stopCategories(): void {
+    this.categoryObject.stop();
     this.categoryAbortController?.abort();
-    this.categoryCancel$.next();
-    this.categoryCancel$.complete();
     this.categoryLoading.set(false);
     this.categoryStatus.set('Cancelled');
   }
@@ -498,29 +525,35 @@ export class AiQaGeneratorService {
 
   // ---- Private helpers --------------------------------------------------
 
+  private makePartialCategoryNode(node: any): CategoryNode {
+    return {
+      id: node.id,
+      title: node.title,
+      questionCount: Number(node.questionCount) || 3,
+      children: Array.isArray(node.children)
+        ? node.children
+          .filter((child: any) => child?.id && child?.title)
+          .map((child: any) => this.makePartialCategoryNode(child))
+        : [],
+      matchedExistingCategoryId: node.matchedExistingCategoryId ?? null,
+      matchedExistingCategoryTitle: node.matchedExistingCategoryTitle ?? null,
+      isExistingCategory: Boolean(node.isExistingCategory),
+    };
+  }
+
   private async generateCategoriesWithVercel(request: CategoryTreeRequest): Promise<CategoryTreeResponse> {
-    try {
-      console.info(`[ai-qa] Sending category request via HttpClient to ${this.aiBackend.apiUrl('/category-tree')}`);
-      const response = await firstValueFrom(
-        this.aiBackend.generateCategoryTree(request).pipe(
-          takeUntil(this.categoryCancel$),
-          timeout(CATEGORY_GENERATION_TIMEOUT_MS),
-        ),
-      );
-      if (!response.tree?.length) {
-        throw new Error('Category generation returned no categories. Please try again.');
-      }
-      const truncatedTitle = flattenCategoryTree(response.tree).find(row => isTruncatedText(row.node.title));
-      if (truncatedTitle) {
-        throw new Error(`Generation produced cut-off text ("${truncatedTitle.node.title}") - please try again`);
-      }
-      return response;
-    } catch (error) {
-      if ((error as {name?: string}).name === 'TimeoutError') {
-        throw new Error('Category generation timed out. Please try again.');
-      }
-      throw error;
+    console.info(`[ai-qa] Streaming category request from ${this.aiBackend.apiUrl('/category-tree/stream-json')}`);
+    await this.categoryObject.submit(request);
+    if (this.categoryObject.error) throw this.categoryObject.error;
+    const response = this.categoryObject.object as CategoryTreeResponse;
+    if (!response?.tree?.length) {
+      throw new Error('Category generation returned no categories. Please try again.');
     }
+    const truncatedTitle = flattenCategoryTree(response.tree).find(row => isTruncatedText(row.node.title));
+    if (truncatedTitle) {
+      throw new Error(`Generation produced cut-off text ("${truncatedTitle.node.title}") - please try again`);
+    }
+    return response;
   }
 
   private async generateQuestionsWithVercel(request: QuestionAnswerRequest): Promise<QuestionAnswerResponse> {
