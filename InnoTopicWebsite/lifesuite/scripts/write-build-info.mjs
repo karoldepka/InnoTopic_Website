@@ -26,7 +26,7 @@ const commitAuthor = gitShow('%an');
 const commitMessage = gitShow('%s');
 const builtAt = new Date().toISOString();
 
-function recentGitCommits(limit = 50) {
+function recentGitCommits(limit = 100) {
   try {
     const output = execFileSync(
       'git',
