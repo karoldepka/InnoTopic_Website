@@ -6,6 +6,7 @@ import { LearnItem$ } from '../../models/LearnItem$'
 import { CachedSubject } from '../../../../libs/AppFedShared/utils/cachedSubject2/CachedSubject2'
 import { appGlobals } from '../../../../libs/AppFedShared/g'
 import { FeaturesConfig } from '../../../../libs/AppFedShared/FeaturesConfig'
+import { ExperimentalQuizScheduler } from './experimental-quiz-scheduler'
 
 function makeFakeLearnDoService() {
   return {
@@ -20,6 +21,17 @@ function makeFakeLearnDoService() {
     authService: { authUser$: { lastVal: { uid: 'user-1' } } },
     localItems$: new CachedSubject<LearnItem$[]>([]),
     itemsLoaded: false,
+  }
+}
+
+function makeFakeFeatureService(enabled = false) {
+  const config = new FeaturesConfig(Object.assign({
+    enableAll: false,
+    beforeProductization: false,
+  }, {experimentalQuizSchedulerEnabled: enabled}) as any)
+  return {
+    config$: new CachedSubject(config),
+    experimentalQuizSchedulerEnabled: enabled,
   }
 }
 
@@ -39,11 +51,17 @@ describe('QuizService — quizStatus$', () => {
     // QuizOptions is persisted to localStorage (LocalOptionsPatchableObservable) - clear it so
     // a previous test/run can't leak its options into this one.
     localStorage.removeItem('QuizOptions')
+    localStorage.removeItem('LifeSuite_experimentalQuizWorkingSet')
     // Normally set once by FeatureService's constructor during app bootstrap; quizStatus$ reads
     // it (via countBy2) so it must exist before anything subscribes.
     appGlobals.feat = new FeaturesConfig({enableAll: false, beforeProductization: false})
     fakeLearnDoService = makeFakeLearnDoService()
-    quizService = new QuizService(fakeLearnDoService as any, {} as any)
+    quizService = new QuizService(
+      fakeLearnDoService as any,
+      {} as any,
+      makeFakeFeatureService() as any,
+      new ExperimentalQuizScheduler(),
+    )
   })
 
   afterEach(() => {
@@ -213,7 +231,12 @@ describe('QuizService — quizStatus$', () => {
       useRegexFilters: true,
     }))
 
-    const migratedService = new QuizService(makeFakeLearnDoService() as any, {} as any)
+    const migratedService = new QuizService(
+      makeFakeLearnDoService() as any,
+      {} as any,
+      makeFakeFeatureService() as any,
+      new ExperimentalQuizScheduler(),
+    )
 
     expect(migratedService.options2$.val.useRegexCategories).toBe(true)
     expect(migratedService.options2$.val.useRegexTextFilter).toBe(true)
@@ -232,6 +255,36 @@ describe('QuizService — quizStatus$', () => {
     expect(lastStatus).toBeDefined()
     expect(lastStatus.itemsLeft).toBe(0)
     expect(lastStatus.nextItem$).toBeUndefined()
+
+    sub.unsubscribe()
+  })
+
+  it('uses only the experimental working set for selection while preserving the total remaining count', async () => {
+    quizService = new QuizService(
+      fakeLearnDoService as any,
+      {} as any,
+      makeFakeFeatureService(true) as any,
+      new ExperimentalQuizScheduler(),
+    )
+    quizService.setOptions(Object.assign(new QuizOptions(false, false), {
+      experimentalWorkingSetSize: 20,
+    }))
+    fakeLearnDoService.itemsLoaded = true
+    const allItems = Array.from({length: 30}, (_, index) =>
+      makeItem$(fakeLearnDoService, {}, `item-${index + 1}`))
+    fakeLearnDoService.localItems$.next(allItems)
+
+    let lastStatus: any
+    const sub = quizService.quizStatus$.subscribe(status => lastStatus = status)
+    await vi.advanceTimersByTimeAsync(1000)
+
+    expect(lastStatus.itemsLeft).toBe(30)
+    expect(lastStatus.experimentalScheduler).toMatchObject({
+      activeCount: 20,
+      backlogCount: 10,
+      targetSize: 20,
+    })
+    expect(allItems.slice(0, 20)).toContain(lastStatus.nextItem$)
 
     sub.unsubscribe()
   })

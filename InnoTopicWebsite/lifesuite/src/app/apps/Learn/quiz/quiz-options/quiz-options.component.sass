@@ -101,6 +101,19 @@
 .quiz-option--slider
   grid-column: span 4
 
+.quiz-option--working-set
+  grid-column: 1 / -1
+
+  ion-input
+    --color: var(--ion-text-color)
+    color: var(--ion-text-color)
+
+  ion-note
+    color: var(--ion-color-step-650)
+
+  ion-button
+    align-self: flex-start
+
 .quiz-option__input
   min-height: 2.35rem
   border: 1px solid rgba(var(--ion-text-color-rgb, 255, 255, 255), 0.14)
@@ -176,5 +189,6 @@ app-quiz-intervals
   .quiz-option--toggles,
   .quiz-option--fun,
   .quiz-option--importance,
-  .quiz-option--slider
+  .quiz-option--slider,
+  .quiz-option--working-set
     grid-column: 1 / -1

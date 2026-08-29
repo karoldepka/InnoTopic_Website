@@ -31,6 +31,8 @@ export class QuizOptions {
     public useRegexCategories: boolean = false,
     /** Interpret `textFilter` as one case-insensitive regex instead of comma-separated substrings. */
     public useRegexTextFilter: boolean = false,
+    /** Maximum number of simultaneously active items in the experimental working-set scheduler. */
+    public experimentalWorkingSetSize: number = 20,
     // TODO: priorityByImportances: 0 .. 1 -- 0 - ignore importances, 1 - items of highest importance go first
     // in-between - probabilities
   ) {

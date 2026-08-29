@@ -43,6 +43,11 @@
   [checked]="journalCompactStarRatings"
   (ionChange)="onChangeJournalCompactStarRatings($event)"
 >Journal metrics as x/5 (GH #106)</ion-checkbox>
+<ion-checkbox
+  labelPlacement="end"
+  [checked]="experimentalQuizSchedulerEnabled"
+  (ionChange)="onChangeExperimentalQuizScheduler($event)"
+>Experimental Quiz working-set scheduler</ion-checkbox>
 <ion-item lines="none">
   <ion-select
     label="{{ 'SETTINGS.VOICE_MEMO_TRANSCRIPTION_MODE' | translate }}"

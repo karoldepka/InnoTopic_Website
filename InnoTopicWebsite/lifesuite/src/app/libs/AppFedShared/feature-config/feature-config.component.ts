@@ -110,6 +110,14 @@ export class FeatureConfigComponent extends BaseComponent implements OnInit {
     this.featureConfigService.setJournalCompactStarRatings($event.detail.checked)
   }
 
+  get experimentalQuizSchedulerEnabled(): boolean {
+    return this.featureConfigService.experimentalQuizSchedulerEnabled
+  }
+
+  onChangeExperimentalQuizScheduler($event: any) {
+    this.featureConfigService.setExperimentalQuizSchedulerEnabled($event.detail.checked)
+  }
+
   get voiceMemoTranscriptionMode() {
     return this.featureConfigService.voiceMemoTranscriptionMode
   }

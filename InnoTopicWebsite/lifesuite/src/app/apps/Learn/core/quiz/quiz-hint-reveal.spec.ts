@@ -1,6 +1,8 @@
 import {describe, it, expect} from 'vitest'
 import {QuizService} from './quiz.service'
 import {sidesDefsHintsArray} from '../sidesDefs'
+import {CachedSubject} from '../../../../libs/AppFedShared/utils/cachedSubject2/CachedSubject2'
+import {ExperimentalQuizScheduler} from './experimental-quiz-scheduler'
 
 /** Mock standing in for LearnItemItemsService - QuizService's constructor only touches
  * nextItemRequests$ synchronously; quizStatus$ (not exercised by these tests) is what actually
@@ -12,9 +14,21 @@ function makeFakeLearnDoService() {
   }
 }
 
+function makeQuizService() {
+  return new QuizService(
+    makeFakeLearnDoService() as any,
+    {} as any,
+    {
+      config$: new CachedSubject({experimentalQuizSchedulerEnabled: false}),
+      experimentalQuizSchedulerEnabled: false,
+    } as any,
+    new ExperimentalQuizScheduler(),
+  )
+}
+
 describe('QuizService — progressive hint reveal (issue #36)', () => {
   it('reveals hint sides one at a time per click, then wraps back to hidden', () => {
-    const quizService = new QuizService(makeFakeLearnDoService() as any, {} as any)
+    const quizService = makeQuizService()
 
     expect(quizService.showHint$.lastVal).toBe(0)
 
@@ -31,7 +45,7 @@ describe('QuizService — progressive hint reveal (issue #36)', () => {
   })
 
   it('resets the hint level when the answer is toggled or a new question starts', () => {
-    const quizService = new QuizService(makeFakeLearnDoService() as any, {} as any)
+    const quizService = makeQuizService()
 
     quizService.toggleShowHint()
     quizService.toggleShowHint()

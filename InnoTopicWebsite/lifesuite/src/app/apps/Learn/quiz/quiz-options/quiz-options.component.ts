@@ -14,6 +14,7 @@ import { QuizIntervalsComponent } from './quiz-intervals/quiz-intervals.componen
 import { QuizDiligenceLevelComponent } from './quiz-diligence-level/quiz-diligence-level.component';
 import { QuizIntervalImportanceScalingComponent } from './quiz-interval-importance-scaling/quiz-interval-importance-scaling.component';
 import { QuizFocusLevelComponent } from './quiz-focus-level/quiz-focus-level.component';
+import {FeatureService} from '../../../../libs/AppFedShared/feature.service'
 
 @Component({
     selector: 'app-quiz-options',
@@ -68,6 +69,7 @@ export class QuizOptionsComponent implements OnInit {
     textToSpeechCategoriesEnabled: new UntypedFormControl(false),
     useRegexCategories: new UntypedFormControl(false),
     useRegexTextFilter: new UntypedFormControl(false),
+    experimentalWorkingSetSize: new UntypedFormControl(20),
   }
 
   formGroup = new UntypedFormGroup(this.controls)
@@ -78,6 +80,7 @@ export class QuizOptionsComponent implements OnInit {
   constructor(
     public quizService: QuizService,
     public optionsService: OptionsService,
+    public featureService: FeatureService,
   ) {
     this.controls.minFunLevel.valueChanges.subscribe(v => {
       console.log('minfun', v)
@@ -99,5 +102,13 @@ export class QuizOptionsComponent implements OnInit {
   }
 
   ngOnInit() {}
+
+  get experimentalQuizSchedulerEnabled(): boolean {
+    return this.featureService.experimentalQuizSchedulerEnabled
+  }
+
+  resetExperimentalWorkingSet(): void {
+    this.quizService.resetExperimentalWorkingSet()
+  }
 
 }

@@ -2,6 +2,7 @@ import {LearnItem$} from '../../models/LearnItem$'
 import {DurationMs} from '../../../../libs/AppFedShared/utils/type-utils'
 import {importanceDescriptorsArray} from '../../models/fields/importance.model'
 import {CountsByImportance} from './quiz.service'
+import {ExperimentalQuizSchedulerStatus} from './experimental-quiz-scheduler'
 
 export class QuizStatus {
 
@@ -25,6 +26,7 @@ export class QuizStatus {
     /* TODO: undefined */
     public itemsCountByImportance?: any,
     public chooserParams?: any,
+    public experimentalScheduler?: ExperimentalQuizSchedulerStatus,
   ) {
   }
 

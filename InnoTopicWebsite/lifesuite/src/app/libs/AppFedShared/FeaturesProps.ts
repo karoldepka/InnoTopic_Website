@@ -27,4 +27,7 @@ export class FeaturesProps {
      * itself - defaults on since this was the explicit ask, not an experiment; off falls back to
      * the previous raw "motivation: 7" display for comparison/rollback. */
     journalCompactStarRatings = true
+
+    /** Hidden developer option for the bounded Quiz working-set scheduler experiment. */
+    experimentalQuizSchedulerEnabled = false
 }

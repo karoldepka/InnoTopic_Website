@@ -70,6 +70,7 @@ export class QuizAnswersService {
   onApplyAndNext(item$: LearnItem$, selfRating: NumericPickerVal) {
     this.storeAnswerForHistory(selfRating)
     item$ ?. setNewSelfRating(selfRating !)
+    this.quizService.recordExperimentalSchedulerRating(item$?.id, selfRating)
     this.whatNextService.whatNext()
     this.quizService.requestNextItem()
   }

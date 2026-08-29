@@ -197,6 +197,33 @@
           [control]="controls.focusLevelProbabilities"
         />
       </div>
+
+      <div
+        *ngIf="experimentalQuizSchedulerEnabled"
+        class="quiz-option quiz-option--working-set"
+      >
+        <div class="quiz-option__label">EXPERIMENTAL WORKING SET</div>
+        <ion-input
+          type="number"
+          label="Items to master"
+          labelPlacement="stacked"
+          [min]="1"
+          [max]="100"
+          [step]="1"
+          [formControl]="controls.experimentalWorkingSetSize"
+        />
+        <ion-note>
+          Keeps this many items in rotation. A rating of 4+ stars masters an item and admits the next due item.
+        </ion-note>
+        <ng-container *ngIf="quizService.quizStatus$ | async as quizStatus">
+          <ion-note *ngIf="quizStatus.experimentalScheduler as scheduler">
+            {{ scheduler.activeCount }} active · {{ scheduler.backlogCount }} waiting · {{ scheduler.remainingCount }} total
+          </ion-note>
+        </ng-container>
+        <ion-button size="small" fill="outline" (click)="resetExperimentalWorkingSet()">
+          Reset working set
+        </ion-button>
+      </div>
     </section>
   </div>
 

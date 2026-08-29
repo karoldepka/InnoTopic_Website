@@ -24,6 +24,8 @@ import {QuizItemChooser} from './quiz-item-chooser'
 import {QuizStatus} from './QuizStatus'
 import {QuizOptions} from './QuizOptions'
 import {sidesDefsHintsArray} from '../sidesDefs'
+import {FeatureService} from '../../../../libs/AppFedShared/feature.service'
+import {ExperimentalQuizScheduler, ExperimentalQuizSchedulerStatus} from './experimental-quiz-scheduler'
 
 /* TODO units; rename to DurationMs or TimeDurationMs;
 *   !!! actually this is used as hours, confusingly! WARNING! */
@@ -61,6 +63,8 @@ export class QuizService {
   constructor(
     private learnDoService: LearnItemItemsService,
     private optionsService: OptionsService,
+    private featureService: FeatureService,
+    private experimentalQuizScheduler: ExperimentalQuizScheduler,
   ) {
     this.migrateCombinedRegexOption()
     console.log('QuizService service constructor')
@@ -118,26 +122,43 @@ export class QuizService {
       timer(0, secondsAsMs(60) /* FIXME make the timer longer for performance/battery */),
       this.nextItemRequests$,
     ]),
-  ]).pipe(map(([quizOptions, item$s]) => {
+    this.featureService.config$,
+  ]).pipe(map(([quizOptions, item$s, , featuresConfig]) => {
       // debugLog(`quizStatus$ combineLatest; FIXME this runs multiple times; use smth like publish() / shareReplay`)
       item$s = this.filterByOptions(quizOptions, item$s)
 
-      let pendingItems = this.filterByIsPendingRepetition(item$s)
+      const pendingItems = this.filterByIsPendingRepetition(item$s)
+      let chooserItems = pendingItems
+      let remainingItems = pendingItems
+      let experimentalSchedulerStatus: ExperimentalQuizSchedulerStatus | undefined
 
-      const quizItemChooser = new QuizItemChooser(pendingItems, quizOptions)
+      if (featuresConfig.experimentalQuizSchedulerEnabled) {
+        const selection = this.experimentalQuizScheduler.selectWorkingSet(
+          item$s,
+          pendingItems,
+          quizOptions.experimentalWorkingSetSize,
+          this.experimentalSchedulerContextKey(quizOptions),
+        )
+        chooserItems = selection.candidateItems
+        remainingItems = selection.remainingItems
+        experimentalSchedulerStatus = selection.status
+      }
+
+      const quizItemChooser = new QuizItemChooser(chooserItems, quizOptions)
 
       let chooserOutput = quizItemChooser.chooseItemFromPending()
       const nextItem$ = chooserOutput.item
 
       const retStatus = new QuizStatus(
-        pendingItems.length,
+        remainingItems.length,
         nextItem$,
         this.calculatePendingItemsTodayCount(item$s),
         nextItem$ ? isInFuture(this.calculateWhenNextRepetitionMsEpoch(nextItem$)) : undefined,
         undefined,
-        countBy(pendingItems, (item$) => item$.getEffectiveImportanceId()) as CountsByImportance,
+        countBy(remainingItems, (item$) => item$.getEffectiveImportanceId()) as CountsByImportance,
         countBy(item$s, (item$) => item$.getEffectiveImportanceId()) as CountsByImportance,
-        chooserOutput.chooserParams
+        chooserOutput.chooserParams,
+        experimentalSchedulerStatus,
         // pendingItems[0] /* TODO: ensure sorted or minBy */,
       );
 
@@ -290,6 +311,33 @@ export class QuizService {
     this.nextItemRequests$.next()
 
     /// whatnext
+  }
+
+  recordExperimentalSchedulerRating(itemId: string | undefined, rating: number | undefined): void {
+    if (this.featureService.experimentalQuizSchedulerEnabled) {
+      this.experimentalQuizScheduler.recordRating(itemId, rating)
+    }
+  }
+
+  resetExperimentalWorkingSet(): void {
+    this.experimentalQuizScheduler.reset()
+    this.requestNextItem()
+  }
+
+  private experimentalSchedulerContextKey(options: QuizOptions): string {
+    return JSON.stringify({
+      dePrioritizeNewMaterial: options.dePrioritizeNewMaterial,
+      onlyWithQA: options.onlyWithQA,
+      skipTasks: options.skipTasks,
+      categories: options.categories,
+      textFilter: options.textFilter,
+      minFunLevel: options.minFunLevel,
+      minImportanceLevel: options.minImportanceLevel,
+      skipAiGenerated: options.skipAiGenerated,
+      onlyAiGenerated: options.onlyAiGenerated,
+      useRegexCategories: options.useRegexCategories,
+      useRegexTextFilter: options.useRegexTextFilter,
+    })
   }
 
   /** Potentially move to QuizItemChooser or QuizItemsFilter... */

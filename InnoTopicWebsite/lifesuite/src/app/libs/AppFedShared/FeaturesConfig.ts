@@ -73,6 +73,8 @@ export class FeaturesConfig extends FeatureLevelsConfig {
 
     quiz = this.fc(this.props)
 
+    experimentalQuizSchedulerEnabled = this.props.experimentalQuizSchedulerEnabled
+
     private fc(props: FeaturesProps) {
         return new FeatureLevelsConfig(props)
     }

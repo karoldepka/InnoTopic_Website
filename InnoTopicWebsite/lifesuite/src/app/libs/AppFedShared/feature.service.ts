@@ -108,6 +108,14 @@ export class FeatureService {
     this.patchProps({journalCompactStarRatings: enabled})
   }
 
+  get experimentalQuizSchedulerEnabled(): boolean {
+    return this.config$.lastVal?.props?.experimentalQuizSchedulerEnabled ?? false
+  }
+
+  setExperimentalQuizSchedulerEnabled(enabled: boolean) {
+    this.patchProps({experimentalQuizSchedulerEnabled: enabled})
+  }
+
   static readonly firestoreEnabledKey = 'firestoreEnabled'
 
   get firestoreEnabled(): boolean {
