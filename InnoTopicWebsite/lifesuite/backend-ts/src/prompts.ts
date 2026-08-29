@@ -183,6 +183,9 @@ Rules:
 - Keep answers concise (2-4 sentences) and factually accurate.
 - If the question contains an acronym (e.g. "What is RAG?"), keep only the acronym in the question. Spell out the full form in the answer (e.g. "RAG stands for Retrieval-Augmented Generation…").
 - Reveal as little as possible in the question — do not hint at the answer or give away key terms.
+- Order items to prevent forward leakage: neither an earlier question nor its answer may reveal the
+  answer or key terms tested by a later item. If one item would disclose another item's tested
+  fact, place the disclosed-fact question first and the dependent question afterward.
 - When the answer enumerates items, use a bulleted list (one item per line starting with "- ") for easier reading and memorization.
 
 Output format — return exactly this JSON shape (no other text):
