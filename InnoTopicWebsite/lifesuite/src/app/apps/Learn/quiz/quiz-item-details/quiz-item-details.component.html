@@ -39,10 +39,11 @@
         type="button"
         *ngFor="let choice of getMultipleChoiceAnswers(itemVal$ | async)"
         class="abcd-answer"
-        (click)="onAbcdChoiceClick()"
-        [attr.aria-pressed]="showAnswer$ | async"
+        (click)="onAbcdChoiceClick(choice)"
+        [attr.aria-pressed]="selectedChoice === choice"
         [class.abcd-answer--correct-revealed]="(showAnswer$ | async) && choice.correct"
         [class.abcd-answer--incorrect-revealed]="(showAnswer$ | async) && !choice.correct"
+        [class.abcd-answer--wrong-selected]="(showAnswer$ | async) && selectedChoice === choice && !choice.correct"
       >
         <strong>{{ choice.label }}.</strong> {{ choice.text }}
       </button>

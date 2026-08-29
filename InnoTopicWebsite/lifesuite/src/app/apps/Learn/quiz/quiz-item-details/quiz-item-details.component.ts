@@ -49,6 +49,7 @@ export class QuizItemDetailsComponent implements OnInit, OnDestroy, AfterViewIni
   private _item$ ? : LearnItem$ | null
   private choiceSource?: MultipleChoiceAnswer[]
   private shuffledChoices: MultipleChoiceAnswer[] = []
+  selectedChoice?: MultipleChoiceAnswer
 
   @Input()
   quizLoaded = false
@@ -82,6 +83,7 @@ export class QuizItemDetailsComponent implements OnInit, OnDestroy, AfterViewIni
     if (choices !== this.choiceSource) {
       this.choiceSource = choices
       this.shuffledChoices = shuffleAbcdAnswerChoices(choices)
+      this.selectedChoice = undefined
     }
     return this.shuffledChoices
   }
@@ -105,7 +107,8 @@ export class QuizItemDetailsComponent implements OnInit, OnDestroy, AfterViewIni
     // debugLog('QuizItemDetailsComponent ctor')
   }
 
-  onAbcdChoiceClick(): void {
+  onAbcdChoiceClick(choice: MultipleChoiceAnswer): void {
+    this.selectedChoice = choice
     this.quizAnswersService.toggleShowAnswer()
   }
 
