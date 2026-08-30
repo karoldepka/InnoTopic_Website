@@ -9,6 +9,27 @@
   font-weight: 600;
 }
 
+.recent-commits__filter {
+  display: grid;
+  gap: 4px;
+  margin-top: 4px;
+}
+
+.recent-commits__filter input {
+  width: 100%;
+  padding: 6px 8px;
+  border: 1px solid var(--ion-color-step-350);
+  border-radius: 4px;
+  background: var(--ion-item-background, var(--ion-background-color));
+  color: inherit;
+}
+
+.recent-commits__count,
+.recent-commits__empty {
+  margin: 6px 0;
+  color: var(--ion-color-step-650);
+}
+
 .recent-commits ol {
   margin: 4px 0 0;
   padding-inline-start: 1.75rem;

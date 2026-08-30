@@ -9,6 +9,28 @@ const branch = (process.env.VERCEL_GIT_COMMIT_REF || process.env.GIT_BRANCH || '
 const fullCommit = (process.env.VERCEL_GIT_COMMIT_SHA || process.env.GIT_COMMIT || '').trim();
 const commit = fullCommit ? fullCommit.slice(0, 8) : 'local';
 const gitCommit = fullCommit || 'HEAD';
+const recentCommitsLimit = 100;
+
+/** Vercel checkouts may contain only the most recent few commits. Deepen that checkout so the
+ * in-app history can consistently show its advertised 100 entries. If Git access is unavailable,
+ * retain the checkout's existing history rather than failing the whole build. */
+function ensureRecentGitHistory() {
+  try {
+    const availableCount = Number(execFileSync('git', ['rev-list', '--count', gitCommit], {
+      cwd: repoRoot,
+      encoding: 'utf8',
+      stdio: ['ignore', 'pipe', 'ignore'],
+    }).trim());
+    if (availableCount < recentCommitsLimit) {
+      execFileSync('git', ['fetch', '--quiet', `--deepen=${recentCommitsLimit}`, 'origin', gitCommit], {
+        cwd: repoRoot,
+        stdio: 'ignore',
+      });
+    }
+  } catch {
+    // The current checkout remains a useful fallback for local/offline builds.
+  }
+}
 
 function gitShow(format) {
   try {
@@ -26,7 +48,7 @@ const commitAuthor = gitShow('%an');
 const commitMessage = gitShow('%s');
 const builtAt = new Date().toISOString();
 
-function recentGitCommits(limit = 100) {
+function recentGitCommits(limit = recentCommitsLimit) {
   try {
     const output = execFileSync(
       'git',
@@ -56,6 +78,7 @@ function recentGitCommits(limit = 100) {
   }
 }
 
+ensureRecentGitHistory();
 const recentCommits = recentGitCommits();
 
 const targetFile = resolve(repoRoot, 'src/environments/build-info.ts');
