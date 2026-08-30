@@ -82,6 +82,10 @@ export class ThemeUiService implements OnDestroy {
     return themeState.font_size_percent;
   }
 
+  get iconSizePercent(): number {
+    return themeState.icon_size_percent;
+  }
+
   /** The preset matching the current live colors, if any - a freeform edit (e.g. via
    * theme-configurator) won't match one, which is expected (undefined). */
   get activePreset(): ThemePreset | undefined {
@@ -112,6 +116,10 @@ export class ThemeUiService implements OnDestroy {
 
   setFontSizePercent(fontSizePercent: number): void {
     engineSetThemeConfig({ font_size_percent: fontSizePercent });
+  }
+
+  setIconSizePercent(iconSizePercent: number): void {
+    engineSetThemeConfig({ icon_size_percent: iconSizePercent });
   }
 
   /** Applies a preset's colors/shadow/corners/icon while preserving the current brightness slider

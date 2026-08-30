@@ -61,6 +61,7 @@ function curatedTheme(name: string, input: CuratedThemeInput): ThemePreset {
       // LifeSuite's original behavior of brightness being independent of which theme is picked.
       brightness_percent: 75,
       font_size_percent: 100,
+      icon_size_percent: 100,
       ion_color_primary: input.primary,
       ion_color_secondary: input.secondary,
       ion_background_color: background,

@@ -90,6 +90,10 @@ export class SyncPopoverComponent extends BaseComponent implements OnInit {
     this.themeUiService.setFontSizePercent(event.detail.value)
   }
 
+  onIconSizeChange(event: any): void {
+    this.themeUiService.setIconSizePercent(event.detail.value)
+  }
+
   onClickAboutAppToggle() {
     this.aboutAppExpanded = ! this.aboutAppExpanded
     if ( ! this.showFeatureConfig ) {

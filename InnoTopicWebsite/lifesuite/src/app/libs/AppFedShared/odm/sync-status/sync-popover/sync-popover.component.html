@@ -17,6 +17,18 @@
     (ionChange)="onFontSizeChange($event)"
   ></ion-range>
 </div>
+<div class="icon-size-control">
+  <label for="sync-popover-icon-size">Icon size <strong>{{ themeUiService.iconSizePercent }}%</strong></label>
+  <ion-range
+    id="sync-popover-icon-size"
+    aria-label="Icon size"
+    [min]="50"
+    [max]="200"
+    [step]="5"
+    [value]="themeUiService.iconSizePercent"
+    (ionChange)="onIconSizeChange($event)"
+  ></ion-range>
+</div>
 
 <!-- GH #78: same toolbarEntries$ the app-root toolbar's own time-tracking bar shows. -->
 <div

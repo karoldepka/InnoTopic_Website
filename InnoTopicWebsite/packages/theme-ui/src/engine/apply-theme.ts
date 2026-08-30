@@ -34,11 +34,13 @@ export function applyThemeConfig(config: ThemeConfigState) {
   // range offered by LifeSuite's theme popover.
   const fontSizePercent = Math.min(300, Math.max(80, Number(config.font_size_percent) || 100))
   root.fontSize = `${fontSizePercent}%`
+  const iconSizePercent = Math.min(200, Math.max(50, Number(config.icon_size_percent) || 100))
+  root.setProperty('--app-icon-size-percent', `${iconSizePercent}%`)
 
-  // brightness_percent/font_size_percent are control inputs, not themed color tokens - skip them
+  // brightness/font/icon size are control inputs, not themed color tokens - skip them
   // here so they do not become nonsensical custom properties or color-mix() inputs.
   for (const [key, value] of Object.entries(config)) {
-    if (key === 'brightness_percent' || key === 'font_size_percent') continue
+    if (key === 'brightness_percent' || key === 'font_size_percent' || key === 'icon_size_percent') continue
     const varName = `--${key.replace(/_/g, '-')}`
     const needsPxSuffix = varName.startsWith('--shadow') || varName.startsWith('--inner-shadow') || varName.startsWith('--corner-radius')
     const val = needsPxSuffix ? `${value}px` : String(value)

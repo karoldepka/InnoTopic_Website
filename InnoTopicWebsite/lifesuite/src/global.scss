@@ -472,6 +472,12 @@ ion-icon:not([color]):not(.action-icon):not(.action-color):not(ion-button *):not
   color: var(--ion-color-primary);
 }
 
+// The icon-size preference intentionally affects only icons that use their normal inherited
+// size. Component-specific/inline sizes remain deliberate exceptions (e.g. compact chevrons).
+ion-icon {
+  font-size: var(--app-icon-size-percent, 100%);
+}
+
 ion-button.button-clear:not([color]):not(.action-icon):not(.action-color) {
   --color: var(--ion-color-primary);
   color: var(--ion-color-primary);

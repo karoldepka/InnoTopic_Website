@@ -39,7 +39,8 @@ export function findActivePreset(presets: ThemePreset[] = themePresets): ThemePr
   )
 }
 
-/** Applies a preset's colors/shadow/corners/icon while preserving global brightness and font-size
+/** Applies a preset's colors/shadow/corners/icon while preserving global brightness, font-size,
+ * and icon-size
  * controls. This is the one place "pick this preset" should go through, rather than calling
  * setThemeConfig(preset.config) directly. */
 export function applyPreset(preset: ThemePreset) {
@@ -47,6 +48,7 @@ export function applyPreset(preset: ThemePreset) {
     ...preset.config,
     brightness_percent: themeState.brightness_percent,
     font_size_percent: themeState.font_size_percent,
+    icon_size_percent: themeState.icon_size_percent,
   })
 }
 

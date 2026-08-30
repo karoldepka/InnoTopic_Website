@@ -71,6 +71,7 @@ function preset(
       // setting rather than using this value.
       brightness_percent: 75,
       font_size_percent: 100,
+      icon_size_percent: 100,
       ...colors,
       ...overrides,
     },

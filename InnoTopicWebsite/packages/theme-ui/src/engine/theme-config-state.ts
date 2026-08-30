@@ -38,6 +38,8 @@ export interface ThemeConfigState {
   brightness_percent: number;
   /** Root text size as a percentage of the browser's default, shared by all theme consumers. */
   font_size_percent: number;
+  /** Default Ionic icon size relative to its surrounding text. */
+  icon_size_percent: number;
 }
 
 export const defaultThemeConfig: ThemeConfigState = {
@@ -60,4 +62,5 @@ export const defaultThemeConfig: ThemeConfigState = {
   icon_brightness: 0,
   brightness_percent: 75,
   font_size_percent: 100,
+  icon_size_percent: 100,
 }
