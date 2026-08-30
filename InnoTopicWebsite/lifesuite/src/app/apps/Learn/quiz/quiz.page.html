@@ -37,7 +37,12 @@
                     name="timer"
            />
 
-          <ion-button (click)="showOptions = ! showOptions" size="large">
+          <ion-button
+            size="large"
+            aria-label="Open quiz options"
+            [attr.aria-expanded]="showOptions"
+            (click)="openQuizOptions()"
+          >
 
             <ion-icon class="action-icon" slot="icon-only" name="settings"
 

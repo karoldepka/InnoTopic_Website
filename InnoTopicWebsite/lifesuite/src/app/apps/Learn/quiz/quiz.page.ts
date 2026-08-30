@@ -1,7 +1,7 @@
-import {AfterViewInit, ChangeDetectorRef, Component, Injector, OnDestroy, OnInit, ChangeDetectionStrategy} from '@angular/core';
+import {AfterViewInit, ChangeDetectorRef, Component, Injector, OnDestroy, OnInit, ViewChild, ChangeDetectionStrategy} from '@angular/core';
 import {QuizService} from '../core/quiz/quiz.service'
 import {Observable} from 'rxjs'
-import { PopoverController, IonicModule } from '@ionic/angular'
+import { IonContent, PopoverController, IonicModule } from '@ionic/angular'
 import {QuizTimerPopoverComponent} from './quiz-timer-popover/quiz-timer-popover.component'
 import {LearnItem$} from '../models/LearnItem$'
 import {debugLog} from '../../../libs/AppFedShared/utils/log'
@@ -45,6 +45,9 @@ import {QuizAnswerDurationAverage, QuizDailyTrackingTotal, QuizTrackingService} 
     ],
 })
 export class QuizPage extends BaseComponent implements OnInit, AfterViewInit, OnDestroy  {
+
+  @ViewChild('ionContent')
+  private contentScroller?: IonContent
 
   item$: LearnItem$ | undefined
 
@@ -133,6 +136,14 @@ export class QuizPage extends BaseComponent implements OnInit, AfterViewInit, On
       mode: 'ios' /* TODO */,
     });
     return await popover.present();
+  }
+
+  openQuizOptions(): void {
+    this.showOptions = true
+    requestAnimationFrame(() => {
+      const prefersReducedMotion = globalThis.matchMedia?.('(prefers-reduced-motion: reduce)').matches
+      this.contentScroller?.scrollToTop(prefersReducedMotion ? 0 : 300)
+    })
   }
 
   nowMs() {
