@@ -12,6 +12,7 @@
     [side]="$safeNavigationMigration((itemVal$ ! | async) ?. getSideWithQuestionOrFirstNonEmpty())"
     [showMic]="false"
     [showAiFillButton]="false"
+    [showSideLabel]="false"
    />
 
   <div
@@ -28,6 +29,7 @@
         [side]="hintSide"
         [showMic]="false"
         [showAiFillButton]="false"
+        [showSideLabel]="false"
        />
     </ng-container>
 
@@ -65,6 +67,7 @@
         [showRevealButton]="! (showAnswer$ | async)"
         [showMic]="false"
         [showAiFillButton]="false"
+        [showSideLabel]="false"
        />
 
       </ng-container>

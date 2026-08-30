@@ -75,6 +75,10 @@ export class ItemSideComponent implements OnInit {
   @Input()
   showAiFillButton = true
 
+  /** Quiz uses the field content directly, so its side names (such as "Title") are redundant. */
+  @Input()
+  showSideLabel = true
+
 
   formControls ! : SideFormControlsDict
 

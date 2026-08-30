@@ -22,6 +22,7 @@
 > <!-- https://github.com/tinymce/tinymce-angular/issues/130 -->
 
   <div
+    *ngIf="showSideLabel || (side.id === answerDescr.id && showAiFillButton)"
     style="
       padding: 0.5rem;
       border-radius: 6px 6px 0px 0px;
@@ -30,6 +31,7 @@
     "
   >
     <app-side-label
+      *ngIf="showSideLabel"
       [side]="side"
      />
     <ion-button
