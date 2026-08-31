@@ -41,6 +41,7 @@ const defaultCorners = {
 
 /** Neutral icon recolor settings (see theme-config-state.ts) - most presets leave these alone. */
 const defaultIcon = {
+  icon_color_mode: 'palette' as const,
   icon_contrast: 1,
   icon_brightness: 0,
 }

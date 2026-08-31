@@ -6,6 +6,7 @@ import { Topic } from '../data/Topic'
 import { recolorSvg } from '../svg-recolor'
 
 export const defaultIconHeight = 18
+const RECOLOR_DEBOUNCE_MS = 120
 
 /**
  * Ports Angular's TopicLogoComponent (app-topic-logo). Its original .scss was empty.
@@ -40,41 +41,57 @@ export class TopicLogo extends LitElement {
 
   /** Setting this switches rendering to a live-recolored inline SVG - see class doc comment. */
   @property({ attribute: 'recolor-primary' }) recolorPrimary?: string
+  @property({ attribute: 'recolor-mode' }) recolorMode?: 'palette' | 'primary_contrast'
   @property({ attribute: 'recolor-secondary' }) recolorSecondary?: string
   @property({ type: Number, attribute: 'recolor-contrast' }) recolorContrast = 1
   @property({ type: Number, attribute: 'recolor-brightness' }) recolorBrightness = 0
+  @property({ type: Number, attribute: 'recolor-primary-contrast' }) recolorPrimaryContrast = 0.3
 
   @state() private recoloredMarkup?: string
   private recolorRequestId = 0
+  private recolorTimer?: ReturnType<typeof setTimeout>
 
   protected willUpdate(changed: Map<string, unknown>) {
-    if (changed.has('recolorPrimary') || changed.has('recolorSecondary')
-      || changed.has('recolorContrast') || changed.has('recolorBrightness') || changed.has('topic')) {
+    if (changed.has('recolorPrimary') || changed.has('recolorMode') || changed.has('recolorSecondary')
+      || changed.has('recolorContrast') || changed.has('recolorBrightness')
+      || changed.has('recolorPrimaryContrast') || changed.has('topic')) {
       this.updateRecolor()
     }
   }
 
   private updateRecolor() {
     const requestId = ++this.recolorRequestId
+    clearTimeout(this.recolorTimer)
     const url = this.resolvedTopic?.logo
     if (!this.recolorPrimary || !url) {
       this.recoloredMarkup = undefined
       return
     }
-    recolorSvg(url, {
-      primaryColor: this.recolorPrimary,
-      secondaryColor: this.recolorSecondary,
-      contrast: this.recolorContrast,
-      brightness: this.recolorBrightness,
-    }).then(markup => {
-      // A newer request may have started (and possibly already finished) while this one was
-      // in flight - drop stale results instead of flickering back to an outdated color.
-      if (requestId === this.recolorRequestId) {
-        this.recoloredMarkup = markup
-      }
-    }).catch(error => {
-      console.error('topic-logo: recolor failed', error)
-    })
+    // Range inputs emit many values per drag. Coalesce them before any worker job is enqueued;
+    // stale responses were already ignored below, but avoiding stale *work* keeps the shared
+    // worker queue and its progress count bounded.
+    this.recolorTimer = setTimeout(() => {
+      recolorSvg(url, {
+        primaryColor: this.recolorPrimary!,
+        colorMode: this.recolorMode,
+        secondaryColor: this.recolorSecondary,
+        contrast: this.recolorContrast,
+        brightness: this.recolorBrightness,
+        primaryContrast: this.recolorPrimaryContrast,
+      }).then(markup => {
+        if (requestId === this.recolorRequestId) {
+          this.recoloredMarkup = markup
+        }
+      }).catch(error => {
+        console.error('topic-logo: recolor failed', error)
+      })
+    }, RECOLOR_DEBOUNCE_MS)
+  }
+
+  disconnectedCallback() {
+    super.disconnectedCallback()
+    clearTimeout(this.recolorTimer)
+    this.recolorRequestId += 1
   }
 
   private get resolvedTopic(): Topic | undefined {

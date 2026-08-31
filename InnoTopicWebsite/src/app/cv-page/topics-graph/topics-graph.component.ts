@@ -29,9 +29,11 @@ export class TopicsGraphComponent implements OnInit, OnDestroy {
   /** True once the graph has rendered once, so the flag effect below doesn't fire before there's anything to rebuild. */
   private graphInitialized = false;
   private recolorRequestId = 0;
+  private recolorTimer?: ReturnType<typeof setTimeout>;
   private readonly stopThemeSubscriptions = [
     onThemeStateChange('ion_color_primary', () => this.refreshRecoloredIcons()),
     onThemeStateChange('ion_color_secondary', () => this.refreshRecoloredIcons()),
+    onThemeStateChange('icon_color_mode', () => this.refreshRecoloredIcons()),
     onThemeStateChange('icon_contrast', () => this.refreshRecoloredIcons()),
     onThemeStateChange('icon_brightness', () => this.refreshRecoloredIcons()),
   ];
@@ -64,9 +66,11 @@ export class TopicsGraphComponent implements OnInit, OnDestroy {
   }
 
   private refreshRecoloredIcons() {
-    if (this.graphInitialized) {
-      void this.fetchIcons();
-    }
+    if (!this.graphInitialized) return;
+    clearTimeout(this.recolorTimer);
+    // A slider dispatches an input event for every thumb position. Submit only the settled value
+    // so graph-wide conversion does not enqueue a complete stale pass for every one of them.
+    this.recolorTimer = setTimeout(() => void this.fetchIcons(), 120);
   }
 
   private async fetchIcons() {
@@ -84,9 +88,11 @@ export class TopicsGraphComponent implements OnInit, OnDestroy {
       if (!topic?.logo) return undefined;
       return recolorSvg(topic.logo, {
         primaryColor: themeState.ion_color_primary,
+        colorMode: themeState.icon_color_mode,
         secondaryColor: themeState.ion_color_secondary,
         contrast: themeState.icon_contrast,
         brightness: themeState.icon_brightness,
+        primaryContrast: themeState.icon_contrast,
       });
     }));
 
@@ -107,6 +113,7 @@ export class TopicsGraphComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
+    clearTimeout(this.recolorTimer);
     this.stopThemeSubscriptions.forEach(unsubscribe => unsubscribe());
   }
 

@@ -14,7 +14,7 @@ const ALL_KEYS: (keyof ThemeConfigState)[] = [
   'shadow_offset', 'shadow_blur_radius', 'shadow_opacity',
   'inner_shadow_offset', 'inner_shadow_blur_radius', 'inner_shadow_opacity',
   'corner_radius_top_left', 'corner_radius_top_right', 'corner_radius_bottom_right', 'corner_radius_bottom_left',
-  'icon_contrast', 'icon_brightness',
+  'icon_color_mode', 'icon_contrast', 'icon_brightness',
 ]
 
 type CornerKey = 'corner_radius_top_left' | 'corner_radius_top_right' | 'corner_radius_bottom_right' | 'corner_radius_bottom_left'
@@ -85,6 +85,15 @@ export class ThemeConfigurator {
 
   private onIconInput(field: 'icon_contrast' | 'icon_brightness', event: Event) {
     setThemeConfig({ [field]: Number((event.target as HTMLInputElement).value) } as Partial<ThemeConfigState>)
+  }
+
+  private onIconColorModeInput(event: Event) {
+    const icon_color_mode = (event.target as HTMLSelectElement).value as ThemeConfigState['icon_color_mode']
+    setThemeConfig({
+      icon_color_mode,
+      // Primary ± contrast is constrained to the Rust converter's 0..1 tolerance range.
+      icon_contrast: icon_color_mode === 'primary_contrast' ? Math.min(themeState.icon_contrast, 1) : themeState.icon_contrast,
+    })
   }
 
   private onCornerInput(key: CornerKey, event: Event) {
@@ -210,8 +219,15 @@ export class ThemeConfigurator {
 
         <div class="field-row">
           <label class="field">
-            <span class="field-label">Icon contrast ({s.icon_contrast.toFixed(2)})</span>
-            <input type="range" min="0" max="2" step="0.05" value={String(s.icon_contrast)}
+            <span class="field-label">Icon color mode</span>
+            <select onInput={this.onIconColorModeInput.bind(this)}>
+              <option value="palette" selected={s.icon_color_mode === 'palette'}>Primary to secondary palette</option>
+              <option value="primary_contrast" selected={s.icon_color_mode === 'primary_contrast'}>Primary ± contrast</option>
+            </select>
+          </label>
+          <label class="field">
+            <span class="field-label">{s.icon_color_mode === 'primary_contrast' ? 'Primary contrast' : 'Icon contrast'} ({s.icon_contrast.toFixed(2)})</span>
+            <input type="range" min="0" max={s.icon_color_mode === 'primary_contrast' ? '1' : '2'} step="0.05" value={String(s.icon_contrast)}
                    onInput={e => this.onIconInput('icon_contrast', e)} />
           </label>
           <label class="field">
@@ -226,32 +242,40 @@ export class ThemeConfigurator {
           <topic-tag
             tid="Angular"
             recolor-primary={s.ion_color_primary}
+            recolor-mode={s.icon_color_mode}
             recolor-secondary={s.ion_color_secondary}
             recolor-contrast={s.icon_contrast}
             recolor-brightness={s.icon_brightness}
+            recolor-primary-contrast={s.icon_contrast}
           ></topic-tag>
           <topic-tag
             tid="React"
             recolor-primary={s.ion_color_primary}
+            recolor-mode={s.icon_color_mode}
             recolor-secondary={s.ion_color_secondary}
             recolor-contrast={s.icon_contrast}
             recolor-brightness={s.icon_brightness}
+            recolor-primary-contrast={s.icon_contrast}
           ></topic-tag>
           <topic-tag
             tid="DeepSeek"
             recolor-primary={s.ion_color_primary}
+            recolor-mode={s.icon_color_mode}
             recolor-secondary={s.ion_color_secondary}
             recolor-contrast={s.icon_contrast}
             recolor-brightness={s.icon_brightness}
+            recolor-primary-contrast={s.icon_contrast}
           ></topic-tag>
         </div>
         {this.recolorProgress && (
           <div class="recolor-progress" role="status" aria-live="polite">
-            <span>Colorizing {this.recolorProgress.completed} of {this.recolorProgress.total} icons</span>
+            <span>
+              Colorizing {this.recolorProgress.uniqueCompleted} of {this.recolorProgress.uniqueTotal} unique icons
+            </span>
             <progress
-              value={this.recolorProgress.completed}
-              max={this.recolorProgress.total}
-              aria-label={`Colorizing ${this.recolorProgress.completed} of ${this.recolorProgress.total} icons`}
+              value={this.recolorProgress.uniqueCompleted}
+              max={this.recolorProgress.uniqueTotal}
+              aria-label={`Colorizing ${this.recolorProgress.uniqueCompleted} of ${this.recolorProgress.uniqueTotal} unique icons`}
             ></progress>
           </div>
         )}

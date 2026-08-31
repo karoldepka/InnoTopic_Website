@@ -29,9 +29,11 @@ export const defaultIconHeight = 18
       [height]="height()"
       [margin]="margin()"
       [recolorPrimary]="themePrimary"
+      [recolorMode]="themeIconColorMode"
       [recolorSecondary]="themeSecondary"
       [recolorContrast]="themeIconContrast"
       [recolorBrightness]="themeIconBrightness"
+      [recolorPrimaryContrast]="themeIconContrast"
     ></topic-logo>
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -42,6 +44,7 @@ export class TopicLogoComponent implements OnDestroy {
   private readonly stopThemeSubscriptions = [
     onThemeStateChange('ion_color_primary', () => this.changeDetector.markForCheck()),
     onThemeStateChange('ion_color_secondary', () => this.changeDetector.markForCheck()),
+    onThemeStateChange('icon_color_mode', () => this.changeDetector.markForCheck()),
     onThemeStateChange('icon_contrast', () => this.changeDetector.markForCheck()),
     onThemeStateChange('icon_brightness', () => this.changeDetector.markForCheck()),
   ]
@@ -59,6 +62,10 @@ export class TopicLogoComponent implements OnDestroy {
 
   get themeSecondary() {
     return themeState.ion_color_secondary
+  }
+
+  get themeIconColorMode() {
+    return themeState.icon_color_mode
   }
 
   get themeIconContrast() {

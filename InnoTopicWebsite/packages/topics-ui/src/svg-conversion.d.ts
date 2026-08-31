@@ -11,6 +11,8 @@ declare module 'svg-conversion' {
 
   export interface ProcessOptions {
     primaryColor?: string
+    /** `primary_contrast` maps the icon's tones around primaryColor and ignores secondaryColor. */
+    colorMode?: 'palette' | 'primary_contrast'
     /** Presence of secondaryColor switches the worker to the two-tone palette conversion. */
     secondaryColor?: string
     /** 0..2, 1 is neutral - only used with secondaryColor. */
@@ -19,6 +21,8 @@ declare module 'svg-conversion' {
     brightness?: number
     /** Single-color tolerance, only used without secondaryColor. */
     tolerance?: number
+    /** 0..1 lightness range above and below primaryColor, used by primary_contrast mode. */
+    primaryContrast?: number
     outputMode?: 'rgb' | 'css_vars'
   }
 

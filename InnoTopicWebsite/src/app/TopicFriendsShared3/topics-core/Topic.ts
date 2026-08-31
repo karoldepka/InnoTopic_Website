@@ -130,7 +130,9 @@ export class Topic {
     if ( nonLogos.some(x => iconFileName.startsWith(x) ) )
       return '../../../assets/images/' + iconFileName
     else
-      return '../../../assets/images/logos-l/logos/' + iconFileName // FIXME: colorful on hover
+      // Theme recoloring works from original SVG palette data. The historic `logos-l` output is
+      // already grayscale and (for masks/styles) can no longer represent the source correctly.
+      return '../../../assets/images/logos/' + iconFileName
   }
 
   private getLogoFileName(tag: string) {

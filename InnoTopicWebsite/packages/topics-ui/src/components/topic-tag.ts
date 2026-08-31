@@ -87,9 +87,11 @@ export class TopicTag extends LitElement {
 
   /** Forwarded to the internal <topic-logo> - see its class doc comment for what these do. */
   @property({ attribute: 'recolor-primary' }) recolorPrimary?: string
+  @property({ attribute: 'recolor-mode' }) recolorMode?: 'palette' | 'primary_contrast'
   @property({ attribute: 'recolor-secondary' }) recolorSecondary?: string
   @property({ type: Number, attribute: 'recolor-contrast' }) recolorContrast = 1
   @property({ type: Number, attribute: 'recolor-brightness' }) recolorBrightness = 0
+  @property({ type: Number, attribute: 'recolor-primary-contrast' }) recolorPrimaryContrast = 0.3
 
   @state() private tagEntry?: Topic
   @state() private showInfoPopover = false
@@ -210,9 +212,11 @@ export class TopicTag extends LitElement {
             <topic-logo
               .topic=${this.tagEntry}
               .recolorPrimary=${this.recolorPrimary}
+              .recolorMode=${this.recolorMode}
               .recolorSecondary=${this.recolorSecondary}
               .recolorContrast=${this.recolorContrast}
               .recolorBrightness=${this.recolorBrightness}
+              .recolorPrimaryContrast=${this.recolorPrimaryContrast}
             ></topic-logo>
           ` : ''}
           ${this.displayName}

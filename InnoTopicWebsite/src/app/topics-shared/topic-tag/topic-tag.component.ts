@@ -27,9 +27,11 @@ import '@innotopic/topics-ui';
       [showLogo]="showLogo()"
       [inline]="inline()"
       [recolorPrimary]="themePrimary"
+      [recolorMode]="themeIconColorMode"
       [recolorSecondary]="themeSecondary"
       [recolorContrast]="themeIconContrast"
       [recolorBrightness]="themeIconBrightness"
+      [recolorPrimaryContrast]="themeIconContrast"
       (click-topic)="onClickTopic($event)"
     >
       <ng-content></ng-content>
@@ -43,6 +45,7 @@ export class TopicTagComponent implements OnDestroy {
   private readonly stopThemeSubscriptions = [
     onThemeStateChange('ion_color_primary', () => this.changeDetector.markForCheck()),
     onThemeStateChange('ion_color_secondary', () => this.changeDetector.markForCheck()),
+    onThemeStateChange('icon_color_mode', () => this.changeDetector.markForCheck()),
     onThemeStateChange('icon_contrast', () => this.changeDetector.markForCheck()),
     onThemeStateChange('icon_brightness', () => this.changeDetector.markForCheck()),
   ]
@@ -60,6 +63,10 @@ export class TopicTagComponent implements OnDestroy {
 
   get themeSecondary() {
     return themeState.ion_color_secondary
+  }
+
+  get themeIconColorMode() {
+    return themeState.icon_color_mode
   }
 
   get themeIconContrast() {

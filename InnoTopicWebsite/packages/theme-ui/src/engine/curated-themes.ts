@@ -23,6 +23,7 @@ const defaultCorners = {
 }
 
 const defaultIcon = {
+  icon_color_mode: 'palette' as const,
   icon_contrast: 1,
   icon_brightness: 0,
 }

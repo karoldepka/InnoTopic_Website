@@ -24,6 +24,8 @@ export interface ThemeConfigState {
   corner_radius_top_right: string;
   corner_radius_bottom_right: string;
   corner_radius_bottom_left: string;
+  /** Use the primary color alone, or interpolate from primary to secondary. */
+  icon_color_mode: 'palette' | 'primary_contrast';
   icon_contrast: number;
   icon_brightness: number;
   // Ported from LifeSuite's ThemeService/ThemeCalculator (theme-config/theme.service.ts) as part
@@ -58,6 +60,7 @@ export const defaultThemeConfig: ThemeConfigState = {
   corner_radius_top_right: '12',
   corner_radius_bottom_right: '12',
   corner_radius_bottom_left: '12',
+  icon_color_mode: 'palette',
   icon_contrast: 1,
   icon_brightness: 0,
   brightness_percent: 75,
