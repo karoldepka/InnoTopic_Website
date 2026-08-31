@@ -1,10 +1,14 @@
 import {
+  ChangeDetectorRef,
   ChangeDetectionStrategy,
   Component,
   CUSTOM_ELEMENTS_SCHEMA,
+  inject,
   input,
+  OnDestroy,
 } from '@angular/core';
 import { Topic } from '@innotopic/topics-ui';
+import { onThemeStateChange, themeState } from '@innotopic/theme-ui';
 import '@innotopic/topics-ui';
 
 export const defaultIconHeight = 18
@@ -24,16 +28,48 @@ export const defaultIconHeight = 18
       [width]="width()"
       [height]="height()"
       [margin]="margin()"
+      [recolorPrimary]="themePrimary"
+      [recolorSecondary]="themeSecondary"
+      [recolorContrast]="themeIconContrast"
+      [recolorBrightness]="themeIconBrightness"
     ></topic-logo>
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class TopicLogoComponent {
+export class TopicLogoComponent implements OnDestroy {
+  private readonly changeDetector = inject(ChangeDetectorRef)
+  private readonly stopThemeSubscriptions = [
+    onThemeStateChange('ion_color_primary', () => this.changeDetector.markForCheck()),
+    onThemeStateChange('ion_color_secondary', () => this.changeDetector.markForCheck()),
+    onThemeStateChange('icon_contrast', () => this.changeDetector.markForCheck()),
+    onThemeStateChange('icon_brightness', () => this.changeDetector.markForCheck()),
+  ]
+
   topic = input.required<Topic | string>();
   size = input(defaultIconHeight);
   /** Only used when the resolved topic has no logoSize - see the Lit component's dimensions logic. */
   width = input<number>();
   height = input<number>();
   margin = input(2);
+
+  get themePrimary() {
+    return themeState.ion_color_primary
+  }
+
+  get themeSecondary() {
+    return themeState.ion_color_secondary
+  }
+
+  get themeIconContrast() {
+    return themeState.icon_contrast
+  }
+
+  get themeIconBrightness() {
+    return themeState.icon_brightness
+  }
+
+  ngOnDestroy() {
+    this.stopThemeSubscriptions.forEach(unsubscribe => unsubscribe())
+  }
 }

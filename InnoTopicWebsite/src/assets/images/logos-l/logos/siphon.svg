@@ -1,8 +1,1 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<svg fill="rgb(131,131,131)" width="256px" height="256px" viewBox="0 0 256 256" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" preserveAspectRatio="xMidYMid">
-  <g>
-      <path d="M0,256 L129,256 L129,128 L0,128 L0,256 L0,256 Z" fill="rgb(216,216,216)"></path>
-      <path d="M128,129 L256,129 L256,0 L128,0 L128,129 L128,129 Z" fill="rgb(243,243,243)"></path>
-      <path d="M128,256 L256,256 L256,128 L128,128 L128,256 L128,256 Z" fill="rgb(230,230,230)"></path>
-  </g>
-</svg>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" height="256px" viewBox="0 0 256 256" version="1.1" preserveAspectRatio="xMidYMid" width="256px" fill="rgb(0,0,0)"><g><path fill="rgb(105,105,105)" d="M0,256 L129,256 L129,128 L0,128 L0,256 L0,256 Z" /><path fill="rgb(138,138,138)" d="M128,129 L256,129 L256,0 L128,0 L128,129 L128,129 Z" /><path d="M128,256 L256,256 L256,128 L128,128 L128,256 L128,256 Z" fill="rgb(122,122,122)" /></g></svg>

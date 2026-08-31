@@ -1,13 +1,1 @@
-<svg fill="rgb(131,131,131)" version="1.1" baseProfile="tiny" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
-	 x="0px" y="0px" width="24px" height="24px" viewBox="0 0 24 24" overflow="visible" xml:space="preserve">
-<g >
-	<rect y="0" fill="none" width="24" height="24"/>
-	<g transform="translate(0.000000, 1.000000)">
-		<polygon fill-rule="evenodd" fill="rgb(221,221,221)" points="13.6,3.2 10.4,3.2 3,10 3,22.2 9,22.2 9,14 15,14 15,22.2 21,22.2 21,10 		
-			"/>
-		<polygon fill-rule="evenodd" fill="rgb(243,243,243)" points="12,3.2 10.4,3.2 3,10 3,22.2 9,22.2 9,14 12,14 		"/>
-		<polygon fill-rule="evenodd" fill="rgb(200,200,200)" points="13.1,3.7 3,14.8 3,11 12.5,2.6 		"/>
-		<polygon fill-rule="evenodd" fill="rgb(243,243,243)" points="12,-0.1 0,11.9 1.8,13.7 12,3.5 22.2,13.7 24,11.9 		"/>
-	</g>
-</g>
-</svg>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" id="Layer_1" viewBox="0 0 24 24" fill="rgb(0,0,0)" y="0px" baseProfile="tiny" version="1.1" x="0px" width="24px" height="24px" overflow="visible" space="preserve"><g><rect width="24" y="0" height="24" fill="none" /><g transform="translate(0.000000, 1.000000)"><polygon fill="rgb(130,130,130)" points="13.6,3.2 10.4,3.2 3,10 3,22.2 9,22.2 9,14 15,14 15,22.2 21,22.2 21,10 		&#xD;&#xA;			" fill-rule="evenodd" /><polygon points="12,3.2 10.4,3.2 3,10 3,22.2 9,22.2 9,14 12,14 		" fill-rule="evenodd" fill="rgb(162,162,162)" /><polygon fill-rule="evenodd" points="13.1,3.7 3,14.8 3,11 12.5,2.6 		" fill="rgb(100,100,100)" /><polygon points="12,-0.1 0,11.9 1.8,13.7 12,3.5 22.2,13.7 24,11.9 		" fill-rule="evenodd" fill="rgb(162,162,162)" /></g></g></svg>

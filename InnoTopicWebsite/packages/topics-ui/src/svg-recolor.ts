@@ -28,16 +28,30 @@ export function setWorkerBasePath(path: string) {
   workerBasePath = path
 }
 
-// One shared worker pool for every <topic-logo> on the page - each instance is cheap to call
-// but the pool itself owns real Worker threads, so it's created lazily and only once.
+// One shared worker pool for every topic icon on the page. It is deliberately sized to the
+// browser-reported number of logical CPU cores so a theme update can recolor many SVGs in
+// parallel; the fallback keeps recoloring available in environments that do not expose it.
+function logicalCpuCount(): number {
+  const count = globalThis.navigator?.hardwareConcurrency
+  return typeof count === 'number' && Number.isInteger(count) && count > 0 ? count : 1
+}
+
+// Each icon component is cheap to call, but the pool owns real Worker threads, so it is created
+// lazily and shared across the page rather than creating a pool per component.
 let poolPromise: Promise<SvgWorkerPoolLike | undefined> | undefined
 async function getPool(): Promise<SvgWorkerPoolLike | undefined> {
   if (!poolPromise) {
     poolPromise = (async () => {
       try {
-        const dynamicImport = Function('m', 'return import(m)') as (moduleName: string) => Promise<any>
-        const svgConversion = await dynamicImport('svg-conversion')
-        return new svgConversion.SvgWorkerPool({ workerUrl: `${workerBasePath}svg-worker.js` }) as SvgWorkerPoolLike
+        // Keep this import visible to the bundler. A Function-created import leaves the bare
+        // `svg-conversion` specifier for the browser to resolve at runtime, so the live theme
+        // preview silently falls back to the original SVG outside a dev-server import map.
+        // The worker URL remains explicit because the worker itself is copied as a static asset.
+        const svgConversion = await import('svg-conversion')
+        return new svgConversion.SvgWorkerPool({
+          size: logicalCpuCount(),
+          workerUrl: `${workerBasePath}svg-worker.js`,
+        }) as SvgWorkerPoolLike
       } catch {
         return undefined
       }
@@ -63,19 +77,70 @@ function fetchSvgText(url: string): Promise<string> {
   return cached
 }
 
+type RecolorBatch = {
+  startedAt: number
+  pending: number
+  completed: number
+  failed: number
+}
+
+let activeBatch: RecolorBatch | undefined
+
+function startRecolorTiming(): { batch: RecolorBatch; startedAt: number } {
+  if (!activeBatch) {
+    activeBatch = {
+      startedAt: performance.now(),
+      pending: 0,
+      completed: 0,
+      failed: 0,
+    }
+  }
+  activeBatch.pending += 1
+  return { batch: activeBatch, startedAt: performance.now() }
+}
+
+function finishRecolorTiming(batch: RecolorBatch, startedAt: number, url: string, failed: boolean) {
+  const elapsedMs = performance.now() - startedAt
+  batch.pending -= 1
+  batch.completed += 1
+  if (failed) batch.failed += 1
+  console.debug('[topics-ui] SVG recolor', {
+    url,
+    elapsedMs: Number(elapsedMs.toFixed(2)),
+    failed,
+  })
+  if (batch.pending === 0) {
+    console.info('[topics-ui] SVG recolor batch complete', {
+      icons: batch.completed,
+      failed: batch.failed,
+      elapsedMs: Number((performance.now() - batch.startedAt).toFixed(2)),
+    })
+    if (activeBatch === batch) activeBatch = undefined
+  }
+}
+
 /** Fetches the icon at `url` and recolors it via the Rust/Wasm worker pool. */
 export async function recolorSvg(url: string, options: RecolorOptions): Promise<string> {
-  const svgText = await fetchSvgText(url)
-  const workerPool = await getPool()
-  if (!workerPool) {
-    return svgText
-  }
+  const { batch, startedAt } = startRecolorTiming()
+  let failed = true
+  try {
+    const svgText = await fetchSvgText(url)
+    const workerPool = await getPool()
+    if (!workerPool) {
+      failed = false
+      return svgText
+    }
 
-  return workerPool.process(svgText, {
-    primaryColor: options.primaryColor,
-    secondaryColor: options.secondaryColor,
-    contrast: options.contrast,
-    brightness: options.brightness,
-    outputMode: 'rgb',
-  })
+    const result = await workerPool.process(svgText, {
+      primaryColor: options.primaryColor,
+      secondaryColor: options.secondaryColor,
+      contrast: options.contrast,
+      brightness: options.brightness,
+      outputMode: 'rgb',
+    })
+    failed = false
+    return result
+  } finally {
+    finishRecolorTiming(batch, startedAt, url, failed)
+  }
 }

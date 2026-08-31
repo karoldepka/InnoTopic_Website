@@ -1,10 +1,1 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<svg fill="rgb(131,131,131)" width="80px" height="80px" viewBox="0 0 80 80" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-    <title>Icon-Architecture/64/Arch_Amazon-WorkMail_64</title>
-    <g id="Icon-Architecture/64/Arch_Amazon-WorkMail_64" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-        <g id="Icon-Architecture-BG/64/Business-Applications" fill="rgb(177,177,177)">
-            <rect id="Rectangle" x="0" y="0" width="80" height="80"></rect>
-        </g>
-        <path d="M14,66 L14,15.414 L39.293,40.707 C39.488,40.902 39.744,41 40,41 C40.256,41 40.512,40.902 40.707,40.707 L66,15.414 L66,66 L14,66 Z M64.586,14 L40,38.586 L15.414,14 L64.586,14 Z M67,12 L13,12 C12.447,12 12,12.448 12,13 L12,67 C12,67.552 12.447,68 13,68 L67,68 C67.553,68 68,67.552 68,67 L68,13 C68,12.448 67.553,12 67,12 L67,12 Z" id="Amazon-WorkMail_Icon_64_Squid" fill="rgb(243,243,243)"></path>
-    </g>
-</svg>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 80 80" height="80px" width="80px" version="1.1" fill="rgb(36,36,36)"><title>Icon-Architecture/64/Arch_Amazon-WorkMail_64</title><g fill-rule="evenodd" stroke="none" id="Icon-Architecture/64/Arch_Amazon-WorkMail_64" stroke-width="1" fill="none"><g fill="rgb(90,90,90)" id="Icon-Architecture-BG/64/Business-Applications"><rect y="0" id="Rectangle" width="80" x="0" height="80" /></g><path d="M14,66 L14,15.414 L39.293,40.707 C39.488,40.902 39.744,41 40,41 C40.256,41 40.512,40.902 40.707,40.707 L66,15.414 L66,66 L14,66 Z M64.586,14 L40,38.586 L15.414,14 L64.586,14 Z M67,12 L13,12 C12.447,12 12,12.448 12,13 L12,67 C12,67.552 12.447,68 13,68 L67,68 C67.553,68 68,67.552 68,67 L68,13 C68,12.448 67.553,12 67,12 L67,12 Z" id="Amazon-WorkMail_Icon_64_Squid" fill="rgb(166,166,166)" /></g></svg>

@@ -1,4 +1,6 @@
-import {Component, effect, Input, OnInit, ViewEncapsulation,} from '@angular/core';
+import {Component, effect, Input, OnDestroy, OnInit, ViewEncapsulation,} from '@angular/core';
+import {recolorSvg} from '@innotopic/topics-ui';
+import {onThemeStateChange, themeState} from '@innotopic/theme-ui';
 import {topics} from '../../TopicFriendsShared3/topics-core/topics-data';
 import {nodeConnections, nodeLinks, preset, sizes, strengths} from "./topics-graph.data";
 import {GraphConnections, GraphNode, GraphNodeId, LinkByIds} from "./topics-graph.types";
@@ -17,7 +19,7 @@ import {FeatureFlagsService} from '../../shared/feature-flags/feature-flags.serv
   styleUrls: ['./topics-graph.component.sass'],
   encapsulation: ViewEncapsulation.None,
 })
-export class TopicsGraphComponent implements OnInit {
+export class TopicsGraphComponent implements OnInit, OnDestroy {
 
   @Input() connections: GraphConnections = {...nodeConnections};
 
@@ -26,6 +28,13 @@ export class TopicsGraphComponent implements OnInit {
 
   /** True once the graph has rendered once, so the flag effect below doesn't fire before there's anything to rebuild. */
   private graphInitialized = false;
+  private recolorRequestId = 0;
+  private readonly stopThemeSubscriptions = [
+    onThemeStateChange('ion_color_primary', () => this.refreshRecoloredIcons()),
+    onThemeStateChange('ion_color_secondary', () => this.refreshRecoloredIcons()),
+    onThemeStateChange('icon_contrast', () => this.refreshRecoloredIcons()),
+    onThemeStateChange('icon_brightness', () => this.refreshRecoloredIcons()),
+  ];
 
   // idea: new/expanding-to topics could be with effect e.g. static noise or fading in-out, e.g. qwik, turbopack; while old, permanently faded
   // TODO: try d3.forceRadial(radius[, x][, y])
@@ -54,7 +63,14 @@ export class TopicsGraphComponent implements OnInit {
     this.fetchIcons() // this inits graph when finished
   }
 
+  private refreshRecoloredIcons() {
+    if (this.graphInitialized) {
+      void this.fetchIcons();
+    }
+  }
+
   private async fetchIcons() {
+    const requestId = ++this.recolorRequestId;
     const topicNodes = this.d3Nodes.map(d3Node => {
       let topicId = d3Node.id;
       const topic = (topics as any)[topicId]
@@ -64,42 +80,34 @@ export class TopicsGraphComponent implements OnInit {
       return topic
     })
 
-    let logosPromises = topicNodes.map((topic: any) => {
-      // console.log(`topic`, topic)
-      const responsePromise = fetch(topic.logo);
-      // responsePromise.then(resp => {
-      //   resp.text().then(text => {
-      //     const d3Node = this.d3Nodes.find(n => n.id === topic.name /* not id coz _dot_js */);
-      //     if ( ! d3Node ) {
-      //       console.error('no node', topic.id)
-      //     }
-      //     d3Node.body = text.trim().substr(text.indexOf('<svg')) // TODO maybe remove other attrs like width height
-      //     // TODO: prolly i really wanna remove stuff AFTER <svg
-      //     console.log('d3Node with text', d3Node)
-      //   })
-      // })
-      return responsePromise;
-    });
-    // console.log(`topic logosPromises`, logosPromises)
-    const topicLogosResponses = await Promise.all(logosPromises)
-    const topicLogosTexts = await Promise.all(topicLogosResponses.map(resp => resp.text())).then(texts => {
-      texts.forEach((text, i) => {
-        const topic = topicNodes[i]
-        const id = topic.name
-        const d3Node = this.d3Nodes.find(n => n.id === topic.name /* not id coz _dot_js */);
-        if ( ! d3Node ) {
-          console.error('no node', topic.id)
-        }
-        d3Node.body = text.trim().substr(text.indexOf('<svg')) // TODO maybe remove other attrs like width height
-        // TODO: prolly i really wanna remove stuff AFTER <svg
-        // console.log('d3Node with text', d3Node)
+    const recoloredIcons = await Promise.all(topicNodes.map(async (topic: any) => {
+      if (!topic?.logo) return undefined;
+      return recolorSvg(topic.logo, {
+        primaryColor: themeState.ion_color_primary,
+        secondaryColor: themeState.ion_color_secondary,
+        contrast: themeState.icon_contrast,
+        brightness: themeState.icon_brightness,
+      });
+    }));
 
-      })
-      this.initD3Graph() // FIXME
-      this.graphInitialized = true
-    })
-    // console.log(`topic logos`, topicLogosResponses)
-    // console.log(`topic logos topicLogosTexts`, topicLogosTexts)
+    // Slider input can queue another recoloring batch before this one finishes. Render only the
+    // latest palette, so an older worker response cannot flash back into the graph.
+    if (requestId !== this.recolorRequestId) return;
+
+    recoloredIcons.forEach((text, i) => {
+      const topic = topicNodes[i];
+      const d3Node = this.d3Nodes.find(n => n.id === topic?.name);
+      if (d3Node && text) {
+        d3Node.body = text.trim().substring(text.indexOf('<svg'));
+      }
+    });
+    this.initD3Graph();
+    this.graphInitialized = true;
+
+  }
+
+  ngOnDestroy() {
+    this.stopThemeSubscriptions.forEach(unsubscribe => unsubscribe());
   }
 
   private initD3Graph() {

@@ -177,9 +177,15 @@ export class WorkOrganisationsAndProjectsData {
     projects: {
       'EpicElite Platform': project({
         roles: 'Lead/Senior Full-Stack Developer & Interviewing and Recruiting (Consultant)',
-        description: 'Recruited and interviewed 5 Developers and a UI/UX/Web/Graphics Designer. I was a #Team_Lead of 5 Developers. Did code&architecture reviews.' +
-          'Working directly with #CEO & #Director_of_Operations. Communication in #English, #Spanish, #Polish. ' +
-          '"#Python #Django + #TypeScript app using #MongoDB and #MariaDB . ',
+        description: 
+          'Developed company\'s platforms and tools for uploading, storing, managing and reviewing assets,' + 
+          ' which served hundreds of thousands of clients' +
+          ' processing millions of assets reaching hundreds of millions of viewers and listeners.'  +
+          ' Recruited 5 Developers and a UI/UX/Web/Graphics Designer.' +
+          ' I was a #Team_Lead of 5 Developers. Did code&architecture reviews.' +
+          ' Worked directly with #CEO & #Director_of_Operations.' +
+          ' Communication in #English, #Spanish, #Polish.',
+          // '"#Python #Django + #TypeScript app using #MongoDB and #MariaDB . ',
         topicsById: {
           'Microservices': {},
           'Mailgun': {},
@@ -208,6 +214,7 @@ export class WorkOrganisationsAndProjectsData {
           'Gatsby': {},
           'Lodash': {},
           'YouTube': {},
+          // TODO 'YouTube API': {},
           'Figma': {},
           'Zeplin': {},
           'SVG': {},

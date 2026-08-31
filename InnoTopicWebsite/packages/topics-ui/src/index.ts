@@ -4,6 +4,7 @@ export { ReactiveValue } from './reactive-value'
 export { Topic, TopicUrls, setIconBasePath, setCountryIconBasePath } from './data/Topic'
 export { TopicExtendedInfo } from './data/TopicExtendedInfo'
 export { setWorkerBasePath as setSvgRecolorWorkerBasePath } from './svg-recolor'
+export { recolorSvg } from './svg-recolor'
 
 export { TopicChip } from './components/chip'
 export { TopicLogo, defaultIconHeight } from './components/topic-logo'

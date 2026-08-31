@@ -1,9 +1,1 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<svg fill="rgb(131,131,131)" width="256px" height="256px" viewBox="0 0 256 256" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" preserveAspectRatio="xMidYMid">
-	<g>
-		<polygon fill="rgb(184,184,184)" points="0 127.944121 128 1.71602774e-14 256 127.944121 128 256"></polygon>
-		<polygon fill="rgb(202,202,202)" points="256 128 128 256 0 128"></polygon>
-		<circle fill="rgb(243,243,243)" cx="128" cy="128.5" r="64.5"></circle>
-		<circle fill="rgb(212,212,212)" cx="128" cy="128.5" r="43.4984264"></circle>
-	</g>
-</svg>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" fill="rgb(20,20,20)" width="256px" version="1.1" viewBox="0 0 256 256" height="256px" preserveAspectRatio="xMidYMid"><g><polygon points="0 127.944121 128 1.71602774e-14 256 127.944121 128 256" fill="rgb(90,90,90)" /><polygon points="256 128 128 256 0 128" fill="rgb(112,112,112)" /><circle r="64.5" fill="rgb(166,166,166)" cx="128" cy="128.5" /><circle cx="128" fill="rgb(125,125,125)" r="43.4984264" cy="128.5" /></g></svg>

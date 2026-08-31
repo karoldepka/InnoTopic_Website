@@ -1,7 +1,1 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<svg fill="rgb(187,187,187)" width="256px" height="384px" viewBox="0 0 256 384" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" preserveAspectRatio="xMidYMid">
-    <title>Framer</title>
-    <g>
-        <path d="M0,0 L256,0 L256,128 L128,128 L0,0 Z M0,128 L128,128 L256,256 L128,256 L128,384 L0,256 L0,128 Z" fill="rgb(187,187,187)"></path>
-    </g>
-</svg>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 256 384" fill="rgb(128,128,128)" height="384px" width="256px" preserveAspectRatio="xMidYMid" version="1.1"><title>Framer</title><g><path d="M0,0 L256,0 L256,128 L128,128 L0,0 Z M0,128 L128,128 L256,256 L128,256 L128,384 L0,256 L0,128 Z" fill="rgb(128,128,128)" /></g></svg>
