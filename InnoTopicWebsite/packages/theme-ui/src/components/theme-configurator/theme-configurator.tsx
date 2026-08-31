@@ -7,6 +7,7 @@ import type { ThemeConfigState } from '../../engine/theme-config-state'
 // @innotopic/topics-ui chips so you can see themed chips while tuning colors, the same role
 // the Angular app's <app-tinted-swatches>/<app-theme-samples> preview components played.
 import '@innotopic/topics-ui'
+import { onSvgRecolorProgress, type SvgRecolorProgress } from '@innotopic/topics-ui'
 
 const ALL_KEYS: (keyof ThemeConfigState)[] = [
   'ion_color_primary', 'ion_color_secondary', 'ion_background_color',
@@ -38,6 +39,7 @@ export class ThemeConfigurator {
   // Locked by default: one corner's slider drives all four, matching the topic-chip's
   // existing "single radius pair" look until someone deliberately opts into independent corners.
   @State() cornersLocked = true
+  @State() recolorProgress?: SvgRecolorProgress
 
   connectedCallback() {
     injectThemeTokens()
@@ -45,6 +47,7 @@ export class ThemeConfigurator {
     ALL_KEYS.forEach(key => {
       this.unsubscribes.push(onThemeStateChange(key, () => forceUpdate(this)))
     })
+    this.unsubscribes.push(onSvgRecolorProgress(progress => { this.recolorProgress = progress }))
   }
 
   disconnectedCallback() {
@@ -54,6 +57,24 @@ export class ThemeConfigurator {
 
   private onColorInput(field: 'ion_color_primary' | 'ion_color_secondary' | 'ion_background_color', event: Event) {
     setThemeConfig({ [field]: (event.target as HTMLInputElement).value } as Partial<ThemeConfigState>)
+  }
+
+  private onPrimaryColorWheel(event: PointerEvent) {
+    const wheel = event.currentTarget as HTMLElement
+    const bounds = wheel.getBoundingClientRect()
+    const x = event.clientX - bounds.left - bounds.width / 2
+    const y = event.clientY - bounds.top - bounds.height / 2
+    const radius = Math.min(bounds.width, bounds.height) / 2
+    const saturation = Math.hypot(x, y) / radius
+    if (saturation > 1) return
+    const hue = (Math.atan2(y, x) * 180 / Math.PI + 360) % 360
+    const chroma = saturation
+    const secondary = chroma * (1 - Math.abs((hue / 60) % 2 - 1))
+    const [r, g, b] = hue < 60 ? [chroma, secondary, 0] : hue < 120 ? [secondary, chroma, 0]
+      : hue < 180 ? [0, chroma, secondary] : hue < 240 ? [0, secondary, chroma]
+        : hue < 300 ? [secondary, 0, chroma] : [chroma, 0, secondary]
+    const toHex = (value: number) => Math.round(value * 255).toString(16).padStart(2, '0')
+    setThemeConfig({ ion_color_primary: `#${toHex(r)}${toHex(g)}${toHex(b)}` })
   }
 
   private onRangeInput(field: 'shadow_offset' | 'shadow_blur_radius' | 'shadow_opacity' | 'inner_shadow_offset' | 'inner_shadow_blur_radius' | 'inner_shadow_opacity', event: Event) {
@@ -104,6 +125,7 @@ export class ThemeConfigurator {
           <label class="field">
             <span class="field-label">Primary</span>
             <input type="color" value={s.ion_color_primary} onInput={e => this.onColorInput('ion_color_primary', e)} />
+            <button type="button" class="color-wheel" onPointerDown={e => this.onPrimaryColorWheel(e)} aria-label="Choose primary color from color wheel" title="Choose primary color"></button>
           </label>
           <label class="field">
             <span class="field-label">Secondary</span>
@@ -223,6 +245,16 @@ export class ThemeConfigurator {
             recolor-brightness={s.icon_brightness}
           ></topic-tag>
         </div>
+        {this.recolorProgress && (
+          <div class="recolor-progress" role="status" aria-live="polite">
+            <span>Colorizing {this.recolorProgress.completed} of {this.recolorProgress.total} icons</span>
+            <progress
+              value={this.recolorProgress.completed}
+              max={this.recolorProgress.total}
+              aria-label={`Colorizing ${this.recolorProgress.completed} of ${this.recolorProgress.total} icons`}
+            ></progress>
+          </div>
+        )}
       </div>
     )
   }

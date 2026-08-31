@@ -84,6 +84,23 @@ type RecolorBatch = {
   failed: number
 }
 
+export interface SvgRecolorProgress {
+  completed: number
+  total: number
+  failed: number
+}
+
+const progressSubscribers = new Set<(progress: SvgRecolorProgress | undefined) => void>()
+export function onSvgRecolorProgress(callback: (progress: SvgRecolorProgress | undefined) => void): () => void {
+  progressSubscribers.add(callback)
+  return () => progressSubscribers.delete(callback)
+}
+
+function publishProgress(batch?: RecolorBatch) {
+  const progress = batch && { completed: batch.completed, total: batch.completed + batch.pending, failed: batch.failed }
+  progressSubscribers.forEach(callback => callback(progress))
+}
+
 let activeBatch: RecolorBatch | undefined
 
 function startRecolorTiming(): { batch: RecolorBatch; startedAt: number } {
@@ -96,6 +113,7 @@ function startRecolorTiming(): { batch: RecolorBatch; startedAt: number } {
     }
   }
   activeBatch.pending += 1
+  publishProgress(activeBatch)
   return { batch: activeBatch, startedAt: performance.now() }
 }
 
@@ -104,6 +122,7 @@ function finishRecolorTiming(batch: RecolorBatch, startedAt: number, url: string
   batch.pending -= 1
   batch.completed += 1
   if (failed) batch.failed += 1
+  publishProgress(batch)
   console.debug('[topics-ui] SVG recolor', {
     url,
     elapsedMs: Number(elapsedMs.toFixed(2)),
@@ -116,6 +135,7 @@ function finishRecolorTiming(batch: RecolorBatch, startedAt: number, url: string
       elapsedMs: Number((performance.now() - batch.startedAt).toFixed(2)),
     })
     if (activeBatch === batch) activeBatch = undefined
+    publishProgress()
   }
 }
 

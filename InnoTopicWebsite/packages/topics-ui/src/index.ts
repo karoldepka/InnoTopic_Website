@@ -5,6 +5,8 @@ export { Topic, TopicUrls, setIconBasePath, setCountryIconBasePath } from './dat
 export { TopicExtendedInfo } from './data/TopicExtendedInfo'
 export { setWorkerBasePath as setSvgRecolorWorkerBasePath } from './svg-recolor'
 export { recolorSvg } from './svg-recolor'
+export { onSvgRecolorProgress } from './svg-recolor'
+export type { SvgRecolorProgress } from './svg-recolor'
 
 export { TopicChip } from './components/chip'
 export { TopicLogo, defaultIconHeight } from './components/topic-logo'

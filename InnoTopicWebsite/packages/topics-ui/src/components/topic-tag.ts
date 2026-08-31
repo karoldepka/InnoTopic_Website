@@ -121,7 +121,7 @@ export class TopicTag extends LitElement {
     this.unsubscribeExtended?.()
   }
 
-  updated(changed: Map<string, unknown>) {
+  protected willUpdate(changed: Map<string, unknown>) {
     if (changed.has('tId')) {
       this.resolveTopic()
     }
