@@ -753,6 +753,7 @@ export class Cloud {
 }
 
 export class Monitoring_and_observability {
+  PostHog = tWide()
   Grafana = tNarrow()
   'Datadog' = t('datadog-icon')
   'Dynatrace' = t('dynatrace-icon')
@@ -822,6 +823,7 @@ export class Version_Control {
 */
 export class Other {
   'Mailgun' = t('mailgun-icon.svg')
+  'Microsoft Advertising' = tNoIcon()
   'reCAPTCHA' = t('recaptcha-icon.svg') // TODO: crop icon only
   'AudioSalad' = t(`audiosalad-traced.svg`)
   'WorldFirst' = tNoIcon()
@@ -1067,7 +1069,7 @@ export class AI_Hardware {
 
 export class Build_Systems_And_Package_Managers {
   Gradle = t()
-  Maven = tWide('maven_OFF')
+  Maven = tWide('maven.svg')
   Yarn = t()
   NPM = tWide()
   Bazel = t(`bazel-icon.svg`)

@@ -452,7 +452,7 @@ export class Testing {
   Karma = t()
   Jasmine = t()
   JUnit = t({logo: 'Junit.fe42161b-ugly.svg', logoSize: [125, 84], iconUrl: `https://zebrunner.com/`})
-  TestNG = t({logo: 'testng.png', logoSize: [634, 176]})
+  TestNG = t({logo: null, logoSize: [634, 176]})
   Cucumber = t()
   Calabash = tNoIcon()
   Cobertura = tNoIcon()
@@ -1066,7 +1066,7 @@ export class AI_Hardware {
 
 export class Build_Systems_And_Package_Managers {
   Gradle = t()
-  Maven = tWide('maven_OFF')
+  Maven = tWide('maven.svg')
   Yarn = t()
   NPM = tWide()
   Bazel = t(`bazel-icon.svg`)

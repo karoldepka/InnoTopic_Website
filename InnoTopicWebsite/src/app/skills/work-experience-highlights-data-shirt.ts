@@ -746,6 +746,7 @@ export const highlights = {
     Erlang: {},
     Elixir: {},
     Haskell: {},
+    
     Prolog: {},
     Lisp: {},
     OCaml: {},

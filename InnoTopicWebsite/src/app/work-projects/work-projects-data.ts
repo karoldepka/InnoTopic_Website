@@ -55,13 +55,13 @@ export class WorkOrganisationsAndProjectsData {
     // subTitle: '(formerly known as CommerceHub / ChannelAdvisor / DSCO)',
     // TODO: some info that it was e-commerce
     flags: 'es uk us pt',
-    time: ['September 2023', 'July 2026' /* TODO: make months optional */],
+    time: ['September 2023', 'September 2026' /* TODO: make months optional */],
     linkedInRecommendations: 0,
     locations: `Málaga, remote, Madrid`,
     logoFileName: `Rithum/rithum-icon.svg`,
     description: '#Staff_Engineer, developing in #Rust, #Python, #React and #AWS, #Amazon_Bedrock, #OpenSearch #Elasticsearch and related', // TODO: #Amazon_CDK
     projects: {
-      'AI-based LLM-powered processing of product metadata': project({
+      'AI-based LLM-powered platform for processing of product metadata and categorization': project({
         roles: 'Staff Engineer',
         description: 'Using #Python and #Amazon_Bedrock with #DynamoDB and #MongoDB and #Django + #TypeScript & #Rust Web App. ' +
           'Working directly with #CTO and #Senior_Principal_Engineer and other #Staff_Engineer. ' +
@@ -178,11 +178,12 @@ export class WorkOrganisationsAndProjectsData {
       'EpicElite Platform': project({
         roles: 'Lead/Senior Full-Stack Developer & Interviewing and Recruiting (Consultant)',
         description: 
-          'Developed company\'s platforms and tools for uploading, storing, managing and reviewing assets,' + 
-          ' which served hundreds of thousands of clients' +
+          'Developed company\'s platforms and tools for uploading, storing, managing and' + 
+          ' reviewing audio and video assets, ' + 
+          ' which served hundreds of thousands of clients,' +
           ' processing millions of assets reaching hundreds of millions of viewers and listeners.'  +
-          ' Recruited 5 Developers and a UI/UX/Web/Graphics Designer.' +
-          ' I was a #Team_Lead of 5 Developers. Did code&architecture reviews.' +
+          ' Recruited 3 Developers and a UI/UX/Web/Graphics Designer.' +
+          ' I was a #Team_Lead of 3 Developers. Did code&architecture reviews.' +
           ' Worked directly with #CEO & #Director_of_Operations.' +
           ' Communication in #English, #Spanish, #Polish.',
           // '"#Python #Django + #TypeScript app using #MongoDB and #MariaDB . ',
@@ -380,8 +381,14 @@ export class WorkOrganisationsAndProjectsData {
     time: [2017],
     projects: {
       'DomainMate': {
+        // tagline:
         description: "smart, linguistic and creative domain name generation and prices comparison.",
-        topicsById: {},
+        topicsById: {
+          "Vue.js": {},
+          Nuxt: {},
+          PostHog: {},
+          'Microsoft Advertising': {},
+        },
       },
       // TODO: 'ShirtGen': project({
       'AIShirtGen - InnoTopic AI LLM Shirts/Posters/Banners Generator': project({
@@ -391,6 +398,16 @@ export class WorkOrganisationsAndProjectsData {
         topicsById: {
           'Vue.js': {},
           'Nuxt': {},
+          // TODO: 'Nitro': {},
+        }
+      }),
+      'TODO: AskMAI (Ask My AI)': project({
+        // TODO: title: "InnoTopic AI LLM Shirts/Posters/Banners Generator",
+        description: "OP #Python #LangChain #Ollama product and LLM & RAG case studies and side-experiments and demos",
+        roles: `Founder, Owner, Angular developer`,
+        topicsById: {
+          'Angular': {},
+          'Ollama': {},
           // TODO: 'Nitro': {},
         }
       }),

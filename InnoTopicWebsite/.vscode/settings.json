@@ -5,9 +5,17 @@
     "workbench.colorTheme": "Abyss",
     "deepscan.enable": true,
     "cSpell.words": [
+        "Dexie",
+        "Genengine",
         "Gridsome",
+        "Inno",
+        "Laravel",
+        "Málaga",
         "Multiplatform",
         "Ollama",
-        "Qwik"
+        "Qwik",
+        "Rithum",
+        "Tauri",
+        "Zeplin"
     ]
 }

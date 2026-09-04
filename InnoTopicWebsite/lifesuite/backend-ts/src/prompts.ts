@@ -310,7 +310,8 @@ export function buildMoreSubcategoriesMessages(
     system: MORE_SUBCATEGORIES_SYSTEM,
     messages: [{ role: 'user' as const, content: userContent }],
   };
-}
+}   
+  
 
 // ─── Copilot chat ─────────────────────────────────────────────────────────────
 
