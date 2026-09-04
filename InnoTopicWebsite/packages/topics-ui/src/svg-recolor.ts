@@ -230,6 +230,58 @@ function finishRecolorTiming(batch: RecolorBatch, startedAt: number, url: string
 
 // Topic logos recur throughout the graph, tags and previews. Coalesce equal requests while a
 // recolor is running so every duplicate shares the same fetch and Wasm-worker conversion.
+/**
+ * Counts the unique fill and stroke colors in an SVG element.
+ * Returns the count, which can be 0, 1, or >1 (returns 2 for any count >= 2).
+ * Uses regex-based parsing for robustness across environments.
+ */
+function countSvgColors(svgText: string): number {
+  const colors = new Set<string>()
+  
+  // Match fill="..." or fill='...' or fill=... (unquoted)
+  const fillRegex = /fill\s*=\s*["']?([^"'\s>;]+)["']?/gi
+  let match: RegExpExecArray | null
+  while ((match = fillRegex.exec(svgText)) !== null) {
+    const color = match[1]
+    if (color && color !== 'none' && !color.startsWith('url(')) {
+      colors.add(color)
+    }
+  }
+  
+  // Match stroke="..." or stroke='...' or stroke=... (unquoted)
+  const strokeRegex = /stroke\s*=\s*["']?([^"'\s>;]+)["']?/gi
+  while ((match = strokeRegex.exec(svgText)) !== null) {
+    const color = match[1]
+    if (color && color !== 'none' && !color.startsWith('url(')) {
+      colors.add(color)
+    }
+  }
+  
+  // Also check for style attributes containing color declarations
+  const styleRegex = /style\s*=\s*["']([^"']+)["']/gi
+  while ((match = styleRegex.exec(svgText)) !== null) {
+    const style = match[1]
+    const fillMatch = style.match(/fill:\s*([^;]+)/i)
+    const strokeMatch = style.match(/stroke:\s*([^;]+)/i)
+    if (fillMatch) {
+      const color = fillMatch[1].trim()
+      if (color !== 'none' && !color.startsWith('url(')) {
+        colors.add(color)
+      }
+    }
+    if (strokeMatch) {
+      const color = strokeMatch[1].trim()
+      if (color !== 'none' && !color.startsWith('url(')) {
+        colors.add(color)
+      }
+    }
+  }
+
+  // Clamp to 0, 1, or 2 (we only care if it's single-color or not)
+  return colors.size > 1 ? 2 : colors.size
+}
+
+
 const recolorInFlight = new Map<string, Promise<string>>()
 function recolorRequestKey(url: string, options: RecolorOptions): string {
   return JSON.stringify([
@@ -268,7 +320,11 @@ async function recolorSvgOnce(url: string, options: RecolorOptions): Promise<str
       return svgText
     }
 
-    const usePrimaryContrast = options.colorMode === 'primary_contrast'
+    // Auto-detect single-color SVGs and use primary_contrast mode for them
+    const colorCount = countSvgColors(svgText)
+    const isSingleColor = colorCount === 1
+    const usePrimaryContrast = isSingleColor || options.colorMode === 'primary_contrast'
+    
     const result = await workerPool.process(svgText, {
       primaryColor: options.primaryColor,
       ...(usePrimaryContrast
