@@ -19,7 +19,7 @@ const GLOBE_LOADERS: Record<GlobeMode, () => Promise<GlobeComponent>> = {
   styleUrls: ['./globe-switcher.component.scss'],
 })
 export class GlobeSwitcherComponent implements OnInit {
-  activeMode: GlobeMode = 'd3';
+  activeMode: GlobeMode = 'svg';
   activeComponent?: GlobeComponent;
   loadingMode?: GlobeMode;
   private loadToken = 0;

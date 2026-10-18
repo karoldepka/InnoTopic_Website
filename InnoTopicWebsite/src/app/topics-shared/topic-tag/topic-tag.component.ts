@@ -8,7 +8,9 @@ import {
   OnDestroy,
   output,
 } from '@angular/core';
-import { Topic } from '@innotopic/topics-ui';
+import { Topic } from '../../TopicFriendsShared3/topics-core/Topic';
+import { FeatureFlagsService } from '../../shared/feature-flags/feature-flags.service';
+import { TopicsService } from '../../TopicFriendsShared3/topics-core/topics.service';
 import { onThemeStateChange, themeState } from '@innotopic/theme-ui';
 import '@innotopic/topics-ui';
 
@@ -22,11 +24,12 @@ import '@innotopic/topics-ui';
   selector: 'app-topic-tag',
   standalone: true,
   template: `
+    @if (flagsService.useLitTopicComponents()) {
     <topic-tag
       [tId]="tId()"
       [showLogo]="showLogo()"
       [inline]="inline()"
-      [recolorPrimary]="themePrimary"
+      [recolorPrimary]="flagsService.dynamicLogoColorization() ? themePrimary : undefined"
       [recolorMode]="themeIconColorMode"
       [recolorSecondary]="themeSecondary"
       [recolorContrast]="themeIconContrast"
@@ -36,11 +39,27 @@ import '@innotopic/topics-ui';
     >
       <ng-content></ng-content>
     </topic-tag>
+    } @else {
+      <span class="angular-topic-tag" [style.display]="inline() ? 'inline' : 'inline-flex'"
+        [style.align-items]="inline() ? 'baseline' : 'center'"
+        [style.padding]="inline() ? '0' : '0.25rem 0.55rem'"
+        [style.border-radius]="inline() ? '0' : '999px'"
+        [style.background]="inline() ? 'transparent' : 'var(--ion-color-step-100, rgba(127,127,127,.14))'"
+        (click)="onClickTopicLegacy()">
+        @if (showLogo() && resolvedTopic?.logo) {
+          <img [src]="resolvedTopic?.logo" [alt]="''" height="18" loading="lazy" decoding="async" />
+        }
+        {{ resolvedTopic?.name ?? tId() }}
+        <ng-content></ng-content>
+      </span>
+    }
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
 export class TopicTagComponent implements OnDestroy {
+  protected readonly flagsService = inject(FeatureFlagsService)
+  private readonly topicsService = inject(TopicsService)
   private readonly changeDetector = inject(ChangeDetectorRef)
   private readonly stopThemeSubscriptions = [
     onThemeStateChange('ion_color_primary', () => this.changeDetector.markForCheck()),
@@ -56,6 +75,18 @@ export class TopicTagComponent implements OnDestroy {
   inline = input(false)
 
   clickTopic = output<Topic | undefined>()
+
+  private cachedTopicId?: string;
+  private cachedTopic?: Topic;
+
+  get resolvedTopic(): Topic | undefined {
+    const topicId = this.tId().replace('#', '').replace(/_/g, ' ');
+    if (topicId !== this.cachedTopicId) {
+      this.cachedTopicId = topicId;
+      this.cachedTopic = this.topicsService.getTopicByIdIfExisting(topicId);
+    }
+    return this.cachedTopic;
+  }
 
   get themePrimary() {
     return themeState.ion_color_primary
@@ -83,5 +114,9 @@ export class TopicTagComponent implements OnDestroy {
 
   onClickTopic(event: Event) {
     this.clickTopic.emit((event as CustomEvent<Topic | undefined>).detail)
+  }
+
+  onClickTopicLegacy() {
+    this.clickTopic.emit(this.resolvedTopic)
   }
 }

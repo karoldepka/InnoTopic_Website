@@ -20,7 +20,7 @@ export class TopicChip extends LitElement {
       margin: var(--chip-shadow-margin, 7px);
       --shadow-light: rgba(255, 255, 255, 0.7);
       --shadow-dark: rgba(0, 0, 0, 0.25);
-      padding: 8px 16px;
+      padding: 0px 0px;
       font-size: 14px;
       font-weight: 500;
       border-radius: var(--corner-radius, 20px 7px);

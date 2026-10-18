@@ -48,9 +48,11 @@ function loadStringFlag<T extends string>(key: string, defaultValue: T): T {
 @Injectable({ providedIn: 'root' })
 export class FeatureFlagsService {
 
-  readonly graphContainer = signal(loadBooleanFlag('graphContainer', false));
+  readonly graphContainer = signal(loadBooleanFlag('graphContainer', true));
+  readonly dynamicLogoColorization = signal(loadBooleanFlag('dynamicLogoColorization', true));
+  readonly useLitTopicComponents = signal(loadBooleanFlag('useLitTopicComponents', true));
   readonly workProjectSkillsLayout = signal<WorkProjectSkillsLayout>(
-    loadStringFlag('workProjectSkillsLayout', 'grouped'));
+    loadStringFlag('workProjectSkillsLayout', 'grouped-inline'));
 
   readonly flags: FeatureFlagDef[] = [
     {
@@ -59,6 +61,20 @@ export class FeatureFlagsService {
       label: 'Graph: contain nodes',
       description: 'Clamp the topics graph nodes within the SVG bounds instead of letting them drift freely.',
       signal: this.graphContainer,
+    },
+    {
+      type: 'boolean',
+      key: 'dynamicLogoColorization',
+      label: 'Logos: dynamic colorization',
+      description: 'Recolor technology logos to match the current theme. Can delay logos while SVGs are converted.',
+      signal: this.dynamicLogoColorization,
+    },
+    {
+      type: 'boolean',
+      key: 'useLitTopicComponents',
+      label: 'Topics: use Lit components',
+      description: 'Use the Lit topic tag and logo web components instead of the Angular fallback rendering.',
+      signal: this.useLitTopicComponents,
     },
     {
       type: 'select',

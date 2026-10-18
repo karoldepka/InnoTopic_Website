@@ -21,6 +21,8 @@ import {FeatureFlagsService} from '../../shared/feature-flags/feature-flags.serv
 })
 export class TopicsGraphComponent implements OnInit, OnDestroy {
 
+  private static readonly rawIconCache = new Map<string, Promise<string | undefined>>();
+
   @Input() connections: GraphConnections = {...nodeConnections};
 
   public d3Nodes: any[] = [];
@@ -30,6 +32,7 @@ export class TopicsGraphComponent implements OnInit, OnDestroy {
   private graphInitialized = false;
   private recolorRequestId = 0;
   private recolorTimer?: ReturnType<typeof setTimeout>;
+  private simulation?: ReturnType<typeof forceSimulation>;
   private readonly stopThemeSubscriptions = [
     onThemeStateChange('ion_color_primary', () => this.refreshRecoloredIcons()),
     onThemeStateChange('ion_color_secondary', () => this.refreshRecoloredIcons()),
@@ -48,8 +51,9 @@ export class TopicsGraphComponent implements OnInit, OnDestroy {
     // Rebuild the (already-fetched) graph whenever the "contain nodes" feature flag is toggled from the popover.
     effect(() => {
       this.flagsService.graphContainer();
+      this.flagsService.dynamicLogoColorization();
       if (this.graphInitialized) {
-        this.initD3Graph();
+        void this.fetchIcons();
       }
     });
   }
@@ -62,7 +66,7 @@ export class TopicsGraphComponent implements OnInit, OnDestroy {
     this.generateNodes(this.connections)
     // console.log('d3Nodes', this.d3Nodes)
     this.generateLinks(this.connections)
-    this.fetchIcons() // this inits graph when finished
+    void this.fetchIcons();
   }
 
   private refreshRecoloredIcons() {
@@ -75,6 +79,27 @@ export class TopicsGraphComponent implements OnInit, OnDestroy {
 
   private async fetchIcons() {
     const requestId = ++this.recolorRequestId;
+    if (!this.flagsService.dynamicLogoColorization()) {
+      const topicNodes = this.d3Nodes.map(d3Node => (topics as any)[d3Node.id]);
+      const rawIcons = await Promise.all(topicNodes.map((topic: any) => {
+        if (!topic?.logo) return undefined;
+        let markup = TopicsGraphComponent.rawIconCache.get(topic.logo);
+        if (!markup) {
+          markup = fetch(topic.logo)
+            .then(response => response.ok ? response.text() : undefined)
+            .catch(() => undefined);
+          TopicsGraphComponent.rawIconCache.set(topic.logo, markup);
+        }
+        return markup;
+      }));
+      if (requestId !== this.recolorRequestId) return;
+      rawIcons.forEach((markup, index) => {
+        if (markup) this.d3Nodes[index].body = markup.trim().substring(markup.indexOf('<svg'));
+      });
+      this.initD3Graph();
+      this.graphInitialized = true;
+      return;
+    }
     const topicNodes = this.d3Nodes.map(d3Node => {
       let topicId = d3Node.id;
       const topic = (topics as any)[topicId]
@@ -114,10 +139,15 @@ export class TopicsGraphComponent implements OnInit, OnDestroy {
 
   ngOnDestroy() {
     clearTimeout(this.recolorTimer);
+    this.simulation?.stop();
     this.stopThemeSubscriptions.forEach(unsubscribe => unsubscribe());
   }
 
   private initD3Graph() {
+
+    // A feature flag or theme change can rebuild this graph. Stop its previous
+    // force simulation first so old tick loops do not keep running in the page.
+    this.simulation?.stop();
 
     const self = this;
     const svgRootElement: any = select("#topics-graph-d3"),
@@ -181,7 +211,7 @@ export class TopicsGraphComponent implements OnInit, OnDestroy {
     const color = d3Color(`rgba(80, 80, 80, 0.5)`) // .copy({opacity: 0.5});
 
     /* Base Example: Force-Directed Graph: https://bl.ocks.org/mbostock/4062045 */
-    const simulation: any = forceSimulation<any>();
+    const simulation: any = this.simulation = forceSimulation<any>();
       if(this.flagsService.graphContainer()) {
         simulation.nodes(this.d3Nodes)
           .force("link", forceLink<any, any>().id(function(d: any) { return d.id; })

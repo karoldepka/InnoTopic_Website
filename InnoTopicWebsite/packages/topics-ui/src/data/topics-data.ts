@@ -684,6 +684,7 @@ export class Mobile {
 
 export class Cloud {
   Cloud = tWide('generic/fontawesome/cloud.svg')
+  Fly = tWide('fly-icon.svg')
   // TODO: cloud-native
   'Refine' = tSquare('refine-icon.svg') /* A React Framework for building internal tools, admin panels, dashboards & B2B apps with unmatched flexibility. */
   'Outline' = tNarrow('outline-icon.svg') // https://www.getoutline.com/images/logo.svg
@@ -752,6 +753,7 @@ export class Cloud {
 }
 
 export class Monitoring_and_observability {
+  PostHog = tNoIcon()
   Grafana = tNarrow()
   'Datadog' = t('datadog-icon')
   'Dynatrace' = t('dynatrace-icon')
@@ -820,6 +822,7 @@ export class Version_Control {
 * Grouping (pick the right granularity based on count) :
 */
 export class Other {
+  'Microsoft Advertising' = tNoIcon()
   'Mailgun' = t('mailgun-icon.svg')
   'reCAPTCHA' = t('recaptcha-icon.svg') // TODO: crop icon only
   'AudioSalad' = t(`audiosalad-traced.svg`)

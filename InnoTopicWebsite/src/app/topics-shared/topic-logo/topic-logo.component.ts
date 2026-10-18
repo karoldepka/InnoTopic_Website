@@ -7,7 +7,9 @@ import {
   input,
   OnDestroy,
 } from '@angular/core';
-import { Topic } from '@innotopic/topics-ui';
+import { Topic } from '../../TopicFriendsShared3/topics-core/Topic';
+import { TopicsService } from '../../TopicFriendsShared3/topics-core/topics.service';
+import { FeatureFlagsService } from '../../shared/feature-flags/feature-flags.service';
 import { onThemeStateChange, themeState } from '@innotopic/theme-ui';
 import '@innotopic/topics-ui';
 
@@ -22,24 +24,37 @@ export const defaultIconHeight = 18
   selector: 'app-topic-logo',
   standalone: true,
   template: `
+    @if (flagsService.useLitTopicComponents()) {
     <topic-logo
       [topic]="topic()"
       [size]="size()"
       [width]="width()"
       [height]="height()"
       [margin]="margin()"
-      [recolorPrimary]="themePrimary"
+      [recolorPrimary]="flagsService.dynamicLogoColorization() ? themePrimary : undefined"
       [recolorMode]="themeIconColorMode"
       [recolorSecondary]="themeSecondary"
       [recolorContrast]="themeIconContrast"
       [recolorBrightness]="themeIconBrightness"
       [recolorPrimaryContrast]="themeIconContrast"
     ></topic-logo>
+    } @else {
+      <img
+        [src]="resolvedTopic?.logo ?? fallbackLogo"
+        [alt]="resolvedTopic?.name ?? ''"
+        [style.height.px]="logoHeight"
+        [style.margin-right.px]="margin()"
+        style="vertical-align: middle"
+        loading="lazy"
+        decoding="async"
+      />
+    }
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
 export class TopicLogoComponent implements OnDestroy {
+  protected readonly flagsService = inject(FeatureFlagsService)
   private readonly changeDetector = inject(ChangeDetectorRef)
   private readonly stopThemeSubscriptions = [
     onThemeStateChange('ion_color_primary', () => this.changeDetector.markForCheck()),
@@ -55,6 +70,27 @@ export class TopicLogoComponent implements OnDestroy {
   width = input<number>();
   height = input<number>();
   margin = input(2);
+
+  get resolvedTopic(): Topic | undefined {
+    const topic = this.topic();
+    if (typeof topic !== 'string') return topic;
+    return this.topicsService.getTopicByIdIfExisting(topic);
+  }
+
+  get logoHeight(): number {
+    const size = this.size();
+    const dimensions = this.resolvedTopic?.logoSize;
+    if (!dimensions) return this.height() ?? size;
+    const [width, height] = dimensions;
+    return height > width ? size * height / width : size;
+  }
+
+  private readonly topicsService = inject(TopicsService);
+
+  get fallbackLogo(): string {
+    const topic = this.topic();
+    return typeof topic === 'string' ? topic : '';
+  }
 
   get themePrimary() {
     return themeState.ion_color_primary

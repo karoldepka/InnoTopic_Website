@@ -193,6 +193,28 @@ function startRecolorTiming(url: string): { batch: RecolorBatch; startedAt: numb
   return { batch: activeBatch, startedAt: performance.now() }
 }
 
+function finishRecolorTiming(batch: RecolorBatch, startedAt: number, url: string, failed: boolean) {
+  batch.pending = Math.max(0, batch.pending - 1)
+  if (failed) batch.failed += 1
+  else batch.completed += 1
+  batch.completedUrls.add(url)
+
+  const previous = urlProgress.get(url) ?? defaultUrlProgress(url)
+  const pending = Math.max(0, previous.pending - 1)
+  urlProgress.set(url, {
+    ...previous,
+    state: pending > 0 ? 'processing' : failed && previous.completed === 0 ? 'failed' : 'complete',
+    pending,
+    completed: previous.completed + (failed ? 0 : 1),
+    failed: previous.failed + (failed ? 1 : 0),
+    elapsedMs: Math.round(performance.now() - startedAt),
+  })
+  publishUrlProgress(url)
+  publishProgress(batch)
+
+  if (batch.pending === 0 && activeBatch === batch) activeBatch = undefined
+}
+
 // Topic logos recur throughout the graph, tags and previews. Coalesce equal requests while a
 // recolor is running so every duplicate shares the same fetch and Wasm-worker conversion.
 const recolorInFlight = new Map<string, Promise<string>>()
