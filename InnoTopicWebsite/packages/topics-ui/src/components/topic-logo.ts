@@ -21,6 +21,7 @@ export class TopicLogo extends LitElement {
   static styles = css`
     :host {
       display: inline-block;
+      vertical-align: middle;
     }
     img, .recolored-logo svg {
       vertical-align: middle;

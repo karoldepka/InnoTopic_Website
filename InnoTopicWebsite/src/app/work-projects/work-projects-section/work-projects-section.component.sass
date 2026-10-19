@@ -15,6 +15,13 @@
   // page-break-before: always
   page-break-before: auto
 
+@media print
+  app-three-d-text
+    break-inside: avoid
+    page-break-inside: avoid
+    break-after: avoid
+    page-break-after: avoid
+
 .organisation
   margin: 0
   &:not(:last-child)
@@ -55,4 +62,9 @@ app-work-project
 .linkedin-logo
   vertical-align: middle
   padding-bottom: 2px
-  margin-left: 8px
+
+.linkedin-recommendations-link
+  text-decoration: none
+
+.linkedin-recommendations-text
+  text-decoration: underline

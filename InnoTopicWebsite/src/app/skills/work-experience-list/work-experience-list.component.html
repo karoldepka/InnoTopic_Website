@@ -5,6 +5,7 @@
         [tId]="experienceItem.topicId"
         [skillLevels]="experienceItem?.skillLevels"
         [showLogo]="showIcons"
+        [inline]="flagsService.workProjectSkillsLayout() === 'grouped-inline'"
       />
     }
   }
@@ -23,14 +24,18 @@
     </span>
   }
   @case ('grouped-inline') {
-    <span>
+    <div class="category-groups-inline">
       @for (category of topicCategoriesArray; track category.name) {
         @if (hasExperienceInCategory(category)) {
-          <span class="category-label-inline">{{categoryTitle(category.name)}}:</span>
-          <ng-container [ngTemplateOutlet]="categoryTopics" [ngTemplateOutletContext]="{$implicit: category}" />
+          <div class="category-group-inline">
+            <span class="category-label-inline">{{categoryTitle(category.name)}}:</span>
+            <div class="category-topic-tags-inline">
+              <ng-container [ngTemplateOutlet]="categoryTopics" [ngTemplateOutletContext]="{$implicit: category}" />
+            </div>
+          </div>
         }
       }
-    </span>
+    </div>
   }
   @default {
     @for (category of topicCategoriesArray; track category.name) {

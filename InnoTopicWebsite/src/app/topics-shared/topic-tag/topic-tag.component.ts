@@ -40,11 +40,7 @@ import '@innotopic/topics-ui';
       <ng-content></ng-content>
     </topic-tag>
     } @else {
-      <span class="angular-topic-tag" [style.display]="inline() ? 'inline' : 'inline-flex'"
-        [style.align-items]="inline() ? 'baseline' : 'center'"
-        [style.padding]="inline() ? '0' : '0.25rem 0.55rem'"
-        [style.border-radius]="inline() ? '0' : '999px'"
-        [style.background]="inline() ? 'transparent' : 'var(--ion-color-step-100, rgba(127,127,127,.14))'"
+      <span class="angular-topic-tag" [class.angular-topic-tag--inline]="inline()"
         (click)="onClickTopicLegacy()">
         @if (showLogo() && resolvedTopic?.logo) {
           <img [src]="resolvedTopic?.logo" [alt]="''" height="18" loading="lazy" decoding="async" />
@@ -54,6 +50,28 @@ import '@innotopic/topics-ui';
       </span>
     }
   `,
+  styles: [`
+    .angular-topic-tag {
+      display: inline-flex;
+      align-items: center;
+      padding: 0;
+      border: 0;
+      border-radius: 0;
+      background: transparent;
+      box-shadow: none;
+      vertical-align: middle;
+    }
+
+    .angular-topic-tag--inline {
+      display: inline-flex;
+      align-items: center;
+    }
+
+    .angular-topic-tag img {
+      margin-right: 6px;
+      vertical-align: middle;
+    }
+  `],
   changeDetection: ChangeDetectionStrategy.OnPush,
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
@@ -71,7 +89,7 @@ export class TopicTagComponent implements OnDestroy {
 
   tId = input.required<string>()
   showLogo = input(true)
-  /** Drops the fixed pill font-size/padding so the tag blends into surrounding running text instead of standing out as a discrete tag. */
+  /** Aligns the plain tag with surrounding text; use app-chip for a neumorphic surface. */
   inline = input(false)
 
   clickTopic = output<Topic | undefined>()

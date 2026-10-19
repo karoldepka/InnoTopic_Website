@@ -103,11 +103,49 @@ html, body {
   app-topic-logo,
   app-flags,
   app-world-map,
-  app-topics-graph,
   app-topic-logos-list {
     break-inside: avoid;
     page-break-inside: avoid;
     display: inline-block;
+  }
+
+  // Put the visualization on its own page using a block wrapper. The custom
+  // element's own page-break was not honored consistently by Chromium printing.
+  .graph-container {
+    display: block !important;
+  }
+
+  .world-map-print-page {
+    display: block !important;
+    break-after: page !important;
+    page-break-after: always !important;
+  }
+
+  .topics-graph-print-page {
+    display: block !important;
+    break-inside: avoid !important;
+    page-break-inside: avoid !important;
+  }
+
+  app-topics-graph {
+    display: block !important;
+    width: 100% !important;
+    break-before: auto !important;
+    page-break-before: auto !important;
+    break-inside: avoid !important;
+    page-break-inside: avoid !important;
+  }
+
+  app-topics-graph #topics-graph-d3 {
+    display: block !important;
+    width: 100% !important;
+    max-width: 1000px !important;
+    height: auto !important;
+    max-height: 600px !important;
+    margin-inline: auto;
+    transform: none !important;
+    break-inside: avoid !important;
+    page-break-inside: avoid !important;
   }
 
   // Prevent individual skill chips from being cut across page boundaries

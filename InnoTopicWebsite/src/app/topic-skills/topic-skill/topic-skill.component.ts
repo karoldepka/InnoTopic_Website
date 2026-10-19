@@ -27,6 +27,8 @@ export class TopicSkillComponent implements OnInit {
 
   @Input() showLogo!: boolean
 
+  @Input() inline = false
+
   constructor(
     public app: ApplicationRef
   ) {

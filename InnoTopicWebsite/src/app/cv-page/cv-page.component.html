@@ -34,19 +34,23 @@
 <!--</model-viewer>-->
 
 <div class="graph-container">
-  @defer (on idle; when isPrint) {
-    <app-globe-switcher />
-  } @placeholder {
-    <div class="graph-placeholder" aria-hidden="true"></div>
-  }
+  <div class="world-map-print-page">
+    @defer (on idle; when isPrint) {
+      <app-globe-switcher />
+    } @placeholder {
+      <div class="graph-placeholder" aria-hidden="true"></div>
+    }
+  </div>
 <!--  <app-tech-graph></app-tech-graph>-->
 <!--  <app-tech-graph-d3-index1></app-tech-graph-d3-index1>-->
 <!--  <app-tech-graph-d3-index1></app-tech-graph-d3-index1>-->
-  @defer (on idle; when isPrint) {
-    <app-topics-graph />
-  } @placeholder {
-    <div class="topics-graph-placeholder" aria-hidden="true"></div>
-  }
+  <div class="topics-graph-print-page">
+    @defer (on idle; when isPrint) {
+      <app-topics-graph />
+    } @placeholder {
+      <div class="topics-graph-placeholder" aria-hidden="true"></div>
+    }
+  </div>
 <!--  <app-video-cv></app-video-cv>-->
   <!-- WebGL svg: https://css-tricks.com/rendering-svg-paths-in-webgl/
     Demo: https://mattdesl.github.io/svg-mesh-3d/

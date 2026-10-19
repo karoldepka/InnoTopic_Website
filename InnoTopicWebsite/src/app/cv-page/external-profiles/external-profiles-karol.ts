@@ -14,7 +14,7 @@ export const externalProfilesKarol: UserOtherProfiles = {
     userName: 'Karol_DepkaPradzinski',
   },
   gitHub: {
-    userName: 'karol-depka',
+    userName: 'karoldepka',
   },
   // TopicFriends: {
   //   userName: 'u/karol-depka'

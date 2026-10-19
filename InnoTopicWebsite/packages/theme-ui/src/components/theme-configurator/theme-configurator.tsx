@@ -227,7 +227,7 @@ export class ThemeConfigurator {
           </label>
           <label class="field">
             <span class="field-label">{s.icon_color_mode === 'primary_contrast' ? 'Primary contrast' : 'Icon contrast'} ({s.icon_contrast.toFixed(2)})</span>
-            <input type="range" min="0" max={s.icon_color_mode === 'primary_contrast' ? '1' : '2'} step="0.05" value={String(s.icon_contrast)}
+            <input type="range" min="0" max={s.icon_color_mode === 'primary_contrast' ? '1' : '4'} step="0.05" value={String(s.icon_contrast)}
                    onInput={e => this.onIconInput('icon_contrast', e)} />
           </label>
           <label class="field">

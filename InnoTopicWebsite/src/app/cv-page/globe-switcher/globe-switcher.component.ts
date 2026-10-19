@@ -1,5 +1,6 @@
 import { NgComponentOutlet } from '@angular/common';
 import { Component, OnInit, Type } from '@angular/core';
+import { WorldMapComponent } from '../world-map/world-map.component';
 
 type GlobeMode = 'globegl' | 'd3' | 'threejs' | 'svg';
 type GlobeComponent = Type<unknown>;
@@ -8,7 +9,7 @@ const GLOBE_LOADERS: Record<GlobeMode, () => Promise<GlobeComponent>> = {
   globegl: () => import('../globe-gl/globe-gl.component').then(m => m.GlobeGlComponent),
   d3: () => import('../globe-d3/globe-d3.component').then(m => m.GlobeD3Component),
   threejs: () => import('../globe-threejs/globe-threejs.component').then(m => m.GlobeThreejsComponent),
-  svg: () => import('../world-map/world-map.component').then(m => m.WorldMapComponent),
+  svg: async () => WorldMapComponent,
 };
 
 @Component({
@@ -20,13 +21,12 @@ const GLOBE_LOADERS: Record<GlobeMode, () => Promise<GlobeComponent>> = {
 })
 export class GlobeSwitcherComponent implements OnInit {
   activeMode: GlobeMode = 'svg';
-  activeComponent?: GlobeComponent;
+  activeComponent?: GlobeComponent = WorldMapComponent;
   loadingMode?: GlobeMode;
   private loadToken = 0;
   private readonly componentCache = new Map<GlobeMode, GlobeComponent>();
 
   ngOnInit() {
-    void this.setMode(this.activeMode);
     this.scheduleIdlePrefetch();
   }
 

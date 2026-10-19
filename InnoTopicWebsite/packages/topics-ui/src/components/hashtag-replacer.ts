@@ -42,7 +42,7 @@ export function splitIntoHashtagParts(text: string): HashtagTextPart[] {
 @customElement('topic-hashtag-replacer')
 export class HashtagReplacer extends LitElement {
   // display:contents - this component has no visuals of its own, just expands into inline
-  // text + <topic-tag> chips; it shouldn't introduce a wrapper box into the surrounding flow.
+  // text + plain <topic-tag> elements; it shouldn't introduce a wrapper box into the surrounding flow.
   static styles = css`
     :host {
       display: contents;

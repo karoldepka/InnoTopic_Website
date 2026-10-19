@@ -57,6 +57,12 @@ section {
   flex-wrap: wrap;
 }
 
+.world-map-print-page,
+.topics-graph-print-page {
+  flex: 1 1 100%;
+  width: 100%;
+}
+
 .graph-placeholder,
 .topics-graph-placeholder {
   width: min(100%, 1000px);
@@ -84,4 +90,16 @@ section {
 
 .books-placeholder {
   min-height: 260px;
+}
+
+@media print {
+  .graph-container {
+    display: block;
+  }
+
+  app-topics-graph {
+    display: block;
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
 }

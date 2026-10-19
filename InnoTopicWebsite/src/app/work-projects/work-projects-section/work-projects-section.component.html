@@ -19,9 +19,8 @@
       </h2>
       <app-hashtag-replacer [text]="orgKV.value.description" />
       @if (orgKV.value.linkedInRecommendations) {
-        <a href="https://www.linkedin.com/in/karoldepka" target="_blank">
-          Please also take a look at {{orgKV.value.linkedInRecommendations}} {{orgKV.value.linkedInRecommendations > 1 ? 'recommendations' : 'recommendation'}} on
-          <img alt="LinkedIn Logo" class="linkedin-logo" height="14px" loading="lazy" decoding="async" src="assets/images/logos/linkedin.svg"> <!-- TODO LinkedIn Logo; TODO: underline link -->
+        <a class="linkedin-recommendations-link" href="https://www.linkedin.com/in/karoldepka" target="_blank">
+          <span class="linkedin-recommendations-text">Please also take a look at {{orgKV.value.linkedInRecommendations}} {{orgKV.value.linkedInRecommendations > 1 ? 'recommendations' : 'recommendation'}} on</span><span class="linkedin-recommendations-space">&nbsp;</span><img alt="LinkedIn Logo" class="linkedin-logo" height="14px" loading="lazy" decoding="async" src="assets/images/logos/linkedin.svg"><span class="linkedin-recommendations-space">&nbsp;</span><span class="linkedin-recommendations-text">for this role</span>
         </a>
       }
       @for (projKV of keyValOrdered(orgKV.value.projects); track projKV.key) {

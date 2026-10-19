@@ -93,7 +93,13 @@ tech:hover
   display: inline-block
 
 @media print
+  :host
+    break-inside: avoid
+    page-break-inside: avoid
+
   #topics-graph-d3
+    break-inside: avoid
+    page-break-inside: avoid
     transform: scale(0.9)
     transform-origin: top center
     width: 100%

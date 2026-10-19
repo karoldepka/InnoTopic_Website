@@ -14,17 +14,29 @@ export class TopicChip extends LitElement {
   static styles = css`
     :host {
       display: inline-block;
+      vertical-align: middle;
     }
     .neumorphic-chip {
-      display: inline-block;
+      display: inline-flex;
+      align-items: center;
       margin: var(--chip-shadow-margin, 7px);
       --shadow-light: rgba(255, 255, 255, 0.7);
       --shadow-dark: rgba(0, 0, 0, 0.25);
-      padding: 0px 0px;
+      box-sizing: border-box;
+      padding: 0.25rem 0.55rem;
+      border: 1px solid var(--ion-color-step-300, rgba(127, 127, 127, 0.35));
       font-size: 14px;
       font-weight: 500;
       border-radius: var(--corner-radius, 20px 7px);
+      background: var(--ion-background-color, transparent);
+      box-shadow:
+        var(--shadow-offset, 2px) var(--shadow-offset, 2px) var(--shadow-blur-radius, 6px) var(--shadow-dark),
+        calc(-1 * var(--shadow-offset, 2px)) calc(-1 * var(--shadow-offset, 2px)) var(--shadow-blur-radius, 6px) var(--shadow-light);
       transition: all 0.3s ease-in-out;
+    }
+    .neumorphic-chip slot {
+      display: inline-flex;
+      align-items: center;
     }
     .neumorphic-chip:hover,
     .neumorphic-chip.force-hover {
@@ -38,7 +50,11 @@ export class TopicChip extends LitElement {
         inset calc(-1 * var(--shadow-offset, 5px)) calc(-1 * var(--shadow-offset, 5px)) var(--shadow-blur-radius, 10px) var(--shadow-dark);
     }
     .neumorphic-chip.chip-inline {
-      padding: 0 0.25em;
+      margin: 0;
+      padding: 0;
+      border-color: transparent;
+      background: transparent;
+      box-shadow: none;
       font-size: inherit;
       font-weight: inherit;
       vertical-align: baseline;

@@ -37,9 +37,44 @@ section
     margin-top: 5px
 
 .category-label-inline
-  display: inline
+  display: block
+  flex: 0 0 230px
+  margin: 0
   font-weight: bold
   text-transform: uppercase
-  margin: 0 0.4em 0 0.8em
-  &:first-child
-    margin-left: 0
+
+.category-groups-inline
+  display: flex
+  flex-direction: column
+  gap: 4px
+  margin-left: -5px
+
+.category-group-inline
+  display: flex
+  align-items: baseline
+  column-gap: 8px
+  min-width: 0
+
+.category-topic-tags-inline
+  display: flex
+  flex: 1 1 0
+  flex-wrap: wrap
+  align-items: baseline
+  column-gap: 10px
+  row-gap: 2px
+  min-width: 0
+
+  app-topic-skill
+    display: inline-flex
+    align-items: baseline
+    margin: 0
+
+@media screen and (max-width: $break-medium)
+  .category-label-inline
+    flex-basis: 150px
+
+  .category-group-inline
+    column-gap: 6px
+
+  .category-topic-tags-inline
+    column-gap: 8px

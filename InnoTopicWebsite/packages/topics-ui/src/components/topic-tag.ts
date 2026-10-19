@@ -5,18 +5,15 @@ import { ifDefined } from 'lit/directives/if-defined.js'
 import { topicsRegistry } from '../topics-registry'
 import { highlightedId } from '../highlight-store'
 import { Topic } from '../data/Topic'
-import './chip'
 import './topic-logo'
 
 /**
  * Ports Angular's TopicTagComponent (app-topic-tag) - the one genuinely Angular-coupled
  * component in this set: document-level click/Escape listeners (host bindings there, manual
  * connectedCallback/disconnectedCallback here) and real Shadow DOM instead of the original's
- * ViewEncapsulation.None. Auditing the original .scss showed only one rule actually reaches
- * across a component boundary (`app-chip app-topic-logo { margin-right: 6px }`, targeting an
- * internally-rendered child, not a slotted one) - that ports to a plain scoped rule below with
- * no Shadow DOM workaround needed. Everything else in the original 217-line file was already
- * dead/commented-out legacy styles.
+ * ViewEncapsulation.None. Topic tags intentionally have no chip surface; the separate
+ * <topic-chip> component supplies the padded neumorphic surface. Logo spacing is scoped here
+ * because the logo is rendered inside this component.
  */
 @customElement('topic-tag')
 export class TopicTag extends LitElement {
@@ -24,23 +21,25 @@ export class TopicTag extends LitElement {
     :host {
       position: relative;
       display: inline-block;
-    }
-    topic-chip {
-      display: inline-block;
-      margin: 0.3rem;
+      vertical-align: middle;
     }
     topic-logo {
       margin-right: 6px;
     }
     .topic-tag-content {
-      display: flex;
+      display: inline-flex;
       align-items: center;
+      padding: 0;
+      border: 0;
+      border-radius: 0;
+      background: transparent;
+      box-shadow: none;
     }
     .topic-tag-content--clickable {
       cursor: pointer;
     }
     .topic-tag-content--inline {
-      align-items: baseline;
+      align-items: center;
     }
     .topic-info-popover {
       position: absolute;
@@ -82,7 +81,7 @@ export class TopicTag extends LitElement {
    * matching the Angular original's deliberate no-op here.
    */
   @property({ type: Boolean, attribute: 'show-logo' }) showLogo = true
-  /** Drops the fixed pill font-size/padding so the tag blends into surrounding running text. */
+  /** Aligns the plain tag with surrounding text; visual chip styling belongs to <topic-chip>. */
   @property({ type: Boolean }) inline = false
 
   /** Forwarded to the internal <topic-logo> - see its class doc comment for what these do. */
@@ -194,35 +193,33 @@ export class TopicTag extends LitElement {
     const clickable = !!info
 
     return html`
-      <topic-chip .inline=${this.inline}>
-        <div
-          class=${classMap({
-            'topic-tag-content': true,
-            'topic-tag-content--clickable': clickable,
-            'topic-tag-content--inline': this.inline,
-          })}
-          role=${ifDefined(clickable ? 'button' : undefined)}
-          tabindex=${ifDefined(clickable ? 0 : undefined)}
-          aria-expanded=${ifDefined(clickable ? String(this.showInfoPopover) : undefined)}
-          title=${ifDefined(clickable ? `${this.displayName} (tap or click to show more info)` : undefined)}
-          @click=${this.onTagClick}
-          @keydown=${this.onTagKeydown}
-        >
-          ${this.tagEntry?.logo ? html`
-            <topic-logo
-              .topic=${this.tagEntry}
-              .recolorPrimary=${this.recolorPrimary}
-              .recolorMode=${this.recolorMode}
-              .recolorSecondary=${this.recolorSecondary}
-              .recolorContrast=${this.recolorContrast}
-              .recolorBrightness=${this.recolorBrightness}
-              .recolorPrimaryContrast=${this.recolorPrimaryContrast}
-            ></topic-logo>
-          ` : ''}
-          ${this.displayName}
-          <slot></slot>
-        </div>
-      </topic-chip>
+      <div
+        class=${classMap({
+          'topic-tag-content': true,
+          'topic-tag-content--clickable': clickable,
+          'topic-tag-content--inline': this.inline,
+        })}
+        role=${ifDefined(clickable ? 'button' : undefined)}
+        tabindex=${ifDefined(clickable ? 0 : undefined)}
+        aria-expanded=${ifDefined(clickable ? String(this.showInfoPopover) : undefined)}
+        title=${ifDefined(clickable ? `${this.displayName} (tap or click to show more info)` : undefined)}
+        @click=${this.onTagClick}
+        @keydown=${this.onTagKeydown}
+      >
+        ${this.tagEntry?.logo ? html`
+          <topic-logo
+            .topic=${this.tagEntry}
+            .recolorPrimary=${this.recolorPrimary}
+            .recolorMode=${this.recolorMode}
+            .recolorSecondary=${this.recolorSecondary}
+            .recolorContrast=${this.recolorContrast}
+            .recolorBrightness=${this.recolorBrightness}
+            .recolorPrimaryContrast=${this.recolorPrimaryContrast}
+          ></topic-logo>
+        ` : ''}
+        ${this.displayName}
+        <slot></slot>
+      </div>
 
       ${this.showInfoPopover ? html`
         <div class="topic-info-popover" role="tooltip" @click=${(e: Event) => e.stopPropagation()}>
