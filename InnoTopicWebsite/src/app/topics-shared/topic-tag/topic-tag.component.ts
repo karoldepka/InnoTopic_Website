@@ -13,6 +13,7 @@ import { FeatureFlagsService } from '../../shared/feature-flags/feature-flags.se
 import { TopicsService } from '../../TopicFriendsShared3/topics-core/topics.service';
 import { onThemeStateChange, themeState } from '@innotopic/theme-ui';
 import '@innotopic/topics-ui';
+import { TopicLogoComponent } from '../topic-logo/topic-logo.component';
 
 /**
  * Thin wrapper around @innotopic/topics-ui's <topic-tag> custom element (the Lit port of
@@ -23,6 +24,7 @@ import '@innotopic/topics-ui';
 @Component({
   selector: 'app-topic-tag',
   standalone: true,
+  imports: [TopicLogoComponent],
   template: `
     @if (flagsService.useLitTopicComponents()) {
     <topic-tag
@@ -43,7 +45,7 @@ import '@innotopic/topics-ui';
       <span class="angular-topic-tag" [class.angular-topic-tag--inline]="inline()"
         (click)="onClickTopicLegacy()">
         @if (showLogo() && resolvedTopic?.logo) {
-          <img [src]="resolvedTopic?.logo" [alt]="''" height="18" loading="lazy" decoding="async" />
+          <app-topic-logo [topic]="resolvedTopic!" [size]="18" [margin]="6" />
         }
         {{ resolvedTopic?.name ?? tId() }}
         <ng-content></ng-content>

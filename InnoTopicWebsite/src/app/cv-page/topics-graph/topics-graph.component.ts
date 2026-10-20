@@ -66,6 +66,10 @@ export class TopicsGraphComponent implements OnInit, OnDestroy {
     this.generateNodes(this.connections)
     // console.log('d3Nodes', this.d3Nodes)
     this.generateLinks(this.connections)
+    // Put labels and the graph on screen immediately. Icon fetch/recoloring can take
+    // several seconds (especially on a cold cache), so it must not gate first paint.
+    this.initD3Graph();
+    this.graphInitialized = true;
     void this.fetchIcons();
   }
 

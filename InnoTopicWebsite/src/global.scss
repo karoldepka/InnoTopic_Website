@@ -50,6 +50,10 @@ html, body {
   //height: 100% !important; /* this is causing no scroll on PDF print */
 }
 
+.topics-graph-page-break {
+  display: none;
+}
+
 @media print {
   ion-header {
     display: none !important;
@@ -63,11 +67,13 @@ html, body {
     -webkit-print-color-adjust: exact !important;
   }
 
-  html, body, app-root, ion-router-outlet {
+  html, body, app-root, ion-app, ion-router-outlet, .ion-page {
+    display: block !important;
     overflow: visible !important;
     height: auto !important;
     max-height: none !important;
     position: static !important;
+    contain: none !important;
   }
 
   html, body {
@@ -84,6 +90,29 @@ html, body {
     --overflow: visible;
     contain: none !important;
     background-color: var(--ion-background-color, #fff) !important;
+  }
+
+  // Keep the CV's identity block visible in PDFs. Its text uses theme variables,
+  // which can resolve to white while Chromium prints a white page background.
+  .profile-header,
+  app-personal-data,
+  app-personal-data section {
+    display: block !important;
+    position: static !important;
+    visibility: visible !important;
+    color: #000 !important;
+  }
+
+  app-personal-data label,
+  app-personal-data p {
+    visibility: visible !important;
+    color: #000 !important;
+  }
+
+  .profile-header .container {
+    display: flex !important;
+    align-items: flex-start !important;
+    flex-direction: row !important;
   }
 
   // Override ion-content's shadow DOM scroll container
@@ -117,12 +146,22 @@ html, body {
 
   .world-map-print-page {
     display: block !important;
-    break-after: page !important;
-    page-break-after: always !important;
+  }
+
+  // An explicit zero-height block gives Chromium a plain-flow page break before
+  // the deferred D3 component; breaks on its custom-element wrapper were ignored.
+  .topics-graph-page-break {
+    display: block !important;
+    height: 0 !important;
+    margin: 0 !important;
+    break-before: page !important;
+    page-break-before: always !important;
   }
 
   .topics-graph-print-page {
     display: block !important;
+    break-after: page !important;
+    page-break-after: always !important;
     break-inside: avoid !important;
     page-break-inside: avoid !important;
   }
@@ -130,8 +169,6 @@ html, body {
   app-topics-graph {
     display: block !important;
     width: 100% !important;
-    break-before: auto !important;
-    page-break-before: auto !important;
     break-inside: avoid !important;
     page-break-inside: avoid !important;
   }

@@ -228,7 +228,7 @@ export class WorkExperienceData {
     WebGL: we(),
     glTF: we(),
     // TODO: performance optimizations, profiling, UX
-  }, false)
+  }, true)
   // additional = experience('Additional experience', 'learning more, but not as critical for me now', {
   //   JUnit:
   //     we(advanced),

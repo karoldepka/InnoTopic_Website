@@ -1,0 +1,77 @@
+.page-break-demo {
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 24px;
+}
+
+.test-case {
+  margin-top: 32px;
+}
+
+.lead-in {
+  height: 24px;
+}
+
+.probe {
+  min-height: 320px;
+  padding: 20px;
+  border: 4px solid #b42318;
+  background: repeating-linear-gradient(
+    135deg,
+    #fee4e2,
+    #fee4e2 24px,
+    #fff 24px,
+    #fff 48px
+  );
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.probe--avoid {
+  border-color: #067647;
+  background: repeating-linear-gradient(
+    135deg,
+    #d1fadf,
+    #d1fadf 24px,
+    #fff 24px,
+    #fff 48px
+  );
+  break-inside: avoid;
+  page-break-inside: avoid;
+}
+
+@media print {
+  .page-break-demo {
+    max-width: none;
+    padding: 0;
+  }
+
+  .test-case {
+    margin: 0;
+    break-after: page;
+    page-break-after: always;
+  }
+
+  .test-case--avoid {
+    break-before: page;
+    page-break-before: always;
+  }
+
+  .lead-in {
+    height: 6.8in;
+  }
+
+  .probe {
+    height: 4in;
+    min-height: 0;
+    box-sizing: border-box;
+    break-inside: auto;
+    page-break-inside: auto;
+  }
+
+  .probe--avoid {
+    break-inside: avoid !important;
+    page-break-inside: avoid !important;
+  }
+}

@@ -11,6 +11,8 @@ const loadTopicsDemo = () => import('./learn/demo/topics-demo/topics-demo.compon
 const loadThemeUiDemo = () => import('./learn/demo/theme-ui-demo/theme-ui-demo.component').then(m => m.ThemeUiDemoComponent);
 const loadPlasmaDemo = () => import('./learn/demo/plasma-demo/plasma-demo.component').then(m => m.PlasmaDemoComponent);
 const loadDoodleDemo = () => import('./learn/demo/doodle-demo/doodle-demo.component').then(m => m.DoodleDemoComponent);
+const loadPageBreakDemo = () =>
+  import('./learn/demo/page-break-demo/page-break-demo.component').then(m => m.PageBreakDemoComponent);
 
 const routes: Routes = [
   {
@@ -69,6 +71,10 @@ const routes: Routes = [
   {
     path: 'learn/demo/doodle',
     loadComponent: loadDoodleDemo,
+  },
+  {
+    path: 'learn/demo/page-break',
+    loadComponent: loadPageBreakDemo,
   },
   {
     path: 'graph',

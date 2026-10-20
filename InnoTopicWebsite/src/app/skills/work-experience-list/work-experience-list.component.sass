@@ -38,43 +38,92 @@ section
 
 .category-label-inline
   display: block
-  flex: 0 0 230px
   margin: 0
+  padding-top: 0.1rem
+  color: var(--ion-color-medium-shade, #6c757d)
+  font-size: 0.72rem
   font-weight: bold
+  letter-spacing: 0.045em
+  line-height: 1.45
   text-transform: uppercase
 
 .category-groups-inline
-  display: flex
-  flex-direction: column
-  gap: 4px
-  margin-left: -5px
+  display: grid
+  gap: 0.3rem
+  max-width: 100%
+  margin: 0.35rem 0 0
 
 .category-group-inline
-  display: flex
-  align-items: baseline
-  column-gap: 8px
+  display: grid
+  grid-template-columns: minmax(7.75rem, 10rem) minmax(0, 1fr)
+  column-gap: 0.75rem
+  align-items: start
+  padding: 0.1rem 0
   min-width: 0
 
 .category-topic-tags-inline
   display: flex
   flex: 1 1 0
   flex-wrap: wrap
-  align-items: baseline
-  column-gap: 10px
-  row-gap: 2px
+  align-items: center
+  gap: 0.15rem 0.75rem
+  line-height: 1.45
   min-width: 0
 
   app-topic-skill
     display: inline-flex
-    align-items: baseline
+    align-items: center
+    min-height: 1.55rem
     margin: 0
 
 @media screen and (max-width: $break-medium)
-  .category-label-inline
-    flex-basis: 150px
-
   .category-group-inline
-    column-gap: 6px
+    grid-template-columns: minmax(6.5rem, 8.25rem) minmax(0, 1fr)
+    column-gap: 0.6rem
 
   .category-topic-tags-inline
-    column-gap: 8px
+    column-gap: 0.6rem
+
+@media screen and (max-width: $break-small)
+  .category-groups-inline
+    gap: 0.45rem
+
+  .category-group-inline
+    grid-template-columns: minmax(0, 1fr)
+    gap: 0.1rem
+
+  .category-label-inline
+    padding-top: 0
+
+  .category-topic-tags-inline
+    gap: 0.15rem 0.55rem
+
+// Chromium can fragment a CSS grid row when printing. Print the same two-column
+// layout as table rows, whose pagination boundary is between complete categories.
+@media print
+  .category-groups-inline
+    display: table !important
+    width: 100%
+    table-layout: fixed
+    border-collapse: collapse
+
+  .category-group-inline
+    display: table-row !important
+    break-inside: avoid !important
+    break-inside: avoid-page !important
+    page-break-inside: avoid !important
+
+  .category-label-inline,
+  .category-topic-tags-inline
+    display: table-cell !important
+    vertical-align: top
+
+  .category-label-inline
+    width: 10rem
+    padding: 0.1rem 0.75rem 0 0
+
+  .category-topic-tags-inline
+    padding-bottom: 0.2rem
+
+    app-topic-skill
+      margin: 0 0.75rem 0.15rem 0

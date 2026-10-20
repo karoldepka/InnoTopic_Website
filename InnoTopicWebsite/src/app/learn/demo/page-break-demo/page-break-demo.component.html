@@ -1,0 +1,29 @@
+<ion-content [fullscreen]="true">
+  <main class="page-break-demo">
+    <h1>Print break-inside demo</h1>
+    <p>
+      Open print preview. The first test has no break rule and should split across pages.
+      The second uses <code>break-inside: avoid</code> and should move intact to the next page.
+    </p>
+
+    <section class="test-case test-case--control">
+      <h2>Control: no break-inside rule</h2>
+      <div class="lead-in" aria-hidden="true"></div>
+      <div class="probe">
+        <strong>CONTROL — TOP</strong>
+        <span>This block is deliberately taller than the remaining page space.</span>
+        <strong>CONTROL — BOTTOM</strong>
+      </div>
+    </section>
+
+    <section class="test-case test-case--avoid">
+      <h2>Test: break-inside: avoid</h2>
+      <div class="lead-in" aria-hidden="true"></div>
+      <div class="probe probe--avoid">
+        <strong>AVOID — TOP</strong>
+        <span>This block is the same size as the control.</span>
+        <strong>AVOID — BOTTOM</strong>
+      </div>
+    </section>
+  </main>
+</ion-content>

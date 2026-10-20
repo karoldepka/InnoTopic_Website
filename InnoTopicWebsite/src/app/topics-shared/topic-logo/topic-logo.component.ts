@@ -3,14 +3,17 @@ import {
   ChangeDetectionStrategy,
   Component,
   CUSTOM_ELEMENTS_SCHEMA,
+  effect,
   inject,
   input,
   OnDestroy,
+  signal,
 } from '@angular/core';
 import { Topic } from '../../TopicFriendsShared3/topics-core/Topic';
 import { TopicsService } from '../../TopicFriendsShared3/topics-core/topics.service';
 import { FeatureFlagsService } from '../../shared/feature-flags/feature-flags.service';
 import { onThemeStateChange, themeState } from '@innotopic/theme-ui';
+import { recolorSvg } from '@innotopic/topics-ui';
 import '@innotopic/topics-ui';
 
 export const defaultIconHeight = 18
@@ -40,7 +43,7 @@ export const defaultIconHeight = 18
     ></topic-logo>
     } @else {
       <img
-        [src]="resolvedTopic?.logo ?? fallbackLogo"
+        [src]="recoloredLogo() ?? resolvedTopic?.logo ?? fallbackLogo"
         [alt]="resolvedTopic?.name ?? ''"
         [style.height.px]="logoHeight"
         [style.margin-right.px]="margin()"
@@ -56,13 +59,51 @@ export const defaultIconHeight = 18
 export class TopicLogoComponent implements OnDestroy {
   protected readonly flagsService = inject(FeatureFlagsService)
   private readonly changeDetector = inject(ChangeDetectorRef)
+  private readonly themeRevision = signal(0)
+  protected readonly recoloredLogo = signal<string | undefined>(undefined)
+  private recolorRequestId = 0
   private readonly stopThemeSubscriptions = [
-    onThemeStateChange('ion_color_primary', () => this.changeDetector.markForCheck()),
-    onThemeStateChange('ion_color_secondary', () => this.changeDetector.markForCheck()),
-    onThemeStateChange('icon_color_mode', () => this.changeDetector.markForCheck()),
-    onThemeStateChange('icon_contrast', () => this.changeDetector.markForCheck()),
-    onThemeStateChange('icon_brightness', () => this.changeDetector.markForCheck()),
+    onThemeStateChange('ion_color_primary', () => this.onThemeChange()),
+    onThemeStateChange('ion_color_secondary', () => this.onThemeChange()),
+    onThemeStateChange('icon_color_mode', () => this.onThemeChange()),
+    onThemeStateChange('icon_contrast', () => this.onThemeChange()),
+    onThemeStateChange('icon_brightness', () => this.onThemeChange()),
   ]
+
+  constructor() {
+    // Keep the Angular fallback in sync with the Lit component. Leave the original
+    // image visible while the shared SVG worker recolors it in the background.
+    effect(() => {
+      const topic = this.topic();
+      const useLit = this.flagsService.useLitTopicComponents();
+      const dynamicColorization = this.flagsService.dynamicLogoColorization();
+      this.themeRevision();
+      const requestId = ++this.recolorRequestId;
+      const logoUrl = this.resolveTopic(topic)?.logo;
+
+      if (useLit || !dynamicColorization || !logoUrl || !logoUrl.toLowerCase().endsWith('.svg')) {
+        this.recoloredLogo.set(undefined);
+        return;
+      }
+
+      void recolorSvg(logoUrl, {
+        primaryColor: themeState.ion_color_primary,
+        colorMode: themeState.icon_color_mode,
+        secondaryColor: themeState.ion_color_secondary,
+        contrast: themeState.icon_contrast,
+        brightness: themeState.icon_brightness,
+        primaryContrast: themeState.icon_contrast,
+      }).then(markup => {
+        if (requestId === this.recolorRequestId) {
+          this.recoloredLogo.set(`data:image/svg+xml;charset=utf-8,${encodeURIComponent(markup)}`);
+        }
+      }).catch(error => {
+        if (requestId === this.recolorRequestId) {
+          console.error('app-topic-logo: recolor failed', error);
+        }
+      });
+    });
+  }
 
   topic = input.required<Topic | string>();
   size = input(defaultIconHeight);
@@ -72,9 +113,17 @@ export class TopicLogoComponent implements OnDestroy {
   margin = input(2);
 
   get resolvedTopic(): Topic | undefined {
-    const topic = this.topic();
+    return this.resolveTopic(this.topic());
+  }
+
+  private resolveTopic(topic: Topic | string): Topic | undefined {
     if (typeof topic !== 'string') return topic;
     return this.topicsService.getTopicByIdIfExisting(topic);
+  }
+
+  private onThemeChange() {
+    this.themeRevision.update(revision => revision + 1);
+    this.changeDetector.markForCheck();
   }
 
   get logoHeight(): number {
