@@ -1,25 +1,27 @@
 import { Injectable } from '@angular/core';
 import {NavigationStart, Router} from "@angular/router";
-import {BehaviorSubject, filter} from "rxjs";
+import {BehaviorSubject, filter, Observable} from "rxjs";
 
 @Injectable({
   providedIn: 'root'
 })
 export class PrintService {
 
-  static isPrint = false // !! JSON.parse(window.localStorage.getItem('isPrint') ?? 'false') // true // hack for now
+  static isPrint = false
   static url?: string
   static page?: string
 
   static readonly printPages = ['/print', '/shirt'];
 
-  private readonly isPrintSubject = new BehaviorSubject(PrintService.isPrint);
-  readonly isPrint$ = this.isPrintSubject.asObservable();
+  private readonly isPrintSubject: BehaviorSubject<boolean>;
+  readonly isPrint$: Observable<boolean>;
 
   constructor(
     private router: Router,
   ) {
-    this.updatePrintMode(this.router.url);
+    this.updatePrintMode(this.currentBrowserUrl());
+    this.isPrintSubject = new BehaviorSubject(PrintService.isPrint);
+    this.isPrint$ = this.isPrintSubject.asObservable();
     this.router.events.pipe(
       filter((event): event is NavigationStart => event instanceof NavigationStart)
     ).subscribe((event) => {
@@ -33,9 +35,15 @@ export class PrintService {
     PrintService.url = isPrint ? url : undefined;
     PrintService.page = isPrint ? url.replace('/', '') : undefined;
 
-    if (this.isPrintSubject.value !== isPrint) {
+    if (this.isPrintSubject && this.isPrintSubject.value !== isPrint) {
       this.isPrintSubject.next(isPrint);
     }
+  }
+
+  private currentBrowserUrl() {
+    return typeof window === 'undefined'
+      ? this.router.url
+      : `${window.location.pathname}${window.location.search}${window.location.hash}`;
   }
 
   private isPrintUrl(url: string) {

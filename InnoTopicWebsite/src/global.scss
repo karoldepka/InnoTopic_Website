@@ -50,6 +50,20 @@ html, body {
   //height: 100% !important; /* this is causing no scroll on PDF print */
 }
 
+// /print is rendered outside Ionic's app shell so browser scrolling works while
+// keeping Ionic's fixed-height screen layout disabled for print pagination.
+.print-page-screen-scroll {
+  min-height: 100vh;
+  overflow: visible;
+}
+
+@media print {
+  .print-page-screen-scroll {
+    min-height: 0;
+    overflow: visible;
+  }
+}
+
 .topics-graph-page-break {
   display: none;
 }
