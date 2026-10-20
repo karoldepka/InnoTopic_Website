@@ -22,7 +22,7 @@ interface DoodleCanvasElement extends HTMLElement {
 
 /**
  * A dedicated demo page for @innotopic/doodle-ui's <doodle-canvas>, used directly (no Angular
- * wrapper), matching the pattern set by the topics-ui/theme-ui/plasma-ui demo pages.
+ * wrapper), matching the pattern set by the theme-ui/plasma-ui demo pages.
  */
 @Component({
   selector: 'app-doodle-demo',

@@ -26,6 +26,9 @@ export type FeatureFlagDef = BooleanFeatureFlagDef | SelectFeatureFlagDef;
 
 export type WorkProjectSkillsLayout = 'grouped' | 'grouped-inline' | 'flat';
 
+/** Milliseconds a recolored logo takes to fade to its original colors on hover (and back). */
+export type LogoHoverFadeMs = '0' | '150' | '250' | '400' | '700';
+
 const STORAGE_KEY_PREFIX = 'featureFlag.';
 
 function loadBooleanFlag(key: string, defaultValue: boolean): boolean {
@@ -50,7 +53,7 @@ export class FeatureFlagsService {
 
   readonly graphContainer = signal(loadBooleanFlag('graphContainer', true));
   readonly dynamicLogoColorization = signal(loadBooleanFlag('dynamicLogoColorization', true));
-  readonly useLitTopicComponents = signal(loadBooleanFlag('useLitTopicComponents', true));
+  readonly logoHoverFadeMs = signal<LogoHoverFadeMs>(loadStringFlag('logoHoverFadeMs', '250'));
   readonly workProjectSkillsLayout = signal<WorkProjectSkillsLayout>(
     loadStringFlag('workProjectSkillsLayout', 'grouped-inline'));
 
@@ -70,11 +73,18 @@ export class FeatureFlagsService {
       signal: this.dynamicLogoColorization,
     },
     {
-      type: 'boolean',
-      key: 'useLitTopicComponents',
-      label: 'Topics: use Lit components',
-      description: 'Use the Lit topic tag and logo web components instead of the Angular fallback rendering.',
-      signal: this.useLitTopicComponents,
+      type: 'select',
+      key: 'logoHoverFadeMs',
+      label: 'Logos: hover fade to original colors',
+      description: 'How long a recolored logo takes to fade to its original colors on mouse-over, and back.',
+      signal: this.logoHoverFadeMs,
+      options: [
+        { value: '0', label: 'Instant' },
+        { value: '150', label: '150 ms (snappy)' },
+        { value: '250', label: '250 ms (recommended)' },
+        { value: '400', label: '400 ms (relaxed)' },
+        { value: '700', label: '700 ms (slow)' },
+      ],
     },
     {
       type: 'select',

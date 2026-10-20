@@ -7,11 +7,10 @@
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "scripts": {
-    "build": "tsc -p tsconfig.json && node scripts/copy-assets.mjs",
+    "build": "tsc -p tsconfig.json",
     "dev": "tsc -p tsconfig.json --watch"
   },
   "dependencies": {
-    "lit": "^3.2.1",
     "svg-conversion": "workspace:*"
   },
   "devDependencies": {

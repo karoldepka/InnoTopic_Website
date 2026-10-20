@@ -2,11 +2,6 @@ import { Component, State, forceUpdate, h } from '@stencil/core'
 import { themeState, setThemeConfig, initThemeConfig, onThemeStateChange } from '../../engine/theme-store'
 import { injectThemeTokens } from '../../engine/tokens'
 import type { ThemeConfigState } from '../../engine/theme-config-state'
-// Side-effect import: registers <topic-tag> so the live preview below can render it.
-// Demonstrates the deliberate Stencil -> Lit dependency: this configurator embeds real
-// @innotopic/topics-ui chips so you can see themed chips while tuning colors, the same role
-// the Angular app's <app-tinted-swatches>/<app-theme-samples> preview components played.
-import '@innotopic/topics-ui'
 import { onSvgRecolorProgress, type SvgRecolorProgress } from '@innotopic/topics-ui'
 
 const ALL_KEYS: (keyof ThemeConfigState)[] = [
@@ -36,7 +31,7 @@ const CORNER_FIELDS: Array<{ key: CornerKey; label: string }> = [
 export class ThemeConfigurator {
   private unsubscribes: Array<() => void> = []
 
-  // Locked by default: one corner's slider drives all four, matching the topic-chip's
+  // Locked by default: one corner's slider drives all four, matching the chip's
   // existing "single radius pair" look until someone deliberately opts into independent corners.
   @State() cornersLocked = true
   @State() recolorProgress?: SvgRecolorProgress
@@ -239,38 +234,15 @@ export class ThemeConfigurator {
 
         <div class="preview">
           <span class="preview-label">Live preview:</span>
-          <topic-tag
-            tid="Angular"
-            recolor-primary={s.ion_color_primary}
-            recolor-mode={s.icon_color_mode}
-            recolor-secondary={s.ion_color_secondary}
-            recolor-contrast={s.icon_contrast}
-            recolor-brightness={s.icon_brightness}
-            recolor-primary-contrast={s.icon_contrast}
-          ></topic-tag>
-          <topic-tag
-            tid="React"
-            recolor-primary={s.ion_color_primary}
-            recolor-mode={s.icon_color_mode}
-            recolor-secondary={s.ion_color_secondary}
-            recolor-contrast={s.icon_contrast}
-            recolor-brightness={s.icon_brightness}
-            recolor-primary-contrast={s.icon_contrast}
-          ></topic-tag>
-          <topic-tag
-            tid="DeepSeek"
-            recolor-primary={s.ion_color_primary}
-            recolor-mode={s.icon_color_mode}
-            recolor-secondary={s.ion_color_secondary}
-            recolor-contrast={s.icon_contrast}
-            recolor-brightness={s.icon_brightness}
-            recolor-primary-contrast={s.icon_contrast}
-          ></topic-tag>
+          {/* The host app supplies themed content (e.g. its own topic tags) for this preview. */}
+          <slot name="preview">The page's own content updates as you tune colors.</slot>
         </div>
         {this.recolorProgress && (
           <div class="recolor-progress" role="status" aria-live="polite">
             <span>
-              Colorizing {this.recolorProgress.uniqueCompleted} of {this.recolorProgress.uniqueTotal} unique icons
+              {this.recolorProgress.done
+                ? `Colorized ${this.recolorProgress.uniqueCompleted} of ${this.recolorProgress.uniqueTotal} unique icons in ${(this.recolorProgress.elapsedMs / 1000).toFixed(1)} s`
+                : `Colorizing ${this.recolorProgress.uniqueCompleted} of ${this.recolorProgress.uniqueTotal} unique icons (${(this.recolorProgress.elapsedMs / 1000).toFixed(1)} s)`}
             </span>
             <progress
               value={this.recolorProgress.uniqueCompleted}

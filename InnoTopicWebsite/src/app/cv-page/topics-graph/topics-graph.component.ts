@@ -11,6 +11,7 @@ import {forceCenter, forceCollide, forceLink, forceManyBody, forceSimulation} fr
 import {event as d3Event, select} from 'd3-selection';
 import {zoom as d3Zoom} from 'd3-zoom';
 import {FeatureFlagsService} from '../../shared/feature-flags/feature-flags.service';
+import {IconsReadyService} from '../../topics-shared/icons-ready.service';
 import {BehaviorSubject, Observable} from 'rxjs';
 
 @Component({
@@ -24,9 +25,10 @@ export class TopicsGraphComponent implements OnInit, OnDestroy {
 
   private static readonly rawIconCache = new Map<string, Promise<string | undefined>>();
 
-  private readonly iconsReadySubject = new BehaviorSubject(false);
-  /** Emits false while the current graph icon batch loads and true when it is rendered. */
-  readonly iconsReady$: Observable<boolean> = this.iconsReadySubject.asObservable();
+  private readonly graphIconsReadySubject = new BehaviorSubject(false);
+  /** Readiness for this graph's own node icon batch. */
+  readonly iconsReady$: Observable<boolean> = this.graphIconsReadySubject.asObservable();
+  private finishIconBatch?: () => void;
 
   @Input() connections: GraphConnections = {...nodeConnections};
 
@@ -52,6 +54,7 @@ export class TopicsGraphComponent implements OnInit, OnDestroy {
   constructor(
     private activatedRoute: ActivatedRoute,
     protected flagsService: FeatureFlagsService,
+    private iconsReadyService: IconsReadyService,
   ) {
     // Rebuild the (already-fetched) graph whenever the "contain nodes" feature flag is toggled from the popover.
     effect(() => {
@@ -88,8 +91,9 @@ export class TopicsGraphComponent implements OnInit, OnDestroy {
 
   private async fetchIcons() {
     const requestId = ++this.recolorRequestId;
-    this.iconsReadySubject.next(false);
-    console.debug('[TopicsGraph] Loading graph icons', {count: this.d3Nodes.length, requestId});
+    this.graphIconsReadySubject.next(false);
+    this.finishIconBatch?.();
+    this.finishIconBatch = this.iconsReadyService.beginLoad('topics-graph');
     if (!this.flagsService.dynamicLogoColorization()) {
       const topicNodes = this.d3Nodes.map(d3Node => (topics as any)[d3Node.id]);
       const rawIcons = await Promise.all(topicNodes.map((topic: any) => {
@@ -109,8 +113,8 @@ export class TopicsGraphComponent implements OnInit, OnDestroy {
       });
       this.initD3Graph();
       this.graphInitialized = true;
-      this.iconsReadySubject.next(true);
-      console.debug('[TopicsGraph] All graph icons ready', {count: this.d3Nodes.length, requestId});
+      this.graphIconsReadySubject.next(true);
+      this.completeIconBatch(requestId);
       return;
     }
     const topicNodes = this.d3Nodes.map(d3Node => {
@@ -150,16 +154,24 @@ export class TopicsGraphComponent implements OnInit, OnDestroy {
     });
     this.initD3Graph();
     this.graphInitialized = true;
-    this.iconsReadySubject.next(true);
-    console.debug('[TopicsGraph] All graph icons ready', {count: this.d3Nodes.length, requestId});
+    this.graphIconsReadySubject.next(true);
+    this.completeIconBatch(requestId);
 
+  }
+
+  private completeIconBatch(requestId: number) {
+    if (requestId !== this.recolorRequestId) return;
+    this.finishIconBatch?.();
+    this.finishIconBatch = undefined;
   }
 
   ngOnDestroy() {
     clearTimeout(this.recolorTimer);
     this.simulation?.stop();
     this.stopThemeSubscriptions.forEach(unsubscribe => unsubscribe());
-    this.iconsReadySubject.complete();
+    this.finishIconBatch?.();
+    this.finishIconBatch = undefined;
+    this.graphIconsReadySubject.complete();
   }
 
   private initD3Graph() {

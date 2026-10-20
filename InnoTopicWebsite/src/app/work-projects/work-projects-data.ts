@@ -15,6 +15,8 @@ export interface Organisation {
 export class Project {
   roles?: string
   description?: string
+  /** Skill icons show unless a project sets this to false. */
+  showIcons?: boolean
   topicsById!: MapToTopics<{}>
 }
 

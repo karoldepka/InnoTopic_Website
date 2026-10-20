@@ -100,6 +100,10 @@ export interface SvgRecolorProgress {
   /** Distinct source SVGs, used by the on-screen progress indicator. */
   uniqueCompleted: number
   uniqueTotal: number
+  /** Time since this batch of conversions started; its total duration once done. */
+  elapsedMs: number
+  /** Nothing in this batch is pending any more. */
+  done: boolean
 }
 
 export interface SvgRecolorUrlProgress {
@@ -130,6 +134,8 @@ function publishProgress(batch?: RecolorBatch) {
     failed: batch.failed,
     uniqueCompleted: batch.completedUrls.size,
     uniqueTotal: batch.iconUrls.size,
+    elapsedMs: Math.round(performance.now() - batch.startedAt),
+    done: batch.pending === 0,
   }
   progressSubscribers.forEach(callback => callback(progress))
 }
@@ -212,7 +218,12 @@ function finishRecolorTiming(batch: RecolorBatch, startedAt: number, url: string
   publishUrlProgress(url)
   publishProgress(batch)
 
-  if (batch.pending === 0 && activeBatch === batch) activeBatch = undefined
+  if (batch.pending === 0 && activeBatch === batch) {
+    activeBatch = undefined
+    const failedNote = batch.failed ? `, ${batch.failed} failed` : ''
+    console.log(`Colorized ${batch.completedUrls.size} unique icons (${batch.completed} conversions${failedNote}) `
+      + `in ${((performance.now() - batch.startedAt) / 1000).toFixed(2)} s`)
+  }
 }
 
 // Topic logos recur throughout the graph, tags and previews. Coalesce equal requests while a

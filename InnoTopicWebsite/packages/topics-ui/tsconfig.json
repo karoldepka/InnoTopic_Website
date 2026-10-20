@@ -8,8 +8,6 @@
     "outDir": "./dist",
     "rootDir": "./src",
     "strict": true,
-    "experimentalDecorators": true,
-    "useDefineForClassFields": false,
     "skipLibCheck": true
   },
   "include": ["src"]

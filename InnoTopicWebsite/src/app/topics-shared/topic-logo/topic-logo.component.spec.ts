@@ -1,5 +1,6 @@
 import { waitForAsync, ComponentFixture, TestBed } from '@angular/core/testing';
 
+import { FeatureFlagsService } from '../../shared/feature-flags/feature-flags.service';
 import { TopicLogoComponent } from './topic-logo.component';
 
 describe('TopicLogoComponent', () => {
@@ -25,12 +26,14 @@ describe('TopicLogoComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  it('forwards the topic input to the underlying <topic-logo> element', () => {
-    component = fixture.componentInstance;
+  it('renders the resolved topic logo as an image', () => {
+    // Without recoloring the original logo URL is shown, and no Wasm worker is started.
+    TestBed.inject(FeatureFlagsService).dynamicLogoColorization.set(false);
     fixture.componentRef.setInput('topic', 'Angular');
     fixture.detectChanges();
 
-    const topicLogoEl = fixture.nativeElement.querySelector('topic-logo');
-    expect(topicLogoEl.topic).toBe('Angular');
+    const image: HTMLImageElement = fixture.nativeElement.querySelector('img');
+    expect(image.alt).toBe('Angular');
+    expect(image.getAttribute('src')).toContain('angular');
   });
 });

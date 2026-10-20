@@ -1,8 +1,8 @@
 // Ported from the Angular app's src/app/models/theme-config-state.model.ts, extended with
-// per-corner radius fields (independently configurable, defaulting to today's topic-chip
+// per-corner radius fields (independently configurable, defaulting to today's chip
 // look - see the "corner_radius_*" defaults below matching its hardcoded `20px 7px`) and
 // icon_brightness/icon_contrast, which feed @innotopic/svg-conversion's Rust/Wasm icon
-// recoloring (topic-logo's recolor-contrast/recolor-brightness properties) rather than any
+// recoloring (recolorSvg's contrast/brightness options) rather than any
 // CSS-level effect - their ranges match that crate's process_svg_with_palette exactly (contrast
 // 0..2, 1 neutral; brightness -1..1, 0 neutral).
 export interface ThemeConfigState {

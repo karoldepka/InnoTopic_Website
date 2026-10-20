@@ -8,7 +8,7 @@ import '@innotopic/plasma-ui';
 
 /**
  * A dedicated demo page for @innotopic/plasma-ui's <animated-plasma>, used directly (no Angular
- * wrapper), matching the pattern set by the topics-ui and theme-ui demo pages. Shows a few
+ * wrapper), matching the pattern set by the theme-ui demo page. Shows a few
  * differently-scaled/sped-up instances side by side since scale/speed are its only two knobs.
  */
 @Component({

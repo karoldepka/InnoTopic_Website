@@ -4,6 +4,15 @@ function escapeRegexp(s: any) {
   return s.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
 }
 
+/** Image folders holding pictures rather than logos (e.g. country flags), served from assets/images/. */
+const nonLogoImageDirs = ['countries/'] // maybe clients, but still we colorize companies logos
+
+/** Whether a resolved topic logo may be recolored to the theme; flags and other non-logo images keep their own colors. */
+export function isThemeRecolorableLogo(logoUrl: string): boolean {
+  return logoUrl.toLowerCase().endsWith('.svg')
+    && !nonLogoImageDirs.some(dir => logoUrl.includes('assets/images/' + dir))
+}
+
 export class TopicUrls {
   constructor(
     public webSite?: string | null,
@@ -126,8 +135,7 @@ export class Topic {
       return null // FIXME: undefined ; well actually it is NULL
 
 
-    const nonLogos = [/*'../countries/', */'countries/'] // maybe clients, but still we colorize companies logos
-    if ( nonLogos.some(x => iconFileName.startsWith(x) ) )
+    if ( nonLogoImageDirs.some(x => iconFileName.startsWith(x) ) )
       return '../../../assets/images/' + iconFileName
     else
       // Theme recoloring works from original SVG palette data. The historic `logos-l` output is

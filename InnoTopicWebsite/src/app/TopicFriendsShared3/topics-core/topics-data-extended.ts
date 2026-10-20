@@ -1321,6 +1321,11 @@ export const topicsDataExtended: Partial<Record<keyof Topics, TopicExtendedInfo>
     description: 'Frames tests as "Given/When/Then" scenarios that both developers and non-technical stakeholders can read and agree on, popularised by tools like Cucumber.',
     whenFirstReleased: '2003',
   },
+  'Hexagonal Architecture': {
+    tagline: 'A "Ports and Adapters" software architecture coined by Alistair Cockburn.',
+    description: 'Keeps the domain core independent of frameworks, databases and UIs: the core talks to the outside world only through ports (interfaces), and adapters plug concrete technologies into them, so either side can be tested or swapped in isolation.',
+    whenFirstReleased: '2005',
+  },
   'DSL - Domain-Specific Languages': {
     tagline: 'Small languages purpose-built for one specific problem domain.',
     description: 'Trades general-purpose flexibility for expressiveness in one narrow area (build scripts, regexes, SQL) rather than being usable for arbitrary programs.',

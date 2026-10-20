@@ -37,11 +37,6 @@
               },
               {
                 "glob": "**/*",
-                "input": "packages/topics-ui/dist/assets",
-                "output": "assets/topics-ui"
-              },
-              {
-                "glob": "**/*",
                 "input": "node_modules/svg-conversion/web",
                 "output": "assets/svg-conversion/web"
               },
@@ -139,11 +134,6 @@
                 "glob": "**/*.svg",
                 "input": "node_modules/ionicons/dist/ionicons/svg",
                 "output": "./svg"
-              },
-              {
-                "glob": "**/*",
-                "input": "packages/topics-ui/dist/assets",
-                "output": "assets/topics-ui"
               }
             ],
             "styles": [
