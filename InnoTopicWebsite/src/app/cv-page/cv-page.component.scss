@@ -32,8 +32,17 @@ app-external-profiles {
   justify-content: center;
 
   .container {
+    width: 100%;
     align-items: center;
     flex-direction: row !important;
+
+    app-personal-data,
+    app-external-profiles {
+      box-sizing: border-box;
+      flex: 0 0 50%;
+      width: 50%;
+      max-width: 50%;
+    }
 
     app-three-d-text {
       margin: 0 16px 0 0;
@@ -43,6 +52,19 @@ app-external-profiles {
     app-three-d-text.profile-section-title.three-d-text--enabled {
       width: 32px;
       height: 300px;
+    }
+  }
+}
+
+@media screen and (max-width: $break-medium) {
+  .profile-header .container {
+    flex-direction: column !important;
+
+    app-personal-data,
+    app-external-profiles {
+      flex-basis: auto;
+      width: 100%;
+      max-width: 100%;
     }
   }
 }

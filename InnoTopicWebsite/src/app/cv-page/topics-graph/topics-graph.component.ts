@@ -11,6 +11,7 @@ import {forceCenter, forceCollide, forceLink, forceManyBody, forceSimulation} fr
 import {event as d3Event, select} from 'd3-selection';
 import {zoom as d3Zoom} from 'd3-zoom';
 import {FeatureFlagsService} from '../../shared/feature-flags/feature-flags.service';
+import {BehaviorSubject, Observable} from 'rxjs';
 
 @Component({
   standalone: true,
@@ -22,6 +23,10 @@ import {FeatureFlagsService} from '../../shared/feature-flags/feature-flags.serv
 export class TopicsGraphComponent implements OnInit, OnDestroy {
 
   private static readonly rawIconCache = new Map<string, Promise<string | undefined>>();
+
+  private readonly iconsReadySubject = new BehaviorSubject(false);
+  /** Emits false while the current graph icon batch loads and true when it is rendered. */
+  readonly iconsReady$: Observable<boolean> = this.iconsReadySubject.asObservable();
 
   @Input() connections: GraphConnections = {...nodeConnections};
 
@@ -83,6 +88,8 @@ export class TopicsGraphComponent implements OnInit, OnDestroy {
 
   private async fetchIcons() {
     const requestId = ++this.recolorRequestId;
+    this.iconsReadySubject.next(false);
+    console.debug('[TopicsGraph] Loading graph icons', {count: this.d3Nodes.length, requestId});
     if (!this.flagsService.dynamicLogoColorization()) {
       const topicNodes = this.d3Nodes.map(d3Node => (topics as any)[d3Node.id]);
       const rawIcons = await Promise.all(topicNodes.map((topic: any) => {
@@ -102,6 +109,8 @@ export class TopicsGraphComponent implements OnInit, OnDestroy {
       });
       this.initD3Graph();
       this.graphInitialized = true;
+      this.iconsReadySubject.next(true);
+      console.debug('[TopicsGraph] All graph icons ready', {count: this.d3Nodes.length, requestId});
       return;
     }
     const topicNodes = this.d3Nodes.map(d3Node => {
@@ -122,6 +131,9 @@ export class TopicsGraphComponent implements OnInit, OnDestroy {
         contrast: themeState.icon_contrast,
         brightness: themeState.icon_brightness,
         primaryContrast: themeState.icon_contrast,
+      }).catch(error => {
+        console.error('[TopicsGraph] Icon recolor failed', {topic: topic.name, error});
+        return undefined;
       });
     }));
 
@@ -138,6 +150,8 @@ export class TopicsGraphComponent implements OnInit, OnDestroy {
     });
     this.initD3Graph();
     this.graphInitialized = true;
+    this.iconsReadySubject.next(true);
+    console.debug('[TopicsGraph] All graph icons ready', {count: this.d3Nodes.length, requestId});
 
   }
 
@@ -145,6 +159,7 @@ export class TopicsGraphComponent implements OnInit, OnDestroy {
     clearTimeout(this.recolorTimer);
     this.simulation?.stop();
     this.stopThemeSubscriptions.forEach(unsubscribe => unsubscribe());
+    this.iconsReadySubject.complete();
   }
 
   private initD3Graph() {
