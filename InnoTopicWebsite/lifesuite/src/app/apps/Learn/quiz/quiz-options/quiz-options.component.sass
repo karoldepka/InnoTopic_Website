@@ -27,14 +27,12 @@
   border: 1px solid rgba(var(--ion-text-color-rgb, 255, 255, 255), 0.12)
   border-radius: 6px
   background: rgba(var(--ion-text-color-rgb, 255, 255, 255), 0.03)
-  padding: 0.6rem
 
-.quiz-group--collapsed
-  padding-bottom: 0.6rem
-
+// The padding lives on the header button (not the group) so the whole header strip is clickable.
 .quiz-group__header
   width: 100%
-  padding: 0
+  padding: var(--space-2-5)
+  border-radius: 6px
   border: 0
   background: transparent
   font: inherit
@@ -57,7 +55,7 @@
   outline-offset: 3px
 
 .quiz-group .quiz-options-grid
-  margin-top: 0.6rem
+  padding: 0 var(--space-2-5) var(--space-2-5)
 
 .quiz-options-grid
   display: grid
