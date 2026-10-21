@@ -40,7 +40,7 @@ export const environmentBase = {
   },
 
   mongo: {
-    enabled: true, // Atlas cluster0free - see backend-ts/.env MONGODB_URI
+    enabled: false, // Disabled temporarily. Atlas cluster0free - see backend-ts/.env MONGODB_URI
     odmApiUrl: 'http://localhost:8000/api/odm-mongo',
     pollIntervalMs: 0,
   },
