@@ -7,6 +7,7 @@ const loadThemeDemo = () => import('./themes/theme-demo/theme-demo.module').then
 const loadThemeList = () => import('./themes/theme-list/theme-list.page').then(m => m.ThemeListPage);
 const loadTopicsGraph = () => import('./cv-page/topics-graph/topics-graph.component').then(m => m.TopicsGraphComponent);
 const loadRagStackInfographic = () => import('./learn/infographics/rag-stack/rag-stack.component').then(m => m.RagStackComponent);
+const loadAgenticAiInfographic = () => import('./learn/infographics/agentic-ai/agentic-ai.component').then(m => m.AgenticAiComponent);
 const loadThemeUiDemo = () => import('./learn/demo/theme-ui-demo/theme-ui-demo.component').then(m => m.ThemeUiDemoComponent);
 const loadPlasmaDemo = () => import('./learn/demo/plasma-demo/plasma-demo.component').then(m => m.PlasmaDemoComponent);
 const loadDoodleDemo = () => import('./learn/demo/doodle-demo/doodle-demo.component').then(m => m.DoodleDemoComponent);
@@ -54,6 +55,10 @@ const routes: Routes = [
   {
     path: 'learn/infographics/rag-stack',
     loadComponent: loadRagStackInfographic,
+  },
+  {
+    path: 'learn/infographics/agentic-ai',
+    loadComponent: loadAgenticAiInfographic,
   },
   {
     path: 'learn/demo/theme',

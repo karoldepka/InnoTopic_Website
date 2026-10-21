@@ -23,7 +23,7 @@ import { TopicLogoComponent } from '../topic-logo/topic-logo.component';
     <span
       class="angular-topic-tag"
       [class.angular-topic-tag--inline]="inline()"
-      [appTopicInfoTrigger]="resolvedTopic()"
+      [appTopicInfoTrigger]="showInfo() ? resolvedTopic() : undefined"
       #topicInfo="topicInfo"
       (click)="clickTopic.emit(resolvedTopic())"
     >
@@ -70,6 +70,8 @@ export class TopicTagComponent {
   showLogo = input(true)
   /** Aligns the plain tag with surrounding text; use app-chip for a neumorphic surface. */
   inline = input(false)
+  /** Click-to-reveal info popover; turn off where the tag sits inside another popup. */
+  showInfo = input(true)
 
   clickTopic = output<Topic | undefined>()
 

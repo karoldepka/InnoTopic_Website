@@ -1,0 +1,119 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button mode="md" [defaultHref]="'/'"></ion-back-button>
+    </ion-buttons>
+    <ion-title>How agentic AI works</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <div class="agentic-page">
+    <header class="agentic-intro">
+      <h1>How agentic AI works</h1>
+      <p>
+        A goal goes in. The agent loops - plan, act through tools, observe, reflect - until the goal is met or it
+        needs your help, drawing on memory and on your own documents (RAG) along the way. Click any part, or any
+        logo in 3D, to learn more - or walk through the loop.
+      </p>
+    </header>
+
+    <div class="agentic-controls" role="toolbar" aria-label="Diagram controls">
+      <div class="agentic-segmented" role="group" aria-label="View">
+        <button type="button" [class.agentic-active]="mode() === '2d'" [attr.aria-pressed]="mode() === '2d'"
+                (click)="setMode('2d')">2D</button>
+        <button type="button" [class.agentic-active]="mode() === '3d'" [attr.aria-pressed]="mode() === '3d'"
+                (click)="setMode('3d')">3D</button>
+      </div>
+      <button type="button" class="agentic-button" (click)="toggleWalkthrough()">
+        {{ walkthroughStep() === null ? '▶ Walk through the loop' : '■ Stop walk-through' }}
+      </button>
+      <button type="button" class="agentic-button" (click)="resetView()">Reset view</button>
+    </div>
+
+    <div class="agentic-stage" #stage [class.agentic-stage--3d]="mode() === '3d'">
+      <canvas
+        #canvas
+        role="img"
+        aria-label="Animated diagram: a goal flows into a language model, which loops through plan, act, guardrails, tools, observe and reflect, using memory, retrieval from a knowledge base and sub-agents, until it returns a result. The same parts are listed below the diagram."
+      ></canvas>
+
+      @if (selected(); as node) {
+        <section
+          #tooltip
+          class="agentic-tooltip"
+          role="dialog"
+          aria-modal="false"
+          aria-labelledby="agentic-tooltip-title"
+          (click)="$event.stopPropagation()"
+          (mouseenter)="pauseWalkthrough()"
+          (mouseleave)="resumeWalkthrough()"
+          (focusin)="pauseWalkthrough()"
+          (focusout)="resumeWalkthrough()"
+        >
+          <header class="agentic-tooltip-header">
+            <span class="agentic-dot" [style.background]="kindColor(node.kind)"></span>
+            <h2 id="agentic-tooltip-title" tabindex="-1">{{ node.title }}</h2>
+            <span class="agentic-kind">{{ kindLabel(node.kind) }}</span>
+            <button type="button" class="agentic-close" aria-label="Close" (click)="close()">×</button>
+          </header>
+          <p class="agentic-summary">{{ node.summary }}</p>
+          <div class="agentic-details">
+            @for (paragraph of node.details; track $index) {
+              <p>{{ paragraph }}</p>
+            }
+          </div>
+          @if (node.examples?.length) {
+            <div class="agentic-examples">
+              <span class="agentic-caption">Examples</span>
+              <!-- No nested info popovers: they would be clipped inside this scrolling tooltip. -->
+              @for (topic of node.examples; track $index) {
+                <app-topic-tag [tId]="topic" [inline]="true" [showInfo]="false"
+                               [class.agentic-example--active]="topic === highlightedExample()" />
+              }
+            </div>
+          }
+          @if (neighbors().length) {
+            <div class="agentic-neighbors">
+              <span class="agentic-caption">Connects to</span>
+              @for (neighbor of neighbors(); track neighbor.id) {
+                <button type="button" class="agentic-chip" (click)="selectFromTooltip(neighbor.id)">
+                  <span class="agentic-dot" [style.background]="kindColor(neighbor.kind)"></span>{{ neighbor.title }}
+                </button>
+              }
+            </div>
+          }
+          @if (walkthroughStep() !== null) {
+            <div class="agentic-walkthrough">
+              <button type="button" class="agentic-chip" (click)="stepWalkthrough(-1)" [disabled]="walkthroughStep() === 0">◀ Back</button>
+              <span>Step {{ walkthroughStep()! + 1 }} of {{ walkthroughLength }}</span>
+              <button type="button" class="agentic-chip" (click)="stepWalkthrough(1)">Next ▶</button>
+            </div>
+          }
+        </section>
+      }
+    </div>
+
+    <ul class="agentic-legend" aria-label="Legend">
+      @for (kind of kindOrder; track kind) {
+        <li><span class="agentic-dot" [style.background]="kindColor(kind)"></span>{{ kindLabel(kind) }}</li>
+      }
+    </ul>
+
+    <nav class="agentic-parts" aria-label="Parts of an AI agent">
+      <h2>The parts</h2>
+      <ul>
+        @for (node of nodes; track node.id) {
+          <li>
+            <button type="button" [class.agentic-active]="selectedId() === node.id" [attr.aria-pressed]="selectedId() === node.id"
+                    (click)="selectFromList(node.id, $event)">
+              <span class="agentic-dot" [style.background]="kindColor(node.kind)"></span>
+              <strong>{{ node.title }}</strong>
+              <span>{{ node.summary }}</span>
+            </button>
+          </li>
+        }
+      </ul>
+    </nav>
+  </div>
+</ion-content>
