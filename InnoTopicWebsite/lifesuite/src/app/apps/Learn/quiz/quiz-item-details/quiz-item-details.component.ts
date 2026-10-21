@@ -18,6 +18,7 @@ import {importanceDescriptors} from '../../models/fields/importance.model'
 import {MultipleChoiceAnswer} from '../../models/LearnItem'
 import {shuffleAbcdAnswerChoices} from '../../../Ai/shared/abcd-answers.util'
 import {QuizAnswersService} from '../../core/quiz/quiz-answers.service'
+import {QuizCelebrationService} from '../../core/quiz/quiz-celebration.service'
 
 @Component({
     selector: 'app-quiz-item-details',
@@ -103,13 +104,19 @@ export class QuizItemDetailsComponent implements OnInit, OnDestroy, AfterViewIni
     public quizService: QuizService,
     private quizSpeech: QuizSpeechService,
     private quizAnswersService: QuizAnswersService,
+    private quizCelebration: QuizCelebrationService,
   ) {
     // debugLog('QuizItemDetailsComponent ctor')
   }
 
   onAbcdChoiceClick(choice: MultipleChoiceAnswer): void {
+    // Only celebrate the click that reveals the answer, not one that hides it again.
+    const isRevealing = ! this.quizService.showAnswer$.lastVal
     this.selectedChoice = choice
     this.quizAnswersService.toggleShowAnswer()
+    if (isRevealing && choice.correct) {
+      this.quizCelebration.celebrateCorrectAnswer()
+    }
   }
 
   ngOnInit() {
