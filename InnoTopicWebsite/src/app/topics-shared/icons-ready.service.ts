@@ -22,7 +22,6 @@ export class IconsReadyService {
     this.batchStartedAt ??= performance.now();
     clearTimeout(this.settleTimer);
     this.readySubject.next(false);
-    console.debug('[IconsReady] Icon load started', { source, loadId, pending: this.pendingLoads.size });
 
     let completed = false;
     return () => {
@@ -30,7 +29,6 @@ export class IconsReadyService {
       completed = true;
       this.pendingLoads.delete(loadId);
       this.lastLoadFinishedAt = performance.now();
-      console.debug('[IconsReady] Icon load finished', { source, loadId, pending: this.pendingLoads.size });
       this.scheduleReadyState();
     };
   }
