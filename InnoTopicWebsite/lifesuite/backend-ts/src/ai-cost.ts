@@ -20,11 +20,21 @@ function languageCostRate(model: string): CostRate {
   // These are deliberately only defaults. A proxy can charge differently, so deployment
   // configuration can always override them with AI_COST_{INPUT,OUTPUT}_PER_MILLION_USD.
   const modelName = model.toLowerCase();
-  const defaultRate = modelName.includes('claude-haiku')
-    ? { inputPerMillion: 1, outputPerMillion: 5, source: 'Claude Haiku default estimate' }
-    : modelName.includes('llama') || modelName.includes('ollama')
-      ? { inputPerMillion: 0, outputPerMillion: 0, source: 'local-model estimate' }
-      : { inputPerMillion: 0, outputPerMillion: 0, source: 'unknown model; configure AI_COST_*_PER_MILLION_USD' };
+  // First match wins, so more specific variants (gpt-5.4-mini) must precede their base model.
+  // GPT-5.4 rates are OpenAI's standard (<272K-token prompt) list prices as of 2026-10.
+  const knownRates: Array<[pattern: string, inputPerMillion: number, outputPerMillion: number, source: string]> = [
+    ['claude-haiku', 1, 5, 'Claude Haiku default estimate'],
+    ['gpt-5.4-pro', 30, 180, 'GPT-5.4 Pro list-price estimate'],
+    ['gpt-5.4-mini', 0.75, 4.5, 'GPT-5.4 mini list-price estimate'],
+    ['gpt-5.4-nano', 0.2, 1.25, 'GPT-5.4 nano list-price estimate'],
+    ['gpt-5.4', 2.5, 15, 'GPT-5.4 list-price estimate'],
+    ['llama', 0, 0, 'local-model estimate'],
+    ['ollama', 0, 0, 'local-model estimate'],
+  ];
+  const match = knownRates.find(([pattern]) => modelName.includes(pattern));
+  const defaultRate = match
+    ? { inputPerMillion: match[1], outputPerMillion: match[2], source: match[3] }
+    : { inputPerMillion: 0, outputPerMillion: 0, source: 'unknown model; configure AI_COST_*_PER_MILLION_USD' };
 
   return {
     inputPerMillion: configuredNumber('AI_COST_INPUT_PER_MILLION_USD', defaultRate.inputPerMillion),

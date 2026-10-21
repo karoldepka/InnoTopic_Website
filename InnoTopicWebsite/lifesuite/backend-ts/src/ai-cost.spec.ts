@@ -24,6 +24,17 @@ describe('AI cost logging', () => {
     }));
   });
 
+  it('prices GPT-5.4 variants by their most specific match', () => {
+    const info = vi.spyOn(console, 'info').mockImplementation(() => undefined);
+    const usage = { inputTokens: 1_000_000, outputTokens: 100_000 };
+
+    logLanguageModelCost('base', 'gpt-5.4', usage);
+    logLanguageModelCost('mini', 'gpt-5.4-mini', usage);
+
+    expect(info).toHaveBeenCalledWith('[ai-cost]', expect.objectContaining({ operation: 'base', estimatedUsd: 4 }));
+    expect(info).toHaveBeenCalledWith('[ai-cost]', expect.objectContaining({ operation: 'mini', estimatedUsd: 1.2 }));
+  });
+
   it('logs usage once a stream has completed', async () => {
     const info = vi.spyOn(console, 'info').mockImplementation(() => undefined);
 
