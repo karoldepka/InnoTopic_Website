@@ -9,7 +9,7 @@ const nonLogoImageDirs = ['countries/'] // maybe clients, but still we colorize 
 
 /** Whether a resolved topic logo may be recolored to the theme; flags and other non-logo images keep their own colors. */
 export function isThemeRecolorableLogo(logoUrl: string): boolean {
-  return logoUrl.toLowerCase().endsWith('.svg')
+  return /\.(svg|png|jpe?g|webp)$/i.test(logoUrl)
     && !nonLogoImageDirs.some(dir => logoUrl.includes('assets/images/' + dir))
 }
 

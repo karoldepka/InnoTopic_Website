@@ -1,13 +1,16 @@
+type WorkerOptions = {
+  primaryColor?: string
+  colorMode?: 'palette' | 'primary_contrast'
+  secondaryColor?: string
+  contrast?: number
+  brightness?: number
+  primaryContrast?: number
+  outputMode?: 'rgb' | 'css_vars'
+}
+
 type SvgWorkerPoolLike = {
-  process(svg: string, options?: {
-    primaryColor?: string
-    colorMode?: 'palette' | 'primary_contrast'
-    secondaryColor?: string
-    contrast?: number
-    brightness?: number
-    primaryContrast?: number
-    outputMode?: 'rgb' | 'css_vars'
-  }): Promise<string>
+  process(svg: string, options?: WorkerOptions): Promise<string>
+  processRaster(url: string, options?: WorkerOptions): Promise<string>
 }
 
 export interface RecolorOptions {
@@ -34,12 +37,15 @@ export function setWorkerBasePath(path: string) {
   workerBasePath = path
 }
 
-// One shared worker pool for every topic icon on the page. It is deliberately sized to the
-// browser-reported number of logical CPU cores so a theme update can recolor many SVGs in
-// parallel; the fallback keeps recoloring available in environments that do not expose it.
-function logicalCpuCount(): number {
+// One shared worker pool for every topic icon on the page. A conversion takes well under a
+// millisecond (all ~2400 logos convert in about a second on one thread), while every worker
+// downloads its own script, glue and Wasm - so a few workers are plenty, and more only delay
+// the page's icons behind extra startup requests.
+const MAX_POOL_SIZE = 4
+function poolSize(): number {
   const count = globalThis.navigator?.hardwareConcurrency
-  return typeof count === 'number' && Number.isInteger(count) && count > 0 ? count : 1
+  const cores = typeof count === 'number' && Number.isInteger(count) && count > 0 ? count : 1
+  return Math.min(MAX_POOL_SIZE, cores)
 }
 
 // Each icon component is cheap to call, but the pool owns real Worker threads, so it is created
@@ -55,7 +61,7 @@ async function getPool(): Promise<SvgWorkerPoolLike | undefined> {
         // The worker URL remains explicit because the worker itself is copied as a static asset.
         const svgConversion = await import('svg-conversion')
         return new svgConversion.SvgWorkerPool({
-          size: logicalCpuCount(),
+          size: poolSize(),
           workerUrl: `${workerBasePath}svg-worker.js`,
         }) as SvgWorkerPoolLike
       } catch {
@@ -66,9 +72,34 @@ async function getPool(): Promise<SvgWorkerPoolLike | undefined> {
   return poolPromise
 }
 
+/**
+ * Starts the worker pool (its script and Wasm) right away. Call it before the page requests its
+ * icons: otherwise those downloads queue behind every icon file and conversions start late.
+ */
+export function warmUpSvgRecolor(): void {
+  void getPool()
+}
+
 // Recoloring re-fetches the same static icon file on every drag tick; caching the raw SVG text
 // (not the recolored result, which depends on the live colors) avoids a network request per tick.
 const svgTextCache = new Map<string, Promise<string>>()
+
+/**
+ * The SVG file's text, downloaded once per page and shared with recolorSvg. Show the original
+ * from it (see svgDataUrl) rather than also pointing an <img> at the URL, which downloads it again.
+ */
+export function loadSvgText(url: string): Promise<string> {
+  return fetchSvgText(url)
+}
+
+/** An <img>-ready data URL for SVG markup; standalone SVG images only render with the namespace. */
+export function svgDataUrl(markup: string): string {
+  const withNamespace = markup.includes('xmlns="http://www.w3.org/2000/svg"') || markup.includes("xmlns='http://www.w3.org/2000/svg'")
+    ? markup
+    : markup.replace('<svg', '<svg xmlns="http://www.w3.org/2000/svg"')
+  return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(withNamespace)}`
+}
+
 function fetchSvgText(url: string): Promise<string> {
   let cached = svgTextCache.get(url)
   if (!cached) {
@@ -243,44 +274,80 @@ function recolorRequestKey(url: string, options: RecolorOptions): string {
 
 /** Fetches the icon at `url` and recolors it via the Rust/Wasm worker pool. */
 export async function recolorSvg(url: string, options: RecolorOptions): Promise<string> {
-  const key = recolorRequestKey(url, options)
+  return shareRecolor(`svg:${recolorRequestKey(url, options)}`, () => recolorSvgOnce(url, options))
+}
+
+/**
+ * Recolors a raster image (PNG/JPEG/WebP) with the same tone mapping as recolorSvg, decoding and
+ * converting it in the worker pool. Resolves to a PNG data URL, or to `url` itself when the pool
+ * is unavailable.
+ */
+export async function recolorRaster(url: string, options: RecolorOptions): Promise<string> {
+  return shareRecolor(`raster:${recolorRequestKey(url, options)}`, () => recolorRasterOnce(url, options))
+}
+
+function shareRecolor(key: string, convert: () => Promise<string>): Promise<string> {
   const existing = recolorInFlight.get(key)
   if (existing) return existing
 
-  const conversion = recolorSvgOnce(url, options)
-  const shared = conversion.finally(() => {
+  const shared = convert().finally(() => {
     if (recolorInFlight.get(key) === shared) recolorInFlight.delete(key)
   })
   recolorInFlight.set(key, shared)
   return shared
 }
 
+function workerOptions(options: RecolorOptions): WorkerOptions {
+  const usePrimaryContrast = options.colorMode === 'primary_contrast'
+  return {
+    primaryColor: options.primaryColor,
+    ...(usePrimaryContrast
+      ? {
+          colorMode: 'primary_contrast' as const,
+          primaryContrast: options.primaryContrast ?? 0.3,
+        }
+      : {
+          secondaryColor: options.secondaryColor,
+          contrast: options.contrast,
+          brightness: options.brightness,
+        }),
+    outputMode: 'rgb',
+  }
+}
+
 async function recolorSvgOnce(url: string, options: RecolorOptions): Promise<string> {
   const { batch, startedAt } = startRecolorTiming(url)
   let failed = true
   try {
+    const pool = getPool()
     const svgText = await fetchSvgText(url)
-    const workerPool = await getPool()
+    const workerPool = await pool
     if (!workerPool) {
       failed = false
       return svgText
     }
 
-    const usePrimaryContrast = options.colorMode === 'primary_contrast'
-    const result = await workerPool.process(svgText, {
-      primaryColor: options.primaryColor,
-      ...(usePrimaryContrast
-        ? {
-            colorMode: 'primary_contrast' as const,
-            primaryContrast: options.primaryContrast ?? 0.3,
-          }
-        : {
-            secondaryColor: options.secondaryColor,
-            contrast: options.contrast,
-            brightness: options.brightness,
-          }),
-      outputMode: 'rgb',
-    })
+    const result = await workerPool.process(svgText, workerOptions(options))
+    failed = false
+    return result
+  } finally {
+    finishRecolorTiming(batch, startedAt, url, failed)
+  }
+}
+
+async function recolorRasterOnce(url: string, options: RecolorOptions): Promise<string> {
+  const { batch, startedAt } = startRecolorTiming(url)
+  let failed = true
+  try {
+    const workerPool = await getPool()
+    if (!workerPool) {
+      failed = false
+      return url
+    }
+
+    // The worker fetches the image itself, where a relative URL would resolve against its script.
+    const absoluteUrl = new URL(url, document.baseURI).href
+    const result = await workerPool.processRaster(absoluteUrl, workerOptions(options))
     failed = false
     return result
   } finally {

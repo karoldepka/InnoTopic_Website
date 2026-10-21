@@ -14,7 +14,7 @@ import { isThemeRecolorableLogo, Topic } from '../../TopicFriendsShared3/topics-
 import { TopicsService } from '../../TopicFriendsShared3/topics-core/topics.service';
 import { FeatureFlagsService } from '../../shared/feature-flags/feature-flags.service';
 import { onThemeStateChange, themeState } from '@innotopic/theme-ui';
-import { recolorSvg } from '@innotopic/topics-ui';
+import { loadSvgText, recolorRaster, recolorSvg, RecolorOptions, svgDataUrl } from '@innotopic/topics-ui';
 import { IconsReadyService } from '../icons-ready.service';
 import { TopicInfoPopoverComponent, TopicInfoTriggerDirective } from '../topic-info/topic-info';
 
@@ -40,7 +40,7 @@ export const defaultIconHeight = 18
     >
       <img
         class="topic-logo-original"
-        [src]="resolvedTopic?.logo ?? fallbackLogo"
+        [attr.src]="originalSrc()"
         [alt]="resolvedTopic?.name ?? ''"
         [style.height.px]="logoHeight"
         loading="eager"
@@ -127,6 +127,10 @@ export class TopicLogoComponent implements OnDestroy {
   private readonly changeDetector = inject(ChangeDetectorRef)
   private readonly themeRevision = signal(0)
   protected readonly recoloredLogo = signal<string | undefined>(undefined)
+  /** The original-colors image; null while its SVG text is still downloading. */
+  protected readonly originalSrc = signal<string | null>(null)
+  /** Logo URL whose downloaded SVG text the original image shows (or will show). */
+  private originalFromTextOf?: string
   protected readonly hoverFade = computed(() => `${this.flagsService.logoHoverFadeMs()}ms`)
   private recolorRequestId = 0
   private isRecoloringIcon = false
@@ -155,28 +159,39 @@ export class TopicLogoComponent implements OnDestroy {
       this.finishLoading();
       if (!logoUrl) {
         this.recoloredLogo.set(undefined);
+        this.showOriginal(this.fallbackLogo || null);
         return;
       }
       this.finishIconLoad = this.iconsReady.beginLoad(`topic-logo:${resolvedTopic?.name ?? logoUrl}`);
 
+      const isSvg = logoUrl.toLowerCase().endsWith('.svg');
       if (!dynamicColorization || !isThemeRecolorableLogo(logoUrl)) {
         this.recoloredLogo.set(undefined);
+        this.showOriginal(logoUrl);
         this.finishIfImageAlreadyLoaded();
         return;
       }
+      if (isSvg) {
+        this.showOriginalFromSvgText(logoUrl);
+      } else {
+        this.showOriginal(logoUrl);
+      }
 
       this.isRecoloringIcon = true;
-      void recolorSvg(logoUrl, {
+      const options: RecolorOptions = {
         primaryColor: themeState.ion_color_primary,
         colorMode: themeState.icon_color_mode,
         secondaryColor: themeState.ion_color_secondary,
         contrast: themeState.icon_contrast,
         brightness: themeState.icon_brightness,
         primaryContrast: themeState.icon_contrast,
-      }).then(markup => {
+      };
+      const recoloring = isSvg
+        ? recolorSvg(logoUrl, options).then(svgDataUrl)
+        : recolorRaster(logoUrl, options);
+      void recoloring.then(recolored => {
         if (requestId === this.recolorRequestId) {
           this.isRecoloringIcon = false;
-          const recolored = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(markup)}`;
           const unchanged = recolored === this.recoloredLogo();
           this.recoloredLogo.set(recolored);
           // The same image fires no new load event, so it is ready right away.
@@ -213,6 +228,27 @@ export class TopicLogoComponent implements OnDestroy {
   private onThemeChange() {
     this.themeRevision.update(revision => revision + 1);
     this.changeDetector.markForCheck();
+  }
+
+  private showOriginal(src: string | null) {
+    this.originalFromTextOf = undefined;
+    this.originalSrc.set(src);
+  }
+
+  /** Shows the original from the SVG text the recolorer downloads anyway, so it is fetched once. */
+  private showOriginalFromSvgText(url: string) {
+    if (this.originalFromTextOf === url) return;
+    this.originalFromTextOf = url;
+    this.originalSrc.set(null);
+    loadSvgText(url).then(
+      text => {
+        if (this.originalFromTextOf === url) this.originalSrc.set(svgDataUrl(text));
+      },
+      // Let the <img> request the file itself, so a missing logo still ends up in onLogoError.
+      () => {
+        if (this.originalFromTextOf === url) this.originalSrc.set(url);
+      },
+    );
   }
 
   onLogoError(event: Event) {

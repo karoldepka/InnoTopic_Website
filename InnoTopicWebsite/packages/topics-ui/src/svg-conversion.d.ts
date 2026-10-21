@@ -29,6 +29,8 @@ declare module 'svg-conversion' {
   export class SvgWorkerPool {
     constructor(options?: SvgWorkerPoolOptions)
     process(svg: string, options?: ProcessOptions): Promise<string>
+    /** Recolors the raster image at an absolute URL; resolves to a PNG data URL. */
+    processRaster(url: string, options?: ProcessOptions): Promise<string>
     generateColorMap(primaryColor?: string): Promise<string>
     close(): void
   }

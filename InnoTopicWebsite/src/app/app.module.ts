@@ -1,4 +1,4 @@
-import {NgModule, provideAppInitializer} from '@angular/core';
+import {inject, NgModule, provideAppInitializer} from '@angular/core';
 import {provideHttpClient} from '@angular/common/http';
 import { BrowserModule } from '@angular/platform-browser';
 import { RouteReuseStrategy } from '@angular/router';
@@ -14,6 +14,8 @@ import { injectThemeTokens, initThemeConfig } from '@innotopic/theme-ui';
 // self-defines on import; the loader's defineCustomElements() is Stencil's own registration
 // step (same pattern this app already uses for @ionic/core/loader in main.ts).
 import { defineCustomElements } from '@innotopic/theme-ui/loader';
+import { warmUpSvgRecolor } from '@innotopic/topics-ui';
+import { FeatureFlagsService } from './shared/feature-flags/feature-flags.service';
 
 /**
  * @innotopic/theme-ui's store already loads persisted config from localStorage at creation
@@ -41,6 +43,10 @@ function initializeThemeConfig() {
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
     provideHttpClient(),
     provideAppInitializer(() => initializeThemeConfig()),
+    // Load the icon recoloring workers before the first route requests its (many) icons.
+    provideAppInitializer(() => {
+      if (inject(FeatureFlagsService).dynamicLogoColorization()) warmUpSvgRecolor();
+    }),
   ],
   bootstrap: [AppComponent],
 })
