@@ -99,6 +99,7 @@ export class QuizItemDetailsComponent implements OnInit, OnDestroy, AfterViewIni
 
 
   private subscriptionToShowAnswer ? : Subscription
+  private subscriptionToShowChoices ? : Subscription
 
   constructor(
     public quizService: QuizService,
@@ -147,18 +148,28 @@ export class QuizItemDetailsComponent implements OnInit, OnDestroy, AfterViewIni
 
   ngOnDestroy(): void {
     this.subscriptionToShowAnswer ?. unsubscribe()
+    this.subscriptionToShowChoices ?. unsubscribe()
+  }
+
+  private scrollToAnswers() {
+    setTimeout(() => {
+      const prefersReducedMotion = globalThis.matchMedia?.('(prefers-reduced-motion: reduce)').matches
+      this.answersChild?.nativeElement?.scrollIntoView({
+        behavior: prefersReducedMotion ? 'auto' : 'smooth',
+        block: 'start',
+      })
+    }, 200)
   }
 
   ngAfterViewInit(): void {
+    this.subscriptionToShowChoices = this.quizService.showChoices$.subscribe(showChoices => {
+      if ( showChoices && this.hasDedicatedMultipleChoiceAnswers(this.item$?.currentVal) ) {
+        this.scrollToAnswers()
+      }
+    })
     this.subscriptionToShowAnswer = this.quizService.showAnswer$.subscribe(showAnswer => {
       if ( showAnswer ) {
-        setTimeout(() => {
-          const prefersReducedMotion = globalThis.matchMedia?.('(prefers-reduced-motion: reduce)').matches
-          this.answersChild?.nativeElement?.scrollIntoView({
-            behavior: prefersReducedMotion ? 'auto' : 'smooth',
-            block: 'start',
-          })
-        }, 200)
+        this.scrollToAnswers()
         if (this.quizService.options2$.val?.textToSpeechEnabled) {
           const itemVal = this.item$?.currentVal
           const answerText = itemVal
