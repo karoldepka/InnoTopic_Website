@@ -2,9 +2,219 @@ export const buildInfo = {
   branch: "local",
   commit: "local",
   commitAuthor: "Karol Depka Pradzinski The First",
-  commitMessage: "Show-latest-100-commits",
-  builtAt: "2026-08-29T10:57:08.843Z",
+  commitMessage: "Add agentic AI 3D visualization; more vector DB and Postgres logos",
+  builtAt: "2026-10-21T18:42:49.110Z",
   recentCommits: [
+  {
+    "hash": "58b656da4bbede97523530b8f5ff32735977aac9",
+    "shortHash": "58b656da4",
+    "author": "Karol Depka Pradzinski The First",
+    "committedAt": "2026-10-21T19:30:38+02:00",
+    "message": "Add agentic AI 3D visualization; more vector DB and Postgres logos"
+  },
+  {
+    "hash": "dffd74e14ec680d328d5a5b53e6cd0755591cb87",
+    "shortHash": "dffd74e14",
+    "author": "Karol Depka Pradzinski The First",
+    "committedAt": "2026-10-21T18:51:32+02:00",
+    "message": "Add standalone RAG architecture 3D visualization (Vis)"
+  },
+  {
+    "hash": "74b4d4a45d969d4c4645e6a152adebe990c143ad",
+    "shortHash": "74b4d4a45",
+    "author": "Karol Depka Pradzinski The First",
+    "committedAt": "2026-10-21T18:51:32+02:00",
+    "message": "Add agentic AI 3D infographic page"
+  },
+  {
+    "hash": "057eff447445b7ce10e5c333aea52b4905a72cfe",
+    "shortHash": "057eff447",
+    "author": "Karol Depka Pradzinski The First",
+    "committedAt": "2026-10-21T18:51:32+02:00",
+    "message": "Drop IconsReady per-icon debug logging"
+  },
+  {
+    "hash": "0d88688bb0d76ca11aa4ba46e0d19bf559c04be3",
+    "shortHash": "0d88688bb",
+    "author": "Karol Depka Pradzinski The First",
+    "committedAt": "2026-10-21T18:51:32+02:00",
+    "message": "Recolor raster topic logos; warm up the recolor workers early"
+  },
+  {
+    "hash": "80e76fbc3d67e01d3565e5e600e7733ca9451c06",
+    "shortHash": "80e76fbc3",
+    "author": "Karol Depka Pradzinski The First",
+    "committedAt": "2026-10-20T17:25:43+02:00",
+    "message": "Remove Lit topic components; add logo hover fade and logo info popovers"
+  },
+  {
+    "hash": "d5ec8cc643efe03980ef853624bc142ea33cb466",
+    "shortHash": "d5ec8cc64",
+    "author": "Karol Depka Pradzinski The First",
+    "committedAt": "2026-10-20T16:28:39+02:00",
+    "message": "Fix Flask and other icons not following the theme color"
+  },
+  {
+    "hash": "d2fcc64c3c90135a712681bc1d4422e978567c9f",
+    "shortHash": "d2fcc64c3",
+    "author": "Karol Depka Pradzinski The First",
+    "committedAt": "2026-10-20T14:23:18+02:00",
+    "message": "Add graph icon readiness observable"
+  },
+  {
+    "hash": "86325935f403438da764c7a9fdc41cc750f9e16e",
+    "shortHash": "86325935f",
+    "author": "Karol Depka Pradzinski The First",
+    "committedAt": "2026-10-20T14:15:41+02:00",
+    "message": "Fix print route startup rendering"
+  },
+  {
+    "hash": "ba43363c3ce2acf6a3de1ffbba6005e522ccd931",
+    "shortHash": "ba43363c3",
+    "author": "Karol Depka Pradzinski The First",
+    "committedAt": "2026-10-20T13:48:25+02:00",
+    "message": "Fix topic logos and print pagination"
+  },
+  {
+    "hash": "82edcd6c8cd2d920bd7d13d0d60ceea53eff6bcf",
+    "shortHash": "82edcd6c8",
+    "author": "Karol Depka Pradzinski The First",
+    "committedAt": "2026-10-19T12:39:11+02:00",
+    "message": "Refine CV visuals and topic components"
+  },
+  {
+    "hash": "25e4d24c23d5cacd05a6e1f57996e16667c816d5",
+    "shortHash": "25e4d24c2",
+    "author": "Karol Depka Pradzinski The First",
+    "committedAt": "2026-10-18T17:37:56+02:00",
+    "message": "Fix defer loading and Lit icon assets"
+  },
+  {
+    "hash": "223421e12fcad833ffb52699c63ae7b317cf2335",
+    "shortHash": "223421e12",
+    "author": "Karol Depka Pradzinski The First",
+    "committedAt": "2026-10-18T17:28:21+02:00",
+    "message": "Fix topic rendering and SVG map defaults"
+  },
+  {
+    "hash": "328feccd0246b6049dae202b59b2fb8d23a9a5b7",
+    "shortHash": "328feccd0",
+    "author": "Karol Depka Pradzinski The First",
+    "committedAt": "2026-09-04T10:34:01+02:00",
+    "message": "refactor: remove TS color detection, use Rust implementation"
+  },
+  {
+    "hash": "66c4542ff88c45b11f2007f0361cd8d79cc195c5",
+    "shortHash": "66c4542ff",
+    "author": "Karol Depka Pradzinski The First",
+    "committedAt": "2026-09-04T10:23:11+02:00",
+    "message": "feat(svg-recolor): auto-detect single-color SVGs and use primary color"
+  },
+  {
+    "hash": "3ce5be9dc108508a7b9657f6b550c553e4a33741",
+    "shortHash": "3ce5be9dc",
+    "author": "Karol Depka Pradzinski The First",
+    "committedAt": "2026-09-04T09:04:18+02:00",
+    "message": "refactor: update work projects and topics data, vscode settings"
+  },
+  {
+    "hash": "e5c269ea0b53ad5667836ac8ce52d7640402d333",
+    "shortHash": "e5c269ea0",
+    "author": "Karol Depka Pradzinski The First",
+    "committedAt": "2026-08-31T20:44:04+02:00",
+    "message": "Improve themed icon recoloring"
+  },
+  {
+    "hash": "b9fc068f22f31fb6a88523094fba1bc71c00b5fc",
+    "shortHash": "b9fc068f2",
+    "author": "Karol Depka Pradzinski The First",
+    "committedAt": "2026-08-31T18:58:17+02:00",
+    "message": "Ship updated SVG colorization worker"
+  },
+  {
+    "hash": "85bd7d70002325a6b19b09edbff533d309fb7cc0",
+    "shortHash": "85bd7d700",
+    "author": "Karol Depka Pradzinski The First",
+    "committedAt": "2026-08-31T18:53:00+02:00",
+    "message": "Enhance theme colorization controls"
+  },
+  {
+    "hash": "4a2bc89c08160dda4c7d00dfc34ff3695c65289d",
+    "shortHash": "4a2bc89c0",
+    "author": "Karol Depka Pradzinski The First",
+    "committedAt": "2026-08-31T18:46:28+02:00",
+    "message": "Add resilient themed SVG recoloring"
+  },
+  {
+    "hash": "825f7c42c7928d1e13fe37137a11c7e98f990974",
+    "shortHash": "825f7c42c",
+    "author": "Karol Depka Pradzinski The First",
+    "committedAt": "2026-08-30T13:44:06+02:00",
+    "message": "Scroll quiz cog to options"
+  },
+  {
+    "hash": "3b54d92b04f3b0245b224cfd5f0e6377a7eb3988",
+    "shortHash": "3b54d92b0",
+    "author": "Karol Depka Pradzinski The First",
+    "committedAt": "2026-08-30T09:26:36+02:00",
+    "message": "Add icon size slider"
+  },
+  {
+    "hash": "f13c852d9e8688f479cff5954b297df017269db2",
+    "shortHash": "f13c852d9",
+    "author": "Karol Depka Pradzinski The First",
+    "committedAt": "2026-08-30T09:17:12+02:00",
+    "message": "Show 100 filtered recent commits"
+  },
+  {
+    "hash": "fda69645dd86152c8abab72120f67950b5450389",
+    "shortHash": "fda69645d",
+    "author": "Karol Depka Pradzinski The First",
+    "committedAt": "2026-08-30T08:41:04+02:00",
+    "message": "Hide field labels in quiz"
+  },
+  {
+    "hash": "d39e9efafcd4a4e8f572f9ed764ffc020462bea0",
+    "shortHash": "d39e9efaf",
+    "author": "Karol Depka Pradzinski The First",
+    "committedAt": "2026-08-29T19:53:32+02:00",
+    "message": "Prevent immediate experimental quiz item repeats"
+  },
+  {
+    "hash": "8493535adeb34c11b984be4c000e98e48941ca07",
+    "shortHash": "8493535ad",
+    "author": "Karol Depka Pradzinski The First",
+    "committedAt": "2026-08-29T18:09:07+02:00",
+    "message": "Restore streaming category generation"
+  },
+  {
+    "hash": "8f0a4fcd31aeed5e748a750400c0081fc58a4790",
+    "shortHash": "8f0a4fcd3",
+    "author": "Karol Depka Pradzinski The First",
+    "committedAt": "2026-08-29T15:04:17+02:00",
+    "message": "experimental quiz batch scheduler"
+  },
+  {
+    "hash": "ee184a77f8cf2118e90913dfd7deb9ef9ab77f53",
+    "shortHash": "ee184a77f",
+    "author": "Karol Depka Pradzinski The First",
+    "committedAt": "2026-08-29T14:53:22+02:00",
+    "message": "Add-experimental-quiz-scheduler"
+  },
+  {
+    "hash": "f5b8eabed21592f3c2df289328c3d5ed15a010d1",
+    "shortHash": "f5b8eabed",
+    "author": "Karol Depka Pradzinski The First",
+    "committedAt": "2026-08-29T13:24:51+02:00",
+    "message": "Dot-wrong-answer-border"
+  },
+  {
+    "hash": "5d95841fcca734ade4339f057bfae655bc3a5829",
+    "shortHash": "5d95841fc",
+    "author": "Karol Depka Pradzinski The First",
+    "committedAt": "2026-08-29T12:57:39+02:00",
+    "message": "Refresh-about-commit-history"
+  },
   {
     "hash": "231eb10758ae4f7c9bb6c0d23a93c2dd9e0f8971",
     "shortHash": "231eb1075",
@@ -494,216 +704,6 @@ export const buildInfo = {
     "author": "Karol Depka Pradzinski The First",
     "committedAt": "2026-08-22T18:47:09+02:00",
     "message": "Persist zero star ratings"
-  },
-  {
-    "hash": "c1909982159dd584d4ccaf86e3f403c33b78605f",
-    "shortHash": "c19099821",
-    "author": "Karol Depka Pradzinski The First",
-    "committedAt": "2026-08-22T18:42:54+02:00",
-    "message": "Clarify unselected star rating state"
-  },
-  {
-    "hash": "3f01287953db577413a0b36fc0bfbe327f995f5a",
-    "shortHash": "3f0128795",
-    "author": "Karol Depka Pradzinski The First",
-    "committedAt": "2026-08-22T18:38:49+02:00",
-    "message": "Disable SurrealDB backend"
-  },
-  {
-    "hash": "1027886a4fd8d9eaa96c8f39a3ad8190cf665f82",
-    "shortHash": "1027886a4",
-    "author": "Karol Depka Pradzinski The First",
-    "committedAt": "2026-08-22T18:31:08+02:00",
-    "message": "Record solid icon preference"
-  },
-  {
-    "hash": "ca6b34ea2c08c9633229c25917d7e0f6768b0431",
-    "shortHash": "ca6b34ea2",
-    "author": "Karol Depka Pradzinski The First",
-    "committedAt": "2026-08-22T18:22:25+02:00",
-    "message": "Merge solid icon and quiz updates"
-  },
-  {
-    "hash": "1d73f40cc0b5e2cc9fcc613ff525c4efb02e3037",
-    "shortHash": "1d73f40cc",
-    "author": "Karol Depka Pradzinski The First",
-    "committedAt": "2026-08-22T18:15:16+02:00",
-    "message": "Replace outline icons with solid variants"
-  },
-  {
-    "hash": "8c5efe08db17f2b8006f6834c13ccfe2885b29e4",
-    "shortHash": "8c5efe08d",
-    "author": "Karol Depka Pradzinski The First",
-    "committedAt": "2026-08-22T17:59:04+02:00",
-    "message": "Use solid Ionicons everywhere"
-  },
-  {
-    "hash": "adabe1dc1f2677f2e19e171b2ea5211e7ac6f3d3",
-    "shortHash": "adabe1dc1",
-    "author": "Karol Depka Pradzinski The First",
-    "committedAt": "2026-08-22T17:55:39+02:00",
-    "message": "Improve quiz interaction and AI QA flow"
-  },
-  {
-    "hash": "073ccb9afbe74474c65707241d799f25f100a1fd",
-    "shortHash": "073ccb9af",
-    "author": "Karol Depka Pradzinski The First",
-    "committedAt": "2026-08-21T12:40:38+02:00",
-    "message": "Fix AI category generation requests"
-  },
-  {
-    "hash": "0eb0ef0b577f434f7de638aec18d40f89388d077",
-    "shortHash": "0eb0ef0b5",
-    "author": "Karol Depka Pradzinski The First",
-    "committedAt": "2026-08-20T18:12:58+02:00",
-    "message": "Set tuned theme defaults"
-  },
-  {
-    "hash": "0fcbe9638c123a6d5491597b294bf68e73979fdb",
-    "shortHash": "0fcbe9638",
-    "author": "Karol Depka Pradzinski The First",
-    "committedAt": "2026-08-20T17:46:27+02:00",
-    "message": "Improve signup form submission"
-  },
-  {
-    "hash": "3185e0c8f19585e7685bd25f80f63f645284d88b",
-    "shortHash": "3185e0c8f",
-    "author": "Karol Depka Pradzinski The First",
-    "committedAt": "2026-08-20T17:45:28+02:00",
-    "message": "Prioritize specific app routes"
-  },
-  {
-    "hash": "cb3cc395dc357eaa47210829820cdf41284029b9",
-    "shortHash": "cb3cc395d",
-    "author": "Karol Depka Pradzinski The First",
-    "committedAt": "2026-08-20T17:43:30+02:00",
-    "message": "Restore reachable audio route"
-  },
-  {
-    "hash": "2ba9c033c9ef4089bd6562d91b5bf33a46916376",
-    "shortHash": "2ba9c033c",
-    "author": "Karol Depka Pradzinski The First",
-    "committedAt": "2026-08-20T17:42:32+02:00",
-    "message": "Use canonical Journal conflict route"
-  },
-  {
-    "hash": "f118aa3746448c4cf7699b7e2a9938a998451411",
-    "shortHash": "f118aa374",
-    "author": "Karol Depka Pradzinski The First",
-    "committedAt": "2026-08-20T17:41:42+02:00",
-    "message": "Label voice memo controls"
-  },
-  {
-    "hash": "af6e46567a4d0be4e98665724118a1ab62e83c58",
-    "shortHash": "af6e46567",
-    "author": "Karol Depka Pradzinski The First",
-    "committedAt": "2026-08-20T17:21:25+02:00",
-    "message": "Label icon-only toolbar actions"
-  },
-  {
-    "hash": "bca8173c501a9b265f1b4ceb2850761c91e7cb99",
-    "shortHash": "bca8173c5",
-    "author": "Karol Depka Pradzinski The First",
-    "committedAt": "2026-08-20T17:20:15+02:00",
-    "message": "Improve toolbar recording accessibility"
-  },
-  {
-    "hash": "49e4e23b9f6085317924549901ebd8888e3fcfca",
-    "shortHash": "49e4e23b9",
-    "author": "Karol Depka Pradzinski The First",
-    "committedAt": "2026-08-20T17:19:16+02:00",
-    "message": "Announce star rating state"
-  },
-  {
-    "hash": "60e1ca16461578f6179495dc00edeabb02607ef9",
-    "shortHash": "60e1ca164",
-    "author": "Karol Depka Pradzinski The First",
-    "committedAt": "2026-08-20T17:17:48+02:00",
-    "message": "Label field comment toggles"
-  },
-  {
-    "hash": "efa0c1f4bda4466cf48a70cb15faa8f16c60a0c5",
-    "shortHash": "efa0c1f4b",
-    "author": "Karol Depka Pradzinski The First",
-    "committedAt": "2026-08-20T17:02:46+02:00",
-    "message": "Improve side menu search enter"
-  },
-  {
-    "hash": "0982a8614f1ad71a30f3698c95ebf80d21b4a00c",
-    "shortHash": "0982a8614",
-    "author": "Karol Depka Pradzinski The First",
-    "committedAt": "2026-08-20T16:57:51+02:00",
-    "message": "Make sync status control accessible"
-  },
-  {
-    "hash": "46d981703ef3cd61e741d7330d8e732c6654cc39",
-    "shortHash": "46d981703",
-    "author": "Karol Depka Pradzinski The First",
-    "committedAt": "2026-08-20T16:55:00+02:00",
-    "message": "Silence stale reload reconciliation conflicts"
-  },
-  {
-    "hash": "b768ea593dedd7e4f1e65c7bee4b375b36869369",
-    "shortHash": "b768ea593",
-    "author": "Karol Depka Pradzinski The First",
-    "committedAt": "2026-08-20T16:52:29+02:00",
-    "message": "Move bullet shortcut to Ctrl 8"
-  },
-  {
-    "hash": "e76a6153fa56938b472f7e257f5485eb78ebcf16",
-    "shortHash": "e76a6153f",
-    "author": "Karol Depka Pradzinski The First",
-    "committedAt": "2026-08-20T16:33:26+02:00",
-    "message": "Identify same-device sync echoes"
-  },
-  {
-    "hash": "6f97a58380dab0fe75aed79683a5c8628caf9086",
-    "shortHash": "6f97a5838",
-    "author": "Karol Depka Pradzinski The First",
-    "committedAt": "2026-08-20T16:30:23+02:00",
-    "message": "Close rendered side menu on enter"
-  },
-  {
-    "hash": "ef8a77bfa60e5f1e136d275305e22711fffcb3d6",
-    "shortHash": "ef8a77bfa",
-    "author": "Karol Depka Pradzinski The First",
-    "committedAt": "2026-08-20T16:27:37+02:00",
-    "message": "Close side menu on search enter"
-  },
-  {
-    "hash": "1238963599e6929b6a95aa59cc1df4e034af8c7e",
-    "shortHash": "123896359",
-    "author": "Karol Depka Pradzinski The First",
-    "committedAt": "2026-08-20T16:20:08+02:00",
-    "message": "Fix search enter event typing"
-  },
-  {
-    "hash": "cbde108015c14f806d276f4315ed736468640eea",
-    "shortHash": "cbde10801",
-    "author": "Karol Depka Pradzinski The First",
-    "committedAt": "2026-08-20T16:18:52+02:00",
-    "message": "Add doodle color picker"
-  },
-  {
-    "hash": "5f341b823cc10aacecb940fed7b6e74878db52ad",
-    "shortHash": "5f341b823",
-    "author": "Karol Depka Pradzinski The First",
-    "committedAt": "2026-08-20T16:16:44+02:00",
-    "message": "Fix doodle overlay toolbar layout"
-  },
-  {
-    "hash": "cb0f8d7f3e1787b2432a2d68db234655c451338a",
-    "shortHash": "cb0f8d7f3",
-    "author": "Karol Depka Pradzinski The First",
-    "committedAt": "2026-08-20T16:13:32+02:00",
-    "message": "Prevent self-echo conflict popups"
-  },
-  {
-    "hash": "48b1ef285c9bc8b999aee30726bc4693e5e752de",
-    "shortHash": "48b1ef285",
-    "author": "Karol Depka Pradzinski The First",
-    "committedAt": "2026-08-20T16:09:01+02:00",
-    "message": "Dismiss menu before search navigation"
   }
 ],
 };

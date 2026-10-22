@@ -750,7 +750,7 @@ export class Cloud {
 }
 
 export class Monitoring_and_observability {
-  PostHog = tWide()
+  PostHog = tWide('posthog-icon.svg')
   Grafana = tNarrow()
   'Datadog' = t('datadog-icon')
   'Dynatrace' = t('dynatrace-icon')
