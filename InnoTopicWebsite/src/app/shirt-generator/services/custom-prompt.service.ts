@@ -1,6 +1,6 @@
 import {Injectable} from '@angular/core';
 import {AbstractTopicsPromptService} from "../models/abstract-topics-prompt.service";
-import {map, Observable, of} from 'rxjs';
+import {map, Observable} from 'rxjs';
 import {HttpClient} from "@angular/common/http";
 
 type CustomAIData = {

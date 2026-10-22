@@ -3,7 +3,6 @@ import {
   OnInit,
 } from '@angular/core';
 import { BooksComponent } from '../books/books.component';
-import { ThreeDTextComponent } from '../shared/threed-text/threed-text.component';
 import { PrintService } from '../TopicFriendsShared3/topics-core/print.service';
 import { WorkExperienceComponent } from '../skills/work-experience.component';
 import { WorkProjectsSectionComponent } from '../work-projects/work-projects-section/work-projects-section.component';

@@ -1,6 +1,5 @@
 import {
   getDictionaryValuesAsArray,
-  setIdsFromKeys,
 } from '../../utils/dictionary-utils';
 import {
   Topic,
@@ -8,8 +7,6 @@ import {
 } from './Topic';
 import {
   tag,
-  tagLogoType,
-  tagNoIcon,
   TopicCategory,
 } from './topics';
 

@@ -8,7 +8,6 @@ import { CommonModule } from '@angular/common';
 import { SkillLevelIconComponent } from '../skill-level-icon/skill-level-icon.component';
 import {
   UserSkillLevelEnum,
-  UserSkillLevelsHaveWant,
   UserSkillLevelsHaveWant2,
 } from '../../TopicFriendsShared3/skills/skills-core/user-skills';
 

@@ -2,7 +2,7 @@ import {Component, effect, ElementRef, inject, Input, OnDestroy, OnInit, signal,
 import {loadSvgText, recolorSvg, svgDataUrl} from '@innotopic/topics-ui';
 import {onThemeStateChange, themeState} from '@innotopic/theme-ui';
 import {topics} from '../../TopicFriendsShared3/topics-core/topics-data';
-import {nodeConnections, nodeLinks, preset, sizes, strengths} from "./topics-graph.data";
+import {nodeConnections, nodeLinks, preset, sizes} from "./topics-graph.data";
 import {GraphConnections, GraphNode, GraphNodeId, LinkByIds} from "./topics-graph.types";
 import {ActivatedRoute} from "@angular/router";
 import {color as d3Color} from 'd3-color';
@@ -362,10 +362,6 @@ export class TopicsGraphComponent implements OnInit, OnDestroy {
         //            return -1000000;
         //        })
       }
-
-    const nodes = {};
-    const nodesKeys = Object.keys(nodes);
-    const nodesArray = nodesKeys.map(function(v) { return (nodes as any)[v]; });
 
     // initial xy: https://observablehq.com/@d3/force-layout-phyllotaxis
 

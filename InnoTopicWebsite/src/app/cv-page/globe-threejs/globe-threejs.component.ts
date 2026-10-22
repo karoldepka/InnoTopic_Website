@@ -9,7 +9,7 @@ import {
   Vector3, WebGLRenderer,
 } from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
-import { WORK_CITIES, WorkCity } from '../work-cities';
+import { WORK_CITIES } from '../work-cities';
 
 const WORKED_ISO3 = new Set(['DEU', 'AUT', 'POL', 'GBR', 'USA', 'ESP', 'LUX', 'IND', 'ARE']);
 const WORKED_NAMES = new Set(['France']);

@@ -1,4 +1,3 @@
-import { t, Topics } from '../TopicFriendsShared3/topics-core/topics-data';
 import { MapToTopics } from './work-experience';
 
 //

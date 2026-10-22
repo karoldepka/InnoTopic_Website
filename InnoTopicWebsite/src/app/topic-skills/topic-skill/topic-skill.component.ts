@@ -8,7 +8,6 @@ import { CommonModule } from '@angular/common';
 import { TopicTagComponent } from '../../topics-shared/topic-tag/topic-tag.component';
 import { SkillLevelsIconsComponent } from '../../skills-shared/skill-levels-icons/skill-levels-icons.component';
 import {
-  UserSkillLevelsHaveWant,
   UserSkillLevelsHaveWant2,
 } from '../../TopicFriendsShared3/skills/skills-core/user-skills';
 

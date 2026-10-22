@@ -1,6 +1,4 @@
-import { t } from '../TopicFriendsShared3/topics-core/topics-data';
 import {
-  beginner,
   advanced,
   expert,
   intermediate,
