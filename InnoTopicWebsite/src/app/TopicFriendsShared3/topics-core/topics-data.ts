@@ -979,6 +979,7 @@ export class AI {
   'Amazon Q' = tNarrow('amazon-q.svg')
   'Amazon CodeWhisperer' = tSquare('Arch_Amazon-CodeWhisperer_16.svg')
   'Amazon Bedrock' = tSquare('Arch_Amazon-Bedrock_16.svg')
+  'Amazon Bedrock Agents' = tSquare('Arch_Amazon-Bedrock_16.svg') // AWS has no separate icon for Bedrock Agents
   'Amazon SageMaker' = tSquare('Arch_Amazon-SageMaker_16.svg')
   'Amazon Lex' = tSquare('Arch_Amazon-Lex_16.svg')
   'Amazon Comprehend' = tSquare('Arch_Amazon-Comprehend_16.svg') // Gewinnen Sie wertvolle Einblicke und Erkenntnisse aus Ihren Textdokumenten

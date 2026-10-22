@@ -2112,6 +2112,11 @@ export const topicsDataExtended: Partial<Record<keyof Topics, TopicExtendedInfo>
     description: 'Lets you call models like Claude or Llama through AWS\'s own infrastructure/billing instead of integrating with each vendor\'s API separately.',
     whenFirstReleased: '2023',
   },
+  'Amazon Bedrock Agents': {
+    tagline: 'Managed AI agents on Amazon Bedrock that plan and carry out multi-step tasks.',
+    description: 'An agent breaks a request into steps, calls your APIs (action groups backed by Lambda or an OpenAPI schema) and searches Bedrock Knowledge Bases (RAG), with AWS running the orchestration loop, session memory and guardrails.',
+    whenFirstReleased: '2023',
+  },
   'Amazon Kendra': {
     tagline: "AWS's intelligent enterprise search service.",
     description: 'Uses NLP to return direct answers from internal documents/wikis, instead of just a list of keyword-matched links like classic enterprise search.',
