@@ -1,8 +1,11 @@
 <ng-container *ngFor="let choosable of allPossible">
 
+  <!-- Chosen = filled + bold, the rest outlined: readable even when the theme's secondary equals its primary. -->
   <ion-button
     (click)="onClick(choosable)"
     [ngClass]="{ chosen: isChosen(choosable) }"
+    [fill]="isChosen(choosable) ? 'solid' : 'outline'"
+    [attr.aria-pressed]="isChosen(choosable)"
   >
     {{ getTitle(choosable) }}
   </ion-button>

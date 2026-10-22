@@ -25,6 +25,8 @@
   white-space: normal
   line-height: 1.1
 
+// Selected = filled + bold, the rest outlined (see the template), so the selection shows even when the
+// theme's secondary equals its primary; the secondary color is only an extra cue on top.
 .selectedButton
   font-weight: bold
   --ion-color-primary: var(--ion-color-secondary)

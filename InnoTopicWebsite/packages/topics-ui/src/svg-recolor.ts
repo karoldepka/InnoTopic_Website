@@ -301,14 +301,37 @@ function shareRecolor(key: string, convert: () => Promise<string>): Promise<stri
   return shared
 }
 
+/** sRGB channels of a #rgb / #rrggbb color; undefined for anything else. */
+function hexRgb(color: string): [number, number, number] | undefined {
+  const hex = color.trim().replace(/^#/, '')
+  const full = hex.length === 3 ? [...hex].map(c => c + c).join('') : hex
+  if (!/^[0-9a-f]{6}$/i.test(full)) return undefined
+  return [0, 2, 4].map(i => parseInt(full.slice(i, i + 2), 16)) as [number, number, number]
+}
+
+/** Below this RGB distance two colors read as the same (out of ~441 for black vs white). */
+const MIN_PALETTE_COLOR_DISTANCE = 48
+
+function tooCloseForPalette(a: string, b: string): boolean {
+  const [x, y] = [hexRgb(a), hexRgb(b)]
+  if (!x || !y) return a.trim().toLowerCase() === b.trim().toLowerCase()
+  return Math.hypot(x[0] - y[0], x[1] - y[1], x[2] - y[2]) < MIN_PALETTE_COLOR_DISTANCE
+}
+
 function workerOptions(options: RecolorOptions): WorkerOptions {
-  const usePrimaryContrast = options.colorMode === 'primary_contrast'
+  // The palette maps a logo's darkest tones to primary and its lightest to secondary. With secondary
+  // (nearly) equal to primary every tone would get the same color and logos would turn into flat
+  // silhouettes, so map the tones around primary instead (keeping the logos' detail).
+  const paletteWithoutContrast = options.colorMode !== 'primary_contrast' && !!options.secondaryColor
+    && tooCloseForPalette(options.primaryColor, options.secondaryColor)
+  const usePrimaryContrast = options.colorMode === 'primary_contrast' || paletteWithoutContrast
   return {
     primaryColor: options.primaryColor,
     ...(usePrimaryContrast
       ? {
           colorMode: 'primary_contrast' as const,
-          primaryContrast: options.primaryContrast ?? 0.3,
+          // The palette's contrast is on a different (0..2) scale, so the fallback uses the default range.
+          primaryContrast: paletteWithoutContrast ? 0.3 : options.primaryContrast ?? 0.3,
         }
       : {
           secondaryColor: options.secondaryColor,

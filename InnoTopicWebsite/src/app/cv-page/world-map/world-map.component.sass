@@ -21,6 +21,13 @@
 .marker-dark
   stop-color: var(--ion-color-secondary, rgb(0, 124, 0))
 
+// A ring in the page background color keeps the markers distinct from the land even when the theme's
+// secondary equals its primary.
+.map-svg circle
+  stroke: var(--ion-background-color, #fff)
+  stroke-width: 1.5px
+  vector-effect: non-scaling-stroke
+
 @media print
   .map-svg
     transform: scale(0.9)
