@@ -2117,6 +2117,11 @@ export const topicsDataExtended: Partial<Record<keyof Topics, TopicExtendedInfo>
     description: 'An agent breaks a request into steps, calls your APIs (action groups backed by Lambda or an OpenAPI schema) and searches Bedrock Knowledge Bases (RAG), with AWS running the orchestration loop, session memory and guardrails.',
     whenFirstReleased: '2023',
   },
+  'Amazon Bedrock AgentCore': {
+    tagline: "AWS's platform for running AI agents in production, built with any framework or model.",
+    description: 'Provides the agent infrastructure as managed services (a serverless runtime with session isolation, memory, a gateway that turns APIs into MCP tools, identity, a code interpreter and browser, and observability), whether the agent uses LangGraph, CrewAI, Strands or another framework.',
+    whenFirstReleased: '2025',
+  },
   'Amazon Kendra': {
     tagline: "AWS's intelligent enterprise search service.",
     description: 'Uses NLP to return direct answers from internal documents/wikis, instead of just a list of keyword-matched links like classic enterprise search.',

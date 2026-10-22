@@ -243,7 +243,7 @@ const TECH = {
   subagents:{ show:4, list:[['crewai','CrewAI crews'],['msaf','Microsoft Agent Framework (AutoGen)'],['openaiagents','OpenAI Agents SDK handoffs'],['claudeagent','Claude Agent SDK subagents'],['langgraph','LangGraph supervisor']] },
   a2a:      { show:3, list:[['a2a','Agent2Agent (A2A)'],['adk','Google ADK'],['msaf','Microsoft Agent Framework']] },
   obs:      { show:5, list:[['langsmith','LangSmith'],['langfuse','Langfuse'],['phoenix','Arize Phoenix'],['opentelemetry','OpenTelemetry'],['braintrust','Braintrust'],['wandb','W&B Weave'],['deepeval','DeepEval']] },
-  loop:     { show:7, list:[['langgraph','LangGraph'],['openaiagents','OpenAI Agents SDK'],['claudeagent','Claude Agent SDK'],['bedrockagents','Amazon Bedrock Agents'],['crewai','CrewAI'],['msaf','Microsoft Agent Framework'],['adk','Google ADK'],['pydanticai','Pydantic AI'],['mastra','Mastra'],['aisdk','Vercel AI SDK'],['llamaindex','LlamaIndex'],['smolagents','smolagents'],['temporal','Temporal (durable)'],['inngest','Inngest (durable)']] },
+  loop:     { show:9, list:[['langgraph','LangGraph'],['openaiagents','OpenAI Agents SDK'],['claudeagent','Claude Agent SDK'],['bedrockagents','Amazon Bedrock Agents'],['bedrockagentcore','Amazon Bedrock AgentCore'],['strands','Strands Agents'],['crewai','CrewAI'],['msaf','Microsoft Agent Framework'],['adk','Google ADK'],['pydanticai','Pydantic AI'],['mastra','Mastra'],['aisdk','Vercel AI SDK'],['llamaindex','LlamaIndex'],['smolagents','smolagents'],['temporal','Temporal (durable)'],['inngest','Inngest (durable)']] },
 };
 const LAYERS = {
   client:  { name:'Users & triggers',    color:'#dfe8ff' },
