@@ -36,6 +36,46 @@
     }
   </section>
 
+  <section class="visualization">
+    <header class="visualization-header">
+      <h2>AI architectures in 3D</h2>
+      <span class="visualization-links">
+        <a [routerLink]="routes.rag">Open RAG view</a>
+        <a [routerLink]="routes.agentic">Open agentic AI view</a>
+      </span>
+    </header>
+    <p class="visualization-description">
+      A RAG pipeline and an agentic AI system as explorable 3D scenes, with logos of 70+ real
+      technologies (Amazon Bedrock, LangGraph, pgvector, MCP…) extruded into 3D around the parts that use them.
+      Hover for a summary, click for a deep-dive card, or play a guided run; the search box at the top of
+      the page highlights matching components here too.
+    </p>
+    <div class="visualization-tech">
+      @for (topic of architecture3dTech; track topic) {
+        <app-topic-tag [tId]="topic" />
+      }
+    </div>
+
+    @if (!isPrint) {
+      <div class="visualization-3d">
+        @defer (on viewport) {
+          <app-rag-architecture-3d [compact]="true" />
+        } @placeholder {
+          <div class="visualization-placeholder" aria-hidden="true"></div>
+        }
+      </div>
+      <div class="visualization-3d">
+        @defer (on viewport) {
+          <app-agentic-architecture-3d [compact]="true" />
+        } @placeholder {
+          <div class="visualization-placeholder" aria-hidden="true"></div>
+        }
+      </div>
+    } @else {
+      <p class="visualization-url">Live: {{ origin }}{{ routes.rag }} · {{ origin }}{{ routes.agentic }}</p>
+    }
+  </section>
+
   <section class="visualizations-more">
     <h3>More on this site</h3>
     <ul>

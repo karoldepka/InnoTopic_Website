@@ -35,6 +35,24 @@
   border-radius: 18px
   background: var(--ion-color-step-50, rgba(127, 127, 127, 0.06))
 
+.visualization-links
+  display: flex
+  gap: 16px
+  white-space: nowrap
+
+// Each 3D mini view fills a fixed-height box (the view sizes itself to its container).
+.visualization-3d
+  height: 520px
+  margin-bottom: 12px
+  border-radius: 18px
+  overflow: hidden
+
+  > *
+    height: 100%
+
+  .visualization-placeholder
+    height: 100%
+
 .visualization-url
   font-size: 0.9em
   color: gray

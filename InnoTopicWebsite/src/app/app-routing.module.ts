@@ -8,7 +8,9 @@ const loadThemeList = () => import('./themes/theme-list/theme-list.page').then(m
 const loadTopicsGraph = () => import('./cv-page/topics-graph/topics-graph.component').then(m => m.TopicsGraphComponent);
 const loadRagStackInfographic = () => import('./learn/infographics/rag-stack/rag-stack.component').then(m => m.RagStackComponent);
 const loadAgenticAiInfographic = () => import('./learn/infographics/agentic-ai/agentic-ai.component').then(m => m.AgenticAiComponent);
-const loadThemeUiDemo = () => import('./learn/demo/theme-ui-demo/theme-ui-demo.component').then(m => m.ThemeUiDemoComponent);
+const loadArchitecture3dPage = () =>
+  import('./learn/architecture-3d/architecture-3d-page.component').then(m => m.Architecture3dPageComponent);
+const loadThemeUiDemo =() => import('./learn/demo/theme-ui-demo/theme-ui-demo.component').then(m => m.ThemeUiDemoComponent);
 const loadPlasmaDemo = () => import('./learn/demo/plasma-demo/plasma-demo.component').then(m => m.PlasmaDemoComponent);
 const loadDoodleDemo = () => import('./learn/demo/doodle-demo/doodle-demo.component').then(m => m.DoodleDemoComponent);
 const loadPageBreakDemo = () =>
@@ -59,6 +61,18 @@ const routes: Routes = [
   {
     path: 'learn/infographics/agentic-ai',
     loadComponent: loadAgenticAiInfographic,
+  },
+  {
+    path: 'learn/architecture-3d/rag',
+    title: 'RAG Architecture · 3D',
+    loadComponent: loadArchitecture3dPage,
+    data: { vis: 'rag' },
+  },
+  {
+    path: 'learn/architecture-3d/agentic',
+    title: 'Agentic AI Architecture · 3D',
+    loadComponent: loadArchitecture3dPage,
+    data: { vis: 'agentic' },
   },
   {
     path: 'learn/demo/theme',

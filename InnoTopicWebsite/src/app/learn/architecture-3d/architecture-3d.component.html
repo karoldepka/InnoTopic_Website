@@ -1,0 +1,61 @@
+<!-- Ported from the standalone Vis/index.html; the engine finds these elements by data-el. -->
+<div class="arch3d" #root [attr.data-vis]="vis" [class.arch3d--compact]="compact()">
+  <div data-el="loading">LOADING 3D SCENE…</div>
+  <div data-el="scene"></div>
+  <div data-el="labels"></div>
+
+  <div data-el="hud" class="glass">
+    @if (!compact()) {
+      <nav class="vis-switch" aria-label="Visualization">
+        @for (view of views; track view.id) {
+          <a [routerLink]="view.route" [attr.aria-current]="view.id === vis ? 'page' : null">{{ view.tab }}</a>
+        }
+      </nav>
+    }
+    <h1><span>{{ page.accent }}</span> · {{ page.heading }}</h1>
+    @if (!compact()) {
+      <p>{{ page.intro }}</p>
+    }
+    <div class="btns">
+      <button data-el="play" class="primary">{{ page.play }}</button>
+      <button data-el="rotate" class="on" title="Auto-rotate">⟳ Auto-rotate</button>
+      <button data-el="reset">⌖ Reset view</button>
+      <button data-el="wheelzoom" title="Let the mouse wheel zoom the 3D scene">🖱 Wheel zoom: off</button>
+      <span class="zoomgrp"><button data-el="zoomout" title="Zoom out">−</button><button data-el="zoomin" title="Zoom in">+</button></span>
+    </div>
+  </div>
+
+  <div data-el="legend" class="glass">
+    <h3>Layers</h3>
+    <div class="lg-grid" data-el="lg-layers"></div>
+    <h3>{{ page.flows }}</h3>
+    <div class="lg-grid" data-el="lg-flows"></div>
+    <div class="hint" data-el="hint">Drag to orbit · Right-drag / Shift-drag to pan · Pinch or +/− to zoom · wheel zoom: off</div>
+  </div>
+
+  <div data-el="info" class="glass">
+    <button class="close" data-el="info-close" title="Close">×</button>
+    <span class="chip" data-el="info-chip"></span>
+    <h2 data-el="info-title"></h2>
+    <p data-el="info-desc"></p>
+    <div class="ex" data-el="info-ex"></div>
+    <div class="stack" data-el="info-stack"><h4>Tech stack</h4><div class="chips" data-el="info-chips"></div></div>
+    <div class="ihint">Click for details, concepts &amp; related tech →</div>
+  </div>
+
+  <div data-el="card" class="glass" role="dialog" aria-modal="false" [attr.aria-label]="page.tab + ' details'">
+    <div class="card-top">
+      <button data-el="card-back" title="Back">←</button>
+      <span class="chip" data-el="card-chip"></span>
+      <button class="close" data-el="card-close" title="Close (Esc)">×</button>
+    </div>
+    <div data-el="card-body"></div>
+  </div>
+
+  <div data-el="tip"></div>
+  <div data-el="caption" class="glass">
+    <div class="meta"><span data-el="cap-step"></span><span class="it" data-el="cap-it"></span><b data-el="cap-node"></b></div>
+    <div class="txt" data-el="cap-text"></div>
+    <div class="bar"><i data-el="cap-bar"></i></div>
+  </div>
+</div>
