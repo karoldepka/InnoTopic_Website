@@ -7,7 +7,7 @@ const MATCH_SELECTOR = '.topic-search--match, .node--search-match';
 /**
  * Search box for the page's topics: matching topics are highlighted and all others muted (see
  * TopicSearchService). Ctrl+Alt+F focuses it from anywhere; Enter / Shift+Enter scroll to the
- * next / previous match; Escape clears it; the .* toggle (Alt+R) switches to regex matching.
+ * next / previous match; Escape clears it; the .* toggle (Ctrl+Alt+R) switches to regex matching.
  */
 @Component({
   selector: 'app-topic-search',
@@ -19,8 +19,8 @@ const MATCH_SELECTOR = '.topic-search--match, .node--search-match';
         #input
         type="search"
         [placeholder]="search.regex() ? 'Search topics (regex)…' : 'Search topics…'"
-        aria-label="Search topics (Ctrl+Alt+F); Enter jumps to the next match; Alt+R toggles regex"
-        aria-keyshortcuts="Control+Alt+F Alt+R"
+        aria-label="Search topics (Ctrl+Alt+F); Enter jumps to the next match; Ctrl+Alt+R toggles regex"
+        aria-keyshortcuts="Control+Alt+F Control+Alt+R"
         autocomplete="off"
         spellcheck="false"
         [value]="search.query()"
@@ -44,7 +44,7 @@ const MATCH_SELECTOR = '.topic-search--match, .node--search-match';
         [class.topic-search-toggle--on]="search.regex()"
         [attr.aria-pressed]="search.regex()"
         aria-label="Regular expression"
-        title="Regular expression (Alt+R)"
+        title="Regular expression (Ctrl+Alt+R)"
         (click)="toggleRegex()"
       >.*</button>
       @if (search.query()) {
@@ -199,11 +199,10 @@ export class TopicSearchComponent {
       event.preventDefault();
       this.input().nativeElement.focus();
       this.input().nativeElement.select();
-    } else if (event.altKey && !event.ctrlKey && !event.metaKey && event.code === 'KeyR'
-      && document.activeElement === this.input().nativeElement) {
-      // Like VS Code's find widget: only while the search box has focus, so Alt+R stays free elsewhere.
+    } else if (event.ctrlKey && event.altKey && !event.shiftKey && event.code === 'KeyR') {
       event.preventDefault();
       this.toggleRegex();
+      this.input().nativeElement.focus();
     }
   }
 
