@@ -9,6 +9,18 @@
   max-width: 1200px
   margin-inline: auto
 
+// Theme colors, so the map follows the active/customized theme; fallbacks are the original art.
+.land
+  fill: var(--ion-color-primary, rgb(39, 120, 156))
+  fill-rule: nonzero
+
+// Place markers keep their light-to-dark gradient, built from the secondary color.
+.marker-light
+  stop-color: var(--ion-color-secondary-tint, rgb(0, 249, 0))
+
+.marker-dark
+  stop-color: var(--ion-color-secondary, rgb(0, 124, 0))
+
 @media print
   .map-svg
     transform: scale(0.9)
