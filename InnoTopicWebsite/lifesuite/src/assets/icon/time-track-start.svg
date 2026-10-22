@@ -1,13 +1,10 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
-  <!-- "Start time tracking" icon: a solid record-style circle with a clock face boolean-subtracted
-       out of the middle - the hands stay solid (not subtracted), bridging across the cut-out like a
-       stencil, so the clock reads clearly rather than just looking like a plain ring. -->
-  <mask id="timeTrackStartClockCutout" maskUnits="userSpaceOnUse">
+  <!-- "Start time tracking" icon: a solid disc (matching the app's solid Ionicons style) with the
+       clock hands boolean-subtracted out of it, so they show through as the background. -->
+  <mask id="timeTrackStartClockHandsCutout" maskUnits="userSpaceOnUse">
     <rect x="0" y="0" width="48" height="48" fill="#fff"/>
-    <circle cx="24" cy="24" r="19" fill="#000"/>
-    <line x1="24" y1="24" x2="24" y2="11" stroke="#fff" stroke-width="3" stroke-linecap="round"/>
-    <line x1="24" y1="24" x2="33" y2="24" stroke="#fff" stroke-width="3" stroke-linecap="round"/>
-    <circle cx="24" cy="24" r="1.8" fill="#fff"/>
+    <line x1="24" y1="24" x2="24" y2="10" stroke="#000" stroke-width="3" stroke-linecap="round"/>
+    <line x1="24" y1="24" x2="33" y2="24" stroke="#000" stroke-width="3" stroke-linecap="round"/>
   </mask>
-  <circle cx="24" cy="24" r="22" fill="currentColor" mask="url(#timeTrackStartClockCutout)"/>
+  <circle cx="24" cy="24" r="22" fill="currentColor" mask="url(#timeTrackStartClockHandsCutout)"/>
 </svg>
