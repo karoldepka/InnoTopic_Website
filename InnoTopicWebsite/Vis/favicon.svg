@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <!-- A tiny 3D architecture diagram: three glowing nodes linked above an isometric floor,
+       in the page's accent colors on its near-black scene background. -->
+  <defs>
+    <radialGradient id="cyan" cx="35%" cy="32%" r="70%">
+      <stop offset="0" stop-color="#eafcff"/><stop offset=".45" stop-color="#3ad7ff"/><stop offset="1" stop-color="#0a6a87"/>
+    </radialGradient>
+    <radialGradient id="magenta" cx="35%" cy="32%" r="70%">
+      <stop offset="0" stop-color="#ffe6f7"/><stop offset=".45" stop-color="#ff5fd2"/><stop offset="1" stop-color="#8a1c6c"/>
+    </radialGradient>
+    <radialGradient id="amber" cx="35%" cy="32%" r="70%">
+      <stop offset="0" stop-color="#fff3dc"/><stop offset=".45" stop-color="#ffb547"/><stop offset="1" stop-color="#94560a"/>
+    </radialGradient>
+  </defs>
+  <rect width="64" height="64" rx="14" fill="#05070d"/>
+  <!-- isometric floor -->
+  <path d="M32 33 L59 46.5 L32 60 L5 46.5 Z" fill="#3ad7ff" fill-opacity=".1" stroke="#5fe0ff" stroke-opacity=".55" stroke-width="1.6" stroke-linejoin="round"/>
+  <!-- stems from the nodes down to the floor -->
+  <path d="M15 37 V47 M49 39 V47 M32 29 V46" stroke="#9fb4d6" stroke-opacity=".5" stroke-width="1.4"/>
+  <!-- links -->
+  <path d="M17 26 Q22 13 30 15" fill="none" stroke="#3ad7ff" stroke-width="3.2" stroke-linecap="round"/>
+  <path d="M34 15 Q44 14 48 27" fill="none" stroke="#ffb547" stroke-width="3.2" stroke-linecap="round"/>
+  <!-- nodes -->
+  <circle cx="32" cy="18" r="10.5" fill="url(#magenta)"/>
+  <circle cx="15" cy="30" r="7.5" fill="url(#cyan)"/>
+  <circle cx="49" cy="32" r="7.5" fill="url(#amber)"/>
+</svg>
