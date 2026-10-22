@@ -17,6 +17,7 @@ import {filter} from 'rxjs/operators'
 import {BaseComponent} from '../../../libs/AppFedShared/base/base.component'
 import {FeatureService} from '../../../libs/AppFedShared/feature.service'
 import {AiBackendService} from '../core/ai-backend.service'
+import {ItemProcessingService} from '../core/item-processing.service'
 import {getVisibleLearnSlotDescriptors} from '../models/LearnSlotDescriptors'
 import {SlotDescriptor} from '../../../libs/AppFedShared/tree/cells/SlotDescriptor'
 import {OdmTreeNode} from '../../../libs/AppFedShared/tree/tree-node/OdmTreeNode'
@@ -66,6 +67,7 @@ export class LearnItemDetailsPage extends BaseComponent implements OnInit, OnDes
 
   featureService = this.injector.get(FeatureService)
   private aiBackend = this.injector.get(AiBackendService)
+  private itemProcessingService = this.injector.get(ItemProcessingService)
 
   get val$(): Observable<LearnItem | nullish> {
     return this.item$.locallyVisibleChanges$
@@ -190,6 +192,7 @@ export class LearnItemDetailsPage extends BaseComponent implements OnInit, OnDes
         const marker = `#FilledByAI:(${modelName})`
         const answer = `${((response as any)?.answer || '').trim()}\n\n${marker}`.trim()
         this.item$.patchThrottled({[descriptor.id]: answer, whenGeneratedByAi: OdmBackend.nowTimestamp()} as any)
+        void this.itemProcessingService.fillCategoriesWithAiIfEmpty(this.item$, (response as any)?.answer)
         // GH #138: still save what came back (better than losing it) but flag it - a silently
         // truncated answer (e.g. cut off mid code-block) otherwise looks like a normal saved
         // answer with nothing telling the user it's incomplete.

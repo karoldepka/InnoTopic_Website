@@ -401,6 +401,8 @@ export class SearchOrAddLearnableItemPageComponent extends BaseComponent impleme
           this.showAddError(this.formatAddError(e, 'The item was added, but AI could not fill the answer.'))
         }
       )
+      // Runs alongside the streamed answer, from the question alone, so it doesn't wait for the stream.
+      void this.itemProcessingService.fillCategoriesWithAiIfEmpty(item$)
       this.presentAddedToast(item$, 'Learn item added with AI.', () => this.stopAI())
     } catch (e) {
       console.error('Error adding with AI', e)

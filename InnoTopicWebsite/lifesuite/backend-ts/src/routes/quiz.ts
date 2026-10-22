@@ -2,7 +2,7 @@ import { Hono } from 'hono';
 import { streamText, generateText } from 'ai';
 import { llm, MODEL_NAME } from '../llm.js';
 import { webSearch } from '../web-search.js';
-import { buildAnswerMessages } from '../prompts.js';
+import { buildAnswerMessages, buildSuggestCategoriesMessages, parseSuggestedCategories } from '../prompts.js';
 import { textStreamResponse } from '../utils.js';
 import { logLanguageModelCost, logStreamLanguageModelCost } from '../ai-cost.js';
 
@@ -61,6 +61,29 @@ quizRouter.post('/generate-answer', handleGenerateAnswer);
 quizRouter.post('/ai-api/generate-answer', handleGenerateAnswer);
 quizRouter.post('/generate-answer-stream', handleGenerateAnswerStream);
 quizRouter.post('/ai-api/generate-answer-stream', handleGenerateAnswerStream);
+
+interface SuggestCategoriesRequest {
+  question: string;
+  answer?: string;
+  existingCategories?: string[];
+}
+
+async function handleSuggestCategories(c: import('hono').Context) {
+  const body = await c.req.json<SuggestCategoriesRequest>();
+  const { system, messages } = buildSuggestCategoriesMessages(body.question, body.answer ?? '', body.existingCategories ?? []);
+  const result = await generateText({
+    model: llm,
+    system,
+    messages,
+    maxOutputTokens: 200,
+    experimental_telemetry: { isEnabled: true, functionId: 'suggest-categories' },
+  });
+  logLanguageModelCost('suggest-categories', MODEL_NAME, result.usage);
+  return c.json({ categories: parseSuggestedCategories(result.text), modelName: MODEL_NAME });
+}
+
+quizRouter.post('/suggest-categories', handleSuggestCategories);
+quizRouter.post('/ai-api/suggest-categories', handleSuggestCategories);
 
 // ─── Raw prompt (debug) ───────────────────────────────────────────────────────
 // Sends the prompt string directly to the model with no system message or schema.

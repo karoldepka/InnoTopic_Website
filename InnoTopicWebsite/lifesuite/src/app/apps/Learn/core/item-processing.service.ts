@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import {LearnItemItemsService} from './learn-item-items.service'
 import {LearnItem$} from '../models/LearnItem$'
 import {map, shareReplay} from 'rxjs/operators'
-import {BehaviorSubject, Observable} from 'rxjs'
+import {BehaviorSubject, Observable, firstValueFrom} from 'rxjs'
 import {findPreferred} from '../../../libs/AppFedShared/utils/cachedSubject2/collectionUtils'
 import {countBy} from 'lodash-es'
 import {LearnItem} from '../models/LearnItem'
@@ -156,7 +156,45 @@ export class ItemProcessingService {
     const modelName = response?.modelName || 'unknown-model'
     const answer = this.withFilledByAiMarker(response?.answer || '', modelName)
     item$.patchThrottled({answer, whenGeneratedByAi: OdmBackend.nowTimestamp()})
+    void this.fillCategoriesWithAiIfEmpty(item$, response?.answer)
     return true
+  }
+
+  /** Fills the item's own Categories field alongside an AI answer. Never overwrites categories the
+   * user already typed, and never fails the answer fill it accompanies - errors are only logged. */
+  public async fillCategoriesWithAiIfEmpty(item$: LearnItem$, answer = ''): Promise<void> {
+    const item = item$.currentVal
+    if (!item || (stripHtml(item.categories || '') || '').trim()) {
+      return
+    }
+    try {
+      const response = await firstValueFrom(this.aiBackend.suggestCategories(
+        this.getQuestionForAi(item),
+        (stripHtml(answer) || '').trim(),
+        this.getExistingCategories(),
+      ))
+      // Re-check: the user may have typed categories while the request was in flight.
+      if (response?.categories?.length && !(stripHtml(item$.currentVal?.categories || '') || '').trim()) {
+        item$.patchThrottled({categories: response.categories.join(', ')})
+      }
+    } catch (e) {
+      console.error('Error filling categories with AI', e)
+    }
+  }
+
+  /** The user's category vocabulary, most-used first, so the AI can reuse names verbatim. */
+  private getExistingCategories(): string[] {
+    const counts = new Map<string, {name: string, count: number}>()
+    for (const item$ of this.learnDoService.localItems$.lastVal ?? []) {
+      for (const raw of (stripHtml(item$.currentVal?.categories || '') || '').split(',')) {
+        const name = raw.trim()
+        if (!name) continue
+        const entry = counts.get(name.toLowerCase()) ?? {name, count: 0}
+        entry.count++
+        counts.set(name.toLowerCase(), entry)
+      }
+    }
+    return [...counts.values()].sort((a, b) => b.count - a.count).map(entry => entry.name).slice(0, 300)
   }
 
   private setFillQuestionsProgress(patch: Partial<FillQuestionsWithAiProgress>) {

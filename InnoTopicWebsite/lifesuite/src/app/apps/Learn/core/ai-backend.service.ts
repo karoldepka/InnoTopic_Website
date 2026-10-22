@@ -150,6 +150,15 @@ export class AiBackendService {
     });
   }
 
+  /** Suggests 1-3 categories for a learn item, preferring (verbatim) the user's existing ones. */
+  suggestCategories(question: string, answer: string, existingCategories: string[]): Observable<{categories: string[], modelName?: string}> {
+    return this.http.post<{categories: string[], modelName?: string}>(this.apiUrl('/suggest-categories'), {
+      question,
+      answer,
+      existingCategories,
+    });
+  }
+
   generateAnswerWithWebSearch(question: string, context: string = ''): Observable<AIResponse> {
     return this.http.post<AIResponse>(this.apiUrl('/generate-answer'), {
       question,

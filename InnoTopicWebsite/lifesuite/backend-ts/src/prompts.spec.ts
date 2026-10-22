@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { buildQAMessages } from './prompts.js';
+import { buildQAMessages, parseSuggestedCategories } from './prompts.js';
 
 describe('ABCD Q&A prompt', () => {
   it('requires same-domain, tricky distractors only in multiple-choice mode', () => {
@@ -24,5 +24,16 @@ describe('ABCD Q&A prompt', () => {
       expect(system).toContain('neither an earlier question nor its answer may reveal');
       expect(system).toContain('place the disclosed-fact question first');
     }
+  });
+});
+
+describe('suggested categories parsing', () => {
+  it('parses JSON, de-duplicates case-insensitively and caps at three', () => {
+    expect(parseSuggestedCategories('```json\n{"categories":["RAG","rag"," Vector DBs ","LLM","AI"]}\n```'))
+      .toEqual(['RAG', 'Vector DBs', 'LLM']);
+  });
+
+  it('falls back to a comma-separated line', () => {
+    expect(parseSuggestedCategories('Postgres, #indexes')).toEqual(['Postgres', 'indexes']);
   });
 });
