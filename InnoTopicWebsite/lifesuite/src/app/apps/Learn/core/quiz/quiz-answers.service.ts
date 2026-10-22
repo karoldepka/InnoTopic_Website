@@ -8,6 +8,13 @@ import {SelfRating} from '../../models/fields/self-rating.model'
 import {WhatNextService} from '../../../../shared/scheduler/what-next.service'
 import {QuizTrackingService} from '../../quiz/quiz-tracking.service'
 
+const answeredTodayStorageKey = 'lifesuite.quiz.answeredToday'
+
+function localDateKey(): string {
+  const now = new Date()
+  return `${now.getFullYear()}-${now.getMonth() + 1}-${now.getDate()}`
+}
+
 
 @Injectable({
   providedIn: 'root'
@@ -67,7 +74,30 @@ export class QuizAnswersService {
       : 0
   }
 
+  /** Items rated since the app was opened (this service is a root singleton). */
+  answeredThisSession = 0
+
+  /** Items rated today on this device; kept in localStorage so it survives reloads. */
+  get answeredToday(): number {
+    try {
+      const stored = JSON.parse(localStorage.getItem(answeredTodayStorageKey) ?? 'null')
+      return stored?.date === localDateKey() ? stored.count : 0
+    } catch {
+      return 0
+    }
+  }
+
+  private countAnswer() {
+    this.answeredThisSession++
+    try {
+      localStorage.setItem(answeredTodayStorageKey, JSON.stringify({date: localDateKey(), count: this.answeredToday + 1}))
+    } catch {
+      // Storage unavailable (private mode etc.) - the per-session count still works.
+    }
+  }
+
   onApplyAndNext(item$: LearnItem$, selfRating: NumericPickerVal) {
+    this.countAnswer()
     this.storeAnswerForHistory(selfRating)
     item$ ?. setNewSelfRating(selfRating !)
     this.quizService.recordExperimentalSchedulerRating(item$?.id, selfRating)

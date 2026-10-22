@@ -1,0 +1,55 @@
+\:host
+  display: flex
+  flex-direction: column
+  align-items: center
+  gap: var(--space-2)
+  padding: var(--space-6) var(--space-4) var(--space-4)
+  text-align: center
+  animation: congrats-pop-in 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) both
+
+.congrats__icon
+  font-size: 2.5rem
+  color: var(--ion-color-secondary)
+  animation: congrats-twinkle 2.4s ease-in-out infinite
+
+.congrats__title
+  margin: 0
+  font-size: clamp(2.25rem, 9vw, 3.5rem)
+  font-weight: 800
+  line-height: 1.1
+  letter-spacing: -0.02em
+  // Primary -> secondary -> primary, twice as wide as the text so it can slowly sweep across.
+  background: linear-gradient(90deg, var(--ion-color-primary), var(--ion-color-secondary), var(--ion-color-primary))
+  background-size: 200% auto
+  -webkit-background-clip: text
+  background-clip: text
+  color: transparent
+  filter: drop-shadow(0 2px 12px rgba(var(--ion-color-primary-rgb, 56, 128, 255), 0.35))
+  animation: congrats-shimmer 4s linear infinite
+
+.congrats__subtitle
+  margin: 0
+  font-size: 1.05rem
+  color: var(--ion-color-step-700, var(--ion-text-color))
+
+@keyframes congrats-pop-in
+  from
+    opacity: 0
+    transform: scale(0.85) translateY(var(--space-2))
+  to
+    opacity: 1
+    transform: none
+
+@keyframes congrats-shimmer
+  to
+    background-position: -200% center
+
+@keyframes congrats-twinkle
+  0%, 100%
+    transform: scale(1) rotate(0)
+  50%
+    transform: scale(1.15) rotate(12deg)
+
+@media (prefers-reduced-motion: reduce)
+  \:host, .congrats__icon, .congrats__title
+    animation: none

@@ -1,33 +1,28 @@
-
 <app-congrats-quiz-finished />
 
-<div>
-  Items learned today: / in this session:
-  <table>
-    <thead>
-    </thead>
-    <tbody>
-    <tr>this session</tr>
-    <tr>today</tr>
-
-    </tbody>
-
-  </table>
+<div class="quiz-finished__stats">
+  <div class="quiz-finished__stat">
+    <span class="quiz-finished__stat-value">{{ quizAnswers.answeredThisSession }}</span>
+    <span class="quiz-finished__stat-label">rated this session</span>
+  </div>
+  <div class="quiz-finished__stat">
+    <span class="quiz-finished__stat-value">{{ quizAnswers.answeredToday }}</span>
+    <span class="quiz-finished__stat-label">rated today</span>
+  </div>
+  <div class="quiz-finished__stat">
+    <span class="quiz-finished__stat-value">{{ formatTimeUntil((nextDueMsEpoch$ | async) ?? undefined) }}</span>
+    <span class="quiz-finished__stat-label">until next item is due</span>
+  </div>
 </div>
 
-<div>
-  <ion-button color="danger">FORCE NEXT</ion-button>
+<div class="quiz-finished__actions">
+  <span class="quiz-finished__process">Process more items <app-process-button /></span>
+  <ion-button fill="outline" routerLink="/learn">
+    <ion-icon name="add-circle" slot="start" />
+    Add more items
+  </ion-button>
+  <ion-button fill="outline" routerLink="/learn/stats">
+    <ion-icon name="bar-chart" slot="start" />
+    See statistics
+  </ion-button>
 </div>
-<div>
-  <ion-button>SCHEDULE NEXT SESSION</ion-button>
-</div>
-
-<a style="display: block">
-  Process more items: <app-process-button />
-</a>
-<a style="display: block" routerLink="/learn">
-  Add more items
-</a>
-<a style="display: block" routerLink="/learn/stats">
-  See statistics
-</a>

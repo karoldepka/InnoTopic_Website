@@ -1,0 +1,45 @@
+\:host
+  display: flex
+  flex-direction: column
+  align-items: center
+  gap: var(--space-4)
+
+.quiz-finished__stats
+  display: grid
+  grid-template-columns: repeat(3, minmax(0, 1fr))
+  gap: var(--space-2)
+  width: 100%
+  max-width: 32rem
+
+.quiz-finished__stat
+  display: flex
+  flex-direction: column
+  align-items: center
+  gap: var(--space-1)
+  padding: var(--space-3) var(--space-2)
+  border: 1px solid var(--ion-border-color, rgba(255, 255, 255, 0.12))
+  border-radius: var(--space-2)
+  background: var(--ion-color-step-50)
+  text-align: center
+
+.quiz-finished__stat-value
+  font-size: 1.5rem
+  font-weight: 700
+  font-variant-numeric: tabular-nums
+  color: var(--ion-text-color)
+
+.quiz-finished__stat-label
+  font-size: 0.75rem
+  color: var(--ion-color-step-700, var(--ion-text-color))
+
+.quiz-finished__actions
+  display: flex
+  flex-wrap: wrap
+  justify-content: center
+  align-items: center
+  gap: var(--space-2)
+
+.quiz-finished__process
+  display: inline-flex
+  align-items: center
+  gap: var(--space-1)
