@@ -1,0 +1,57 @@
+.visualizations-intro
+  margin: 8px 0 16px
+
+.visualization
+  margin-bottom: 24px
+
+.visualization-header
+  display: flex
+  flex-wrap: wrap
+  align-items: baseline
+  justify-content: space-between
+  column-gap: 16px
+
+  h2
+    margin: 0
+    font-size: 1.3rem
+    color: var(--ion-color-secondary)
+
+.visualization-open
+  white-space: nowrap
+
+.visualization-description
+  margin: 6px 0 8px
+
+.visualization-tech
+  display: flex
+  flex-wrap: wrap
+  align-items: center
+  gap: 4px 12px
+  margin-bottom: 12px
+
+// Same height as the embedded diagram, so nothing below shifts when it loads.
+.visualization-placeholder
+  height: 460px
+  border-radius: 18px
+  background: var(--ion-color-step-50, rgba(127, 127, 127, 0.06))
+
+.visualization-url
+  font-size: 0.9em
+  color: gray
+
+.visualizations-more
+  h3
+    margin: 0 0 6px
+    font-size: 1.1rem
+
+  ul
+    margin: 0
+    padding-left: 20px
+
+  li
+    margin-bottom: 6px
+
+@media print
+  :host
+    break-inside: avoid
+    page-break-inside: avoid

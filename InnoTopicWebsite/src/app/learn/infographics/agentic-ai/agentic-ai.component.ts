@@ -6,6 +6,7 @@ import {
   effect,
   ElementRef,
   inject,
+  input,
   NgZone,
   OnDestroy,
   signal,
@@ -13,6 +14,7 @@ import {
   ViewChild,
   ViewEncapsulation,
 } from '@angular/core';
+import { NgTemplateOutlet } from '@angular/common';
 import { IonicModule } from '@ionic/angular';
 import { onThemeStateChange, themeState } from '@innotopic/theme-ui';
 import { loadSvgText, recolorRaster, recolorSvg, RecolorOptions, svgDataUrl } from '@innotopic/topics-ui';
@@ -230,7 +232,7 @@ const FRAME = diagramFrame();
 @Component({
   selector: 'app-agentic-ai',
   standalone: true,
-  imports: [IonicModule, TopicTagComponent],
+  imports: [IonicModule, NgTemplateOutlet, TopicTagComponent],
   templateUrl: './agentic-ai.component.html',
   styleUrls: ['./agentic-ai.component.scss'],
   // The CSS2DRenderer's label elements are created outside the template.
@@ -242,9 +244,14 @@ const FRAME = diagramFrame();
   },
 })
 export class AgenticAiComponent implements AfterViewInit, OnDestroy {
-  @ViewChild('stage', { static: true }) private stageRef!: ElementRef<HTMLDivElement>;
-  @ViewChild('canvas', { static: true }) private canvasRef!: ElementRef<HTMLCanvasElement>;
+  // Not static: the diagram is stamped from a template (inside ion-content, or bare when embedded).
+  // Both exist by ngAfterViewInit, the first place they are used.
+  @ViewChild('stage') private stageRef!: ElementRef<HTMLDivElement>;
+  @ViewChild('canvas') private canvasRef!: ElementRef<HTMLCanvasElement>;
   @ViewChild('tooltip') private tooltipRef?: ElementRef<HTMLElement>;
+
+  /** Just the diagram, for showing it inside another page (e.g. the CV); no page chrome. */
+  readonly embedded = input(false);
 
   protected readonly nodes = agentNodes;
   protected readonly walkthroughLength = agentWalkthrough.length;

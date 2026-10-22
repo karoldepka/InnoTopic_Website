@@ -7,6 +7,17 @@
   padding: 16px 16px 48px;
 }
 
+// Embedded in another page: just the diagram, sized for a section rather than the viewport.
+.agentic-page--embedded {
+  max-width: none;
+  padding: 0;
+
+  .agentic-stage {
+    height: 460px;
+    min-height: 0;
+  }
+}
+
 .agentic-intro {
   text-align: center;
   margin-bottom: 12px;

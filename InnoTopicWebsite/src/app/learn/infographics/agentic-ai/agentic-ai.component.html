@@ -1,22 +1,33 @@
-<ion-header [translucent]="true">
-  <ion-toolbar>
-    <ion-buttons slot="start">
-      <ion-back-button mode="md" [defaultHref]="'/'"></ion-back-button>
-    </ion-buttons>
-    <ion-title>How agentic AI works</ion-title>
-  </ion-toolbar>
-</ion-header>
+<!-- Embedded (e.g. in the CV page), only the diagram renders: no page header, own scrolling or parts list. -->
+@if (embedded()) {
+  <ng-container [ngTemplateOutlet]="diagram" />
+} @else {
+  <ion-header [translucent]="true">
+    <ion-toolbar>
+      <ion-buttons slot="start">
+        <ion-back-button mode="md" [defaultHref]="'/'"></ion-back-button>
+      </ion-buttons>
+      <ion-title>How agentic AI works</ion-title>
+    </ion-toolbar>
+  </ion-header>
 
-<ion-content [fullscreen]="true">
-  <div class="agentic-page">
-    <header class="agentic-intro">
-      <h1>How agentic AI works</h1>
-      <p>
-        A goal goes in. The agent loops - plan, act through tools, observe, reflect - until the goal is met or it
-        needs your help, drawing on memory and on your own documents (RAG) along the way. Click any part, or any
-        logo in 3D, to learn more - or walk through the loop.
-      </p>
-    </header>
+  <ion-content [fullscreen]="true">
+    <ng-container [ngTemplateOutlet]="diagram" />
+  </ion-content>
+}
+
+<ng-template #diagram>
+  <div class="agentic-page" [class.agentic-page--embedded]="embedded()">
+    @if (!embedded()) {
+      <header class="agentic-intro">
+        <h1>How agentic AI works</h1>
+        <p>
+          A goal goes in. The agent loops - plan, act through tools, observe, reflect - until the goal is met or it
+          needs your help, drawing on memory and on your own documents (RAG) along the way. Click any part, or any
+          logo in 3D, to learn more - or walk through the loop.
+        </p>
+      </header>
+    }
 
     <div class="agentic-controls" role="toolbar" aria-label="Diagram controls">
       <div class="agentic-segmented" role="group" aria-label="View">
@@ -35,7 +46,7 @@
       <canvas
         #canvas
         role="img"
-        aria-label="Animated diagram: a goal flows into a language model, which loops through plan, act, guardrails, tools, observe and reflect, using memory, retrieval from a knowledge base and sub-agents, until it returns a result. The same parts are listed below the diagram."
+        [attr.aria-label]="'Animated diagram: a goal flows into a language model, which loops through plan, act, guardrails, tools, observe and reflect, using memory, retrieval from a knowledge base and sub-agents, until it returns a result.' + (embedded() ? '' : ' The same parts are listed below the diagram.')"
       ></canvas>
 
       @if (selected(); as node) {
@@ -100,20 +111,22 @@
       }
     </ul>
 
-    <nav class="agentic-parts" aria-label="Parts of an AI agent">
-      <h2>The parts</h2>
-      <ul>
-        @for (node of nodes; track node.id) {
-          <li>
-            <button type="button" [class.agentic-active]="selectedId() === node.id" [attr.aria-pressed]="selectedId() === node.id"
-                    (click)="selectFromList(node.id, $event)">
-              <span class="agentic-dot" [style.background]="kindColor(node.kind)"></span>
-              <strong>{{ node.title }}</strong>
-              <span>{{ node.summary }}</span>
-            </button>
-          </li>
-        }
-      </ul>
-    </nav>
+    @if (!embedded()) {
+      <nav class="agentic-parts" aria-label="Parts of an AI agent">
+        <h2>The parts</h2>
+        <ul>
+          @for (node of nodes; track node.id) {
+            <li>
+              <button type="button" [class.agentic-active]="selectedId() === node.id" [attr.aria-pressed]="selectedId() === node.id"
+                      (click)="selectFromList(node.id, $event)">
+                <span class="agentic-dot" [style.background]="kindColor(node.kind)"></span>
+                <strong>{{ node.title }}</strong>
+                <span>{{ node.summary }}</span>
+              </button>
+            </li>
+          }
+        </ul>
+      </nav>
+    }
   </div>
-</ion-content>
+</ng-template>

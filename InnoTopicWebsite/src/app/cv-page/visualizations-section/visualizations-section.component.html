@@ -1,0 +1,59 @@
+<div class="container">
+  <app-three-d-text text="Interactive Visualizations" />
+
+  <p class="visualizations-intro">
+    Dynamic, interactive visualizations I design and build. The one below runs live: drag to orbit it,
+    switch between 2D and 3D, click any part or logo for details, or walk through the loop.
+  </p>
+
+  <section class="visualization">
+    <header class="visualization-header">
+      <h2>How agentic AI works</h2>
+      <a class="visualization-open" [routerLink]="agenticAiPath">Open full version</a>
+    </header>
+    <p class="visualization-description">
+      An AI agent's loop - plan, act through tools, observe, reflect - with memory, retrieval (RAG) and
+      sub-agents, as an animated diagram that morphs between a flat 2D view and 3D depth layers. Logos of
+      real technologies orbit their parts, recolored to the site's theme by a Rust/WebAssembly worker pool.
+    </p>
+    <div class="visualization-tech">
+      @for (topic of agenticAiTech; track topic) {
+        <app-topic-tag [tId]="topic" />
+      }
+    </div>
+
+    @if (!isPrint) {
+      <div class="visualization-live">
+        <!-- The 3D scene's code loads only once the section is about to be seen. -->
+        @defer (on viewport) {
+          <app-agentic-ai [embedded]="true" />
+        } @placeholder {
+          <div class="visualization-placeholder" aria-hidden="true"></div>
+        }
+      </div>
+    } @else {
+      <p class="visualization-url">Live: {{ origin }}{{ agenticAiPath }}</p>
+    }
+  </section>
+
+  <section class="visualizations-more">
+    <h3>More on this site</h3>
+    <ul>
+      <li>
+        <strong>Technology graph</strong> (above): a D3.js force-directed graph of the technologies I work with;
+        drag the nodes, hover a logo for its original colors, click it for details.
+      </li>
+      <li>
+        <strong>Where I've worked</strong> (above): the same places on a WebGL globe (Globe.gl), a D3.js
+        orthographic globe, a raw Three.js globe and a themed SVG map.
+      </li>
+      <li>
+        <a routerLink="/learn/infographics/rag-stack"><strong>2026 RAG Tech Stack</strong></a>: the nine layers of
+        a production RAG system as an iceberg, each with the tools that implement it.
+        @if (isPrint) {
+          <span class="visualization-url">({{ origin }}/learn/infographics/rag-stack)</span>
+        }
+      </li>
+    </ul>
+  </section>
+</div>

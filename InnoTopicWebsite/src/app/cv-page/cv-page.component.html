@@ -85,6 +85,12 @@
 }
 
 @defer (on idle; when isPrint) {
+  <app-visualizations-section />
+} @placeholder {
+  <div class="section-placeholder visualizations-placeholder" aria-hidden="true"></div>
+}
+
+@defer (on idle; when isPrint) {
   <app-books />
 } @placeholder {
   <div class="section-placeholder books-placeholder" aria-hidden="true"></div>
