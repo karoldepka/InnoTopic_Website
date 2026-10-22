@@ -92,7 +92,40 @@ tech:hover
 #topics-graph-d3
   display: inline-block
 
+// Positions the clicked node's info blurb (placed by positionInfo()).
+.topics-graph-container
+  position: relative
+  display: flex
+  justify-content: center
+
+// Same hover swap as app-topic-logo: the recolored logo fades out to reveal the original, which
+// hides again only once the recolored one has faded back in.
+.node-logo-recolored
+  transition: opacity var(--logo-hover-fade, 250ms) ease-in-out
+
+.node-logo-original
+  opacity: 0
+  transition: opacity 0s linear var(--logo-hover-fade, 250ms)
+
+.node--hover
+  .node-logo-original
+    opacity: 1
+    transition-delay: 0s
+
+  .node-logo-recolored
+    opacity: 0
+
+@media (prefers-reduced-motion: reduce)
+  .node-logo-recolored
+    transition-duration: 0s
+
+  .node-logo-original
+    transition-delay: 0s
+
 @media print
+  .topics-graph-info
+    display: none
+
   :host
     break-inside: avoid
     page-break-inside: avoid

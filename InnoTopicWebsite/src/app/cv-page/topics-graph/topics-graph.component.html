@@ -1,8 +1,11 @@
-<div style="display: flex; justify-content: center;">
+<div class="topics-graph-container">
      <svg id="topics-graph-d3"
           width="1000"
           height="600"
           viewBox="0 0 1000 600"
      ></svg>
 
+     @if (openInfo(); as info) {
+       <app-topic-info-popover class="topics-graph-info" [text]="info.text" [style.left.px]="info.left" [style.top.px]="info.top" />
+     }
 </div>

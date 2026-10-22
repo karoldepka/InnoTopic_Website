@@ -1,5 +1,5 @@
-import {Component, effect, Input, OnDestroy, OnInit, ViewEncapsulation,} from '@angular/core';
-import {recolorSvg} from '@innotopic/topics-ui';
+import {Component, effect, ElementRef, Input, OnDestroy, OnInit, signal, ViewEncapsulation,} from '@angular/core';
+import {loadSvgText, recolorSvg, svgDataUrl} from '@innotopic/topics-ui';
 import {onThemeStateChange, themeState} from '@innotopic/theme-ui';
 import {topics} from '../../TopicFriendsShared3/topics-core/topics-data';
 import {nodeConnections, nodeLinks, preset, sizes, strengths} from "./topics-graph.data";
@@ -12,7 +12,20 @@ import {event as d3Event, select} from 'd3-selection';
 import {zoom as d3Zoom} from 'd3-zoom';
 import {FeatureFlagsService} from '../../shared/feature-flags/feature-flags.service';
 import {IconsReadyService} from '../../topics-shared/icons-ready.service';
+import {TopicInfoPopoverComponent} from '../../topics-shared/topic-info/topic-info';
+import {TopicsService} from '../../TopicFriendsShared3/topics-core/topics.service';
 import {BehaviorSubject, Observable} from 'rxjs';
+
+/** The info blurb opened by clicking a node, positioned below it within the graph container. */
+interface OpenNodeInfo {
+  nodeId: string
+  text: string
+  left: number
+  top: number
+}
+
+// Matches the info popover's max-width plus padding, to keep it inside the container.
+const infoPopoverWidth = 304;
 
 @Component({
   standalone: true,
@@ -20,8 +33,16 @@ import {BehaviorSubject, Observable} from 'rxjs';
   templateUrl: './topics-graph.component.html',
   styleUrls: ['./topics-graph.component.sass'],
   encapsulation: ViewEncapsulation.None,
+  imports: [TopicInfoPopoverComponent],
+  host: {
+    '(document:click)': 'onDocumentClick($event)',
+    '(document:keydown.escape)': 'openInfo.set(undefined)',
+  },
 })
 export class TopicsGraphComponent implements OnInit, OnDestroy {
+
+  /** Like a topic tag, a clicked node shows the topic's info blurb (see TopicsService.getTopicInfo). */
+  protected readonly openInfo = signal<OpenNodeInfo | undefined>(undefined);
 
   private static readonly rawIconCache = new Map<string, Promise<string | undefined>>();
 
@@ -55,6 +76,8 @@ export class TopicsGraphComponent implements OnInit, OnDestroy {
     private activatedRoute: ActivatedRoute,
     protected flagsService: FeatureFlagsService,
     private iconsReadyService: IconsReadyService,
+    private topicsService: TopicsService,
+    private host: ElementRef<HTMLElement>,
   ) {
     // Rebuild the (already-fetched) graph whenever the "contain nodes" feature flag is toggled from the popover.
     effect(() => {
@@ -109,7 +132,8 @@ export class TopicsGraphComponent implements OnInit, OnDestroy {
       }));
       if (requestId !== this.recolorRequestId) return;
       rawIcons.forEach((markup, index) => {
-        if (markup) this.d3Nodes[index].body = markup.trim().substring(markup.indexOf('<svg'));
+        this.d3Nodes[index].body = markup ? svgDataUrl(markup) : undefined;
+        this.d3Nodes[index].originalBody = undefined;
       });
       this.initD3Graph();
       this.graphInitialized = true;
@@ -126,20 +150,24 @@ export class TopicsGraphComponent implements OnInit, OnDestroy {
       return topic
     })
 
-    const recoloredIcons = await Promise.all(topicNodes.map(async (topic: any) => {
-      if (!topic?.logo) return undefined;
-      return recolorSvg(topic.logo, {
-        primaryColor: themeState.ion_color_primary,
-        colorMode: themeState.icon_color_mode,
-        secondaryColor: themeState.ion_color_secondary,
-        contrast: themeState.icon_contrast,
-        brightness: themeState.icon_brightness,
-        primaryContrast: themeState.icon_contrast,
-      }).catch(error => {
-        console.error('[TopicsGraph] Icon recolor failed', {topic: topic.name, error});
-        return undefined;
-      });
-    }));
+    const [recoloredIcons, originalIcons] = await Promise.all([
+      Promise.all(topicNodes.map(async (topic: any) => {
+        if (!topic?.logo) return undefined;
+        return recolorSvg(topic.logo, {
+          primaryColor: themeState.ion_color_primary,
+          colorMode: themeState.icon_color_mode,
+          secondaryColor: themeState.ion_color_secondary,
+          contrast: themeState.icon_contrast,
+          brightness: themeState.icon_brightness,
+          primaryContrast: themeState.icon_contrast,
+        }).catch(error => {
+          console.error('[TopicsGraph] Icon recolor failed', {topic: topic.name, error});
+          return undefined;
+        });
+      })),
+      // The original colors show on hover, like a topic logo. Same (cached) download as the recolor.
+      Promise.all(topicNodes.map((topic: any) => topic?.logo ? loadSvgText(topic.logo).catch(() => undefined) : undefined)),
+    ]);
 
     // Slider input can queue another recoloring batch before this one finishes. Render only the
     // latest palette, so an older worker response cannot flash back into the graph.
@@ -148,15 +176,50 @@ export class TopicsGraphComponent implements OnInit, OnDestroy {
     recoloredIcons.forEach((text, i) => {
       const topic = topicNodes[i];
       const d3Node = this.d3Nodes.find(n => n.id === topic?.name);
-      if (d3Node && text) {
-        d3Node.body = text.trim().substring(text.indexOf('<svg'));
-      }
+      if (!d3Node) return;
+      const original = originalIcons[i];
+      d3Node.body = text ? svgDataUrl(text) : original && svgDataUrl(original);
+      d3Node.originalBody = text && original ? svgDataUrl(original) : undefined;
     });
     this.initD3Graph();
     this.graphInitialized = true;
     this.graphIconsReadySubject.next(true);
     this.completeIconBatch(requestId);
 
+  }
+
+  private nodeInfo(nodeId: string): string | undefined {
+    return this.topicsService.getTopicInfo((topics as any)[nodeId]);
+  }
+
+  /** Opens the clicked node's info blurb, or closes it when that node's is already open. */
+  private toggleInfo(nodeId: string) {
+    const text = this.nodeInfo(nodeId);
+    if (!text || this.openInfo()?.nodeId === nodeId) {
+      this.openInfo.set(undefined);
+      return;
+    }
+    this.openInfo.set({nodeId, text, left: 0, top: 0});
+    this.positionInfo();
+  }
+
+  /** Keeps the open blurb below its node, which the force simulation and dragging keep moving. */
+  private positionInfo() {
+    const open = this.openInfo();
+    if (!open) return;
+    const container = this.host.nativeElement.querySelector('.topics-graph-container');
+    const node = this.host.nativeElement.querySelector(`[data-node-id="${CSS.escape(open.nodeId)}"]`);
+    if (!container || !node) return;
+    const bounds = container.getBoundingClientRect();
+    const nodeBounds = node.getBoundingClientRect();
+    const left = Math.round(Math.max(0, Math.min(nodeBounds.left - bounds.left, bounds.width - infoPopoverWidth)));
+    const top = Math.round(nodeBounds.bottom - bounds.top);
+    if (left !== open.left || top !== open.top) this.openInfo.set({...open, left, top});
+  }
+
+  protected onDocumentClick(event: MouseEvent) {
+    // Clicks on nodes toggle the blurb themselves; any other click closes it.
+    if (!(event.target as Element | null)?.closest?.('.techCircleOverlay')) this.openInfo.set(undefined);
   }
 
   private completeIconBatch(requestId: number) {
@@ -352,23 +415,23 @@ export class TopicsGraphComponent implements OnInit, OnDestroy {
     const foreignObjectH = 50;
     const defaultSize = 30;
 
-    perNodeMainGroup.append("g").html(function(d: any) {
-      const bodyText = d.body || "";
-      const size = d.sizeMult ? d.sizeMult * defaultSize
-        : defaultSize;
-
-      if (bodyText.trim().endsWith("</svg>")) {
-        const htmlContent = '<svg '
-          + 'width=\"'  + size + 'px\" '
-          + 'height=\"' + size + 'px\" '
-          + 'x="' + (-size / 2) + '" '
-          + 'y="' + (-size / 2) + '" '
-          + bodyText /* also contains </svg> */;
-        return htmlContent;
-      } else {
-        return "";
-      }
-    });
+    // Logos are <image>s rather than inlined markup: inlined copies of the same logo (its original
+    // and recolored versions) would share element ids, so one's gradients could paint the other.
+    const logoSize = (d: any) => d.sizeMult ? d.sizeMult * defaultSize : defaultSize;
+    const nodeLogo = perNodeMainGroup.append("g").attr("class", "node-logo");
+    const appendLogoImage = (src: (d: any) => string | undefined, className: (d: any) => string) => nodeLogo
+      .filter((d: any) => !!src(d))
+      .append("image")
+      .attr("class", className)
+      .attr("href", src)
+      .attr("width", logoSize)
+      .attr("height", logoSize)
+      .attr("x", (d: any) => -logoSize(d) / 2)
+      .attr("y", (d: any) => -logoSize(d) / 2);
+    // Like a topic logo, the recolored copy covers the original, which shows while hovered.
+    appendLogoImage((d: any) => d.originalBody, () => "node-logo-original");
+    appendLogoImage((d: any) => d.body, (d: any) => d.originalBody ? "node-logo-recolored" : "node-logo-plain");
+    svgRootElement.style("--logo-hover-fade", `${this.flagsService.logoHoverFadeMs()}ms`);
 
     perNodeMainGroup.append("foreignObject")
       .attr("style", "pointer-events:none;")
@@ -395,6 +458,7 @@ export class TopicsGraphComponent implements OnInit, OnDestroy {
       document.querySelectorAll('.techCircleHover').forEach((element) => {
         element.classList.remove("techCircleHover");
       });
+      perNodeMainGroup.classed("node--hover", false);
     }
 
     /* need to set the overlay's position separately in root,
@@ -411,11 +475,19 @@ export class TopicsGraphComponent implements OnInit, OnDestroy {
       //        .attr("x", -defaultRadius)
       //        .attr("y", 0)
       //        .attr("y", -defaultRadius)
-      .classed("techCircleOverlay", true);
+      .classed("techCircleOverlay", true)
+      .attr("data-node-id", (d: any) => d.id)
+      .style("cursor", (d: any) => self.nodeInfo(d.id) ? "pointer" : null);
 
     nodeCircleOverlay
+      .on("click", function (d: any) {
+        // d3-drag swallows the click that ends a real drag, so this is a plain click.
+        self.toggleInfo(d.id);
+      })
       .on("mouseover", function (this: any, d: any) {
         if (!isDragging) {
+          // The overlay sits above the node, so the node's own :hover never matches.
+          perNodeMainGroup.filter((node: any) => node === d).classed("node--hover", true);
           // $('tech').hover(function() {
           document.getElementById(d.id)?.classList.add("techCircleHover");
           // $("[id2='"+ d.id + "']").css('background-color','rgba(0, 0, 0, 0.6)');
@@ -438,7 +510,9 @@ export class TopicsGraphComponent implements OnInit, OnDestroy {
         .on("end", dragEnded)
     );
 
-    const titleFunc = function(d: any) { return d.id; };
+    const titleFunc = function(d: any) {
+      return self.nodeInfo(d.id) ? `${d.id} (click to show more info)` : d.id;
+    };
     nodeCircle.append("title")
       .text(titleFunc);
     nodeCircleOverlay.append("title")
@@ -470,6 +544,7 @@ export class TopicsGraphComponent implements OnInit, OnDestroy {
         // return "translate(" + (d.x + radiusFunc(d) / 2) + "," + (d.y + radiusFunc(d) / 2) + ")";
         return "translate(" + (d.x) + "," + (d.y) + ")";
       });
+      self.positionInfo();
     }
 
     function dragStarted(d: any) {
