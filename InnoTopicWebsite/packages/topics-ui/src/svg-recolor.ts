@@ -64,7 +64,11 @@ async function getPool(): Promise<SvgWorkerPoolLike | undefined> {
           size: poolSize(),
           workerUrl: `${workerBasePath}svg-worker.js`,
         }) as SvgWorkerPoolLike
-      } catch {
+      } catch (error) {
+        // Don't remember the failure: a transient one (a lazy chunk renamed by a dev-server
+        // rebuild, a network blip) would otherwise leave every icon uncolored until a reload.
+        console.warn('svg-recolor: worker pool unavailable, showing original icons', error)
+        poolPromise = undefined
         return undefined
       }
     })()
