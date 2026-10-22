@@ -4,8 +4,8 @@ import { Topic } from '../TopicFriendsShared3/topics-core/Topic';
 /** How a topic shows while a search is active: highlighted, muted, or (no search) as usual. */
 export type TopicSearchState = 'match' | 'muted' | undefined;
 
-/** Lowercase letters and digits only, so "nextjs" finds "Next.js" and "vue" finds "Vue.js". */
-const normalize = (text: string) => text.toLowerCase().replace(/[^\p{L}\p{N}]+/gu, '');
+/** Letters and digits only, so "nextjs" finds "Next.js" and "vue" finds "Vue.js". */
+const lettersAndDigits = (text: string) => text.replace(/[^\p{L}\p{N}]+/gu, '');
 
 /**
  * The page's topic search: topics whose name matches the query are highlighted, every other topic
@@ -14,21 +14,27 @@ const normalize = (text: string) => text.toLowerCase().replace(/[^\p{L}\p{N}]+/g
 @Injectable({ providedIn: 'root' })
 export class TopicSearchService {
   readonly query = signal('');
-  /** Treat the query as a (case-insensitive) regular expression instead of plain text. */
+  /** Treat the query as a regular expression instead of plain text. */
   readonly regex = signal(false);
+  /** Match letter case exactly (plain text and regex alike). */
+  readonly caseSensitive = signal(false);
 
-  /** Tests a topic name; undefined when there is no search, null while the regex is invalid. */
-  private readonly matcher = computed<((name: string) => boolean) | undefined | null>(() => {
+  /** Tests a name; undefined when there is no search, null while the regex is invalid. */
+  readonly matcher = computed<((name: string) => boolean) | undefined | null>(() => {
     const query = this.query();
     if (!query.trim()) return undefined;
+    const caseSensitive = this.caseSensitive();
     if (this.regex()) {
       try {
-        const pattern = new RegExp(query, 'i');
+        const pattern = new RegExp(query, caseSensitive ? '' : 'i');
         return name => pattern.test(name);
       } catch {
         return null;
       }
     }
+    const normalize = caseSensitive
+      ? lettersAndDigits
+      : (text: string) => lettersAndDigits(text.toLowerCase());
     const needle = normalize(query);
     return needle ? name => normalize(name).includes(needle) : undefined;
   });

@@ -1,13 +1,25 @@
 import { ChangeDetectionStrategy, Component, effect, ElementRef, inject, signal, viewChild } from '@angular/core';
 import { TopicSearchService } from '../topic-search.service';
 
+/**
+ * Ctrl+Alt+<letter>, matched by physical key (event.code) so it works on any layout. On Windows
+ * Ctrl+Alt is AltGr, which types characters on many layouts (Polish AltGr+C is "ć"): when the
+ * keys produce a character, it is typing, not the shortcut.
+ */
+function isShortcut(event: KeyboardEvent, letter: string): boolean {
+  return event.ctrlKey && event.altKey && !event.shiftKey && !event.metaKey
+    && event.code === `Key${letter}`
+    && !(event.key.length === 1 && event.key.toUpperCase() !== letter);
+}
+
 /** Topic tags/logos and graph nodes currently highlighted by the search, in page order. */
 const MATCH_SELECTOR = '.topic-search--match, .node--search-match';
 
 /**
  * Search box for the page's topics: matching topics are highlighted and all others muted (see
  * TopicSearchService). Ctrl+Alt+F focuses it from anywhere; Enter / Shift+Enter scroll to the
- * next / previous match; Escape clears it; the .* toggle (Ctrl+Alt+R) switches to regex matching.
+ * next / previous match; Escape clears it; the Aa toggle (Ctrl+Alt+M) matches case, the .* toggle
+ * (Ctrl+Alt+R) switches to regex matching.
  */
 @Component({
   selector: 'app-topic-search',
@@ -19,8 +31,8 @@ const MATCH_SELECTOR = '.topic-search--match, .node--search-match';
         #input
         type="search"
         [placeholder]="search.regex() ? 'Search topics (regex)…' : 'Search topics…'"
-        aria-label="Search topics (Ctrl+Alt+F); Enter jumps to the next match; Ctrl+Alt+R toggles regex"
-        aria-keyshortcuts="Control+Alt+F Control+Alt+R"
+        aria-label="Search topics (Ctrl+Alt+F); Enter jumps to the next match; Ctrl+Alt+M toggles match case, Ctrl+Alt+R regex"
+        aria-keyshortcuts="Control+Alt+F Control+Alt+M Control+Alt+R"
         autocomplete="off"
         spellcheck="false"
         [value]="search.query()"
@@ -38,6 +50,15 @@ const MATCH_SELECTOR = '.topic-search--match, .node--search-match';
       } @else {
         <kbd class="topic-search-hint" aria-hidden="true">Ctrl+Alt+F</kbd>
       }
+      <button
+        type="button"
+        class="topic-search-toggle"
+        [class.topic-search-toggle--on]="search.caseSensitive()"
+        [attr.aria-pressed]="search.caseSensitive()"
+        aria-label="Match case"
+        title="Match case (Ctrl+Alt+M)"
+        (click)="toggleCaseSensitive()"
+      >Aa</button>
       <button
         type="button"
         class="topic-search-toggle"
@@ -185,8 +206,7 @@ export class TopicSearchComponent {
 
   constructor() {
     effect(() => {
-      this.search.query();
-      this.search.regex();
+      this.search.matcher();
       this.current.set(0);
       // Count once the tags and graph have applied the new query.
       setTimeout(() => this.matchCount.set(this.matches().length));
@@ -194,20 +214,24 @@ export class TopicSearchComponent {
   }
 
   protected onDocumentKeydown(event: KeyboardEvent) {
-    // event.code, not key: Ctrl+Alt+F works on any keyboard layout.
-    if (event.ctrlKey && event.altKey && !event.shiftKey && event.code === 'KeyF') {
+    if (isShortcut(event, 'F')) {
       event.preventDefault();
       this.input().nativeElement.focus();
       this.input().nativeElement.select();
-    } else if (event.ctrlKey && event.altKey && !event.shiftKey && event.code === 'KeyR') {
+    } else if (isShortcut(event, 'R') || isShortcut(event, 'M')) {
       event.preventDefault();
-      this.toggleRegex();
+      if (event.code === 'KeyR') this.toggleRegex();
+      else this.toggleCaseSensitive();
       this.input().nativeElement.focus();
     }
   }
 
   protected toggleRegex() {
     this.search.regex.update(regex => !regex);
+  }
+
+  protected toggleCaseSensitive() {
+    this.search.caseSensitive.update(caseSensitive => !caseSensitive);
   }
 
   protected jump(event: Event, step: 1 | -1) {
