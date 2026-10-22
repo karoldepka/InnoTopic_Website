@@ -7,6 +7,7 @@ import {
   effect,
   inject,
   input,
+  NgZone,
   OnDestroy,
   signal,
 } from '@angular/core';
@@ -48,8 +49,6 @@ export const defaultIconHeight = 18
         [style.width.px]="logoWidth"
         loading="eager"
         decoding="async"
-        (load)="onIconReady()"
-        (error)="onLogoError($event)"
       />
       @if (recoloredLogo(); as recolored) {
         <img
@@ -60,7 +59,6 @@ export const defaultIconHeight = 18
           [style.height.px]="logoHeight"
           [style.width.px]="logoWidth"
           decoding="async"
-          (load)="onIconReady()"
         />
       }
     </span>
@@ -175,7 +173,28 @@ export class TopicLogoComponent implements OnDestroy {
     onThemeStateChange('icon_brightness', () => this.onThemeChange()),
   ]
 
+  /** Removes the image load/error listeners (see the constructor). */
+  private readonly stopImageListeners: () => void
+
   constructor() {
+    // A page shows hundreds of logos, two images each; a template (load)/(error) binding would run a
+    // full change detection pass per image event. The handlers only do loading bookkeeping and hide a
+    // broken image, so listen outside Angular, on the host in the capture phase (load doesn't bubble).
+    const host: HTMLElement = this.host.nativeElement
+    const onImageEvent = (event: Event) => {
+      if (!(event.target instanceof HTMLImageElement)) return
+      if (event.type === 'error') this.onLogoError(event)
+      else this.onIconReady()
+    }
+    inject(NgZone).runOutsideAngular(() => {
+      host.addEventListener('load', onImageEvent, true)
+      host.addEventListener('error', onImageEvent, true)
+    })
+    this.stopImageListeners = () => {
+      host.removeEventListener('load', onImageEvent, true)
+      host.removeEventListener('error', onImageEvent, true)
+    }
+
     // Leave the original image visible while the shared SVG worker recolors it in the background.
     effect(() => {
       const topic = this.topic();
@@ -334,5 +353,6 @@ export class TopicLogoComponent implements OnDestroy {
     this.recolorRequestId++;
     this.finishLoading();
     this.stopThemeSubscriptions.forEach(unsubscribe => unsubscribe())
+    this.stopImageListeners()
   }
 }

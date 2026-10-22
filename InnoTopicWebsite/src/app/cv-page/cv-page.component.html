@@ -36,7 +36,7 @@
 
 <div class="graph-container">
   <div class="world-map-print-page">
-    @defer (on idle; when isPrint) {
+    @defer (on idle; on viewport; on timer(4s); when isPrint) {
       <app-globe-switcher />
     } @placeholder {
       <div class="graph-placeholder" aria-hidden="true"></div>
@@ -47,7 +47,7 @@
 <!--  <app-tech-graph-d3-index1></app-tech-graph-d3-index1>-->
   <div class="topics-graph-page-break" aria-hidden="true"></div>
   <div class="topics-graph-print-page">
-    @defer (on idle; when isPrint) {
+    @defer (on idle; on viewport; on timer(4s); when isPrint) {
       <app-topics-graph />
     } @placeholder {
       <div class="topics-graph-placeholder" aria-hidden="true"></div>
@@ -73,25 +73,25 @@
 <!--  <li>Could also be a quick video per-</li>-->
 <!--</ol>-->
 
-@defer (on idle; when isPrint) {
+@defer (on idle; on viewport; on timer(4s); when isPrint) {
   <app-work-experience /> <!-- rename to work-skills ? -->
 } @placeholder {
   <div class="section-placeholder work-experience-placeholder" aria-hidden="true"></div>
 }
 
-@defer (on idle; when isPrint) {
+@defer (on idle; on viewport; on timer(4s); when isPrint) {
   <app-work-projects-section />
 } @placeholder {
   <div class="section-placeholder work-projects-placeholder" aria-hidden="true"></div>
 }
 
-@defer (on idle; when isPrint) {
+@defer (on idle; on viewport; on timer(4s); when isPrint) {
   <app-visualizations-section />
 } @placeholder {
   <div class="section-placeholder visualizations-placeholder" aria-hidden="true"></div>
 }
 
-@defer (on idle; when isPrint) {
+@defer (on idle; on viewport; on timer(4s); when isPrint) {
   <app-books />
 } @placeholder {
   <div class="section-placeholder books-placeholder" aria-hidden="true"></div>
