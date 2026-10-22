@@ -940,7 +940,8 @@ export class AI {
   "LLM" = tSquare('generic/ai.svg' /*TODO*/)
   "C3 AI" = tWide('c3-ai.svg')
   "LangChain" = tWide('langchain.svg')
-  "AutoGen" = tWide('autogen-icon.svg')
+  // A raster rendering of autogen-icon.svg (a 423 KB auto-traced vector): 46 KB, same look at icon sizes.
+  "AutoGen" = tWide('autogen-icon.webp')
   "Microsoft Bing" = tNarrow('bing.svg')
   "Microsoft Copilot" = tNarrow('microsoft-copilot-icon.svg')
   "GitHub Copilot" = tWide('github-copilot.svg')

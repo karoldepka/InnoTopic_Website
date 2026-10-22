@@ -95,7 +95,7 @@ export class Topic {
     }
   }
 
-  private static regexpImageFileEndingWithExtension = /.*\.(png|svg|jpg)$/;
+  private static regexpImageFileEndingWithExtension = /.*\.(png|svg|jpe?g|webp|gif|avif)$/;
 
   /** Using Convention Over Configuration */
   public setNameAndLogoAndId(name: string, logo?: string | null) {
