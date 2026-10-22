@@ -16,6 +16,7 @@ export class QuizCelebrationService {
       icon: 'sparkles',
       duration: 1200,
       position: 'top',
+      cssClass: 'quiz-celebration-toast',
     }).then(toast => toast.present())
   }
 

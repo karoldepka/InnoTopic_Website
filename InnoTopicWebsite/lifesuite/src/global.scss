@@ -537,3 +537,18 @@ ion-button.button-clear:not([color]):not(.action-icon):not(.action-color) {
     --width: 94vw;
   }
 }
+
+// QuizCelebrationService's "Correct!" toast. Ionic's default toast colors come from the
+// --ion-color-step-* scale, which this app's theme engine (setIonicColorSteps) generates as
+// *translucent* rgba() values - step-50 (Ionic's default toast text color) is ~5% opaque, so the
+// text was effectively invisible. Use an opaque, theme-aware surface (the page background lifted
+// slightly toward the text color) and the regular text color instead.
+.quiz-celebration-toast {
+  --background: color-mix(in srgb, var(--ion-text-color, #fff) 12%, var(--ion-background-color, #121212));
+  --color: var(--ion-text-color, #fff);
+  --border-color: var(--ion-color-success, #2dd36f);
+  --border-style: solid;
+  --border-width: 1px;
+  --border-radius: var(--space-2);
+  font-weight: 700;
+}
