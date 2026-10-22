@@ -1,0 +1,118 @@
+// Writes the intrinsic size of every topic logo (and country flag) to logo-sizes.json, so an
+// <img> can reserve its width before the image arrives instead of the layout jumping when it does.
+//   node scripts/generate-logo-sizes.mjs
+import { readdirSync, readFileSync, writeFileSync } from 'node:fs'
+import { extname, join, relative } from 'node:path'
+import { fileURLToPath } from 'node:url'
+
+const root = fileURLToPath(new URL('..', import.meta.url))
+const imagesDir = join(root, 'src/assets/images')
+// Topic.getLogoPath resolves logos from these folders, relative to assets/images.
+const dirs = ['logos', 'countries']
+// Icon packs and parked folders no topic uses; thousands of files that would only bloat the bundle.
+const skippedDirs = /^(AWS|google-cloud-icons|__TODO__|.*_OFF.*)$/i
+const output = join(root, 'src/app/TopicFriendsShared3/topics-core/logo-sizes.json')
+
+function* files(dir) {
+  for (const entry of readdirSync(dir, { withFileTypes: true })) {
+    const path = join(dir, entry.name)
+    if (entry.isDirectory()) {
+      if (!skippedDirs.test(entry.name)) yield* files(path)
+    } else {
+      yield path
+    }
+  }
+}
+
+const number = value => {
+  const parsed = Number.parseFloat(value ?? '')
+  return Number.isFinite(parsed) && parsed > 0 ? parsed : undefined
+}
+
+function svgSize(text) {
+  const tag = text.match(/<svg\b[^>]*>/i)?.[0]
+  if (!tag) return undefined
+  const attribute = name => tag.match(new RegExp(`\\s${name}\\s*=\\s*["']([^"']*)["']`, 'i'))?.[1]
+  // Same precedence as a browser sizing an <img>: absolute width and height, else the viewBox.
+  const width = attribute('width'), height = attribute('height')
+  const w = number(width), h = number(height)
+  if (w && h && !width.includes('%') && !height.includes('%')) return [w, h]
+  const viewBox = attribute('viewBox')?.trim().split(/[\s,]+/).map(Number)
+  if (viewBox?.length === 4 && viewBox[2] > 0 && viewBox[3] > 0) return [viewBox[2], viewBox[3]]
+  return undefined
+}
+
+function pngSize(bytes) {
+  if (bytes.toString('ascii', 12, 16) !== 'IHDR') return undefined
+  return [bytes.readUInt32BE(16), bytes.readUInt32BE(20)]
+}
+
+function gifSize(bytes) {
+  return [bytes.readUInt16LE(6), bytes.readUInt16LE(8)]
+}
+
+function jpegSize(bytes) {
+  let offset = 2
+  while (offset + 9 < bytes.length) {
+    if (bytes[offset] !== 0xff) return undefined
+    const marker = bytes[offset + 1]
+    const length = bytes.readUInt16BE(offset + 2)
+    // Start-of-frame markers (SOF0..SOF15, except DHT/JPG/DAC) carry the image size.
+    if (marker >= 0xc0 && marker <= 0xcf && ![0xc4, 0xc8, 0xcc].includes(marker)) {
+      return [bytes.readUInt16BE(offset + 7), bytes.readUInt16BE(offset + 5)]
+    }
+    offset += 2 + length
+  }
+  return undefined
+}
+
+function webpSize(bytes) {
+  const chunk = bytes.toString('ascii', 12, 16)
+  if (chunk === 'VP8X') return [1 + bytes.readUIntLE(24, 3), 1 + bytes.readUIntLE(27, 3)]
+  if (chunk === 'VP8 ') return [bytes.readUInt16LE(26) & 0x3fff, bytes.readUInt16LE(28) & 0x3fff]
+  if (chunk === 'VP8L') {
+    const bits = bytes.readUInt32LE(21)
+    return [1 + (bits & 0x3fff), 1 + ((bits >> 14) & 0x3fff)]
+  }
+  return undefined
+}
+
+function imageSize(path) {
+  const bytes = readFileSync(path)
+  switch (extname(path).toLowerCase()) {
+    case '.svg': return svgSize(bytes.toString('utf8'))
+    case '.png': return pngSize(bytes)
+    case '.gif': return gifSize(bytes)
+    case '.jpg':
+    case '.jpeg': return jpegSize(bytes)
+    case '.webp': return webpSize(bytes)
+    default: return undefined
+  }
+}
+
+// Two decimals keep every aspect ratio exact enough at icon sizes while keeping the file small.
+const round = value => Math.round(value * 100) / 100
+const sizes = {}
+let skipped = 0
+for (const dir of dirs) {
+  for (const path of files(join(imagesDir, dir))) {
+    if (!/\.(svg|png|gif|jpe?g|webp)$/i.test(path)) continue
+    let size
+    try {
+      size = imageSize(path)
+    } catch {
+      size = undefined
+    }
+    if (size && size[0] > 0 && size[1] > 0) {
+      sizes[relative(imagesDir, path).split('\\').join('/')] = size.map(round)
+    } else {
+      skipped += 1
+    }
+  }
+}
+
+const sorted = Object.fromEntries(Object.entries(sizes).sort(([a], [b]) => a.localeCompare(b)))
+// One entry per line: readable diffs when logos are added, still compact.
+const json = '{\n' + Object.entries(sorted).map(([key, size]) => `${JSON.stringify(key)}:${JSON.stringify(size)}`).join(',\n') + '\n}\n'
+writeFileSync(output, json)
+console.log(`logo-sizes.json: ${Object.keys(sorted).length} images (${skipped} without a readable size)`)

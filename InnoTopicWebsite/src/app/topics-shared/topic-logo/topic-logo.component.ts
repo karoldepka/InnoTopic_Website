@@ -12,6 +12,7 @@ import {
 } from '@angular/core';
 import { isThemeRecolorableLogo, Topic } from '../../TopicFriendsShared3/topics-core/Topic';
 import { TopicsService } from '../../TopicFriendsShared3/topics-core/topics.service';
+import { intrinsicLogoSize } from '../../TopicFriendsShared3/topics-core/logo-sizes';
 import { FeatureFlagsService } from '../../shared/feature-flags/feature-flags.service';
 import { onThemeStateChange, themeState } from '@innotopic/theme-ui';
 import { loadSvgText, recolorRaster, recolorSvg, RecolorOptions, svgDataUrl } from '@innotopic/topics-ui';
@@ -43,6 +44,7 @@ export const defaultIconHeight = 18
         [attr.src]="originalSrc()"
         [alt]="resolvedTopic?.name ?? ''"
         [style.height.px]="logoHeight"
+        [style.width.px]="logoWidth"
         loading="eager"
         decoding="async"
         (load)="onIconReady()"
@@ -55,6 +57,7 @@ export const defaultIconHeight = 18
           alt=""
           aria-hidden="true"
           [style.height.px]="logoHeight"
+          [style.width.px]="logoWidth"
           decoding="async"
           (load)="onIconReady()"
         />
@@ -79,6 +82,7 @@ export const defaultIconHeight = 18
 
     .topic-logo img {
       display: block;
+      object-fit: contain;
     }
 
     /* The recolored copy covers the original. Hovering the logo (or its topic tag) fades the copy
@@ -284,6 +288,12 @@ export class TopicLogoComponent implements OnDestroy {
     if (!dimensions) return this.height() ?? size;
     const [width, height] = dimensions;
     return height > width ? size * height / width : size;
+  }
+
+  /** Reserved from the logo's known proportions (logo-sizes.json), so the layout doesn't jump when it loads. */
+  get logoWidth(): number | undefined {
+    const size = intrinsicLogoSize(this.resolvedTopic?.logo ?? this.fallbackLogo);
+    return size && this.logoHeight * size[0] / size[1];
   }
 
   private readonly topicsService = inject(TopicsService);

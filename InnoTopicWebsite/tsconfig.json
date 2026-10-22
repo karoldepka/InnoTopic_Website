@@ -18,6 +18,7 @@
     "ignoreDeprecations": "6.0",
     "experimentalDecorators": true,
     "moduleResolution": "bundler",
+    "resolveJsonModule": true,
     "importHelpers": true,
     "target": "es2022",
     "module": "es2020",
