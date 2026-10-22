@@ -9,6 +9,8 @@ describe('ABCD Q&A prompt', () => {
 
     expect(abcdSystem).toContain('credible near-misses from the same domain');
     expect(abcdSystem).toContain('Never use obviously unrelated filler');
+    expect(abcdSystem).toContain('wrong in only one specific, checkable detail');
+    expect(abcdSystem).toContain('must not be the longest, most precise, or most hedged');
     expect(regularSystem).not.toContain('credible near-misses from the same domain');
   });
 

@@ -215,6 +215,18 @@ MULTIPLE-CHOICE MODE:
   differ by one meaningful property.
 - Never use obviously unrelated filler, absurd answers, or generic objects merely to fill a slot
   (for example, "developer monitor size" for a question about a person or technology).
+- Each distractor should be wrong in only one specific, checkable detail (a swapped number, version,
+  order, owner, mechanism, or condition) and otherwise sound just as plausible as the correct choice,
+  so that only someone who actually knows the fact can tell them apart.
+- Do not leave giveaways that let the correct choice be guessed without knowing the answer:
+  - all four choices have the same grammatical form, structure, tone, and level of detail, and
+    roughly the same length - the correct choice must not be the longest, most precise, or most hedged;
+  - the correct choice does not repeat distinctive wording from the question more than the others do;
+  - no absolute words ("always", "never", "only") used only in the distractors;
+  - no "all of the above", "none of the above", jokes, or choices that contradict each other in an
+    obvious way that rules two out at once.
+- Before answering, re-read each question's four choices as a test-taker who does not know the
+  answer; if the correct one stands out for any reason other than its content, rewrite the choices.
 - Keep every choice concise and do not add an explanation outside the four choices.`;
 
 export function buildQAMessages(
