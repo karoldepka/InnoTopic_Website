@@ -15,6 +15,7 @@ import { QuizDiligenceLevelComponent } from './quiz-diligence-level/quiz-diligen
 import { QuizIntervalImportanceScalingComponent } from './quiz-interval-importance-scaling/quiz-interval-importance-scaling.component';
 import { QuizFocusLevelComponent } from './quiz-focus-level/quiz-focus-level.component';
 import {FeatureService} from '../../../../libs/AppFedShared/feature.service'
+import {DEFAULT_EXPERIMENTAL_MASTERY_STARS} from '../../core/quiz/experimental-quiz-scheduler'
 
 @Component({
     selector: 'app-quiz-options',
@@ -70,7 +71,7 @@ export class QuizOptionsComponent implements OnInit {
     useRegexCategories: new UntypedFormControl(false),
     useRegexTextFilter: new UntypedFormControl(false),
     experimentalWorkingSetSize: new UntypedFormControl(20),
-    experimentalMasteryStars: new UntypedFormControl(2),
+    experimentalMasteryStars: new UntypedFormControl(DEFAULT_EXPERIMENTAL_MASTERY_STARS),
     experimentalSchedulerMode: new UntypedFormControl('strict-batches'),
     sameItemMinDelaySeconds: new UntypedFormControl(60),
   }

@@ -3,7 +3,7 @@ import type {LearnItem$} from '../../models/LearnItem$'
 
 export const DEFAULT_EXPERIMENTAL_WORKING_SET_SIZE = 20
 export const MAX_EXPERIMENTAL_WORKING_SET_SIZE = 100
-export const DEFAULT_EXPERIMENTAL_MASTERY_STARS = 2
+export const DEFAULT_EXPERIMENTAL_MASTERY_STARS = 1
 export const MAX_EXPERIMENTAL_MASTERY_STARS = 5
 /** Prevent an item from being selected again immediately after it was shown. */
 export const DEFAULT_SAME_ITEM_MIN_DELAY_SECONDS = 60
