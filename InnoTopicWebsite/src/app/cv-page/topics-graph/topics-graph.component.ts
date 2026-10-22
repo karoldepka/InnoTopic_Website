@@ -96,7 +96,9 @@ export class TopicsGraphComponent implements OnInit, OnDestroy {
   }
 
   private applyTopicSearch() {
-    this.topicSearch.query(); // re-run on every query change, even before the graph has rendered
+    // re-run on every query/mode change, even before the graph has rendered
+    this.topicSearch.query();
+    this.topicSearch.regex();
     const active = this.topicSearch.active();
     const matches = (d: any) => this.topicSearch.matches(d.id);
     this.nodeGroups

@@ -7,20 +7,20 @@ const MATCH_SELECTOR = '.topic-search--match, .node--search-match';
 /**
  * Search box for the page's topics: matching topics are highlighted and all others muted (see
  * TopicSearchService). Ctrl+Alt+F focuses it from anywhere; Enter / Shift+Enter scroll to the
- * next / previous match; Escape clears it.
+ * next / previous match; Escape clears it; the .* toggle (Alt+R) switches to regex matching.
  */
 @Component({
   selector: 'app-topic-search',
   standalone: true,
   template: `
-    <label class="topic-search">
+    <label class="topic-search" [class.topic-search--invalid]="search.invalidRegex()">
       <span class="topic-search-icon" aria-hidden="true">⌕</span>
       <input
         #input
         type="search"
-        placeholder="Search topics…"
-        aria-label="Search topics (Ctrl+Alt+F); Enter jumps to the next match"
-        aria-keyshortcuts="Control+Alt+F"
+        [placeholder]="search.regex() ? 'Search topics (regex)…' : 'Search topics…'"
+        aria-label="Search topics (Ctrl+Alt+F); Enter jumps to the next match; Alt+R toggles regex"
+        aria-keyshortcuts="Control+Alt+F Alt+R"
         autocomplete="off"
         spellcheck="false"
         [value]="search.query()"
@@ -29,13 +29,26 @@ const MATCH_SELECTOR = '.topic-search--match, .node--search-match';
         (keydown.shift.enter)="jump($event, -1)"
         (keydown.escape)="clear()"
       />
-      @if (search.active()) {
+      @if (search.invalidRegex()) {
+        <span class="topic-search-count" aria-live="polite">Invalid regex</span>
+      } @else if (search.active()) {
         <span class="topic-search-count" aria-live="polite">
           {{ matchCount() === 0 ? 'No matches' : (current() ? current() + ' / ' : '') + matchCount() + (matchCount() === 1 ? ' match' : ' matches') }}
         </span>
-        <button type="button" class="topic-search-clear" aria-label="Clear search" (click)="clear()">×</button>
       } @else {
         <kbd class="topic-search-hint" aria-hidden="true">Ctrl+Alt+F</kbd>
+      }
+      <button
+        type="button"
+        class="topic-search-toggle"
+        [class.topic-search-toggle--on]="search.regex()"
+        [attr.aria-pressed]="search.regex()"
+        aria-label="Regular expression"
+        title="Regular expression (Alt+R)"
+        (click)="toggleRegex()"
+      >.*</button>
+      @if (search.query()) {
+        <button type="button" class="topic-search-clear" aria-label="Clear search" (click)="clear()">×</button>
       }
     </label>
   `,
@@ -108,6 +121,34 @@ const MATCH_SELECTOR = '.topic-search--match, .node--search-match';
       font-family: inherit;
     }
 
+    /* An unparseable regex: dashed outline instead of a color, which reads on any theme. */
+    .topic-search--invalid,
+    .topic-search--invalid:focus-within {
+      border-style: dashed;
+      border-color: currentColor;
+    }
+
+    .topic-search-toggle {
+      padding: 2px 6px;
+      border: 1px solid transparent;
+      border-radius: 4px;
+      background: transparent;
+      color: inherit;
+      font: 600 12px/1 ui-monospace, monospace;
+      opacity: 0.6;
+      cursor: pointer;
+    }
+
+    .topic-search-toggle:hover {
+      opacity: 1;
+    }
+
+    .topic-search-toggle--on {
+      border-color: currentColor;
+      background: color-mix(in srgb, currentColor 14%, transparent);
+      opacity: 1;
+    }
+
     .topic-search-clear {
       width: 26px;
       height: 26px;
@@ -145,6 +186,7 @@ export class TopicSearchComponent {
   constructor() {
     effect(() => {
       this.search.query();
+      this.search.regex();
       this.current.set(0);
       // Count once the tags and graph have applied the new query.
       setTimeout(() => this.matchCount.set(this.matches().length));
@@ -157,7 +199,16 @@ export class TopicSearchComponent {
       event.preventDefault();
       this.input().nativeElement.focus();
       this.input().nativeElement.select();
+    } else if (event.altKey && !event.ctrlKey && !event.metaKey && event.code === 'KeyR'
+      && document.activeElement === this.input().nativeElement) {
+      // Like VS Code's find widget: only while the search box has focus, so Alt+R stays free elsewhere.
+      event.preventDefault();
+      this.toggleRegex();
     }
+  }
+
+  protected toggleRegex() {
+    this.search.regex.update(regex => !regex);
   }
 
   protected jump(event: Event, step: 1 | -1) {
