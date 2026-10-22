@@ -53,20 +53,27 @@
     <br>
     <p id="legend">Legend:</p>
 
-      @for (level of skillLevels; track level) {
-        <app-skill-level-icon
-          [skillLevel]="level"
-        ></app-skill-level-icon>
-        &nbsp;<span style="text-transform: uppercase">{{level}}</span>
-      }
+      <div class="legend-items">
+        @for (level of skillLevels; track level) {
+          <span class="legend-item">
+            <app-skill-level-icon
+              [skillLevel]="level"
+            ></app-skill-level-icon>
+            <span>{{level}}</span>
+          </span>
+        }
+      </div>
 
   <!--    <img style="width: 12px; height: 12px" src="assets/images/icons/signal/signal-solid-2.svg">-->
   <!--    <app-skill-levels-icons [skillLevels]="{have: 'beginner', want: 'expert'}"></app-skill-levels-icons>-->
   <!--    <app-skill-levels-icons [skillLevels]="{have: 'advanced'}"></app-skill-levels-icons>-->
       <p class="example">Example:</p>
-      <app-topic-skill [tId]="'Python'"
-                      [skillLevels]="{have: 'advanced', want: 'expert'}"
-      />- have: advanced; on my way to become: expert.
+      <p class="example-line">
+        <app-topic-skill [tId]="'Python'"
+                        [skillLevels]="{have: 'advanced', want: 'expert'}"
+        />
+        <span>- have: advanced; on my way to become: expert.</span>
+      </p>
   <!--    none: 'battery-empty',-->
   <!--    beginner: "battery-quarter",-->
   <!--    intermediate: "battery-half",-->

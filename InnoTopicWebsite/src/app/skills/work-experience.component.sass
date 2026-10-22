@@ -46,6 +46,29 @@ p
   color: var(--ion-color-secondary) // mat-color($light-accent,900)
   text-transform: uppercase
 
+// Same gap above "Example:" as between the endorsements link and "Legend:".
+.example
+  margin-top: 16px
+
+.legend-items, .example-line
+  display: flex
+  flex-wrap: wrap
+  align-items: center
+  column-gap: 16px
+  row-gap: 4px
+
+.example-line
+  column-gap: 6px
+
+.legend-item
+  display: inline-flex
+  align-items: center
+  gap: 6px
+  text-transform: uppercase
+
+  app-skill-level-icon
+    margin-left: 0
+
 .experience-info
   margin-left: 10px
 
