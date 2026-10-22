@@ -1,4 +1,4 @@
-import {Component, effect, ElementRef, Input, OnDestroy, OnInit, signal, ViewEncapsulation,} from '@angular/core';
+import {Component, effect, ElementRef, inject, Input, OnDestroy, OnInit, signal, untracked, ViewEncapsulation,} from '@angular/core';
 import {loadSvgText, recolorSvg, svgDataUrl} from '@innotopic/topics-ui';
 import {onThemeStateChange, themeState} from '@innotopic/theme-ui';
 import {topics} from '../../TopicFriendsShared3/topics-core/topics-data';
@@ -14,6 +14,7 @@ import {FeatureFlagsService} from '../../shared/feature-flags/feature-flags.serv
 import {IconsReadyService} from '../../topics-shared/icons-ready.service';
 import {TopicInfoPopoverComponent} from '../../topics-shared/topic-info/topic-info';
 import {TopicsService} from '../../TopicFriendsShared3/topics-core/topics.service';
+import {TopicSearchService} from '../../topics-shared/topic-search.service';
 import {BehaviorSubject, Observable} from 'rxjs';
 
 /** The info blurb opened by clicking a node, positioned below it within the graph container. */
@@ -43,6 +44,9 @@ export class TopicsGraphComponent implements OnInit, OnDestroy {
 
   /** Like a topic tag, a clicked node shows the topic's info blurb (see TopicsService.getTopicInfo). */
   protected readonly openInfo = signal<OpenNodeInfo | undefined>(undefined);
+  private readonly topicSearch = inject(TopicSearchService);
+  /** The rendered node groups, for marking topic-search matches (the graph is rebuilt on theme changes). */
+  private nodeGroups?: any;
 
   private static readonly rawIconCache = new Map<string, Promise<string | undefined>>();
 
@@ -87,6 +91,17 @@ export class TopicsGraphComponent implements OnInit, OnDestroy {
         void this.fetchIcons();
       }
     });
+    // Like topic tags: nodes matching the topic search are highlighted, the rest muted.
+    effect(() => this.applyTopicSearch());
+  }
+
+  private applyTopicSearch() {
+    this.topicSearch.query(); // re-run on every query change, even before the graph has rendered
+    const active = this.topicSearch.active();
+    const matches = (d: any) => this.topicSearch.matches(d.id);
+    this.nodeGroups
+      ?.classed('node--search-match', (d: any) => active && matches(d))
+      .classed('node--search-muted', (d: any) => active && !matches(d));
   }
 
   ngOnInit() {
@@ -376,6 +391,8 @@ export class TopicsGraphComponent implements OnInit, OnDestroy {
 
     const perNodeMainGroup = allNodesGroup.append("g") /* top-level group of a node which will include the circle and icon */
       .attr("class", "node");
+    this.nodeGroups = perNodeMainGroup;
+    untracked(() => this.applyTopicSearch());
 
     allNodesGroup.selectAll(".techCircleOverlay")
       .data(graph.nodes)

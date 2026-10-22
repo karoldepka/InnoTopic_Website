@@ -17,6 +17,7 @@ import { FeatureFlagsService } from '../../shared/feature-flags/feature-flags.se
 import { onThemeStateChange, themeState } from '@innotopic/theme-ui';
 import { loadSvgText, recolorRaster, recolorSvg, RecolorOptions, svgDataUrl } from '@innotopic/topics-ui';
 import { IconsReadyService } from '../icons-ready.service';
+import { TopicSearchService } from '../topic-search.service';
 import { TopicInfoPopoverComponent, TopicInfoTriggerDirective } from '../topic-info/topic-info';
 
 export const defaultIconHeight = 18
@@ -120,13 +121,38 @@ export const defaultIconHeight = 18
         transition-delay: 0s;
       }
     }
+
+    /* Topic search, same look as app-topic-tag's (see there). */
+    :host {
+      transition: opacity 0.2s ease, filter 0.2s ease;
+    }
+
+    :host(.topic-search--muted) {
+      opacity: 0.25;
+      filter: grayscale(1);
+    }
+
+    :host(.topic-search--match) .topic-logo {
+      border-radius: 4px;
+      box-shadow:
+        0 0 0 2px var(--ion-background-color, #fff),
+        0 0 0 4px var(--ion-text-color, #000);
+    }
   `],
   host: {
     '[style.--logo-hover-fade]': 'hoverFade()',
+    '[class.topic-search--match]': "searchState() === 'match'",
+    '[class.topic-search--muted]': "searchState() === 'muted'",
   },
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TopicLogoComponent implements OnDestroy {
+  private readonly topicSearch = inject(TopicSearchService)
+  /** Standalone logos follow the topic search; inside a topic tag the tag shows it for both. */
+  protected readonly searchState = computed(() => {
+    const state = this.topicSearch.stateOf(this.resolveTopic(this.topic()) ?? this.fallbackLogo)
+    return state && !this.host.nativeElement.parentElement?.closest('app-topic-tag') ? state : undefined
+  })
   protected readonly flagsService = inject(FeatureFlagsService)
   private readonly changeDetector = inject(ChangeDetectorRef)
   private readonly themeRevision = signal(0)

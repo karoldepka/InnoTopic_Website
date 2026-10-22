@@ -10,6 +10,7 @@ import { Topic } from '../../TopicFriendsShared3/topics-core/Topic';
 import { TopicsService } from '../../TopicFriendsShared3/topics-core/topics.service';
 import { TopicInfoPopoverComponent, TopicInfoTriggerDirective } from '../topic-info/topic-info';
 import { TopicLogoComponent } from '../topic-logo/topic-logo.component';
+import { TopicSearchService } from '../topic-search.service';
 
 /**
  * A topic's (theme-recolored) logo and name. Topics with an info blurb are clickable: clicking
@@ -60,7 +61,33 @@ import { TopicLogoComponent } from '../topic-logo/topic-logo.component';
       display: inline-flex;
       align-items: center;
     }
+
+    /* Topic search (see TopicSearchService). Muting fades toward whatever is behind the tag, and the
+       match ring pairs the theme's background and text colors, which contrast with each other, so
+       one of the two rings stands out on any surface color. */
+    :host {
+      transition: opacity 0.2s ease, filter 0.2s ease;
+    }
+
+    :host(.topic-search--muted) {
+      opacity: 0.25;
+      filter: grayscale(1);
+    }
+
+    :host(.topic-search--match) .angular-topic-tag {
+      /* Room for the ring without shifting the surrounding layout. */
+      padding: 0 4px;
+      margin: 0 -4px;
+      border-radius: 6px;
+      box-shadow:
+        0 0 0 2px var(--ion-background-color, #fff),
+        0 0 0 4px var(--ion-text-color, #000);
+    }
   `],
+  host: {
+    '[class.topic-search--match]': "searchState() === 'match'",
+    '[class.topic-search--muted]': "searchState() === 'muted'",
+  },
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TopicTagComponent {
@@ -79,4 +106,6 @@ export class TopicTagComponent {
   protected readonly resolvedTopic = computed(() =>
     this.topicsService.getTopicByIdIfExisting(this.tId().replace('#', '').replace(/_/g, ' ')))
   protected readonly displayName = computed(() => this.resolvedTopic()?.name ?? this.tId())
+  private readonly topicSearch = inject(TopicSearchService)
+  protected readonly searchState = computed(() => this.topicSearch.stateOf(this.resolvedTopic() ?? this.tId()))
 }

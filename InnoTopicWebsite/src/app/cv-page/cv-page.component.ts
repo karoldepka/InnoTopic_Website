@@ -11,6 +11,7 @@ import { ExternalProfilesComponent } from './external-profiles/external-profiles
 import { GlobeSwitcherComponent } from './globe-switcher/globe-switcher.component';
 import { PersonalDataComponent } from './personal-data/personal-data.component';
 import { TopicsGraphComponent } from './topics-graph/topics-graph.component';
+import { TopicSearchComponent } from '../topics-shared/topic-search/topic-search.component';
 import { VisualizationsSectionComponent } from './visualizations-section/visualizations-section.component';
 import { FeatureFlagsPopoverComponent } from '../shared/feature-flags-popover/feature-flags-popover.component';
 
@@ -22,6 +23,7 @@ import { FeatureFlagsPopoverComponent } from '../shared/feature-flags-popover/fe
     FeatureFlagsPopoverComponent,
     GlobeSwitcherComponent,
     PersonalDataComponent,
+    TopicSearchComponent,
     TopicsGraphComponent,
     VisualizationsSectionComponent,
     WorkExperienceComponent,

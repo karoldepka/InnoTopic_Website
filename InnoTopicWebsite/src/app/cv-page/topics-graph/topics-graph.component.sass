@@ -98,6 +98,19 @@ tech:hover
   display: flex
   justify-content: center
 
+// Topic search (see TopicSearchService): matching nodes get a ring in the theme's text color, which
+// contrasts with the page background the graph sits on; the other nodes fade into that background.
+.node
+  transition: opacity 0.2s ease, filter 0.2s ease
+
+.node--search-muted
+  opacity: 0.2
+  filter: grayscale(1)
+
+.node--search-match .techCircle
+  stroke: var(--ion-text-color, #000)
+  stroke-width: 3.5px
+
 // Same hover swap as app-topic-logo: the recolored logo fades out to reveal the original, which
 // hides again only once the recolored one has faded back in.
 .node-logo-recolored
