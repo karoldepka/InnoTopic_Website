@@ -834,7 +834,8 @@ function addBadges(owner, center, yOff, flank){
     const m = makeLogoMesh(TECHINFO[k].logo);
     const hit = new THREE.Mesh(new THREE.BoxGeometry(LOGO_SIZE * 1.15, LOGO_SIZE * 1.15, .5), new THREE.MeshBasicMaterial({ visible:false }));
     m.group.add(hit); scene.add(m.group);
-    const b = { k, owner, center, yOff, i, n, xl, zl, orbit: !!flank, group:m.group, mats:m.mats, kind:m.kind, phase: Math.random() * 6.28, hs:1, hsT:1 };
+    m.mats.forEach(mat => { mat.transparent = true; });
+    const b = { k, owner, center, yOff, i, n, xl, zl, orbit: !!flank, group:m.group, mats:m.mats, kind:m.kind, phase: Math.random() * 6.28, hs:1, hsT:1, hit:false, op:1 };
     hit.userData.badge = b; badgeHits.push(hit); badges.push(b);
   });
 }
@@ -859,12 +860,16 @@ function updateBadges(t){
       b.group.position.set(b.center.x + rx * b.xl + fx * b.zl, b.center.y + b.yOff + bob, b.center.z + rz * b.xl + fz * b.zl);
       b.group.rotation.set(-.18, yaw + logoYawBias + Math.sin(t * .55 + b.phase) * .42 - b.xl * .12, 0, 'YXZ');  // billboard + gentle spin so the depth shows
     }
-    b.hs += (b.hsT - b.hs) * .2; b.group.scale.setScalar(b.hs);
+    // search: matching logos pulse continuously (swell + glow), the others fade almost out
+    const pulse = searchHits && b.hit ? Math.sin(t * 4.5 + b.phase) * .5 + .5 : 0;
+    b.op += ((searchHits && !b.hit ? .12 : 1) - b.op) * .15;
+    b.hs += (b.hsT - b.hs) * .2; b.group.scale.setScalar(b.hs * (1 + pulse * .3));
     // play emphasis: the active component's logos brighten, others dim
     const o = nodeMap[b.owner];
     const dimT = b.owner === OV ? (player.active ? 1 : 0) : o.dimT, hl = b.owner === OV ? ov.v : o.hl;
     const dim = 1 - dimT * .75;
-    b.mats.forEach(m => { m.emissiveIntensity = .4 * dim + hl * .55 + (b.hsT > 1 ? .25 : 0); m.color.copy(m.userData.base).multiplyScalar(.35 + .65 * dim); });
+    b.mats.forEach(m => { m.emissiveIntensity = .4 * dim + hl * .55 + (b.hsT > 1 ? .25 : 0) + pulse * 1.2; m.color.copy(m.userData.base).multiplyScalar(.35 + .65 * dim);
+      m.opacity = b.op; m.depthWrite = b.op > .98; });
   }
 }
 
@@ -1044,6 +1049,8 @@ function refreshHighlights(){
 // through Amazon Bedrock). Uses the same highlight/dim as the walkthrough; null = no search.
 let searchHits = null;
 function setSearch(test){
+  const badgeName = b => (TECH[b.owner]?.list.find(([k]) => k === b.k) ?? [])[1] ?? '';
+  badges.forEach(b => { b.hit = !!test && (test(TECHINFO[b.k].name) || test(badgeName(b))); });
   if (!test){ searchHits = null; refreshHighlights(); return; }
   const techMatches = id => (TECH[id]?.list ?? []).some(([k, nm]) => test(nm) || test(TECHINFO[k]?.name ?? ''));
   searchHits = new Set(Object.keys(nodeMap).filter(id => test(nodeMap[id].n.label) || techMatches(id)));
