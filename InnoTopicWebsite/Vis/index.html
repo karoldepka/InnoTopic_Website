@@ -1167,7 +1167,10 @@ function updateBadges(t){
     // search: matching logos pulse continuously (swell + glow), the others fade almost out
     const pulse = searchHits && b.hit ? Math.sin(t * 4.5 + b.phase) * .5 + .5 : 0;
     b.op += ((searchHits && !b.hit ? .12 : 1) - b.op) * .15;
-    b.hs += (b.hsT - b.hs) * .2; b.group.scale.setScalar(b.hs * (1 + pulse * .3));
+    // intro: logos pop in one after another once their component has landed
+    const ownerStart = b.owner === OV ? ov.introStart : nodeMap[b.owner].introStart;
+    const pop = ownerStart == null ? 0 : elastic((t - ownerStart - .35 - b.i * .07) / .6);
+    b.hs += (b.hsT - b.hs) * .2; b.group.scale.setScalar(b.hs * (1 + pulse * .3) * pop);
     // play emphasis: the active component's logos brighten, others dim
     const o = nodeMap[b.owner];
     const dimT = b.owner === OV ? (player.active ? 1 : 0) : o.dimT, hl = b.owner === OV ? ov.v : o.hl;
@@ -1633,9 +1636,26 @@ function updateReveal(t){
   revealWall.position.copy(HOME_TARGET).addScaledVector(revealDir, depth - depthOf(HOME_TARGET)).setY(FLOOR_Y + 6);
   revealWall.material.opacity = Math.sin(Math.PI * k) * .35;
   if (starfield) starfield.material.opacity = .8 * k;
-  for (const o of Object.values(nodeMap)) o.labelEl.style.opacity = k >= 1 || depthOf(o.root.position) <= depth ? '' : '0';
-  ov.label.style.opacity = k >= 1 || depthOf(overlay.labelPos) <= depth ? '' : '0';
+  for (const o of Object.values(nodeMap)){
+    const reached = k >= 1 || depthOf(o.root.position) <= depth;
+    o.labelEl.style.opacity = reached ? '' : '0';
+    if (reached) o.introStart ??= REVEAL_SECONDS ? t : -Infinity;   // jumps in (see introPose)
+  }
+  const ovReached = k >= 1 || depthOf(overlay.labelPos) <= depth;
+  ov.label.style.opacity = ovReached ? '' : '0';
+  if (ovReached) ov.introStart ??= REVEAL_SECONDS ? t : -Infinity;
   if (k >= 1) revealDone = true;
+}
+// Each component jumps up out of the floor as the reveal reaches it: it springs up from below with an
+// elastic overshoot while growing to full size, and its floor ring flashes outward like a shockwave.
+const elastic = u => u <= 0 ? 0 : u >= 1 ? 1 : 1 - Math.exp(-5 * u) * Math.cos(10 * u);   // 0 → 1, overshooting
+const JUMP_SECONDS = .9;
+function introPose(start, t){
+  if (start == null) return { y:-3, s:0, burst:0 };   // not reached by the reveal yet
+  const u = (t - start) / JUMP_SECONDS;
+  if (u >= 1) return { y:0, s:1, burst:0 };
+  const e = elastic(u);
+  return { y:(e - 1) * 3, s:.25 + .75 * e, burst:Math.sin(Math.PI * Math.min(1, u * 1.6)) * (1 - u) };
 }
 
 /* ---------------- loop ---------------- */
@@ -1647,15 +1667,16 @@ function animate(){
   for (const id in nodeMap){
     const o = nodeMap[id];
     o.hl += (o.hlTarget - o.hl) * .12; o.dimT += (o.dimTarget - o.dimT) * .1;
-    o.holder.position.y = Math.sin(t*1.1 + o.phase) * .18;
+    const intro = introPose(o.introStart, t);
+    o.holder.position.y = Math.sin(t*1.1 + o.phase) * .18 + intro.y;
     if (SWAY_SHAPES.has(o.n.shape)) o.group.rotation.y = Math.sin(t*.4 + o.phase) * .35;
     else o.group.rotation.y = t * .25 + o.phase;
     o.spin.forEach(([m, s]) => m.rotation.z = t * s);
-    const sc = 1 + o.hl * (o.n.big ? .1 : .28) + (o.hl > .9 ? Math.sin(t*6)*.03 : 0); o.holder.scale.setScalar(sc);
+    const sc = 1 + o.hl * (o.n.big ? .1 : .28) + (o.hl > .9 ? Math.sin(t*6)*.03 : 0); o.holder.scale.setScalar(sc * intro.s);
     const dim = 1 - o.dimT * .75;
     o.mats.forEach(m => m.emissiveIntensity = (m.userData.baseEI ?? .4) * dim + o.hl * (o.n.big ? .5 : 1.1));
     o.halo.material.opacity = ((o.n.big ? .28 : .22) + o.hl * (o.n.big ? .25 : .5)) * dim;
-    o.ring.material.opacity = (.4 + o.hl * .5) * dim;
+    o.ring.material.opacity = (.4 + o.hl * .5 + intro.burst * .6) * dim; o.ring.scale.setScalar(1 + intro.burst * .9);
   }
   if (llmNode.group.userData.core) llmNode.group.userData.core.scale.setScalar(1 + Math.sin(t*2.2)*.08);
   llmLight.intensity = 30 + Math.sin(t*2.2)*8;
