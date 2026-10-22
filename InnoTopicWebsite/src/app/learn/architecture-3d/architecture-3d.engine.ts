@@ -527,7 +527,7 @@ const GLOW = glowTexture();
   const g = new THREE.BufferGeometry();
   g.setAttribute('position', new THREE.BufferAttribute(p,3)); g.setAttribute('color', new THREE.BufferAttribute(col,3));
   const m = new THREE.PointsMaterial({ size:1.4, map:GLOW, vertexColors:true, transparent:true, depthWrite:false, opacity:.8, fog:false, blending:THREE.AdditiveBlending });
-  scene.add(new THREE.Points(g, m));
+  const stars = new THREE.Points(g, m); stars.userData.starfield = true; scene.add(stars);
 }
 /* floor items: the overlay, zone platforms and floor words. Each opens the same extended card as a node:
    { info:{label, desc, ex}, layer, spans, spansTitle?, card (DEEP content), focus, flyDist, glow?(on) }.
@@ -1266,6 +1266,48 @@ const resizeObserver = new ResizeObserver(() => {
 resizeObserver.observe(root);
 cleanups.push(() => resizeObserver.disconnect());
 
+/* ---------------- intro: reveal the scene by depth, like a z-buffer filling ---------------- */
+// An upright clipping plane sweeps away from the camera, front to back: nothing behind it is drawn yet. Its
+// front shows as a faint glowing wall, labels appear as it passes them, and the starfield fades in alongside.
+const REVEAL_SECONDS = matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 2.6;
+const revealDir = HOME_TARGET.clone().sub(HOME_POS).setY(0).normalize();   // horizontal view direction
+const revealPlane = new THREE.Plane(revealDir.clone().negate(), 1e9);    // keeps points with revealDir·p <= constant
+const depthOf = p => revealDir.dot(p);
+const nodeDepths = Object.values(nodeMap).map(o => depthOf(o.root.position));
+const REVEAL_FROM = Math.min(...nodeDepths) - 14, REVEAL_TO = Math.max(...nodeDepths) + 14;
+renderer.localClippingEnabled = true;
+const starfield = scene.children.find(o => o.userData.starfield);
+scene.traverse(o => {
+  if (o === starfield || !o.material) return;
+  for (const m of [o.material].flat()) m.clippingPlanes = [revealPlane];
+});
+const revealWall = (() => {
+  // a vertical gradient: brightest along the floor, fading upward
+  const c = document.createElement('canvas'); c.width = 4; c.height = 128; const g = c.getContext('2d');
+  const gr = g.createLinearGradient(0, 128, 0, 0);
+  gr.addColorStop(0, 'rgba(170,230,255,.9)'); gr.addColorStop(.12, 'rgba(120,200,255,.3)'); gr.addColorStop(.6, 'rgba(120,200,255,0)');
+  g.fillStyle = gr; g.fillRect(0, 0, 4, 128);
+  const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace;
+  const wall = new THREE.Mesh(new THREE.PlaneGeometry(160, 12), new THREE.MeshBasicMaterial({ map:t, transparent:true, opacity:0,
+    depthWrite:false, blending:THREE.AdditiveBlending, side:THREE.DoubleSide, fog:false }));
+  wall.lookAt(revealDir); wall.visible = false; scene.add(wall); return wall;
+})();
+let revealStart = null, revealDone = false;
+function updateReveal(t){
+  if (revealDone) return;
+  revealStart ??= t;
+  const k = REVEAL_SECONDS ? Math.min(1, (t - revealStart) / REVEAL_SECONDS) : 1;
+  const depth = REVEAL_FROM + (REVEAL_TO - REVEAL_FROM) * easeInOut(k);
+  revealPlane.constant = k < 1 ? depth : 1e9;   // done: nothing clipped
+  revealWall.visible = k < 1;
+  revealWall.position.copy(HOME_TARGET).addScaledVector(revealDir, depth - depthOf(HOME_TARGET)).setY(FLOOR_Y + 6);
+  revealWall.material.opacity = Math.sin(Math.PI * k) * .35;
+  if (starfield) starfield.material.opacity = .8 * k;
+  for (const o of Object.values(nodeMap)) o.labelEl.style.opacity = k >= 1 || depthOf(o.root.position) <= depth ? '' : '0';
+  ov.label.style.opacity = k >= 1 || depthOf(overlay.labelPos) <= depth ? '' : '0';
+  if (k >= 1) revealDone = true;
+}
+
 /* ---------------- loop ---------------- */
 // Runs only while the view is on screen and the page visible: no frames for nobody to see.
 const clock = new THREE.Clock(); let frames = 0, lastT = 0, frameId = 0, onScreen = false;
@@ -1314,6 +1356,7 @@ function animate(){
   if (camGoal.target){ controls.target.lerp(camGoal.target, kT); if (!camGoal.pos && !player.active && controls.target.distanceTo(camGoal.target) < .05) camGoal.target = null; }
   if (camGoal.pos){ camera.position.lerp(camGoal.pos, kP); if (camera.position.distanceTo(camGoal.pos) < .15) camGoal.pos = null; }
   controls.update();
+  updateReveal(t);
   if (composer) composer.render(); else renderer.render(scene, camera);
   labelRenderer.render(scene, camera);
   if (++frames === 3){ const l = $('loading'); l.style.opacity = 0; setTimeout(() => l.remove(), 600); }
