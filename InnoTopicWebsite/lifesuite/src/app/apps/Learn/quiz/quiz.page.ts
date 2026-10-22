@@ -138,7 +138,11 @@ export class QuizPage extends BaseComponent implements OnInit, AfterViewInit, On
     return await popover.present();
   }
 
-  openQuizOptions(): void {
+  toggleQuizOptions(): void {
+    if (this.showOptions) {
+      this.showOptions = false
+      return
+    }
     this.showOptions = true
     requestAnimationFrame(() => {
       const prefersReducedMotion = globalThis.matchMedia?.('(prefers-reduced-motion: reduce)').matches
