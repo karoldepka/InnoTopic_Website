@@ -29,6 +29,8 @@ declare module 'svg-conversion' {
   export class SvgWorkerPool {
     constructor(options?: SvgWorkerPoolOptions)
     process(svg: string, options?: ProcessOptions): Promise<string>
+    /** Converts several SVGs in one worker message; one `{ result }` or `{ error }` per input, in order. */
+    processMany(svgs: string[], options?: ProcessOptions): Promise<Array<{ result?: string; error?: string }>>
     /** Recolors the raster image at an absolute URL; resolves to a PNG data URL. */
     processRaster(url: string, options?: ProcessOptions): Promise<string>
     generateColorMap(primaryColor?: string): Promise<string>

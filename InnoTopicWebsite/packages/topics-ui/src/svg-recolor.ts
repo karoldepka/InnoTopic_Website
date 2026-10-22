@@ -9,7 +9,7 @@ type WorkerOptions = {
 }
 
 type SvgWorkerPoolLike = {
-  process(svg: string, options?: WorkerOptions): Promise<string>
+  processMany(svgs: string[], options?: WorkerOptions): Promise<Array<{ result?: string; error?: string }>>
   processRaster(url: string, options?: WorkerOptions): Promise<string>
 }
 
@@ -319,6 +319,47 @@ function workerOptions(options: RecolorOptions): WorkerOptions {
   }
 }
 
+// A page shows hundreds of icons. Conversions requested within a short window go out as one
+// message per worker rather than one per icon, so the page's main thread handles a few replies
+// (and their framework change-detection passes) instead of hundreds.
+const BATCH_WINDOW_MS = 30
+type QueuedConversion = { svg: string; resolve: (svg: string) => void; reject: (error: Error) => void }
+const conversionQueues = new Map<string, { options: WorkerOptions; items: QueuedConversion[] }>()
+let batchFlushTimer: ReturnType<typeof setTimeout> | undefined
+
+function convertInBatch(pool: SvgWorkerPoolLike, svg: string, options: WorkerOptions): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const key = JSON.stringify(options)
+    let queue = conversionQueues.get(key)
+    if (!queue) {
+      queue = { options, items: [] }
+      conversionQueues.set(key, queue)
+    }
+    queue.items.push({ svg, resolve, reject })
+    batchFlushTimer ??= setTimeout(() => flushConversions(pool), BATCH_WINDOW_MS)
+  })
+}
+
+function flushConversions(pool: SvgWorkerPoolLike) {
+  batchFlushTimer = undefined
+  const queues = [...conversionQueues.values()]
+  conversionQueues.clear()
+  for (const { options, items } of queues) {
+    // One chunk per worker, so the pool still converts in parallel.
+    const chunkSize = Math.ceil(items.length / poolSize())
+    for (let start = 0; start < items.length; start += chunkSize) {
+      const chunk = items.slice(start, start + chunkSize)
+      pool.processMany(chunk.map(item => item.svg), options).then(
+        outcomes => outcomes.forEach(({ result, error }, index) => {
+          if (result === undefined) chunk[index].reject(new Error(error ?? 'svg-recolor: no result'))
+          else chunk[index].resolve(result)
+        }),
+        error => chunk.forEach(item => item.reject(error)),
+      )
+    }
+  }
+}
+
 async function recolorSvgOnce(url: string, options: RecolorOptions): Promise<string> {
   const { batch, startedAt } = startRecolorTiming(url)
   let failed = true
@@ -331,7 +372,7 @@ async function recolorSvgOnce(url: string, options: RecolorOptions): Promise<str
       return svgText
     }
 
-    const result = await workerPool.process(svgText, workerOptions(options))
+    const result = await convertInBatch(workerPool, svgText, workerOptions(options))
     failed = false
     return result
   } finally {
