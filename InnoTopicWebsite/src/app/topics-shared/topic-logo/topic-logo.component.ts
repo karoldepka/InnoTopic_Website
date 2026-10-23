@@ -99,14 +99,19 @@ export const defaultIconHeight = 18
       transition: opacity 0s linear var(--logo-hover-fade, 250ms);
     }
 
+    /* Hovered, or highlighted by the topic search (on the logo itself or its topic tag): original colors. */
     :host(:hover) .topic-logo-original,
-    :host-context(app-topic-tag:hover) .topic-logo-original {
+    :host-context(app-topic-tag:hover) .topic-logo-original,
+    :host(.topic-search--match) .topic-logo-original,
+    :host-context(app-topic-tag.topic-search--match) .topic-logo-original {
       opacity: 1;
       transition-delay: 0s;
     }
 
     :host(:hover) .topic-logo-recolored,
-    :host-context(app-topic-tag:hover) .topic-logo-recolored {
+    :host-context(app-topic-tag:hover) .topic-logo-recolored,
+    :host(.topic-search--match) .topic-logo-recolored,
+    :host-context(app-topic-tag.topic-search--match) .topic-logo-recolored {
       opacity: 0;
     }
 
