@@ -2,6 +2,7 @@ import type { LanguageModel } from 'ai';
 import { createOpenAI } from '@ai-sdk/openai';
 import { createAnthropic } from '@ai-sdk/anthropic';
 import { createAmazonBedrock } from '@ai-sdk/amazon-bedrock';
+import { fromNodeProviderChain } from '@aws-sdk/credential-providers';
 
 // Common facade over every supported LLM provider. Routes only ever import `llm` and
 // `MODEL_NAME` from here, so switching providers is purely an env-var change:
@@ -49,13 +50,18 @@ const providers: Record<AiProviderId, AiProvider> = {
   },
 
   // Amazon Bedrock foundation models (Anthropic, Amazon Nova, Meta Llama, Mistral, ...) via the
-  // Converse API. AWS_REGION plus either AWS_BEARER_TOKEN_BEDROCK (a Bedrock API key) or
-  // AWS_ACCESS_KEY_ID / AWS_SECRET_ACCESS_KEY (/ AWS_SESSION_TOKEN) - the provider reads all of
-  // these from the environment itself. No default model: Bedrock IDs are account/region specific
-  // (e.g. cross-region inference profiles like "us.anthropic...."), so AI_MODEL must name one
-  // that is enabled in your account.
+  // Converse API. AWS_REGION, plus credentials:
+  // - AWS_BEARER_TOKEN_BEDROCK (a Bedrock API key), if set, takes precedence - but some AWS
+  //   Organizations deny bearer tokens via an SCP (bedrock:CallWithBearerToken), so
+  // - otherwise, the standard AWS SDK credential chain: AWS_ACCESS_KEY_ID / AWS_SECRET_ACCESS_KEY
+  //   env vars, then the `aws login` / SSO session or ~/.aws profile (AWS_PROFILE picks one), then
+  //   container/instance roles. Session credentials are refreshed by the chain as they expire.
+  // No default model: Bedrock IDs are account/region specific (e.g. cross-region inference
+  // profiles like "us.anthropic...."), so AI_MODEL must name one enabled in your account.
   bedrock: {
-    createModel: modelId => createAmazonBedrock()(modelId),
+    createModel: modelId => createAmazonBedrock(
+      process.env['AWS_BEARER_TOKEN_BEDROCK'] ? {} : { credentialProvider: fromNodeProviderChain() },
+    )(modelId),
   },
 };
 

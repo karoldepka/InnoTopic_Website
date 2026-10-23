@@ -585,6 +585,9 @@ importers:
       '@ai-sdk/openai':
         specifier: ^3.0.86
         version: 3.0.90(zod@4.4.3)
+      '@aws-sdk/credential-providers':
+        specifier: ^3.1155.0
+        version: 3.1155.0
       '@hono/node-server':
         specifier: ^1.13.7
         version: 1.19.17(hono@4.12.33)

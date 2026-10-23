@@ -12,6 +12,7 @@
     "@ai-sdk/amazon-bedrock": "^4.0.201",
     "@ai-sdk/anthropic": "^3.0.96",
     "@ai-sdk/openai": "^3.0.86",
+    "@aws-sdk/credential-providers": "^3.1155.0",
     "@hono/node-server": "^1.13.7",
     "@opentelemetry/api-logs": "^0.219.0",
     "@tavily/core": "^0.4.0",
