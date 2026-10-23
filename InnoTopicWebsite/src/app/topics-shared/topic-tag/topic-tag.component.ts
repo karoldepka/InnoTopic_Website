@@ -75,9 +75,10 @@ import { TopicSearchService } from '../topic-search.service';
     }
 
     :host(.topic-search--match) .angular-topic-tag {
-      /* Room for the ring without shifting the surrounding layout. */
-      padding: 0 4px;
-      margin: 0 -4px;
+      /* Room for the ring without shifting the surrounding layout; the vertical padding keeps the
+         skill-level icon, which hangs slightly below the tag, inside the ring. */
+      padding: 3px 4px;
+      margin: -3px -4px;
       border-radius: 6px;
       box-shadow:
         0 0 0 2px var(--ion-background-color, #fff),
