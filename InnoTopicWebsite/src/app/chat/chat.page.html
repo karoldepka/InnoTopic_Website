@@ -3,7 +3,7 @@
     <ion-buttons slot="start">
       <ion-back-button defaultHref="/karol-depka"></ion-back-button>
     </ion-buttons>
-    <ion-title>InnoTopic AI Assistant</ion-title>
+    <ion-title>Ask about Karol's CV</ion-title>
   </ion-toolbar>
 </ion-header>
 
@@ -14,8 +14,13 @@
     <div class="chat-messages" #chatContent>
       <div class="welcome-box" *ngIf="chat.messages.length === 0">
         <ion-icon name="chatbubbles-outline" class="welcome-icon"></ion-icon>
-        <h2>Welcome to InnoTopic AI</h2>
-        <p>Ask me anything about wisdom, strength, or design projects!</p>
+        <h2>Ask about Karol's CV</h2>
+        <p>Experience, projects, technologies, languages: answered from the CV by Claude on Amazon Bedrock.</p>
+        <div class="example-questions">
+          @for (question of exampleQuestions; track question) {
+            <button type="button" class="example-question" (click)="askExample(question)">{{ question }}</button>
+          }
+        </div>
       </div>
 
       @for (message of chat.messages; track message.id) {
@@ -29,7 +34,7 @@
       }
 
       <!-- Loading / Streaming Indicator -->
-      <div *ngIf="chat.status === 'streaming'" class="typing-indicator-wrapper">
+      <div *ngIf="busy" class="typing-indicator-wrapper">
         <div class="typing-indicator">
           <span></span><span></span><span></span>
         </div>
@@ -52,13 +57,13 @@
           rows="1"
           class="chat-input-textarea"
           (keydown.enter)="$event.preventDefault(); sendMessage()"
-          [disabled]="chat.status === 'streaming'"
+          [disabled]="busy"
         ></ion-textarea>
-        
-        <ion-button 
-          type="submit" 
-          color="tertiary" 
-          [disabled]="chat.status === 'streaming' || !inputMessage().trim()"
+
+        <ion-button
+          type="submit"
+          color="tertiary"
+          [disabled]="busy || !inputMessage().trim()"
           class="send-btn"
         >
           <ion-icon name="send" slot="icon-only"></ion-icon>

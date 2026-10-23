@@ -11,10 +11,10 @@ import { TextStreamChatTransport, UIMessage } from 'ai';
 export class ChatPage implements AfterViewChecked {
   @ViewChild('chatContent', { read: ElementRef }) private chatContent!: ElementRef;
 
-  // Initialize the Chat instance with a TextStreamChatTransport
+  // Questions about the CV, answered by Claude on Amazon Bedrock (api/cv-chat.ts), streamed as plain text
   public chat = new Chat({
     transport: new TextStreamChatTransport({
-      api: '/ai-api/chat',
+      api: '/api/cv-chat',
     }),
     onError: (error) => {
       console.error('AI Chat Error:', error);
@@ -23,6 +23,13 @@ export class ChatPage implements AfterViewChecked {
 
   // Signal to handle local input message state
   public inputMessage = signal('');
+
+  public readonly exampleQuestions = [
+    'What does Karol work on currently?',
+    'How much experience does Karol have with Angular?',
+    'Has Karol built anything with Amazon Bedrock or other LLMs?',
+    'Which languages does Karol speak?',
+  ];
 
   private shouldScroll = false;
 
@@ -33,13 +40,23 @@ export class ChatPage implements AfterViewChecked {
     }
   }
 
+  /** Waiting for the answer to start (the model reads the CV and thinks first) or streaming it. */
+  public get busy(): boolean {
+    return this.chat.status === 'submitted' || this.chat.status === 'streaming';
+  }
+
+  public askExample(question: string) {
+    this.inputMessage.set(question);
+    this.sendMessage();
+  }
+
   public sendMessage(event?: Event) {
     if (event) {
       event.preventDefault();
     }
 
     const content = this.inputMessage().trim();
-    if (!content || this.chat.status === 'streaming') {
+    if (!content || this.busy) {
       return;
     }
 
