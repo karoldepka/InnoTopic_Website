@@ -2117,6 +2117,11 @@ export const topicsDataExtended: Partial<Record<keyof Topics, TopicExtendedInfo>
     description: 'An agent breaks a request into steps, calls your APIs (action groups backed by Lambda or an OpenAPI schema) and searches Bedrock Knowledge Bases (RAG), with AWS running the orchestration loop, session memory and guardrails.',
     whenFirstReleased: '2023',
   },
+  'Amazon CloudWatch': {
+    tagline: "AWS's monitoring and observability service: metrics, logs, alarms and dashboards.",
+    description: 'Collects metrics and logs from AWS services and your own applications; alarms can notify or trigger scaling, and Logs Insights queries, dashboards and Application Signals (traces) help find what went wrong.',
+    whenFirstReleased: '2009',
+  },
   'Amazon Bedrock AgentCore': {
     tagline: "AWS's platform for running AI agents in production, built with any framework or model.",
     description: 'Provides the agent infrastructure as managed services (a serverless runtime with session isolation, memory, a gateway that turns APIs into MCP tools, identity, a code interpreter and browser, and observability), whether the agent uses LangGraph, CrewAI, Strands or another framework.',

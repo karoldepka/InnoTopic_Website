@@ -756,6 +756,7 @@ export class Monitoring_and_observability {
   'Dynatrace' = t('dynatrace-icon')
   'Sentry' = tWide('sentry-icon.svg')
   OpenTelemetry = t('opentelemetry-icon.svg')
+  'Amazon CloudWatch' = tSquare('aws-cloudwatch.svg')
   Langfuse = tNoIcon() // LLM observability & tracing platform
 }
 
