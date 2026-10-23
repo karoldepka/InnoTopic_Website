@@ -9,6 +9,7 @@
     "test": "vitest run"
   },
   "dependencies": {
+    "@ai-sdk/amazon-bedrock": "^4.0.201",
     "@ai-sdk/anthropic": "^3.0.96",
     "@ai-sdk/openai": "^3.0.86",
     "@hono/node-server": "^1.13.7",

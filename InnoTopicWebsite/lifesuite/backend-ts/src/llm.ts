@@ -1,37 +1,83 @@
+import type { LanguageModel } from 'ai';
 import { createOpenAI } from '@ai-sdk/openai';
 import { createAnthropic } from '@ai-sdk/anthropic';
+import { createAmazonBedrock } from '@ai-sdk/amazon-bedrock';
 
-// Anthropic's real API, called directly (not through an OpenAI-compatible proxy) - takes
-// priority when ANTHROPIC_API_KEY is set, regardless of what AI_API_BASE_URL/AI_API_KEY below
-// are pointed at, so switching providers is a matter of setting/unsetting one env var rather
-// than commenting different blocks in/out. createAnthropic() defaults apiKey to this same env
-// var itself, but reading it here first is what lets the ternary below decide which provider to
-// use at all.
-const anthropicApiKey = process.env['ANTHROPIC_API_KEY'];
-
-const anthropicProvider = anthropicApiKey ? createAnthropic({ apiKey: anthropicApiKey }) : undefined;
-
-// Supports any OpenAI-compatible endpoint (local proxy, Ollama, Sub2API, etc.)
-// For Anthropic proxies set AI_API_BASE_URL=http://localhost:8080/v1
-// and AI_API_KEY=<ANTHROPIC_AUTH_TOKEN value>.
-const openaiCompatProvider = createOpenAI({
-  baseURL: process.env['AI_API_BASE_URL'] ?? 'http://localhost:11434/v1',
-  apiKey: process.env['AI_API_KEY'] ?? 'ollama',
-});
-
-export const MODEL_NAME = process.env['AI_MODEL'] ?? (anthropicProvider ? 'claude-haiku-4-5-20251001' : 'llama3.2');
-
-// Anthropic's own SDK targets its Messages API directly - no Chat-Completions-vs-Responses-API
-// ambiguity to route around (see the Chat Completions comment below), so the bare call is fine
-// here.
+// Common facade over every supported LLM provider. Routes only ever import `llm` and
+// `MODEL_NAME` from here, so switching providers is purely an env-var change:
 //
-// For the OpenAI-compatible path: .chat(), not the bare openaiCompatProvider(modelId) - since AI
-// SDK 5, that shorthand calls the newer Responses API by default (POSTs expecting a `{ output:
-// [{ id, ... }] }` response). Ollama and Anthropic-proxy setups (this file's two documented
-// AI_API_BASE_URL targets, see the comment above) only implement the older Chat Completions API,
-// so the SDK's response parsing failed validation at output[0].id - confirmed live via the exact
-// error every "Get AI advice" call was producing. (A Sub2API "group" whose *own* upstream is the
-// newer Responses API - as opposed to being proxied through Sub2API at all - would need the bare
-// call instead; that's a property of the specific proxy/group, not something this file can detect,
-// so it isn't handled generically here.)
-export const llm = anthropicProvider ? anthropicProvider(MODEL_NAME) : openaiCompatProvider.chat(MODEL_NAME);
+//   AI_PROVIDER=openai-compatible | anthropic | bedrock   (optional - see resolveProviderId())
+//   AI_MODEL=<model id for that provider>                (optional except for bedrock)
+//
+// Each provider's own credentials/endpoint come from its usual env vars, documented per entry.
+
+export type AiProviderId = 'openai-compatible' | 'anthropic' | 'bedrock';
+
+interface AiProvider {
+  defaultModel?: string;
+  createModel(modelId: string): LanguageModel;
+}
+
+const providers: Record<AiProviderId, AiProvider> = {
+  // Any OpenAI-compatible endpoint (local proxy, Ollama, Sub2API, etc.):
+  // AI_API_BASE_URL (default: local Ollama) + AI_API_KEY.
+  // For Anthropic proxies set AI_API_BASE_URL=http://localhost:8080/v1
+  // and AI_API_KEY=<ANTHROPIC_AUTH_TOKEN value>.
+  //
+  // .chat(), not the bare provider(modelId) - since AI SDK 5, that shorthand calls the newer
+  // Responses API by default (POSTs expecting a `{ output: [{ id, ... }] }` response). Ollama and
+  // Anthropic-proxy setups (this entry's two documented AI_API_BASE_URL targets) only implement
+  // the older Chat Completions API, so the SDK's response parsing failed validation at
+  // output[0].id - confirmed live via the exact error every "Get AI advice" call was producing. (A
+  // Sub2API "group" whose *own* upstream is the newer Responses API - as opposed to being proxied
+  // through Sub2API at all - would need the bare call instead; that's a property of the specific
+  // proxy/group, not something this file can detect, so it isn't handled generically here.)
+  'openai-compatible': {
+    defaultModel: 'llama3.2',
+    createModel: modelId => createOpenAI({
+      baseURL: process.env['AI_API_BASE_URL'] ?? 'http://localhost:11434/v1',
+      apiKey: process.env['AI_API_KEY'] ?? 'ollama',
+    }).chat(modelId),
+  },
+
+  // Anthropic's real API, called directly (not through an OpenAI-compatible proxy):
+  // ANTHROPIC_API_KEY. Its Messages API has no Chat-Completions-vs-Responses ambiguity, so the
+  // bare call is fine.
+  anthropic: {
+    defaultModel: 'claude-haiku-4-5-20251001',
+    createModel: modelId => createAnthropic({ apiKey: process.env['ANTHROPIC_API_KEY'] })(modelId),
+  },
+
+  // Amazon Bedrock foundation models (Anthropic, Amazon Nova, Meta Llama, Mistral, ...) via the
+  // Converse API. AWS_REGION plus either AWS_BEARER_TOKEN_BEDROCK (a Bedrock API key) or
+  // AWS_ACCESS_KEY_ID / AWS_SECRET_ACCESS_KEY (/ AWS_SESSION_TOKEN) - the provider reads all of
+  // these from the environment itself. No default model: Bedrock IDs are account/region specific
+  // (e.g. cross-region inference profiles like "us.anthropic...."), so AI_MODEL must name one
+  // that is enabled in your account.
+  bedrock: {
+    createModel: modelId => createAmazonBedrock()(modelId),
+  },
+};
+
+/** An explicit AI_PROVIDER wins. Otherwise keep the historical behaviour: a set
+ * ANTHROPIC_API_KEY means Anthropic directly, anything else the OpenAI-compatible endpoint. */
+function resolveProviderId(): AiProviderId {
+  const requested = process.env['AI_PROVIDER']?.trim().toLowerCase();
+  if (requested) {
+    if (requested in providers) return requested as AiProviderId;
+    throw new Error(`Unknown AI_PROVIDER "${requested}" - expected one of: ${Object.keys(providers).join(', ')}`);
+  }
+  return process.env['ANTHROPIC_API_KEY'] ? 'anthropic' : 'openai-compatible';
+}
+
+export const AI_PROVIDER: AiProviderId = resolveProviderId();
+
+const provider = providers[AI_PROVIDER];
+
+export const MODEL_NAME: string = (() => {
+  const modelName = process.env['AI_MODEL'] ?? provider.defaultModel;
+  if (!modelName) throw new Error(`AI_MODEL must be set when AI_PROVIDER=${AI_PROVIDER}`);
+  return modelName;
+})();
+
+export const llm: LanguageModel = provider.createModel(MODEL_NAME);
