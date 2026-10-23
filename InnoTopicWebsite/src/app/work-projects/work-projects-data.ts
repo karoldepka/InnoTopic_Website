@@ -50,7 +50,7 @@ export class WorkOrganisationsAndProjectsData {
   // Tokio, Clap, Diesel, LaunchDarkly, Amazon RDS
   // Rust Rover. C# jetbrains thingy - JetBrains Rider, dotMemory, dotTrace, dotCover, Resharper, dotPeek.
   // Serde, Serde JSON
-  // Bedrock, Gradio, Qdrant, AutoGen
+  // Gradio, Qdrant, AutoGen
   // Azure (for GPT4)
   // TerraForm CDK
   'Rithum' = org({
@@ -102,6 +102,13 @@ export class WorkOrganisationsAndProjectsData {
           'Kubernetes': {},
           'Elasticsearch': {},
           'AWS': {},
+          'Amazon Bedrock': {},
+          'Amazon Bedrock Agents': {},
+          'LangChain': {},
+          'LangGraph': {},
+
+          // 'Amazon Bedrock AgentCore': {},
+          'Amazon CloudWatch': {},
           // 'Trello': {},
           'WebStorm': {},
           // 'PyCharm': {},
@@ -148,6 +155,8 @@ export class WorkOrganisationsAndProjectsData {
           'DynamoDB': {},
           'MongoDB': {},
           'AWS': {},
+          'Amazon CloudWatch': {},
+
           // 'Trello': {},
           'WebStorm': {},
           // 'PyCharm': {},
@@ -230,6 +239,7 @@ export class WorkOrganisationsAndProjectsData {
           'Kubernetes': {},
           'Elasticsearch': {},
           'AWS': {},
+          'Amazon CloudWatch': {},
           // 'Trello': {},
           'WebStorm': {},
           // 'PyCharm': {},
@@ -410,6 +420,9 @@ export class WorkOrganisationsAndProjectsData {
         topicsById: {
           'Angular': {},
           'Ollama': {},
+          'OpenTelemetry': {},
+          'LangChain': {},
+          'LangGraph': {},
           // TODO: 'Nitro': {},
         }
       }),
