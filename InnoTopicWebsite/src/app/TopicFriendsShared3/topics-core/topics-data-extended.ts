@@ -2117,6 +2117,16 @@ export const topicsDataExtended: Partial<Record<keyof Topics, TopicExtendedInfo>
     description: 'An agent breaks a request into steps, calls your APIs (action groups backed by Lambda or an OpenAPI schema) and searches Bedrock Knowledge Bases (RAG), with AWS running the orchestration loop, session memory and guardrails.',
     whenFirstReleased: '2023',
   },
+  OpenTelemetry: {
+    tagline: 'The open, vendor-neutral standard for traces, metrics and logs.',
+    description: 'A CNCF project (APIs, SDKs and the Collector) for instrumenting code once and sending its telemetry to any backend, such as Jaeger, Prometheus, Datadog, CloudWatch or Langfuse; its GenAI conventions also cover LLM calls and agents.',
+    whenFirstReleased: '2019',
+  },
+  LangGraph: {
+    tagline: "LangChain's framework for building stateful AI agents as graphs.",
+    description: 'Models an agent as a graph of steps (LLM calls, tools, other agents) over shared state, so loops, branching, human-in-the-loop interrupts and checkpointed, resumable runs are explicit; usable with or without LangChain.',
+    whenFirstReleased: '2024',
+  },
   'Amazon CloudWatch': {
     tagline: "AWS's monitoring and observability service: metrics, logs, alarms and dashboards.",
     description: 'Collects metrics and logs from AWS services and your own applications; alarms can notify or trigger scaling, and Logs Insights queries, dashboards and Application Signals (traces) help find what went wrong.',

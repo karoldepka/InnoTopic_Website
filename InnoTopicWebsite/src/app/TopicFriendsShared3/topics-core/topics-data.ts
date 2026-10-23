@@ -1030,7 +1030,7 @@ export class AI {
   Firecrawl = tNoIcon() // web scraping/crawling for LLM pipelines
   Mem0 = tNoIcon() // long-term memory layer for AI agents
   Zep = tNoIcon() // memory/context store for AI agents
-  LangGraph = tNoIcon() // LangChain's agent/state-graph orchestration
+  LangGraph = tSquare('langgraph.svg') // LangChain's agent/state-graph orchestration; Simple Icons mark
   'Guardrails AI' = tNoIcon() // output validation/guardrails framework
   'NeMo Guardrails' = tNoIcon() // NVIDIA's LLM guardrails toolkit
 
