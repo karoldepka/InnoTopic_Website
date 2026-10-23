@@ -537,6 +537,10 @@ export class WorkOrganisationsAndProjectsData {
           'Affinity Designer': {},
           Docker: {},
           "Hexagonal Architecture": {},
+          LangGraph: {},
+          LangChain: {},
+          "Amazon Bedrock": {},
+          OpenAI: {},
         }
       },
       'CloudTime': {
