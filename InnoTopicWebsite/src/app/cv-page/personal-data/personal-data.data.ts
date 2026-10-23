@@ -3,7 +3,7 @@ export interface InfoItem {
   value: string;
 }
 
-/** Shown in the CV header and given to the CV chat (see scripts/generate-cv-context.mjs). */
+/** Shown in the CV header and given to the CV chat (see scripts/generate-api-data.mjs). */
 export const personalDataItems: InfoItem[] = [
   { label: 'First Name', value: 'Karol' },
   { label: 'Last Name', value: 'Depka Pradzinski' },

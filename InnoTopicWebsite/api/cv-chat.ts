@@ -9,7 +9,7 @@
  * - BEDROCK_AWS_REGION (default: AWS_REGION, then us-east-1).
  * - BEDROCK_MODEL (default: anthropic.claude-opus-5-5).
  *
- * The CV itself comes from api/_cv-context.ts; regenerate it with `pnpm cv-context`.
+ * The CV itself comes from api/_cv-context.ts; regenerate it with `pnpm api-data`.
  */
 import Anthropic from '@anthropic-ai/sdk';
 import { AnthropicBedrockMantle } from '@anthropic-ai/bedrock-sdk';

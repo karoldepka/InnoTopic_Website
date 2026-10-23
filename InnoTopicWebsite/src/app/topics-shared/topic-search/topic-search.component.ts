@@ -19,7 +19,8 @@ const MATCH_SELECTOR = '.topic-search--match, .node--search-match';
  * Search box for the page's topics: matching topics are highlighted and all others muted (see
  * TopicSearchService). Ctrl+Alt+F focuses it from anywhere; Enter / Shift+Enter scroll to the
  * next / previous match; Escape clears it; the Aa toggle (Ctrl+Alt+M) matches case, the .* toggle
- * (Ctrl+Alt+R) switches to regex matching.
+ * (Ctrl+Alt+R) switches to regex matching, and the AI toggle (Ctrl+Alt+I) adds the topics related
+ * by meaning ("databases", "java ecosystem").
  */
 @Component({
   selector: 'app-topic-search',
@@ -30,9 +31,9 @@ const MATCH_SELECTOR = '.topic-search--match, .node--search-match';
       <input
         #input
         type="search"
-        [placeholder]="search.regex() ? 'Search topics (regex)…' : 'Search topics…'"
-        aria-label="Search topics (Ctrl+Alt+F); Enter jumps to the next match; Ctrl+Alt+M toggles match case, Ctrl+Alt+R regex"
-        aria-keyshortcuts="Control+Alt+F Control+Alt+M Control+Alt+R"
+        [placeholder]="search.semantic() ? 'Search topics by meaning, e.g. “databases”…' : search.regex() ? 'Search topics (regex)…' : 'Search topics…'"
+        aria-label="Search topics (Ctrl+Alt+F); Enter jumps to the next match; Ctrl+Alt+M toggles match case, Ctrl+Alt+R regex, Ctrl+Alt+I semantic search"
+        aria-keyshortcuts="Control+Alt+F Control+Alt+M Control+Alt+R Control+Alt+I"
         autocomplete="off"
         spellcheck="false"
         [value]="search.query()"
@@ -46,6 +47,11 @@ const MATCH_SELECTOR = '.topic-search--match, .node--search-match';
       } @else if (search.active()) {
         <span class="topic-search-count" aria-live="polite">
           {{ matchCount() === 0 ? 'No matches' : (current() ? current() + ' / ' : '') + matchCount() + (matchCount() === 1 ? ' match' : ' matches') }}
+          @if (search.semanticStatus() === 'loading') {
+            · finding related…
+          } @else if (search.semanticStatus() === 'error') {
+            · related unavailable
+          }
         </span>
       } @else {
         <kbd class="topic-search-hint" aria-hidden="true">Ctrl+Alt+F</kbd>
@@ -68,6 +74,16 @@ const MATCH_SELECTOR = '.topic-search--match, .node--search-match';
         title="Regular expression (Ctrl+Alt+R)"
         (click)="toggleRegex()"
       >.*</button>
+      <button
+        type="button"
+        class="topic-search-toggle"
+        [class.topic-search-toggle--on]="search.semantic()"
+        [class.topic-search-toggle--busy]="search.semanticStatus() === 'loading'"
+        [attr.aria-pressed]="search.semantic()"
+        aria-label="Semantic search"
+        title="Semantic search: also finds related topics, e.g. “java ecosystem” (Ctrl+Alt+I)"
+        (click)="toggleSemantic()"
+      >AI</button>
       @if (search.query()) {
         <button type="button" class="topic-search-clear" aria-label="Clear search" (click)="clear()">×</button>
       }
@@ -109,7 +125,8 @@ const MATCH_SELECTOR = '.topic-search--match, .node--search-match';
 
     input {
       flex: 1;
-      min-width: 0;
+      /* On phones the status text gives way (ellipsis) before the query does. */
+      min-width: 6em;
       padding: 4px 0;
       border: 0;
       outline: 0;
@@ -133,6 +150,12 @@ const MATCH_SELECTOR = '.topic-search--match, .node--search-match';
       font-size: 12px;
       white-space: nowrap;
       opacity: 0.7;
+    }
+
+    .topic-search-count {
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
     .topic-search-hint {
@@ -168,6 +191,22 @@ const MATCH_SELECTOR = '.topic-search--match, .node--search-match';
       border-color: currentColor;
       background: color-mix(in srgb, currentColor 14%, transparent);
       opacity: 1;
+    }
+
+    /* The semantic search is looking up related topics (also said by the count, when it fits). */
+    .topic-search-toggle--busy {
+      animation: topic-search-busy 1s ease-in-out infinite alternate;
+    }
+
+    @keyframes topic-search-busy {
+      to { opacity: 0.35; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .topic-search-toggle--busy {
+        animation: none;
+        border-style: dashed;
+      }
     }
 
     .topic-search-clear {
@@ -218,16 +257,24 @@ export class TopicSearchComponent {
       event.preventDefault();
       this.input().nativeElement.focus();
       this.input().nativeElement.select();
-    } else if (isShortcut(event, 'R') || isShortcut(event, 'M')) {
+    } else if (isShortcut(event, 'R') || isShortcut(event, 'M') || isShortcut(event, 'I')) {
       event.preventDefault();
       if (event.code === 'KeyR') this.toggleRegex();
+      else if (event.code === 'KeyI') this.toggleSemantic();
       else this.toggleCaseSensitive();
       this.input().nativeElement.focus();
     }
   }
 
+  /** Regex and semantic search are alternative ways to read the query: turning one on turns the other off. */
   protected toggleRegex() {
     this.search.regex.update(regex => !regex);
+    if (this.search.regex()) this.search.semantic.set(false);
+  }
+
+  protected toggleSemantic() {
+    this.search.semantic.update(semantic => !semantic);
+    if (this.search.semantic()) this.search.regex.set(false);
   }
 
   protected toggleCaseSensitive() {

@@ -6,10 +6,10 @@
   "scripts": {
     "ng": "ng",
     "start": "ng serve --port 42014",
-    "prebuild": "node scripts/generate-logo-sizes.mjs && node scripts/generate-cv-context.mjs",
+    "prebuild": "node scripts/generate-logo-sizes.mjs && node scripts/generate-api-data.mjs",
     "build": "ng build",
     "logo-sizes": "node scripts/generate-logo-sizes.mjs",
-    "cv-context": "node scripts/generate-cv-context.mjs",
+    "api-data": "node scripts/generate-api-data.mjs",
     "dev-api": "node scripts/dev-api.mjs",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",

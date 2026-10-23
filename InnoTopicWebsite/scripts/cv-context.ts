@@ -1,6 +1,6 @@
 /**
  * Renders the CV page's data as Markdown for the CV chat's system prompt. Bundled and run by
- * generate-cv-context.mjs, which writes the result to api/_cv-context.ts.
+ * generate-api-data.mjs, which writes the result to api/_cv-context.ts.
  */
 import { personalDataItems } from '../src/app/cv-page/personal-data/personal-data.data';
 import { LanguageExperiences } from '../src/app/skills/language-experience-data';
