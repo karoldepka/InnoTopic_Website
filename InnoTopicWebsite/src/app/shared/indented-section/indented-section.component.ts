@@ -1,4 +1,5 @@
 import { ChangeDetectionStrategy, Component, ElementRef, input, signal, viewChild } from '@angular/core';
+import { AnchorLinkComponent } from '../anchors/anchors';
 
 let nextId = 0;
 
@@ -31,6 +32,9 @@ let nextId = 0;
         <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4 6l4 4 4-4" /></svg>
       </button>
       <div class="header" #header tabindex="-1"><ng-content select="[section-header]" /></div>
+      @if (anchor(); as anchor) {
+        <app-anchor-link [anchor]="anchor" [label]="label()" />
+      }
     </div>
     <div class="collapse" [class.collapse--collapsed]="collapsed()">
       <div class="collapse-inner" [id]="bodyId" [attr.inert]="collapsed() ? '' : null">
@@ -48,11 +52,19 @@ let nextId = 0;
     </div>
   `,
   styleUrl: './indented-section.component.scss',
+  imports: [AnchorLinkComponent],
+  host: {
+    // A `#` anchor when given one: the section's id, and a link to it beside the header.
+    '[attr.id]': 'anchor() || null',
+    '[attr.data-anchor]': "anchor() ? '' : null",
+  },
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class IndentedSectionComponent {
   /** Names the section for the knob's and the line's labels ("Collapse Rithum", "Back to Rithum"). */
   readonly label = input.required<string>();
+  /** The section's `#` anchor (its id), e.g. "organisation-rithum"; none by default. */
+  readonly anchor = input<string>();
   protected readonly collapsed = signal(false);
   protected readonly bodyId = `indented-section-${nextId++}`;
   private readonly header = viewChild.required<ElementRef<HTMLElement>>('header');

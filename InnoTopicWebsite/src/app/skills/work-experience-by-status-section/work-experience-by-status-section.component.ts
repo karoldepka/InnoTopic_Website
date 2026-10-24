@@ -7,6 +7,7 @@ import { CommonModule } from '@angular/common';
 import { WorkExperienceListComponent } from '../work-experience-list/work-experience-list.component';
 import { WorkExperienceByStatus } from '../work-experience';
 import { IndentedSectionComponent } from '../../shared/indented-section/indented-section.component';
+import { slugify } from '../../shared/anchors/anchors';
 
 /** status: mode / approach / intent(ions) */
 @Component({
@@ -19,6 +20,8 @@ import { IndentedSectionComponent } from '../../shared/indented-section/indented
 export class WorkExperienceByStatusSectionComponent implements OnInit {
 
   @Input() experience!: WorkExperienceByStatus
+
+  protected readonly slugify = slugify
 
   constructor() { }
 

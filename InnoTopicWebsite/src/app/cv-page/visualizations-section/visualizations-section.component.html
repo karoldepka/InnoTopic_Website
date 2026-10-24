@@ -1,4 +1,4 @@
-<div class="container">
+<div class="container" appAnchor="interactive-visualizations">
   <app-three-d-text text="Interactive Visualizations" />
 
   <p class="visualizations-intro">
@@ -6,9 +6,9 @@
     switch between 2D and 3D, click any part or logo for details, or walk through the loop.
   </p>
 
-  <section class="visualization">
+  <section class="visualization" appAnchor="visualization-how-agentic-ai-works">
     <header class="visualization-header">
-      <h2>How agentic AI works</h2>
+      <h2>How agentic AI works <app-anchor-link anchor="visualization-how-agentic-ai-works" label="How agentic AI works" /></h2>
       <a class="visualization-open" [routerLink]="agenticAiPath">Open full version</a>
     </header>
     <p class="visualization-description">
@@ -36,9 +36,9 @@
     }
   </section>
 
-  <section class="visualization">
+  <section class="visualization" appAnchor="visualization-ai-architectures-in-3d">
     <header class="visualization-header">
-      <h2>AI architectures in 3D</h2>
+      <h2>AI architectures in 3D <app-anchor-link anchor="visualization-ai-architectures-in-3d" label="AI architectures in 3D" /></h2>
       <span class="visualization-links">
         <a [routerLink]="routes.rag">Open RAG view</a>
         <a [routerLink]="routes.agentic">Open agentic AI view</a>
@@ -76,8 +76,8 @@
     }
   </section>
 
-  <section class="visualizations-more">
-    <h3>More on this site</h3>
+  <section class="visualizations-more" appAnchor="more-on-this-site">
+    <h3>More on this site <app-anchor-link anchor="more-on-this-site" label="More on this site" /></h3>
     <ul>
       <li>
         <strong>Technology graph</strong> (above): a D3.js force-directed graph of the technologies I work with;

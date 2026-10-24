@@ -10,6 +10,7 @@ import {
   HashtagReplacerComponent,
 } from '../../../topics-shared/hashtag-replacer/hashtag-replacer.component';
 import { WorkExperienceListComponent } from '../../../skills/work-experience-list/work-experience-list.component';
+import { AnchorLinkComponent, slugify } from '../../../shared/anchors/anchors';
 
 import { faLaptop } from '@fortawesome/free-solid-svg-icons'
 import { IconDefinition } from '@fortawesome/fontawesome-svg-core';
@@ -17,9 +18,14 @@ import { IconDefinition } from '@fortawesome/fontawesome-svg-core';
 @Component({
   selector: 'app-work-project',
   standalone: true,
-  imports: [CommonModule, FontAwesomeModule, HashtagReplacerComponent, WorkExperienceListComponent],
+  imports: [CommonModule, FontAwesomeModule, HashtagReplacerComponent, WorkExperienceListComponent, AnchorLinkComponent],
   templateUrl: './work-project.component.html',
-  styleUrls: ['./work-project.component.sass']
+  styleUrls: ['./work-project.component.sass'],
+  host: {
+    // Each project is a `#` anchor (see AnchorDirective).
+    '[attr.id]': 'anchor',
+    '[attr.data-anchor]': "''",
+  },
 })
 export class WorkProjectComponent implements OnInit {
 
@@ -28,6 +34,10 @@ export class WorkProjectComponent implements OnInit {
   @Input() project!: any
 
   @Input() projectTitle!: string
+
+  get anchor(): string {
+    return 'project-' + slugify(this.projectTitle ?? '')
+  }
 
   get projectDescriptionWithTopicTags(): string {
     return this.addTopicHashTags(this.project?.description ?? '')

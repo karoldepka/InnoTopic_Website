@@ -9,6 +9,7 @@ import {
 import { ThreeDTextComponent } from '../../shared/threed-text/threed-text.component';
 import { PrintService } from '../../TopicFriendsShared3/topics-core/print.service';
 import { TopicTagComponent } from '../../topics-shared/topic-tag/topic-tag.component';
+import { AnchorDirective, AnchorLinkComponent } from '../../shared/anchors/anchors';
 
 /**
  * CV section showcasing the site's dynamic, interactive visualizations, with a mini version of the
@@ -24,6 +25,8 @@ import { TopicTagComponent } from '../../topics-shared/topic-tag/topic-tag.compo
     RouterLink,
     ThreeDTextComponent,
     TopicTagComponent,
+    AnchorDirective,
+    AnchorLinkComponent,
   ],
   templateUrl: './visualizations-section.component.html',
   styleUrls: ['./visualizations-section.component.sass'],

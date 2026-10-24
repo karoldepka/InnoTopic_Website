@@ -1,4 +1,4 @@
-<app-indented-section [label]="experience.title">
+<app-indented-section [label]="experience.title" [anchor]="'skills-' + slugify(experience.title)">
   <h3 section-header>{{experience.title}} <span class="comment">({{experience.comment}})</span></h3>
 
   <app-work-experience-list

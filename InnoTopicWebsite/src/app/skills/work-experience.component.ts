@@ -16,6 +16,7 @@ import { TopicSkillComponent } from '../topic-skills/topic-skill/topic-skill.com
 import { WorkExperienceByStatusSectionComponent } from './work-experience-by-status-section/work-experience-by-status-section.component';
 import { LanguageSectionComponent } from './language-section/language-section.component';
 import { ThreeDTextComponent } from '../shared/threed-text/threed-text.component';
+import { AnchorDirective } from '../shared/anchors/anchors';
 
 @Component({
   selector: 'app-work-experience',
@@ -29,6 +30,7 @@ import { ThreeDTextComponent } from '../shared/threed-text/threed-text.component
     WorkExperienceByStatusSectionComponent,
     LanguageSectionComponent,
     ThreeDTextComponent,
+    AnchorDirective,
   ],
   templateUrl: './work-experience.component.html',
   styleUrls: ['./work-experience.component.sass']

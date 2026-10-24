@@ -17,6 +17,7 @@ import { defineCustomElements } from '@innotopic/theme-ui/loader';
 import { setSvgCacheVersion, warmUpSvgRecolor } from '@innotopic/topics-ui';
 import { FeatureFlagsService } from './shared/feature-flags/feature-flags.service';
 import { LOGO_FILES_VERSION } from './TopicFriendsShared3/topics-core/logo-files-version';
+import { FragmentScrollService } from './shared/anchors/anchors';
 
 /**
  * @innotopic/theme-ui's store already loads persisted config from localStorage at creation
@@ -44,6 +45,8 @@ function initializeThemeConfig() {
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
     provideHttpClient(),
     provideAppInitializer(() => initializeThemeConfig()),
+    // `#section` links: scroll to the section once it has rendered (see FragmentScrollService).
+    provideAppInitializer(() => inject(FragmentScrollService).start()),
     // Load the icon recoloring workers before the first route requests its (many) icons, and keep
     // the downloaded icons across visits until a logo file changes (`pnpm logo-sizes` re-hashes them).
     provideAppInitializer(() => {

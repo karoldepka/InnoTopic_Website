@@ -3,7 +3,7 @@
   <app-topic-search />
 }
 
-<div class="profile-header">
+<div class="profile-header" appAnchor="profile">
   <div class="container">
 <!--     TODO tagline; T-Shaped / Star-Shaped-->
 
@@ -35,14 +35,14 @@
 <!--</model-viewer>-->
 
 <div class="graph-container">
-  <div class="world-map-print-page">
+  <div class="world-map-print-page" appAnchor="world-map">
     @defer (on idle; on viewport; on timer(4s); when isPrint) {
       <app-world-map />
     } @placeholder {
       <div class="world-map-placeholder" aria-hidden="true"></div>
     }
   </div>
-  <div class="globes">
+  <div class="globes" appAnchor="globes">
     @defer (on idle; on viewport; on timer(4s); when isPrint) {
       <app-globe-switcher />
     } @placeholder {
@@ -53,7 +53,7 @@
 <!--  <app-tech-graph-d3-index1></app-tech-graph-d3-index1>-->
 <!--  <app-tech-graph-d3-index1></app-tech-graph-d3-index1>-->
   <div class="topics-graph-page-break" aria-hidden="true"></div>
-  <div class="topics-graph-print-page">
+  <div class="topics-graph-print-page" appAnchor="topics-graph">
     @defer (on idle; on viewport; on timer(4s); when isPrint) {
       <app-topics-graph />
     } @placeholder {

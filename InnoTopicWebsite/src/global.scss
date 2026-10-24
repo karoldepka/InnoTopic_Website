@@ -68,6 +68,12 @@ html, body {
   display: none;
 }
 
+// Sections reached by a `#` link (appAnchor) stop below the app header and the sticky topic
+// search, which the page scrolls under.
+[data-anchor] {
+  scroll-margin-top: 124px;
+}
+
 @media print {
   ion-header {
     display: none !important;

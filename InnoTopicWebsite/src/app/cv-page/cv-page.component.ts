@@ -13,6 +13,7 @@ import { TopicsGraphComponent } from './topics-graph/topics-graph.component';
 import { TopicSearchComponent } from '../topics-shared/topic-search/topic-search.component';
 import { VisualizationsSectionComponent } from './visualizations-section/visualizations-section.component';
 import { WorldMapComponent } from './world-map/world-map.component';
+import { AnchorDirective } from '../shared/anchors/anchors';
 import { FeatureFlagsPopoverComponent } from '../shared/feature-flags-popover/feature-flags-popover.component';
 
 @Component({
@@ -29,6 +30,7 @@ import { FeatureFlagsPopoverComponent } from '../shared/feature-flags-popover/fe
     WorkExperienceComponent,
     WorkProjectsSectionComponent,
     WorldMapComponent,
+    AnchorDirective,
   ],
   selector: 'app-cv-page',
   templateUrl: './cv-page.component.html',

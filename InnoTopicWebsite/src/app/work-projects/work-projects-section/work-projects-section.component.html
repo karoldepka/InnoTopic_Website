@@ -1,10 +1,10 @@
 
-<div class="container">
+<div class="container" appAnchor="organisations-and-projects">
   <app-three-d-text text="Organisations and Projects"></app-three-d-text>
 
   @for (orgKV of keyValOrdered(organisationsAndProjects); track orgKV.key) {
     <!-- Everything under the organisation, indented beside a collapsible line back to its header. -->
-    <app-indented-section class="organisation" [label]="orgKV.key">
+    <app-indented-section class="organisation" [label]="orgKV.key" [anchor]="'organisation-' + slugify(orgKV.key)">
       <h2 section-header>
         @if (orgKV.value.logoFileName) {
           <img alt="Organization Logo" width=auto height=50 loading="lazy" decoding="async" src="assets/images/clients/{{orgKV.value.logoFileName}}">
