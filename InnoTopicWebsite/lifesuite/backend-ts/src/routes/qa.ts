@@ -1,5 +1,5 @@
 import { Hono } from 'hono';
-import { streamText, generateObject } from 'ai';
+import { streamText, generateObject, generateText } from 'ai';
 import { z } from 'zod';
 import postgres from 'postgres';
 import { llm, MAX_OUTPUT_TOKENS, MODEL_NAME } from '../llm.js';
@@ -7,7 +7,8 @@ import { webSearch } from '../web-search.js';
 import { buildQAMessages } from '../prompts.js';
 import { textStreamResponse, stripJsonFences } from '../utils.js';
 import { logLanguageModelCost, logStreamLanguageModelCost } from '../ai-cost.js';
-import type { QuestionAnswerRequest } from '../types.js';
+import type { CategoryNode, QuestionAnswer, QuestionAnswerRequest } from '../types.js';
+import { extractQuestionItems, mapConcurrently, partitionTreeBySecondLevel } from '../qa-partition.js';
 
 export const qaRouter = new Hono();
 
@@ -72,6 +73,16 @@ async function handleQAStream(c: import('hono').Context) {
   const body = await c.req.json<QuestionAnswerRequest>();
   const query = (body.tree ?? []).map(n => n.title).join(' ');
   const searchResults = body.web_search ? await webSearch(query) : [];
+
+  // Big trees are split per 2nd-level category into parallel, smaller prompts: faster, and each
+  // stays well under the model's output cap. Partitions don't see each other's questions, so a
+  // few cross-partition duplicates are accepted (the frontend's duplicate check filters most).
+  const partitions = partitionTreeBySecondLevel(body.tree ?? []);
+  if (partitions.length > 1) {
+    console.info('[qa] Generating in partitions', { partitions: partitions.length, concurrency: QA_PARTITION_CONCURRENCY });
+    return textStreamResponse(streamPartitionedItems(body, partitions, searchResults), c);
+  }
+
   const { system, messages } = buildQAMessages(body, searchResults);
 
   const result = streamText({
@@ -85,6 +96,53 @@ async function handleQAStream(c: import('hono').Context) {
   });
   logStreamLanguageModelCost('qa-stream', MODEL_NAME, result.usage);
   return textStreamResponse(stripJsonFences(result.textStream), c);
+}
+
+const QA_PARTITION_CONCURRENCY = 4;
+
+/** Emits the same `{"items":[...]}` JSON the single-prompt stream produces, adding each
+ * partition's items as soon as that partition finishes, so the frontend parses it unchanged. */
+async function* streamPartitionedItems(
+  body: QuestionAnswerRequest,
+  partitions: CategoryNode[][],
+  searchResults: string[],
+): AsyncGenerator<string> {
+  yield '{"items":[';
+  let first = true;
+  for await (const items of mapConcurrently(partitions, QA_PARTITION_CONCURRENCY, tree => generatePartition(body, tree, searchResults))) {
+    for (const item of items) {
+      yield (first ? '' : ',') + JSON.stringify(item);
+      first = false;
+    }
+  }
+  yield ']}';
+}
+
+/** Smaller models (e.g. Qwen3 32B) sometimes answer a small partition with `{"items":[]}`;
+ * a fresh attempt usually succeeds, so an empty result is retried this many extra times. */
+const QA_PARTITION_EMPTY_RETRIES = 2;
+
+async function generatePartition(body: QuestionAnswerRequest, tree: CategoryNode[], searchResults: string[]): Promise<QuestionAnswer[]> {
+  const { system, messages } = buildQAMessages({ ...body, tree }, searchResults);
+  try {
+    for (let attempt = 0; ; attempt++) {
+      const result = await generateText({
+        model: llm,
+        maxOutputTokens: MAX_OUTPUT_TOKENS,
+        system,
+        messages,
+        maxRetries: 1,
+        experimental_telemetry: { isEnabled: true, functionId: 'qa-partition' },
+      });
+      logLanguageModelCost('qa-partition', MODEL_NAME, result.usage);
+      const items = await extractQuestionItems(result.text);
+      if (items.length || attempt >= QA_PARTITION_EMPTY_RETRIES) return items;
+    }
+  } catch (error) {
+    // One failed partition shouldn't sink the rest; the frontend's top-up rounds can refill it.
+    console.error('[qa] Partition failed', { category: tree[0]?.title, error: String(error) });
+    return [];
+  }
 }
 
 qaRouter.post('/category-tree/questions/stream-json', handleQAStream);
