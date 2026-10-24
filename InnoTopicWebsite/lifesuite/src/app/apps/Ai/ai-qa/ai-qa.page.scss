@@ -144,10 +144,11 @@
   min-height: 22px;
   padding: 4px 12px;
   font-size: 0.84rem;
-  color: #c6d2df;
+  // Theme text colour (faded) rather than a fixed light grey, which vanished on light themes.
+  color: color-mix(in srgb, var(--ion-text-color) 75%, transparent);
   flex-shrink: 0;
 
-  &.error { color: #ffb4a8; }
+  &.error { color: var(--ion-color-danger, #eb445a); font-weight: 600; }
 }
 
 .metrics {
@@ -160,7 +161,7 @@
     border-radius: 999px;
     padding: 2px 8px;
     font-size: 0.76rem;
-    color: #b9dcc9;
+    color: var(--ion-text-color);
     background: rgba(60, 127, 91, 0.13);
   }
 }
@@ -294,7 +295,7 @@
   border-radius: 4px;
   transition: background 0.12s, color 0.12s;
 
-  &:hover { color: var(--ion-color-light); background: rgba(255, 255, 255, 0.09); }
+  &:hover { color: var(--ion-text-color); background: var(--ion-color-step-150); }
 
   ion-icon { font-size: 0.8rem; }
 }
@@ -346,7 +347,7 @@
   border: 1px solid rgba(122, 186, 152, 0.35);
   border-radius: 4px;
   padding: 1px 4px;
-  color: #9fd0bf;
+  color: color-mix(in srgb, var(--ion-text-color) 75%, transparent);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -391,7 +392,7 @@
 
 .q-path {
   margin-bottom: 4px;
-  color: #9fd0bf;
+  color: color-mix(in srgb, var(--ion-text-color) 75%, transparent);
   font-size: 0.75rem;
 }
 
@@ -415,7 +416,7 @@
   margin: 8px 0 0;
   border-left: 3px solid #7aba98;
   padding-left: 9px;
-  color: #dce8f0;
+  color: var(--ion-text-color);
   line-height: 1.42;
 }
 
