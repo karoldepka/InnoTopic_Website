@@ -28,6 +28,12 @@ function languageCostRate(model: string): CostRate {
     ['gpt-5.4-mini', 0.75, 4.5, 'GPT-5.4 mini list-price estimate'],
     ['gpt-5.4-nano', 0.2, 1.25, 'GPT-5.4 nano list-price estimate'],
     ['gpt-5.4', 2.5, 15, 'GPT-5.4 list-price estimate'],
+    // Amazon Nova on Bedrock, us-east-1 on-demand list prices; other regions (e.g. eu-north-1)
+    // can differ slightly - override with AI_COST_*_PER_MILLION_USD for exact numbers.
+    ['nova-premier', 2.5, 12.5, 'Amazon Nova Premier list-price estimate'],
+    ['nova-pro', 0.8, 3.2, 'Amazon Nova Pro list-price estimate'],
+    ['nova-lite', 0.06, 0.24, 'Amazon Nova Lite list-price estimate'],
+    ['nova-micro', 0.035, 0.14, 'Amazon Nova Micro list-price estimate'],
     ['llama', 0, 0, 'local-model estimate'],
     ['ollama', 0, 0, 'local-model estimate'],
   ];

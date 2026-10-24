@@ -35,6 +35,14 @@ describe('AI cost logging', () => {
     expect(info).toHaveBeenCalledWith('[ai-cost]', expect.objectContaining({ operation: 'mini', estimatedUsd: 1.2 }));
   });
 
+  it('prices Bedrock Nova models from their inference-profile IDs', () => {
+    const info = vi.spyOn(console, 'info').mockImplementation(() => undefined);
+
+    logLanguageModelCost('nova', 'eu.amazon.nova-pro-v1:0', { inputTokens: 1_000_000, outputTokens: 1_000_000 });
+
+    expect(info).toHaveBeenCalledWith('[ai-cost]', expect.objectContaining({ operation: 'nova', estimatedUsd: 4 }));
+  });
+
   it('logs usage once a stream has completed', async () => {
     const info = vi.spyOn(console, 'info').mockImplementation(() => undefined);
 
