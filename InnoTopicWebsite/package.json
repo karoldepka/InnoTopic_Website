@@ -10,6 +10,7 @@
     "build": "ng build",
     "logo-sizes": "node scripts/generate-logo-sizes.mjs",
     "api-data": "node scripts/generate-api-data.mjs",
+    "knowledge-base": "node scripts/generate-knowledge-base.mjs",
     "dev-api": "node scripts/dev-api.mjs",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",

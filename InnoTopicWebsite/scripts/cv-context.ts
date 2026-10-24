@@ -10,7 +10,7 @@ import { WorkOrganisationsAndProjectsData, Organisation } from '../src/app/work-
 import { booksData } from '../src/app/books/books.data';
 
 /** "#Amazon_Bedrock" (a topic tag on the CV page) → "Amazon Bedrock". */
-function plainText(text: string): string {
+export function plainText(text: string): string {
   return text.replace(/#([\w.+-]+)/g, (_, tag: string) => tag.replace(/_/g, ' ')).trim();
 }
 
