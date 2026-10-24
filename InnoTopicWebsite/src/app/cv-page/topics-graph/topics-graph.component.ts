@@ -21,12 +21,9 @@ import {BehaviorSubject, Observable} from 'rxjs';
 interface OpenNodeInfo {
   nodeId: string
   text: string
-  left: number
-  top: number
+  /** The node the blurb follows (see TopicInfoPopoverComponent). */
+  anchor: Element
 }
-
-// Matches the info popover's max-width plus padding, to keep it inside the container.
-const infoPopoverWidth = 304;
 
 @Component({
   standalone: true,
@@ -214,22 +211,9 @@ export class TopicsGraphComponent implements OnInit, OnDestroy {
       this.openInfo.set(undefined);
       return;
     }
-    this.openInfo.set({nodeId, text, left: 0, top: 0});
-    this.positionInfo();
-  }
-
-  /** Keeps the open blurb below its node, which the force simulation and dragging keep moving. */
-  private positionInfo() {
-    const open = this.openInfo();
-    if (!open) return;
-    const container = this.host.nativeElement.querySelector('.topics-graph-container');
-    const node = this.host.nativeElement.querySelector(`[data-node-id="${CSS.escape(open.nodeId)}"]`);
-    if (!container || !node) return;
-    const bounds = container.getBoundingClientRect();
-    const nodeBounds = node.getBoundingClientRect();
-    const left = Math.round(Math.max(0, Math.min(nodeBounds.left - bounds.left, bounds.width - infoPopoverWidth)));
-    const top = Math.round(nodeBounds.bottom - bounds.top);
-    if (left !== open.left || top !== open.top) this.openInfo.set({...open, left, top});
+    const anchor = this.host.nativeElement.querySelector(`[data-node-id="${CSS.escape(nodeId)}"]`);
+    // The blurb follows the node, which the force simulation and dragging keep moving.
+    this.openInfo.set(anchor ? {nodeId, text, anchor} : undefined);
   }
 
   protected onDocumentClick(event: MouseEvent) {
@@ -557,7 +541,6 @@ export class TopicsGraphComponent implements OnInit, OnDestroy {
         // return "translate(" + (d.x + radiusFunc(d) / 2) + "," + (d.y + radiusFunc(d) / 2) + ")";
         return "translate(" + (d.x) + "," + (d.y) + ")";
       });
-      self.positionInfo();
     }
 
     function dragStarted(d: any) {

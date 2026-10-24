@@ -6,6 +6,6 @@
      ></svg>
 
      @if (openInfo(); as info) {
-       <app-topic-info-popover class="topics-graph-info" [text]="info.text" [style.left.px]="info.left" [style.top.px]="info.top" />
+       <app-topic-info-popover class="topics-graph-info" [text]="info.text" [anchor]="info.anchor" />
      }
 </div>

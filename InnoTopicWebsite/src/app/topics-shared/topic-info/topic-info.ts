@@ -1,4 +1,5 @@
 import {
+  afterNextRender,
   ChangeDetectionStrategy,
   Component,
   computed,
@@ -6,6 +7,7 @@ import {
   ElementRef,
   inject,
   input,
+  NgZone,
   OnDestroy,
   signal,
 } from '@angular/core';
@@ -80,22 +82,31 @@ export class TopicInfoTriggerDirective implements OnDestroy {
   }
 }
 
-/** The info blurb shown below a topic trigger; its host needs a positioned (e.g. relative) ancestor. */
+/** Space kept between the blurb and its anchor, and between the blurb and the screen's edges. */
+const ANCHOR_GAP = 4;
+const SCREEN_MARGIN = 8;
+
+/**
+ * The info blurb shown by a topic trigger. It always fits on screen: placed (fixed) below its
+ * anchor, or above it when there's no room below, and shifted sideways to stay inside the screen.
+ * It follows the anchor while open (scrolling, moving graph nodes). The anchor is the element it's
+ * in, unless given.
+ */
 @Component({
   selector: 'app-topic-info-popover',
   standalone: true,
   template: `{{ text() }}`,
   styles: [`
     :host {
-      position: absolute;
-      top: 100%;
+      position: fixed;
+      top: 0;
       left: 0;
       z-index: 20;
       display: block;
-      margin-top: 4px;
       padding: 10px 12px;
       width: max-content;
-      max-width: 280px;
+      max-width: min(280px, calc(100vw - ${2 * SCREEN_MARGIN}px));
+      box-sizing: border-box;
       font-size: 13px;
       font-weight: normal;
       line-height: 1.4;
@@ -127,6 +138,49 @@ export class TopicInfoTriggerDirective implements OnDestroy {
   },
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class TopicInfoPopoverComponent {
+export class TopicInfoPopoverComponent implements OnDestroy {
   readonly text = input.required<string>()
+  /** What the blurb is placed next to; by default, the element it's in. */
+  readonly anchor = input<Element | undefined>(undefined)
+
+  private readonly host = inject<ElementRef<HTMLElement>>(ElementRef)
+  private readonly zone = inject(NgZone)
+  private frame?: number
+  private placed = ''
+
+  constructor() {
+    // Follows the anchor every frame while open: cheap (one element), and it covers page and
+    // container scrolling, resizing and moving graph nodes alike. Outside Angular: nothing in the
+    // app depends on it.
+    afterNextRender(() => this.zone.runOutsideAngular(() => this.follow()))
+  }
+
+  private follow() {
+    this.place()
+    this.frame = requestAnimationFrame(() => this.follow())
+  }
+
+  private place() {
+    const popover = this.host.nativeElement
+    const anchor = this.anchor() ?? popover.parentElement
+    if (!anchor) return
+    const a = anchor.getBoundingClientRect()
+    const { offsetWidth: width, offsetHeight: height } = popover
+    const screenWidth = document.documentElement.clientWidth
+    const screenHeight = window.innerHeight
+    const left = Math.max(SCREEN_MARGIN, Math.min(a.left, screenWidth - SCREEN_MARGIN - width))
+    const below = a.bottom + ANCHOR_GAP
+    const above = a.top - ANCHOR_GAP - height
+    const fitsBelow = below + height <= screenHeight - SCREEN_MARGIN
+    const top = fitsBelow || above < SCREEN_MARGIN ? below : above
+    const position = `${Math.round(left)},${Math.round(top)}`
+    if (position === this.placed) return
+    this.placed = position
+    popover.style.left = `${Math.round(left)}px`
+    popover.style.top = `${Math.round(top)}px`
+  }
+
+  ngOnDestroy() {
+    if (this.frame !== undefined) cancelAnimationFrame(this.frame)
+  }
 }
