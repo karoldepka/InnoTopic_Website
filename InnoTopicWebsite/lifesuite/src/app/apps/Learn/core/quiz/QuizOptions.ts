@@ -40,6 +40,9 @@ export class QuizOptions {
     public experimentalSchedulerMode: ExperimentalQuizSchedulerMode = 'strict-batches',
     /** Minimum time before an item shown in the experimental scheduler can be selected again. */
     public sameItemMinDelaySeconds: number = 60,
+    /** Plays a short fanfare when an ABCD question is answered correctly (the toast always shows).
+     * Options saved before this field existed lack it, so treat anything but `false` as on. */
+    public playSoundOnCorrectAnswer: boolean = true,
     // TODO: priorityByImportances: 0 .. 1 -- 0 - ignore importances, 1 - items of highest importance go first
     // in-between - probabilities
   ) {

@@ -116,7 +116,9 @@ export class QuizItemDetailsComponent implements OnInit, OnDestroy, AfterViewIni
     this.selectedChoice = choice
     this.quizAnswersService.toggleShowAnswer()
     if (isRevealing && choice.correct) {
-      this.quizCelebration.celebrateCorrectAnswer()
+      this.quizCelebration.celebrateCorrectAnswer({
+        playSound: this.quizService.options2$.val?.playSoundOnCorrectAnswer !== false,
+      })
     }
   }
 

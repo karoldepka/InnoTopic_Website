@@ -132,7 +132,7 @@
       [attr.aria-expanded]="groupsExpanded.tts"
       aria-controls="quiz-options-tts"
     >
-      TEXT TO SPEECH (TTS)
+      SOUND &amp; SPEECH
       <ion-icon [name]="groupsExpanded.tts ? 'chevron-up' : 'chevron-down'"></ion-icon>
     </button>
 
@@ -157,6 +157,14 @@
             [formControl]="controls.textToSpeechCategoriesEnabled"
           >
             READ CATEGORIES ALOUD
+          </ion-checkbox>
+
+          <ion-checkbox
+            class="quiz-toggle-cell"
+            labelPlacement="end"
+            [formControl]="controls.playSoundOnCorrectAnswer"
+          >
+            PLAY SOUND ON CORRECT ANSWER
           </ion-checkbox>
         </div>
       </div>

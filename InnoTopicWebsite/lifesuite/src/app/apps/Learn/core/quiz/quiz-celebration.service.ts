@@ -9,8 +9,10 @@ export class QuizCelebrationService {
 
   constructor(private toastController: ToastController) {}
 
-  celebrateCorrectAnswer(): void {
-    this.playFanfare()
+  celebrateCorrectAnswer({playSound = true}: {playSound?: boolean} = {}): void {
+    if (playSound) {
+      this.playFanfare()
+    }
     void this.toastController.create({
       message: congratulations[Math.floor(Math.random() * congratulations.length)],
       icon: 'sparkles',

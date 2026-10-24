@@ -74,6 +74,7 @@ export class QuizOptionsComponent implements OnInit {
     experimentalMasteryStars: new UntypedFormControl(DEFAULT_EXPERIMENTAL_MASTERY_STARS),
     experimentalSchedulerMode: new UntypedFormControl('strict-batches'),
     sameItemMinDelaySeconds: new UntypedFormControl(60),
+    playSoundOnCorrectAnswer: new UntypedFormControl(true),
   }
 
   formGroup = new UntypedFormGroup(this.controls)
