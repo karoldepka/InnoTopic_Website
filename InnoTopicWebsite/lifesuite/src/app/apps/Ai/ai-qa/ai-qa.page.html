@@ -299,7 +299,11 @@
       <div class="questions-scroll">
         @if (gen.questions().length) {
           @for (item of gen.questions(); track $index; let i = $index) {
-            <article class="q-card" [class.q-selected]="selectedQIndices().has(i)">
+            <article
+              class="q-card"
+              [class.q-selected]="selectedQIndices().has(i)"
+              (contextmenu)="openQuestionMenu($event, i)"
+            >
               <div class="q-path">{{ item.categoryPath || item.categoryId }}</div>
               <div class="q-row">
                 <ion-checkbox
@@ -320,34 +324,56 @@
                     slot="icon-only"
                   ></ion-icon>
                 </ion-button>
+                <ion-button
+                  fill="clear"
+                  size="small"
+                  aria-label="More actions"
+                  (click)="openQuestionMenu($event, i)"
+                >
+                  <ion-icon name="ellipsis-vertical" slot="icon-only"></ion-icon>
+                </ion-button>
               </div>
               @if (answerVisible(item, i)) {
                 <p class="q-answer">{{ item.answer || '…' }}</p>
               }
-              <div class="q-image">
-                @if (item.imageDataUrl) {
-                  <img [src]="item.imageDataUrl" [alt]="item.question" class="q-image__img" />
-                }
-                <ion-button
-                  fill="clear"
-                  size="small"
-                  [disabled]="gen.questionImageLoadingIndices().has(i)"
-                  (click)="gen.generateQuestionImage(i)"
-                >
-                  @if (gen.questionImageLoadingIndices().has(i)) {
-                    <ion-spinner name="dots" slot="start"></ion-spinner>
-                  } @else {
-                    <ion-icon name="image" slot="start"></ion-icon>
+              @if (item.imageDataUrl || gen.questionImageLoadingIndices().has(i)) {
+                <div class="q-image">
+                  @if (item.imageDataUrl) {
+                    <img [src]="item.imageDataUrl" [alt]="item.question" class="q-image__img" />
                   }
-                  {{ item.imageDataUrl ? 'Regenerate image' : 'Generate image' }}
-                </ion-button>
-              </div>
+                  @if (gen.questionImageLoadingIndices().has(i)) {
+                    <ion-spinner name="dots" aria-label="Generating image"></ion-spinner>
+                  }
+                </div>
+              }
             </article>
           }
         } @else {
           <div class="empty">No questions yet.</div>
         }
       </div>
+
+      <ion-popover
+        [isOpen]="questionMenuIndex() !== null"
+        [event]="questionMenuEvent"
+        (didDismiss)="closeQuestionMenu()"
+      >
+        <ng-template>
+          @if (gen.questions()[questionMenuIndex() ?? -1]; as menuItem) {
+            <ion-list lines="none">
+              <ion-item
+                button
+                [detail]="false"
+                [disabled]="gen.questionImageLoadingIndices().has(questionMenuIndex()!)"
+                (click)="generateImageFromMenu()"
+              >
+                <ion-icon name="image" slot="start"></ion-icon>
+                <ion-label>{{ menuItem.imageDataUrl ? 'Regenerate image' : 'Generate image' }}</ion-label>
+              </ion-item>
+            </ion-list>
+          }
+        </ng-template>
+      </ion-popover>
 
       @if (gen.questions().length || gen.questionLoading()) {
         <div class="panel-foot q-actions">

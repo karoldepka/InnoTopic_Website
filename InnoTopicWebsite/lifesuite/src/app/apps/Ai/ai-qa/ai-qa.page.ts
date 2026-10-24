@@ -70,6 +70,9 @@ export class AiQaPage implements OnInit {
   readonly rawPromptMode = signal(false);
   readonly rawResponse = signal('');
   readonly showAnswers = signal(false);
+  /** Index of the question whose context menu (⋮ button / right-click) is open, if any. */
+  readonly questionMenuIndex = signal<number | null>(null);
+  questionMenuEvent?: Event;
   readonly expandedAnswerKeys = signal<ReadonlySet<string>>(new Set<string>());
   readonly selectedQIndices = signal<ReadonlySet<number>>(new Set<number>());
   readonly allQSelected = computed(() =>
@@ -447,6 +450,23 @@ export class AiQaPage implements OnInit {
 
   answerVisible(item: QuestionAnswer, i: number): boolean {
     return this.showAnswers() || this.expandedAnswerKeys().has(this.answerKey(item, i));
+  }
+
+  openQuestionMenu(event: Event, i: number): void {
+    event.preventDefault();
+    event.stopPropagation();
+    this.questionMenuEvent = event;
+    this.questionMenuIndex.set(i);
+  }
+
+  closeQuestionMenu(): void {
+    this.questionMenuIndex.set(null);
+  }
+
+  generateImageFromMenu(): void {
+    const i = this.questionMenuIndex();
+    this.closeQuestionMenu();
+    if (i !== null) this.gen.generateQuestionImage(i);
   }
 
   toggleAnswer(item: QuestionAnswer, i: number): void {
