@@ -399,6 +399,7 @@ export class WorkOrganisationsAndProjectsData {
           "Vue.js": {},
           Nuxt: {},
           PostHog: {},
+          Vercel: {},
           'Microsoft Advertising': {},
         },
       },
