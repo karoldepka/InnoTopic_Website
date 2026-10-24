@@ -62,6 +62,19 @@ export class WorkExperienceListComponent implements OnInit {
     return (key as any).replaceAll('_', ' ')
   }
 
+  /** Where a category's indent line leads: its label, scrolled into view and briefly outlined. */
+  showCategoryLabel(label: HTMLElement) {
+    const smooth = !matchMedia('(prefers-reduced-motion: reduce)').matches
+    label.scrollIntoView({ behavior: smooth ? 'smooth' : 'auto', block: 'nearest' })
+    label.animate(
+      [
+        { outline: '2px solid currentColor', outlineOffset: '2px' },
+        { outline: '2px solid transparent', outlineOffset: '2px' },
+      ],
+      { duration: smooth ? 900 : 1, easing: 'ease-out' },
+    )
+  }
+
   hasExperienceInCategory(category: TopicCategory) {
     let experienceByCat = (this.experienceByCategory as any)[category.name];
     // console.log('hasExperienceInCategory', arguments, this.experienceByCategory)

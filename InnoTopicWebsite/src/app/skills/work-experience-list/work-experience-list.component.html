@@ -28,7 +28,16 @@
       @for (category of topicCategoriesArray; track category.name) {
         @if (hasExperienceInCategory(category)) {
           <div class="category-group-inline">
-            <span class="category-label-inline">{{categoryTitle(category.name)}}:</span>
+            <!-- The hanging indent's line; mouse-only (the tags themselves are the keyboard's way through). -->
+            <button
+              type="button"
+              class="category-rail"
+              tabindex="-1"
+              aria-hidden="true"
+              [title]="'Back to ' + categoryTitle(category.name)"
+              (click)="showCategoryLabel(categoryLabel)"
+            ></button>
+            <span class="category-label-inline" #categoryLabel>{{categoryTitle(category.name)}}:</span>
             <div class="category-topic-tags-inline">
               <ng-container [ngTemplateOutlet]="categoryTopics" [ngTemplateOutletContext]="{$implicit: category}" />
             </div>

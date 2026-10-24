@@ -94,33 +94,13 @@
   padding: 10px 0 0 calc(var(--knob) + var(--gap) + var(--step));
 }
 
-/* A thin line in the text color, straight down from the knob's center, on a wider (invisible)
-   click target; darker on hover and focus. */
+/* The clickable line, straight down from the knob's center (see indent-rail in src/shared.scss). */
 .rail {
-  position: absolute;
+  @include indent-rail(calc(50% - 1px));
   top: 2px;
   bottom: 0;
   left: 0;
   width: var(--knob);
-  padding: 0;
-  border: 0;
-  background: transparent;
-  cursor: pointer;
-}
-
-.rail::before {
-  @include indent-line(calc(50% - 1px));
-  transition: opacity 0.15s ease;
-}
-
-.rail:hover::before,
-.rail:focus-visible::before {
-  opacity: 0.6;
-}
-
-.rail:focus-visible {
-  outline: 2px solid var(--line);
-  outline-offset: 2px;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -131,8 +111,7 @@
 }
 
 @media print {
-  .knob,
-  .rail {
+  .knob {
     display: none;
   }
 

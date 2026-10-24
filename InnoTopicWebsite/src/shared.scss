@@ -14,3 +14,33 @@ $break-medium: 800px;
   background: var(--ion-text-color, #000);
   opacity: 0.15;
 }
+
+// That line made clickable: a button (absolutely positioned by the caller) whose ::before is the
+// line, on a wider, invisible click target; darker on hover and focus. Clicking it leads back to
+// what the indent belongs to.
+@mixin indent-rail($line-left) {
+  position: absolute;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+
+  &::before {
+    @include indent-line($line-left);
+    transition: opacity 0.15s ease;
+  }
+
+  &:hover::before,
+  &:focus-visible::before {
+    opacity: 0.6;
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--ion-text-color, #000);
+    outline-offset: 2px;
+  }
+
+  @media print {
+    display: none;
+  }
+}
