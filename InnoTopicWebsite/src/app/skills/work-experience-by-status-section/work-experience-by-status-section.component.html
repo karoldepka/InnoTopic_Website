@@ -1,6 +1,8 @@
-<h3>{{experience.title}} <span class="comment">({{experience.comment}})</span></h3>
+<app-indented-section [label]="experience.title">
+  <h3 section-header>{{experience.title}} <span class="comment">({{experience.comment}})</span></h3>
 
-<app-work-experience-list
-  [experienceByName]="experience.topics"
-  [showIcons]="experience.showIcons"
-></app-work-experience-list>
+  <app-work-experience-list
+    [experienceByName]="experience.topics"
+    [showIcons]="experience.showIcons"
+  ></app-work-experience-list>
+</app-indented-section>

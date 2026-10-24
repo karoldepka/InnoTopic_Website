@@ -41,15 +41,22 @@ section
   margin: 0.35rem 0 0
 
 // Each category flows like a paragraph: the label starts the first line, its tags follow on the
-// same line and wrap, and the wrapped lines get a hanging indent.
+// same line and wrap, and the wrapped lines get a hanging indent, marked by the same line as
+// app-indented-section's (from the second line down, so it shows only when the tags wrap).
 .category-group-inline
   --category-indent: 1rem
+  position: relative
   padding: 0.1rem 0 0.1rem var(--category-indent)
   text-indent: calc(-1 * var(--category-indent))
   min-width: 0
 
   & + &
     margin-top: 0.2rem
+
+  &::before
+    @include indent-line(calc(var(--category-indent) / 2 - 1px))
+    top: 1.85rem
+    bottom: 0.2rem
 
 .category-label-inline
   display: inline

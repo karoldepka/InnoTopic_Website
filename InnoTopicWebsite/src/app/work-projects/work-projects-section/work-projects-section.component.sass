@@ -22,11 +22,8 @@
     break-after: avoid
     page-break-after: avoid
 
-// Two left edges show the hierarchy: an organisation's header starts at the section's edge; everything
-// under it (description, links, projects) one indent further in, beside a rail back to the header.
-$body-indent: 18px
-$body-indent-small: 14px
-
+// Each organisation is an app-indented-section: its header beside the collapse knob, and everything
+// under it (description, links, projects) indented beside the line back to the header.
 .organisation
   margin: 0
   &:not(:last-child)
@@ -35,7 +32,8 @@ $body-indent-small: 14px
     margin-bottom: 35px
   h2
     //border-bottom: 2px solid mat-color($light-accent,800)
-    margin-bottom: 20px
+    // No vertical margin, so the knob centers on the header (the section spaces it from the body).
+    margin: 0
     display: flex
     align-items: center
     line-height: 1.1
@@ -44,57 +42,14 @@ $body-indent-small: 14px
       flex-wrap: wrap
     @media screen and (max-width: $break-small)
       font-size: 1.1rem
-      margin-bottom: 10px
+    // Spaced apart when the header wraps (a vertical margin would offset the knob).
+    row-gap: 8px
     & > *
-      margin: 0px 15px 10px 0px
+      margin: 0 15px 0 0
       @media screen and (max-width: $break-small)
-        margin: 0px 10px 5px 0px
+        margin: 0 10px 0 0
     img
       height: 40px
-  h2
-    // When the rail scrolls back to it: below the app header and the sticky topic search (the page
-    // scrolls under both, which end ~107px down).
-    scroll-margin-top: 124px
-    &:focus
-      outline: none
-
-.organisation-body
-  position: relative
-  padding-left: $body-indent
-  @media screen and (max-width: $break-small)
-    padding-left: $body-indent-small
-
-// A thin line in the text color, on a wider (invisible) click target; it darkens on hover and focus.
-.organisation-rail
-  position: absolute
-  top: 0
-  bottom: 0
-  left: 0
-  width: 12px
-  padding: 0
-  border: 0
-  background: transparent
-  cursor: pointer
-  &::before
-    content: ''
-    position: absolute
-    top: 0
-    bottom: 0
-    left: 3px
-    width: 2px
-    border-radius: 1px
-    background: var(--ion-text-color, #000)
-    opacity: 0.15
-    transition: opacity 0.15s ease, width 0.15s ease
-  &:hover::before,
-  &:focus-visible::before
-    opacity: 0.6
-    width: 3px
-  &:focus-visible
-    outline: 2px solid var(--ion-text-color, #000)
-    outline-offset: 2px
-  @media print
-    display: none
 
 app-work-project
   display: block

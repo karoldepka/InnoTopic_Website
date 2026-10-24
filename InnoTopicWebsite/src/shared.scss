@@ -1,2 +1,16 @@
 $break-small: 500px;
 $break-medium: 800px;
+
+// The thin vertical line beside indented content, drawn by a pseudo-element of a positioned box:
+// app-indented-section's line, and the wrapped lines of the skill categories.
+@mixin indent-line($left) {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: $left;
+  width: 2px;
+  border-radius: 1px;
+  background: var(--ion-text-color, #000);
+  opacity: 0.15;
+}

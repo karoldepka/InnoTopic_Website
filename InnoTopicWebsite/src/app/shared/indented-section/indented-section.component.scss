@@ -1,0 +1,146 @@
+@use '../../../shared' as *;
+
+/*
+ * Layout, like a tree view: the knob sits left of the header, centered on it; the line drops
+ * from under the knob down the body; the body is indented one step past the header's text.
+ * Give the projected header no vertical margins, so the knob centers on the header itself.
+ */
+:host {
+  display: block;
+  --knob: 18px;
+  --gap: 8px;    /* between the knob and the header */
+  --step: 14px;  /* how much further the body is indented than the header */
+  --line: var(--ion-text-color, #000);
+}
+
+@media screen and (max-width: $break-small) {
+  :host { --gap: 6px; --step: 10px; }
+}
+
+.head {
+  display: flex;
+  align-items: center;
+  gap: var(--gap);
+}
+
+.header {
+  flex: 1;
+  min-width: 0;
+  /* When the line scrolls back to it: below the app header and the sticky topic search. */
+  scroll-margin-top: 124px;
+  outline: none;
+}
+
+.knob {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: var(--knob);
+  height: var(--knob);
+  padding: 0;
+  border: 1.5px solid color-mix(in srgb, var(--line) 35%, transparent);
+  border-radius: 50%;
+  background: var(--ion-background-color, #fff);
+  color: var(--line);
+  cursor: pointer;
+  opacity: 0.6;
+  transition: opacity 0.15s ease, border-color 0.15s ease;
+}
+
+.knob:hover,
+.knob:focus-visible {
+  opacity: 1;
+  border-color: var(--line);
+}
+
+.knob:focus-visible {
+  outline: 2px solid var(--line);
+  outline-offset: 2px;
+}
+
+.knob svg {
+  width: 12px;
+  height: 12px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  transition: transform 0.25s ease;
+}
+
+.knob[aria-expanded="false"] svg {
+  transform: rotate(-90deg);
+}
+
+/* Animates the body's height: a grid row between its content's height and 0. */
+.collapse {
+  display: grid;
+  grid-template-rows: 1fr;
+  transition: grid-template-rows 0.3s ease;
+}
+
+.collapse--collapsed {
+  grid-template-rows: 0fr;
+}
+
+.collapse-inner {
+  min-height: 0;
+  overflow: hidden;
+}
+
+.body {
+  position: relative;
+  padding: 10px 0 0 calc(var(--knob) + var(--gap) + var(--step));
+}
+
+/* A thin line in the text color, straight down from the knob's center, on a wider (invisible)
+   click target; darker on hover and focus. */
+.rail {
+  position: absolute;
+  top: 2px;
+  bottom: 0;
+  left: 0;
+  width: var(--knob);
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
+.rail::before {
+  @include indent-line(calc(50% - 1px));
+  transition: opacity 0.15s ease;
+}
+
+.rail:hover::before,
+.rail:focus-visible::before {
+  opacity: 0.6;
+}
+
+.rail:focus-visible {
+  outline: 2px solid var(--line);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .collapse,
+  .knob svg {
+    transition: none;
+  }
+}
+
+@media print {
+  .knob,
+  .rail {
+    display: none;
+  }
+
+  .body {
+    padding-left: var(--step);
+  }
+
+  .collapse--collapsed {
+    grid-template-rows: 1fr;
+  }
+}

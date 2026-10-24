@@ -3,10 +3,9 @@
   <app-three-d-text text="Organisations and Projects"></app-three-d-text>
 
   @for (orgKV of keyValOrdered(organisationsAndProjects); track orgKV.key) {
-    <section class="organisation">
-      <!--<ng-template let-org="orgKV.value">-->
-
-      <h2 #orgHeader tabindex="-1">
+    <!-- Everything under the organisation, indented beside a collapsible line back to its header. -->
+    <app-indented-section class="organisation" [label]="orgKV.key">
+      <h2 section-header>
         @if (orgKV.value.logoFileName) {
           <img alt="Organization Logo" width=auto height=50 loading="lazy" decoding="async" src="assets/images/clients/{{orgKV.value.logoFileName}}">
         }
@@ -17,30 +16,18 @@
           <span class="comment">{{locations}} </span>
         }
       </h2>
-      <!-- Everything under the organisation, indented; the rail on its left leads back to the header. -->
-      <div class="organisation-body">
-        <button
-          type="button"
-          class="organisation-rail"
-          [attr.aria-label]="'Back to ' + orgKV.key"
-          [title]="'Back to ' + orgKV.key"
-          (click)="scrollToHeader(orgHeader)"
-        ></button>
-        <app-hashtag-replacer [text]="orgKV.value.description" />
-        @if (orgKV.value.linkedInRecommendations) {
-          <a class="linkedin-recommendations-link" href="https://www.linkedin.com/in/karoldepka" target="_blank">
-            <span class="linkedin-recommendations-text">Please also take a look at {{orgKV.value.linkedInRecommendations}} {{orgKV.value.linkedInRecommendations > 1 ? 'recommendations' : 'recommendation'}} on</span><span class="linkedin-recommendations-space">&nbsp;</span><img alt="LinkedIn Logo" class="linkedin-logo" height="14px" loading="lazy" decoding="async" src="assets/images/logos/linkedin.svg"><span class="linkedin-recommendations-space">&nbsp;</span><span class="linkedin-recommendations-text">for this role</span>
-          </a>
-        }
-        @for (projKV of keyValOrdered(orgKV.value.projects); track projKV.key) {
-          <app-work-project
-            [project]="projKV.value"
-            [projectTitle]="projKV.key"
-          ></app-work-project>
-        }
-      </div>
-
-    <!--</ng-template>-->
-    </section>
+      <app-hashtag-replacer [text]="orgKV.value.description" />
+      @if (orgKV.value.linkedInRecommendations) {
+        <a class="linkedin-recommendations-link" href="https://www.linkedin.com/in/karoldepka" target="_blank">
+          <span class="linkedin-recommendations-text">Please also take a look at {{orgKV.value.linkedInRecommendations}} {{orgKV.value.linkedInRecommendations > 1 ? 'recommendations' : 'recommendation'}} on</span><span class="linkedin-recommendations-space">&nbsp;</span><img alt="LinkedIn Logo" class="linkedin-logo" height="14px" loading="lazy" decoding="async" src="assets/images/logos/linkedin.svg"><span class="linkedin-recommendations-space">&nbsp;</span><span class="linkedin-recommendations-text">for this role</span>
+        </a>
+      }
+      @for (projKV of keyValOrdered(orgKV.value.projects); track projKV.key) {
+        <app-work-project
+          [project]="projKV.value"
+          [projectTitle]="projKV.key"
+        ></app-work-project>
+      }
+    </app-indented-section>
   }
 </div>

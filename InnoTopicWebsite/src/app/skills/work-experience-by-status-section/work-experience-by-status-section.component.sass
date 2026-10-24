@@ -4,12 +4,18 @@
 app-work-experience-list
   display: inline
 
+// An app-indented-section, like each organisation in the work history.
+app-indented-section
+  margin-top: 25px
+  @media screen and (max-width: $break-small)
+    margin-top: 15px
+
+// Left-aligned, without vertical margins, so the section's knob centers on it.
 h3
   border-bottom: 2px solid var(--ion-color-secondary)
   color: var(--ion-color-secondary)
-  padding: 10px
-  margin-top: 25px
+  margin: 0
+  padding: 10px 0
   text-transform: uppercase
   @media screen and (max-width: $break-small)
-    padding: 5px 10px
-    margin-top: 15px
+    padding: 5px 0

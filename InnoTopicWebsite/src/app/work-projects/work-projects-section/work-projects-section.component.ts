@@ -9,11 +9,12 @@ import { HashtagReplacerComponent } from '../../topics-shared/hashtag-replacer/h
 import { WorkProjectComponent } from './work-project/work-project.component';
 import { WorkOrganisationsAndProjectsData } from '../work-projects-data';
 import { ThreeDTextComponent } from '../../shared/threed-text/threed-text.component';
+import { IndentedSectionComponent } from '../../shared/indented-section/indented-section.component';
 
 @Component({
   selector: 'app-work-projects-section',
   standalone: true,
-  imports: [CommonModule, FlagsComponent, HashtagReplacerComponent, WorkProjectComponent, ThreeDTextComponent],
+  imports: [CommonModule, FlagsComponent, HashtagReplacerComponent, WorkProjectComponent, ThreeDTextComponent, IndentedSectionComponent],
   templateUrl: './work-projects-section.component.html',
   styleUrls: ['./work-projects-section.component.sass'],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -25,13 +26,6 @@ export class WorkProjectsSectionComponent implements OnInit {
   constructor() { }
 
   ngOnInit() {
-  }
-
-  /** The rail beside an organisation's details leads back to its header. */
-  scrollToHeader(header: HTMLElement) {
-    const smooth = !matchMedia('(prefers-reduced-motion: reduce)').matches;
-    header.scrollIntoView({ behavior: smooth ? 'smooth' : 'auto', block: 'start' });
-    header.focus({ preventScroll: true });
   }
 
   keyValOrdered(input: any) {
