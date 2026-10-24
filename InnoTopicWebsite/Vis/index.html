@@ -21,7 +21,9 @@
   html,body{margin:0;height:100%;overflow:hidden;background:var(--bg);color:var(--text);
     font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
   #scene{position:fixed;inset:0}
-  #labels{position:fixed;inset:0;pointer-events:none}
+  /* z-index makes this a stacking context: CSS2DRenderer gives each label a z-index (up to the label
+     count) for depth order, which otherwise competed with, and covered, the panels (z-index 5+). */
+  #labels{position:fixed;inset:0;pointer-events:none;z-index:1}
   .glass{background:var(--panel);border:1px solid var(--line);border-radius:14px;
     backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);box-shadow:0 10px 40px rgba(0,0,0,.45)}
   /* header */
