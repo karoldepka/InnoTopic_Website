@@ -12,10 +12,14 @@ describe('Q&A partitioning', () => {
   });
 
   it('extracts complete items from fenced or truncated output', async () => {
-    const item = '{"categoryId":"a","categoryPath":"P > A","question":"Q1?","answer":"A1"}';
+    const item = '{"categoryId":"a","categoryPath":"P > A","question":"What is Q1?","answer":"A1"}';
     expect(await extractQuestionItems('```json\n{"items":[' + item + ']}\n```')).toHaveLength(1);
     expect(await extractQuestionItems('{"items":[' + item + ',{"categoryId":"b","question":"Q2')).toHaveLength(1);
     expect(await extractQuestionItems('no json here')).toEqual([]);
+    const choiceAsQuestion = '{"categoryId":"a","categoryPath":"P > A","question":"A. ✓","answer":"x"}';
+    const prefixed = '{"categoryId":"a","categoryPath":"P > A","question":"A. ✓ When is X used?","answer":"x"}';
+    const result = await extractQuestionItems('{"items":[' + item + ',' + choiceAsQuestion + ',' + prefixed + ']}');
+    expect(result.map(r => r.question)).toEqual(['What is Q1?', 'When is X used?']);
   });
 
   it('runs with bounded concurrency and yields every result', async () => {
