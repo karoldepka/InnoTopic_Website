@@ -65,15 +65,20 @@ const providers: Record<AiProviderId, AiProvider> = {
   },
 };
 
-/** An explicit AI_PROVIDER wins. Otherwise keep the historical behaviour: a set
- * ANTHROPIC_API_KEY means Anthropic directly, anything else the OpenAI-compatible endpoint. */
+/** An explicit AI_PROVIDER wins. Otherwise infer it from which credentials are configured,
+ * keeping the historical behaviour first: ANTHROPIC_API_KEY means Anthropic directly, an
+ * AI_API_BASE_URL means that OpenAI-compatible endpoint, then a Bedrock API key means Bedrock,
+ * and with none of them the OpenAI-compatible default (local Ollama). */
 function resolveProviderId(): AiProviderId {
   const requested = process.env['AI_PROVIDER']?.trim().toLowerCase();
   if (requested) {
     if (requested in providers) return requested as AiProviderId;
     throw new Error(`Unknown AI_PROVIDER "${requested}" - expected one of: ${Object.keys(providers).join(', ')}`);
   }
-  return process.env['ANTHROPIC_API_KEY'] ? 'anthropic' : 'openai-compatible';
+  if (process.env['ANTHROPIC_API_KEY']) return 'anthropic';
+  if (process.env['AI_API_BASE_URL']) return 'openai-compatible';
+  if (process.env['AWS_BEARER_TOKEN_BEDROCK']) return 'bedrock';
+  return 'openai-compatible';
 }
 
 export const AI_PROVIDER: AiProviderId = resolveProviderId();
