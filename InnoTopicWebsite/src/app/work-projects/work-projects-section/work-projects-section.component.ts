@@ -27,6 +27,13 @@ export class WorkProjectsSectionComponent implements OnInit {
   ngOnInit() {
   }
 
+  /** The rail beside an organisation's details leads back to its header. */
+  scrollToHeader(header: HTMLElement) {
+    const smooth = !matchMedia('(prefers-reduced-motion: reduce)').matches;
+    header.scrollIntoView({ behavior: smooth ? 'smooth' : 'auto', block: 'start' });
+    header.focus({ preventScroll: true });
+  }
+
   keyValOrdered(input: any) {
     const retArray: any = []
     for ( const key of Object.keys(input) ) {
