@@ -12,6 +12,12 @@ function safeChildren(node: CategoryNode): CategoryNode[] {
   return Array.isArray(node.children) ? node.children : [];
 }
 
+/** Some models (e.g. Amazon Nova) omit `children` on leaf nodes instead of sending `[]`; the
+ * rest of the app relies on it always being an array, so fill it in recursively. */
+export function normalizeCategoryTree(nodes: CategoryNode[]): CategoryNode[] {
+  return nodes.map(node => ({...node, children: normalizeCategoryTree(safeChildren(node))}));
+}
+
 /** GH #129: detects the specific corruption signature seen when a streamed AI response got
  * silently truncated mid-token by the underlying partial-JSON repair (Vercel AI SDK's fixJson) -
  * a required text field ending in a lone, unmatched formatting character (a stray backtick from

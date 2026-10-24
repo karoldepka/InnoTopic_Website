@@ -22,6 +22,7 @@ import {
   countLeafNodes,
   flattenCategoryTree,
   isTruncatedText,
+  normalizeCategoryTree,
   setLeafQuestionCounts,
   sumQuestionCounts,
   updateCategoryNode,
@@ -41,17 +42,19 @@ export const COPILOT_AGENT_ID = 'lifesuite-qa';
 
 // ---- Zod schemas --------------------------------------------------------
 
-const categoryNodeSchema: z.ZodType<CategoryNode> = z.lazy(() => z.object({
+// Input type is looser than CategoryNode (`children` may be missing), hence the third type argument.
+const categoryNodeSchema: z.ZodType<CategoryNode, z.ZodTypeDef, unknown> = z.lazy(() => z.object({
   id: z.string(),
   title: z.string(),
   questionCount: z.number(),
-  children: z.array(categoryNodeSchema),
+  // Optional: some models omit `children` on leaves - see normalizeCategoryTree().
+  children: z.array(categoryNodeSchema).default([]),
   matchedExistingCategoryId: z.string().nullable().optional(),
   matchedExistingCategoryTitle: z.string().nullable().optional(),
   isExistingCategory: z.boolean().optional(),
 }));
 
-export const categoryTreeResponseSchema: z.ZodType<CategoryTreeResponse> = z.object({
+export const categoryTreeResponseSchema: z.ZodType<CategoryTreeResponse, z.ZodTypeDef, unknown> = z.object({
   tree: z.array(categoryNodeSchema),
   assistantMessage: z.string().optional(),
   modelName: z.string().optional(),
@@ -464,7 +467,7 @@ export class AiQaGeneratorService {
       text += dec.decode();
 
       const data = JSON.parse(text);
-      const newChildren: CategoryNode[] = (data.children ?? []).filter((c: any) => c?.id && c?.title);
+      const newChildren: CategoryNode[] = normalizeCategoryTree((data.children ?? []).filter((c: any) => c?.id && c?.title));
       if (newChildren.length) {
         const now = Date.now();
         const stamped = this.stampTreeDraftedAt(newChildren, now);
@@ -545,10 +548,12 @@ export class AiQaGeneratorService {
     console.info(`[ai-qa] Streaming category request from ${this.aiBackend.apiUrl('/category-tree/stream-json')}`);
     await this.categoryObject.submit(request);
     if (this.categoryObject.error) throw this.categoryObject.error;
-    const response = this.categoryObject.object as CategoryTreeResponse;
-    if (!response?.tree?.length) {
+    const rawResponse = this.categoryObject.object as CategoryTreeResponse;
+    if (!rawResponse?.tree?.length) {
       throw new Error('Category generation returned no categories. Please try again.');
     }
+    // `.object` is the raw parsed JSON (schema defaults are not applied to it).
+    const response = {...rawResponse, tree: normalizeCategoryTree(rawResponse.tree)};
     const truncatedTitle = flattenCategoryTree(response.tree).find(row => isTruncatedText(row.node.title));
     if (truncatedTitle) {
       throw new Error(`Generation produced cut-off text ("${truncatedTitle.node.title}") - please try again`);
@@ -596,7 +601,7 @@ export class AiQaGeneratorService {
     );
   }
 
-  private async runCopilotStructuredJson<T>(prompt: string, schema: z.ZodType<T>): Promise<T> {
+  private async runCopilotStructuredJson<T>(prompt: string, schema: z.ZodType<T, z.ZodTypeDef, unknown>): Promise<T> {
     const store = this.copilotStore();
     const agent = store.agent;
     const previousMessageIds = new Set(store.messages().map(m => m.id));
@@ -613,7 +618,7 @@ export class AiQaGeneratorService {
     return this.parseStructuredJson(content, schema);
   }
 
-  private parseStructuredJson<T>(content: string, schema: z.ZodType<T>): T {
+  private parseStructuredJson<T>(content: string, schema: z.ZodType<T, z.ZodTypeDef, unknown>): T {
     const jsonText = this.extractJsonObject(content);
     const parsed = schema.safeParse(JSON.parse(jsonText));
     if (!parsed.success) throw new Error(parsed.error.issues.map(i => i.message).join('; '));

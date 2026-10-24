@@ -77,7 +77,8 @@ const categoryNodeSchema: z.ZodType<any> = z.lazy(() => z.object({
   id: z.string(),
   title: z.string(),
   questionCount: z.number(),
-  children: z.array(categoryNodeSchema),
+  // Optional: some models (e.g. Amazon Nova) omit `children` on leaf nodes instead of sending [].
+  children: z.array(categoryNodeSchema).default([]),
   matchedExistingCategoryId: z.string().nullable().optional(),
   matchedExistingCategoryTitle: z.string().nullable().optional(),
   isExistingCategory: z.boolean().optional(),
