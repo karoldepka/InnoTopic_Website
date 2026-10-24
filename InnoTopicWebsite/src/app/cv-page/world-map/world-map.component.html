@@ -19,6 +19,9 @@
       </linearGradient>
     </defs>
 
+    <!-- The ocean in the page's background color: the same on screen, and kept in print (where the
+         page background usually isn't). -->
+    <rect class="ocean" [attr.width]="width" [attr.height]="height" />
     <rect class="texture" [attr.width]="width" [attr.height]="height" [attr.fill]="'url(#' + ids.texture + ')'" />
     <path class="graticule" [attr.d]="graticule" />
     <g appWorldMapLand [attr.id]="ids.land"></g>

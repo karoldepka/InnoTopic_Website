@@ -13,6 +13,9 @@
   width: 100%
   height: auto
 
+.ocean
+  fill: var(--ion-background-color, #fff)
+
 // A faint dot texture and grid behind the land, in the theme's text color, so they read (faintly)
 // on any background color.
 .texture-dot
@@ -118,8 +121,9 @@
     max-width: 800px
     margin-inline: auto
 
-  .texture,
-  .graticule,
-  .land-texture,
+    // The oceans' and the land's textures print too; keep their colors (browsers may drop them).
+    print-color-adjust: exact
+    -webkit-print-color-adjust: exact
+
   .world-map-tooltip
     display: none
