@@ -94,7 +94,6 @@ export class WorkOrganisationsAndProjectsData {
           'Lodash': {},
           'YouTube': {},
           'Figma': {},
-          // 'TestCafe': {},
           'Git': {},
           'GitHub': {},
           'GitLab': {},
@@ -102,12 +101,13 @@ export class WorkOrganisationsAndProjectsData {
           'Kubernetes': {},
           'Elasticsearch': {},
           'AWS': {},
+          'Amazon SageMaker': {},
           'Amazon Bedrock': {},
           'Amazon Bedrock Agents': {},
           'LangChain': {},
           'LangGraph': {},
 
-          // 'Amazon Bedrock AgentCore': {},
+          'Amazon Bedrock AgentCore': {},
           'Amazon CloudWatch': {},
           // 'Trello': {},
           'WebStorm': {},
@@ -399,6 +399,8 @@ export class WorkOrganisationsAndProjectsData {
           "Vue.js": {},
           Nuxt: {},
           PostHog: {},
+          'Amazon Bedrock': {},
+          'Amazon Bedrock Agents': {},
           Vercel: {},
           'Microsoft Advertising': {},
         },
@@ -409,6 +411,9 @@ export class WorkOrganisationsAndProjectsData {
         description: "OP #Python #LangChain #Ollama product and LLM & RAG case studies and side-experiments and demos",
         roles: `Founder, Owner, Angular developer`,
         topicsById: {
+          'Amazon Bedrock': {},
+          'Amazon Bedrock Agents': {},
+
           'Vue.js': {},
           'Nuxt': {},
           // TODO: 'Nitro': {},
@@ -424,12 +429,19 @@ export class WorkOrganisationsAndProjectsData {
           'OpenTelemetry': {},
           'LangChain': {},
           'LangGraph': {},
+          'Amazon Bedrock': {},
+          'Amazon Bedrock Agents': {},
+
           // TODO: 'Nitro': {},
         }
       }),
       'InnoTopic.com website': project({
         roles: `Founder, Owner, Angular developer`,
         topicsById: {
+          'LangChain': {},
+          'LangGraph': {},
+          'Amazon Bedrock': {},
+          'Amazon Bedrock Agents': {},
           'Ionic': {},
           'Angular Material': {},
           Angular: {},
