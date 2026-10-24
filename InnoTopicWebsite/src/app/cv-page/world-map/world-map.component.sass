@@ -2,34 +2,110 @@
   display: block
   width: 100%
 
+// Positions the tooltip over the map, in fractions of its size.
+.world-map
+  position: relative
+  max-width: 1200px
+  margin-inline: auto
+
 .map-svg
   display: block
   width: 100%
   height: auto
-  max-width: 1200px
-  margin-inline: auto
 
-// Theme colors, so the map follows the active/customized theme; fallbacks are the original art.
-.land
-  fill: var(--ion-color-primary, rgb(39, 120, 156))
-  fill-rule: nonzero
+// A faint dot texture and grid behind the land, in the theme's text color, so they read (faintly)
+// on any background color.
+.texture-dot
+  fill: var(--ion-text-color, #000)
 
-// Place markers keep their light-to-dark gradient, built from the secondary color.
+.texture
+  opacity: 0.1
+
+.graticule
+  fill: none
+  stroke: var(--ion-text-color, #000)
+  stroke-width: 0.75px
+  vector-effect: non-scaling-stroke
+  opacity: 0.14
+
 .marker-light
   stop-color: var(--ion-color-secondary-tint, rgb(0, 249, 0))
 
 .marker-dark
   stop-color: var(--ion-color-secondary, rgb(0, 124, 0))
 
+.marker
+  cursor: pointer
+  outline: none
+
+.marker-hit
+  fill: transparent
+
 // A ring in the page background color keeps the markers distinct from the land even when the theme's
 // secondary equals its primary.
-.map-svg circle
+.marker-dot
   stroke: var(--ion-background-color, #fff)
   stroke-width: 1.5px
   vector-effect: non-scaling-stroke
+  transform-box: fill-box
+  transform-origin: center
+  transition: transform 0.15s ease
+
+.marker:hover .marker-dot,
+.marker--active .marker-dot,
+.marker:focus-visible .marker-dot
+  transform: scale(1.5)
+
+// Keyboard focus: a ring in the text color, which contrasts with the background ring.
+.marker:focus-visible .marker-dot
+  stroke: var(--ion-text-color, #000)
+
+// The theme's text and background colors swapped, which contrast with each other on any theme.
+.world-map-tooltip
+  position: absolute
+  z-index: 2
+  max-width: 260px
+  padding: 6px 10px
+  border-radius: 6px
+  background: var(--ion-text-color, #000)
+  color: var(--ion-background-color, #fff)
+  // The land may be the text color too: a background-colored ring keeps the tooltip apart from it.
+  box-shadow: 0 0 0 1.5px var(--ion-background-color, #fff), 0 4px 14px rgba(0, 0, 0, 0.3)
+  font-size: 13px
+  line-height: 1.35
+  white-space: nowrap
+  pointer-events: none
+  // Above the dot (below it in the map's upper part), centered on it or hugging the map's edge near it.
+  --tooltip-x: -50%
+  --tooltip-y: calc(-100% - 10px)
+  transform: translate(var(--tooltip-x), var(--tooltip-y))
+
+.world-map-tooltip--start
+  --tooltip-x: -12px
+
+.world-map-tooltip--end
+  --tooltip-x: calc(-100% + 12px)
+
+.world-map-tooltip--below
+  --tooltip-y: 10px
+
+.world-map-tooltip-country
+  margin-left: 0.4em
+  opacity: 0.75
+
+.world-map-tooltip-orgs
+  font-size: 12px
+  opacity: 0.85
+  white-space: normal
 
 @media print
   .map-svg
     transform: scale(0.9)
     transform-origin: top center
     max-width: 800px
+    margin-inline: auto
+
+  .texture,
+  .graticule,
+  .world-map-tooltip
+    display: none

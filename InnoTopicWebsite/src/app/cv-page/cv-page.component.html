@@ -37,6 +37,13 @@
 <div class="graph-container">
   <div class="world-map-print-page">
     @defer (on idle; on viewport; on timer(4s); when isPrint) {
+      <app-world-map />
+    } @placeholder {
+      <div class="world-map-placeholder" aria-hidden="true"></div>
+    }
+  </div>
+  <div class="globes">
+    @defer (on idle; on viewport; on timer(4s); when isPrint) {
       <app-globe-switcher />
     } @placeholder {
       <div class="graph-placeholder" aria-hidden="true"></div>

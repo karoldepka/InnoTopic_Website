@@ -80,9 +80,22 @@ section {
 }
 
 .world-map-print-page,
+.globes,
 .topics-graph-print-page {
   flex: 1 1 100%;
   width: 100%;
+}
+
+.globes {
+  display: flex;
+  justify-content: center;
+  margin-top: 24px;
+}
+
+.world-map-placeholder {
+  width: min(100%, 1200px);
+  aspect-ratio: 468 / 239; // the map's viewBox, so nothing moves when it arrives
+  margin-inline: auto;
 }
 
 .graph-placeholder,

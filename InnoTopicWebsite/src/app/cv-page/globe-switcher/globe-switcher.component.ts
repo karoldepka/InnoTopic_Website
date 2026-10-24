@@ -1,16 +1,18 @@
 import { NgComponentOutlet } from '@angular/common';
 import { Component, OnInit, Type } from '@angular/core';
-import { WorldMapComponent } from '../world-map/world-map.component';
 
-type GlobeMode = 'globegl' | 'd3' | 'threejs' | 'svg';
+// The flat SVG map is its own section on the CV page (app-world-map), not one of these modes.
+type GlobeMode = 'globegl' | 'd3' | 'threejs';
 type GlobeComponent = Type<unknown>;
 
 const GLOBE_LOADERS: Record<GlobeMode, () => Promise<GlobeComponent>> = {
   globegl: () => import('../globe-gl/globe-gl.component').then(m => m.GlobeGlComponent),
   d3: () => import('../globe-d3/globe-d3.component').then(m => m.GlobeD3Component),
   threejs: () => import('../globe-threejs/globe-threejs.component').then(m => m.GlobeThreejsComponent),
-  svg: async () => WorldMapComponent,
 };
+
+/** Shown first: the lightest of the three (plain SVG, no WebGL). */
+const DEFAULT_MODE: GlobeMode = 'd3';
 
 @Component({
   standalone: true,
@@ -20,13 +22,14 @@ const GLOBE_LOADERS: Record<GlobeMode, () => Promise<GlobeComponent>> = {
   styleUrls: ['./globe-switcher.component.scss'],
 })
 export class GlobeSwitcherComponent implements OnInit {
-  activeMode: GlobeMode = 'svg';
-  activeComponent?: GlobeComponent = WorldMapComponent;
+  activeMode: GlobeMode = DEFAULT_MODE;
+  activeComponent?: GlobeComponent;
   loadingMode?: GlobeMode;
   private loadToken = 0;
   private readonly componentCache = new Map<GlobeMode, GlobeComponent>();
 
   ngOnInit() {
+    void this.setMode(DEFAULT_MODE);
     this.scheduleIdlePrefetch();
   }
 
@@ -34,7 +37,6 @@ export class GlobeSwitcherComponent implements OnInit {
     { key: 'globegl', label: 'Globe.gl',  tech: 'WebGL + Three.js via Globe.gl' },
     { key: 'd3',      label: 'D3',        tech: 'SVG · geoOrthographic projection' },
     { key: 'threejs', label: 'Three.js',  tech: 'Raw WebGL · custom geo lines' },
-    { key: 'svg',     label: 'SVG Map',   tech: 'Flat SVG world map' },
   ];
 
   get activeTech(): string {
@@ -67,7 +69,7 @@ export class GlobeSwitcherComponent implements OnInit {
   }
 
   private scheduleIdlePrefetch() {
-    const modesToPrefetch: GlobeMode[] = ['svg', 'globegl', 'threejs'];
+    const modesToPrefetch: GlobeMode[] = ['globegl', 'threejs'];
     const schedule = (cb: () => void) => {
       if ('requestIdleCallback' in window) {
         (window as any).requestIdleCallback(cb, { timeout: 4000 });

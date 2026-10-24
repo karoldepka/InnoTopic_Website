@@ -55,20 +55,10 @@
   letter-spacing: 0.04em;
 }
 
+// The globes are interactive (and mostly canvas, which doesn't print); the flat world map section
+// stands in for them on paper.
 @media print {
-  .switcher-tabs,
-  .tech-label {
+  :host {
     display: none !important;
-  }
-
-  // Canvas-based renderers won't print; always show the SVG map
-  app-globe-gl,
-  app-globe-d3,
-  app-globe-threejs {
-    display: none !important;
-  }
-
-  app-world-map {
-    display: block !important;
   }
 }
