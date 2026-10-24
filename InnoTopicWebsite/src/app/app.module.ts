@@ -14,8 +14,9 @@ import { injectThemeTokens, initThemeConfig } from '@innotopic/theme-ui';
 // self-defines on import; the loader's defineCustomElements() is Stencil's own registration
 // step (same pattern this app already uses for @ionic/core/loader in main.ts).
 import { defineCustomElements } from '@innotopic/theme-ui/loader';
-import { warmUpSvgRecolor } from '@innotopic/topics-ui';
+import { setSvgCacheVersion, warmUpSvgRecolor } from '@innotopic/topics-ui';
 import { FeatureFlagsService } from './shared/feature-flags/feature-flags.service';
+import { LOGO_FILES_VERSION } from './TopicFriendsShared3/topics-core/logo-files-version';
 
 /**
  * @innotopic/theme-ui's store already loads persisted config from localStorage at creation
@@ -43,8 +44,10 @@ function initializeThemeConfig() {
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
     provideHttpClient(),
     provideAppInitializer(() => initializeThemeConfig()),
-    // Load the icon recoloring workers before the first route requests its (many) icons.
+    // Load the icon recoloring workers before the first route requests its (many) icons, and keep
+    // the downloaded icons across visits until a logo file changes (`pnpm logo-sizes` re-hashes them).
     provideAppInitializer(() => {
+      setSvgCacheVersion(LOGO_FILES_VERSION);
       if (inject(FeatureFlagsService).dynamicLogoColorization()) warmUpSvgRecolor();
     }),
   ],

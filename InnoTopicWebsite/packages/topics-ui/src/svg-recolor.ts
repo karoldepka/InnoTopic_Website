@@ -104,15 +104,74 @@ export function svgDataUrl(markup: string): string {
   return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(withNamespace)}`
 }
 
+// The original SVG files are also kept across visits, so a returning visitor's hundreds of icons need
+// no request each (static files are typically served must-revalidate: a round trip per icon even when
+// the browser has them). They are stored together as one Cache Storage entry, read once per page:
+// reading hundreds of separate entries took about as long as downloading the files. The cache name
+// carries the icon set's version, so a deploy that changes any icon starts afresh.
+const SVG_CACHE_PREFIX = 'topics-ui-svg-'
+/** The stored bundle's key; Cache Storage keys are URLs, but this one is never requested. */
+const SVG_BUNDLE_KEY = '/topics-ui-svg-bundle.json'
+/** Save the bundle once the page's icons have stopped arriving, not once per icon. */
+const SVG_BUNDLE_SAVE_DELAY_MS = 2000
+let svgCacheVersion: string | undefined
+let storedSvgsPromise: Promise<StoredSvgs | undefined> | undefined
+type StoredSvgs = { cache: Cache; texts: Map<string, string>; saveTimer?: ReturnType<typeof setTimeout> }
+
+/**
+ * Keeps downloaded SVG files across visits under `version`, which must change whenever any icon
+ * file does (e.g. a hash of the files). Without a version, files are only reused within the page.
+ */
+export function setSvgCacheVersion(version: string | undefined) {
+  svgCacheVersion = version
+  storedSvgsPromise = undefined
+}
+
+function storedSvgs(): Promise<StoredSvgs | undefined> {
+  const version = svgCacheVersion
+  if (!version || !globalThis.caches) return Promise.resolve(undefined) // unversioned, or no Cache Storage (insecure origin)
+  storedSvgsPromise ??= (async () => {
+    const name = SVG_CACHE_PREFIX + version
+    try {
+      for (const old of await caches.keys()) {
+        if (old.startsWith(SVG_CACHE_PREFIX) && old !== name) void caches.delete(old)
+      }
+      const cache = await caches.open(name)
+      const bundle = await cache.match(SVG_BUNDLE_KEY)
+      const texts = new Map<string, string>(bundle ? Object.entries(await bundle.json() as Record<string, string>) : [])
+      return { cache, texts }
+    } catch {
+      return undefined // storage blocked (e.g. some private modes) or a damaged bundle: download as usual
+    }
+  })()
+  return storedSvgsPromise
+}
+
+function storeSvg(stored: StoredSvgs, url: string, text: string) {
+  stored.texts.set(url, text)
+  clearTimeout(stored.saveTimer)
+  stored.saveTimer = setTimeout(() => {
+    const bundle = new Response(JSON.stringify(Object.fromEntries(stored.texts)), { headers: { 'Content-Type': 'application/json' } })
+    void stored.cache.put(SVG_BUNDLE_KEY, bundle).catch(() => undefined) // e.g. over quota: just not kept
+  }, SVG_BUNDLE_SAVE_DELAY_MS)
+}
+
 function fetchSvgText(url: string): Promise<string> {
   let cached = svgTextCache.get(url)
   if (!cached) {
-    cached = fetch(url).then(response => {
+    cached = (async () => {
+      const stored = await storedSvgs()
+      const storedText = stored?.texts.get(url)
+      if (storedText !== undefined) return storedText
+
+      const response = await fetch(url)
       if (!response.ok) {
         throw new Error(`svg-recolor: failed to fetch ${url} (${response.status})`)
       }
-      return response.text()
-    })
+      const text = await response.text()
+      if (stored) storeSvg(stored, url, text)
+      return text
+    })()
     svgTextCache.set(url, cached)
   }
   return cached
