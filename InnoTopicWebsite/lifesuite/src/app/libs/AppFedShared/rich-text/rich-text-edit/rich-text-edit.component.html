@@ -1,6 +1,7 @@
 
 <!--   [apiKey]="'o9pxe54rr0n0ox46qj7gtlks0ilkpf7gmximm8syjqzjl184'"
 -->
+@if (showEditor) {
 <editor
   [init]="tinyMceInit"
   [inline]="true"
@@ -30,3 +31,13 @@
   -->
 
 </editor>
+} @else {
+  <!-- activateOnClick: plain HTML until the user clicks/focuses it - TinyMCE costs ~0.5s to start. -->
+  <div
+    class="mce-content-body rich-text-static"
+    tabindex="0"
+    [innerHTML]="staticHtml"
+    (click)="activateEditor()"
+    (focus)="activateEditor()"
+  ></div>
+}

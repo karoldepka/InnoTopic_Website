@@ -55,6 +55,30 @@ export class RichTextEditComponent extends AbstractCellComponent implements OnIn
   /** workaround for searchOrAdd not updating when deleting all text at once */
   @Input() enableModelEventNodeChange = false
 
+  /** Render the content as plain HTML and only construct the TinyMCE editor once the user clicks
+   * or focuses it. TinyMCE takes ~0.5s of main-thread time to start, so screens that mostly just
+   * *display* rich text (e.g. the quiz question) opt into this to open noticeably faster. */
+  @Input() activateOnClick = false
+
+  editorActivated = false
+
+  get showEditor(): boolean {
+    return ! this.activateOnClick || this.editorActivated
+  }
+
+  get staticHtml(): string {
+    const value = this.formControl1?.value
+    return typeof value === 'string' ? convertToHtmlIfNeeded(value) ?? '' : ''
+  }
+
+  activateEditor() {
+    if ( this.editorActivated ) {
+      return
+    }
+    this.editorActivated = true
+    this.focusPending = true // focused by onEditorInit() once TinyMCE has finished constructing
+  }
+
   @Input() showClearButton: boolean = false
 
   /** Used in search-or-add (because enter creates a new item). */
@@ -817,6 +841,10 @@ export class RichTextEditComponent extends AbstractCellComponent implements OnIn
   }
 
   focusEditor() {
+    if ( ! this.showEditor ) {
+      this.activateEditor()
+      return
+    }
     if ( ! this.editorReady ) {
       // Editor isn't constructed yet - defer instead of calling into a half-built TinyMCE
       // instance. onEditorInit() below replays this once (onInit) actually fires.

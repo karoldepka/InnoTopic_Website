@@ -79,6 +79,11 @@ export class ItemSideComponent implements OnInit {
   @Input()
   showSideLabel = true
 
+  /** Quiz sets this to true - show the text as plain HTML and only start the (slow) rich-text
+   * editor when the user clicks into it. See RichTextEditComponent.activateOnClick. */
+  @Input()
+  activateEditorOnClick = false
+
 
   formControls ! : SideFormControlsDict
 
