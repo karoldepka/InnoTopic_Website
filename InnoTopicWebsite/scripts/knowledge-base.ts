@@ -87,7 +87,8 @@ export function workHistoryData() {
       name,
       period: org.time.join(' – '),
       startYear: year(org.time[0]),
-      endYear: year(org.time[org.time.length - 1]),
+      // A period of one year ("2017") gives no end: open-ended for filtering.
+      endYear: org.time.length > 1 ? year(org.time[org.time.length - 1]) : null,
       locations: org.locations ?? null,
       description: org.description ? plainText(org.description) : null,
       projects: Object.entries(org.projects).map(([projectName, project]) => ({

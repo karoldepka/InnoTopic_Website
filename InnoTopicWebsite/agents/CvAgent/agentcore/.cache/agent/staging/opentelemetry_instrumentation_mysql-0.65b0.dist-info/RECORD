@@ -1,0 +1,10 @@
+opentelemetry/instrumentation/mysql/__init__.py,sha256=xsZ4Gqry-Qv1b28-TkfilpPezrHoIY6Djq1QgyB8Ca4,10948
+opentelemetry/instrumentation/mysql/package.py,sha256=JJF-01WUFHIAi1LUZk98AkcquhltoCShkBe51DM57Us,167
+opentelemetry/instrumentation/mysql/version.py,sha256=-Rf_XkVgjzBGXkth6rg5g0wlRe89UiHM9N5QtCtYKW0,100
+opentelemetry_instrumentation_mysql-0.65b0.dist-info/INSTALLER,sha256=5hhM4Q4mYTT9z6QB6PGpUAW81PGNFrYrdXMj4oM_6ak,2
+opentelemetry_instrumentation_mysql-0.65b0.dist-info/METADATA,sha256=2euwJO7d2srpVCZOUdR9_DG57bY9Nys_B5nflgV1P4U,2088
+opentelemetry_instrumentation_mysql-0.65b0.dist-info/RECORD,,
+opentelemetry_instrumentation_mysql-0.65b0.dist-info/REQUESTED,sha256=47DEQpj8HBSa-_TImW-5JCeuQeRkm5NMpJWZG3hSuFU,0
+opentelemetry_instrumentation_mysql-0.65b0.dist-info/WHEEL,sha256=lCkmxWfQsSc9CfIClYeavTdQeEX2toPqufh9gI35EQA,87
+opentelemetry_instrumentation_mysql-0.65b0.dist-info/entry_points.txt,sha256=5iCC9hhmhTfgnQjF1hxtafJdMfGqns_WICyNJN_beeU,91
+opentelemetry_instrumentation_mysql-0.65b0.dist-info/licenses/LICENSE,sha256=xx0jnfkXJvxRnG63LTGOxlggYnIysveWIZ6H3PNdCrQ,11357

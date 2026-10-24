@@ -5,8 +5,8 @@
   "runtimes": [
     {
       "name": "agent",
-      "build": "CodeZip",
       "modelProvider": "Bedrock",
+      "build": "CodeZip",
       "entrypoint": "main.py",
       "codeLocation": "app/agent",
       "runtimeVersion": "PYTHON_3_14",
@@ -47,5 +47,180 @@
         }
       ]
     }
-  ]
+  ],
+  "knowledgeBases": [
+    {
+      "type": "AgentCoreKnowledgeBase",
+      "name": "cvKnowledge",
+      "description": "Karol Depka Pradzinski's work history (organisations, projects, technologies) and skill levels",
+      "dataSources": [
+        {
+          "type": "S3",
+          "uri": "s3://innotopic-cv-agent-knowledge-736162636892/knowledge-base/"
+        }
+      ]
+    }
+  ],
+  "credentials": [],
+  "evaluators": [
+    {
+      "name": "CvAnswerQuality",
+      "level": "SESSION",
+      "config": {
+        "llmAsAJudge": {
+          "model": "global.anthropic.claude-sonnet-5-5",
+          "instructions": "Judge from {context} whether the CV assistant answered the visitor's questions about Karol's career with facts from his work history (organisations, periods, projects, technologies, skill levels), named the organisations and years its answers rest on, said so instead of guessing when the history did not cover a question, and stayed short and in plain text.",
+          "ratingScale": {
+            "numerical": [
+              {
+                "value": 1,
+                "label": "Very Poor",
+                "definition": "The response fails to address the task and contains significant errors."
+              },
+              {
+                "value": 2,
+                "label": "Poor",
+                "definition": "The response partially addresses the task but has notable gaps or inaccuracies."
+              },
+              {
+                "value": 3,
+                "label": "Fair",
+                "definition": "The response addresses the task adequately, with minor issues."
+              },
+              {
+                "value": 4,
+                "label": "Good",
+                "definition": "The response addresses the task well and is accurate and helpful."
+              },
+              {
+                "value": 5,
+                "label": "Excellent",
+                "definition": "The response fully addresses the task and is accurate, complete, and helpful."
+              }
+            ]
+          }
+        }
+      }
+    }
+  ],
+  "onlineEvalConfigs": [
+    {
+      "name": "CvMonitor",
+      "agent": "agent",
+      "evaluators": [
+        "CvAnswerQuality",
+        "Builtin.Helpfulness"
+      ],
+      "samplingRate": 100
+    }
+  ],
+  "agentCoreGateways": [
+    {
+      "name": "cvtools",
+      "protocolType": "None",
+      "targets": [
+        {
+          "name": "workHistory",
+          "targetType": "lambda",
+          "toolDefinitions": [
+            {
+              "name": "listOrganisations",
+              "description": "List every organisation Karol has worked for or with, most recent first, with the period, locations and project names. Start here for an overview of his career.",
+              "inputSchema": {
+                "type": "object",
+                "properties": {}
+              }
+            },
+            {
+              "name": "getOrganisation",
+              "description": "Get one organisation in full: description, and each project's roles, description and technologies. Matches by name or part of it, e.g. \"Rithum\" or \"AIG\".",
+              "inputSchema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "description": "The organisation's name or part of it"
+                  }
+                },
+                "required": [
+                  "name"
+                ]
+              }
+            },
+            {
+              "name": "findProjects",
+              "description": "Find projects by technology (e.g. \"Kotlin\", \"Amazon Bedrock\"), by text in the project's name, roles or description, and/or within a range of years. Combine filters to answer questions like \"Which projects used React after 2020?\".",
+              "inputSchema": {
+                "type": "object",
+                "properties": {
+                  "technology": {
+                    "type": "string",
+                    "description": "A technology used in the project, or part of its name"
+                  },
+                  "text": {
+                    "type": "string",
+                    "description": "Text to find in the project's name, roles or description"
+                  },
+                  "sinceYear": {
+                    "type": "integer",
+                    "description": "Only organisations whose period reaches this year or later"
+                  },
+                  "untilYear": {
+                    "type": "integer",
+                    "description": "Only organisations whose period starts this year or earlier"
+                  }
+                }
+              }
+            },
+            {
+              "name": "getSkillLevels",
+              "description": "Karol's skill levels per technology: the level he has and the level he aims for (beginner, intermediate, advanced, expert). Optionally only for topics matching a name.",
+              "inputSchema": {
+                "type": "object",
+                "properties": {
+                  "topic": {
+                    "type": "string",
+                    "description": "A technology, or part of its name, e.g. \"Rust\""
+                  }
+                }
+              }
+            },
+            {
+              "name": "technologyTimeline",
+              "description": "When and where a technology was used across the work history, and for how many distinct years: use it for questions like \"How many years of Java experience?\".",
+              "inputSchema": {
+                "type": "object",
+                "properties": {
+                  "technology": {
+                    "type": "string",
+                    "description": "The technology, e.g. \"Java\""
+                  }
+                },
+                "required": [
+                  "technology"
+                ]
+              }
+            }
+          ],
+          "compute": {
+            "host": "Lambda",
+            "implementation": {
+              "language": "Python",
+              "path": "app/tools/work_history",
+              "handler": "handler.lambda_handler"
+            },
+            "pythonVersion": "PYTHON_3_13",
+            "timeout": 10,
+            "memorySize": 256
+          }
+        }
+      ],
+      "authorizerType": "AWS_IAM",
+      "enableSemanticSearch": false,
+      "exceptionLevel": "NONE"
+    }
+  ],
+  "policyEngines": [],
+  "configBundles": [],
+  "harnesses": []
 }

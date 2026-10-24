@@ -1,17 +1,16 @@
-// Writes the work history and skill levels as documents for an Amazon Bedrock knowledge base, to
-// dist/knowledge-base/: Markdown files, each with a "<file>.metadata.json" sidecar Bedrock reads for
-// metadata filtering; and the same data as JSON for the CV agent's tools (agents/CvAgent).
-// Upload the documents to the knowledge base's S3 data source and sync it:
-//   node scripts/generate-knowledge-base.mjs
-//   aws s3 sync dist/knowledge-base s3://<bucket>/<prefix> --delete
-//   aws bedrock-agent start-ingestion-job --knowledge-base-id <id> --data-source-id <id>
+// Writes the work history and skill levels for the CV agent (agents/CvAgent):
+// - knowledge-base/: Markdown documents for its Bedrock knowledge base, each with a
+//   "<file>.metadata.json" sidecar Bedrock reads for metadata filtering. The agent's deploy uploads
+//   them to the knowledge base's S3 data source and starts an ingestion (agentcore/cdk/lib/cdk-stack.ts);
+// - app/tools/work_history/work-history.json: the same data, structured, for its work-history tools.
+//   node scripts/generate-knowledge-base.mjs        (pnpm knowledge-base)
 import { build } from 'esbuild'
 import { mkdirSync, rmSync, writeFileSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
 const root = fileURLToPath(new URL('..', import.meta.url))
-const outDir = join(root, 'dist/knowledge-base')
+const outDir = join(root, 'agents/CvAgent/knowledge-base')
 
 const { outputFiles } = await build({
   entryPoints: [join(root, 'scripts/knowledge-base.ts')],
@@ -33,7 +32,6 @@ for (const { path, markdown, metadata } of documents) {
 }
 console.log(`Wrote ${documents.length} documents to ${outDir}`)
 
-// The structured work history for the CV agent's tools (agents/CvAgent).
 const toolsData = join(root, 'agents/CvAgent/app/tools/work_history/work-history.json')
 mkdirSync(dirname(toolsData), { recursive: true })
 writeFileSync(toolsData, JSON.stringify(workHistoryData(), null, 2) + '\n')

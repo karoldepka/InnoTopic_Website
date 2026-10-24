@@ -1,0 +1,15 @@
+[opentelemetry_configurator]
+aws_configurator = amazon.opentelemetry.distro.aws_opentelemetry_configurator:AwsOpenTelemetryConfigurator
+
+[opentelemetry_distro]
+aws_distro = amazon.opentelemetry.distro.aws_opentelemetry_distro:AwsOpenTelemetryDistro
+
+[opentelemetry_instrumentor]
+aws_crewai = amazon.opentelemetry.distro.instrumentation.crewai:CrewAIInstrumentor
+aws_langchain = amazon.opentelemetry.distro.instrumentation.langchain:LangChainInstrumentor
+aws_llama-index = amazon.opentelemetry.distro.instrumentation.llama_index:LlamaIndexInstrumentor
+aws_mcp = amazon.opentelemetry.distro.instrumentation.mcp:McpInstrumentor
+aws_openai_agents = amazon.opentelemetry.distro.instrumentation.openai_agents:OpenAIAgentsInstrumentor
+
+[opentelemetry_otlp_credential_provider]
+aws_sigv4 = amazon.opentelemetry.distro.exporter.otlp.aws.common.aws_sigv4_session_factory:aws_sigv4_session

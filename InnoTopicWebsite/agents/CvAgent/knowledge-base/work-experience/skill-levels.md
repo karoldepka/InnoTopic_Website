@@ -1,0 +1,136 @@
+# Karol Depka Pradzinski – skill levels
+
+Karol Depka Pradzinski's technology skills: the level he has, and the level he aims for.
+
+## Main Experience
+
+(extensive usage and always honing my skills and learning)
+
+- Java: has advanced, aiming for expert
+- Python: has advanced, aiming for expert
+- Rust: has advanced, aiming for expert
+- Docker: has advanced
+- AWS: has advanced
+- Angular: has advanced, aiming for expert
+- React: has advanced, aiming for expert
+- Vue.js: has advanced, aiming for expert
+- Codelyzer: has advanced, aiming for expert
+- Nx: has intermediate, aiming for expert
+- WebPack: has intermediate, aiming for advanced
+- Vite: has intermediate, aiming for advanced
+- Playwright: has intermediate, aiming for advanced
+- Chart.js: has advanced
+- GCP - Google Cloud Platform: has advanced, aiming for expert
+- PrimeNG: has intermediate, aiming for expert
+- AngularFire: has advanced, aiming for expert
+- Promises: has advanced, aiming for expert
+- Ionic: has intermediate, aiming for expert
+- PWA: has advanced, aiming for expert
+- HTML5: has advanced, aiming for expert
+- CSS3: has advanced, aiming for expert
+- Git: has advanced, aiming for expert
+- GitHub: has advanced, aiming for expert
+- GitLab: has advanced, aiming for expert
+- NPM: has advanced, aiming for expert
+- Yarn: has intermediate
+- D3.js: has intermediate, aiming for expert
+- Lodash: has advanced, aiming for expert
+- jQuery: has intermediate
+- SVG: has advanced, aiming for expert
+- Markdown: has advanced, aiming for expert
+- Google Maps: has advanced, aiming for expert
+- AG Grid: has advanced, aiming for expert
+- MongoDB: has advanced
+- Mongoose: has advanced
+- Bootstrap: has intermediate, aiming for expert
+- TypeScript: has advanced, aiming for expert
+- Spring: has intermediate, aiming for advanced
+- Spring Boot: has intermediate, aiming for advanced
+- Kafka: has intermediate, aiming for advanced
+- Kafka Streams: has intermediate, aiming for advanced
+- Micro Frontends: has advanced, aiming for expert
+- RxJS: has advanced, aiming for expert
+- ReactiveX: has advanced, aiming for expert
+- Firebase: has advanced, aiming for expert
+- Cloud Firestore: has advanced, aiming for expert
+- NgRx: has intermediate, aiming for expert
+- NGXS: has intermediate, aiming for expert
+- TestCafe: has intermediate, aiming for expert
+- KeystoneJS: has intermediate, aiming for advanced
+- WebSocket: has intermediate, aiming for expert
+- Android: has advanced
+- Bash: has advanced
+- Gradle: has advanced
+- Kotlin: has advanced
+- Linux: has advanced
+- Ubuntu Linux: has advanced
+- Debian Linux: has advanced
+- RedHat Linux: has intermediate
+- Fedora Linux: has intermediate
+- CentOS Linux: has intermediate
+- SUSE Linux: has intermediate
+- macOS: has advanced
+- Microsoft Windows: has advanced
+- NGINX: has intermediate
+- GraphQL: has advanced, aiming for expert
+- Microservices: has advanced, aiming for expert
+- RegExp: has advanced, aiming for expert
+- Jest: has intermediate, aiming for expert
+- Jasmine: has advanced, aiming for expert
+- Karma: has advanced, aiming for expert
+- Figma: has advanced, aiming for expert
+- Node.js: has advanced, aiming for expert
+- Express.js: has advanced, aiming for expert
+- Chrome Extensions: has intermediate, aiming for expert
+- NoSQL: has advanced, aiming for expert
+- WebStorm: has advanced, aiming for expert
+- IntelliJ IDEA: has advanced, aiming for expert
+- Android Studio: has advanced, aiming for expert
+- Visual Studio: has advanced
+- Visual Studio Code: has intermediate, aiming for expert
+- Vim: has intermediate
+- PostgreSQL: has advanced
+- MySQL: has advanced
+- Oracle: has advanced
+- IndexedDB: has advanced, aiming for expert
+- WordPress: has intermediate
+- Font Awesome: has advanced, aiming for expert
+- VirtualBox: has advanced
+- Blender: has intermediate, aiming for advanced
+- Adobe Illustrator: has advanced, aiming for expert
+- Adobe Photoshop: has intermediate, aiming for advanced
+- Adobe Creative Cloud: has intermediate, aiming for advanced
+- Affinity Designer: has advanced, aiming for expert
+- GIMP: has advanced
+- Inkscape: has advanced
+- Google Play: has advanced, aiming for expert
+- Customer Support: has intermediate, aiming for advanced
+- Agile: has advanced, aiming for expert
+- Scrum: has advanced, aiming for expert
+- ALM - Application Lifecycle Management: has advanced, aiming for expert
+- Algorithms: has advanced, aiming for expert
+- Data Structures: has advanced, aiming for expert
+- OOP - Object Oriented Programming: has advanced, aiming for expert
+- SOLID Principles: has advanced, aiming for expert
+- FP - Functional Programming: has advanced, aiming for expert
+- Design Patterns: has advanced, aiming for expert
+- Antipatterns: has advanced, aiming for expert
+- Software Architecture: has advanced, aiming for expert
+- Hexagonal Architecture: has advanced, aiming for expert
+- Refactoring: has advanced, aiming for expert
+- Code Review: has advanced, aiming for expert
+- TDD - Test-Driven Development: has advanced, aiming for expert
+- BDD - Behavior-Driven Development: has advanced, aiming for expert
+- DSL - Domain-Specific Languages: has intermediate, aiming for expert
+- Making Presentations: has advanced, aiming for expert
+- Leadership: has advanced, aiming for expert
+- Performance Optimization: has advanced, aiming for expert
+- Performance Profiling: has advanced, aiming for expert
+- UX - User Experience: has advanced, aiming for expert
+- Troubleshooting: has advanced, aiming for expert
+- Graphic Design: has intermediate, aiming for expert
+- Testing: has advanced, aiming for expert
+- Lighthouse
+- three.js
+- WebGL
+- glTF

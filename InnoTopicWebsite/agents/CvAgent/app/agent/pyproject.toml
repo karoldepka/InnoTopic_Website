@@ -13,6 +13,7 @@ dependencies = [
     "bedrock-agentcore[strands-agents] >= 1.18.1, < 2.0.0",
     "botocore[crt] ~= 1.43.0",
     "strands-agents >= 1.62.0, < 2.0.0",
+    "strands-agents-tools>=0.8.10",
 ]
 
 [tool.hatch.build.targets.wheel]

@@ -297,7 +297,7 @@
       "name": "InnoTopic SLU",
       "period": "2017",
       "startYear": 2017,
-      "endYear": 2017,
+      "endYear": null,
       "locations": null,
       "description": null,
       "projects": [
@@ -499,7 +499,7 @@
       "name": "Angular Málaga Meetup Group",
       "period": "2017",
       "startYear": 2017,
-      "endYear": 2017,
+      "endYear": null,
       "locations": "Málaga - Spain",
       "description": null,
       "projects": [
@@ -521,7 +521,7 @@
       "name": "TopicFriends.org",
       "period": "2017",
       "startYear": 2017,
-      "endYear": 2017,
+      "endYear": null,
       "locations": null,
       "description": null,
       "projects": [
@@ -765,7 +765,7 @@
       "name": "Freelance Software Developer",
       "period": "2002",
       "startYear": 2002,
-      "endYear": 2002,
+      "endYear": null,
       "locations": "Poland, Germany, Spain",
       "description": null,
       "projects": [

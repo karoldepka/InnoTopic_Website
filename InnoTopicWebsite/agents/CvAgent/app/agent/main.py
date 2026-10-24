@@ -1,24 +1,43 @@
+import os
 from functools import lru_cache
 
-from strands import Agent, tool
+from strands import Agent
 from strands.agent.conversation_manager.null_conversation_manager import NullConversationManager
+from strands_tools import retrieve
+from strands_tools.code_interpreter import AgentCoreCodeInterpreter
 from bedrock_agentcore.runtime import BedrockAgentCoreApp
 from model.load import load_model
 from parse import parse_payload
 from memory.session import get_memory_session_manager
+from gateway_client import get_gateway_client
 
-DEFAULT_SYSTEM_PROMPT = "You are a helpful assistant. Use tools when appropriate."
+SYSTEM_PROMPT = """You answer questions about Karol Depka Pradzinski's career for visitors of his CV website: recruiters, potential clients and fellow engineers.
 
-# Define a collection of tools used by the model
+Answer from his work history, not from general knowledge:
+- The work-history tools give exact facts: organisations, periods, projects, roles, technologies and skill levels. Use them for anything specific, such as which projects used a technology, when, or for how many years.
+- The knowledge base (retrieve) holds the same history as prose; use it for open questions about what he did and how.
+- Use the code interpreter only for calculations or summaries over data the tools returned.
+
+When the history doesn't cover something, say so and suggest contacting Karol, rather than guessing. You may remember what a returning visitor is interested in (for example, a role they are hiring for) and use it.
+
+Keep answers short and conversational, name the organisations and years your answer rests on, and reply in the language the visitor writes in. Write plain text without Markdown: the chat shows text as-is."""
+
+REGION = os.getenv("AWS_REGION")
+
 tools = []
 
-# Define a simple function tool
-@tool
-def add_numbers(a: int, b: int) -> int:
-    """Return the sum of two numbers"""
-    return a + b
+# The work-history tools, served by AgentCore Gateway (MCP).
+gateway = get_gateway_client()
+if gateway:
+    tools.append(gateway)
 
-tools.append(add_numbers)
+# The Bedrock knowledge base (KNOWLEDGE_BASE_ID is set by the deployment).
+if os.getenv("KNOWLEDGE_BASE_ID"):
+    tools.append(retrieve)
+
+# The AgentCore Code Interpreter: a sandbox for calculations over the tools' results.
+tools.append(AgentCoreCodeInterpreter(region=REGION).code_interpreter)
+
 
 def _make_conversation_manager():
     return NullConversationManager()
@@ -32,7 +51,7 @@ def _get_agent(session_id: str, actor_id: str) -> Agent:
         model=load_model(),
         session_manager=get_memory_session_manager(session_id, actor_id),
         conversation_manager=_make_conversation_manager(),
-        system_prompt=DEFAULT_SYSTEM_PROMPT,
+        system_prompt=SYSTEM_PROMPT,
         tools=tools,
     )
 
