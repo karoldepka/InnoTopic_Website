@@ -22,6 +22,11 @@
     break-after: avoid
     page-break-after: avoid
 
+// Two left edges show the hierarchy: an organisation's header, description and links start at the
+// section's edge; its projects (heading, description, skills) all start one indent further in.
+$project-indent: 16px
+$project-indent-small: 12px
+
 .organisation
   margin: 0
   &:not(:last-child)
@@ -37,33 +42,29 @@
     page-break-inside: avoid
     @media screen and (max-width: $break-medium)
       flex-wrap: wrap
-      justify-content: center
     @media screen and (max-width: $break-small)
       font-size: 1.1rem
       margin-bottom: 10px
     & > *
-      margin: 0px 15px 10px 15px
-      text-align: center
+      margin: 0px 15px 10px 0px
       @media screen and (max-width: $break-small)
-        margin: 0px 5px 5px 5px
-    & > *:first-child
-      margin-left: 0px
+        margin: 0px 10px 5px 0px
     img
       height: 40px
-  a
-    margin-left: 10px
-    display: block
 
 app-work-project
+  display: block
+  margin-left: $project-indent
   page-break-before: auto
-  &:first-child
-    background-color: red
+  @media screen and (max-width: $break-small)
+    margin-left: $project-indent-small
 
 .linkedin-logo
   vertical-align: middle
   padding-bottom: 2px
 
 .linkedin-recommendations-link
+  display: block
   text-decoration: none
 
 .linkedin-recommendations-text

@@ -3,18 +3,17 @@
 //
 @use '../../../../shared' as *
 
+// Everything in a project (heading, description, skills) shares one left edge; the organisation
+// list indents the project as a whole (see work-projects-section).
 .project-skills label
-  margin-left: 10px
   font-weight: bold
   //color: #555
 
 h3
   border-bottom: 1px solid #ddd
   color: var(--ion-color-primary)
-  padding: 0 10px 8px 10px
+  padding: 0 0 8px 0
   text-transform: uppercase
-  @media screen and (max-width: $break-medium)
-    padding: 0 0 8px 0
 
 fa
   padding-right: 10px
@@ -23,9 +22,9 @@ fa
 
 .project
   h3
-    margin: 25px 10px 10px 10px
+    margin: 25px 0 10px 0
   & > span
-    margin: 0 10px 5px 10px
+    margin: 0 0 5px 0
     display: block
     //color: #555
   fa-icon
