@@ -1,0 +1,1479 @@
+{
+  "person": "Karol Depka Pradzinski",
+  "organisations": [
+    {
+      "name": "Rithum",
+      "period": "September 2023 – September 2026",
+      "startYear": 2023,
+      "endYear": 2026,
+      "locations": "Málaga, remote, Madrid",
+      "description": "Staff Engineer, developing in Rust, Python, React and AWS, Amazon Bedrock, OpenSearch Elasticsearch and related",
+      "projects": [
+        {
+          "name": "AI-based LLM-powered platform for processing of product metadata and categorization",
+          "roles": "Staff Engineer",
+          "description": "Using Python and Amazon Bedrock with DynamoDB and MongoDB and Django + TypeScript & Rust Web App. Working directly with CTO and Senior Principal Engineer and other Staff Engineer. Working with big brands like Amazon, Walmart, Adidas, Puma. Application processed millions of events per day in realtime.",
+          "technologies": [
+            "Java",
+            "Django",
+            "MongoDB",
+            "Terraform",
+            "Angular",
+            "React",
+            "Tailwind CSS",
+            "Angular Material",
+            "AG Grid",
+            "GraphQL",
+            "Apollo",
+            "Apollo Studio",
+            "TypeScript",
+            "Ionic",
+            "Cypress",
+            "Jest",
+            "Bootstrap",
+            "React-Bootstrap",
+            "Netlify",
+            "Gatsby",
+            "Lodash",
+            "YouTube",
+            "Figma",
+            "Git",
+            "GitHub",
+            "GitLab",
+            "Docker",
+            "Kubernetes",
+            "Elasticsearch",
+            "AWS",
+            "Amazon SageMaker",
+            "Amazon Bedrock",
+            "Amazon Bedrock Agents",
+            "LangChain",
+            "LangGraph",
+            "Amazon Bedrock AgentCore",
+            "Amazon CloudWatch",
+            "WebStorm",
+            "Notion",
+            "Slack",
+            "Datadog"
+          ]
+        },
+        {
+          "name": "eCommerce Orders SLA real-time monitor and analytics platform",
+          "roles": "Staff Engineer, Rust, React, Angular Developer",
+          "description": "Using Rust, Python, Java, DynamoDB, MongoDB and Django + TypeScript Web App. Working directly with CTO and Senior Principal Engineer. Working with big brands like Amazon, Walmart, Adidas, Puma. Application processed millions of events per day in realtime.",
+          "technologies": [
+            "AWS CDK",
+            "Rust",
+            "Tokio",
+            "Tauri",
+            "Terraform",
+            "Angular",
+            "React",
+            "Tailwind CSS",
+            "Angular Material",
+            "AG Grid",
+            "GraphQL",
+            "Apollo",
+            "Apollo Studio",
+            "TypeScript",
+            "Ionic",
+            "Cypress",
+            "Jest",
+            "Bootstrap",
+            "React-Bootstrap",
+            "Git",
+            "GitHub",
+            "GitLab",
+            "Docker",
+            "Kubernetes",
+            "Serverless",
+            "Elasticsearch",
+            "DynamoDB",
+            "MongoDB",
+            "AWS",
+            "Amazon CloudWatch",
+            "WebStorm",
+            "Notion",
+            "Slack",
+            "Datadog",
+            "Python",
+            "Django",
+            "Java"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Epic Elite FZE",
+      "period": "March 2021 – September 2022",
+      "startYear": 2021,
+      "endYear": 2022,
+      "locations": "Málaga, remote, London, Dubai",
+      "description": null,
+      "projects": [
+        {
+          "name": "EpicElite Platform",
+          "roles": "Lead/Senior Full-Stack Developer & Interviewing and Recruiting (Consultant)",
+          "description": "Developed company's platforms and tools for uploading, storing, managing and reviewing audio and video assets,  which served hundreds of thousands of clients, processing millions of assets reaching hundreds of millions of viewers and listeners. Recruited 3 Developers and a UI/UX/Web/Graphics Designer. I was a Team Lead of 3 Developers. Did code&architecture reviews. Worked directly with CEO & Director of Operations. Communication in English, Spanish, Polish.",
+          "technologies": [
+            "Microservices",
+            "Mailgun",
+            "RabbitMQ",
+            "Kafka",
+            "Kafka Streams",
+            "Spring Boot",
+            "reCAPTCHA",
+            "Terraform",
+            "Angular",
+            "Vue.js",
+            "Angular Material",
+            "AG Grid",
+            "GraphQL",
+            "Apollo",
+            "Apollo Studio",
+            "TypeScript",
+            "Ionic",
+            "Cypress",
+            "Jest",
+            "React",
+            "Tailwind CSS",
+            "Bootstrap",
+            "React-Bootstrap",
+            "Netlify",
+            "Gatsby",
+            "Lodash",
+            "YouTube",
+            "Figma",
+            "Zeplin",
+            "SVG",
+            "MobX",
+            "MobX-State-Tree",
+            "Git",
+            "GitHub",
+            "Docker",
+            "Kubernetes",
+            "Elasticsearch",
+            "AWS",
+            "Amazon CloudWatch",
+            "WebStorm",
+            "Notion",
+            "Slack",
+            "Datadog",
+            "TypeORM",
+            "TypeGraphQL",
+            "AudioSalad",
+            "Python",
+            "Django",
+            "PHP",
+            "Laravel",
+            "PandaDoc",
+            "Java",
+            "Kotlin",
+            "Hexagonal Architecture"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Genengine SL (as Consultant)",
+      "period": "2019 – 2020",
+      "startYear": 2019,
+      "endYear": 2020,
+      "locations": "Málaga, on-site and remote",
+      "description": null,
+      "projects": [
+        {
+          "name": "Genengine Angular App for genetic diagnosis of rare diseases",
+          "roles": "Senior Angular Developer (Consultant)",
+          "description": "First I wrote a suite of E2E UI tests in TestCafe from scratch, in order to increase confidence while making changes. Then I made numerous improvements of UI/UX, performance, robustness, architecture, refactors and I prepared the app for release. Working directly with CEO & CTO. Communication in English and Spanish.",
+          "technologies": [
+            "Angular",
+            "React",
+            "TypeScript",
+            "TestCafe",
+            "Angular Material",
+            "Git",
+            "GitLab",
+            "Docker",
+            "Trello",
+            "WebStorm",
+            "R Language"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "AIG (as Consultant)",
+      "period": "October 2017 – July 2018",
+      "startYear": 2017,
+      "endYear": 2018,
+      "locations": "Heilbronn - Germany, Málaga - Spain (remote)",
+      "description": null,
+      "projects": [
+        {
+          "name": "Platform for assessing risk",
+          "roles": "Lead frontend developer and backend developer, teaching Angular",
+          "description": "PWA working fully offline and synchronising with server to support multi-million-dollar multi-national functionality. Advanced analytics using charts and grid. Internationalisation. I developed the Angular + Bootstrap app from scratch and helped with the Node.js + MongoDB backend (conceptually as well as in development). Communication in English and German.",
+          "technologies": [
+            "Vue.js",
+            "Angular",
+            "TypeScript",
+            "Java",
+            "Kotlin",
+            "Spring",
+            "Spring Boot",
+            "Kafka",
+            "Kafka Streams",
+            "Python",
+            "Django",
+            "Karma",
+            "Jasmine",
+            "Bootstrap",
+            "Less",
+            "Node.js",
+            "Express.js",
+            "Dexie.js",
+            "AG Grid",
+            "Chart.js",
+            "PWA",
+            "Docker",
+            "Lodash",
+            "MongoDB",
+            "Mongoose",
+            "KeystoneJS",
+            "Agile Central",
+            "Git"
+          ]
+        },
+        {
+          "name": "Customer-facing application for managing insurance plans and customer data. Millions of users.",
+          "roles": "Senior Angular & Node.js & Java/Kotlin Developer",
+          "description": null,
+          "technologies": [
+            "Angular",
+            "Bootstrap",
+            "TypeScript",
+            "Java",
+            "Kotlin",
+            "Groovy",
+            "Gradle",
+            "Spring",
+            "Spring Boot",
+            "Kafka",
+            "Kafka Streams",
+            "Less",
+            "Node.js",
+            "Express.js",
+            "XML",
+            "XML Schema",
+            "BiPRO",
+            "Git"
+          ]
+        },
+        {
+          "name": "Application for managing insurance plans",
+          "roles": "Senior Angular Developer",
+          "description": "Drag & drop tree, file upload via drag & drop.",
+          "technologies": [
+            "Java",
+            "Kotlin",
+            "Groovy",
+            "Gradle",
+            "Maven",
+            "Spring",
+            "Spring Boot",
+            "Angular",
+            "TypeScript",
+            "Karma",
+            "Jasmine",
+            "Bootstrap",
+            "PrimeNG",
+            "Git"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "InnoTopic SLU",
+      "period": "2017",
+      "startYear": 2017,
+      "endYear": 2017,
+      "locations": null,
+      "description": null,
+      "projects": [
+        {
+          "name": "DomainMate",
+          "roles": null,
+          "description": "smart, linguistic and creative domain name generation and prices comparison.",
+          "technologies": [
+            "Vue.js",
+            "Nuxt",
+            "PostHog",
+            "Amazon Bedrock",
+            "Amazon Bedrock Agents",
+            "Vercel",
+            "Microsoft Advertising"
+          ]
+        },
+        {
+          "name": "AIShirtGen - InnoTopic AI LLM Shirts/Posters/Banners Generator",
+          "roles": "Founder, Owner, Angular developer",
+          "description": "OP Python LangChain Ollama product and LLM & RAG case studies and side-experiments and demos",
+          "technologies": [
+            "Amazon Bedrock",
+            "Amazon Bedrock Agents",
+            "Vue.js",
+            "Nuxt"
+          ]
+        },
+        {
+          "name": "TODO: AskMAI (Ask My AI)",
+          "roles": "Founder, Owner, Angular developer",
+          "description": "OP Python LangChain Ollama product and LLM & RAG case studies and side-experiments and demos",
+          "technologies": [
+            "Angular",
+            "Ollama",
+            "OpenTelemetry",
+            "LangChain",
+            "LangGraph",
+            "Amazon Bedrock",
+            "Amazon Bedrock Agents"
+          ]
+        },
+        {
+          "name": "InnoTopic.com website",
+          "roles": "Founder, Owner, Angular developer",
+          "description": null,
+          "technologies": [
+            "LangChain",
+            "LangGraph",
+            "Amazon Bedrock",
+            "Amazon Bedrock Agents",
+            "Ionic",
+            "Angular Material",
+            "Angular",
+            "NgRx",
+            "RxJS",
+            "TypeScript",
+            "Nx",
+            "Sass",
+            "WebStorm",
+            "WebGL",
+            "Blender",
+            "glTF",
+            "D3.js",
+            "Git",
+            "GitHub",
+            "Docker",
+            "SVG",
+            "Affinity Designer",
+            "Figma",
+            "Font Awesome",
+            "Node.js",
+            "Firebase",
+            "pnpm"
+          ]
+        },
+        {
+          "name": "FlexAgenda",
+          "roles": "Founder, Android/Java Developer, Publisher",
+          "description": "Android app for time planning (freemium). Reached 100k installs organically; 4.3/5 average rating. I developed the app from scratch in native Android & Java and released many versions based on a lot of user feedback I received. I was also in regular communication with users (paid and gratis) over e-mail, IM and voice chat, helping to solve issues and discussing improvement suggestions. App available in English, Spanish, Catalan, German, Polish, French, Italian.",
+          "technologies": [
+            "Ionic",
+            "Android",
+            "Java",
+            "Kotlin",
+            "Groovy",
+            "Spock",
+            "Gradle",
+            "JUnit",
+            "Eclipse",
+            "IntelliJ IDEA",
+            "Android Studio",
+            "Google Play",
+            "GIMP",
+            "Inkscape",
+            "Adobe Illustrator",
+            "Customer Support",
+            "Docker"
+          ]
+        },
+        {
+          "name": "OrYoL - Organize Your Life",
+          "roles": "Founder, Angular Developer",
+          "description": null,
+          "technologies": [
+            "Angular",
+            "Ionic",
+            "Android",
+            "Groovy",
+            "Gradle",
+            "Java",
+            "Kotlin",
+            "NgRx",
+            "RxJS",
+            "PrimeNG",
+            "Font Awesome",
+            "Sass",
+            "TypeScript",
+            "Karma",
+            "Jasmine",
+            "Bootstrap",
+            "Firebase",
+            "Cloud Firestore",
+            "GCP - Google Cloud Platform",
+            "GitHub",
+            "Docker"
+          ]
+        },
+        {
+          "name": "LifeSuite",
+          "roles": "Founder, Angular/Ionic/Android/iOS Developer",
+          "description": "Ionic 5 App (Web, Android, iOS) for finding solutions (psychology, motivation, productivity, etc.) to common life problems and to see life overview in terms of charts (SVG) like Ikigai, Flow State, etc. Released to Google Play and soon to Apple App Store. Has a search engine with Damerau-Levenshtein distance between strings - fuzzy search taking typos into account, with memoization for performance optimization. Strictest settings of TypeScript and Angular.",
+          "technologies": [
+            "Angular",
+            "Ionic",
+            "Sass",
+            "TypeScript",
+            "NgRx",
+            "RxJS",
+            "Karma",
+            "Jasmine",
+            "TestCafe",
+            "Bash",
+            "Bootstrap",
+            "Firebase",
+            "Cloud Firestore",
+            "GCP - Google Cloud Platform",
+            "Git",
+            "GitHub",
+            "Android",
+            "Java",
+            "Kotlin",
+            "Groovy",
+            "Gradle",
+            "iOS",
+            "Google Play",
+            "SVG",
+            "Gravit Designer",
+            "Affinity Designer",
+            "Docker",
+            "Hexagonal Architecture",
+            "LangGraph",
+            "LangChain",
+            "Amazon Bedrock",
+            "OpenAI"
+          ]
+        },
+        {
+          "name": "CloudTime",
+          "roles": "Founder, Angular/Ionic/Android/iOS Developer",
+          "description": "Ionic 5 App (Web, Android, iOS) for timers (countdown, soon also counting up) synced across devices. Soon to be released to Google Play and Apple App Store.",
+          "technologies": [
+            "Angular",
+            "Ionic",
+            "TypeScript",
+            "Karma",
+            "Jasmine",
+            "TestCafe",
+            "Bash",
+            "Firebase",
+            "Cloud Firestore",
+            "GCP - Google Cloud Platform",
+            "Git",
+            "GitHub",
+            "Android",
+            "Java",
+            "Kotlin",
+            "Groovy",
+            "Gradle",
+            "iOS",
+            "Google Play",
+            "Affinity Designer",
+            "Docker"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Angular Málaga Meetup Group",
+      "period": "2017",
+      "startYear": 2017,
+      "endYear": 2017,
+      "locations": "Málaga - Spain",
+      "description": null,
+      "projects": [
+        {
+          "name": "Angular Málaga Meetup Group",
+          "roles": "Co-Founder / Co-Organizer, Event Organizer",
+          "description": null,
+          "technologies": [
+            "Angular",
+            "TypeScript",
+            "Karma",
+            "Meetup",
+            "Git"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "TopicFriends.org",
+      "period": "2017",
+      "startYear": 2017,
+      "endYear": 2017,
+      "locations": null,
+      "description": null,
+      "projects": [
+        {
+          "name": "TopicFriends.org Web App",
+          "roles": "Founder, Architect, Angular Developer",
+          "description": null,
+          "technologies": [
+            "Angular",
+            "Firebase",
+            "GCP - Google Cloud Platform",
+            "Angular Material",
+            "TestCafe",
+            "WebStorm",
+            "CircleCI",
+            "Travis CI",
+            "Git",
+            "GitHub",
+            "Bash",
+            "TypeScript",
+            "Karma",
+            "Jasmine",
+            "Figma",
+            "Affinity Designer",
+            "SVG",
+            "Google Maps"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Oblong Industries",
+      "period": "2013 – 2015",
+      "startYear": 2013,
+      "endYear": 2015,
+      "locations": "Barcelona, Los Angeles",
+      "description": null,
+      "projects": [
+        {
+          "name": "Mezzanine Android",
+          "roles": "Android Lead, Senior Developer",
+          "description": "Lead developer, Java Developer on the Android client of Company's flagship product, Mezzanine. I solidified and refactored existing codebase/prototype written by a Junior Developer, successfully releasing it and then making subsequent releases with new features. Also developed a schema language and code generator for Company's communication protocol, using JetBrains MPS (generating Java code from a DSL).",
+          "technologies": [
+            "Google Play",
+            "JetBrains MPS",
+            "DSL - Domain-Specific Languages",
+            "Groovy",
+            "Android",
+            "iOS",
+            "Kotlin",
+            "Ubuntu Linux",
+            "macOS",
+            "Java",
+            "Gradle",
+            "Bugzilla",
+            "Ruby",
+            "Calabash",
+            "BDD - Behavior-Driven Development",
+            "RubyMine",
+            "Cucumber",
+            "JUnit",
+            "Eclipse",
+            "IntelliJ IDEA",
+            "Android Studio",
+            "Docker"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "CollabNet",
+      "period": "2011 – 2013",
+      "startYear": 2011,
+      "endYear": 2013,
+      "locations": "Potsdam, Berlin, Silicon Valley",
+      "description": null,
+      "projects": [
+        {
+          "name": "TeamForge integration with Gerrit and Git",
+          "roles": "Java Developer and related",
+          "description": "Worked as a Java Developer at the Company that created Subversion (Svn) version control system, somewhat ironically on development of integration of Git and Gerrit with CollabNet's flagship product - TeamForge, an ALM (Application Lifecycle Management) enterprise system, used by big enterprise clients like Intel, Ericsson, NXP. We were also dogfooding using the Gerrit-based code review system which was a great opportunity to also master advanced Git workflows using rebasing, squashing, etc. Communication in English, German, Polish .",
+          "technologies": [
+            "Java",
+            "Scala",
+            "Groovy",
+            "Spring",
+            "SOAP",
+            "Perl",
+            "Python",
+            "Bash",
+            "Git",
+            "Gerrit",
+            "Subversion",
+            "JUnit",
+            "Cobertura",
+            "Mockito",
+            "Guice",
+            "CentOS Linux",
+            "Eclipse",
+            "Jenkins",
+            "TeamForge",
+            "PostgreSQL"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Siemens SIS (later Atos)",
+      "period": "2010 – 2011",
+      "startYear": 2010,
+      "endYear": 2011,
+      "locations": "Wroclaw - Poland, Koszalin - Poland (remote)",
+      "description": null,
+      "projects": [
+        {
+          "name": "Multi-Dimensional-Tool for EuroStat (European Commission)",
+          "roles": "Java & Java Swing Senior Developer",
+          "description": "Development of EuroStat's MDT (Multi-Dimensional Tool) - main tool used for all kinds of statistics in the European Union. Advanced Java Java Swing UI.",
+          "technologies": [
+            "Java",
+            "Scala",
+            "Spring",
+            "Groovy",
+            "Jira",
+            "Subversion",
+            "Eclipse",
+            "IntelliJ IDEA",
+            "PostgreSQL"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "CoViOb - Communicate via Objects",
+      "period": "2006 – 2010",
+      "startYear": 2006,
+      "endYear": 2010,
+      "locations": null,
+      "description": null,
+      "projects": [
+        {
+          "name": "CoViOb - Communicate via Objects",
+          "roles": "Startup Co-Founder, Architect, Java developer",
+          "description": "Won startup competition main prize among ~100 startups. Decentralized database with version control (before Git became popular), real-time threaded communication (before Google Wave)",
+          "technologies": [
+            "Java",
+            "Git",
+            "Subversion",
+            "Debian Linux",
+            "Scala",
+            "Spring",
+            "Groovy",
+            "Android",
+            "Maven",
+            "Eclipse",
+            "NetBeans",
+            "Bash",
+            "IntelliJ IDEA",
+            "JUnit",
+            "TestNG"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Research And Engineering Center (REC), later GlobalLogic",
+      "period": "2010 – 2011",
+      "startYear": 2010,
+      "endYear": 2011,
+      "locations": "Koszalin - Poland, Wroclaw - Poland",
+      "description": null,
+      "projects": [
+        {
+          "name": "Rostock Harbor",
+          "roles": "Senior Java developer",
+          "description": null,
+          "technologies": [
+            "Java",
+            "Spring",
+            "Subversion",
+            "JAXB"
+          ]
+        },
+        {
+          "name": "M2M Platform",
+          "roles": "Senior Java developer, tech lead",
+          "description": null,
+          "technologies": [
+            "Java",
+            "Spring",
+            "Java Micro Edition",
+            "Subversion",
+            "Trac"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "o2.pl",
+      "period": "2008 – 2009",
+      "startYear": 2008,
+      "endYear": 2009,
+      "locations": null,
+      "description": null,
+      "projects": [
+        {
+          "name": "Java ME clients for E-mail and Instant Messaging",
+          "roles": "Java ME developer",
+          "description": "Got my hands very dirty working with binary IM protocol and E-mail protocol/format directly.",
+          "technologies": [
+            "Java",
+            "Java Micro Edition",
+            "Trac",
+            "Subversion"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Petrus - TV, Internet, Phone",
+      "period": "2006 – 2006",
+      "startYear": 2006,
+      "endYear": 2006,
+      "locations": "Chojnice, Poland",
+      "description": null,
+      "projects": [
+        {
+          "name": "Server Administration, Customer Support, Help Desk",
+          "roles": null,
+          "description": null,
+          "technologies": [
+            "Linux",
+            "Customer Support",
+            "Oracle",
+            "Perl"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Freelance Software Developer",
+      "period": "2002",
+      "startYear": 2002,
+      "endYear": 2002,
+      "locations": "Poland, Germany, Spain",
+      "description": null,
+      "projects": [
+        {
+          "name": "3D Homes - Real estate app on Costa del Sol, with interactive maps and 3D views of homes",
+          "roles": null,
+          "description": null,
+          "technologies": [
+            "Angular",
+            "TypeScript",
+            "Angular Material",
+            "Firebase",
+            "Cloud Firestore",
+            "WebStorm",
+            "Git",
+            "GitLab"
+          ]
+        },
+        {
+          "name": "Angular app for geo-fencing protection of field workers in dangerous areas",
+          "roles": null,
+          "description": "Angular Development. Worked directly with CEO/Founder.",
+          "technologies": [
+            "Angular",
+            "TypeScript",
+            "Bootstrap",
+            "WebStorm",
+            "Vagrant",
+            "Git",
+            "Mapbox"
+          ]
+        },
+        {
+          "name": "Invoice Generator for Cable TV + Internet + Phone Company (Petrus)",
+          "roles": null,
+          "description": "Reliably generated tens of thousands of e-invoices every month, amounting to millions of invoices generated over the years.",
+          "technologies": [
+            "Java",
+            "XML",
+            "XML Schema",
+            "JAXB",
+            "PDF",
+            "iText",
+            "Git"
+          ]
+        },
+        {
+          "name": "BlackBerry client for a social network",
+          "roles": null,
+          "description": null,
+          "technologies": [
+            "Java",
+            "BlackBerry",
+            "Java Micro Edition",
+            "Eclipse",
+            "Git",
+            "Pivotal Tracker"
+          ]
+        }
+      ]
+    }
+  ],
+  "skills": [
+    {
+      "group": "Main Experience",
+      "comment": "extensive usage and always honing my skills and learning",
+      "topics": [
+        {
+          "topic": "Java",
+          "have": "advanced",
+          "want": "expert"
+        },
+        {
+          "topic": "Python",
+          "have": "advanced",
+          "want": "expert"
+        },
+        {
+          "topic": "Rust",
+          "have": "advanced",
+          "want": "expert"
+        },
+        {
+          "topic": "Docker",
+          "have": "advanced",
+          "want": null
+        },
+        {
+          "topic": "AWS",
+          "have": "advanced",
+          "want": null
+        },
+        {
+          "topic": "Angular",
+          "have": "advanced",
+          "want": "expert"
+        },
+        {
+          "topic": "React",
+          "have": "advanced",
+          "want": "expert"
+        },
+        {
+          "topic": "Vue.js",
+          "have": "advanced",
+          "want": "expert"
+        },
+        {
+          "topic": "Codelyzer",
+          "have": "advanced",
+          "want": "expert"
+        },
+        {
+          "topic": "Nx",
+          "have": "intermediate",
+          "want": "expert"
+        },
+        {
+          "topic": "WebPack",
+          "have": "intermediate",
+          "want": "advanced"
+        },
+        {
+          "topic": "Vite",
+          "have": "intermediate",
+          "want": "advanced"
+        },
+        {
+          "topic": "Playwright",
+          "have": "intermediate",
+          "want": "advanced"
+        },
+        {
+          "topic": "Chart.js",
+          "have": "advanced",
+          "want": null
+        },
+        {
+          "topic": "GCP - Google Cloud Platform",
+          "have": "advanced",
+          "want": "expert"
+        },
+        {
+          "topic": "PrimeNG",
+          "have": "intermediate",
+          "want": "expert"
+        },
+        {
+          "topic": "AngularFire",
+          "have": "advanced",
+          "want": "expert"
+        },
+        {
+          "topic": "Promises",
+          "have": "advanced",
+          "want": "expert"
+        },
+        {
+          "topic": "Ionic",
+          "have": "intermediate",
+          "want": "expert"
+        },
+        {
+          "topic": "PWA",
+          "have": "advanced",
+          "want": "expert"
+        },
+        {
+          "topic": "HTML5",
+          "have": "advanced",
+          "want": "expert"
+        },
+        {
+          "topic": "CSS3",
+          "have": "advanced",
+          "want": "expert"
+        },
+        {
+          "topic": "Git",
+          "have": "advanced",
+          "want": "expert"
+        },
+        {
+          "topic": "GitHub",
+          "have": "advanced",
+          "want": "expert"
+        },
+        {
+          "topic": "GitLab",
+          "have": "advanced",
+          "want": "expert"
+        },
+        {
+          "topic": "NPM",
+          "have": "advanced",
+          "want": "expert"
+        },
+        {
+          "topic": "Yarn",
+          "have": "intermediate",
+          "want": null
+        },
+        {
+          "topic": "D3.js",
+          "have": "intermediate",
+          "want": "expert"
+        },
+        {
+          "topic": "Lodash",
+          "have": "advanced",
+          "want": "expert"
+        },
+        {
+          "topic": "jQuery",
+          "have": "intermediate",
+          "want": null
+        },
+        {
+          "topic": "SVG",
+          "have": "advanced",
+          "want": "expert"
+        },
+        {
+          "topic": "Markdown",
+          "have": "advanced",
+          "want": "expert"
+        },
+        {
+          "topic": "Google Maps",
+          "have": "advanced",
+          "want": "expert"
+        },
+        {
+          "topic": "AG Grid",
+          "have": "advanced",
+          "want": "expert"
+        },
+        {
+          "topic": "MongoDB",
+          "have": "advanced",
+          "want": "advanced"
+        },
+        {
+          "topic": "Mongoose",
+          "have": "advanced",
+          "want": "advanced"
+        },
+        {
+          "topic": "Bootstrap",
+          "have": "intermediate",
+          "want": "expert"
+        },
+        {
+          "topic": "TypeScript",
+          "have": "advanced",
+          "want": "expert"
+        },
+        {
+          "topic": "Spring",
+          "have": "intermediate",
+          "want": "advanced"
+        },
+        {
+          "topic": "Spring Boot",
+          "have": "intermediate",
+          "want": "advanced"
+        },
+        {
+          "topic": "Kafka",
+          "have": "intermediate",
+          "want": "advanced"
+        },
+        {
+          "topic": "Kafka Streams",
+          "have": "intermediate",
+          "want": "advanced"
+        },
+        {
+          "topic": "Micro Frontends",
+          "have": "advanced",
+          "want": "expert"
+        },
+        {
+          "topic": "RxJS",
+          "have": "advanced",
+          "want": "expert"
+        },
+        {
+          "topic": "ReactiveX",
+          "have": "advanced",
+          "want": "expert"
+        },
+        {
+          "topic": "Firebase",
+          "have": "advanced",
+          "want": "expert"
+        },
+        {
+          "topic": "Cloud Firestore",
+          "have": "advanced",
+          "want": "expert"
+        },
+        {
+          "topic": "NgRx",
+          "have": "intermediate",
+          "want": "expert"
+        },
+        {
+          "topic": "NGXS",
+          "have": "intermediate",
+          "want": "expert"
+        },
+        {
+          "topic": "TestCafe",
+          "have": "intermediate",
+          "want": "expert"
+        },
+        {
+          "topic": "KeystoneJS",
+          "have": "intermediate",
+          "want": "advanced"
+        },
+        {
+          "topic": "WebSocket",
+          "have": "intermediate",
+          "want": "expert"
+        },
+        {
+          "topic": "Android",
+          "have": "advanced",
+          "want": null
+        },
+        {
+          "topic": "Bash",
+          "have": "advanced",
+          "want": null
+        },
+        {
+          "topic": "Gradle",
+          "have": "advanced",
+          "want": null
+        },
+        {
+          "topic": "Kotlin",
+          "have": "advanced",
+          "want": null
+        },
+        {
+          "topic": "Linux",
+          "have": "advanced",
+          "want": null
+        },
+        {
+          "topic": "Ubuntu Linux",
+          "have": "advanced",
+          "want": null
+        },
+        {
+          "topic": "Debian Linux",
+          "have": "advanced",
+          "want": null
+        },
+        {
+          "topic": "RedHat Linux",
+          "have": "intermediate",
+          "want": null
+        },
+        {
+          "topic": "Fedora Linux",
+          "have": "intermediate",
+          "want": null
+        },
+        {
+          "topic": "CentOS Linux",
+          "have": "intermediate",
+          "want": null
+        },
+        {
+          "topic": "SUSE Linux",
+          "have": "intermediate",
+          "want": null
+        },
+        {
+          "topic": "macOS",
+          "have": "advanced",
+          "want": null
+        },
+        {
+          "topic": "Microsoft Windows",
+          "have": "advanced",
+          "want": null
+        },
+        {
+          "topic": "NGINX",
+          "have": "intermediate",
+          "want": null
+        },
+        {
+          "topic": "GraphQL",
+          "have": "advanced",
+          "want": "expert"
+        },
+        {
+          "topic": "Microservices",
+          "have": "advanced",
+          "want": "expert"
+        },
+        {
+          "topic": "RegExp",
+          "have": "advanced",
+          "want": "expert"
+        },
+        {
+          "topic": "Jest",
+          "have": "intermediate",
+          "want": "expert"
+        },
+        {
+          "topic": "Jasmine",
+          "have": "advanced",
+          "want": "expert"
+        },
+        {
+          "topic": "Karma",
+          "have": "advanced",
+          "want": "expert"
+        },
+        {
+          "topic": "Figma",
+          "have": "advanced",
+          "want": "expert"
+        },
+        {
+          "topic": "Node.js",
+          "have": "advanced",
+          "want": "expert"
+        },
+        {
+          "topic": "Express.js",
+          "have": "advanced",
+          "want": "expert"
+        },
+        {
+          "topic": "Chrome Extensions",
+          "have": "intermediate",
+          "want": "expert"
+        },
+        {
+          "topic": "NoSQL",
+          "have": "advanced",
+          "want": "expert"
+        },
+        {
+          "topic": "WebStorm",
+          "have": "advanced",
+          "want": "expert"
+        },
+        {
+          "topic": "IntelliJ IDEA",
+          "have": "advanced",
+          "want": "expert"
+        },
+        {
+          "topic": "Android Studio",
+          "have": "advanced",
+          "want": "expert"
+        },
+        {
+          "topic": "Visual Studio",
+          "have": "advanced",
+          "want": null
+        },
+        {
+          "topic": "Visual Studio Code",
+          "have": "intermediate",
+          "want": "expert"
+        },
+        {
+          "topic": "Vim",
+          "have": "intermediate",
+          "want": null
+        },
+        {
+          "topic": "PostgreSQL",
+          "have": "advanced",
+          "want": null
+        },
+        {
+          "topic": "MySQL",
+          "have": "advanced",
+          "want": null
+        },
+        {
+          "topic": "Oracle",
+          "have": "advanced",
+          "want": null
+        },
+        {
+          "topic": "IndexedDB",
+          "have": "advanced",
+          "want": "expert"
+        },
+        {
+          "topic": "WordPress",
+          "have": "intermediate",
+          "want": null
+        },
+        {
+          "topic": "Font Awesome",
+          "have": "advanced",
+          "want": "expert"
+        },
+        {
+          "topic": "VirtualBox",
+          "have": "advanced",
+          "want": null
+        },
+        {
+          "topic": "Blender",
+          "have": "intermediate",
+          "want": "advanced"
+        },
+        {
+          "topic": "Adobe Illustrator",
+          "have": "advanced",
+          "want": "expert"
+        },
+        {
+          "topic": "Adobe Photoshop",
+          "have": "intermediate",
+          "want": "advanced"
+        },
+        {
+          "topic": "Adobe Creative Cloud",
+          "have": "intermediate",
+          "want": "advanced"
+        },
+        {
+          "topic": "Affinity Designer",
+          "have": "advanced",
+          "want": "expert"
+        },
+        {
+          "topic": "GIMP",
+          "have": "advanced",
+          "want": null
+        },
+        {
+          "topic": "Inkscape",
+          "have": "advanced",
+          "want": null
+        },
+        {
+          "topic": "Google Play",
+          "have": "advanced",
+          "want": "expert"
+        },
+        {
+          "topic": "Customer Support",
+          "have": "intermediate",
+          "want": "advanced"
+        },
+        {
+          "topic": "Agile",
+          "have": "advanced",
+          "want": "expert"
+        },
+        {
+          "topic": "Scrum",
+          "have": "advanced",
+          "want": "expert"
+        },
+        {
+          "topic": "ALM - Application Lifecycle Management",
+          "have": "advanced",
+          "want": "expert"
+        },
+        {
+          "topic": "Algorithms",
+          "have": "advanced",
+          "want": "expert"
+        },
+        {
+          "topic": "Data Structures",
+          "have": "advanced",
+          "want": "expert"
+        },
+        {
+          "topic": "OOP - Object Oriented Programming",
+          "have": "advanced",
+          "want": "expert"
+        },
+        {
+          "topic": "SOLID Principles",
+          "have": "advanced",
+          "want": "expert"
+        },
+        {
+          "topic": "FP - Functional Programming",
+          "have": "advanced",
+          "want": "expert"
+        },
+        {
+          "topic": "Design Patterns",
+          "have": "advanced",
+          "want": "expert"
+        },
+        {
+          "topic": "Antipatterns",
+          "have": "advanced",
+          "want": "expert"
+        },
+        {
+          "topic": "Software Architecture",
+          "have": "advanced",
+          "want": "expert"
+        },
+        {
+          "topic": "Hexagonal Architecture",
+          "have": "advanced",
+          "want": "expert"
+        },
+        {
+          "topic": "Refactoring",
+          "have": "advanced",
+          "want": "expert"
+        },
+        {
+          "topic": "Code Review",
+          "have": "advanced",
+          "want": "expert"
+        },
+        {
+          "topic": "TDD - Test-Driven Development",
+          "have": "advanced",
+          "want": "expert"
+        },
+        {
+          "topic": "BDD - Behavior-Driven Development",
+          "have": "advanced",
+          "want": "expert"
+        },
+        {
+          "topic": "DSL - Domain-Specific Languages",
+          "have": "intermediate",
+          "want": "expert"
+        },
+        {
+          "topic": "Making Presentations",
+          "have": "advanced",
+          "want": "expert"
+        },
+        {
+          "topic": "Leadership",
+          "have": "advanced",
+          "want": "expert"
+        },
+        {
+          "topic": "Performance Optimization",
+          "have": "advanced",
+          "want": "expert"
+        },
+        {
+          "topic": "Performance Profiling",
+          "have": "advanced",
+          "want": "expert"
+        },
+        {
+          "topic": "UX - User Experience",
+          "have": "advanced",
+          "want": "expert"
+        },
+        {
+          "topic": "Troubleshooting",
+          "have": "advanced",
+          "want": "expert"
+        },
+        {
+          "topic": "Graphic Design",
+          "have": "intermediate",
+          "want": "expert"
+        },
+        {
+          "topic": "Testing",
+          "have": "advanced",
+          "want": "expert"
+        },
+        {
+          "topic": "Lighthouse",
+          "have": null,
+          "want": null
+        },
+        {
+          "topic": "three.js",
+          "have": null,
+          "want": null
+        },
+        {
+          "topic": "WebGL",
+          "have": null,
+          "want": null
+        },
+        {
+          "topic": "glTF",
+          "have": null,
+          "want": null
+        }
+      ]
+    }
+  ]
+}

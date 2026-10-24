@@ -1,0 +1,51 @@
+{
+  "name": "CvAgent",
+  "version": 2,
+  "managedBy": "CDK",
+  "runtimes": [
+    {
+      "name": "agent",
+      "build": "CodeZip",
+      "modelProvider": "Bedrock",
+      "entrypoint": "main.py",
+      "codeLocation": "app/agent",
+      "runtimeVersion": "PYTHON_3_14",
+      "protocol": "HTTP"
+    }
+  ],
+  "memories": [
+    {
+      "name": "agentMemory",
+      "eventExpiryDuration": 30,
+      "strategies": [
+        {
+          "type": "SEMANTIC",
+          "namespaceTemplates": [
+            "/users/{actorId}/facts"
+          ]
+        },
+        {
+          "type": "USER_PREFERENCE",
+          "namespaceTemplates": [
+            "/users/{actorId}/preferences"
+          ]
+        },
+        {
+          "type": "SUMMARIZATION",
+          "namespaceTemplates": [
+            "/summaries/{actorId}/{sessionId}"
+          ]
+        },
+        {
+          "type": "EPISODIC",
+          "namespaceTemplates": [
+            "/episodes/{actorId}/{sessionId}"
+          ],
+          "reflectionNamespaceTemplates": [
+            "/episodes/{actorId}"
+          ]
+        }
+      ]
+    }
+  ]
+}

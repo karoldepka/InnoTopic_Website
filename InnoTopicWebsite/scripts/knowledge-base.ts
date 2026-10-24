@@ -77,3 +77,31 @@ export function knowledgeBaseDocuments(): KnowledgeBaseDocument[] {
   const organisations = Object.entries(WorkOrganisationsAndProjectsData.instance) as [string, Organisation][];
   return [...organisations.map(([name, org], i) => organisationDocument(name, org, i + 1)), skillsDocument()];
 }
+
+/** The same work history as structured data, for tools that filter it (by technology, year, ...). */
+export function workHistoryData() {
+  const organisations = Object.entries(WorkOrganisationsAndProjectsData.instance) as [string, Organisation][];
+  return {
+    person: PERSON,
+    organisations: organisations.map(([name, org]) => ({
+      name,
+      period: org.time.join(' – '),
+      startYear: year(org.time[0]),
+      endYear: year(org.time[org.time.length - 1]),
+      locations: org.locations ?? null,
+      description: org.description ? plainText(org.description) : null,
+      projects: Object.entries(org.projects).map(([projectName, project]) => ({
+        name: plainText(projectName),
+        roles: project.roles ? plainText(project.roles) : null,
+        description: project.description ? plainText(project.description) : null,
+        technologies: Object.keys(project.topicsById ?? {}),
+      })),
+    })),
+    skills: Object.values(workExperience).map(group => ({
+      group: group.title,
+      comment: group.comment,
+      topics: Object.entries(group.topics as Record<string, { skillLevels?: { have?: string; want?: string } }>)
+        .map(([topic, value]) => ({ topic, have: value.skillLevels?.have ?? null, want: value.skillLevels?.want ?? null })),
+    })),
+  };
+}
