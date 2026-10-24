@@ -1,7 +1,0 @@
-[project]
-name = "work-history-tools"
-version = "0.1.0"
-description = "AgentCore Gateway Lambda tools over Karol's work history (handler.py, work-history.json)"
-requires-python = ">=3.13"
-# The standard library suffices.
-dependencies = []

@@ -17,3 +17,6 @@ agentcore/.cli/*
 
 # CDK
 agentcore/cdk/cdk.out/
+
+# AgentCore CLI build cache (packaged code and its dependencies)
+agentcore/.cache/
