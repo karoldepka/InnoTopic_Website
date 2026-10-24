@@ -92,3 +92,13 @@ export const MODEL_NAME: string = (() => {
 })();
 
 export const llm: LanguageModel = provider.createModel(MODEL_NAME);
+
+/** Output-token cap for calls that can produce long output (category trees, Q&A batches, chat).
+ * Without one, some providers silently apply a small default - Bedrock's Nova stopped Q&A
+ * generation after ~2k tokens, mid-JSON - while exceeding a model's own cap is rejected outright
+ * (Nova: 10,000). AI_MAX_OUTPUT_TOKENS overrides the per-model default. */
+export const MAX_OUTPUT_TOKENS: number = (() => {
+  const configured = Number(process.env['AI_MAX_OUTPUT_TOKENS']);
+  if (Number.isInteger(configured) && configured > 0) return configured;
+  return MODEL_NAME.toLowerCase().includes('nova-') ? 10_000 : 16_000;
+})();

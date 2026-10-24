@@ -1,6 +1,6 @@
 import { Hono } from 'hono';
 import { streamText } from 'ai';
-import { llm, MODEL_NAME } from '../llm.js';
+import { llm, MAX_OUTPUT_TOKENS, MODEL_NAME } from '../llm.js';
 import { buildCopilotMessages } from '../prompts.js';
 import { sseData, sseStreamResponse } from '../utils.js';
 import { logStreamLanguageModelCost } from '../ai-cost.js';
@@ -15,6 +15,7 @@ async function handleCopilotAgui(c: import('hono').Context) {
   const prompt = buildCopilotMessages(messages);
   const result = streamText({
     model: llm,
+    maxOutputTokens: MAX_OUTPUT_TOKENS,
     system: prompt.system,
     messages: prompt.messages,
     experimental_telemetry: { isEnabled: true, functionId: 'copilotkit-agui' },

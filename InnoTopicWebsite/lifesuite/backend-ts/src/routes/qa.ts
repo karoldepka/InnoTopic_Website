@@ -2,7 +2,7 @@ import { Hono } from 'hono';
 import { streamText, generateObject } from 'ai';
 import { z } from 'zod';
 import postgres from 'postgres';
-import { llm, MODEL_NAME } from '../llm.js';
+import { llm, MAX_OUTPUT_TOKENS, MODEL_NAME } from '../llm.js';
 import { webSearch } from '../web-search.js';
 import { buildQAMessages } from '../prompts.js';
 import { textStreamResponse, stripJsonFences } from '../utils.js';
@@ -76,6 +76,7 @@ async function handleQAStream(c: import('hono').Context) {
 
   const result = streamText({
     model: llm,
+    maxOutputTokens: MAX_OUTPUT_TOKENS,
     system,
     messages,
     maxRetries: 0,
@@ -101,6 +102,7 @@ async function handleQA(c: import('hono').Context) {
   // Keep that complexity at the SDK boundary; the response is still runtime-validated by Zod.
   const result = await (generateObject as any)({
     model: llm,
+    maxOutputTokens: MAX_OUTPUT_TOKENS,
     schema: questionAnswerResponseSchema,
     system,
     messages,

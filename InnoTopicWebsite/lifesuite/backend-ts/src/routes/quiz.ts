@@ -1,6 +1,6 @@
 import { Hono } from 'hono';
 import { streamText, generateText } from 'ai';
-import { llm, MODEL_NAME } from '../llm.js';
+import { llm, MAX_OUTPUT_TOKENS, MODEL_NAME } from '../llm.js';
 import { webSearch } from '../web-search.js';
 import { buildAnswerMessages, buildSuggestCategoriesMessages, parseSuggestedCategories } from '../prompts.js';
 import { textStreamResponse } from '../utils.js';
@@ -42,6 +42,7 @@ async function handleGenerateAnswerStream(c: import('hono').Context) {
 
   const result = streamText({
     model: llm,
+    maxOutputTokens: MAX_OUTPUT_TOKENS,
     system,
     messages,
     experimental_telemetry: { isEnabled: true, functionId: 'generate-answer-stream' },
@@ -93,6 +94,7 @@ async function handleRawPrompt(c: import('hono').Context) {
   const { prompt } = await c.req.json<{ prompt: string }>();
   const result = await generateText({
     model: llm,
+    maxOutputTokens: MAX_OUTPUT_TOKENS,
     prompt,
     maxRetries: 0,
   });
@@ -104,6 +106,7 @@ async function handleRawPromptStream(c: import('hono').Context) {
   const { prompt } = await c.req.json<{ prompt: string }>();
   const result = streamText({
     model: llm,
+    maxOutputTokens: MAX_OUTPUT_TOKENS,
     prompt,
     maxRetries: 0,
   });

@@ -1,7 +1,7 @@
 import { Hono } from 'hono';
 import { streamText, generateObject } from 'ai';
 import { z } from 'zod';
-import { llm, MODEL_NAME } from '../llm.js';
+import { llm, MAX_OUTPUT_TOKENS, MODEL_NAME } from '../llm.js';
 import { webSearch } from '../web-search.js';
 import { loadExistingCategories } from '../existing-categories.js';
 import { buildCategoryTreeMessages, buildMoreSubcategoriesMessages } from '../prompts.js';
@@ -115,6 +115,7 @@ async function handleCategoryTreeStream(c: import('hono').Context) {
 
   const result = streamText({
     model: llm,
+    maxOutputTokens: MAX_OUTPUT_TOKENS,
     system,
     messages,
     maxRetries: 0,
@@ -139,6 +140,7 @@ async function handleCategoryTreeStreamSSE(c: import('hono').Context) {
 
   const result = streamText({
     model: llm,
+    maxOutputTokens: MAX_OUTPUT_TOKENS,
     system,
     messages,
     maxRetries: 0,
@@ -172,6 +174,7 @@ async function handleCategoryTree(c: import('hono').Context) {
   // Keep that complexity at the SDK boundary; the response is still runtime-validated by Zod.
   const result = await (generateObject as any)({
     model: llm,
+    maxOutputTokens: MAX_OUTPUT_TOKENS,
     schema: categoryTreeResponseSchema,
     system,
     messages,
@@ -198,6 +201,7 @@ async function handleMoreSubcategories(c: import('hono').Context) {
 
   const result = streamText({
     model: llm,
+    maxOutputTokens: MAX_OUTPUT_TOKENS,
     system,
     messages,
     maxRetries: 0,
