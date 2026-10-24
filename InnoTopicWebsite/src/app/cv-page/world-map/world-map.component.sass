@@ -28,6 +28,19 @@
   vector-effect: non-scaling-stroke
   opacity: 0.14
 
+// The land's texture: hatching in the background color over the land (which is the primary color), so
+// it reads on any theme; the land itself is its alpha mask.
+.land-mask
+  mask-type: alpha
+
+.land-texture-line
+  stroke: var(--ion-background-color, #fff)
+  stroke-width: 0.35
+
+.land-texture
+  opacity: 0.16
+  pointer-events: none
+
 .marker-light
   stop-color: var(--ion-color-secondary-tint, rgb(0, 249, 0))
 
@@ -107,5 +120,6 @@
 
   .texture,
   .graticule,
+  .land-texture,
   .world-map-tooltip
     display: none

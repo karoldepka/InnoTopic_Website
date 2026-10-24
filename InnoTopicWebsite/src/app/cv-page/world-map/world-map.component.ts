@@ -47,7 +47,13 @@ let nextId = 0;
 export class WorldMapComponent {
   protected readonly width = MAP_WIDTH;
   protected readonly height = MAP_HEIGHT;
-  protected readonly ids = { texture: `world-map-texture-${nextId}`, marker: `world-map-marker-${nextId++}` };
+  protected readonly ids = (id => ({
+    texture: `world-map-texture-${id}`,
+    marker: `world-map-marker-${id}`,
+    land: `world-map-land-${id}`,
+    landTexture: `world-map-land-texture-${id}`,
+    landMask: `world-map-land-mask-${id}`,
+  }))(nextId++);
   protected readonly graticule = graticulePath();
   protected readonly cities: CityMarker[] = MAP_CITIES.map(city => {
     const left = city.x / MAP_WIDTH;

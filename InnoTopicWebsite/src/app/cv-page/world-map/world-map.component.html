@@ -4,6 +4,14 @@
       <pattern [attr.id]="ids.texture" width="3" height="3" patternUnits="userSpaceOnUse">
         <circle class="texture-dot" cx="1.5" cy="1.5" r="0.3" />
       </pattern>
+      <!-- The land's own texture: fine diagonal hatching, shown only on the land through its mask. -->
+      <pattern [attr.id]="ids.landTexture" width="2.4" height="2.4" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+        <line class="land-texture-line" x1="0" y1="0" x2="0" y2="2.4" />
+      </pattern>
+      <!-- An alpha mask: wherever the land is drawn (opaque), the texture shows. -->
+      <mask [attr.id]="ids.landMask" class="land-mask" maskUnits="userSpaceOnUse" x="0" y="0" [attr.width]="width" [attr.height]="height">
+        <use [attr.href]="'#' + ids.land" />
+      </mask>
       <!-- Markers keep the original art's light-to-dark gradient, built from the secondary color. -->
       <linearGradient [attr.id]="ids.marker">
         <stop offset="0" class="marker-light" />
@@ -13,7 +21,8 @@
 
     <rect class="texture" [attr.width]="width" [attr.height]="height" [attr.fill]="'url(#' + ids.texture + ')'" />
     <path class="graticule" [attr.d]="graticule" />
-    <g appWorldMapLand></g>
+    <g appWorldMapLand [attr.id]="ids.land"></g>
+    <rect class="land-texture" [attr.width]="width" [attr.height]="height" [attr.fill]="'url(#' + ids.landTexture + ')'" [attr.mask]="'url(#' + ids.landMask + ')'" />
 
     @for (city of cities; track city.label) {
       <g
