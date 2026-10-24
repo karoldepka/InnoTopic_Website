@@ -89,8 +89,18 @@ tech:hover
   overflow: scroll
 
 
+// Fits narrower screens by scaling down (its viewBox keeps the proportions), rather than overflowing
+// the centered container on both sides.
 #topics-graph-d3
   display: inline-block
+  max-width: 100%
+  height: auto
+
+// Spans the row (also as a flex item, which would otherwise shrink to the graph's width), so its
+// container centers the graph.
+app-topics-graph
+  display: block
+  width: 100%
 
 // Positions the clicked node's info blurb (placed by positionInfo()).
 .topics-graph-container
